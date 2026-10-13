@@ -55,6 +55,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 13 | Reduce fused output owners to native16x8 Tensor Core tiles | 0.2953 | 0.681080 | regression |
 
+| 14 | 16x8 B fill across a full warp | 0.3673 | 0.678265 | screened; numerical gate failed; structural validation pending |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -515,3 +517,45 @@ experiments have not been silently marked complete in PLAN.
 - **Analysis:** Predeclared quick20/5/1 launch signal. Primary128..1024 geometric gain vs prior observed envelope=0.642482x (prior includes full100-call batch samples, signal-only cross-protocol comparison; final same-binary full repeat required). bf16 128^3 5.139us Dense/SW=0.808x best-prior/SW=0.903x; fp16 128^3 5.373us Dense/SW=0.767x best-prior/SW=0.890x; bf16 256^3 8.170us Dense/SW=0.647x best-prior/SW=0.782x; fp16 256^3 8.296us Dense/SW=0.582x best-prior/SW=0.772x; bf16 512^3 14.478us Dense/SW=0.424x best-prior/SW=0.820x; fp16 512^3 14.622us Dense/SW=0.418x best-prior/SW=0.807x; bf16 1024^3 65.978us Dense/SW=0.196x best-prior/SW=0.301x; fp16 1024^3 65.354us Dense/SW=0.155x best-prior/SW=0.300x. Narrow owner doubles CTA coverage and halves P fragment, but repeats A transforms and retains B lane<16 instruction sequence. All18numerical gatesfail finite. Iter12 complete GPU structural/bitwise4/7/8/9/10 PASS and three10sanitizers0errors0warnings. Reassess current compiler/timeline, primary CUDA/CUTLASS docs and logs before next source iteration; viable next B all-lane four-element vector optimization is already CPU-reviewed.
 - **Next:** Reassess and GPUvalidate11; then measure all-lane four-element B fill variant12.
 - **Archive:** trajectory/20261013_135613_iter-13/
+
+### Reassessment after iterations 11–13 (small matrices)
+
+The aggregate128–1024 score of each new path has not exceeded the best prior paths for three trials; variant10 nevertheless improved128/256 and remains the tiny winner. Thus no blanket plateau or hardware floor is inferred from this aggregate. The logs preserve the per-shape distinction. The current H100 is clock-unlocked; comparing own latency is an iteration signal, while same-binary100/5/3 alternating Dense/candidate and separate launch/Graph are required at closure.
+
+Nsight Systems128 BF16 traces show one GPU kernel and no memory-transfer activity: productfast10=4.032us; native16x8_11=4.512us. The profiled host API duration is heavily inflated and is not used as steady-state overhead. These kernel durations are close to, but below, their ordinary-launch event measurements4.642/5.139us: GPU work remains material, so a launch-floor stop is unsupported. ncu remains unavailable after the original single failed probe; it is not retried. Full GPU structural/dyadic bitwise4/7/8/9/10/11 passes; variant11 memcheck/racecheck/synccheck have0errors0warnings.
+
+Re-read primary sources: [CUDA12.4.1 instruction/control-flow guidance](https://docs.nvidia.com/cuda/archive/12.4.1/cuda-c-programming-guide/index.html#maximize-instruction-throughput), [CUTLASS3.5.1 native Sm80 MMA definitions](https://github.com/NVIDIA/cutlass/blob/v3.5.1/include/cute/arch/mma_sm80.hpp), [CUDA12.4.1 DSM lifecycle](https://docs.nvidia.com/cuda/archive/12.4.1/cuda-c-programming-guide/index.html#distributed-shared-memory), and [explicit rounding/FMA control](https://docs.nvidia.com/cuda/archive/12.4.0/pdf/Floating_Point_on_NVIDIA_GPU.pdf). These support instruction reduction and synchronization design, not a promised speedup. Lower-precision half2 preadds would violate the FP32 S/T contract and are excluded.
+
+Viable directions remain and are CPU-reviewed: (1) all32 B lanes each4elements instead of half-warp8elements to halve issued conversion work; (2) cluster8 with one product per CTA to spread sparse tiny work while protecting DSM with two cluster barriers; (3) float2 output and32bit tile counters,64bit stride products; (4) immutable alpha1/beta0 output specialization. Continue testing these independently before final full repeats. Evidence: results/timeline_small_mma10_reassess.txt, results/timeline_small_mma11_reassess.txt, results/small_sass_reassessment_iter13.json and trajectory iterations11–13.
+
+### Iter 14 — 16x8 B fill across a full warp
+
+- **Hypothesis:** Assign four B elements to every lane instead of eight to half the warp to reduce issued conversion and predicate work while preserving the fixed SW DAG.
+- **Changes:** Added Mega12 with uint2 B loads and shared stores, two final RN conversion pairs per lane, the existing full-tile guards, zero workspace, and explicit alpha RN then beta FMA; retained Mega11 and all earlier variants.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.678265 ms; mean speedup=0.3673x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.005992 | 0.004992 | 1.2003 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.005981 | 0.005179 | 1.1548 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.006013 | 0.007541 | 0.7974 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.005990 | 0.007566 | 0.7917 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.006549 | 0.013683 | 0.4786 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.006619 | 0.013669 | 0.4843 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.013790 | 0.066320 | 0.2079 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.010413 | 0.066200 | 0.1573 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.032184 | 0.522301 | 0.0616 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.033318 | 0.514770 | 0.0647 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.086234 | 1.610298 | 0.0536 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.089186 | 1.575963 | 0.0566 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.195517 | 3.830817 | 0.0510 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.206056 | 3.829974 | 0.0538 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.009198 | 0.034874 | 0.2638 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.009229 | 0.034979 | 0.2638 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.008027 | 0.034798 | 0.2307 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_warp_mma_16x8_vec4 v12 | launch | 0.008334 | 0.034853 | 0.2391 | 0.00075151 | 0 |
+
+- **Analysis:** Quick 20-call five-group screening completed for all 18 rows; all rows are finite and all frozen numerical gates fail, yielding exit 2. Results are archived at trajectory/20261013_140256_iter-14. Performance must be compared per primary shape against the prior best envelope after closure; this quick run is a screening signal and does not certify speedup. The preceding CUDA/CUTLASS, SASS, and Nsight Systems reassessment identified remaining measurable GPU work and further viable directions.
+- **Next:** Validate Mega12 structural and bitwise behavior with all three sanitizers, then test portable eight-CTA product clusters as the next separate iteration.
+- **Archive:** trajectory/20261013_140256_iter-14/

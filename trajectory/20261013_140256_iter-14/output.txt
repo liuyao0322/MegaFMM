@@ -1,0 +1,514 @@
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[  5%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 17%] Building CUDA object CMakeFiles/megafmm.dir/solution/combine_fp32.cu.o
+[ 17%] Building CUDA object CMakeFiles/megafmm.dir/solution/pack_winograd.cu.o
+[ 23%] Building CUDA object CMakeFiles/megafmm.dir/solution/gemm_hopper.cu.o
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2012scale_kernelILb1EEEvPKfPfllllf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2012scale_kernelILb1EEEvPKfPfllllf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 22 registers
+ptxas info    : Compiling entry function '_ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2012scale_kernelILb0EEEvPKfPfllllf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2012scale_kernelILb0EEEvPKfPfllllf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 22 registers
+ptxas info    : Compiling entry function '_ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2014combine_kernelILb1EEEvPKfS4_Pfllllff' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2014combine_kernelILb1EEEvPKfS4_Pfllllff
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 30 registers
+ptxas info    : Compiling entry function '_ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2014combine_kernelILb0EEEvPKfS4_Pfllllff' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2014combine_kernelILb0EEEvPKfS4_Pfllllff
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 28 registers
+ptxas info    : Compiling entry function '_ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2021combine_vector_kernelILb1EEEvPKfS4_Pfllllff' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2021combine_vector_kernelILb1EEEvPKfS4_Pfllllff
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 50 registers
+ptxas info    : Compiling entry function '_ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2021combine_vector_kernelILb0EEEvPKfS4_Pfllllff' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2021combine_vector_kernelILb0EEEvPKfS4_Pfllllff
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers
+[ 29%] Building CUDA object CMakeFiles/megafmm.dir/solution/gemm_batched.cu.o
+[ 35%] Building CUDA object CMakeFiles/megafmm.dir/solution/megakernel_hopper.cu.o
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_vector_kernelI6__halfLb0EEEvPKT_PS4_lll' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_vector_kernelI6__halfLb0EEEvPKT_PS4_lll
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 33 registers
+ptxas info    : Compiling entry function '_ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_vector_kernelI13__nv_bfloat16Lb0EEEvPKT_PS4_lll' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_vector_kernelI13__nv_bfloat16Lb0EEEvPKT_PS4_lll
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers
+ptxas info    : Compiling entry function '_ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_vector_kernelI6__halfLb1EEEvPKT_PS4_lll' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_vector_kernelI6__halfLb1EEEvPKT_PS4_lll
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers
+ptxas info    : Compiling entry function '_ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_vector_kernelI13__nv_bfloat16Lb1EEEvPKT_PS4_lll' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_vector_kernelI13__nv_bfloat16Lb1EEEvPKT_PS4_lll
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 39 registers
+ptxas info    : Compiling entry function '_ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_inputs_kernelI6__halfLb1EEEvNS_7ProblemEPKT_S7_PS5_S8_jj' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_inputs_kernelI6__halfLb1EEEvNS_7ProblemEPKT_S7_PS5_S8_jj
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 54 registers
+ptxas info    : Compiling entry function '_ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_inputs_kernelI13__nv_bfloat16Lb1EEEvNS_7ProblemEPKT_S7_PS5_S8_jj' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_inputs_kernelI13__nv_bfloat16Lb1EEEvNS_7ProblemEPKT_S7_PS5_S8_jj
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 55 registers
+ptxas info    : Compiling entry function '_ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_inputs_kernelI6__halfLb0EEEvNS_7ProblemEPKT_S7_PS5_S8_jj' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_inputs_kernelI6__halfLb0EEEvNS_7ProblemEPKT_S7_PS5_S8_jj
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers
+ptxas info    : Compiling entry function '_ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_inputs_kernelI13__nv_bfloat16Lb0EEEvNS_7ProblemEPKT_S7_PS5_S8_jj' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_inputs_kernelI13__nv_bfloat16Lb0EEEvNS_7ProblemEPKT_S7_PS5_S8_jj
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers
+[ 41%] Building CUDA object CMakeFiles/megafmm.dir/solution/small_mma.cu.o
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock13MmaMultistageINS1_9GemmShapeILi32ELi64ELi32EEENS_9transform11threadblock28PredicatedTileAccessIteratorINS_11MatrixShapeILi32ELi32EEENS_6half_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi32ELi32EEELi64ENSH_ILi4ELi8EEELi8EEENS_5ArrayISD_Li8ELb0EEELb0ENSE_9NoPermuteEEENS9_25RegularTileAccessIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi32EEELi0ESK_Li16EEELNS_4arch14CacheOperation4KindE1ENSA_INSB_ILi32ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi32EEELi64ENSH_ILi8ELi4EEELi8EEESM_Lb0ESN_EENSP_ISW_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0ESZ_Li16EEELSV_1EfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi32EEESD_SR_SD_S12_fSF_NS15_17MmaTensorOpPolicyINST_3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NST_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1H_Li1EEELi3ELNS1_23SharedMemoryClearOptionE0EbEENS_8epilogue11threadblock8EpilogueIS7_S1G_Li1ENS1M_22PredicatedTileIteratorINS1M_26OutputTileOptimalThreadMapINS1M_15OutputTileShapeILi64ELi8ELi1ELi1ELi1EEENS1Q_ILi1ELi4ELi1ELi1ELi4EEELi64ELi4ELi32EEEfLb0ESN_Lb0EEENS1L_4warp24FragmentIteratorTensorOpIS17_S1A_fNSL_IfLi4ELb1EEESF_EENS1V_20TileIteratorTensorOpIS17_S1A_fSF_EENS1M_18SharedLoadIteratorINS1T_18CompactedThreadMapEfLi16EEENS1L_6thread17LinearCombinationIfLi4EffLNS24_9ScaleType4KindE2ELNS_15FloatRoundStyleE2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock13MmaMultistageINS1_9GemmShapeILi32ELi64ELi32EEENS_9transform11threadblock28PredicatedTileAccessIteratorINS_11MatrixShapeILi32ELi32EEENS_6half_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi32ELi32EEELi64ENSH_ILi4ELi8EEELi8EEENS_5ArrayISD_Li8ELb0EEELb0ENSE_9NoPermuteEEENS9_25RegularTileAccessIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi32EEELi0ESK_Li16EEELNS_4arch14CacheOperation4KindE1ENSA_INSB_ILi32ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi32EEELi64ENSH_ILi8ELi4EEELi8EEESM_Lb0ESN_EENSP_ISW_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0ESZ_Li16EEELSV_1EfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi32EEESD_SR_SD_S12_fSF_NS15_17MmaTensorOpPolicyINST_3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NST_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1H_Li1EEELi3ELNS1_23SharedMemoryClearOptionE0EbEENS_8epilogue11threadblock8EpilogueIS7_S1G_Li1ENS1M_22PredicatedTileIteratorINS1M_26OutputTileOptimalThreadMapINS1M_15OutputTileShapeILi64ELi8ELi1ELi1ELi1EEENS1Q_ILi1ELi4ELi1ELi1ELi4EEELi64ELi4ELi32EEEfLb0ESN_Lb0EEENS1L_4warp24FragmentIteratorTensorOpIS17_S1A_fNSL_IfLi4ELb1EEESF_EENS1V_20TileIteratorTensorOpIS17_S1A_fSF_EENS1M_18SharedLoadIteratorINS1T_18CompactedThreadMapEfLi16EEENS1L_6thread17LinearCombinationIfLi4EffLNS24_9ScaleType4KindE2ELNS_15FloatRoundStyleE2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 122 registers
+ptxas info    : Compiling entry function '_ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock13MmaMultistageINS1_9GemmShapeILi64ELi64ELi32EEENS_9transform11threadblock28PredicatedTileAccessIteratorINS_11MatrixShapeILi64ELi32EEENS_6half_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi32ELi64EEELi128ENSH_ILi4ELi8EEELi8EEENS_5ArrayISD_Li8ELb0EEELb0ENSE_9NoPermuteEEENS9_25RegularTileAccessIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi32EEELi0ESK_Li16EEELNS_4arch14CacheOperation4KindE1ENSA_INSB_ILi32ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi32EEELi128ENSH_ILi8ELi4EEELi8EEESM_Lb0ESN_EENSP_ISW_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0ESZ_Li16EEELSV_1EfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi32EEESD_SR_SD_S12_fSF_NS15_17MmaTensorOpPolicyINST_3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NST_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1H_Li1EEELi3ELNS1_23SharedMemoryClearOptionE0EbEENS_8epilogue11threadblock8EpilogueIS7_S1G_Li1ENS1M_22PredicatedTileIteratorINS1M_26OutputTileOptimalThreadMapINS1M_15OutputTileShapeILi64ELi8ELi2ELi1ELi1EEENS1Q_ILi1ELi4ELi1ELi1ELi4EEELi128ELi4ELi32EEEfLb0ESN_Lb0EEENS1L_4warp24FragmentIteratorTensorOpIS17_S1A_fNSL_IfLi4ELb1EEESF_EENS1V_20TileIteratorTensorOpIS17_S1A_fSF_EENS1M_18SharedLoadIteratorINS1T_18CompactedThreadMapEfLi16EEENS1L_6thread17LinearCombinationIfLi4EffLNS24_9ScaleType4KindE2ELNS_15FloatRoundStyleE2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock13MmaMultistageINS1_9GemmShapeILi64ELi64ELi32EEENS_9transform11threadblock28PredicatedTileAccessIteratorINS_11MatrixShapeILi64ELi32EEENS_6half_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi32ELi64EEELi128ENSH_ILi4ELi8EEELi8EEENS_5ArrayISD_Li8ELb0EEELb0ENSE_9NoPermuteEEENS9_25RegularTileAccessIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi32EEELi0ESK_Li16EEELNS_4arch14CacheOperation4KindE1ENSA_INSB_ILi32ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi32EEELi128ENSH_ILi8ELi4EEELi8EEESM_Lb0ESN_EENSP_ISW_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0ESZ_Li16EEELSV_1EfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi32EEESD_SR_SD_S12_fSF_NS15_17MmaTensorOpPolicyINST_3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NST_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1H_Li1EEELi3ELNS1_23SharedMemoryClearOptionE0EbEENS_8epilogue11threadblock8EpilogueIS7_S1G_Li1ENS1M_22PredicatedTileIteratorINS1M_26OutputTileOptimalThreadMapINS1M_15OutputTileShapeILi64ELi8ELi2ELi1ELi1EEENS1Q_ILi1ELi4ELi1ELi1ELi4EEELi128ELi4ELi32EEEfLb0ESN_Lb0EEENS1L_4warp24FragmentIteratorTensorOpIS17_S1A_fNSL_IfLi4ELb1EEESF_EENS1V_20TileIteratorTensorOpIS17_S1A_fSF_EENS1M_18SharedLoadIteratorINS1T_18CompactedThreadMapEfLi16EEENS1L_6thread17LinearCombinationIfLi4EffLNS24_9ScaleType4KindE2ELNS_15FloatRoundStyleE2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 124 registers
+ptxas info    : Compiling entry function '_ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock13MmaMultistageINS1_9GemmShapeILi32ELi64ELi32EEENS_9transform11threadblock28PredicatedTileAccessIteratorINS_11MatrixShapeILi32ELi32EEENS_10bfloat16_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi32ELi32EEELi64ENSH_ILi4ELi8EEELi8EEENS_5ArrayISD_Li8ELb0EEELb0ENSE_9NoPermuteEEENS9_25RegularTileAccessIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi32EEELi0ESK_Li16EEELNS_4arch14CacheOperation4KindE1ENSA_INSB_ILi32ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi32EEELi64ENSH_ILi8ELi4EEELi8EEESM_Lb0ESN_EENSP_ISW_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0ESZ_Li16EEELSV_1EfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi32EEESD_SR_SD_S12_fSF_NS15_17MmaTensorOpPolicyINST_3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NST_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1H_Li1EEELi3ELNS1_23SharedMemoryClearOptionE0EbEENS_8epilogue11threadblock8EpilogueIS7_S1G_Li1ENS1M_22PredicatedTileIteratorINS1M_26OutputTileOptimalThreadMapINS1M_15OutputTileShapeILi64ELi8ELi1ELi1ELi1EEENS1Q_ILi1ELi4ELi1ELi1ELi4EEELi64ELi4ELi32EEEfLb0ESN_Lb0EEENS1L_4warp24FragmentIteratorTensorOpIS17_S1A_fNSL_IfLi4ELb1EEESF_EENS1V_20TileIteratorTensorOpIS17_S1A_fSF_EENS1M_18SharedLoadIteratorINS1T_18CompactedThreadMapEfLi16EEENS1L_6thread17LinearCombinationIfLi4EffLNS24_9ScaleType4KindE2ELNS_15FloatRoundStyleE2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock13MmaMultistageINS1_9GemmShapeILi32ELi64ELi32EEENS_9transform11threadblock28PredicatedTileAccessIteratorINS_11MatrixShapeILi32ELi32EEENS_10bfloat16_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi32ELi32EEELi64ENSH_ILi4ELi8EEELi8EEENS_5ArrayISD_Li8ELb0EEELb0ENSE_9NoPermuteEEENS9_25RegularTileAccessIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi32EEELi0ESK_Li16EEELNS_4arch14CacheOperation4KindE1ENSA_INSB_ILi32ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi32EEELi64ENSH_ILi8ELi4EEELi8EEESM_Lb0ESN_EENSP_ISW_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0ESZ_Li16EEELSV_1EfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi32EEESD_SR_SD_S12_fSF_NS15_17MmaTensorOpPolicyINST_3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NST_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1H_Li1EEELi3ELNS1_23SharedMemoryClearOptionE0EbEENS_8epilogue11threadblock8EpilogueIS7_S1G_Li1ENS1M_22PredicatedTileIteratorINS1M_26OutputTileOptimalThreadMapINS1M_15OutputTileShapeILi64ELi8ELi1ELi1ELi1EEENS1Q_ILi1ELi4ELi1ELi1ELi4EEELi64ELi4ELi32EEEfLb0ESN_Lb0EEENS1L_4warp24FragmentIteratorTensorOpIS17_S1A_fNSL_IfLi4ELb1EEESF_EENS1V_20TileIteratorTensorOpIS17_S1A_fSF_EENS1M_18SharedLoadIteratorINS1T_18CompactedThreadMapEfLi16EEENS1L_6thread17LinearCombinationIfLi4EffLNS24_9ScaleType4KindE2ELNS_15FloatRoundStyleE2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 122 registers
+ptxas info    : Compiling entry function '_ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock13MmaMultistageINS1_9GemmShapeILi64ELi64ELi32EEENS_9transform11threadblock28PredicatedTileAccessIteratorINS_11MatrixShapeILi64ELi32EEENS_10bfloat16_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi32ELi64EEELi128ENSH_ILi4ELi8EEELi8EEENS_5ArrayISD_Li8ELb0EEELb0ENSE_9NoPermuteEEENS9_25RegularTileAccessIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi32EEELi0ESK_Li16EEELNS_4arch14CacheOperation4KindE1ENSA_INSB_ILi32ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi32EEELi128ENSH_ILi8ELi4EEELi8EEESM_Lb0ESN_EENSP_ISW_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0ESZ_Li16EEELSV_1EfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi32EEESD_SR_SD_S12_fSF_NS15_17MmaTensorOpPolicyINST_3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NST_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1H_Li1EEELi3ELNS1_23SharedMemoryClearOptionE0EbEENS_8epilogue11threadblock8EpilogueIS7_S1G_Li1ENS1M_22PredicatedTileIteratorINS1M_26OutputTileOptimalThreadMapINS1M_15OutputTileShapeILi64ELi8ELi2ELi1ELi1EEENS1Q_ILi1ELi4ELi1ELi1ELi4EEELi128ELi4ELi32EEEfLb0ESN_Lb0EEENS1L_4warp24FragmentIteratorTensorOpIS17_S1A_fNSL_IfLi4ELb1EEESF_EENS1V_20TileIteratorTensorOpIS17_S1A_fSF_EENS1M_18SharedLoadIteratorINS1T_18CompactedThreadMapEfLi16EEENS1L_6thread17LinearCombinationIfLi4EffLNS24_9ScaleType4KindE2ELNS_15FloatRoundStyleE2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock13MmaMultistageINS1_9GemmShapeILi64ELi64ELi32EEENS_9transform11threadblock28PredicatedTileAccessIteratorINS_11MatrixShapeILi64ELi32EEENS_10bfloat16_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi32ELi64EEELi128ENSH_ILi4ELi8EEELi8EEENS_5ArrayISD_Li8ELb0EEELb0ENSE_9NoPermuteEEENS9_25RegularTileAccessIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi32EEELi0ESK_Li16EEELNS_4arch14CacheOperation4KindE1ENSA_INSB_ILi32ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi32EEELi128ENSH_ILi8ELi4EEELi8EEESM_Lb0ESN_EENSP_ISW_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0ESZ_Li16EEELSV_1EfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi32EEESD_SR_SD_S12_fSF_NS15_17MmaTensorOpPolicyINST_3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NST_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1H_Li1EEELi3ELNS1_23SharedMemoryClearOptionE0EbEENS_8epilogue11threadblock8EpilogueIS7_S1G_Li1ENS1M_22PredicatedTileIteratorINS1M_26OutputTileOptimalThreadMapINS1M_15OutputTileShapeILi64ELi8ELi2ELi1ELi1EEENS1Q_ILi1ELi4ELi1ELi1ELi4EEELi128ELi4ELi32EEEfLb0ESN_Lb0EEENS1L_4warp24FragmentIteratorTensorOpIS17_S1A_fNSL_IfLi4ELb1EEESF_EENS1V_20TileIteratorTensorOpIS17_S1A_fSF_EENS1M_18SharedLoadIteratorINS1T_18CompactedThreadMapEfLi16EEENS1L_6thread17LinearCombinationIfLi4EffLNS24_9ScaleType4KindE2ELNS_15FloatRoundStyleE2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 124 registers
+/share/home/liuyao/workspace/MegaFMM/solution/small_mma.cu(42): warning #177-D: member "megafmm::<unnamed>::SmallMmaTraits<Element>::WarpSharedBytes [with Element=cutlass::half_t]" was declared but never referenced
+    static constexpr int WarpSharedBytes = WarpElements * sizeof(Element);
+                         ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/solution/small_mma.cu(42): warning #177-D: member "megafmm::<unnamed>::SmallMmaTraits<Element>::WarpSharedBytes [with Element=cutlass::bfloat16_t]" was declared but never referenced
+    static constexpr int WarpSharedBytes = WarpElements * sizeof(Element);
+                         ^
+
+[ 47%] Building CUDA object CMakeFiles/megafmm.dir/solution/small_mma_fast.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/small_mma_fast.cu(43): warning #177-D: member "megafmm::<unnamed>::SmallMmaTraits<Element>::WarpSharedBytes [with Element=cutlass::half_t]" was declared but never referenced
+    static constexpr int WarpSharedBytes = WarpElements * sizeof(Element);
+                         ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/solution/small_mma_fast.cu(43): warning #177-D: member "megafmm::<unnamed>::SmallMmaTraits<Element>::WarpSharedBytes [with Element=cutlass::bfloat16_t]" was declared but never referenced
+    static constexpr int WarpSharedBytes = WarpElements * sizeof(Element);
+                         ^
+
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm45_GLOBAL__N__26d687b6_12_small_mma_cu_a887f2bf16small_mma_kernelIN7cutlass6half_tELi4EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm45_GLOBAL__N__26d687b6_12_small_mma_cu_a887f2bf16small_mma_kernelIN7cutlass6half_tELi4EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 128 registers, 28672 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm45_GLOBAL__N__26d687b6_12_small_mma_cu_a887f2bf16small_mma_kernelIN7cutlass6half_tELi2EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm45_GLOBAL__N__26d687b6_12_small_mma_cu_a887f2bf16small_mma_kernelIN7cutlass6half_tELi2EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, 14336 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm45_GLOBAL__N__26d687b6_12_small_mma_cu_a887f2bf16small_mma_kernelIN7cutlass6half_tELi1EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm45_GLOBAL__N__26d687b6_12_small_mma_cu_a887f2bf16small_mma_kernelIN7cutlass6half_tELi1EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, 7168 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm45_GLOBAL__N__26d687b6_12_small_mma_cu_a887f2bf16small_mma_kernelIN7cutlass10bfloat16_tELi4EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm45_GLOBAL__N__26d687b6_12_small_mma_cu_a887f2bf16small_mma_kernelIN7cutlass10bfloat16_tELi4EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 128 registers, 28672 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm45_GLOBAL__N__26d687b6_12_small_mma_cu_a887f2bf16small_mma_kernelIN7cutlass10bfloat16_tELi2EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm45_GLOBAL__N__26d687b6_12_small_mma_cu_a887f2bf16small_mma_kernelIN7cutlass10bfloat16_tELi2EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, 14336 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm45_GLOBAL__N__26d687b6_12_small_mma_cu_a887f2bf16small_mma_kernelIN7cutlass10bfloat16_tELi1EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm45_GLOBAL__N__26d687b6_12_small_mma_cu_a887f2bf16small_mma_kernelIN7cutlass10bfloat16_tELi1EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, 7168 bytes smem
+[ 52%] Building CUDA object CMakeFiles/megafmm.dir/solution/small_product_mma.cu.o
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m4IN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_Pf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m4IN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_Pf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 233 registers
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m3IN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m3IN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 248 registers
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 150 registers
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m4IN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_Pf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m4IN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_Pf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 233 registers
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m3IN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m3IN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 248 registers
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 150 registers
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass6half_tELi64EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass6half_tELi64EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 254 registers
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass10bfloat16_tELi64EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass10bfloat16_tELi64EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 254 registers
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass6half_tELb0EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass6half_tELb0EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, 7168 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass6half_tELb1EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass6half_tELb1EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, 7168 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass10bfloat16_tELb0EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass10bfloat16_tELb0EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, 7168 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass10bfloat16_tELb1EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass10bfloat16_tELb1EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, 7168 bytes smem
+[ 58%] Building CUDA object CMakeFiles/megafmm.dir/solution/small_product_mma_fast.cu.o
+[ 64%] Building CUDA object CMakeFiles/megafmm.dir/solution/small_mma_16x8.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/small_product_mma.cu(30): warning #177-D: member "megafmm::<unnamed>::ProductMmaTraits<Element>::Threads [with Element=cutlass::half_t]" was declared but never referenced
+    static constexpr int Threads = 32 * Products;
+                         ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/solution/small_product_mma.cu(30): warning #177-D: member "megafmm::<unnamed>::ProductMmaTraits<Element>::Threads [with Element=cutlass::bfloat16_t]" was declared but never referenced
+    static constexpr int Threads = 32 * Products;
+                         ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/small_product_mma_fast.cu(38): warning #177-D: member "megafmm::<unnamed>::FastProductMmaTraits<Element>::Threads [with Element=cutlass::half_t]" was declared but never referenced
+    static constexpr int Threads = 32 * Products;
+                         ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/solution/small_product_mma_fast.cu(38): warning #177-D: member "megafmm::<unnamed>::FastProductMmaTraits<Element>::Threads [with Element=cutlass::bfloat16_t]" was declared but never referenced
+    static constexpr int Threads = 32 * Products;
+                         ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/small_mma_16x8.cu(58): warning #177-D: function "megafmm::<unnamed>::SmallPackedEight::insert" was declared but never referenced
+               void insert(int lane, uint16_t value) {
+                    ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__2fd6794d_20_small_product_mma_cu_36c6146620small_product_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__2fd6794d_20_small_product_mma_cu_36c6146620small_product_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 66 registers, 14336 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__2fd6794d_20_small_product_mma_cu_36c6146620small_product_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__2fd6794d_20_small_product_mma_cu_36c6146620small_product_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 66 registers, 14336 bytes smem
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm50_GLOBAL__N__9edcf2a2_17_small_mma_16x8_cu_ad3bb54d14mma16x8_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm50_GLOBAL__N__9edcf2a2_17_small_mma_16x8_cu_ad3bb54d14mma16x8_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 87 registers, 5376 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm50_GLOBAL__N__9edcf2a2_17_small_mma_16x8_cu_ad3bb54d14mma16x8_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm50_GLOBAL__N__9edcf2a2_17_small_mma_16x8_cu_ad3bb54d14mma16x8_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 87 registers, 5376 bytes smem
+[ 70%] Building CUDA object CMakeFiles/megafmm.dir/solution/small_mma_16x8_vec4.cu.o
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm58_GLOBAL__N__47a870d1_25_small_product_mma_fast_cu_4e96df1425small_product_fast_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm58_GLOBAL__N__47a870d1_25_small_product_mma_fast_cu_4e96df1425small_product_fast_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 56 registers, 14336 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm58_GLOBAL__N__47a870d1_25_small_product_mma_fast_cu_4e96df1425small_product_fast_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm58_GLOBAL__N__47a870d1_25_small_product_mma_fast_cu_4e96df1425small_product_fast_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 56 registers, 14336 bytes smem
+/share/home/liuyao/workspace/MegaFMM/solution/small_mma_16x8_vec4.cu(58): warning #177-D: function "megafmm::<unnamed>::SmallPackedEight::insert" was declared but never referenced
+               void insert(int lane, uint16_t value) {
+                    ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm55_GLOBAL__N__20861aad_22_small_mma_16x8_vec4_cu_9b5446ba19mma16x8_vec4_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm55_GLOBAL__N__20861aad_22_small_mma_16x8_vec4_cu_9b5446ba19mma16x8_vec4_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 94 registers, 5376 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm55_GLOBAL__N__20861aad_22_small_mma_16x8_vec4_cu_9b5446ba19mma16x8_vec4_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm55_GLOBAL__N__20861aad_22_small_mma_16x8_vec4_cu_9b5446ba19mma16x8_vec4_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 94 registers, 5376 bytes smem
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi4ENS5_IJNS4_1CILi2EEENSA_ILi1EEESC_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_6half_tENS5_IJlSC_lEEESK_NS5_IJSC_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x256x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSR_1ELNSQ_7ScaleInE1ELSS_1EEEEEENS4_6LayoutISD_NS5_IJSC_NSA_ILi0EEESW_EEEEENS5_IJNS4_10UnderscoreESZ_SZ_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSV_INS5_IJNSA_ILi8EEESI_EEENS5_IJSI_SC_EEEEEEEvNS4_8identityENS4_23SM90_TMA_LOAD_MULTICASTENS13_IS15_S17_NSV_INS5_IJSI_S18_EEENS5_IJSC_SI_EEEEEEEvS1D_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb0ELb1EEEJSJ_NS5_IJSG_NSA_ILi32EEEEEEvSL_fSL_NS1K_6fusion15FusionCallbacksIS1O_NS1R_9ScaledAccIfffLNS_15FloatRoundStyleE2EEESJ_S1Q_JEEES12_NS13_IS15_NS16_ILi32EEENSV_INS5_IJS18_S1P_EEENS5_IJS1P_SC_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESK_EEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi4ENS5_IJNS4_1CILi2EEENSA_ILi1EEESC_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_6half_tENS5_IJlSC_lEEESK_NS5_IJSC_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x256x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSR_1ELNSQ_7ScaleInE1ELSS_1EEEEEENS4_6LayoutISD_NS5_IJSC_NSA_ILi0EEESW_EEEEENS5_IJNS4_10UnderscoreESZ_SZ_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSV_INS5_IJNSA_ILi8EEESI_EEENS5_IJSI_SC_EEEEEEEvNS4_8identityENS4_23SM90_TMA_LOAD_MULTICASTENS13_IS15_S17_NSV_INS5_IJSI_S18_EEENS5_IJSC_SI_EEEEEEEvS1D_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb0ELb1EEEJSJ_NS5_IJSG_NSA_ILi32EEEEEEvSL_fSL_NS1K_6fusion15FusionCallbacksIS1O_NS1R_9ScaledAccIfffLNS_15FloatRoundStyleE2EEESJ_S1Q_JEEES12_NS13_IS15_NS16_ILi32EEENSV_INS5_IJS18_S1P_EEENS5_IJS1P_SC_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESK_EEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers
+ptxas info    : Compiling entry function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi4ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_6half_tENS5_IJlSB_lEEESJ_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x256x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSQ_1ELNSP_7ScaleInE1ELSR_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESX_EEEEENS5_IJNS4_10UnderscoreES10_S10_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSU_INS5_IJNSA_ILi8EEESH_EEENS5_IJSH_SB_EEEEEEEvNS4_8identityES13_NS14_IS16_S18_NSU_INS5_IJSH_S19_EEENS5_IJSB_SH_EEEEEEEvS1E_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb0ELb1EEEJSI_NS5_IJSF_NSA_ILi32EEEEEEvSK_fSK_NS1K_6fusion15FusionCallbacksIS1O_NS1R_9ScaledAccIfffLNS_15FloatRoundStyleE2EEESI_S1Q_JEEES13_NS14_IS16_NS17_ILi32EEENSU_INS5_IJS19_S1P_EEENS5_IJS1P_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESJ_EEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi4ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_6half_tENS5_IJlSB_lEEESJ_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x256x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSQ_1ELNSP_7ScaleInE1ELSR_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESX_EEEEENS5_IJNS4_10UnderscoreES10_S10_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSU_INS5_IJNSA_ILi8EEESH_EEENS5_IJSH_SB_EEEEEEEvNS4_8identityES13_NS14_IS16_S18_NSU_INS5_IJSH_S19_EEENS5_IJSB_SH_EEEEEEEvS1E_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb0ELb1EEEJSI_NS5_IJSF_NSA_ILi32EEEEEEvSK_fSK_NS1K_6fusion15FusionCallbacksIS1O_NS1R_9ScaledAccIfffLNS_15FloatRoundStyleE2EEESI_S1Q_JEEES13_NS14_IS16_NS17_ILi32EEENSU_INS5_IJS19_S1P_EEENS5_IJS1P_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESJ_EEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers
+ptxas info    : Compiling entry function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi8ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_24KernelTmaWarpSpecializedEEENS5_IJNSA_ILi64EEENSA_ILi128EEESF_EEENS_6half_tENS5_IJlSB_lEEESI_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x128x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSP_1ELNSO_7ScaleInE1ELSQ_1EEEEEENS4_6LayoutISC_NS5_IJNSA_ILi0EEESU_SU_EEEEENS5_IJNS4_10UnderscoreESX_SX_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENST_INS5_IJNSA_ILi8EEESF_EEENS5_IJSF_SB_EEEEEEEvNS4_8identityES10_NS11_IS13_S15_NST_INS5_IJSF_S16_EEENS5_IJSB_SF_EEEEEEEvS1B_EENS_8epilogue10collective18CollectiveEpilogueINS1H_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSH_NS5_IJSF_NSA_ILi32EEEEEEfSJ_fSJ_NS1H_6fusion15FusionCallbacksIS1L_NS1O_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESH_S1N_JEEES10_NS11_IS13_NS14_ILi32EEENST_INS5_IJS16_S1M_EEENS5_IJS1M_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES1Y_S20_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESI_EEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi8ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_24KernelTmaWarpSpecializedEEENS5_IJNSA_ILi64EEENSA_ILi128EEESF_EEENS_6half_tENS5_IJlSB_lEEESI_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x128x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSP_1ELNSO_7ScaleInE1ELSQ_1EEEEEENS4_6LayoutISC_NS5_IJNSA_ILi0EEESU_SU_EEEEENS5_IJNS4_10UnderscoreESX_SX_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENST_INS5_IJNSA_ILi8EEESF_EEENS5_IJSF_SB_EEEEEEEvNS4_8identityES10_NS11_IS13_S15_NST_INS5_IJSF_S16_EEENS5_IJSB_SF_EEEEEEEvS1B_EENS_8epilogue10collective18CollectiveEpilogueINS1H_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSH_NS5_IJSF_NSA_ILi32EEEEEEfSJ_fSJ_NS1H_6fusion15FusionCallbacksIS1L_NS1O_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESH_S1N_JEEES10_NS11_IS13_NS14_ILi32EEENST_INS5_IJS16_S1M_EEENS5_IJS1M_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES1Y_S20_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESI_EEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 96 registers
+ptxas info    : Compiling entry function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi3ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_6half_tENS5_IJlSB_lEEESJ_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x256x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSQ_1ELNSP_7ScaleInE1ELSR_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESX_EEEEENS5_IJNS4_10UnderscoreES10_S10_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSU_INS5_IJNSA_ILi8EEESH_EEENS5_IJSH_SB_EEEEEEEvNS4_8identityES13_NS14_IS16_S18_NSU_INS5_IJSH_S19_EEENS5_IJSB_SH_EEEEEEEvS1E_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSI_NS5_IJSF_NSA_ILi32EEEEEEfSK_fSK_NS1K_6fusion15FusionCallbacksIS1O_NS1R_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESI_S1Q_JEEES13_NS14_IS16_NS17_ILi32EEENSU_INS5_IJS19_S1P_EEENS5_IJS1P_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESJ_EEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi3ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_6half_tENS5_IJlSB_lEEESJ_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x256x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSQ_1ELNSP_7ScaleInE1ELSR_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESX_EEEEENS5_IJNS4_10UnderscoreES10_S10_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSU_INS5_IJNSA_ILi8EEESH_EEENS5_IJSH_SB_EEEEEEEvNS4_8identityES13_NS14_IS16_S18_NSU_INS5_IJSH_S19_EEENS5_IJSB_SH_EEEEEEEvS1E_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSI_NS5_IJSF_NSA_ILi32EEEEEEfSK_fSK_NS1K_6fusion15FusionCallbacksIS1O_NS1R_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESI_S1Q_JEEES13_NS14_IS16_NS17_ILi32EEENSU_INS5_IJS19_S1P_EEENS5_IJS1P_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESJ_EEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers
+ptxas info    : Compiling entry function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi5ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEESF_NSA_ILi64EEEEEENS_6half_tENS5_IJlSB_lEEESI_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x128x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSP_1ELNSO_7ScaleInE1ELSQ_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESW_EEEEENS5_IJNS4_10UnderscoreESZ_SZ_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENST_INS5_IJNSA_ILi8EEESG_EEENS5_IJSG_SB_EEEEEEEvNS4_8identityES12_NS13_IS15_S17_NST_INS5_IJSG_S18_EEENS5_IJSB_SG_EEEEEEEvS1D_EENS_8epilogue10collective18CollectiveEpilogueINS1J_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSH_NS5_IJSF_NSA_ILi32EEEEEEfSJ_fSJ_NS1J_6fusion15FusionCallbacksIS1N_NS1Q_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESH_S1P_JEEES12_NS13_IS15_NS16_ILi32EEENST_INS5_IJS18_S1O_EEENS5_IJS1O_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES20_S22_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESI_EEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi5ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEESF_NSA_ILi64EEEEEENS_6half_tENS5_IJlSB_lEEESI_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x128x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSP_1ELNSO_7ScaleInE1ELSQ_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESW_EEEEENS5_IJNS4_10UnderscoreESZ_SZ_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENST_INS5_IJNSA_ILi8EEESG_EEENS5_IJSG_SB_EEEEEEEvNS4_8identityES12_NS13_IS15_S17_NST_INS5_IJSG_S18_EEENS5_IJSB_SG_EEEEEEEvS1D_EENS_8epilogue10collective18CollectiveEpilogueINS1J_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSH_NS5_IJSF_NSA_ILi32EEEEEEfSJ_fSJ_NS1J_6fusion15FusionCallbacksIS1N_NS1Q_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESH_S1P_JEEES12_NS13_IS15_NS16_ILi32EEENST_INS5_IJS18_S1O_EEENS5_IJS1O_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES20_S22_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESI_EEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers
+ptxas info    : Compiling entry function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi4ENS5_IJNS4_1CILi2EEENSA_ILi1EEESC_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_10bfloat16_tENS5_IJlSC_lEEESK_NS5_IJSC_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x256x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSR_1ELNSQ_7ScaleInE1ELSS_1EEEEEENS4_6LayoutISD_NS5_IJSC_NSA_ILi0EEESW_EEEEENS5_IJNS4_10UnderscoreESZ_SZ_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSV_INS5_IJNSA_ILi8EEESI_EEENS5_IJSI_SC_EEEEEEEvNS4_8identityENS4_23SM90_TMA_LOAD_MULTICASTENS13_IS15_S17_NSV_INS5_IJSI_S18_EEENS5_IJSC_SI_EEEEEEEvS1D_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb0ELb1EEEJSJ_NS5_IJSG_NSA_ILi32EEEEEEvSL_fSL_NS1K_6fusion15FusionCallbacksIS1O_NS1R_9ScaledAccIfffLNS_15FloatRoundStyleE2EEESJ_S1Q_JEEES12_NS13_IS15_NS16_ILi32EEENSV_INS5_IJS18_S1P_EEENS5_IJS1P_SC_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi4ENS5_IJNS4_1CILi2EEENSA_ILi1EEESC_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_10bfloat16_tENS5_IJlSC_lEEESK_NS5_IJSC_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x256x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSR_1ELNSQ_7ScaleInE1ELSS_1EEEEEENS4_6LayoutISD_NS5_IJSC_NSA_ILi0EEESW_EEEEENS5_IJNS4_10UnderscoreESZ_SZ_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSV_INS5_IJNSA_ILi8EEESI_EEENS5_IJSI_SC_EEEEEEEvNS4_8identityENS4_23SM90_TMA_LOAD_MULTICASTENS13_IS15_S17_NSV_INS5_IJSI_S18_EEENS5_IJSC_SI_EEEEEEEvS1D_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb0ELb1EEEJSJ_NS5_IJSG_NSA_ILi32EEEEEEvSL_fSL_NS1K_6fusion15FusionCallbacksIS1O_NS1R_9ScaledAccIfffLNS_15FloatRoundStyleE2EEESJ_S1Q_JEEES12_NS13_IS15_NS16_ILi32EEENSV_INS5_IJS18_S1P_EEENS5_IJS1P_SC_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers
+ptxas info    : Compiling entry function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi4ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_10bfloat16_tENS5_IJlSB_lEEESJ_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x256x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSQ_1ELNSP_7ScaleInE1ELSR_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESX_EEEEENS5_IJNS4_10UnderscoreES10_S10_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSU_INS5_IJNSA_ILi8EEESH_EEENS5_IJSH_SB_EEEEEEEvNS4_8identityES13_NS14_IS16_S18_NSU_INS5_IJSH_S19_EEENS5_IJSB_SH_EEEEEEEvS1E_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb0ELb1EEEJSI_NS5_IJSF_NSA_ILi32EEEEEEvSK_fSK_NS1K_6fusion15FusionCallbacksIS1O_NS1R_9ScaledAccIfffLNS_15FloatRoundStyleE2EEESI_S1Q_JEEES13_NS14_IS16_NS17_ILi32EEENSU_INS5_IJS19_S1P_EEENS5_IJS1P_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi4ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_10bfloat16_tENS5_IJlSB_lEEESJ_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x256x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSQ_1ELNSP_7ScaleInE1ELSR_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESX_EEEEENS5_IJNS4_10UnderscoreES10_S10_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSU_INS5_IJNSA_ILi8EEESH_EEENS5_IJSH_SB_EEEEEEEvNS4_8identityES13_NS14_IS16_S18_NSU_INS5_IJSH_S19_EEENS5_IJSB_SH_EEEEEEEvS1E_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb0ELb1EEEJSI_NS5_IJSF_NSA_ILi32EEEEEEvSK_fSK_NS1K_6fusion15FusionCallbacksIS1O_NS1R_9ScaledAccIfffLNS_15FloatRoundStyleE2EEESI_S1Q_JEEES13_NS14_IS16_NS17_ILi32EEENSU_INS5_IJS19_S1P_EEENS5_IJS1P_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers
+ptxas info    : Compiling entry function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi8ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_24KernelTmaWarpSpecializedEEENS5_IJNSA_ILi64EEENSA_ILi128EEESF_EEENS_10bfloat16_tENS5_IJlSB_lEEESI_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x128x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSP_1ELNSO_7ScaleInE1ELSQ_1EEEEEENS4_6LayoutISC_NS5_IJNSA_ILi0EEESU_SU_EEEEENS5_IJNS4_10UnderscoreESX_SX_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENST_INS5_IJNSA_ILi8EEESF_EEENS5_IJSF_SB_EEEEEEEvNS4_8identityES10_NS11_IS13_S15_NST_INS5_IJSF_S16_EEENS5_IJSB_SF_EEEEEEEvS1B_EENS_8epilogue10collective18CollectiveEpilogueINS1H_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSH_NS5_IJSF_NSA_ILi32EEEEEEfSJ_fSJ_NS1H_6fusion15FusionCallbacksIS1L_NS1O_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESH_S1N_JEEES10_NS11_IS13_NS14_ILi32EEENST_INS5_IJS16_S1M_EEENS5_IJS1M_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES1Y_S20_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi8ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_24KernelTmaWarpSpecializedEEENS5_IJNSA_ILi64EEENSA_ILi128EEESF_EEENS_10bfloat16_tENS5_IJlSB_lEEESI_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x128x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSP_1ELNSO_7ScaleInE1ELSQ_1EEEEEENS4_6LayoutISC_NS5_IJNSA_ILi0EEESU_SU_EEEEENS5_IJNS4_10UnderscoreESX_SX_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENST_INS5_IJNSA_ILi8EEESF_EEENS5_IJSF_SB_EEEEEEEvNS4_8identityES10_NS11_IS13_S15_NST_INS5_IJSF_S16_EEENS5_IJSB_SF_EEEEEEEvS1B_EENS_8epilogue10collective18CollectiveEpilogueINS1H_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSH_NS5_IJSF_NSA_ILi32EEEEEEfSJ_fSJ_NS1H_6fusion15FusionCallbacksIS1L_NS1O_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESH_S1N_JEEES10_NS11_IS13_NS14_ILi32EEENST_INS5_IJS16_S1M_EEENS5_IJS1M_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES1Y_S20_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 96 registers
+ptxas info    : Compiling entry function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi3ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_10bfloat16_tENS5_IJlSB_lEEESJ_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x256x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSQ_1ELNSP_7ScaleInE1ELSR_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESX_EEEEENS5_IJNS4_10UnderscoreES10_S10_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSU_INS5_IJNSA_ILi8EEESH_EEENS5_IJSH_SB_EEEEEEEvNS4_8identityES13_NS14_IS16_S18_NSU_INS5_IJSH_S19_EEENS5_IJSB_SH_EEEEEEEvS1E_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSI_NS5_IJSF_NSA_ILi32EEEEEEfSK_fSK_NS1K_6fusion15FusionCallbacksIS1O_NS1R_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESI_S1Q_JEEES13_NS14_IS16_NS17_ILi32EEENSU_INS5_IJS19_S1P_EEENS5_IJS1P_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi3ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_10bfloat16_tENS5_IJlSB_lEEESJ_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x256x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSQ_1ELNSP_7ScaleInE1ELSR_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESX_EEEEENS5_IJNS4_10UnderscoreES10_S10_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSU_INS5_IJNSA_ILi8EEESH_EEENS5_IJSH_SB_EEEEEEEvNS4_8identityES13_NS14_IS16_S18_NSU_INS5_IJSH_S19_EEENS5_IJSB_SH_EEEEEEEvS1E_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSI_NS5_IJSF_NSA_ILi32EEEEEEfSK_fSK_NS1K_6fusion15FusionCallbacksIS1O_NS1R_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESI_S1Q_JEEES13_NS14_IS16_NS17_ILi32EEENSU_INS5_IJS19_S1P_EEENS5_IJS1P_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers
+ptxas info    : Compiling entry function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi5ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEESF_NSA_ILi64EEEEEENS_10bfloat16_tENS5_IJlSB_lEEESI_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x128x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSP_1ELNSO_7ScaleInE1ELSQ_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESW_EEEEENS5_IJNS4_10UnderscoreESZ_SZ_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENST_INS5_IJNSA_ILi8EEESG_EEENS5_IJSG_SB_EEEEEEEvNS4_8identityES12_NS13_IS15_S17_NST_INS5_IJSG_S18_EEENS5_IJSB_SG_EEEEEEEvS1D_EENS_8epilogue10collective18CollectiveEpilogueINS1J_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSH_NS5_IJSF_NSA_ILi32EEEEEEfSJ_fSJ_NS1J_6fusion15FusionCallbacksIS1N_NS1Q_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESH_S1P_JEEES12_NS13_IS15_NS16_ILi32EEENST_INS5_IJS18_S1O_EEENS5_IJS1O_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES20_S22_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE' for 'sm_90a'
+ptxas info    : Function properties for _ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi5ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEESF_NSA_ILi64EEEEEENS_10bfloat16_tENS5_IJlSB_lEEESI_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x128x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSP_1ELNSO_7ScaleInE1ELSQ_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESW_EEEEENS5_IJNS4_10UnderscoreESZ_SZ_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENST_INS5_IJNSA_ILi8EEESG_EEENS5_IJSG_SB_EEEEEEEvNS4_8identityES12_NS13_IS15_S17_NST_INS5_IJSG_S18_EEENS5_IJSB_SG_EEEEEEEvS1D_EENS_8epilogue10collective18CollectiveEpilogueINS1J_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSH_NS5_IJSF_NSA_ILi32EEEEEEfSJ_fSJ_NS1J_6fusion15FusionCallbacksIS1N_NS1Q_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESH_S1P_JEEES12_NS13_IS15_NS16_ILi32EEENST_INS5_IJS18_S1O_EEENS5_IJS1O_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES20_S22_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers
+[ 76%] Linking CXX static library libmegafmm.a
+[ 76%] Built target megafmm
+gmake[2]: Warning: File 'CMakeFiles/test_correctness.dir/compiler_depend.make' has modification time 0.0014 s in the future
+[ 88%] Building CUDA object CMakeFiles/megafmm_bench.dir/bench/benchmark.cu.o
+[ 88%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(79): warning #177-D: variable "ac" was declared but never referenced
+    int ar=p.trans_a ? p.k:p.m, ac=p.trans_a ? p.m:p.k;
+                                ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(80): warning #177-D: variable "bc" was declared but never referenced
+    int br=p.trans_b ? p.n:p.k, bc=p.trans_b ? p.k:p.n;
+                                ^
+
+[ 94%] Linking CXX executable megafmm_bench
+[ 94%] Built target megafmm_bench
+[100%] Linking CXX executable test_correctness
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+[100%] Built target test_correctness
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+CHECK 128,128,128 bf16 trial=0 dense_eF=9.61283e-08 solution_eF=0.00605216 gate=0.00100029 pass=0
+TIME shape=128,128,128 dtype=bf16 group=0 case=dense event_ms=0.0057008 wall_ms=0.00623245
+TIME shape=128,128,128 dtype=bf16 group=0 case=solution event_ms=0.004936 wall_ms=0.0053628
+TIME shape=128,128,128 dtype=bf16 group=1 case=dense event_ms=0.0060064 wall_ms=0.00642965
+TIME shape=128,128,128 dtype=bf16 group=1 case=solution event_ms=0.004992 wall_ms=0.0054079
+TIME shape=128,128,128 dtype=bf16 group=2 case=dense event_ms=0.0063008 wall_ms=0.00673495
+TIME shape=128,128,128 dtype=bf16 group=2 case=solution event_ms=0.004984 wall_ms=0.0053933
+TIME shape=128,128,128 dtype=bf16 group=3 case=solution event_ms=0.0055184 wall_ms=0.00595005
+TIME shape=128,128,128 dtype=bf16 group=3 case=dense event_ms=0.005992 wall_ms=0.00640255
+TIME shape=128,128,128 dtype=bf16 group=4 case=solution event_ms=0.005048 wall_ms=0.00548185
+TIME shape=128,128,128 dtype=bf16 group=4 case=dense event_ms=0.0059184 wall_ms=0.00633915
+CHECK 128,128,128 fp16 trial=0 dense_eF=1.82311e-07 solution_eF=0.000744325 gate=0.000100547 pass=0
+TIME shape=128,128,128 dtype=fp16 group=0 case=dense event_ms=0.0058336 wall_ms=0.006282
+TIME shape=128,128,128 dtype=fp16 group=0 case=solution event_ms=0.0051792 wall_ms=0.00558535
+TIME shape=128,128,128 dtype=fp16 group=1 case=dense event_ms=0.006144 wall_ms=0.00657505
+TIME shape=128,128,128 dtype=fp16 group=1 case=solution event_ms=0.0051392 wall_ms=0.0055481
+TIME shape=128,128,128 dtype=fp16 group=2 case=dense event_ms=0.0060416 wall_ms=0.00646295
+TIME shape=128,128,128 dtype=fp16 group=2 case=solution event_ms=0.005848 wall_ms=0.00625365
+TIME shape=128,128,128 dtype=fp16 group=3 case=solution event_ms=0.0052864 wall_ms=0.00571675
+TIME shape=128,128,128 dtype=fp16 group=3 case=dense event_ms=0.0058112 wall_ms=0.00621165
+TIME shape=128,128,128 dtype=fp16 group=4 case=solution event_ms=0.0050896 wall_ms=0.0055044
+TIME shape=128,128,128 dtype=fp16 group=4 case=dense event_ms=0.0059808 wall_ms=0.0063869
+CHECK 256,256,256 bf16 trial=0 dense_eF=1.86507e-07 solution_eF=0.00597914 gate=0.00100056 pass=0
+TIME shape=256,256,256 dtype=bf16 group=0 case=solution event_ms=0.007496 wall_ms=0.00796665
+TIME shape=256,256,256 dtype=bf16 group=0 case=dense event_ms=0.006272 wall_ms=0.00669175
+TIME shape=256,256,256 dtype=bf16 group=1 case=solution event_ms=0.0075616 wall_ms=0.0079643
+TIME shape=256,256,256 dtype=bf16 group=1 case=dense event_ms=0.0060032 wall_ms=0.0064189
+TIME shape=256,256,256 dtype=bf16 group=2 case=dense event_ms=0.0060128 wall_ms=0.00642365
+TIME shape=256,256,256 dtype=bf16 group=2 case=solution event_ms=0.007528 wall_ms=0.00795575
+TIME shape=256,256,256 dtype=bf16 group=3 case=solution event_ms=0.0075408 wall_ms=0.0079453
+TIME shape=256,256,256 dtype=bf16 group=3 case=dense event_ms=0.0063664 wall_ms=0.0067863
+TIME shape=256,256,256 dtype=bf16 group=4 case=solution event_ms=0.0075952 wall_ms=0.00799845
+TIME shape=256,256,256 dtype=bf16 group=4 case=dense event_ms=0.0057968 wall_ms=0.00622345
+CHECK 256,256,256 fp16 trial=0 dense_eF=3.37859e-07 solution_eF=0.000737165 gate=0.000101014 pass=0
+TIME shape=256,256,256 dtype=fp16 group=0 case=solution event_ms=0.0075552 wall_ms=0.00799575
+TIME shape=256,256,256 dtype=fp16 group=0 case=dense event_ms=0.0064368 wall_ms=0.00686005
+TIME shape=256,256,256 dtype=fp16 group=1 case=solution event_ms=0.0075728 wall_ms=0.00798705
+TIME shape=256,256,256 dtype=fp16 group=1 case=dense event_ms=0.0060368 wall_ms=0.00645495
+TIME shape=256,256,256 dtype=fp16 group=2 case=dense event_ms=0.0059904 wall_ms=0.0064011
+TIME shape=256,256,256 dtype=fp16 group=2 case=solution event_ms=0.0076176 wall_ms=0.0080374
+TIME shape=256,256,256 dtype=fp16 group=3 case=solution event_ms=0.0075664 wall_ms=0.0079715
+TIME shape=256,256,256 dtype=fp16 group=3 case=dense event_ms=0.0058768 wall_ms=0.00628855
+TIME shape=256,256,256 dtype=fp16 group=4 case=solution event_ms=0.0075584 wall_ms=0.00796995
+TIME shape=256,256,256 dtype=fp16 group=4 case=dense event_ms=0.0058592 wall_ms=0.0062765
+CHECK 512,512,512 bf16 trial=0 dense_eF=3.91153e-07 solution_eF=0.00598238 gate=0.00100117 pass=0
+TIME shape=512,512,512 dtype=bf16 group=0 case=solution event_ms=0.0136832 wall_ms=0.0141378
+TIME shape=512,512,512 dtype=bf16 group=0 case=dense event_ms=0.0066336 wall_ms=0.0070519
+TIME shape=512,512,512 dtype=bf16 group=1 case=dense event_ms=0.0064976 wall_ms=0.0069147
+TIME shape=512,512,512 dtype=bf16 group=1 case=solution event_ms=0.013672 wall_ms=0.0140866
+TIME shape=512,512,512 dtype=bf16 group=2 case=solution event_ms=0.0137408 wall_ms=0.0141534
+TIME shape=512,512,512 dtype=bf16 group=2 case=dense event_ms=0.0065984 wall_ms=0.00701535
+TIME shape=512,512,512 dtype=bf16 group=3 case=solution event_ms=0.0136832 wall_ms=0.0140934
+TIME shape=512,512,512 dtype=bf16 group=3 case=dense event_ms=0.0065488 wall_ms=0.00697145
+TIME shape=512,512,512 dtype=bf16 group=4 case=solution event_ms=0.0136912 wall_ms=0.0141129
+TIME shape=512,512,512 dtype=bf16 group=4 case=dense event_ms=0.0064432 wall_ms=0.0068655
+CHECK 512,512,512 fp16 trial=0 dense_eF=6.4198e-07 solution_eF=0.000753207 gate=0.000101926 pass=0
+TIME shape=512,512,512 dtype=fp16 group=0 case=solution event_ms=0.0136432 wall_ms=0.014083
+TIME shape=512,512,512 dtype=fp16 group=0 case=dense event_ms=0.00664 wall_ms=0.00706565
+TIME shape=512,512,512 dtype=fp16 group=1 case=dense event_ms=0.0064112 wall_ms=0.00683975
+TIME shape=512,512,512 dtype=fp16 group=1 case=solution event_ms=0.0136816 wall_ms=0.0141128
+TIME shape=512,512,512 dtype=fp16 group=2 case=solution event_ms=0.0137232 wall_ms=0.0141402
+TIME shape=512,512,512 dtype=fp16 group=2 case=dense event_ms=0.0066048 wall_ms=0.00701345
+TIME shape=512,512,512 dtype=fp16 group=3 case=solution event_ms=0.0136688 wall_ms=0.0140733
+TIME shape=512,512,512 dtype=fp16 group=3 case=dense event_ms=0.007136 wall_ms=0.0075363
+TIME shape=512,512,512 dtype=fp16 group=4 case=solution event_ms=0.0136352 wall_ms=0.0140637
+TIME shape=512,512,512 dtype=fp16 group=4 case=dense event_ms=0.0066192 wall_ms=0.00703215
+CHECK 1024,1024,1024 bf16 trial=0 dense_eF=8.51899e-07 solution_eF=0.00600975 gate=0.00100256 pass=0
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.0662752 wall_ms=0.0667479
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0143296 wall_ms=0.0147564
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.0137904 wall_ms=0.014211
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.0663872 wall_ms=0.0668057
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.0662928 wall_ms=0.0667328
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.0133904 wall_ms=0.0138057
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.06632 wall_ms=0.066742
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.016088 wall_ms=0.0165051
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.013232 wall_ms=0.0136697
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.0663712 wall_ms=0.0667915
+CHECK 1024,1024,1024 fp16 trial=0 dense_eF=1.24851e-06 solution_eF=0.000751819 gate=0.000103746 pass=0
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.0662 wall_ms=0.0666464
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.0104576 wall_ms=0.0109343
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.0104128 wall_ms=0.0108238
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.0661808 wall_ms=0.0666066
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.0663072 wall_ms=0.0667242
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.0104416 wall_ms=0.0108628
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.0662448 wall_ms=0.0666516
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.010408 wall_ms=0.0108168
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.0103248 wall_ms=0.0107259
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.0661648 wall_ms=0.0665755
+CHECK 2048,2048,2048 bf16 trial=0 dense_eF=1.85669e-06 solution_eF=0.00602393 gate=0.00100557 pass=0
+TIME shape=2048,2048,2048 dtype=bf16 group=0 case=dense event_ms=0.032184 wall_ms=0.0327171
+TIME shape=2048,2048,2048 dtype=bf16 group=0 case=solution event_ms=0.522341 wall_ms=0.522771
+TIME shape=2048,2048,2048 dtype=bf16 group=1 case=dense event_ms=0.0323392 wall_ms=0.0327715
+TIME shape=2048,2048,2048 dtype=bf16 group=1 case=solution event_ms=0.523022 wall_ms=0.52346
+TIME shape=2048,2048,2048 dtype=bf16 group=2 case=dense event_ms=0.0335648 wall_ms=0.0339979
+TIME shape=2048,2048,2048 dtype=bf16 group=2 case=solution event_ms=0.522301 wall_ms=0.522736
+TIME shape=2048,2048,2048 dtype=bf16 group=3 case=dense event_ms=0.0317584 wall_ms=0.0321921
+TIME shape=2048,2048,2048 dtype=bf16 group=3 case=solution event_ms=0.515955 wall_ms=0.516534
+TIME shape=2048,2048,2048 dtype=bf16 group=4 case=dense event_ms=0.0321456 wall_ms=0.0325856
+TIME shape=2048,2048,2048 dtype=bf16 group=4 case=solution event_ms=0.514698 wall_ms=0.515141
+CHECK 2048,2048,2048 fp16 trial=0 dense_eF=2.45575e-06 solution_eF=0.000752202 gate=0.000107367 pass=0
+TIME shape=2048,2048,2048 dtype=fp16 group=0 case=dense event_ms=0.0332816 wall_ms=0.0337535
+TIME shape=2048,2048,2048 dtype=fp16 group=0 case=solution event_ms=0.51477 wall_ms=0.51528
+TIME shape=2048,2048,2048 dtype=fp16 group=1 case=dense event_ms=0.0333184 wall_ms=0.03375
+TIME shape=2048,2048,2048 dtype=fp16 group=1 case=solution event_ms=0.515443 wall_ms=0.515892
+TIME shape=2048,2048,2048 dtype=fp16 group=2 case=dense event_ms=0.0338448 wall_ms=0.0342718
+TIME shape=2048,2048,2048 dtype=fp16 group=2 case=solution event_ms=0.514059 wall_ms=0.514521
+TIME shape=2048,2048,2048 dtype=fp16 group=3 case=dense event_ms=0.0331776 wall_ms=0.0336038
+TIME shape=2048,2048,2048 dtype=fp16 group=3 case=solution event_ms=0.516158 wall_ms=0.516585
+TIME shape=2048,2048,2048 dtype=fp16 group=4 case=dense event_ms=0.0334192 wall_ms=0.0340147
+TIME shape=2048,2048,2048 dtype=fp16 group=4 case=solution event_ms=0.513461 wall_ms=0.51389
+CHECK 3072,3072,3072 bf16 trial=0 dense_eF=2.92563e-06 solution_eF=0.00601824 gate=0.00100878 pass=0
+TIME shape=3072,3072,3072 dtype=bf16 group=0 case=dense event_ms=0.0862304 wall_ms=0.0867371
+TIME shape=3072,3072,3072 dtype=bf16 group=0 case=solution event_ms=1.61315 wall_ms=1.61358
+TIME shape=3072,3072,3072 dtype=bf16 group=1 case=dense event_ms=0.086624 wall_ms=0.0870676
+TIME shape=3072,3072,3072 dtype=bf16 group=1 case=solution event_ms=1.6103 wall_ms=1.61076
+TIME shape=3072,3072,3072 dtype=bf16 group=2 case=dense event_ms=0.0866352 wall_ms=0.0870719
+TIME shape=3072,3072,3072 dtype=bf16 group=2 case=solution event_ms=1.61262 wall_ms=1.61305
+TIME shape=3072,3072,3072 dtype=bf16 group=3 case=solution event_ms=1.61019 wall_ms=1.61062
+TIME shape=3072,3072,3072 dtype=bf16 group=3 case=dense event_ms=0.0862336 wall_ms=0.0866604
+TIME shape=3072,3072,3072 dtype=bf16 group=4 case=dense event_ms=0.0859264 wall_ms=0.0863717
+TIME shape=3072,3072,3072 dtype=bf16 group=4 case=solution event_ms=1.57525 wall_ms=1.57609
+CHECK 3072,3072,3072 fp16 trial=0 dense_eF=3.66723e-06 solution_eF=0.000752812 gate=0.000111002 pass=0
+TIME shape=3072,3072,3072 dtype=fp16 group=0 case=dense event_ms=0.0886688 wall_ms=0.08917
+TIME shape=3072,3072,3072 dtype=fp16 group=0 case=solution event_ms=1.57523 wall_ms=1.57568
+TIME shape=3072,3072,3072 dtype=fp16 group=1 case=dense event_ms=0.0894096 wall_ms=0.0898566
+TIME shape=3072,3072,3072 dtype=fp16 group=1 case=solution event_ms=1.61298 wall_ms=1.6134
+TIME shape=3072,3072,3072 dtype=fp16 group=2 case=dense event_ms=0.08932 wall_ms=0.0897551
+TIME shape=3072,3072,3072 dtype=fp16 group=2 case=solution event_ms=1.61149 wall_ms=1.61204
+TIME shape=3072,3072,3072 dtype=fp16 group=3 case=solution event_ms=1.57596 wall_ms=1.57639
+TIME shape=3072,3072,3072 dtype=fp16 group=3 case=dense event_ms=0.0891856 wall_ms=0.0896327
+TIME shape=3072,3072,3072 dtype=fp16 group=4 case=dense event_ms=0.0891728 wall_ms=0.0896149
+TIME shape=3072,3072,3072 dtype=fp16 group=4 case=solution event_ms=1.57526 wall_ms=1.57569
+CHECK 4096,4096,4096 bf16 trial=0 dense_eF=4.02334e-06 solution_eF=0.00602272 gate=0.00101207 pass=0
+TIME shape=4096,4096,4096 dtype=bf16 group=0 case=dense event_ms=0.195437 wall_ms=0.195953
+TIME shape=4096,4096,4096 dtype=bf16 group=0 case=solution event_ms=3.77052 wall_ms=3.77095
+TIME shape=4096,4096,4096 dtype=bf16 group=1 case=solution event_ms=3.81728 wall_ms=3.81779
+TIME shape=4096,4096,4096 dtype=bf16 group=1 case=dense event_ms=0.195632 wall_ms=0.196096
+TIME shape=4096,4096,4096 dtype=bf16 group=2 case=solution event_ms=3.83082 wall_ms=3.83128
+TIME shape=4096,4096,4096 dtype=bf16 group=2 case=dense event_ms=0.195474 wall_ms=0.195929
+TIME shape=4096,4096,4096 dtype=bf16 group=3 case=dense event_ms=0.195517 wall_ms=0.195954
+TIME shape=4096,4096,4096 dtype=bf16 group=3 case=solution event_ms=3.86244 wall_ms=3.8629
+TIME shape=4096,4096,4096 dtype=bf16 group=4 case=solution event_ms=3.858 wall_ms=3.85848
+TIME shape=4096,4096,4096 dtype=bf16 group=4 case=dense event_ms=0.195834 wall_ms=0.196328
+CHECK 4096,4096,4096 fp16 trial=0 dense_eF=4.87534e-06 solution_eF=0.000753133 gate=0.000114626 pass=0
+TIME shape=4096,4096,4096 dtype=fp16 group=0 case=dense event_ms=0.206056 wall_ms=0.206571
+TIME shape=4096,4096,4096 dtype=fp16 group=0 case=solution event_ms=3.84272 wall_ms=3.84321
+TIME shape=4096,4096,4096 dtype=fp16 group=1 case=solution event_ms=3.82997 wall_ms=3.83047
+TIME shape=4096,4096,4096 dtype=fp16 group=1 case=dense event_ms=0.207451 wall_ms=0.20789
+TIME shape=4096,4096,4096 dtype=fp16 group=2 case=solution event_ms=3.76585 wall_ms=3.76627
+TIME shape=4096,4096,4096 dtype=fp16 group=2 case=dense event_ms=0.206256 wall_ms=0.20665
+TIME shape=4096,4096,4096 dtype=fp16 group=3 case=dense event_ms=0.20575 wall_ms=0.206154
+TIME shape=4096,4096,4096 dtype=fp16 group=3 case=solution event_ms=3.99261 wall_ms=3.99306
+TIME shape=4096,4096,4096 dtype=fp16 group=4 case=solution event_ms=3.81239 wall_ms=3.81278
+TIME shape=4096,4096,4096 dtype=fp16 group=4 case=dense event_ms=0.205613 wall_ms=0.20602
+CHECK 1024,512,1024 bf16 trial=0 dense_eF=8.50761e-07 solution_eF=0.00599042 gate=0.00100255 pass=0
+TIME shape=1024,512,1024 dtype=bf16 group=0 case=solution event_ms=0.0348256 wall_ms=0.0352336
+TIME shape=1024,512,1024 dtype=bf16 group=0 case=dense event_ms=0.0092896 wall_ms=0.0096671
+TIME shape=1024,512,1024 dtype=bf16 group=1 case=solution event_ms=0.0348928 wall_ms=0.0352775
+TIME shape=1024,512,1024 dtype=bf16 group=1 case=dense event_ms=0.0091984 wall_ms=0.00957825
+TIME shape=1024,512,1024 dtype=bf16 group=2 case=solution event_ms=0.0348448 wall_ms=0.0352248
+TIME shape=1024,512,1024 dtype=bf16 group=2 case=dense event_ms=0.0092192 wall_ms=0.0095986
+TIME shape=1024,512,1024 dtype=bf16 group=3 case=dense event_ms=0.0091792 wall_ms=0.00955555
+TIME shape=1024,512,1024 dtype=bf16 group=3 case=solution event_ms=0.0348944 wall_ms=0.035283
+TIME shape=1024,512,1024 dtype=bf16 group=4 case=dense event_ms=0.0091856 wall_ms=0.00961845
+TIME shape=1024,512,1024 dtype=bf16 group=4 case=solution event_ms=0.0348736 wall_ms=0.149813
+CHECK 1024,512,1024 fp16 trial=0 dense_eF=1.24738e-06 solution_eF=0.000749333 gate=0.000103742 pass=0
+TIME shape=1024,512,1024 dtype=fp16 group=0 case=solution event_ms=0.0349968 wall_ms=0.0354136
+TIME shape=1024,512,1024 dtype=fp16 group=0 case=dense event_ms=0.0093184 wall_ms=0.009708
+TIME shape=1024,512,1024 dtype=fp16 group=1 case=solution event_ms=0.034976 wall_ms=0.0353648
+TIME shape=1024,512,1024 dtype=fp16 group=1 case=dense event_ms=0.0092752 wall_ms=0.00965895
+TIME shape=1024,512,1024 dtype=fp16 group=2 case=solution event_ms=0.0349392 wall_ms=0.0353332
+TIME shape=1024,512,1024 dtype=fp16 group=2 case=dense event_ms=0.0092288 wall_ms=0.00960705
+TIME shape=1024,512,1024 dtype=fp16 group=3 case=dense event_ms=0.0091712 wall_ms=0.0095719
+TIME shape=1024,512,1024 dtype=fp16 group=3 case=solution event_ms=0.0349792 wall_ms=0.0353581
+TIME shape=1024,512,1024 dtype=fp16 group=4 case=dense event_ms=0.0091904 wall_ms=0.009577
+TIME shape=1024,512,1024 dtype=fp16 group=4 case=solution event_ms=0.0350176 wall_ms=0.0353933
+CHECK 512,1024,1024 bf16 trial=0 dense_eF=8.53264e-07 solution_eF=0.00601885 gate=0.00100256 pass=0
+TIME shape=512,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.0347424 wall_ms=0.0351585
+TIME shape=512,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0080272 wall_ms=0.00842445
+TIME shape=512,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.0080496 wall_ms=0.00842415
+TIME shape=512,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.0347984 wall_ms=0.0351884
+TIME shape=512,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.0080272 wall_ms=0.0084086
+TIME shape=512,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.0353344 wall_ms=0.035722
+TIME shape=512,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.034856 wall_ms=0.035234
+TIME shape=512,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.0080432 wall_ms=0.00844765
+TIME shape=512,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.034728 wall_ms=0.0351204
+TIME shape=512,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.008 wall_ms=0.00839285
+CHECK 512,1024,1024 fp16 trial=0 dense_eF=1.24935e-06 solution_eF=0.00075151 gate=0.000103748 pass=0
+TIME shape=512,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.0347664 wall_ms=0.0351832
+TIME shape=512,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.0083344 wall_ms=0.00872455
+TIME shape=512,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.0083264 wall_ms=0.00870645
+TIME shape=512,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.0348096 wall_ms=0.0351992
+TIME shape=512,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.008344 wall_ms=0.00871865
+TIME shape=512,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.0351264 wall_ms=0.0357289
+TIME shape=512,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.0348752 wall_ms=0.0352592
+TIME shape=512,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.0083264 wall_ms=0.008719
+TIME shape=512,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.0348528 wall_ms=0.0352332
+TIME shape=512,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.008352 wall_ms=0.0087405
+srun: error: g08: task 0: Exited with exit code 2

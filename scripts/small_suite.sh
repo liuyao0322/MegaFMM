@@ -15,6 +15,7 @@ all_labels=(
   narrow12_launch narrow12_graph
   cluster13_launch cluster13_graph epilogue14_launch epilogue14_graph
   coefficients15_launch coefficients15_graph
+  prefetch16_launch prefetch16_graph
 )
 if [[ "${1:-}" == --help || "${1:-}" == -h ]]; then
   printf 'Usage: bash scripts/small_suite.sh [LABEL ...]\n'
@@ -181,4 +182,6 @@ run_case epilogue14_launch --algorithm mega --mega-variant 14
 run_case epilogue14_graph --algorithm mega --mega-variant 14 --graph
 run_case coefficients15_launch --algorithm mega --mega-variant 15
 run_case coefficients15_graph --algorithm mega --mega-variant 15 --graph
+run_case prefetch16_launch --algorithm mega --mega-variant 16
+run_case prefetch16_graph --algorithm mega --mega-variant 16 --graph
 exit "$numeric_failure"

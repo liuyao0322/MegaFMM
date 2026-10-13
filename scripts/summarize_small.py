@@ -18,6 +18,7 @@ import hashlib
 import json
 import math
 import os
+import textwrap
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -275,7 +276,15 @@ def series_label(series: tuple) -> str:
     name = name.removesuffix("_launch").removesuffix("_graph")
     name = name.removeprefix("final_")
     short_route = actual.removeprefix("winograd_").removeprefix("megakernel_")
-    return f"{'original ' if role == 'baseline' else ''}{name}: {short_route} v{variant}"
+    source = textwrap.fill(f"{'original ' if role == 'baseline' else ''}{name} · v{variant}", width=38)
+    return source + "\n" + textwrap.fill(short_route, width=38)
+
+
+def route_style_key(series: tuple) -> tuple:
+    # Source and execution mode remain separate observations. Only their visual
+    # encoding is shared so the same route/variant retains its color in all files.
+    _, actual, variant, _ = series
+    return actual, variant
 
 
 def select_envelope(records: list[Record]) -> dict[tuple, Record]:
@@ -327,118 +336,141 @@ def export_figures(records: list[Record], candidates: list[Record], baseline: Ba
     for r in records:
         by_panel[r.panel].append(r)
     envelope = select_envelope(candidates)
-    all_series = sorted({r.series for r in records}, key=lambda s: tuple(map(str, s)))
+    style_keys = sorted({route_style_key(r.series) for r in records})
     color_map = plt.get_cmap("tab20")
-    colors = {s: color_map(i % 20) for i, s in enumerate(all_series)}
+    # Use the saturated tab20 colors first, then the lighter alternatives. There
+    # are no source/mode duplicates consuming palette entries.
+    palette_order = list(range(0,20,2)) + list(range(1,20,2))
+    colors = {key: color_map(palette_order[i % 20]) for i,key in enumerate(style_keys)}
     marks = ("o", "s", "^", "D", "v", "P", "X", "<", ">")
-    markers = {s: marks[i % len(marks)] for i, s in enumerate(all_series)}
+    markers = {key: marks[i % len(marks)] for i,key in enumerate(style_keys)}
     artifacts = []
     categories = sorted({p[-1] for p in by_panel})
+    primary_shapes = {(n,n,n) for n in (128,256,512,1024)}
     for category in categories:
         panels = sorted((p for p in by_panel if p[-1] == category),
                         key=lambda p: (p[1], p[2], p[3], p[0]))
+        scenarios = sorted({(p[1],p[2],p[3]) for p in panels})
         kinds = ("primary_performance", "performance", "numerical", "original_lt_gain") if category == "sw" else ("performance", "numerical")
         for kind in kinds:
-            displayed_panels = panels
-            if kind == "primary_performance":
-                displayed_panels = [p for p in panels if any(r.panel == p and r.shape in
-                                    {(n,n,n) for n in (128,256,512,1024)} for r in candidates)]
-            if not displayed_panels:
-                continue
-            cols = min(2, len(displayed_panels))
-            rows = math.ceil(len(displayed_panels) / cols)
-            max_series = max(len({r.series for r in by_panel[p]}) for p in displayed_panels)
-            height = 4.8 + .18*math.ceil((max_series+3)/2)
-            fig, axes = plt.subplots(rows, cols, figsize=(8.2*cols, height*rows),
-                                     squeeze=False, constrained_layout=True)
-            for panel_number, panel in enumerate(displayed_panels):
-                ax = axes.flat[panel_number]
-                group = by_panel[panel]
+            for mode,cache,rotations in scenarios:
+                displayed_panels = [p for p in panels if p[1:4] == (mode,cache,rotations)]
                 if kind == "primary_performance":
-                    group = [r for r in group if r.shape in {(n,n,n) for n in (128,256,512,1024)}
-                             and (r.role == "candidate" or (r.values["requested"] == "lt" and r.integer("variant") == 0))]
-                shapes = sorted({r.shape for r in group}, key=lambda s: shape_order(s, squares))
-                positions = {shape: i for i, shape in enumerate(shapes)}
-                series_records = defaultdict(list)
-                for r in group:
-                    series_records[r.series].append(r)
-                for series, samples in sorted(series_records.items(), key=lambda item: tuple(map(str, item[0]))):
-                    samples.sort(key=lambda r: (positions[r.shape], r.line))
-                    if kind == "numerical":
-                        samples = [r for r in samples if r.checked and math.isfinite(r.number("solution_ef"))]
-                    if kind == "original_lt_gain":
-                        samples = [r for r in samples if baseline.original_lt(r) is not None]
-                    if not samples:
-                        continue
-                    xs = [positions[r.shape] for r in samples]
-                    if kind in {"performance", "primary_performance"}:
-                        ys = [r.speedup for r in samples]
-                        ranges = [r.dispersion_ratio for r in samples]
-                    elif kind == "original_lt_gain":
-                        anchors = [baseline.original_lt(r) for r in samples]
-                        ys = [a.number("solution_event_ms")/r.number("solution_event_ms") for r,a in zip(samples,anchors)]
-                        ranges = [(a.number("solution_p10_ms")/r.number("solution_p90_ms"),
-                                   a.number("solution_p90_ms")/r.number("solution_p10_ms")) for r,a in zip(samples,anchors)]
-                    else:
-                        ys = [max(1e-12, r.number("solution_ef")) for r in samples]
-                        ranges = None
-                    style = {"color": colors[series], "marker": markers[series],
-                             "markersize": 4, "linewidth": 1.25,
-                             "linestyle": "--" if series[-1] == "baseline" else "-",
-                             "label": series_label(series)}
-                    if ranges is None:
-                        ax.plot(xs, ys, **style)
-                    else:
-                        ax.errorbar(xs, ys, yerr=([max(0,y-lo) for y,(lo,hi) in zip(ys,ranges)],
-                                                 [max(0,hi-y) for y,(lo,hi) in zip(ys,ranges)]), capsize=2.5, **style)
-                if kind in {"performance", "primary_performance"} and category == "sw":
-                    selected = [envelope[panel,shape] for shape in shapes if (panel,shape) in envelope]
-                    if selected:
-                        ax.plot([positions[r.shape] for r in selected], [r.speedup for r in selected],
-                                color="black", linestyle="-.", linewidth=1.7,
-                                marker="*", markersize=7, label="Empirical envelope: selected on measurement")
-                dtype, mode, cache, rotations, _ = panel
-                category_text = {"sw": "Actual SW routes; numerical status in tables",
-                                 "dense_fallback": "Actual Dense fallback; no SW acceptance",
-                                 "dense": "Actual ordinary Dense backend"}.get(category, category)
-                ax.set_title(f"{dtype.upper()} · {mode} · {cache} · pairs={rotations}\n{category_text}", fontsize=11)
-                ax.set_xticks(range(len(shapes)), [shape_tick(shape) for shape in shapes],
-                              fontsize=8, rotation=30, ha="right")
-                ax.set_xlabel("Predeclared shape M × N × K", fontsize=9)
-                ax.grid(axis="y", alpha=.2)
-                if kind in {"performance", "primary_performance"}:
-                    ax.axhline(1, color="#334155", linestyle="--", linewidth=1, label="Same-row tuned Dense = 1×")
-                    if category == "sw":
-                        ax.axhline(TARGET, color="#64748b", linestyle=":", linewidth=1, label="1.05× target; accuracy also required")
-                    ax.set_ylabel("Same-row Dense / actual backend", fontsize=9)
-                    ax.set_ylim(bottom=0)
-                elif kind == "original_lt_gain":
-                    ax.axhline(1, color="#334155", linestyle=":", linewidth=1, label="Original Lt0 anchor = 1×")
-                    ax.set_ylabel("Original Lt0 / measured SW duration\nHistorical comparison; separate runs", fontsize=9)
-                    ax.set_ylim(bottom=0)
-                else:
-                    ax.axhline(FLOORS[dtype], color="#111827", linestyle="--", linewidth=1.25,
-                               label=f"Frozen floor = {FLOORS[dtype]:g}")
-                    limits = defaultdict(list)
+                    displayed_panels = [p for p in displayed_panels if any(r.panel == p and
+                                        r.shape in primary_shapes for r in candidates)]
+                if not displayed_panels:
+                    continue
+                groups = []
+                for panel in displayed_panels:
+                    group = by_panel[panel]
+                    if kind == "primary_performance":
+                        group = [r for r in group if r.shape in primary_shapes and
+                                 (r.role == "candidate" or (r.values["requested"] == "lt" and r.integer("variant") == 0))]
+                    groups.append(group)
+                # Each mode/cache/address scenario has at most BF16 and FP16.
+                # A dedicated second row contains legends; titles and labels
+                # cannot collide with the next execution mode's panel.
+                cols = len(displayed_panels)
+                legend_lines = []
+                for group in groups:
+                    labels = [series_label(s) for s in sorted({r.series for r in group},
+                                                               key=lambda s:tuple(map(str,s)))]
+                    labels += ["auxiliary reference"] * (3 if kind in {"performance","primary_performance"} else 2)
+                    half = math.ceil(len(labels)/2)
+                    legend_lines.append(max(sum(label.count("\n")+1 for label in labels[:half]),
+                                            sum(label.count("\n")+1 for label in labels[half:])))
+                legend_height = .17*max(legend_lines) + .4
+                fig = plt.figure(figsize=(8.2*cols, 4.6+legend_height), constrained_layout=True)
+                grid = fig.add_gridspec(2,cols,height_ratios=(4.6,legend_height))
+                for column,(panel,group) in enumerate(zip(displayed_panels,groups)):
+                    ax = fig.add_subplot(grid[0,column])
+                    legend_ax = fig.add_subplot(grid[1,column])
+                    legend_ax.set_axis_off()
+                    shapes = sorted({r.shape for r in group}, key=lambda s: shape_order(s,squares))
+                    positions = {shape:i for i,shape in enumerate(shapes)}
+                    series_records = defaultdict(list)
                     for r in group:
-                        if r.checked and math.isfinite(r.number("gate_limit")):
-                            limits[r.shape].append(r.number("gate_limit"))
-                    if limits:
-                        ordered = sorted(limits, key=lambda shape: positions[shape])
-                        ax.plot([positions[shape] for shape in ordered], [max(limits[shape]) for shape in ordered],
-                                color="#64748b", linestyle=":", linewidth=1,
-                                label="Max reported per-trial gate (display only)")
-                    ax.set_yscale("log")
-                    ax.set_ylabel("Worst reported relative Frobenius error eF", fontsize=9)
-                ax.legend(loc="upper center", bbox_to_anchor=(.5, -.35), ncols=2,
-                          fontsize=7.2, frameon=False, columnspacing=1, handlelength=2.2)
-            for ax in axes.flat[len(displayed_panels):]:
-                ax.set_visible(False)
-            for suffix in ("svg", "png"):
-                path = directory / f"{kind}_{category}.{suffix}"
-                fig.savefig(path, dpi=180, bbox_inches="tight")
-                artifacts.append(path)
-            plt.close(fig)
+                        series_records[r.series].append(r)
+                    for series,samples in sorted(series_records.items(),key=lambda item:tuple(map(str,item[0]))):
+                        samples.sort(key=lambda r:(positions[r.shape],r.line))
+                        if kind == "numerical":
+                            samples = [r for r in samples if r.checked and math.isfinite(r.number("solution_ef"))]
+                        if kind == "original_lt_gain":
+                            samples = [r for r in samples if baseline.original_lt(r) is not None]
+                        if not samples:
+                            continue
+                        xs = [positions[r.shape] for r in samples]
+                        if kind in {"performance","primary_performance"}:
+                            ys = [r.speedup for r in samples]
+                            ranges = [r.dispersion_ratio for r in samples]
+                        elif kind == "original_lt_gain":
+                            anchors = [baseline.original_lt(r) for r in samples]
+                            ys = [a.number("solution_event_ms")/r.number("solution_event_ms") for r,a in zip(samples,anchors)]
+                            ranges = [(a.number("solution_p10_ms")/r.number("solution_p90_ms"),
+                                       a.number("solution_p90_ms")/r.number("solution_p10_ms")) for r,a in zip(samples,anchors)]
+                        else:
+                            ys = [max(1e-12,r.number("solution_ef")) for r in samples]
+                            ranges = None
+                        key = route_style_key(series)
+                        style = {"color":colors[key],"marker":markers[key],
+                                 "markersize":4,"linewidth":1.25,
+                                 "linestyle":"--" if series[-1] == "baseline" else "-",
+                                 "label":series_label(series)}
+                        if ranges is None:
+                            ax.plot(xs,ys,**style)
+                        else:
+                            ax.errorbar(xs,ys,yerr=([max(0,y-lo) for y,(lo,hi) in zip(ys,ranges)],
+                                                   [max(0,hi-y) for y,(lo,hi) in zip(ys,ranges)]),capsize=2.5,**style)
+                    if kind in {"performance","primary_performance"} and category == "sw":
+                        selected = [envelope[panel,shape] for shape in shapes if (panel,shape) in envelope]
+                        if selected:
+                            ax.plot([positions[r.shape] for r in selected],[r.speedup for r in selected],
+                                    color="black",linestyle="-.",linewidth=1.7,
+                                    marker="*",markersize=7,label="Empirical envelope: selected on measurement")
+                    dtype,mode,cache,rotations,_ = panel
+                    category_text = {"sw":"Actual SW routes; numerical status in tables",
+                                     "dense_fallback":"Actual Dense fallback; no SW acceptance",
+                                     "dense":"Actual ordinary Dense backend"}.get(category,category)
+                    ax.set_title(f"{dtype.upper()} · {mode} · {cache} · pairs={rotations}\n{category_text}",fontsize=11)
+                    ax.set_xticks(range(len(shapes)),[shape_tick(shape) for shape in shapes],
+                                  fontsize=8,rotation=30,ha="right")
+                    ax.set_xlabel("Predeclared shape M × N × K",fontsize=9)
+                    ax.grid(axis="y",alpha=.2)
+                    if kind in {"performance","primary_performance"}:
+                        ax.axhline(1,color="#334155",linestyle="--",linewidth=1,label="Same-row tuned Dense = 1×")
+                        if category == "sw":
+                            ax.axhline(TARGET,color="#64748b",linestyle=":",linewidth=1,label="1.05× target; accuracy also required")
+                        ax.set_ylabel("Same-row Dense / actual backend",fontsize=9)
+                        ax.set_ylim(bottom=0)
+                    elif kind == "original_lt_gain":
+                        ax.axhline(1,color="#334155",linestyle=":",linewidth=1,label="Original Lt0 anchor = 1×")
+                        ax.set_ylabel("Original Lt0 / measured SW duration\nHistorical comparison; separate runs",fontsize=9)
+                        ax.set_ylim(bottom=0)
+                    else:
+                        ax.axhline(FLOORS[dtype],color="#111827",linestyle="--",linewidth=1.25,
+                                   label=f"Frozen floor = {FLOORS[dtype]:g}")
+                        limits = defaultdict(list)
+                        for r in group:
+                            if r.checked and math.isfinite(r.number("gate_limit")):
+                                limits[r.shape].append(r.number("gate_limit"))
+                        if limits:
+                            ordered = sorted(limits,key=lambda shape:positions[shape])
+                            ax.plot([positions[shape] for shape in ordered],[max(limits[shape]) for shape in ordered],
+                                    color="#64748b",linestyle=":",linewidth=1,
+                                    label="Max reported per-trial gate (display only)")
+                        ax.set_yscale("log")
+                        ax.set_ylabel("Worst reported relative Frobenius error eF",fontsize=9)
+                    handles,labels = ax.get_legend_handles_labels()
+                    legend_ax.legend(handles,labels,loc="upper center",ncols=2,
+                                     fontsize=7.8,frameon=False,columnspacing=1.2,handlelength=2.2)
+                scenario_suffix = mode
+                if sum(s[0] == mode for s in scenarios) > 1:
+                    scenario_suffix += f"_{cache.replace('/', '_').replace(' ', '_')}_pairs{rotations}"
+                for suffix in ("svg","png"):
+                    path = directory / f"{kind}_{category}_{scenario_suffix}.{suffix}"
+                    fig.savefig(path,dpi=180,bbox_inches="tight")
+                    artifacts.append(path)
+                plt.close(fig)
     return artifacts
 
 
@@ -490,25 +522,28 @@ def write_report(records: list[Record], candidates: list[Record], baseline: Base
             errors = f"{min(finite_sw):.6g}–{max(finite_sw):.6g}" if finite_sw else "无有限 SW 数据"
             lines += [f"{dtype.upper()}：候选已检查 {len(checked)} 行，实际 SW eF 范围 {errors}；floor={FLOORS[dtype]:g}。", ""]
     lines += ["## 128–1024 主表：测量后选择的经验包络", "",
-              "每个 dtype/mode/cache/地址对数/形状，在明确指定候选中的已检查 SW 行选择最大逐行 Dense/候选比；此包络为 **selected-on-measurement**，可能逐尺寸切换 variant，也会受到 Dense 调优/运行波动影响。它不是预先固定的 dispatcher、独立验证收益或数值认证。完整逐行表保留所有数据，包括失败和 unchecked。", ""]
+              "每个 dtype/mode/cache/地址对数/形状，在明确指定候选中的已检查 SW 行选择最大逐行 Dense/候选比；此包络为 **selected-on-measurement**，可能逐尺寸切换 variant，也会受到 Dense 调优/运行波动影响。它不是预先固定的 dispatcher、独立验证收益或数值认证。主表耗时和比值仅列组均值分布的 median；完整逐行表保留所有原始实际 route、来源、p10/p90、CV 和数值结果，包括失败和 unchecked。", ""]
     envelope = select_envelope(candidates)
     panels = sorted({r.panel for r in sw if r.checked}, key=lambda p:(p[1],p[2],p[3],p[0]))
     for panel in panels:
         dtype, mode, cache, rotations, _ = panel
         lines += [f"### {dtype.upper()} / {mode} / {cache} / pairs={rotations}", "",
-                  table(["M,N,K", "原始 Lt0 µs", "所选实际 route / source", "同一行 Dense µs", "候选 µs", "Dense/候选 [离散度]", "vs 原始 Lt0 [离散度]", "CV Dense/候选", "数值状态"]),
-                  table(["---", "---:", "---", "---:", "---:", "---", "---", "---", "---"])]
+                  table(["M,N,K", "原始 Lt0 µs", "候选 / source:row", "同一行 Dense µs", "候选 µs", "Dense/候选", "原始 Lt0/候选", "数值状态"]),
+                  table(["---", "---:", "---", "---:", "---:", "---:", "---:", "---"])]
         for size in (128,256,512,1024):
             shape = (size,size,size)
             r = envelope.get((panel,shape))
             if r is None:
-                lines.append(table([shape_text(shape), "—", "缺少明确候选", "—", "—", "—", "—", "—", "未检查"])); continue
+                lines.append(table([shape_text(shape), "—", "缺少明确候选", "—", "—", "—", "—", "未检查"])); continue
             original = baseline.original_lt(r)
-            low, high = r.dispersion_ratio
-            lines.append(table([shape_text(shape), timing(original,"solution") if original else "N/A",
-                                f"{r.actual} v{r.integer('variant')} / {relative_link(r.source,target)}:{r.line}",
-                                timing(r,"dense"), timing(r,"solution"), f"{r.speedup:.3f}× [{low:.3f},{high:.3f}]",
-                                historic_gain(r,original), f"{100*r.number('dense_cv'):.2f}%/{100*r.number('solution_cv'):.2f}%", r.status]))
+            source_label = r.source.name.removeprefix("small_final_").removeprefix("small_")
+            source_label = "<br>".join(textwrap.wrap(source_label,width=26))
+            candidate = f"{r.values['requested']} v{r.integer('variant')}<br>{relative_link(r.source,target,source_label)}:{r.line}"
+            original_time = f"{1000*original.number('solution_event_ms'):.3f}" if original else "N/A"
+            gain = f"{original.number('solution_event_ms')/r.number('solution_event_ms'):.3f}×" if original else "N/A"
+            lines.append(table([shape_text(shape),original_time,candidate,
+                                f"{1000*r.number('dense_event_ms'):.3f}",f"{1000*r.number('solution_event_ms'):.3f}",
+                                f"{r.speedup:.3f}×",gain,r.status]))
         lines.append("")
     lines += ["## 全尺寸、全实际路径证据表", "",
               "耗时单位均为 µs，格式为 median [p10,p90]；历史改善格式为 ratio [p10/p90 端点]。每组先按实际 route 再按预声明尺寸排序；Dense fallback 与 SW 分开。", ""]
@@ -547,7 +582,7 @@ def write_report(records: list[Record], candidates: list[Record], baseline: Base
         lines.append("")
     lines += ["## 独立静态图与原始证据", ""]
     lines += [relative_link(path,target) for path in artifacts]
-    lines += ["", "主性能图仅展示 128–1024 的明确候选与原始 Lt0；全九尺寸图保留全部原始路径。每条曲线明确标注实际 route、variant 和来源；baseline 为虚线。SW、普通 Dense fallback、unchecked 分面。误差条表示上述组均值离散度，不是置信区间。原始 Lt0 改善图是跨运行历史比较；数值图精确零仅为 log 显示置于 1e-12，灰线最大 gate 仅用于显示，不能取代逐行/逐试验认证。", ""]
+    lines += ["", "每种 mode/cache/输入地址配置分别输出一张 BF16/FP16 并排图，图例位于专用行；同一 actual route/variant 在各模式保留颜色和 marker，来源和观测仍分别列出，不合并统计。主性能图仅展示 128–1024 的明确候选与原始 Lt0；全九尺寸图保留全部原始路径。每条曲线明确标注实际 route、variant 和来源；baseline 为虚线。SW、普通 Dense fallback、unchecked 分面。误差条表示上述组均值离散度，不是置信区间。原始 Lt0 改善图是跨运行历史比较；数值图精确零仅为 log 显示置于 1e-12，灰线最大 gate 仅用于显示，不能取代逐行/逐试验认证。", ""]
     for path in sorted(by_source):
         evidence = [sibling for sibling in (path.with_suffix(".log"), path.with_suffix(".exit")) if sibling.is_file()]
         if evidence:

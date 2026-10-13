@@ -50,4 +50,11 @@ void prepare_mma16x8(const Problem& p, int variant=11);
 void launch_mma16x8(const Problem& p, const void* A, const void* B,
                     const float* C0, float* D, cudaStream_t stream,
                     int variant=11);
+// Same complete 16x8 tiles with four-element B vectors from all 32 lanes.
+bool mma16x8_vec4_can_implement(const Problem& p, int variant=12);
+bool mma16x8_vec4_full_tiles(const Problem& p, const void* A, const void* B);
+void prepare_mma16x8_vec4(const Problem& p, int variant=12);
+void launch_mma16x8_vec4(const Problem& p, const void* A, const void* B,
+                        const float* C0, float* D, cudaStream_t stream,
+                        int variant=12);
 }
