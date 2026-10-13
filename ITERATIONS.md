@@ -1843,3 +1843,8 @@ Full samebinary20 rows45/39/44/36/Lt1,20warm100calls5groups3fresh32Lt8GiB. Origi
 - **Analysis:** Own complete SW latency ranks code changes; Dense timing variation and machine/fixture/SAN PASS do not certify original FP64 numerical accuracy.
 - **Next:** Mandatory samebinaryfull20 for46/45/39/36/Lt1,100calls5groups3fresh irrespectivequick3%, originalstrict30 andserialSAN3, coverage/profile/report/twoindependentfinal audits.
 - **Archive:** trajectory/20261014_074453_iter-42/
+
+
+#### Iter42 mandatory full1024 closure
+
+Mandatory samebinary20 rows46/45/39/36/Lt1,20warm100calls5groups3fresh32Lt8GiB completed with all five groups/authorityCSV retained. Original60/60 fresh numericalFAIL/NF0 and ten innerexit2 remain. SW128 SIMT46 with deliberately unused currentA map encode is slower than selectiveTMA45 by ordinary BF33.0511%/FP31.6073%, Graph35.6808%/31.7414%;45 remains fastest measured native. Current45 ordinary Dense/SW0.696120/0.558143 and Graph0.668873/0.553662 remain below1, original precision still fails. Strict30=18PASS12FAIL/NF0, SAN3 actualexit0 with zero summaries, structural default/target PASS; these do not certify FP64 floors. Full1830 code domain unexecuted. CPU-only coverage/metadata adapter failures and exact narrow corrections are archived without changing source/bin/raw or repeating GPU. Full primary report binds event/100-call batchwall scope, no isolated physical-cause or residency claim. AutoDense/goalactive; no automatic next iteration.

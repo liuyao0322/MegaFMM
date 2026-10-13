@@ -1,0 +1,184 @@
+{
+  "schema": "megafmm.iter42.sw128-simt-control-measured-identity.v1",
+  "base_checkpoint": "a4fd033a8f1cea56e4e70c49b0218f4a2b759906",
+  "measurement_source_commit": "d372045901ed1ef97ed4a933109d409835ed1d83",
+  "frozen_sources": {
+    "CMakeLists.txt": "fd718d138b8bdadd6da512717df427a26a4fdeea53f006dca0a1c48f8d85c7cd",
+    "bench/benchmark.cu": "1e326b2fce8eb60f0c6f8f6f19d2779d23cbea8b81f363bae59a3b312364a691",
+    "include/megafmm/gemm.h": "934859b65a4b8f249a42aca52ea40d98b0611b9f986241222f9acc11667c0c84",
+    "include/megafmm/kernels.h": "02d9bf187f0e90f4eceacea8d8f20a7c4b8b7af12087f558773d2e19923807d2",
+    "solution/plan.cpp": "4f3597e066e3a347771f9f69d6d24d42403b632bce9c8d71730dbd9b76714f1e",
+    "tests/test_correctness.cu": "a6a9658cb4864ed72db1a519c363d9f08d6e237f3c4afb9c0838ea5580c0f6b3",
+    "solution/megakernel_wgmma_psplit_sw128_simt_control.cu": "fe970244906a10d84b172d1c4255d2633285820bf3f7f1bd1f14fde54daa1a11"
+  },
+  "frozen_binaries": {
+    "build/megafmm_bench": "e2faf8111ce7efa6a2751d0774a018389ee6568a49762bb2e483086152125bf0",
+    "build/test_correctness": "7fe2e01f38b2525fa3f3c2e8ffd25e549e6ad28e5099feac833035b8d6895df9"
+  },
+  "predeclared_plan": {
+    "path": "results/psplit_sw128_simt_control1024_plan_iter42.json",
+    "sha256": "5bb36a72ae4d704297cd8c7933a01d3d895deaade1819628b93d9d7215c00fdf"
+  },
+  "predeclared_plan_sha256": "5bb36a72ae4d704297cd8c7933a01d3d895deaade1819628b93d9d7215c00fdf",
+  "quick_archive": "trajectory/20261014_074453_iter-42",
+  "independent_compiled_gate": {
+    "path": "results/psplit_sw128_simt_control_static_review_initial_iter42.json",
+    "sha256": "af06b801dc5c0ec6e65889154935b56870f30d16e68872050710affe1bfeeade",
+    "status": "PASS_COMPILED_CAN_LAUNCH_46_ONLY"
+  },
+  "route_configurations": {
+    "45": {
+      "actual_name": "megakernel_wgmma_psplit_selective_tma_a_64x32",
+      "enabled": true,
+      "producer_quota": 64,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "launch_bounds_min_ctas": 1,
+      "BM": 64,
+      "BN": 32,
+      "BK": 64,
+      "threads": 384,
+      "dynamic_shared_bytes": 123904,
+      "static_shared_bytes": 0,
+      "tool_resource_shared_bytes": 1024,
+      "device_reserved_shared_bytes_per_CTA": 1024,
+      "initial_registers_per_thread": 168,
+      "initial_owned_CTA_pool_registers": 64512,
+      "requested_role_pool_registers": 57344,
+      "drain_barrier": "nonaligned barrier.sync6,384; epochs0/6/0; BOTH banks drained",
+      "raw_A_transaction_bytes_per_stage": 32768,
+      "raw_A_TMA_boxes_per_stage": 4,
+      "A_native_lda_upper_exclusive": 549755813888,
+      "B_native_stride_extra_bound": null,
+      "A_shared_absolute_alignment_bytes": 1024,
+      "occupancy_API_predicted_active_CTAs_per_SM": 1,
+      "actual_measured_CTA_residency": null,
+      "function_probe_path": "results/psplit_selective_tma_a_function_occupancy_probe_iter41.txt",
+      "resource_metadata_scope": "Retained legacy compiled metadata, not a fresh iteration42 resource/residency query."
+    },
+    "39": {
+      "actual_name": "megakernel_wgmma_psplit_rsa_64x32",
+      "producer_quota": 64,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "launch_bounds_min_ctas": 1,
+      "enabled": true,
+      "BM": 64,
+      "BN": 32,
+      "BK": 64,
+      "threads": 384,
+      "dynamic_shared_bytes": 123008,
+      "predicted_dynamic_shared_bytes": 123008,
+      "static_shared_bytes": 1024,
+      "drain_barrier": "nonaligned barrier.sync6,384; CTAepochs0/6/0",
+      "compiled_gate": {
+        "path": "results/psplit_rsa_static_review_initial_iter36.json",
+        "sha256": "46db33836552063d31dd3cfde249ddb472cf0bdd252e2a9e4f790690362a1488",
+        "status": "PASS_COMPILED_CAN_LAUNCH_39_ONLY_37_REMAINS_BLOCKED"
+      },
+      "initial_registers_per_thread": 168,
+      "initial_owned_CTA_pool_registers": 64512,
+      "requested_role_pool_registers": 57344,
+      "producer_gpr_highest_including_implicit": 52,
+      "wg0_gpr_highest_including_implicit": 185,
+      "wg1_gpr_highest_including_implicit": 186,
+      "resource_metadata_scope": "Retained legacy compiled metadata, not a fresh iteration42 resource/residency query."
+    },
+    "36": {
+      "actual_name": "megakernel_wgmma_psplit_64x32",
+      "producer_quota": 64,
+      "consumer_quotas": [
+        96,
+        96
+      ],
+      "launch_bounds_min_ctas": 1,
+      "enabled": true,
+      "BM": 64,
+      "BN": 32,
+      "BK": 32,
+      "threads": 384,
+      "dynamic_shared_bytes": 86144,
+      "static_shared_bytes": 1024,
+      "resource_metadata_scope": "Retained legacy compiled metadata, not a fresh iteration42 resource/residency query."
+    },
+    "46": {
+      "actual_name": "megakernel_wgmma_psplit_sw128_simt_control_64x32",
+      "enabled": true,
+      "producer_quota": 64,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "launch_bounds_min_ctas": 1,
+      "BM": 64,
+      "BN": 32,
+      "BK": 64,
+      "threads": 384,
+      "dynamic_shared_bytes": 123904,
+      "static_shared_bytes": 0,
+      "tool_resource_shared_bytes": 1024,
+      "device_reserved_shared_bytes_per_CTA": 1024,
+      "initial_registers_per_thread": 168,
+      "initial_owned_CTA_pool_registers": 64512,
+      "requested_role_pool_registers": 57344,
+      "drain_barrier": "nonaligned barrier.sync6,384; epochs0/6/0; BOTH banks drained",
+      "raw_A_transaction_bytes_per_stage": 0,
+      "raw_A_TMA_boxes_per_stage": 0,
+      "A_native_lda_upper_exclusive": 549755813888,
+      "B_native_stride_extra_bound": null,
+      "A_shared_absolute_alignment_bytes": 1024,
+      "occupancy_API_predicted_active_CTAs_per_SM": 1,
+      "actual_measured_CTA_residency": null,
+      "function_probe_path": "results/psplit_sw128_simt_control_function_occupancy_probe_iter42.txt",
+      "resource_metadata_scope": "Fresh independent CAN46 and current DriverAPI actual probe; no measured residency.",
+      "raw_A_SIMT_vector8_tasks_per_stage": 512,
+      "map_encode_per_ordinary_call": 1,
+      "encoded_map_consumed": false,
+      "raw_done_scope": "Storage/init retained unused; no rawTX arm/issue/wait"
+    }
+  },
+  "linked_identity_path": "results/psplit_sw128_simt_control_final_link_identity_iter42.json",
+  "linked_identity_sha256": "9ac9da1019f8fa130b9e410644d3791df199ebff7ed9c753805ee1dfd1995b59",
+  "initial_identity": {
+    "path": "results/psplit_sw128_simt_control_initial_frozen_identity_iter42.json",
+    "sha256": "4697db52e225f6103215b4bbee8b6edc8d11f1fbce76354fa227fa7269d0e7bd"
+  },
+  "new_variants": [
+    46
+  ],
+  "new_source_paths": [
+    "solution/megakernel_wgmma_psplit_sw128_simt_control.cu"
+  ],
+  "comparison_pairs": [
+    {
+      "candidate_algorithm": "mega",
+      "candidate_variant": 46,
+      "baseline_algorithm": "mega",
+      "baseline_variant": 45,
+      "axis": "SW128_CONTROL46_vs_45",
+      "controlled_axis_claimed": false
+    },
+    {
+      "candidate_algorithm": "mega",
+      "candidate_variant": 45,
+      "baseline_algorithm": "mega",
+      "baseline_variant": 39,
+      "axis": "SW128_CONTROL45_vs_39",
+      "controlled_axis_claimed": false
+    },
+    {
+      "candidate_algorithm": "mega",
+      "candidate_variant": 46,
+      "baseline_algorithm": "mega",
+      "baseline_variant": 39,
+      "axis": "SW128_CONTROL46_vs_39",
+      "controlled_axis_claimed": false
+    }
+  ],
+  "compiled_scope": "Fresh original iteration42 compiled gate authorizes only its enabled instance scope. Source7/bin2 and linked identity are exact; initial pending history is preserved, never promoted to compiled proof. Numerical/performance certification remains separate.",
+  "metadata_scope": "Created ONCE after owner AKO quicklogger/Git closure and before mandatory full timing. Gate/link/planSHA/quickarchive/source commit and all source7/bin2 bindings are present initially; no hindsight append."
+}

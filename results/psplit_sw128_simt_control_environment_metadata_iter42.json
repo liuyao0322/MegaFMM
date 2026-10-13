@@ -1,0 +1,64 @@
+{
+  "path": "results/small_psplit_sw128_simt_control_environment_iter42.txt",
+  "exit_path": "results/small_psplit_sw128_simt_control_environment_iter42.exit",
+  "sha256": "1fbfda14481d725a309dcae84954db436f58481c24d1d01255e6116d242a5665",
+  "exit": 0,
+  "allocation": 107488,
+  "host": "g08",
+  "GPU": "NVIDIA H100 80GB HBM3",
+  "gpu_uuid": "GPU-78def847-b6c1-9dd4-ff30-269a9ae1a73f",
+  "SMs": 132,
+  "SMs_evidence": "actual archived DriverAPI cuDeviceGetAttribute",
+  "application_cuda": "12.4.99",
+  "driver": "575.51.03",
+  "CUTLASS": "3.5.1 commit f7b19de32c5d1f3cedfc735c2849f12b537522ee",
+  "sanitizer_path": "/share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer",
+  "sanitizer_version": "2025.1.0.0 build35583870",
+  "clocks_locked": false,
+  "snapshot_scope": "Actual readonly postvalidation snapshot; no kernel launch or within-group clock stability/residency proof.",
+  "function_attributes_and_occupancy_API": {
+    "path": "results/psplit_sw128_simt_control_function_occupancy_probe_iter42.txt",
+    "sha256": "378c4e84ae3fbdc793ad432eb17f14fce3866f9f4975ee27935ec9b8fae34908",
+    "exit": 0,
+    "records": [
+      {
+        "variant": 46,
+        "dtype": "fp16",
+        "symbol": "_ZN7megafmm78_GLOBAL__N__8e6b49be_45_megakernel_wgmma_psplit_sw128_simt_control_cu_7c2d4f1440winograd_wgmma_psplit_sw128_simt_controlIN7cutlass6half_tELi32EEEvNS_7ProblemENS0_26SW128SimtControlDescriptorEPKT_S8_PKfPf",
+        "cubin_path": "results/psplit_sw128_simt_control_final_megakernel_wgmma_psplit_sw128_simt_control_iter42.cubin",
+        "cubin_sha256": "dec13dafd0952cc9571f606e1108d79bcd20c15e44efe848851215d77a051d66",
+        "queried_dynamic_shared_bytes": 123904,
+        "queried_threads": 384,
+        "function_attributes": {
+          "max_threads_per_block": 384,
+          "static_shared_bytes": 0,
+          "local_bytes": 0,
+          "registers_per_thread": 168,
+          "max_dynamic_shared_bytes_before_optin": 49152,
+          "max_dynamic_shared_bytes_after_optin": 123904
+        },
+        "occupancy_API_predicted_active_CTAs_per_SM": 1,
+        "measured_residency": null
+      },
+      {
+        "variant": 46,
+        "dtype": "bf16",
+        "symbol": "_ZN7megafmm78_GLOBAL__N__8e6b49be_45_megakernel_wgmma_psplit_sw128_simt_control_cu_7c2d4f1440winograd_wgmma_psplit_sw128_simt_controlIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemENS0_26SW128SimtControlDescriptorEPKT_S8_PKfPf",
+        "cubin_path": "results/psplit_sw128_simt_control_final_megakernel_wgmma_psplit_sw128_simt_control_iter42.cubin",
+        "cubin_sha256": "dec13dafd0952cc9571f606e1108d79bcd20c15e44efe848851215d77a051d66",
+        "queried_dynamic_shared_bytes": 123904,
+        "queried_threads": 384,
+        "function_attributes": {
+          "max_threads_per_block": 384,
+          "static_shared_bytes": 0,
+          "local_bytes": 0,
+          "registers_per_thread": 168,
+          "max_dynamic_shared_bytes_before_optin": 49152,
+          "max_dynamic_shared_bytes_after_optin": 123904
+        },
+        "occupancy_API_predicted_active_CTAs_per_SM": 1,
+        "measured_residency": null
+      }
+    ]
+  }
+}

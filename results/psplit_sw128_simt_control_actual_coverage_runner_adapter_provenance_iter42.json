@@ -1,0 +1,40 @@
+{
+  "status": "CPU_ADAPTER_PRE_EXECUTION_RUNNER_ABI_EXACT",
+  "parent_adapter": {
+    "path": "results/psplit_sw128_simt_control_actual_coverage_command_adapter_iter42.py",
+    "sha256": "46d3b2b946f0bbb84bd7138b72487ea10be66c238018cd95cbad0c642aeb984a"
+  },
+  "prepared_generator": {
+    "path": "results/psplit_sw128_simt_control_actual_test_coverage_generator_iter42.py",
+    "sha256": "0099ed61d28b082dae336b20ce07acfe76b8dbaf3e51bba33978b3297c5cd13c"
+  },
+  "actual_adapter": {
+    "path": "results/psplit_sw128_simt_control_actual_coverage_runner_adapter_iter42.py",
+    "sha256": "d076b3126ae872d61de10156caea66a77a4f4a73c3cac7d90c0eacf7bdaa5d3a"
+  },
+  "actual_parent_attempt": {
+    "stdout_path": "results/psplit_sw128_simt_control_actual_coverage_adapter_execution_iter42.txt",
+    "stdout_sha256": "a8a2e3e326016cdcb26819023caf995a5ffc9bee7605db9a708bcd6cc47de8da",
+    "exit_path": "results/psplit_sw128_simt_control_actual_coverage_adapter_execution_iter42.exit",
+    "exit_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "actual_exit": 1
+  },
+  "pre_execution_validation_runner": {
+    "path": "results/psplit_sw128_simt_control_validation_runner_iter42.py",
+    "sha256": "6a1082c16d5a1dfde6f9834f61a20811ae65e04cd363f905ddda065da067ad36",
+    "frozen_source_commit": "d372045901ed1ef97ed4a933109d409835ed1d83"
+  },
+  "deltas": [
+    {
+      "before": "extra = ['--leak-check', 'full'] if tool == 'memcheck' else ['--racecheck-report', 'all'] if tool == 'racecheck' else []",
+      "after": "extra = ['--leak-check', 'full'] if tool == 'memcheck' else []",
+      "occurrences": 1
+    },
+    {
+      "before": "command[3:] == ['--tool', tool, '--error-exitcode', '99'] + extra +",
+      "after": "command[3:] == ['--tool', tool, '--error-exitcode', '97'] + extra +",
+      "occurrences": 1
+    }
+  ],
+  "scope": "Require exact actual pre-execution runner command with error-exitcode97 and default race report. All zero-error summaries, selected complete marker multisets, binary/source/link identity checks unchanged. Parent retains only known test executable leading ./ path canonicalization. No expected/source/binary/raw mutation or GPU rerun."
+}
