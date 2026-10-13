@@ -1,0 +1,1512 @@
+{
+  "schema": "megafmm.iteration38.psplit-hybrid-s-independent-static-final-review.v1",
+  "iteration": 38,
+  "status": "PASS_INDEPENDENT_EVIDENCE_REVIEW_ORIGINAL_NUMERICAL_GATE_FAIL",
+  "reviewer": "/root/pipeline_review30",
+  "scope": "CPU-only narrow final evidence/semantic review; no build, GPU, benchmark, sanitizer run, extraction, Git or model rerun. Fresh iteration38 machine proof retained unchanged; no inherited old39/40/SS36 gate.",
+  "compiled_gate_inherited_from_iteration37": false,
+  "compiled_gate_inherited_from_iteration36": false,
+  "compiled_gate_inherited_from_SS36": false,
+  "reviewed_document_snapshot": {
+    "checkpoint": "7863fa4270b331a80f4cc21365afd494b72112b8",
+    "checkpoint_provenance": "Full clean prestatus supplied by sole owner and separately root/data audited; reviewer executes no Git.",
+    "primary_sha256": {
+      "results/small_psplit_hybrid_s_profile_iter38.json": "40424bf5dae5332b1834c8772f2cb2049c2705931d256e6ddbf63ab16ee4c39b",
+      "results/1024_MEGAKERNEL_PSPLIT_HYBRID_S_REPORT.md": "6502f9825ef2ff5edf7d04a5d540a0c3b6d74cd42fe796fe48f1f675c122e93c",
+      "results/small_psplit_hybrid_s_measurements_iter38.json": "3e81dcdd5d76d4d007b67834c53cf0e42907d010d296d3c116ae61892c23b325",
+      "results/psplit_hybrid_s_test_coverage_iter38.json": "56be7b665be178b6b4f3ec891f1a11905d5f53fbd2d72f6b45924ac9bb55728e"
+    },
+    "document_snapshot_only": true,
+    "later_metadata_scope": "Only finalaudit status/path/SHA and original exactcopies; never self-reference finalprofile."
+  },
+  "base_checkpoint": "c7be7d18ddc25a264b0591782d4a733ff7b758d5",
+  "measurement_source_commit": "dec5e4b55f838f77fda3ec31a9869931cd9829f4",
+  "frozen_bindings": {
+    "CMakeLists.txt": "bff645d92a844e6bce355b71dfdd1e5d37a25babca05af2aaa9f7d019ac1c8d3",
+    "bench/benchmark.cu": "f6c5716e610a74e68611a01b4d6813f6e374a4c3eee50b7e1194ab4fa77ddcbf",
+    "include/megafmm/gemm.h": "03344003fa3e7c324c170833e557806cdb3f62780077c6b1d9d0500f3322fb02",
+    "include/megafmm/kernels.h": "cad0a9d521951b0c52825f7ed23b8bcc7e2d40dbb9565abb2066f5d5cd49cf5d",
+    "solution/plan.cpp": "0db2b38640237f002b836f666bdf493dc1cefa439ad90e32f8b7207d0b5b034d",
+    "tests/test_correctness.cu": "62f376ab23d2b401eeafc16ad32ff995d7ba6a2bc441b36731311c43ad7ec6e2",
+    "solution/megakernel_wgmma_psplit_hybrid_s.cu": "db5ed2caf91fe7713830b16876c2e08c9d58fad6f75389d391afc77827a1f8be",
+    "build/megafmm_bench": "6f81bf43e39d7d6bc089f4877cb8cdceb16c2e7f1dbdc47a47e4a6f02b0e97d8",
+    "build/test_correctness": "37706b3c9b881ce59153905a4dbe98db02cbcebf144243c73003e7c35be1ae45",
+    "results/psplit_hybrid_s_static_review_initial_iter38.json": "bdd8ae67d1206ecf870a5b17eb255fc8f5d76789fa996a61f650b0719dd86932",
+    "results/psplit_hybrid_s_static_review_initial_iter38.md": "789405bb89acf0d6a5c377d81561b265baf51c11588875c52f0163a6a79b259e",
+    "results/psplit_hybrid_s_initial_object_sass_iter38.txt": "891584c2e6d4764ca172d50e9cedc79d78ba6111e410b02f96b5706caafe77f9",
+    "results/small_psplit_hybrid_s_initial_sass_iter38.txt": "03fb59e51db74ce4c3849cb5c1ff7c8ea722febdb95ce92e9cfef63b06ce76ba",
+    "results/psplit_hybrid_s_initial_test_sass_iter38.txt": "03fb59e51db74ce4c3849cb5c1ff7c8ea722febdb95ce92e9cfef63b06ce76ba",
+    "results/psplit_hybrid_s_initial_megakernel_wgmma_psplit_hybrid_s_iter38.ptx": "feed2f57a2e8c0399fc3a59a27017785659b9f4eceffac8fc569c851d6d9ee4d",
+    "results/psplit_hybrid_s_initial_object_elf_iter38.txt": "537da7f671418410ab5abf701608d613d4bf070a8db573bc101e9858ea8b3710",
+    "results/psplit_hybrid_s_initial_host_objdump_iter38.txt": "65ded1d187fd464b96ee5d891983b358a80b5e260f0739ef9680cd36072d1fc8",
+    "results/psplit_hybrid_s_initial_link_identity_iter38.json": "722741479b60958894ca254c8f91ef85c69dfae58ff62fc170e7a22fc36db197",
+    "results/correctness_psplit_hybrid_s_iter38.txt": "b66b267a4cc8a2b2b321e1783e2bf96022005ee75cebb75eeb1d219a16143826",
+    "results/correctness_psplit_hybrid_s_iter38.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/correctness_psplit_hybrid_s41_targeted_iter38.txt": "4b289853a89c2269e12fda8b7361a2b7d29f713cb179e551adbd3a5822fe597b",
+    "results/correctness_psplit_hybrid_s41_targeted_iter38.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/sanitizer_psplit_hybrid_s41_memcheck_iter38.txt": "b080fea31accd2acdb8c831e9b7a0865eeef1a15827b038c248f8566ba70901d",
+    "results/sanitizer_psplit_hybrid_s41_memcheck_iter38.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/sanitizer_psplit_hybrid_s41_racecheck_iter38.txt": "2285cd1c9a13cf5e2da45fad3489748d4b68f445884342fd230a0b47b10215e2",
+    "results/sanitizer_psplit_hybrid_s41_racecheck_iter38.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/sanitizer_psplit_hybrid_s41_synccheck_iter38.txt": "cd1f4f0a275aaec9dfb14e423073303809455d4a07eca4e196244e005536ed9c",
+    "results/sanitizer_psplit_hybrid_s41_synccheck_iter38.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/strict_psplit_hybrid_s_iter38.txt": "8ac246b5432cb9d27793bf832c5f7179bedb5ada11811549a89e98a1e026803f",
+    "results/strict_psplit_hybrid_s_iter38.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/disabled_psplit_hybrid_s37_cli_iter38.txt": "a9fccfc2796ef871f2689d23d493ec40e436bdb52ea22616bcd2c8e1a256bf64",
+    "results/disabled_psplit_hybrid_s37_cli_iter38.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "results/psplit_hybrid_s_cpu_state_model_iter38.txt": "9fa53047988c1a046a5ab0882b6fe5a7c5ca2f29380b444567bfc7541c506932",
+    "results/psplit_hybrid_s_cpu_state_model_iter38.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/psplit_hybrid_s_cpu_planar_model_iter38.txt": "44bfc57f75396cff2f34ee7e5f5f4e7b0406419c23fe6bee259542673833f152",
+    "results/psplit_hybrid_s_cpu_planar_model_iter38.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/small_psplit_hybrid_s41_launch_iter38_full1024.csv": "80c6afe1f03b9da8d852ff4c6c0cc6095e8a404a5e37773703e8ae654e23d2dc",
+    "results/small_psplit_hybrid_s41_launch_iter38_full1024.log": "a61483a9bffb02fb388832b544287299c9f16544c8ebfbbf637f36d6395115e2",
+    "results/small_psplit_hybrid_s41_launch_iter38_full1024.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/small_psplit_hybrid_s41_graph_iter38_full1024.csv": "806b27089a95197e97aae134cffb21d101daf84760d493a4abef6a09c241e309",
+    "results/small_psplit_hybrid_s41_graph_iter38_full1024.log": "0e09b8f51a057b56e68da739f007bc7740394c26c7d7dd2aa2eca9aa588ff9f9",
+    "results/small_psplit_hybrid_s41_graph_iter38_full1024.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/small_psplit_rsa39_launch_iter38_full1024.csv": "a82c894fe52030513ae67580edfd024b73cdb8f95f76f04be54a867677411f0a",
+    "results/small_psplit_rsa39_launch_iter38_full1024.log": "6861cf6303672e83dacd95a3322b6d1f44ed6217ea5698b63b77827f59ff636e",
+    "results/small_psplit_rsa39_launch_iter38_full1024.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/small_psplit_rsa39_graph_iter38_full1024.csv": "ba2a11c25b5fd6e3f68f76b7e7c99dc5e71c174a70a680d185416f16faa9f0fb",
+    "results/small_psplit_rsa39_graph_iter38_full1024.log": "5454f9c8c430d17626aa85ce79e78825556daf0cbe9294ef8f16fd8d50a501cd",
+    "results/small_psplit_rsa39_graph_iter38_full1024.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/small_psplit_rsa_bk3240_launch_iter38_full1024.csv": "45ec0066f9bd045f889a2fc51f8e1f718e3afa784dfd41869f90cf7953e4179d",
+    "results/small_psplit_rsa_bk3240_launch_iter38_full1024.log": "959833bbc6ff0c537267ab69ac53b6f02f091b78d4563e3fe43c27f0d5e2106a",
+    "results/small_psplit_rsa_bk3240_launch_iter38_full1024.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/small_psplit_rsa_bk3240_graph_iter38_full1024.csv": "9506b53ea046c3b7765c925022a8c985d3bbef4d7258c37acb8e9d616d40b672",
+    "results/small_psplit_rsa_bk3240_graph_iter38_full1024.log": "bef96e71b4ddd6cc5a5d9793d40e9b0a04b2b061c5f4c428358b6d3cd5539d00",
+    "results/small_psplit_rsa_bk3240_graph_iter38_full1024.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/small_psplit36_launch_iter38_full1024.csv": "a1cd160d18b0f911d6eb113e968fb90917a89ba000967b69d9b06258c75ccccd",
+    "results/small_psplit36_launch_iter38_full1024.log": "33c9e2427f7397d8ef88127e0abdd0b452d3271be3d33a7459cef4ecd6750f6f",
+    "results/small_psplit36_launch_iter38_full1024.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/small_psplit36_graph_iter38_full1024.csv": "db6f2bec72a891bc3149fdd3096983d936de4dbc15cefc862f502c50a778dd6e",
+    "results/small_psplit36_graph_iter38_full1024.log": "c182d67611913d779d2e9d54706dbd48cb0339a9b3e3fdf56c87121b75b6edc4",
+    "results/small_psplit36_graph_iter38_full1024.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/small_packed_lt1_launch_iter38_full1024.csv": "db07630478d104195ee6cc9df14075e02b825ccb2735ae57180ab6b0371b2ea8",
+    "results/small_packed_lt1_launch_iter38_full1024.log": "17f001e3afd1f899f4a4bb820d1561a4be7db9279b3c6e44ba7eb7c6e3e311cb",
+    "results/small_packed_lt1_launch_iter38_full1024.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/small_packed_lt1_graph_iter38_full1024.csv": "77cfa5dc1b86812f7cd15e30c1daaf7f54d0bd70ae077bad1d08b37b95a87c80",
+    "results/small_packed_lt1_graph_iter38_full1024.log": "cc8b34e2e5931b555d7c009881003950aff61f51a9ba76b8dbbdcc9da7ddb73d",
+    "results/small_packed_lt1_graph_iter38_full1024.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/psplit_hybrid_s_measured_identity_iter38.json": "81320e862d2b7e1373f5888d52e96c5278effd6af5a455732c8c8af041589293",
+    "results/psplit_hybrid_s_compiled_metadata_iter38.json": "4dcfd7c91bb00bea734d0eda455eb411c7e242ca774d35a87a1fda89db3db877",
+    "results/psplit_hybrid_s1024_plan_iter38.json": "4c9b459de971f9385a0d81c75fd637b79967950f029ca68f348820c430bd2673",
+    "results/small_psplit_hybrid_s_profile_iter38.json": "40424bf5dae5332b1834c8772f2cb2049c2705931d256e6ddbf63ab16ee4c39b",
+    "results/1024_MEGAKERNEL_PSPLIT_HYBRID_S_REPORT.md": "6502f9825ef2ff5edf7d04a5d540a0c3b6d74cd42fe796fe48f1f675c122e93c",
+    "results/small_psplit_hybrid_s_measurements_iter38.json": "3e81dcdd5d76d4d007b67834c53cf0e42907d010d296d3c116ae61892c23b325",
+    "results/psplit_hybrid_s_test_coverage_iter38.json": "56be7b665be178b6b4f3ec891f1a11905d5f53fbd2d72f6b45924ac9bb55728e"
+  },
+  "source7_bin2_equal_initial_and_measured_identity": true,
+  "initial_gate": {
+    "path": "results/psplit_hybrid_s_static_review_initial_iter38.json",
+    "sha256": "bdd8ae67d1206ecf870a5b17eb255fc8f5d76789fa996a61f650b0719dd86932",
+    "status": "PASS_COMPILED_CAN_LAUNCH_41_ONLY_37_REMAINS_BLOCKED"
+  },
+  "initial_JSON_MD_original_exactcopies": true,
+  "instances": [
+    {
+      "variant": 41,
+      "dtype": "FP16",
+      "function": "_ZN7megafmm68_GLOBAL__N__4fd0e613_35_megakernel_wgmma_psplit_hybrid_s_cu_a0c2e1eb30winograd_wgmma_psplit_hybrid_sIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf",
+      "status": "PASS_FRESH_COMPILED_STATIC_LAUNCH_GATE",
+      "bm": 64,
+      "bn": 32,
+      "bk": 32,
+      "threads": 384,
+      "banks": 2,
+      "k16_atoms": 2,
+      "parent_1024_stage_count": 16,
+      "static_instruction_count": 2024,
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "canonical_instruction_stream_sha256": "a314c57c8a250f2f93bdaa4eddb06e123c880f9e62c279ecfebf375dbe3292e3",
+      "actual_reported_registers": 168,
+      "effective_initial_registers_per_thread": 168,
+      "effective_initial_evidence": [
+        "Actual feeding ELF EIATTR_REGCOUNT168 and MAXREG_COUNT0xa8",
+        "ptxas and linked resource REG168; allocation granularity8, 21x256 words per warp"
+      ],
+      "producer_quota": 64,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "initial_owned_cta_register_pool": 64512,
+      "required_role_register_pool": 57344,
+      "owned_pool_spare": 7168,
+      "legal_setmaxnreg_directions": true,
+      "prequota_highest_register": 20,
+      "role_highest_including_implicit": {
+        "producer": 41,
+        "WG0": 124,
+        "WG1": 164
+      },
+      "producer_common_U_highest_register": 37,
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 659,
+          "possibly_executed_instruction_count": 658,
+          "abstract_state_count": 795,
+          "gpr_highest_including_implicit": 41,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x6af0",
+              "instruction": "IMAD R41, R34, 0x2, R23",
+              "highest": 41
+            },
+            {
+              "pc": "0x6b10",
+              "instruction": "LOP3.LUT R7, R41, 0x80, RZ, 0xc0, !PT",
+              "highest": 41
+            },
+            {
+              "pc": "0x6b50",
+              "instruction": "LOP3.LUT R41, R34, R41, RZ, 0x3c, !PT",
+              "highest": 41
+            },
+            {
+              "pc": "0x6b90",
+              "instruction": "IADD3 R41, -R0, R41, RZ",
+              "highest": 41
+            },
+            {
+              "pc": "0x6c40",
+              "instruction": "STS.128 [R41], R4",
+              "highest": 41
+            }
+          ],
+          "pending_RS_A_and_P_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 940,
+          "possibly_executed_instruction_count": 892,
+          "abstract_state_count": 1250,
+          "gpr_highest_including_implicit": 124,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x3e10",
+              "instruction": "IMAD.IADD R124, R23, 0x1, R24.reuse",
+              "highest": 124
+            },
+            {
+              "pc": "0x3ec0",
+              "instruction": "LOP3.LUT R27, R124, 0x80, RZ, 0xc0, !PT",
+              "highest": 124
+            },
+            {
+              "pc": "0x3fc0",
+              "instruction": "LOP3.LUT R124, R27, R124, RZ, 0x3c, !PT",
+              "highest": 124
+            },
+            {
+              "pc": "0x4010",
+              "instruction": "VIADD R124, R124, -UR6",
+              "highest": 124
+            },
+            {
+              "pc": "0x4070",
+              "instruction": "LDS R124, [R124]",
+              "highest": 124
+            },
+            {
+              "pc": "0x45b0",
+              "instruction": "FADD R117, -R124, R117",
+              "highest": 124
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x47f0",
+              "last_issue_pc": "0x4940",
+              "covered_wait0_pc": "0x4950",
+              "MMA_count": 6,
+              "A_packed_register_count": 24,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95
+              ],
+              "P_register_count": 48,
+              "P_registers": [
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all complete-stage physical A words from first MMA until covered wait0,including future-issued A; actual role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 1084,
+          "possibly_executed_instruction_count": 1079,
+          "abstract_state_count": 1398,
+          "gpr_highest_including_implicit": 164,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x13a0",
+              "instruction": "VIADD R164, R22, UR7",
+              "highest": 164
+            },
+            {
+              "pc": "0x1610",
+              "instruction": "LOP3.LUT R93, R164, 0x80, RZ, 0xc0, !PT",
+              "highest": 164
+            },
+            {
+              "pc": "0x1710",
+              "instruction": "LOP3.LUT R164, R93, R164, RZ, 0x3c, !PT",
+              "highest": 164
+            },
+            {
+              "pc": "0x1760",
+              "instruction": "VIADD R164, R164, -UR12",
+              "highest": 164
+            },
+            {
+              "pc": "0x17c0",
+              "instruction": "LDS R164, [R164]",
+              "highest": 164
+            },
+            {
+              "pc": "0x2340",
+              "instruction": "HADD2.F32 R101, -RZ, R164.H0_H0",
+              "highest": 164
+            },
+            {
+              "pc": "0x2360",
+              "instruction": "HADD2.F32 R164, -RZ, R164.H1_H1",
+              "highest": 164
+            },
+            {
+              "pc": "0x23e0",
+              "instruction": "FADD R107, R164, -R107",
+              "highest": 164
+            },
+            {
+              "pc": "0x2750",
+              "instruction": "LOP3.LUT R164, R101, 0x80, RZ, 0xc0, !PT",
+              "highest": 164
+            },
+            {
+              "pc": "0x27b0",
+              "instruction": "SHF.R.U64 R164, R164, 0x3, RZ",
+              "highest": 164
+            },
+            {
+              "pc": "0x27f0",
+              "instruction": "LOP3.LUT R101, R164, R101, RZ, 0x3c, !PT",
+              "highest": 164
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x2930",
+              "last_issue_pc": "0x2af0",
+              "covered_wait0_pc": "0x2b00",
+              "MMA_count": 8,
+              "A_packed_register_count": 32,
+              "A_registers": [
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                116,
+                117,
+                118,
+                119
+              ],
+              "P_register_count": 64,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all complete-stage physical A words from first MMA until covered wait0,including future-issued A; actual role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        }
+      ],
+      "initialization_gate": {
+        "status": "PASS_FRESH_OPERAND_AWARE_CFG",
+        "INC192_pc": "0x230",
+        "retry_pc": "0x260 -> 0x220",
+        "success_pc": "0x270",
+        "pre_success_owned_P_accesses": 0,
+        "common_P_clear_pcs": "0x290..0x440 R40..R87",
+        "WG1_extra_P_clear_pcs": "0x470..0x4f0 R24..R39",
+        "WG0_initial_P_MMA_blocks": [
+          "0x47f0",
+          "0x4880",
+          "0x4900"
+        ],
+        "WG1_initial_P_MMA_blocks": [
+          "0x2930",
+          "0x29b0",
+          "0x2a30",
+          "0x2ab0"
+        ],
+        "all_P_first_reads_defined_zero_after_alloc_success": true,
+        "WG0_uniform_zero_and_reload_chain_verified": true,
+        "all_new_R168_to_R191_accesses": [],
+        "loopbacks_preserve_accumulator_and_skip_initial_clear": true,
+        "producer_DEC64_pc": "0x55a0",
+        "independent_worker": "/root/pipeline_review30/psplit_scope_barrier_cpu34"
+      },
+      "RS_A_operand_packed_width": 4,
+      "P_accumulator_source_and_destination_width": 16,
+      "whole_stage_pending_generic_A_or_P_accesses": 0,
+      "STACK": 0,
+      "LOCAL": 0,
+      "spill_stores": 0,
+      "spill_loads": 0,
+      "new_function_C7512": false,
+      "serialization_warning_for_new_function": false,
+      "dynamic_shared_bytes": 86144,
+      "static_shared_bytes": 1024,
+      "dynamic_plus_static_shared_bytes": 87168,
+      "documented_reserved_allowance_bytes": 1024,
+      "capacity_budget_including_reserved": 88192,
+      "capacity_budget_is_not_measured_occupancy": true,
+      "typed_bank_rawA4_and_roundedS1_bytes": 20480,
+      "typed_bank_FP32_S2_even_odd_bytes": 8192,
+      "typed_bank_finalB7_bytes": 14336,
+      "typed_bank_s2_offset_bytes": 20480,
+      "typed_bank_b_offset_bytes": 28672,
+      "typed_bank_alignment_bytes": 128,
+      "typed_bank_compact_offsets_and_size_compiled_static_asserts": true,
+      "S2_float_pointer_flag_bits": 32,
+      "S2_vector4_contiguous_and_aligned_full_domain_pinned_API_proof": true,
+      "shared_bank_bytes": 43008,
+      "two_banks_bytes": 86016,
+      "P_tail_bytes": 57344,
+      "tail_bank0_bytes": 43008,
+      "tail_bank1_bytes": 14336,
+      "full_barrier_offsets": [
+        86016,
+        86024
+      ],
+      "empty_barrier_offsets": [
+        86032,
+        86040
+      ],
+      "full_barrier_arrival_count": 128,
+      "empty_barrier_arrival_count": 256,
+      "host_launch_and_optin_actual_immediate": "0x15080",
+      "host_threads_actual_dim3_immediate": "0x100000180",
+      "native_ordinary_kernel_launches": 1,
+      "global_workspace_bytes": 0,
+      "synchronization_gate": {
+        "status": "PASS_CURRENT_SOURCE_FEEDING_PTX_AND_SASS",
+        "CTA_collective_epochs": [
+          0,
+          6,
+          0
+        ],
+        "init_bar0_pc": "0x1a0",
+        "consumer_drain_bar6_pc": "0x49c0",
+        "producer_drain_bar6_pc": "0x6f40",
+        "publish_bar0_pc": "0x6f70",
+        "drain_id": 6,
+        "drain_count": 384,
+        "drain_non_aligned": true,
+        "all_12_full_warps_exactly_once": true,
+        "WG0_wait0_release_pcs": [
+          "0x4950",
+          "0x4960"
+        ],
+        "WG1_wait0_release_pcs": [
+          "0x2b00",
+          "0x2b10"
+        ],
+        "producer_last_commit_pc": "0x6dd0",
+        "producer_tail_two_empty_wait_pcs": [
+          "0x6e90",
+          "0x6f20"
+        ],
+        "both_banks_fully_retired_before_tail": true,
+        "tail_STS_first_last_pcs": [
+          "0x4ec0",
+          "0x5570"
+        ],
+        "all_tail_STS_after_drain_and_before_publish": true,
+        "all_U_reads_after_publish": true,
+        "tail_S2R_after_whole_K_before_drain_is_permitted_address_computation": true
+      },
+      "hybrid_math_DAG_gate": {
+        "status": "PASS_ORIGINAL_RN_NODE_ORDER_FINAL_ONECAST",
+        "producer_S1_FP32_fadd_then_S2_fsub_from_unrounded_S1": true,
+        "rounded_shared_S1_only_for_P5": true,
+        "unrounded_S2_shared_as_float_raw_words": true,
+        "WG0_S4_from_FP32_S2": true,
+        "WG1_S3_and_final_cast_S2": true,
+        "B_DAG_unchanged": true,
+        "wholeK_all_seven_FP32_P_and_fixed_U_unchanged": true,
+        "CPU_finite_model_not_FP64_precision_certification": true
+      },
+      "alias_epilogue_gate": {
+        "status": "PASS",
+        "current_AB_validation_and_bindings": true,
+        "alpha_separate_RN_multiply_then_active_beta_FMA": true,
+        "active_exact_C0_D_all_four_loads_before_first_store": true,
+        "active_C0_load_pcs": [
+          "0x7800",
+          "0x7840",
+          "0x7880",
+          "0x78e0"
+        ],
+        "active_D_store_pcs": [
+          "0x7ac0",
+          "0x7ae0",
+          "0x7af0",
+          "0x7b10"
+        ],
+        "beta_zero_null_C0_reads": 0
+      },
+      "GPU_validation_at_compiled_gate": null,
+      "original_precision_certification_at_compiled_gate": null,
+      "performance_at_compiled_gate": null
+    },
+    {
+      "variant": 41,
+      "dtype": "BF16",
+      "function": "_ZN7megafmm68_GLOBAL__N__4fd0e613_35_megakernel_wgmma_psplit_hybrid_s_cu_a0c2e1eb30winograd_wgmma_psplit_hybrid_sIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf",
+      "status": "PASS_FRESH_COMPILED_STATIC_LAUNCH_GATE",
+      "bm": 64,
+      "bn": 32,
+      "bk": 32,
+      "threads": 384,
+      "banks": 2,
+      "k16_atoms": 2,
+      "parent_1024_stage_count": 16,
+      "static_instruction_count": 2024,
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "canonical_instruction_stream_sha256": "0bf76bb40087d10b500c539bce1d5c638679f6d6ebac713959adeb802fb962fd",
+      "actual_reported_registers": 168,
+      "effective_initial_registers_per_thread": 168,
+      "effective_initial_evidence": [
+        "Actual feeding ELF EIATTR_REGCOUNT168 and MAXREG_COUNT0xa8",
+        "ptxas and linked resource REG168; allocation granularity8, 21x256 words per warp"
+      ],
+      "producer_quota": 64,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "initial_owned_cta_register_pool": 64512,
+      "required_role_register_pool": 57344,
+      "owned_pool_spare": 7168,
+      "legal_setmaxnreg_directions": true,
+      "prequota_highest_register": 20,
+      "role_highest_including_implicit": {
+        "producer": 39,
+        "WG0": 124,
+        "WG1": 164
+      },
+      "producer_common_U_highest_register": 37,
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 659,
+          "possibly_executed_instruction_count": 658,
+          "abstract_state_count": 795,
+          "gpr_highest_including_implicit": 39,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x6a80",
+              "instruction": "FADD R39, -R32, R19",
+              "highest": 39
+            },
+            {
+              "pc": "0x6ad0",
+              "instruction": "FADD R19, R32, -R39",
+              "highest": 39
+            },
+            {
+              "pc": "0x6b40",
+              "instruction": "F2FP.BF16.F32.PACK_AB R7, R36, R39",
+              "highest": 39
+            }
+          ],
+          "pending_RS_A_and_P_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 940,
+          "possibly_executed_instruction_count": 892,
+          "abstract_state_count": 1250,
+          "gpr_highest_including_implicit": 124,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x3de0",
+              "instruction": "IMAD.IADD R124, R23, 0x1, R24.reuse",
+              "highest": 124
+            },
+            {
+              "pc": "0x3e90",
+              "instruction": "LOP3.LUT R27, R124, 0x80, RZ, 0xc0, !PT",
+              "highest": 124
+            },
+            {
+              "pc": "0x3fb0",
+              "instruction": "LOP3.LUT R124, R27, R124, RZ, 0x3c, !PT",
+              "highest": 124
+            },
+            {
+              "pc": "0x4020",
+              "instruction": "VIADD R124, R124, -UR6",
+              "highest": 124
+            },
+            {
+              "pc": "0x40a0",
+              "instruction": "LDS R124, [R124]",
+              "highest": 124
+            },
+            {
+              "pc": "0x4550",
+              "instruction": "FADD R117, -R124, R117",
+              "highest": 124
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x47f0",
+              "last_issue_pc": "0x4940",
+              "covered_wait0_pc": "0x4950",
+              "MMA_count": 6,
+              "A_packed_register_count": 24,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95
+              ],
+              "P_register_count": 48,
+              "P_registers": [
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all complete-stage physical A words from first MMA until covered wait0,including future-issued A; actual role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 1084,
+          "possibly_executed_instruction_count": 1079,
+          "abstract_state_count": 1398,
+          "gpr_highest_including_implicit": 164,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x13c0",
+              "instruction": "VIADD R164, R22, UR7",
+              "highest": 164
+            },
+            {
+              "pc": "0x15f0",
+              "instruction": "LOP3.LUT R93, R164, 0x80, RZ, 0xc0, !PT",
+              "highest": 164
+            },
+            {
+              "pc": "0x16f0",
+              "instruction": "LOP3.LUT R164, R93, R164, RZ, 0x3c, !PT",
+              "highest": 164
+            },
+            {
+              "pc": "0x1740",
+              "instruction": "VIADD R164, R164, -UR12",
+              "highest": 164
+            },
+            {
+              "pc": "0x17c0",
+              "instruction": "LDS R164, [R164]",
+              "highest": 164
+            },
+            {
+              "pc": "0x2360",
+              "instruction": "IMAD.U32 R101, R164.reuse, 0x10000, RZ",
+              "highest": 164
+            },
+            {
+              "pc": "0x2370",
+              "instruction": "LOP3.LUT R164, R164, 0xffff0000, RZ, 0xc0, !PT",
+              "highest": 164
+            },
+            {
+              "pc": "0x2430",
+              "instruction": "FADD R107, R164, -R107",
+              "highest": 164
+            },
+            {
+              "pc": "0x27b0",
+              "instruction": "LOP3.LUT R164, R101, 0x80, RZ, 0xc0, !PT",
+              "highest": 164
+            },
+            {
+              "pc": "0x2800",
+              "instruction": "SHF.R.U64 R164, R164, 0x3, RZ",
+              "highest": 164
+            },
+            {
+              "pc": "0x2840",
+              "instruction": "LOP3.LUT R101, R164, R101, RZ, 0x3c, !PT",
+              "highest": 164
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x2930",
+              "last_issue_pc": "0x2af0",
+              "covered_wait0_pc": "0x2b00",
+              "MMA_count": 8,
+              "A_packed_register_count": 32,
+              "A_registers": [
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                116,
+                117,
+                118,
+                119
+              ],
+              "P_register_count": 64,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all complete-stage physical A words from first MMA until covered wait0,including future-issued A; actual role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        }
+      ],
+      "initialization_gate": {
+        "status": "PASS_FRESH_OPERAND_AWARE_CFG",
+        "INC192_pc": "0x230",
+        "retry_pc": "0x260 -> 0x220",
+        "success_pc": "0x270",
+        "pre_success_owned_P_accesses": 0,
+        "common_P_clear_pcs": "0x290..0x440 R40..R87",
+        "WG1_extra_P_clear_pcs": "0x470..0x4f0 R24..R39",
+        "WG0_initial_P_MMA_blocks": [
+          "0x47f0",
+          "0x4880",
+          "0x4900"
+        ],
+        "WG1_initial_P_MMA_blocks": [
+          "0x2930",
+          "0x29b0",
+          "0x2a30",
+          "0x2ab0"
+        ],
+        "all_P_first_reads_defined_zero_after_alloc_success": true,
+        "WG0_uniform_zero_and_reload_chain_verified": true,
+        "all_new_R168_to_R191_accesses": [],
+        "loopbacks_preserve_accumulator_and_skip_initial_clear": true,
+        "producer_DEC64_pc": "0x55a0",
+        "independent_worker": "/root/pipeline_review30/psplit_scope_barrier_cpu34"
+      },
+      "RS_A_operand_packed_width": 4,
+      "P_accumulator_source_and_destination_width": 16,
+      "whole_stage_pending_generic_A_or_P_accesses": 0,
+      "STACK": 0,
+      "LOCAL": 0,
+      "spill_stores": 0,
+      "spill_loads": 0,
+      "new_function_C7512": false,
+      "serialization_warning_for_new_function": false,
+      "dynamic_shared_bytes": 86144,
+      "static_shared_bytes": 1024,
+      "dynamic_plus_static_shared_bytes": 87168,
+      "documented_reserved_allowance_bytes": 1024,
+      "capacity_budget_including_reserved": 88192,
+      "capacity_budget_is_not_measured_occupancy": true,
+      "typed_bank_rawA4_and_roundedS1_bytes": 20480,
+      "typed_bank_FP32_S2_even_odd_bytes": 8192,
+      "typed_bank_finalB7_bytes": 14336,
+      "typed_bank_s2_offset_bytes": 20480,
+      "typed_bank_b_offset_bytes": 28672,
+      "typed_bank_alignment_bytes": 128,
+      "typed_bank_compact_offsets_and_size_compiled_static_asserts": true,
+      "S2_float_pointer_flag_bits": 32,
+      "S2_vector4_contiguous_and_aligned_full_domain_pinned_API_proof": true,
+      "shared_bank_bytes": 43008,
+      "two_banks_bytes": 86016,
+      "P_tail_bytes": 57344,
+      "tail_bank0_bytes": 43008,
+      "tail_bank1_bytes": 14336,
+      "full_barrier_offsets": [
+        86016,
+        86024
+      ],
+      "empty_barrier_offsets": [
+        86032,
+        86040
+      ],
+      "full_barrier_arrival_count": 128,
+      "empty_barrier_arrival_count": 256,
+      "host_launch_and_optin_actual_immediate": "0x15080",
+      "host_threads_actual_dim3_immediate": "0x100000180",
+      "native_ordinary_kernel_launches": 1,
+      "global_workspace_bytes": 0,
+      "synchronization_gate": {
+        "status": "PASS_CURRENT_SOURCE_FEEDING_PTX_AND_SASS",
+        "CTA_collective_epochs": [
+          0,
+          6,
+          0
+        ],
+        "init_bar0_pc": "0x1a0",
+        "consumer_drain_bar6_pc": "0x49c0",
+        "producer_drain_bar6_pc": "0x6f40",
+        "publish_bar0_pc": "0x6f70",
+        "drain_id": 6,
+        "drain_count": 384,
+        "drain_non_aligned": true,
+        "all_12_full_warps_exactly_once": true,
+        "WG0_wait0_release_pcs": [
+          "0x4950",
+          "0x4960"
+        ],
+        "WG1_wait0_release_pcs": [
+          "0x2b00",
+          "0x2b10"
+        ],
+        "producer_last_commit_pc": "0x6dd0",
+        "producer_tail_two_empty_wait_pcs": [
+          "0x6e90",
+          "0x6f20"
+        ],
+        "both_banks_fully_retired_before_tail": true,
+        "tail_STS_first_last_pcs": [
+          "0x4ec0",
+          "0x5570"
+        ],
+        "all_tail_STS_after_drain_and_before_publish": true,
+        "all_U_reads_after_publish": true,
+        "tail_S2R_after_whole_K_before_drain_is_permitted_address_computation": true
+      },
+      "hybrid_math_DAG_gate": {
+        "status": "PASS_ORIGINAL_RN_NODE_ORDER_FINAL_ONECAST",
+        "producer_S1_FP32_fadd_then_S2_fsub_from_unrounded_S1": true,
+        "rounded_shared_S1_only_for_P5": true,
+        "unrounded_S2_shared_as_float_raw_words": true,
+        "WG0_S4_from_FP32_S2": true,
+        "WG1_S3_and_final_cast_S2": true,
+        "B_DAG_unchanged": true,
+        "wholeK_all_seven_FP32_P_and_fixed_U_unchanged": true,
+        "CPU_finite_model_not_FP64_precision_certification": true
+      },
+      "alias_epilogue_gate": {
+        "status": "PASS",
+        "current_AB_validation_and_bindings": true,
+        "alpha_separate_RN_multiply_then_active_beta_FMA": true,
+        "active_exact_C0_D_all_four_loads_before_first_store": true,
+        "active_C0_load_pcs": [
+          "0x7800",
+          "0x7840",
+          "0x7880",
+          "0x78e0"
+        ],
+        "active_D_store_pcs": [
+          "0x7ac0",
+          "0x7ae0",
+          "0x7af0",
+          "0x7b10"
+        ],
+        "beta_zero_null_C0_reads": 0
+      },
+      "GPU_validation_at_compiled_gate": null,
+      "original_precision_certification_at_compiled_gate": null,
+      "performance_at_compiled_gate": null
+    }
+  ],
+  "disabled_instances": [
+    {
+      "variant": 37,
+      "status": "HOST_DISABLED_PRIOR_STACK_SPILL_GATE_FAIL",
+      "native_launch_allowed": false,
+      "scope": "Forced Plan37 before normal/empty/alpha0/K0, raw helper false and CLI reject; no repeated old37 device proof."
+    }
+  ],
+  "compiled_metadata_original_allfields_preserved": true,
+  "complete_object_bench_test_stream_archives_unchanged": true,
+  "early_diagnostics_preserved": [
+    {
+      "kind": "FAIL_API_RUN41_FALLTHROUGH",
+      "independent_diagnostic_path": ".scratch/psplit_hybrid_s_api_diagnostic_iter38.json",
+      "bad_Plan_sha256": "8a6a4251c541064eadb2ac9edd375121eb608938051ba973075f6710800815fd",
+      "resolution": "Corrected0db2 else-if chain; final73725 log explicitly recompiles Plan.cpp and links both final binaries. Initial diagnostic stores contemporaneous owner plan/intention; actual final chronology follows frozen build failure and final build records."
+    },
+    {
+      "kind": "FAIL_INITIAL_BUILD_KEEP_DIRECTORY_MISSING",
+      "build_path": "results/psplit_hybrid_s_initial_build_iter38.txt",
+      "exit": 2,
+      "scope": "cc1plus cannot open new keepdir hybrid_s.cpp1.ii. No new41 feeding/REG/spill/machine gate exists from this failed build; old37 warnings cannot be attributed to41."
+    }
+  ],
+  "validation": {
+    "default": {
+      "CASE": 2522,
+      "PASS": 1893,
+      "BEGIN": 3926,
+      "exit": 0
+    },
+    "selected41": {
+      "CASE": 56,
+      "PASS": 135,
+      "BEGIN": 186,
+      "exit": 0
+    },
+    "actual_scope_summary": {
+      "default_CASE": 2522,
+      "default_PASS": 1893,
+      "selected41_CASE": 56,
+      "selected41_PASS": 135,
+      "new41_basic_actual_routes": {
+        "megakernel_wgmma_psplit_hybrid_s_64x32": 34,
+        "megakernel_warp_mma_packed": 12,
+        "dense_cublaslt": 10
+      },
+      "rawU_groups": 84,
+      "rawU_bound_loop_kernel_runs": 246,
+      "A_B_bindings": 20,
+      "epilogue_PASS_groups": 10,
+      "epilogue_bound_loop_runs": 30,
+      "Graph_configs": 36,
+      "Graph_actual_routes": {
+        "megakernel_wgmma_psplit_hybrid_s_64x32": 28,
+        "megakernel_warp_mma_packed": 8
+      },
+      "Graph_fresh_AB_replays": 108,
+      "default_all_Graph_configs": 330,
+      "default_all_Graph_fresh_AB_replays": 990,
+      "strict_candidate_gates": 30,
+      "strict_PASS": 18,
+      "strict_FAIL": 12,
+      "strict_nonfinite": 0,
+      "strict_exit": 2,
+      "sanitizer_variant41_runs": 3,
+      "sanitizer_all_clean": true,
+      "disabled37_CLI_exit": 1,
+      "disabled37_CLI_native_CASE": 0,
+      "source38_full1680_actually_executed": false,
+      "original_new41_only_gate_all_pass": false,
+      "original_full_numerical_suite_certification_claimed": false,
+      "performance_claim_by_this_test_artifact": false
+    },
+    "sameatom_rawU_and_host_epilogue": {
+      "PASS_groups": 84,
+      "identity_groups": 6,
+      "active_groups": 78,
+      "kernel_runs_completed_by_bound_fixture_loop": 246,
+      "reference_variant": 36,
+      "reference_storage": "BK32 SS",
+      "raw_U_bits_all_checked": true,
+      "independent_host_RNalpha_betaFMA_all_checked": true,
+      "padding_guard_all_checked": true,
+      "unique_complete_domain": true,
+      "native_parent_K": [
+        64,
+        128,
+        192,
+        256,
+        384,
+        448,
+        512,
+        576,
+        640,
+        1024,
+        1088,
+        1152,
+        2112,
+        2176
+      ],
+      "MN": [
+        [
+          128,
+          64
+        ],
+        [
+          128,
+          256
+        ],
+        [
+          256,
+          256
+        ]
+      ]
+    },
+    "sameatom_run_scope": {
+      "total": 246,
+      "reference36_BK32SS_runs": 84,
+      "candidate41_runs": 162
+    },
+    "native_stage_domain": {
+      "dtypes": [
+        "bf16",
+        "fp16"
+      ],
+      "parent_K": [
+        64,
+        128,
+        192,
+        256,
+        384,
+        448,
+        512,
+        576,
+        640,
+        1024,
+        1088,
+        1152,
+        2112,
+        2176
+      ],
+      "stage_counts": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        16,
+        17,
+        18,
+        33,
+        34
+      ],
+      "stage16_K1024": true,
+      "exact_one_stage_case_per_dtype_K": true,
+      "long_K_bounded_integer_pattern_checked": true
+    },
+    "current_AB_rebinding": {
+      "PASS_groups": 2,
+      "bindings": 20,
+      "native_bindings": 14,
+      "Dense_bindings": 6,
+      "fresh_current_pointer_and_aligned_recovery_assertions_completed": true
+    },
+    "epilogue_rebinding": {
+      "PASS_groups": 10,
+      "kernel_runs_completed_by_bound_fixture_loop": 30,
+      "unique_complete_identity_active_D_C0_alias_domain": true
+    },
+    "newGraph": {
+      "new41_config_groups": 36,
+      "new41_actual_routes": {
+        "megakernel_wgmma_psplit_hybrid_s_64x32": 28,
+        "megakernel_warp_mma_packed": 8
+      },
+      "new41_fresh_AB_replays": 108,
+      "one_kernel_node_each": true,
+      "unique_complete_domain": true,
+      "native_parent_K": [
+        64,
+        128,
+        192,
+        256,
+        384,
+        448,
+        512,
+        576,
+        640,
+        1024,
+        1088,
+        1152,
+        2112,
+        2176
+      ],
+      "partial_K_P7": [
+        32,
+        96,
+        160
+      ],
+      "immutable_C0_restore_verified_in_bound_fixture_source": true,
+      "all_default_or_selected_config_groups": 36,
+      "all_default_or_selected_fresh_replays": 108
+    },
+    "coverage_exact_scratch_copy": true,
+    "CPU_model_exit_recorded": true,
+    "CPU_model_scope": "Recorded CPU exit0 limited to respective literal/abstract geometry/DAG models; not GPU forward-progress, memory-order or occupancy evidence."
+  },
+  "strict": {
+    "gates": 30,
+    "CASE": 60,
+    "Dense_reference_CASE": 30,
+    "PASS": 18,
+    "FAIL": 12,
+    "nonfinite": 0,
+    "exit": 2,
+    "native_gates": 24,
+    "native_PASS": 12,
+    "native_FAIL": 12,
+    "Dense_range_fallback_gates": 6,
+    "Dense_range_fallback_PASS": 6,
+    "original_printed_metric_gate_recomputed": true,
+    "BF16_floor": 0.001,
+    "FP16_floor": 0.0001,
+    "original_gate": "finite and eF<=3*Dense_eF+floor",
+    "full1680_code_domain_executed": false,
+    "history_scope": "Source/bin-specific actual old runs remain separate; full1350/1410/1470/1530/1560/1590/1620/1650/1680 are unexecuted source-domain counts.37 native0."
+  },
+  "sanitizers": [
+    {
+      "tool": "memcheck",
+      "variant": 41,
+      "path": "results/sanitizer_psplit_hybrid_s41_memcheck_iter38.txt",
+      "sha256": "b080fea31accd2acdb8c831e9b7a0865eeef1a15827b038c248f8566ba70901d",
+      "exit": 0,
+      "errors": 0,
+      "race_hazards": null,
+      "race_warnings": null,
+      "leaked_bytes": 0,
+      "complete_CASE_PASS_BEGIN_multiset_equals_selected41": true,
+      "CASE": 56,
+      "PASS": 135,
+      "BEGIN": 186,
+      "version": "2025.1.0.0 (build35583870)"
+    },
+    {
+      "tool": "racecheck",
+      "variant": 41,
+      "path": "results/sanitizer_psplit_hybrid_s41_racecheck_iter38.txt",
+      "sha256": "2285cd1c9a13cf5e2da45fad3489748d4b68f445884342fd230a0b47b10215e2",
+      "exit": 0,
+      "errors": 0,
+      "race_hazards": 0,
+      "race_warnings": 0,
+      "leaked_bytes": null,
+      "complete_CASE_PASS_BEGIN_multiset_equals_selected41": true,
+      "CASE": 56,
+      "PASS": 135,
+      "BEGIN": 186,
+      "version": "2025.1.0.0 (build35583870)"
+    },
+    {
+      "tool": "synccheck",
+      "variant": 41,
+      "path": "results/sanitizer_psplit_hybrid_s41_synccheck_iter38.txt",
+      "sha256": "cd1f4f0a275aaec9dfb14e423073303809455d4a07eca4e196244e005536ed9c",
+      "exit": 0,
+      "errors": 0,
+      "race_hazards": null,
+      "race_warnings": null,
+      "leaked_bytes": null,
+      "complete_CASE_PASS_BEGIN_multiset_equals_selected41": true,
+      "CASE": 56,
+      "PASS": 135,
+      "BEGIN": 186,
+      "version": "2025.1.0.0 (build35583870)"
+    }
+  ],
+  "mandatory_full": {
+    "scope": "Same-binary41/39/40/36/Lt1 x2dtype xordinary/Graph. Old36 H10/H12 full24 retained only as history.",
+    "expected_rows": 20,
+    "actual_rows": 20,
+    "complete_matrix": true,
+    "missing_rows": [],
+    "csv_paths": [
+      "results/small_psplit_hybrid_s41_launch_iter38_full1024.csv",
+      "results/small_psplit_hybrid_s41_graph_iter38_full1024.csv",
+      "results/small_psplit_rsa39_launch_iter38_full1024.csv",
+      "results/small_psplit_rsa39_graph_iter38_full1024.csv",
+      "results/small_psplit_rsa_bk3240_launch_iter38_full1024.csv",
+      "results/small_psplit_rsa_bk3240_graph_iter38_full1024.csv",
+      "results/small_psplit36_launch_iter38_full1024.csv",
+      "results/small_psplit36_graph_iter38_full1024.csv",
+      "results/small_packed_lt1_launch_iter38_full1024.csv",
+      "results/small_packed_lt1_graph_iter38_full1024.csv"
+    ],
+    "TIME": 200,
+    "CHECK": 60,
+    "fresh_PASS": 0,
+    "fresh_FAIL": 60,
+    "nonfinite": 0,
+    "inner_exit_codes": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "candidate41_rows": [
+      {
+        "dtype": "bf16",
+        "mode": "launch",
+        "SW_us": 29.221119880699998,
+        "Dense_us": 12.576639652299999,
+        "same_row_Dense_over_SW": 0.430395539377,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "fp16",
+        "mode": "launch",
+        "SW_us": 29.146239757500002,
+        "Dense_us": 9.879999756810001,
+        "same_row_Dense_over_SW": 0.338980254023,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "bf16",
+        "mode": "graph",
+        "SW_us": 28.7820792198,
+        "Dense_us": 11.209599971800001,
+        "same_row_Dense_over_SW": 0.3894645653,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "fp16",
+        "mode": "graph",
+        "SW_us": 28.912000656100002,
+        "Dense_us": 9.40576016903,
+        "same_row_Dense_over_SW": 0.325323739471,
+        "numerical_pass": false
+      }
+    ],
+    "protocol": "20warmup,100calls/group,5groups,3fresh,32Lt,8GiB; ordinary tuning beforecapture; same-row complete eventmedians; batchwall100calls includingbatchsync divided100 median5, not individually synchronized CPUwall.",
+    "actually_measured_native_variants": [
+      36,
+      39,
+      40,
+      41
+    ],
+    "new41_complete_ordinary_kernel_count": 1,
+    "new41_global_workspace_bytes": 0,
+    "native_host_descriptor_encode": false,
+    "newGraph_reads_current_fixed_capture_address_contents": true,
+    "native_best_measured_this_matrix": 39,
+    "new41_promotion": false
+  },
+  "document_semantics": {
+    "source_bin_scope_match": true,
+    "same_row_Dense_over_complete_SW": true,
+    "original_FAIL_explicit": true,
+    "structure_and_SAN_PASS_not_precision_certification": true,
+    "Auto": "Dense",
+    "original_precision_certified": false,
+    "goal_complete": false,
+    "fallback_PASS_not_native_certification": true,
+    "no_dynamic_occupancy_stall_traffic_causal_claim": true,
+    "initial_missing_keepdir_not_new41_machine_result": true,
+    "corrected_Plan_else_if_bound_final_build": true,
+    "remaining_blockers": []
+  },
+  "audit_boundaries": "Separate root/data full1623 onsite/Git/retained-history audit; this review independently checks current necessary originals and semantic scope without repeating full oldstat/hash/model checks."
+}
