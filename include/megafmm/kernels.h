@@ -79,4 +79,12 @@ void prepare_mma16x8_identity(const Problem& p, int variant=15);
 void launch_mma16x8_identity(const Problem& p, const void* A, const void* B,
                             const float* C0, float* D, cudaStream_t stream,
                             int variant=15);
+// Identity output with a 24-word raw input bank loaded one K tile ahead.
+bool mma16x8_prefetch_can_implement(const Problem& p, int variant=16);
+bool mma16x8_prefetch_full_tiles(const Problem& p, const void* A, const void* B,
+                                const float* C0, const float* D);
+void prepare_mma16x8_prefetch(const Problem& p, int variant=16);
+void launch_mma16x8_prefetch(const Problem& p, const void* A, const void* B,
+                            const float* C0, float* D, cudaStream_t stream,
+                            int variant=16);
 }

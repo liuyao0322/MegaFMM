@@ -63,6 +63,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 17 | Specialize native16x8 output for immutable alpha1 beta0 | 0.3082 | 0.678775 | screened; numerical gate failed; identity validation pending |
 
+| 18 | Prefetch next raw K16 tile into registers | 0.3553 | 0.675800 | promising-screen-numerical-fail |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -683,3 +685,37 @@ Viable separately reviewed directions remain: immutablealpha1/beta0 specializati
 - **Analysis:** Build and quick20/5/1 screening completed with18 finite rows; all frozen numerical gates fail, exit2. Dynamic input transforms remain inside every call. This screening is not full acceptance. The earlier 14-16 stall reassessment is logged, with GPU timeline and static SASS evidence and remaining separately reviewed directions.
 - **Next:** Run full structural/bitwise and three15sanitizers, then test raw register lookahead as a separate iteration.
 - **Archive:** trajectory/20261013_144105_iter-17/
+
+Iter17 post-closure primary comparison (quick signal, mixed historical full protocols, no acceptance): bf16 128^3 4.925us Dense/SW=0.862x prior(iter12)/SW=0.942x; fp16 128^3 5.109us Dense/SW=0.820x prior(iter12)/SW=0.936x; bf16 256^3 7.842us Dense/SW=0.674x prior(iter12)/SW=0.815x; fp16 256^3 7.976us Dense/SW=0.607x prior(iter12)/SW=0.803x; bf16 512^3 14.005us Dense/SW=0.438x prior(iter8)/SW=0.848x; fp16 512^3 14.109us Dense/SW=0.436x prior(iter8)/SW=0.837x; bf16 1024^3 64.856us Dense/SW=0.199x prior(iter7)/SW=0.306x; fp16 1024^3 64.760us Dense/SW=0.158x prior(iter7)/SW=0.303x.
+
+### Iter 18 — Prefetch next raw K16 tile into registers
+
+- **Hypothesis:** Issuing next-tile global loads before current seven products can overlap memory latency without changing any transformed operand or P/U accumulation order.
+- **Changes:** Added Mega16 raw 24-u32 bank lookahead, guarded identity chain16 to15 to14 to12 to7, zero workspace, exact current input pointers, and short K32/64/96, N16/N48, bitwise, coefficient and rebinding tests. Earlier variants retained verbatim.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.675800 ms; mean speedup=0.3553x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.004203 | 0.004126 | 1.0186 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.004126 | 0.004339 | 0.9510 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.005286 | 0.006346 | 0.8331 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.004827 | 0.006504 | 0.7422 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.006179 | 0.010994 | 0.5621 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.006141 | 0.011086 | 0.5539 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.012928 | 0.065475 | 0.1974 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.010210 | 0.065357 | 0.1562 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.031547 | 0.486712 | 0.0648 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.032810 | 0.486224 | 0.0675 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.085768 | 1.624280 | 0.0528 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.089288 | 1.620158 | 0.0551 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.194886 | 3.801155 | 0.0513 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.205702 | 3.836810 | 0.0536 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.009197 | 0.033747 | 0.2725 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.009262 | 0.033685 | 0.2750 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.008066 | 0.033794 | 0.2387 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_warp_mma_16x8_prefetch v16 | launch | 0.008384 | 0.033611 | 0.2494 | 0.00075151 | 0 |
+
+- **Analysis:** Quick20/5/1 screening completed18 finite rows, all frozen numerical gates fail, exit2. Initial128BF grouping is4.13–4.26us versus historical4.64us best, a promising screening signal requiring same-binary full confirmation; compiler uses120registers without spills. This variant can also change default inlinePTX global cache policy relative to readonly compiler loads, so actual SASS issue order and cache modifiers must be inspected before attributing gains purely to scheduling.
+- **Next:** Validate16 structural/bitwise/short-K with three standaloneCUDA12.8sanitizers and SASS, then separately test compact BK64 seven-batch H7/H8.
+- **Archive:** trajectory/20261013_144926_iter-18/
