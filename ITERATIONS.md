@@ -47,6 +47,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 9 | Fuse Winograd into independent warp-level mma.sync owners | 0.2690 | 0.403353 | regression |
 
+| 10 | Specialize complete small tiles and packed final conversions | 0.3431 | 0.399807 | improved |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -379,3 +381,35 @@ experiments have not been silently marked complete in PLAN.
 - **Analysis:** Quick signal only, not final acceptance; protocol differs from iter7full100/5/3. Matched Ltbatch approximate geometric latency gain=0.4538x. 128 bf16=6.86us (Dense/SW 0.607x); 128 fp16=7.09us (Dense/SW 0.582x); 256 bf16=11.16us (Dense/SW 0.471x); 256 fp16=11.28us (Dense/SW 0.429x); 512 bf16=18.51us (Dense/SW 0.331x); 512 fp16=18.79us (Dense/SW 0.325x); 1024 bf16=45.85us (Dense/SW 0.281x); 1024 fp16=44.78us (Dense/SW 0.229x). Tiny128 improves absolute latency relative to batch, while larger tiles regress as repeated DAG conversion and smallK steps dominate. All18freshchecks fail frozen numeric gate with finite outputs; AutoDense.
 - **Next:** GPU structural/sanitizer and Graph tests; profile SIMT cast work, compare warp grouping, then paired finalcasts
 - **Archive:** trajectory/20261013_132604_iter-9/
+
+### Iter 10 — Specialize complete small tiles and packed final conversions
+
+- **Hypothesis:** Remove generic vector-bound checks and 64-bit owner division/modulo while preserving complete products and fixed FP32 U DAG.
+- **Changes:** Add independent Mega 7 packed RN casts and Mega 8 complete-tile 2D grid path; zero workspace; preserve Mega 4-6; add exact and bitwise tests; add final small suite and verification scripts.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.399807 ms; mean speedup=0.3431x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_warp_mma_fast v8 | launch | 0.004208 | 0.005277 | 0.7975 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_warp_mma_fast v8 | launch | 0.004123 | 0.005403 | 0.7631 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_warp_mma_fast v8 | launch | 0.005496 | 0.008198 | 0.6704 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_warp_mma_fast v8 | launch | 0.004866 | 0.008190 | 0.5941 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_warp_mma_fast v8 | launch | 0.006165 | 0.013720 | 0.4493 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_warp_mma_fast v8 | launch | 0.006166 | 0.013912 | 0.4432 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_warp_mma_fast v8 | launch | 0.012861 | 0.041330 | 0.3112 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_warp_mma_fast v8 | launch | 0.010254 | 0.041168 | 0.2491 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_warp_mma_fast v8 | launch | 0.031942 | 0.284176 | 0.1124 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_warp_mma_fast v8 | launch | 0.032947 | 0.284205 | 0.1159 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_warp_mma_fast v8 | launch | 0.086251 | 0.974886 | 0.0885 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_warp_mma_fast v8 | launch | 0.089274 | 0.974491 | 0.0916 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_warp_mma_fast v8 | launch | 0.194622 | 2.205798 | 0.0882 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_warp_mma_fast v8 | launch | 0.205419 | 2.225819 | 0.0923 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_warp_mma_fast v8 | launch | 0.009474 | 0.027360 | 0.3463 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_warp_mma_fast v8 | launch | 0.009578 | 0.027531 | 0.3479 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_warp_mma_fast v8 | launch | 0.008266 | 0.027304 | 0.3027 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_warp_mma_fast v8 | launch | 0.008662 | 0.027750 | 0.3122 | 0.00075151 | 0 |
+
+- **Analysis:** Quick predeclared 20 calls x 5 groups x 1 fresh correctness trial, H100, ordinary launch, variant 8. Matched geometric gain vs iteration 9 variant 4 = 1.181938x; bf16 128^3 5.277 us Dense/SW=0.797453010639; fp16 128^3 5.403 us Dense/SW=0.763103342123; bf16 256^3 8.198 us Dense/SW=0.670374735566; fp16 256^3 8.190 us Dense/SW=0.594061349577; bf16 512^3 13.720 us Dense/SW=0.449329453166; fp16 512^3 13.912 us Dense/SW=0.443243251928; bf16 1024^3 41.330 us Dense/SW=0.311176490651; fp16 1024^3 41.168 us Dense/SW=0.249086666856. All 18 numerical gates fail with finite output (exit 2); frozen thresholds unchanged. Paired conversion is an ablation because iteration 9 SASS already contains packed conversion instructions. Structural GPU/sanitizer validation follows this closure.
+- **Next:** Validate variants 7/8 and compare packed ablation; integrate product-parallel M1 variant 9 with seven complete products.
+- **Archive:** trajectory/20261013_133924_iter-10/

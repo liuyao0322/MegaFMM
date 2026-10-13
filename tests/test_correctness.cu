@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <limits>
 #include <random>
@@ -58,6 +59,11 @@ std::string algorithm_name(megafmm::Algorithm algorithm) {
     case megafmm::Algorithm::WinogradLt:return "lt";case megafmm::Algorithm::WinogradHopper:return "hopper";
     case megafmm::Algorithm::Megakernel:return "mega";
   } return "unknown";
+}
+const char* warp_mma_name(int variant,const megafmm::Problem& p) {
+  if(variant<=6)return "megakernel_warp_mma";
+  if(variant==8 && p.m%32==0 && p.n%32==0 && p.k%32==0)return "megakernel_warp_mma_fast";
+  return "megakernel_warp_mma_packed";
 }
 template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorithm,
                                   Pattern pattern,bool alias,bool certified,uint32_t seed=1234567,int variant=0,
@@ -120,7 +126,7 @@ template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorit
   auto plan=megafmm::create_plan(p,policy);
   if(expected_route)require(plan->algorithm_name()==expected_route,
                            std::string("unexpected route: expected ")+expected_route+", got "+plan->algorithm_name());
-  if(expected_route && std::string(expected_route)=="megakernel_warp_mma")
+  if(expected_route && std::string(expected_route).find("megakernel_warp_mma")==0)
     require(plan->workspace_bytes()==0,"warp MMA unexpectedly requires workspace");
   Buffer workspace(plan->workspace_bytes());
   float* output=alias ? dc.as<float>():dd.as<float>();
@@ -206,6 +212,8 @@ template<class T> void structural_suite(megafmm::DType dtype) {
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,4},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,5},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,6},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,7},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,8},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,1},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,2}}) {
     auto e=run_case<T>(problem(256,256,256,dtype),candidate.first,Pattern::Integers,false,true,1234567,candidate.second);
@@ -270,10 +278,10 @@ template<class T> void batched_suite(megafmm::DType dtype,bool lt_only=false) {
   }
 }
 template<class T> void warp_mma_suite(megafmm::DType dtype) {
-  for(int variant=4;variant<=6;++variant) {
+  for(int variant=4;variant<=8;++variant) {
     auto exact=[dtype,variant](megafmm::Problem p,Pattern pattern,bool alias=false,bool certified=true,
                               bool expect_warp=true,bool do_tune=false) {
-      const char* route=expect_warp ? "megakernel_warp_mma":"dense_cublaslt";
+      const char* route=expect_warp ? warp_mma_name(variant,p):"dense_cublaslt";
       std::cout << "BEGIN_WARP_MMA dtype=" << megafmm::dtype_name(dtype) << " variant=" << variant
                 << " pattern=" << pattern_name(pattern) << " shape=" << p.m << ',' << p.n << ',' << p.k
                 << " alpha=" << p.alpha << " beta=" << p.beta << " alias=" << alias
@@ -284,6 +292,12 @@ template<class T> void warp_mma_suite(megafmm::DType dtype) {
     };
     for(auto pattern:{Pattern::Integers,Pattern::Zero,Pattern::Identity,Pattern::Cancellation})
       exact(problem(128,128,128,dtype),pattern);
+    if(variant>=7) {
+      exact(problem(256,256,256,dtype),Pattern::Integers);
+      auto full=problem(128,128,128,dtype);full.alpha=.5f;full.beta=-.25f;
+      full.lda+=8;full.ldb+=8;full.ldc+=8;full.ldd+=8;
+      exact(full,Pattern::Integers,true,true,true,true);
+    }
     // Partial output/K tiles, including a final CTA with inactive owner warps.
     exact(problem(80,80,48,dtype),Pattern::Integers);
     auto p=problem(80,112,48,dtype);
@@ -310,6 +324,50 @@ template<class T> void warp_mma_suite(megafmm::DType dtype) {
     exact(p,Pattern::Integers,false,true,false);
   }
 }
+template<class T> void warp_mma_bitwise_suite(megafmm::DType dtype) {
+  for(auto dims:{std::vector<int>{128,128,128},std::vector<int>{80,112,48}})
+  for(int scenario=0;scenario<3;++scenario) {
+    auto p=problem(dims[0],dims[1],dims[2],dtype);
+    bool alias=scenario==2;
+    if(scenario!=0) {p.alpha=.375f;p.beta=-.625f;}
+    uint32_t seed=424242u+uint32_t(p.m*31+p.n*17+p.k*7+scenario*131)+
+                  (dtype==megafmm::DType::BF16 ? 0u:918273u);
+    std::mt19937 rng(seed);
+    std::vector<T> a(size_t(p.m)*p.lda),b(size_t(p.k)*p.ldb);
+    std::vector<float> c(size_t(p.m)*p.ldc),actual(size_t(p.m)*p.ldd),baseline(actual.size());
+    // Fresh exact dyadic inputs retain nontrivial rounding in transformed S/T.
+    for(auto& value:a)value=round_value<T>(float(int(rng()%2049)-1024)/1024.0f);
+    for(auto& value:b)value=round_value<T>(float(int(rng()%2049)-1024)/1024.0f);
+    for(auto& value:c)value=float(int(rng()%257)-128)/64.0f;
+    Buffer da(a.size()*sizeof(T)),db(b.size()*sizeof(T)),dc(c.size()*sizeof(float)),
+           dd(actual.size()*sizeof(float));
+    check(cudaMemcpy(da.data,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice));
+    check(cudaMemcpy(db.data,b.data(),b.size()*sizeof(T),cudaMemcpyHostToDevice));
+    std::cout << "BEGIN_MMA_BITWISE dtype=" << megafmm::dtype_name(dtype)
+              << " shape=" << p.m << ',' << p.n << ',' << p.k << " alpha=" << p.alpha
+              << " beta=" << p.beta << " alias=" << alias << " seed=" << seed << std::endl;
+    for(int variant:{4,7,8}) {
+      megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::Megakernel;
+      policy.certified_range=true;policy.mega_variant=variant;
+      auto plan=megafmm::create_plan(p,policy);
+      require(plan->algorithm_name()==warp_mma_name(variant,p),"MMA bitwise test selected another route");
+      require(plan->workspace_bytes()==0,"MMA bitwise test unexpectedly requires workspace");
+      check(cudaMemcpy(dc.data,c.data(),c.size()*sizeof(float),cudaMemcpyHostToDevice));
+      if(!alias)check(cudaMemset(dd.data,0xff,actual.size()*sizeof(float)));
+      float* output=alias ? dc.as<float>():dd.as<float>();
+      megafmm::run(*plan,da.data,db.data,p.beta==0 ? nullptr:dc.as<float>(),output,nullptr);
+      check(cudaDeviceSynchronize());
+      check(cudaMemcpy(actual.data(),output,actual.size()*sizeof(float),cudaMemcpyDeviceToHost));
+      for(float value:actual)require(std::isfinite(value),"MMA bitwise test returned nonfinite output");
+      if(variant==4)baseline=actual;
+      else require(std::memcmp(baseline.data(),actual.data(),actual.size()*sizeof(float))==0,
+                   "Mega4 vs Mega"+std::to_string(variant)+" output bits differ on fresh dyadic inputs");
+    }
+    std::cout << "PASS_MMA_BITWISE dtype=" << megafmm::dtype_name(dtype)
+              << " shape=" << p.m << ',' << p.n << ',' << p.k << " alpha=" << p.alpha
+              << " beta=" << p.beta << " alias=" << alias << " variants=4,7,8\n";
+  }
+}
 template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false) {
   // Reuse a tuned plan with changed addresses: an aligned preferred SW route must
   // safely choose Dense when the new input views have only element alignment.
@@ -330,7 +388,9 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,3},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,4},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,5},
-                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,6}}) {
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,6},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,7},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,8}}) {
     auto algo=candidate.first;int variant=candidate.second;
     bool is_batched=(algo==megafmm::Algorithm::WinogradLt && variant==1) ||
                     (algo==megafmm::Algorithm::WinogradHopper && variant>=5);
@@ -343,7 +403,7 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
     if(is_batched)require(plan->algorithm_name()==(algo==megafmm::Algorithm::WinogradLt ?
                          "winograd_lt_batched":"winograd_sm80_batched"),"batched rebind test selected Dense");
     if(algo==megafmm::Algorithm::Megakernel && variant>=4) {
-      require(plan->algorithm_name()=="megakernel_warp_mma","warp MMA rebind test selected another route");
+      require(plan->algorithm_name()==warp_mma_name(variant,p),"warp MMA rebind test selected another route");
       require(plan->workspace_bytes()==0,"warp MMA rebind unexpectedly requires workspace");
     }
     check(cudaMemcpy(da.data,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice));
@@ -368,7 +428,7 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
 void batched_policy_rejection_suite(bool lt_only=false) {
   for(auto algorithm:{megafmm::Algorithm::Auto,megafmm::Algorithm::Dense,megafmm::Algorithm::WinogradLt,
                       megafmm::Algorithm::WinogradHopper,megafmm::Algorithm::Megakernel})
-  for(bool empty:{false,true}) for(int family=0;family<3;++family) for(int variant:{-1,family==0 ? 2:7}) {
+  for(bool empty:{false,true}) for(int family=0;family<3;++family) for(int variant:{-1,family==0 ? 2:family==1 ? 7:9}) {
     if(lt_only && family!=0)continue;
     megafmm::Policy policy;policy.algorithm=algorithm;policy.certified_range=true;
     if(family==0)policy.lt_variant=variant;
@@ -465,7 +525,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype) {
   struct Candidate { megafmm::Algorithm algorithm;int variant; };
   std::vector<Candidate> candidates={{megafmm::Algorithm::WinogradLt,0},{megafmm::Algorithm::WinogradLt,1}};
   for(int variant=0;variant<=6;++variant)candidates.push_back({megafmm::Algorithm::WinogradHopper,variant});
-  for(int variant=0;variant<=6;++variant)candidates.push_back({megafmm::Algorithm::Megakernel,variant});
+  for(int variant=0;variant<=8;++variant)candidates.push_back({megafmm::Algorithm::Megakernel,variant});
   for(auto pat:{Pattern::Uniform,Pattern::Positive,Pattern::Range,Pattern::Cancellation,Pattern::HighHalf}) {
     std::vector<std::vector<double>> ef(candidates.size());
     std::vector<double> dense_ef;
@@ -518,7 +578,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype) {
 int main(int argc,char** argv) {
   try {
     std::cout << std::unitbuf;std::cerr << std::unitbuf;
-    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-batched | --smoke-candidates [--mega-only] [--mega-variant 0..6 | --hopper-variant 0..6]]";
+    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-batched | --smoke-candidates [--mega-only] [--mega-variant 0..8 | --hopper-variant 0..6]]";
     bool numeric=false, candidates_only=false,mega_only=false,batched_only=false;
     int hopper_filter=-1,mega_filter=-1;
     for(int i=1;i<argc;++i) {
@@ -530,7 +590,7 @@ int main(int argc,char** argv) {
         require(i+1<argc,usage);
         std::string value=argv[++i];size_t consumed=0;
         mega_filter=std::stoi(value,&consumed);
-        require(consumed==value.size() && mega_filter>=0 && mega_filter<=6,usage);
+        require(consumed==value.size() && mega_filter>=0 && mega_filter<=8,usage);
       }
       else if(std::string(argv[i])=="--hopper-variant") {
         require(i+1<argc,usage);
@@ -563,6 +623,8 @@ int main(int argc,char** argv) {
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,4},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,5},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,6},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,7},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,8},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,0},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,1},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,2},
@@ -576,14 +638,16 @@ int main(int argc,char** argv) {
           if(mega_filter>=0 && (candidate.first!=megafmm::Algorithm::Megakernel ||
                                 candidate.second!=mega_filter))continue;
           bool warp_mma=candidate.first==megafmm::Algorithm::Megakernel && candidate.second>=4;
-          for(int scenario=0;scenario<6;++scenario) {
+          for(int scenario=0;scenario<7;++scenario) {
             if(scenario==2 && candidate.first!=megafmm::Algorithm::Megakernel && candidate.second<5)continue;
             if(scenario>=3 && !warp_mma)continue;
+            if(scenario==6 && candidate.second<7)continue;
             auto p=scenario==2 ? problem(128,64,256,dtype):problem(256,256,256,dtype);
             if(scenario==3 || scenario==4)p=problem(80,112,48,dtype);
             if(scenario==5)p=problem(80,80,48,dtype);
-            if(scenario==4) {p.lda+=8;p.ldb+=8;p.ldc+=8;p.ldd+=8;}
-            bool alias=scenario==1 || scenario==4;
+            if(scenario==6)p=problem(128,128,128,dtype);
+            if(scenario==4 || scenario==6) {p.lda+=8;p.ldb+=8;p.ldc+=8;p.ldd+=8;}
+            bool alias=scenario==1 || scenario==4 || scenario==6;
             if(alias) {p.alpha=.5f;p.beta=-.25f;}
             std::cout << "BEGIN_CANDIDATE dtype=" << megafmm::dtype_name(dtype)
                       << " algorithm=" << algorithm_name(candidate.first) << " variant=" << candidate.second
@@ -596,7 +660,7 @@ int main(int argc,char** argv) {
             auto planned=megafmm::create_plan(p,policy);
             require(planned->algorithm_name().find("dense")==std::string::npos,
                     "supported candidate unexpectedly fell back to Dense");
-            const char* route=warp_mma ? "megakernel_warp_mma":
+            const char* route=warp_mma ? warp_mma_name(candidate.second,p):
                               candidate.first==megafmm::Algorithm::WinogradHopper && candidate.second>=5 ?
                                 "winograd_sm80_batched":nullptr;
             auto e=run_case<T>(p,candidate.first,Pattern::Integers,alias,true,1234567,candidate.second,
@@ -616,6 +680,8 @@ int main(int argc,char** argv) {
     batched_suite<__half>(megafmm::DType::FP16);
     warp_mma_suite<__nv_bfloat16>(megafmm::DType::BF16);
     warp_mma_suite<__half>(megafmm::DType::FP16);
+    warp_mma_bitwise_suite<__nv_bfloat16>(megafmm::DType::BF16);
+    warp_mma_bitwise_suite<__half>(megafmm::DType::FP16);
     rebind_suite<__nv_bfloat16>(megafmm::DType::BF16);
     rebind_suite<__half>(megafmm::DType::FP16);
     degenerate_suite();rejection_suite();batched_policy_rejection_suite();

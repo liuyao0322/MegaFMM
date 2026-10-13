@@ -24,4 +24,11 @@ void prepare_small_mma(const Problem& p, int variant=4);
 void launch_small_mma(const Problem& p, const void* A, const void* B,
                       const float* C0, float* D, cudaStream_t stream,
                       int variant=4);
+// Paired final operand conversions, one owner warp: 7=general, 8=full tiles
+// when parent M/N/K are divisible by 32, with general paired fallback for tails.
+bool packed_mma_can_implement(const Problem& p, int variant=7);
+void prepare_packed_mma(const Problem& p, int variant=7);
+void launch_packed_mma(const Problem& p, const void* A, const void* B,
+                       const float* C0, float* D, cudaStream_t stream,
+                       int variant=7);
 }

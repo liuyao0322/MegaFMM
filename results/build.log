@@ -1,10 +1,10 @@
 -- Configuring done
 -- Generating done
 -- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
-[  8%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
-[ 16%] Building CUDA object CMakeFiles/megafmm.dir/solution/pack_winograd.cu.o
-[ 25%] Building CUDA object CMakeFiles/megafmm.dir/solution/combine_fp32.cu.o
-[ 33%] Building CUDA object CMakeFiles/megafmm.dir/solution/gemm_hopper.cu.o
+[  7%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 15%] Building CUDA object CMakeFiles/megafmm.dir/solution/pack_winograd.cu.o
+[ 23%] Building CUDA object CMakeFiles/megafmm.dir/solution/combine_fp32.cu.o
+[ 30%] Building CUDA object CMakeFiles/megafmm.dir/solution/gemm_hopper.cu.o
 ptxas info    : 0 bytes gmem
 ptxas info    : Compiling entry function '_ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2012scale_kernelILb1EEEvPKfPfllllf' for 'sm_90a'
 ptxas info    : Function properties for _ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2012scale_kernelILb1EEEvPKfPfllllf
@@ -30,8 +30,8 @@ ptxas info    : Compiling entry function '_ZN7megafmm6detail48_GLOBAL__N__e8ae8e
 ptxas info    : Function properties for _ZN7megafmm6detail48_GLOBAL__N__e8ae8edb_15_combine_fp32_cu_903abb2021combine_vector_kernelILb0EEEvPKfS4_Pfllllff
     0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
 ptxas info    : Used 40 registers
-[ 41%] Building CUDA object CMakeFiles/megafmm.dir/solution/gemm_batched.cu.o
-[ 50%] Building CUDA object CMakeFiles/megafmm.dir/solution/megakernel_hopper.cu.o
+[ 38%] Building CUDA object CMakeFiles/megafmm.dir/solution/gemm_batched.cu.o
+[ 46%] Building CUDA object CMakeFiles/megafmm.dir/solution/megakernel_hopper.cu.o
 ptxas info    : 0 bytes gmem
 ptxas info    : Compiling entry function '_ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_vector_kernelI6__halfLb0EEEvPKT_PS4_lll' for 'sm_90a'
 ptxas info    : Function properties for _ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_vector_kernelI6__halfLb0EEEvPKT_PS4_lll
@@ -65,7 +65,7 @@ ptxas info    : Compiling entry function '_ZN7megafmm6detail49_GLOBAL__N__163d99
 ptxas info    : Function properties for _ZN7megafmm6detail49_GLOBAL__N__163d998c_16_pack_winograd_cu_930bc9bc18pack_inputs_kernelI13__nv_bfloat16Lb0EEEvNS_7ProblemEPKT_S7_PS5_S8_jj
     0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
 ptxas info    : Used 40 registers
-[ 58%] Building CUDA object CMakeFiles/megafmm.dir/solution/small_mma.cu.o
+[ 53%] Building CUDA object CMakeFiles/megafmm.dir/solution/small_mma.cu.o
 ptxas info    : 2 bytes gmem
 ptxas info    : Compiling entry function '_ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock13MmaMultistageINS1_9GemmShapeILi32ELi64ELi32EEENS_9transform11threadblock28PredicatedTileAccessIteratorINS_11MatrixShapeILi32ELi32EEENS_6half_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi32ELi32EEELi64ENSH_ILi4ELi8EEELi8EEENS_5ArrayISD_Li8ELb0EEELb0ENSE_9NoPermuteEEENS9_25RegularTileAccessIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi32EEELi0ESK_Li16EEELNS_4arch14CacheOperation4KindE1ENSA_INSB_ILi32ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi32EEELi64ENSH_ILi8ELi4EEELi8EEESM_Lb0ESN_EENSP_ISW_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0ESZ_Li16EEELSV_1EfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi32EEESD_SR_SD_S12_fSF_NS15_17MmaTensorOpPolicyINST_3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NST_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1H_Li1EEELi3ELNS1_23SharedMemoryClearOptionE0EbEENS_8epilogue11threadblock8EpilogueIS7_S1G_Li1ENS1M_22PredicatedTileIteratorINS1M_26OutputTileOptimalThreadMapINS1M_15OutputTileShapeILi64ELi8ELi1ELi1ELi1EEENS1Q_ILi1ELi4ELi1ELi1ELi4EEELi64ELi4ELi32EEEfLb0ESN_Lb0EEENS1L_4warp24FragmentIteratorTensorOpIS17_S1A_fNSL_IfLi4ELb1EEESF_EENS1V_20TileIteratorTensorOpIS17_S1A_fSF_EENS1M_18SharedLoadIteratorINS1T_18CompactedThreadMapEfLi16EEENS1L_6thread17LinearCombinationIfLi4EffLNS24_9ScaleType4KindE2ELNS_15FloatRoundStyleE2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE' for 'sm_90a'
 ptxas info    : Function properties for _ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock13MmaMultistageINS1_9GemmShapeILi32ELi64ELi32EEENS_9transform11threadblock28PredicatedTileAccessIteratorINS_11MatrixShapeILi32ELi32EEENS_6half_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi32ELi32EEELi64ENSH_ILi4ELi8EEELi8EEENS_5ArrayISD_Li8ELb0EEELb0ENSE_9NoPermuteEEENS9_25RegularTileAccessIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi32EEELi0ESK_Li16EEELNS_4arch14CacheOperation4KindE1ENSA_INSB_ILi32ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi32EEELi64ENSH_ILi8ELi4EEELi8EEESM_Lb0ESN_EENSP_ISW_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0ESZ_Li16EEELSV_1EfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi32EEESD_SR_SD_S12_fSF_NS15_17MmaTensorOpPolicyINST_3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NST_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1H_Li1EEELi3ELNS1_23SharedMemoryClearOptionE0EbEENS_8epilogue11threadblock8EpilogueIS7_S1G_Li1ENS1M_22PredicatedTileIteratorINS1M_26OutputTileOptimalThreadMapINS1M_15OutputTileShapeILi64ELi8ELi1ELi1ELi1EEENS1Q_ILi1ELi4ELi1ELi1ELi4EEELi64ELi4ELi32EEEfLb0ESN_Lb0EEENS1L_4warp24FragmentIteratorTensorOpIS17_S1A_fNSL_IfLi4ELb1EEESF_EENS1V_20TileIteratorTensorOpIS17_S1A_fSF_EENS1M_18SharedLoadIteratorINS1T_18CompactedThreadMapEfLi16EEENS1L_6thread17LinearCombinationIfLi4EffLNS24_9ScaleType4KindE2ELNS_15FloatRoundStyleE2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE
@@ -90,6 +90,17 @@ ptxas info    : Used 124 registers
 Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
 
 /share/home/liuyao/workspace/MegaFMM/solution/small_mma.cu(42): warning #177-D: member "megafmm::<unnamed>::SmallMmaTraits<Element>::WarpSharedBytes [with Element=cutlass::bfloat16_t]" was declared but never referenced
+    static constexpr int WarpSharedBytes = WarpElements * sizeof(Element);
+                         ^
+
+[ 61%] Building CUDA object CMakeFiles/megafmm.dir/solution/small_mma_fast.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/small_mma_fast.cu(43): warning #177-D: member "megafmm::<unnamed>::SmallMmaTraits<Element>::WarpSharedBytes [with Element=cutlass::half_t]" was declared but never referenced
+    static constexpr int WarpSharedBytes = WarpElements * sizeof(Element);
+                         ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/solution/small_mma_fast.cu(43): warning #177-D: member "megafmm::<unnamed>::SmallMmaTraits<Element>::WarpSharedBytes [with Element=cutlass::bfloat16_t]" was declared but never referenced
     static constexpr int WarpSharedBytes = WarpElements * sizeof(Element);
                          ^
 
@@ -152,6 +163,23 @@ ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_meg
     0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
 ptxas info    : Used 254 registers
 ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass6half_tELb0EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass6half_tELb0EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, 7168 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass6half_tELb1EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass6half_tELb1EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, 7168 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass10bfloat16_tELb0EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass10bfloat16_tELb0EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, 7168 bytes smem
+ptxas info    : Compiling entry function '_ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass10bfloat16_tELb1EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass10bfloat16_tELb1EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, 7168 bytes smem
+ptxas info    : 2 bytes gmem
 ptxas info    : Compiling entry function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi4ENS5_IJNS4_1CILi2EEENSA_ILi1EEESC_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_6half_tENS5_IJlSC_lEEESK_NS5_IJSC_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x256x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSR_1ELNSQ_7ScaleInE1ELSS_1EEEEEENS4_6LayoutISD_NS5_IJSC_NSA_ILi0EEESW_EEEEENS5_IJNS4_10UnderscoreESZ_SZ_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSV_INS5_IJNSA_ILi8EEESI_EEENS5_IJSI_SC_EEEEEEEvNS4_8identityENS4_23SM90_TMA_LOAD_MULTICASTENS13_IS15_S17_NSV_INS5_IJSI_S18_EEENS5_IJSC_SI_EEEEEEEvS1D_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb0ELb1EEEJSJ_NS5_IJSG_NSA_ILi32EEEEEEvSL_fSL_NS1K_6fusion15FusionCallbacksIS1O_NS1R_9ScaledAccIfffLNS_15FloatRoundStyleE2EEESJ_S1Q_JEEES12_NS13_IS15_NS16_ILi32EEENSV_INS5_IJS18_S1P_EEENS5_IJS1P_SC_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESK_EEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE' for 'sm_90a'
 ptxas info    : Function properties for _ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi4ENS5_IJNS4_1CILi2EEENSA_ILi1EEESC_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_6half_tENS5_IJlSC_lEEESK_NS5_IJSC_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x256x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSR_1ELNSQ_7ScaleInE1ELSS_1EEEEEENS4_6LayoutISD_NS5_IJSC_NSA_ILi0EEESW_EEEEENS5_IJNS4_10UnderscoreESZ_SZ_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSV_INS5_IJNSA_ILi8EEESI_EEENS5_IJSI_SC_EEEEEEEvNS4_8identityENS4_23SM90_TMA_LOAD_MULTICASTENS13_IS15_S17_NSV_INS5_IJSI_S18_EEENS5_IJSC_SI_EEEEEEEvS1D_EENS_8epilogue10collective18CollectiveEpilogueINS1K_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb0ELb1EEEJSJ_NS5_IJSG_NSA_ILi32EEEEEEvSL_fSL_NS1K_6fusion15FusionCallbacksIS1O_NS1R_9ScaledAccIfffLNS_15FloatRoundStyleE2EEESJ_S1Q_JEEES12_NS13_IS15_NS16_ILi32EEENSV_INS5_IJS18_S1P_EEENS5_IJS1P_SC_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES21_S23_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESK_EEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE
     0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
@@ -192,23 +220,25 @@ ptxas info    : Compiling entry function '_ZN7cutlass13device_kernelINS_4gemm6ke
 ptxas info    : Function properties for _ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi5ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_35KernelTmaWarpSpecializedCooperativeEEENS5_IJNSA_ILi128EEESF_NSA_ILi64EEEEEENS_10bfloat16_tENS5_IJlSB_lEEESI_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x128x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSP_1ELNSO_7ScaleInE1ELSQ_1EEEEEENS4_6LayoutINS5_IJNSA_ILi2EEESB_SB_EEENS5_IJSB_NSA_ILi0EEESW_EEEEENS5_IJNS4_10UnderscoreESZ_SZ_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENST_INS5_IJNSA_ILi8EEESG_EEENS5_IJSG_SB_EEEEEEEvNS4_8identityES12_NS13_IS15_S17_NST_INS5_IJSG_S18_EEENS5_IJSB_SG_EEEEEEEvS1D_EENS_8epilogue10collective18CollectiveEpilogueINS1J_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSH_NS5_IJSF_NSA_ILi32EEEEEEfSJ_fSJ_NS1J_6fusion15FusionCallbacksIS1N_NS1Q_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESH_S1P_JEEES12_NS13_IS15_NS16_ILi32EEENST_INS5_IJS18_S1O_EEENS5_IJS1O_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES20_S22_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEENS1_19PersistentSchedulerEvEEEEvNT_6ParamsE
     0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
 ptxas info    : Used 168 registers
-[ 66%] Linking CXX static library libmegafmm.a
-[ 66%] Built target megafmm
-gmake[2]: Warning: File 'CMakeFiles/test_correctness.dir/compiler_depend.make' has modification time 0.00029 s in the future
-[ 83%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
-[ 83%] Building CUDA object CMakeFiles/megafmm_bench.dir/bench/benchmark.cu.o
-/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(66): warning #177-D: variable "ac" was declared but never referenced
+[ 69%] Linking CXX static library libmegafmm.a
+[ 69%] Built target megafmm
+gmake[2]: Warning: File 'CMakeFiles/test_correctness.dir/compiler_depend.make' has modification time 0.0016 s in the future
+gmake[2]: Warning: File 'CMakeFiles/megafmm_bench.dir/compiler_depend.make' has modification time 0.00095 s in the future
+[ 76%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+[ 84%] Building CUDA object CMakeFiles/megafmm_bench.dir/bench/benchmark.cu.o
+/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(72): warning #177-D: variable "ac" was declared but never referenced
     int ar=p.trans_a ? p.k:p.m, ac=p.trans_a ? p.m:p.k;
                                 ^
 
 Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
 
-/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(67): warning #177-D: variable "bc" was declared but never referenced
+/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(73): warning #177-D: variable "bc" was declared but never referenced
     int br=p.trans_b ? p.n:p.k, bc=p.trans_b ? p.k:p.n;
                                 ^
 
-[ 91%] Linking CXX executable megafmm_bench
-[ 91%] Built target megafmm_bench
+[ 92%] Linking CXX executable megafmm_bench
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+[ 92%] Built target megafmm_bench
 [100%] Linking CXX executable test_correctness
 gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
 [100%] Built target test_correctness
