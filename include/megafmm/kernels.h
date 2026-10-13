@@ -201,6 +201,18 @@ void launch_wgmma_pipeline(const Problem& p, const void* A, const void* B,
 
 // Three-bank vector producer wait1 consumer, native configs0/1 map to34/35.
 // Full/empty128 participation preserved; modulo3 phases and three tail acquires.
+// P3+4 independent consumer WGs; both native variants use BN32.
+bool wgmma_psplit_can_implement(const Problem& p, int configuration=0);
+bool wgmma_psplit_full_tiles(const Problem& p, const void* A, const void* B, int configuration=0);
+void prepare_wgmma_psplit(const Problem& p, int configuration=0);
+void launch_wgmma_psplit(const Problem& p, const void* A, const void* B,
+    const float* C0, float* D, cudaStream_t stream, int configuration=0);
+bool wgmma_psplit_asymmetric_can_implement(const Problem& p, int configuration=0);
+bool wgmma_psplit_asymmetric_full_tiles(const Problem& p, const void* A, const void* B, int configuration=0);
+void prepare_wgmma_psplit_asymmetric(const Problem& p, int configuration=0);
+void launch_wgmma_psplit_asymmetric(const Problem& p, const void* A, const void* B,
+    const float* C0, float* D, cudaStream_t stream, int configuration=0);
+
 bool wgmma_wait1_three_stage_can_implement(const Problem& p, int configuration=0);
 bool wgmma_wait1_three_stage_full_tiles(const Problem& p, const void* A, const void* B,
                                        int configuration=0);

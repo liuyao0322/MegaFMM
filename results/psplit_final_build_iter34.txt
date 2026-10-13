@@ -1,0 +1,31 @@
+[  2%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[  5%] Building CUDA object CMakeFiles/megafmm.dir/solution/megakernel_wgmma_psplit_asymmetric.cu.o
+ptxas info    : (C7512) Potential Performance Loss: wgmma.mma_async instructions are serialized due to insufficient register resources for the function '_ZN7megafmm70_GLOBAL__N__2caa371d_37_megakernel_wgmma_psplit_asymmetric_cu_774a091632winograd_wgmma_psplit_asymmetricIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf'
+ptxas info    : (C7512) Potential Performance Loss: wgmma.mma_async instructions are serialized due to insufficient register resources for the function '_ZN7megafmm70_GLOBAL__N__2caa371d_37_megakernel_wgmma_psplit_asymmetric_cu_774a091632winograd_wgmma_psplit_asymmetricIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf'
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm70_GLOBAL__N__2caa371d_37_megakernel_wgmma_psplit_asymmetric_cu_774a091632winograd_wgmma_psplit_asymmetricIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm70_GLOBAL__N__2caa371d_37_megakernel_wgmma_psplit_asymmetric_cu_774a091632winograd_wgmma_psplit_asymmetricIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf
+    128 bytes stack frame, 384 bytes spill stores, 256 bytes spill loads
+ptxas info    : Used 80 registers, 128 bytes cumulative stack size
+ptxas info    : Compiling entry function '_ZN7megafmm70_GLOBAL__N__2caa371d_37_megakernel_wgmma_psplit_asymmetric_cu_774a091632winograd_wgmma_psplit_asymmetricIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm70_GLOBAL__N__2caa371d_37_megakernel_wgmma_psplit_asymmetric_cu_774a091632winograd_wgmma_psplit_asymmetricIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf
+    128 bytes stack frame, 384 bytes spill stores, 256 bytes spill loads
+ptxas info    : Used 80 registers, 128 bytes cumulative stack size
+[  8%] Linking CXX static library libmegafmm.a
+[ 94%] Built target megafmm
+[ 97%] Linking CXX executable megafmm_bench
+[100%] Built target megafmm_bench
+[ 94%] Built target megafmm
+[ 97%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(326): warning #177-D: variable "ac" was declared but never referenced
+    int ar=p.trans_a ? p.k:p.m, ac=p.trans_a ? p.m:p.k;
+                                ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(327): warning #177-D: variable "bc" was declared but never referenced
+    int br=p.trans_b ? p.n:p.k, bc=p.trans_b ? p.k:p.n;
+                                ^
+
+[100%] Linking CXX executable test_correctness
+[100%] Built target test_correctness

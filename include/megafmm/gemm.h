@@ -68,6 +68,8 @@ struct Policy {
   // Original precision and packed7/Dense guards; no native matrix workspace.
   // 34/35=three-bank vector64x16/64x32 wait1; old bank retirement
   // and tail wait0 remain, original precision and packed7/Dense guards.
+  // 36/37=P3+4 two-consumer WGs, both64x32; quotas64/96/96 or64/80/96.
+  // Original two-bank transforms and full7P fixedU, one launch, no globalSTP.
   int mega_variant=0;
 };
 class Plan {

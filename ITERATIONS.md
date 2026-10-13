@@ -1554,3 +1554,34 @@ A third bank recovers12.29–12.88% of35latency versus sameBN32 two-bank33, whil
 Actual GPU default2262CASE1269PASS, selected34=36CASE98PASS and35=38CASE98PASS, all exit0; new74CASE194PASS,132sameatom rawU+specifiedhostepilogue,40currentABchecks,20outputrebindgroups60runs,new36Graph108fresh(all168/504), singlekernel node and stages1/2/3/4/6/7/16/17/18/33/34 verified. Strictnew60=36PASS24FAILNF0exit2,48native12Densefallback; source29actualfull1290 andsource30/31/32actualnew60 retained by separateidentity; source30full1350/31full1410/32full1470/currentfull1530 remain unexecuted fullscopecounts. SixserialCUDA12.8SANexit0, memcheckerrors/leakedbytes0,racehazards/errors/warnings0,synccheckerrors0; leaktestonlymemcheck.
 
 Freshfourinstancecompiledgate independentlyPASS, completeobject/bench/test address+predicate+instructionstreams5424 (raw objectheaderflags differ), REG96/160, prodhighestR58/54 conshighestR89/145 includingimplicitwidth, initialownedCTA24576/40960 meetsrolepool20480/28672, directionslegal, allaccinitialized andgenericPaccess0 untiltailwait0. Dynamic107648/129152B+static1024B align128, stack/local/spill0; actualmod3phase/six8Bbarriers/3producertailacquires checked. CPUabstractmodelstdout+realexit0 archived14279states27569transitions395523phasecrosschecks; notGPUhardwarecertificate. All28oldCUDA/source23–32 evidence bytepreserved. ncu not retried after priorlockfailure. Fullrowstats and allrawbinds: results/small_three_stage_measurements_iter33.json, results/small_three_stage_profile_iter33.json, results/1024_MEGAKERNEL_THREE_STAGE_REPORT.md. Independentfinalaudits freeze separately. Originalgoal remainsactive andAutoDense.
+
+### Iter 34 — Dual consumer P3+4 experiment with actual compiled safety gates
+
+- **Hypothesis:** Split whole-K P1–3/P4–7 across two independent consumer warp groups while one vector producer constructs S/T once per tile and shares the final two operand banks.
+- **Changes:** Both variants use BM64 BN32 BK32,384 threads, full128/empty256, whole seven P, original fixed U/alphaRNbetaFMA, no global S/T/P workspace. Source/budget revisions and blocked routes are separately frozen; only independently gated kernels may execute. Consumer-only q scope uses a nonaligned drain CTA barrier with count384, followed by complete P publication and shared U. Old29CUDA preserved. Original numerical gate and AutoDense unchanged.
+- **Bench:** quick20warm20calls5groups1fresh; original numericalFAIL is retained, no certification.
+
+| M,N,K | dtype | route | mode | Dense µs | complete SW µs | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_wgmma_psplit_64x32 v36 | launch | 5.779200 | 6.398400 | 0.903226 | FAIL |
+| 128,128,128 | fp16 | megakernel_wgmma_psplit_64x32 v36 | launch | 5.812800 | 6.528000 | 0.890441 | FAIL |
+| 256,256,256 | bf16 | megakernel_wgmma_psplit_64x32 v36 | launch | 6.072000 | 9.025600 | 0.672753 | FAIL |
+| 256,256,256 | fp16 | megakernel_wgmma_psplit_64x32 v36 | launch | 5.884800 | 9.096000 | 0.646966 | FAIL |
+| 512,512,512 | bf16 | megakernel_wgmma_psplit_64x32 v36 | launch | 6.582400 | 14.284800 | 0.460798 | FAIL |
+| 512,512,512 | fp16 | megakernel_wgmma_psplit_64x32 v36 | launch | 6.350400 | 14.270400 | 0.445005 | FAIL |
+| 1024,1024,1024 | bf16 | megakernel_wgmma_psplit_64x32 v36 | launch | 13.177601 | 23.748800 | 0.554874 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_psplit_64x32 v36 | launch | 10.254400 | 23.667200 | 0.433275 | FAIL |
+| 2048,2048,2048 | bf16 | megakernel_wgmma_psplit_64x32 v36 | launch | 32.011199 | 197.489595 | 0.162091 | FAIL |
+| 2048,2048,2048 | fp16 | megakernel_wgmma_psplit_64x32 v36 | launch | 33.105600 | 202.563190 | 0.163433 | FAIL |
+| 3072,3072,3072 | bf16 | megakernel_wgmma_psplit_64x32 v36 | launch | 87.111998 | 752.070379 | 0.115830 | FAIL |
+| 3072,3072,3072 | fp16 | megakernel_wgmma_psplit_64x32 v36 | launch | 88.896000 | 741.963196 | 0.119812 | FAIL |
+| 4096,4096,4096 | bf16 | megakernel_wgmma_psplit_64x32 v36 | launch | 195.400000 | 1918.872070 | 0.101831 | FAIL |
+| 4096,4096,4096 | fp16 | megakernel_wgmma_psplit_64x32 v36 | launch | 206.367993 | 1935.454369 | 0.106625 | FAIL |
+| 1024,512,1024 | bf16 | megakernel_wgmma_psplit_64x32 v36 | launch | 11.627200 | 24.097601 | 0.482504 | FAIL |
+| 1024,512,1024 | fp16 | megakernel_wgmma_psplit_64x32 v36 | launch | 11.700800 | 23.119999 | 0.506090 | FAIL |
+| 512,1024,1024 | bf16 | megakernel_wgmma_psplit_64x32 v36 | launch | 8.198400 | 23.032001 | 0.355957 | FAIL |
+| 512,1024,1024 | fp16 | megakernel_wgmma_psplit_64x32 v36 | launch | 8.478400 | 23.123200 | 0.366662 | FAIL |
+
+- **Analysis:** Own complete SW latency determines code benefit; same-row tuned Dense/SW reports the comparison. Numerical/structural/SAN evidence stays separate. Missing unsafe routes will have explicit compiled-safety exclusions rather than invented rows.
+- **Next:** Mandatory full1024 measured safe routes plus retained29/35/Lt1,100calls5groups3fresh; actual validation scope, independent implementation/data audits and source/raw/report/Git closure.
+- **Archive:** trajectory/20261014_032834_iter-34/

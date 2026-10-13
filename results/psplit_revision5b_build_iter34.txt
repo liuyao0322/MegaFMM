@@ -1,0 +1,29 @@
+[  2%] Building CUDA object CMakeFiles/megafmm.dir/solution/megakernel_wgmma_psplit.cu.o
+[  5%] Building CUDA object CMakeFiles/megafmm.dir/solution/megakernel_wgmma_psplit_asymmetric.cu.o
+ptxas info    : (C7512) Potential Performance Loss: wgmma.mma_async instructions are serialized due to insufficient register resources for the function '_ZN7megafmm70_GLOBAL__N__2caa371d_37_megakernel_wgmma_psplit_asymmetric_cu_774a091632winograd_wgmma_psplit_asymmetricIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf'
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm59_GLOBAL__N__5f8c8c2a_26_megakernel_wgmma_psplit_cu_b28aa09221winograd_wgmma_psplitIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm59_GLOBAL__N__5f8c8c2a_26_megakernel_wgmma_psplit_cu_b28aa09221winograd_wgmma_psplitIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 128 registers
+ptxas info    : Compiling entry function '_ZN7megafmm59_GLOBAL__N__5f8c8c2a_26_megakernel_wgmma_psplit_cu_b28aa09221winograd_wgmma_psplitIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm59_GLOBAL__N__5f8c8c2a_26_megakernel_wgmma_psplit_cu_b28aa09221winograd_wgmma_psplitIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 128 registers
+ptxas info    : (C7512) Potential Performance Loss: wgmma.mma_async instructions are serialized due to insufficient register resources for the function '_ZN7megafmm70_GLOBAL__N__2caa371d_37_megakernel_wgmma_psplit_asymmetric_cu_774a091632winograd_wgmma_psplit_asymmetricIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf'
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm70_GLOBAL__N__2caa371d_37_megakernel_wgmma_psplit_asymmetric_cu_774a091632winograd_wgmma_psplit_asymmetricIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm70_GLOBAL__N__2caa371d_37_megakernel_wgmma_psplit_asymmetric_cu_774a091632winograd_wgmma_psplit_asymmetricIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf
+    128 bytes stack frame, 384 bytes spill stores, 256 bytes spill loads
+ptxas info    : Used 80 registers, 128 bytes cumulative stack size
+ptxas info    : Compiling entry function '_ZN7megafmm70_GLOBAL__N__2caa371d_37_megakernel_wgmma_psplit_asymmetric_cu_774a091632winograd_wgmma_psplit_asymmetricIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm70_GLOBAL__N__2caa371d_37_megakernel_wgmma_psplit_asymmetric_cu_774a091632winograd_wgmma_psplit_asymmetricIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf
+    128 bytes stack frame, 384 bytes spill stores, 256 bytes spill loads
+ptxas info    : Used 80 registers, 128 bytes cumulative stack size
+[  8%] Linking CXX static library libmegafmm.a
+[ 94%] Built target megafmm
+[ 97%] Linking CXX executable megafmm_bench
+[100%] Built target megafmm_bench
+[ 94%] Built target megafmm
+[ 97%] Linking CXX executable test_correctness
+[100%] Built target test_correctness

@@ -1,0 +1,18 @@
+[  5%] Building CUDA object CMakeFiles/megafmm.dir/solution/megakernel_wgmma_psplit_asymmetric.cu.o
+[  5%] Building CUDA object CMakeFiles/megafmm.dir/solution/megakernel_wgmma_psplit.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/megakernel_wgmma_psplit_asymmetric.cu(408): error: identifier "tail" is undefined
+      const float p1 = tail[psplit_asymmetric_tail_word(0,local_row,local_col)];
+                       ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/megakernel_wgmma_psplit.cu(405): error: identifier "tail" is undefined
+      const float p1 = tail[psplit_tail_word(0,local_row,local_col)];
+                       ^
+
+1 error detected in the compilation of "/share/home/liuyao/workspace/MegaFMM/solution/megakernel_wgmma_psplit_asymmetric.cu".
+1 error detected in the compilation of "/share/home/liuyao/workspace/MegaFMM/solution/megakernel_wgmma_psplit.cu".
+gmake[3]: *** [CMakeFiles/megafmm.dir/build.make:541: CMakeFiles/megafmm.dir/solution/megakernel_wgmma_psplit_asymmetric.cu.o] Error 2
+gmake[3]: *** Waiting for unfinished jobs....
+gmake[3]: *** [CMakeFiles/megafmm.dir/build.make:526: CMakeFiles/megafmm.dir/solution/megakernel_wgmma_psplit.cu.o] Error 2
+gmake[2]: *** [CMakeFiles/Makefile2:87: CMakeFiles/megafmm.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:120: CMakeFiles/megafmm_bench.dir/rule] Error 2
+gmake: *** [Makefile:147: megafmm_bench] Error 2
