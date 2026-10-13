@@ -15,8 +15,8 @@ WGMMA/Sm80 batched leaves，以及 M1/M2/M3、warp/product/cluster megakernel。
 用户已要求持续优化，并优先处理小矩阵。本快照记录 iteration23 的完整复测，
 不表示优化停止、达到物理延迟下限或整份 PLAN 已完成。直接寄存器传递 operand
 已在 iteration24 作为 Mega20/21 加入并完成诊断验证，未更新本快照的最优包络。
-iteration25 的连续向量加载/寄存器重排和26的K128循环控制都已完成诊断与验证，
-仍未更新最优包络。
+iteration25 的连续向量加载/寄存器重排、26的K128循环控制与27的cooperative
+共享变换都已完成诊断与验证，仍未更新最优包络。
 持续优化目标为128/256/512/1024四尺寸都快于同行调优cuBLASLt；当前证据尚未满足。
 
 证据在 [小矩阵报告](results/SMALL_REPORT.md)、[small manifest](results/small_manifest.json)
@@ -153,6 +153,26 @@ Strict在旧1050检查外加入60项K128候选检查（48native、12必需Dense�
 不重试，也不是性能下限证据。接下来可分别检验融合原输入变换与批量leaf的
 两launch完整P/U路线，以及小矩阵的进一步复用/阶段几何；原较快路径继续保留，
 四尺寸目标与固定数值要求仍未满足。
+
+Iteration27 新增 cooperative32×16(Mega26)与32×32(Mega27)，在每个CTA/K16
+stage只生成一次共享S/T，输出warp共同读取，仍保留完整七P后固定U。
+同binary诊断512 BF16/FP16分别为13.3488/13.5072µs与12.6160/12.6704µs；
+1024为39.1136/38.3104µs与31.4480/30.6704µs。四个primary尺寸均未改善
+已有SW自身最低观测值，未触发≥3%改善后的完整扩测；两个控制的36行全部
+实际native、全部固定数值失败，nonfinite零，Auto保持Dense。
+
+默认GPU结构/API验证exit0，新增36组与packed7的原生随机逐位比较通过；
+72项Graph/216次fresh-A/B重放包含新路线的一般alpha/beta、active C0=D和
+奇数输出stride。Strict1170项702通过/468失败/nonfinite零；旧1050和K12860
+保持，新增cooperative60项准确拆为48native与12HighHalf必需Dense回退。
+两个控制分别通过CUDA12.8 memcheck/racecheck/synccheck，零错误/危害/警告。
+编译资源为REG126/128，ptxas shared10752/14336B，ELF字段11776/15360B，
+零spill；这些字段与静态指令数量不能证明动态瓶颈或延迟收益。
+[第27轮独立证据](results/small_cooperative_profile_iter27.json)绑定测量source
+`cad199f7a9eb35b3c5154be95f803f4d04257709`、两binary及全部原始数据；
+[Mega27控制CSV](results/small_cooperative27_launch_iter27.csv)另存，旧证据冻结。
+进一步融合原输入变换与leaf、保留完整P及既有combine仍可检验；本checkpoint
+没有宣称性能下限、方向耗尽或四尺寸目标完成。
 
 ## 构建、验证与复现
 
