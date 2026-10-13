@@ -1,0 +1,97 @@
+{
+  "status": "PASS_CPU_ONLY_RS_A_BK32_GEOMETRY_VIRTUAL_LIFETIME",
+  "source_sha256": "2432db461a2575161fc3aa1d43d43254b3ab172c57ec6d593395d36d9c641f48",
+  "secondary160_sha256": "fac1c428f5a8c62052033b3067f7eacd2ceee4188b26afaf7f7221b962c2a1bf",
+  "geometry": {
+    "status": "PASS_EXPLICIT_LITERAL_LAYOUT_HYPOTHESIS_NOT_CUDA_INSTANTIATION",
+    "vector8_physical_checks": 15360,
+    "aligned_contiguous_RS_pair_checks": 32768,
+    "RS_partition_unique_A_cells": 2048,
+    "generic_raw_A_u32_warp_load_bank_checks": 1024,
+    "generic_raw_A_worst_distinct_words_per_bank": 1,
+    "bank_scope": "Only scalar generic rawA layout loads; no inference about actual compiled instruction grouping or WGMMA hardware bank traffic",
+    "barrier_union_intersection_bytes": 0
+  },
+  "predicted_shared_storage_bytes_only": 61568,
+  "tail_bank_overlaps_bytes": [
+    30720,
+    26624
+  ],
+  "quota_hypotheses": {
+    "192": {
+      "producer": 64,
+      "consumers": [
+        192,
+        192
+      ],
+      "source_required_pool": 57344,
+      "legal_uniform_initial_candidates": [
+        152,
+        160,
+        168
+      ],
+      "directions_and_pool": {
+        "152": {
+          "initial_pool": 58368,
+          "producer_release": 11264,
+          "each_consumer_request": 5120
+        },
+        "160": {
+          "initial_pool": 61440,
+          "producer_release": 12288,
+          "each_consumer_request": 4096
+        },
+        "168": {
+          "initial_pool": 64512,
+          "producer_release": 13312,
+          "each_consumer_request": 3072
+        }
+      },
+      "actual_uniform_allocation_verified": false
+    },
+    "160": {
+      "producer": 64,
+      "consumers": [
+        160,
+        160
+      ],
+      "source_required_pool": 49152,
+      "legal_uniform_initial_candidates": [
+        128,
+        136,
+        144,
+        152,
+        160
+      ],
+      "directions_and_pool": {
+        "128": {
+          "initial_pool": 49152,
+          "producer_release": 8192,
+          "each_consumer_request": 4096
+        },
+        "136": {
+          "initial_pool": 52224,
+          "producer_release": 9216,
+          "each_consumer_request": 3072
+        },
+        "144": {
+          "initial_pool": 55296,
+          "producer_release": 10240,
+          "each_consumer_request": 2048
+        },
+        "152": {
+          "initial_pool": 58368,
+          "producer_release": 11264,
+          "each_consumer_request": 1024
+        },
+        "160": {
+          "initial_pool": 61440,
+          "producer_release": 12288,
+          "each_consumer_request": 0
+        }
+      },
+      "actual_uniform_allocation_verified": false
+    }
+  },
+  "old_frozen_eight_files_verified_unchanged": true
+}

@@ -1,0 +1,89 @@
+{
+  "schema": "megafmm.iter37.BK32-source-port-normalization.v1",
+  "prototype": {
+    "path": ".scratch/psplit_rsA_bk32_future36_candidate.cu",
+    "sha256": "2432db461a2575161fc3aa1d43d43254b3ab172c57ec6d593395d36d9c641f48"
+  },
+  "formal": {
+    "path": "solution/megakernel_wgmma_psplit_rsa_bk32.cu",
+    "sha256": "548f27dc7a284a150423bd0162fa751b9dcf945baeccd4e7d571f044e0a6c0d3"
+  },
+  "inverse_rename_header_numeric_ARLayout_byte_exact": true,
+  "ARLayout_adapter": {
+    "scope": "Unevaluated numeric dense Element partition_A/make_fragment_A copied from verified39 before first build; identity tensor remains only in real coordinate builder. No owning initialization/null access or runtime arithmetic/synchronization change.",
+    "old_declaration": "    using ARLayout=typename decltype(thr_mma.make_fragment_A(thr_mma.partition_A(\n        make_identity_tensor(make_shape(Int<T::BM>{},Int<T::BK>{})))) )::layout_type;",
+    "actual_declaration": "    using ARLayout=typename decltype(thr_mma.make_fragment_A(thr_mma.partition_A(\n        make_tensor(make_rmem_ptr(static_cast<Element*>(nullptr)),\n            make_layout(make_shape(Int<T::BM>{},Int<T::BK>{}))))))::layout_type;"
+  },
+  "original_frozen_archives": [
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_candidate.cu",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_candidate_iter37.cu",
+      "sha256": "2432db461a2575161fc3aa1d43d43254b3ab172c57ec6d593395d36d9c641f48"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_candidate.diff",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_candidate_iter37.diff",
+      "sha256": "f08dec3055f8638732c33ef0895bb1b776fca47a0707ee6907c9e26f238d57f0"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_candidate_160.cu",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_candidate_160_iter37.cu",
+      "sha256": "fac1c428f5a8c62052033b3067f7eacd2ceee4188b26afaf7f7221b962c2a1bf"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_cpu.exit",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_cpu_iter37.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_geometry_changes.json",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_geometry_changes_iter37.json",
+      "sha256": "1bc8fd457d657c45fc630875df3916b6e6c48f6c8525889b4cee9c21c29d5d41"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_independent_review.json",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_independent_review_iter37.json",
+      "sha256": "df91440022fae867769732e7928f1e0df17d52dbdbdd85aae034b18bf73e9591"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_independent_review.md",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_independent_review_iter37.md",
+      "sha256": "34d23322437ffc858c1705b16ceb4f411b661186e56c19e8a176db7a6447d994"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_manifest_v1.json",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_manifest_v1_iter37.json",
+      "sha256": "3955824e2fbbc003a22d89d47937f6bbb8437ef56d29beccee22c217ba49f457"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_model.py",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_model_iter37.py",
+      "sha256": "dcd63a2e77f76b4304d5341c33c89b1ffd54897bf9863a542492295481d1c411"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_protocol.md",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_protocol_iter37.md",
+      "sha256": "63cc33fc25e6214e4326aee5a713afcbd736895a2edc8195b6695750662acd45"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_review.json",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_review_iter37.json",
+      "sha256": "37a92f4aefe96855fd110776a84b5e5963deada5f0341b6fc289a8d4ec6b9306"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_stderr.txt",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_stderr_iter37.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_stdout.json",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_stdout_iter37.json",
+      "sha256": "50d0df3849af849f6c68ebee8f3c32854e315422b0b23e26e23a4b98f0e8ff89"
+    },
+    {
+      "path": ".scratch/psplit_rsA_bk32_future36_manifest.json",
+      "archive": "results/psplit_rsa_bk32_frozen_psplit_rsA_bk32_future36_manifest_iter37.json",
+      "sha256": "08dec83cafe9920c0b3823cd4343a0cce1972ad9a000904855d116adfa94456d"
+    }
+  ]
+}

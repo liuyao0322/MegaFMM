@@ -1,0 +1,5788 @@
+{
+  "status": "PASS_CPU_ONLY_RS_A_BK32_GEOMETRY_VIRTUAL_LIFETIME",
+  "baseline_model_sha256": "aab2e1940470681b51d83596440ae49c5f2369e6abf2a1ff33d7f3c5ab7644ee",
+  "baseline_manifest_sha256": "78b454ce6247a2da0f08dadb48c2bf1a0a6b378ed01fe66673fa5cbfb4a46108",
+  "source_sha256": "2432db461a2575161fc3aa1d43d43254b3ab172c57ec6d593395d36d9c641f48",
+  "secondary160_sha256": "fac1c428f5a8c62052033b3067f7eacd2ceee4188b26afaf7f7221b962c2a1bf",
+  "geometry": {
+    "status": "PASS_EXPLICIT_LITERAL_LAYOUT_HYPOTHESIS_NOT_CUDA_INSTANTIATION",
+    "vector8_physical_checks": 15360,
+    "aligned_contiguous_RS_pair_checks": 32768,
+    "RS_partition_unique_A_cells": 2048,
+    "generic_raw_A_u32_warp_load_bank_checks": 1024,
+    "generic_raw_A_worst_distinct_words_per_bank": 1,
+    "bank_scope": "Only scalar generic rawA layout loads; no inference about actual compiled instruction grouping or WGMMA hardware bank traffic",
+    "barrier_union_intersection_bytes": 0
+  },
+  "counts32": {
+    "BK": 32,
+    "stages_1024": 16,
+    "CTA_grid_1024": [
+      8,
+      16
+    ],
+    "CTAs": 128,
+    "logical_A_cells": 2048,
+    "logical_B_cells": 1024,
+    "producer_original_A_read_bytes": 16384,
+    "producer_original_B_read_bytes": 8192,
+    "SS_producer_A_write_bytes": 28672,
+    "RS_producer_A_write_bytes": 16384,
+    "producer_final_B_write_bytes": 14336,
+    "RS_consumer_A_raw_read_bytes": 28672,
+    "RS_consumer_WG0_A_quadrant_reads": 4,
+    "RS_consumer_WG1_A_quadrant_reads": 3,
+    "SS_logical_A_operand_cells_consumed": 14336,
+    "RS_generic_raw_A_cells_read": 14336,
+    "SS_A_RN_operations": 8192,
+    "RS_A_RN_operations": 12288,
+    "RS_A_RN_WG0": 6144,
+    "RS_A_RN_WG1": 6144,
+    "B_RN_operations": 4096,
+    "A_final_onecasts": 8192,
+    "B_final_onecasts": 4096,
+    "RS_A_onecasts_WG0": 2048,
+    "RS_A_onecasts_WG1": 6144,
+    "SS_total_ST_RN": 12288,
+    "RS_total_ST_RN": 16384,
+    "SS_producer_ST_RN": 12288,
+    "RS_producer_ST_RN": 4096,
+    "SS_producer_ST_onecasts": 12288,
+    "RS_producer_ST_onecasts": 4096,
+    "raw_operand_bank_bytes": 30720,
+    "raw_operand_two_banks_bytes": 61440,
+    "SS_operand_two_banks_bytes": 86016,
+    "tail_bytes": 57344,
+    "barrier_expected_bytes": 32,
+    "WG0_full_stage_packed_A_words": 24,
+    "WG1_full_stage_packed_A_words": 32,
+    "WG0_FP32_P_registers": 48,
+    "WG1_FP32_P_registers": 64,
+    "expected_shared_align128": 61568,
+    "tail_overlaps_bank1_bytes": 26624,
+    "tail_read_write_bytes_per_CTA": 114688,
+    "wholeCTA_producer_original_A_read_bytes": 262144,
+    "wholeCTA_producer_original_B_read_bytes": 131072,
+    "wholeCTA_SS_producer_A_write_bytes": 458752,
+    "wholeCTA_RS_producer_A_write_bytes": 262144,
+    "wholeCTA_producer_final_B_write_bytes": 229376,
+    "wholeCTA_RS_consumer_A_raw_read_bytes": 458752,
+    "wholeCTA_SS_total_ST_RN": 196608,
+    "wholeCTA_RS_total_ST_RN": 262144,
+    "wholeCTA_SS_producer_ST_RN": 196608,
+    "wholeCTA_RS_producer_ST_RN": 65536,
+    "wholeCTA_A_final_onecasts": 131072,
+    "wholeCTA_B_final_onecasts": 65536,
+    "wholeCTA_SS_operand_shared_writes": 688128,
+    "wholeCTA_RS_operand_shared_writes": 491520
+  },
+  "counts64_parent": {
+    "BK": 64,
+    "stages_1024": 8,
+    "CTA_grid_1024": [
+      8,
+      16
+    ],
+    "CTAs": 128,
+    "logical_A_cells": 4096,
+    "logical_B_cells": 2048,
+    "producer_original_A_read_bytes": 32768,
+    "producer_original_B_read_bytes": 16384,
+    "SS_producer_A_write_bytes": 57344,
+    "RS_producer_A_write_bytes": 32768,
+    "producer_final_B_write_bytes": 28672,
+    "RS_consumer_A_raw_read_bytes": 57344,
+    "RS_consumer_WG0_A_quadrant_reads": 4,
+    "RS_consumer_WG1_A_quadrant_reads": 3,
+    "SS_logical_A_operand_cells_consumed": 28672,
+    "RS_generic_raw_A_cells_read": 28672,
+    "SS_A_RN_operations": 16384,
+    "RS_A_RN_operations": 24576,
+    "RS_A_RN_WG0": 12288,
+    "RS_A_RN_WG1": 12288,
+    "B_RN_operations": 8192,
+    "A_final_onecasts": 16384,
+    "B_final_onecasts": 8192,
+    "RS_A_onecasts_WG0": 4096,
+    "RS_A_onecasts_WG1": 12288,
+    "SS_total_ST_RN": 24576,
+    "RS_total_ST_RN": 32768,
+    "SS_producer_ST_RN": 24576,
+    "RS_producer_ST_RN": 8192,
+    "SS_producer_ST_onecasts": 24576,
+    "RS_producer_ST_onecasts": 8192,
+    "raw_operand_bank_bytes": 61440,
+    "raw_operand_two_banks_bytes": 122880,
+    "SS_operand_two_banks_bytes": 172032,
+    "tail_bytes": 57344,
+    "barrier_expected_bytes": 32,
+    "WG0_full_stage_packed_A_words": 48,
+    "WG1_full_stage_packed_A_words": 64,
+    "WG0_FP32_P_registers": 48,
+    "WG1_FP32_P_registers": 64,
+    "expected_shared_align128": 123008,
+    "tail_overlaps_bank1_bytes": 0,
+    "tail_read_write_bytes_per_CTA": 114688,
+    "wholeCTA_producer_original_A_read_bytes": 262144,
+    "wholeCTA_producer_original_B_read_bytes": 131072,
+    "wholeCTA_SS_producer_A_write_bytes": 458752,
+    "wholeCTA_RS_producer_A_write_bytes": 262144,
+    "wholeCTA_producer_final_B_write_bytes": 229376,
+    "wholeCTA_RS_consumer_A_raw_read_bytes": 458752,
+    "wholeCTA_SS_total_ST_RN": 196608,
+    "wholeCTA_RS_total_ST_RN": 262144,
+    "wholeCTA_SS_producer_ST_RN": 196608,
+    "wholeCTA_RS_producer_ST_RN": 65536,
+    "wholeCTA_A_final_onecasts": 131072,
+    "wholeCTA_B_final_onecasts": 65536,
+    "wholeCTA_SS_operand_shared_writes": 688128,
+    "wholeCTA_RS_operand_shared_writes": 491520
+  },
+  "predicted_shared_storage_bytes_only": 61568,
+  "tail_bank_overlaps_bytes": [
+    30720,
+    26624
+  ],
+  "requires_both_banks_fully_drained_before_tail": true,
+  "virtual_A_lifetimes": [
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 1,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 6,
+      "A_writes": 24,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 2,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 12,
+      "A_writes": 48,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 3,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 18,
+      "A_writes": 72,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 4,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 24,
+      "A_writes": 96,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 6,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 36,
+      "A_writes": 144,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 7,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 42,
+      "A_writes": 168,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 8,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 48,
+      "A_writes": 192,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 9,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 54,
+      "A_writes": 216,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 10,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 60,
+      "A_writes": 240,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          9,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          9,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          9,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 16,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 96,
+      "A_writes": 384,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          9,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          9,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          9,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          10,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          10,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          10,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          11,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          11,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          11,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          12,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          12,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          12,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          13,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          13,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          13,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          14,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          14,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          14,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          15,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          15,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          15,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 17,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 102,
+      "A_writes": 408,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          9,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          9,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          9,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          10,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          10,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          10,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          11,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          11,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          11,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          12,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          12,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          12,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          13,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          13,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          13,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          14,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          14,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          14,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          15,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          15,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          15,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          16,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          16,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          16,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 18,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 108,
+      "A_writes": 432,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          9,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          9,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          9,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          10,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          10,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          10,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          11,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          11,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          11,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          12,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          12,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          12,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          13,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          13,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          13,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          14,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          14,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          14,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          15,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          15,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          15,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          16,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          16,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          16,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          17,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          17,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          17,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 33,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 198,
+      "A_writes": 792,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          9,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          9,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          9,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          10,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          10,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          10,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          11,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          11,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          11,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          12,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          12,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          12,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          13,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          13,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          13,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          14,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          14,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          14,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          15,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          15,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          15,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          16,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          16,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          16,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          17,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          17,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          17,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          18,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          18,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          18,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          19,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          19,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          19,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          20,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          20,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          20,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          21,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          21,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          21,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          22,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          22,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          22,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          23,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          23,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          23,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          24,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          24,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          24,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          25,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          25,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          25,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          26,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          26,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          26,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          27,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          27,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          27,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          28,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          28,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          28,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          29,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          29,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          29,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          30,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          30,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          30,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          31,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          31,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          31,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          32,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          32,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          32,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 3,
+      "atoms": 2,
+      "stages": 34,
+      "packed_A_words": 24,
+      "FP32_P_words": 48,
+      "payload_register_lower_bound": 72,
+      "MMA_issues": 204,
+      "A_writes": 816,
+      "max_pending_words": 24,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          9,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          9,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          9,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          10,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          10,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          10,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          11,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          11,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          11,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          12,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          12,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          12,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          13,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          13,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          13,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          14,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          14,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          14,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          15,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          15,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          15,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          16,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          16,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          16,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          17,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          17,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          17,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          18,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          18,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          18,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          19,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          19,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          19,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          20,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          20,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          20,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          21,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          21,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          21,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          22,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          22,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          22,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          23,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          23,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          23,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          24,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          24,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          24,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          25,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          25,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          25,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          26,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          26,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          26,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          27,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          27,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          27,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          28,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          28,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          28,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          29,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          29,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          29,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          30,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          30,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          30,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          31,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          31,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          31,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          32,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          32,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          32,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          33,
+          "all_A_built_before_first_issue",
+          24
+        ],
+        [
+          33,
+          "commit_then_wait0",
+          24
+        ],
+        [
+          33,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 1,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 8,
+      "A_writes": 32,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 2,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 16,
+      "A_writes": 64,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 3,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 24,
+      "A_writes": 96,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 4,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 32,
+      "A_writes": 128,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 6,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 48,
+      "A_writes": 192,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 7,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 56,
+      "A_writes": 224,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 8,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 64,
+      "A_writes": 256,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 9,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 72,
+      "A_writes": 288,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 10,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 80,
+      "A_writes": 320,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          9,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          9,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          9,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 16,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 128,
+      "A_writes": 512,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          9,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          9,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          9,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          10,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          10,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          10,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          11,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          11,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          11,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          12,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          12,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          12,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          13,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          13,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          13,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          14,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          14,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          14,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          15,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          15,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          15,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 17,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 136,
+      "A_writes": 544,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          9,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          9,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          9,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          10,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          10,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          10,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          11,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          11,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          11,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          12,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          12,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          12,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          13,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          13,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          13,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          14,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          14,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          14,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          15,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          15,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          15,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          16,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          16,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          16,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 18,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 144,
+      "A_writes": 576,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          9,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          9,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          9,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          10,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          10,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          10,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          11,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          11,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          11,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          12,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          12,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          12,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          13,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          13,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          13,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          14,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          14,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          14,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          15,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          15,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          15,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          16,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          16,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          16,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          17,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          17,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          17,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 33,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 264,
+      "A_writes": 1056,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          9,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          9,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          9,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          10,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          10,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          10,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          11,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          11,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          11,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          12,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          12,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          12,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          13,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          13,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          13,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          14,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          14,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          14,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          15,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          15,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          15,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          16,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          16,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          16,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          17,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          17,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          17,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          18,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          18,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          18,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          19,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          19,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          19,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          20,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          20,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          20,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          21,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          21,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          21,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          22,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          22,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          22,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          23,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          23,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          23,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          24,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          24,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          24,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          25,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          25,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          25,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          26,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          26,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          26,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          27,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          27,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          27,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          28,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          28,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          28,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          29,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          29,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          29,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          30,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          30,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          30,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          31,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          31,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          31,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          32,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          32,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          32,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    },
+    {
+      "products": 4,
+      "atoms": 2,
+      "stages": 34,
+      "packed_A_words": 32,
+      "FP32_P_words": 64,
+      "payload_register_lower_bound": 96,
+      "MMA_issues": 272,
+      "A_writes": 1088,
+      "max_pending_words": 32,
+      "negative_controls": {
+        "four_words_rewritten_after_first_MMA": true,
+        "generic_read_or_fence_before_wait0": true
+      },
+      "trace": [
+        [
+          0,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          0,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          0,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          1,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          1,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          1,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          2,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          2,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          2,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          3,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          3,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          3,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          4,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          4,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          4,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          5,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          5,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          5,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          6,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          6,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          6,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          7,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          7,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          7,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          8,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          8,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          8,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          9,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          9,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          9,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          10,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          10,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          10,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          11,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          11,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          11,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          12,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          12,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          12,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          13,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          13,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          13,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          14,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          14,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          14,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          15,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          15,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          15,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          16,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          16,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          16,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          17,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          17,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          17,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          18,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          18,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          18,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          19,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          19,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          19,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          20,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          20,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          20,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          21,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          21,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          21,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          22,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          22,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          22,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          23,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          23,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          23,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          24,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          24,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          24,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          25,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          25,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          25,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          26,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          26,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          26,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          27,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          27,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          27,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          28,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          28,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          28,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          29,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          29,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          29,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          30,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          30,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          30,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          31,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          31,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          31,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          32,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          32,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          32,
+          "postwait_generic_fence_then_release",
+          0
+        ],
+        [
+          33,
+          "all_A_built_before_first_issue",
+          32
+        ],
+        [
+          33,
+          "commit_then_wait0",
+          32
+        ],
+        [
+          33,
+          "postwait_generic_fence_then_release",
+          0
+        ]
+      ],
+      "physical_allocation_proved": false
+    }
+  ],
+  "quota_hypotheses": {
+    "192": {
+      "producer": 64,
+      "consumers": [
+        192,
+        192
+      ],
+      "source_required_pool": 57344,
+      "legal_uniform_initial_candidates": [
+        152,
+        160,
+        168
+      ],
+      "directions_and_pool": {
+        "152": {
+          "initial_pool": 58368,
+          "producer_release": 11264,
+          "each_consumer_request": 5120
+        },
+        "160": {
+          "initial_pool": 61440,
+          "producer_release": 12288,
+          "each_consumer_request": 4096
+        },
+        "168": {
+          "initial_pool": 64512,
+          "producer_release": 13312,
+          "each_consumer_request": 3072
+        }
+      },
+      "actual_uniform_allocation_verified": false
+    },
+    "160": {
+      "producer": 64,
+      "consumers": [
+        160,
+        160
+      ],
+      "source_required_pool": 49152,
+      "legal_uniform_initial_candidates": [
+        128,
+        136,
+        144,
+        152,
+        160
+      ],
+      "directions_and_pool": {
+        "128": {
+          "initial_pool": 49152,
+          "producer_release": 8192,
+          "each_consumer_request": 4096
+        },
+        "136": {
+          "initial_pool": 52224,
+          "producer_release": 9216,
+          "each_consumer_request": 3072
+        },
+        "144": {
+          "initial_pool": 55296,
+          "producer_release": 10240,
+          "each_consumer_request": 2048
+        },
+        "152": {
+          "initial_pool": 58368,
+          "producer_release": 11264,
+          "each_consumer_request": 1024
+        },
+        "160": {
+          "initial_pool": 61440,
+          "producer_release": 12288,
+          "each_consumer_request": 0
+        }
+      },
+      "actual_uniform_allocation_verified": false
+    }
+  },
+  "precision_contract_changed": false,
+  "CPU_numerical_emulation_rerun": false,
+  "CPU_numerical_scope": "geometry-only transformation keeps the parent FP32 RN/onecast helper arithmetic unchanged; parent emulation is retained, not claimed as a new CUDA or FP64 test",
+  "not_proved": [
+    "CUDA template instantiation or layouts",
+    "actual initial/role register allocation",
+    "zero stack/local/spill or async physical A/P lifetime",
+    "hardware synchronization",
+    "original FP64 numerical gates",
+    "GPU/Sanitizer/performance/cuBLAS speedup"
+  ],
+  "old_frozen_eight_files_verified_unchanged": true,
+  "owner_execution": {
+    "frozen_original_path": ".scratch/psplit_rsA_bk32_future36_model.py",
+    "frozen_original_sha256": "dcd63a2e77f76b4304d5341c33c89b1ffd54897bf9863a542492295481d1c411",
+    "execution_scope": "All frozen BK32 computations executed; only old output-file writer and its brief print tail removed. Parent definitions loaded by the frozen model remain definitions-only.",
+    "file_write_audit_hook": "All filesystem write opens refused; no old model output writer invoked.",
+    "actual_compilation_hardware_order_liveness_precision_performance_certified": false
+  }
+}

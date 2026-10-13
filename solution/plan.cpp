@@ -429,7 +429,11 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     return;
   }
   if (plan.algorithm == Algorithm::Megakernel) {
-    if (plan.policy.mega_variant == 39) {
+    if (plan.policy.mega_variant == 40) {
+      if (wgmma_psplit_rsa_bk32_full_tiles(p, A, B, 0))
+        launch_wgmma_psplit_rsa_bk32(p, A, B, C0, D, stream, 0);
+      else launch_packed_mma(p, A, B, C0, D, stream, 7);
+    } else if (plan.policy.mega_variant == 39) {
       if (wgmma_psplit_rsa_full_tiles(p, A, B, 0))
         launch_wgmma_psplit_rsa(p, A, B, C0, D, stream, 0);
       else launch_packed_mma(p, A, B, C0, D, stream, 7);
@@ -688,6 +692,10 @@ std::string Plan::algorithm_name() const {
       return impl_->small_batched ? (impl_->policy.hopper_variant >= 7
         ? "winograd_sm80_batched_k64" : "winograd_sm80_batched") : "winograd_hopper_v2";
     case Algorithm::Megakernel:
+      if (impl_->policy.mega_variant == 40) {
+        if (wgmma_psplit_rsa_bk32_can_implement(impl_->problem, 0)) return "megakernel_wgmma_psplit_rsa_bk32_64x32";
+        return "megakernel_warp_mma_packed";
+      }
       if (impl_->policy.mega_variant == 39) {
         if (wgmma_psplit_rsa_can_implement(impl_->problem, 0)) return "megakernel_wgmma_psplit_rsa_64x32";
         return "megakernel_warp_mma_packed";
@@ -869,8 +877,8 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     throw std::invalid_argument("lt_variant must be 0 (views) or 1 (uniform batched operands)");
   if (policy.hopper_variant < 0 || policy.hopper_variant > 12)
     throw std::invalid_argument("hopper_variant must be between 0 and 12");
-  if (policy.mega_variant < 0 || policy.mega_variant > 39)
-    throw std::invalid_argument("mega_variant must be between 0 and 39");
+  if (policy.mega_variant < 0 || policy.mega_variant > 40)
+    throw std::invalid_argument("mega_variant must be between 0 and 40");
   if (policy.algorithm < Algorithm::Auto || policy.algorithm > Algorithm::Megakernel)
     throw std::invalid_argument("unsupported algorithm policy");
   // Registered experimental ID37 failed the fresh zero-stack/spill gate.
@@ -887,7 +895,9 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   Algorithm desired = policy.algorithm;
   if (desired == Algorithm::Auto || policy.levels == 0 || !winograd_shape(p, policy)) desired = Algorithm::Dense;
   if (desired == Algorithm::Megakernel) {
-    const bool supported = policy.mega_variant == 39
+    const bool supported = policy.mega_variant == 40
+                             ? (wgmma_psplit_rsa_bk32_can_implement(p, 0) || packed_mma_can_implement(p, 7))
+                           : policy.mega_variant == 39
                              ? (wgmma_psplit_rsa_can_implement(p, 0) || packed_mma_can_implement(p, 7))
                            : policy.mega_variant == 38
                              ? (wgmma_psplit_bk64_can_implement(p, 0) || packed_mma_can_implement(p, 7))
@@ -1012,7 +1022,10 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);
     impl->bytes = impl->dense->scratch_bytes();
   } else if (desired == Algorithm::Megakernel) {
-    if (policy.mega_variant == 39) {
+    if (policy.mega_variant == 40) {
+      if (wgmma_psplit_rsa_bk32_can_implement(p, 0)) prepare_wgmma_psplit_rsa_bk32(p, 0);
+      else prepare_packed_mma(p, 7);
+    } else if (policy.mega_variant == 39) {
       if (wgmma_psplit_rsa_can_implement(p, 0)) prepare_wgmma_psplit_rsa(p, 0);
       else prepare_packed_mma(p, 7);
     } else if (policy.mega_variant == 38) {

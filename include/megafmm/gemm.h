@@ -73,6 +73,7 @@ struct Policy {
   // 38=P3+4 BK64 two-bank,64x32; quotas64/96/96, parent K%128==0.
   // 39=RS-A P3+4 BK64,64x32: raw A4 shared/final B7 shared, quotas64/192/192.
   // Complete onecast A transform in registers, whole7P then fixedU, no globalSTP.
+  // 40=RS-A P3+4 BK32,64x32; rawA4/finalB7 shared, quotas64/192/192, parentK%64.
   int mega_variant=0;
 };
 class Plan {

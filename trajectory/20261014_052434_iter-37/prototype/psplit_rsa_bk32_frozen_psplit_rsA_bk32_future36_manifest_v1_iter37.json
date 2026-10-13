@@ -1,0 +1,105 @@
+{
+  "status": "FROZEN_CPU_ONLY_UNCOMPILED_RS_A_BK32_FUTURE36",
+  "manifest_no_self_hash": true,
+  "lease": "ROOT-owned future prefix frozen after actual CPU exit and independent review; no formal/build/GPU/Git writes",
+  "files": {
+    ".scratch/psplit_rsA_bk32_future36_candidate.cu": "2432db461a2575161fc3aa1d43d43254b3ab172c57ec6d593395d36d9c641f48",
+    ".scratch/psplit_rsA_bk32_future36_candidate.diff": "f08dec3055f8638732c33ef0895bb1b776fca47a0707ee6907c9e26f238d57f0",
+    ".scratch/psplit_rsA_bk32_future36_candidate_160.cu": "fac1c428f5a8c62052033b3067f7eacd2ceee4188b26afaf7f7221b962c2a1bf",
+    ".scratch/psplit_rsA_bk32_future36_cpu.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    ".scratch/psplit_rsA_bk32_future36_geometry_changes.json": "1bc8fd457d657c45fc630875df3916b6e6c48f6c8525889b4cee9c21c29d5d41",
+    ".scratch/psplit_rsA_bk32_future36_independent_review.json": "29fdb6062c2693f442ffd13c1ea1ff287722524942f64455ebe4f3b82ca83f94",
+    ".scratch/psplit_rsA_bk32_future36_independent_review.md": "8a5b493f6ec207ba8fddf74f97ae0ee669870a1dbc6ed6a8dc0f7e642fe20cd8",
+    ".scratch/psplit_rsA_bk32_future36_model.py": "dcd63a2e77f76b4304d5341c33c89b1ffd54897bf9863a542492295481d1c411",
+    ".scratch/psplit_rsA_bk32_future36_protocol.md": "63cc33fc25e6214e4326aee5a713afcbd736895a2edc8195b6695750662acd45",
+    ".scratch/psplit_rsA_bk32_future36_review.json": "37a92f4aefe96855fd110776a84b5e5963deada5f0341b6fc289a8d4ec6b9306",
+    ".scratch/psplit_rsA_bk32_future36_stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".scratch/psplit_rsA_bk32_future36_stdout.json": "50d0df3849af849f6c68ebee8f3c32854e315422b0b23e26e23a4b98f0e8ff89"
+  },
+  "file_count_excluding_manifest": 12,
+  "parent_manifest": {
+    "path": ".scratch/psplit_rsA_future35_manifest.json",
+    "sha256": "78b454ce6247a2da0f08dadb48c2bf1a0a6b378ed01fe66673fa5cbfb4a46108",
+    "eight_bindings_rechecked": 8,
+    "mismatches": 0
+  },
+  "independent_bound_files_verified": 12,
+  "binding_mismatches": 0,
+  "geometry": {
+    "BM": 64,
+    "BN": 32,
+    "BK": 32,
+    "banks": 2,
+    "CTA_threads": 384,
+    "CTA_grid_1024": [
+      8,
+      16
+    ],
+    "stages_at_1024": 16,
+    "packed_A_words_per_thread": [
+      24,
+      32
+    ],
+    "P_FP32_words_per_thread": [
+      48,
+      64
+    ]
+  },
+  "quota_hypotheses_only": {
+    "primary": [
+      64,
+      192,
+      192
+    ],
+    "primary_legal_uniform_initial": [
+      152,
+      160,
+      168
+    ],
+    "secondary": [
+      64,
+      160,
+      160
+    ],
+    "secondary_legal_uniform_initial": [
+      128,
+      136,
+      144,
+      152,
+      160
+    ],
+    "initial168_to_inc160_illegal": true,
+    "actual_allocation_verified": false
+  },
+  "predicted_storage_only": {
+    "dynamic_shared_bytes": 61568,
+    "bank_bytes": 30720,
+    "P_tail_bytes": 57344,
+    "P_tail_bank_overlap_bytes": [
+      30720,
+      26624
+    ],
+    "both_banks_must_be_drained": true
+  },
+  "CPU_result": {
+    "actual_exit": 0,
+    "stderr_bytes": 0,
+    "scope": "literal source geometry, virtual input lifetime, quota algebra only; not a CUDA or FP64 gate"
+  },
+  "known_unresolved_port": {
+    "observed_in_parent_iteration36_initial_build": "make_fragment_A(partition_A(identity coordinate tensor)) fails CuTe ScaledBasis order comparison; numeric dense Element layout must be used to derive fragment storage before any candidate build",
+    "future_source_changed_for_this": false,
+    "candidate_performance_claim": null
+  },
+  "pending_actual_gates": [
+    "CuTe fragment type port and both datatype compilation",
+    "physical initial and role registers, pool/directions, A/P lifetime, zero stack/local/spill and no serialization",
+    "sizeof/layout/static/reserved/dynamic shared, opt-in limit and identical object/linked instructions",
+    "runtime protocol and safety, original FP64 numerical gates",
+    "ordinary-call and Graph full timings versus independently tuned same-row cuBLAS"
+  ],
+  "GPU_launched": false,
+  "numerical_certification": false,
+  "precision_contract_changed": false,
+  "performance_claim": null
+}

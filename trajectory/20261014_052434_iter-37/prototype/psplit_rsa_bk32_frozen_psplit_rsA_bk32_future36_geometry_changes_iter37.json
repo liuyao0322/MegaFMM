@@ -1,0 +1,60 @@
+{
+  "baseline_path": ".scratch/psplit_rsA_future35_candidate.cu",
+  "baseline_sha256": "4e32c7cf4bd7b916ae5fad3cab8aba601fb629aaca41ffd310ce40014113fca1",
+  "changes": [
+    {
+      "old": "not iteration35 formal source.",
+      "new": "not iteration36 formal source."
+    },
+    {
+      "old": "// BK64 raw A4 shared",
+      "new": "// BK32 raw A4 shared"
+    },
+    {
+      "old": "static constexpr int BK = 64;",
+      "new": "static constexpr int BK = 32;"
+    },
+    {
+      "old": "template <class Element,int First,class ThrMma,class SmemRawA,",
+      "new": "template <class Element,int First,int BK,class ThrMma,class SmemRawA,"
+    },
+    {
+      "old": "make_shape(Int<64>{},Int<64>{}))",
+      "new": "make_shape(Int<64>{},Int<BK>{}))"
+    },
+    {
+      "old": "size<2>(coords)==Int<4>{}",
+      "new": "size<2>(coords)==Int<BK/16>{}"
+    },
+    {
+      "old": "for(int atom=0;atom<4;++atom)",
+      "new": "for(int atom=0;atom<BK/16;++atom)"
+    },
+    {
+      "old": "psplit_rsA_build_stage<Element,0>",
+      "new": "psplit_rsA_build_stage<Element,0,T::BK>"
+    },
+    {
+      "old": "psplit_rsA_build_stage<Element,3>",
+      "new": "psplit_rsA_build_stage<Element,3,T::BK>"
+    },
+    {
+      "old": "p.k%128 == 0",
+      "new": "p.k%64 == 0"
+    },
+    {
+      "old": "// BK64/BN32 has256 B vector tasks;",
+      "new": "// BK32/BN32 has128 B vector tasks;"
+    }
+  ],
+  "inverse_byte_exact": true,
+  "secondary_consumer160_is_separate_axis": true,
+  "compiled": false,
+  "GPU_launched": false,
+  "performance_claim": null,
+  "files": {
+    ".scratch/psplit_rsA_bk32_future36_candidate.cu": "2432db461a2575161fc3aa1d43d43254b3ab172c57ec6d593395d36d9c641f48",
+    ".scratch/psplit_rsA_bk32_future36_candidate_160.cu": "fac1c428f5a8c62052033b3067f7eacd2ceee4188b26afaf7f7221b962c2a1bf",
+    ".scratch/psplit_rsA_bk32_future36_candidate.diff": "f08dec3055f8638732c33ef0895bb1b776fca47a0707ee6907c9e26f238d57f0"
+  }
+}
