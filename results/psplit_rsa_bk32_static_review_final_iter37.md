@@ -1,0 +1,17 @@
+# Iteration37 independent final review
+
+PASS_INDEPENDENT_EVIDENCE_REVIEW_ORIGINAL_NUMERICAL_GATE_FAIL. No checkpoint blocker remains. This conclusion audits evidence and report scope; it does not certify original numerical precision or complete the optimization goal.
+
+Frozen prestatus checkpoint is a25d6edad198f9320432c99eb47bbf7a49c1b7fa and profile SHA820825585633caf4da9b8b26da6be437c265d44a8ebaa5240bc961158ffbcd8d. Report986946b3…, measurements5e92d729… and actual coverage112acc38… are bound with all seven sources and both binaries in the JSON. Later informational audit metadata is outside this frozen document snapshot.
+
+The current Mega40 source, object, feeding PTX/cubin, resources, benchmark/test streams and initial audit842e07f6… remain unchanged. All original compiled-instance fields are retained in the final metadata. Fresh initial37 proof established effective168, owned64512 versus need57344, legal64/192/192 directions, zero STACK/LOCAL/spill, complete three-role CFG including RS A4/P16 widths, post-allocation P initialization, zero pending generic A/P access, and actual61568 dynamic plus1024 static shared. FP16/BF16 complete streams have1880/1872 instructions. This final audit preserves that current37 proof by identity; it does not inherit Mega39 or SS36 compiled proof or rerun the machine gate.
+
+Actual default2466 CASE/1760 PASS and selected40 56 CASE/135 PASS/186 BEGIN both exited0. Coverage confirms34 native,12 P7 and10 Dense basic cases;14 stage domains including stage16 at1024;84 raw-U groups with246 total bound runs (162 candidate40 and84 reference36);20 currentAB bindings;10 epilogue groups/30 runs;36 new Graph configurations and108 fresh replays, cumulative294/882. Partial parentK32/96/160 exercise real fallback. Disabled37 CLI exits1 with zero CASE/BEGIN. Full1650 is unexecuted code scope.
+
+The original current40 strict30 gates have18 PASS/12 FAIL/NF0, exit2, including24 native (12/12) and6 Dense fallback PASS. Three sanitizers exited0 and have exact selected CASE/PASS/BEGIN multisets: memcheck errors0/leaks0, racecheck hazards/errors/warnings0, synccheck errors0. Non-memcheck leaks remain null/unmeasured. CPU geometry model has an actual archived exit0 and remains an abstract model.
+
+Mandatory16 same-binary rows are complete:40/39/36/Lt1 ×two dtypes×ordinary/Graph;160 TIME and48 fresh CHECK are archived. All48 checks and all16 numerical rows fail the original gate, NF0. The protocol retains20 warmup,100 calls per group,5 groups,3 fresh checks,32 Lt candidates and8GiB cap. Ordinary and Graph ratios use each row's Dense event median over complete solution event median. Batch wall includes100 calls and batch-end synchronization; tuning precedes capture and is not Graph-specific. Prior iteration36 H10/H12 expanded24 remains historical.
+
+Mega40 ordinary BF16 is25.497279µs at0.481131× cuBLASLt and FP16 is24.322560µs at0.408878×. It is slower than same-binary39 and36 in both modes and dtypes. The report preserves original FAIL, current-input one-kernel zero-workspace scope, and distinct multi-launch Lt1 control. It makes no isolated hardware-cause, measured occupancy or precision-promotion claim. Auto remains Dense; goal remains active.
+
+No formal source, GPU/build/benchmark/Git, model rerun or broad historical audit was performed by this reviewer. Owner may copy these review files exactly and update audit status/path/SHA metadata only.
