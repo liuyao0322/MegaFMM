@@ -231,6 +231,11 @@ void launch_wgmma_psplit_rsa_bk32(const Problem& p, const void* A, const void* B
     const float* C0, float* D, cudaStream_t stream, int configuration=0);
 // Selective rawA4 TMA, SIMT finalB7: config0 maps to45, BN32/BK64.
 // Current AB16, parentK%128 and A-only lda<2^39; one current A map per ordinary run.
+bool wgmma_psplit_sw128_simt_control_can_implement(const Problem& p, int configuration=0);
+bool wgmma_psplit_sw128_simt_control_full_tiles(const Problem& p, const void* A, const void* B, int configuration=0);
+void prepare_wgmma_psplit_sw128_simt_control(const Problem& p, int configuration=0);
+void launch_wgmma_psplit_sw128_simt_control(const Problem& p, const void* A, const void* B,
+    const float* C0, float* D, cudaStream_t stream, int configuration=0);
 bool wgmma_psplit_selective_tma_a_can_implement(const Problem& p, int configuration=0);
 bool wgmma_psplit_selective_tma_a_full_tiles(const Problem& p, const void* A, const void* B, int configuration=0);
 void prepare_wgmma_psplit_selective_tma_a(const Problem& p, int configuration=0);

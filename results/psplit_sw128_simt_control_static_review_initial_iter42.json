@@ -1,0 +1,1397 @@
+{
+  "schema": "megafmm.iter42.sw128-simt-control-fresh-compiled-static-review.v1",
+  "status": "PASS_COMPILED_CAN_LAUNCH_46_ONLY",
+  "reviewer": "pipeline_review30 with two independent read-only CPU source workers",
+  "compiled_gate_inherited_from_iteration41": false,
+  "compiled_gate_inherited_from_iteration40": false,
+  "compiled_gate_inherited_from_iteration39": false,
+  "compiled_gate_inherited_from_older_iterations": false,
+  "allowed_native_launch_variants": [
+    46
+  ],
+  "scope": "Fresh new46 source7/bin2/feeding PTX ELF actual object+bench+test complete2704x2 streams. All3role CFG implicit A4/P16/vector64/128; firstPzero and grownR168/170 definite-write after INC; pendingwholeA/P0; ABI/publication/drain/alias. Native launch permission only; no newGPU/SAN/performance/numerical certificate.",
+  "frozen_bindings": {
+    "CMakeLists.txt": "fd718d138b8bdadd6da512717df427a26a4fdeea53f006dca0a1c48f8d85c7cd",
+    "bench/benchmark.cu": "1e326b2fce8eb60f0c6f8f6f19d2779d23cbea8b81f363bae59a3b312364a691",
+    "include/megafmm/gemm.h": "934859b65a4b8f249a42aca52ea40d98b0611b9f986241222f9acc11667c0c84",
+    "include/megafmm/kernels.h": "02d9bf187f0e90f4eceacea8d8f20a7c4b8b7af12087f558773d2e19923807d2",
+    "solution/plan.cpp": "4f3597e066e3a347771f9f69d6d24d42403b632bce9c8d71730dbd9b76714f1e",
+    "tests/test_correctness.cu": "a6a9658cb4864ed72db1a519c363d9f08d6e237f3c4afb9c0838ea5580c0f6b3",
+    "solution/megakernel_wgmma_psplit_sw128_simt_control.cu": "fe970244906a10d84b172d1c4255d2633285820bf3f7f1bd1f14fde54daa1a11",
+    "build/megafmm_bench": "e2faf8111ce7efa6a2751d0774a018389ee6568a49762bb2e483086152125bf0",
+    "build/test_correctness": "7fe2e01f38b2525fa3f3c2e8ffd25e549e6ad28e5099feac833035b8d6895df9",
+    "results/psplit_sw128_simt_control_initial_frozen_identity_iter42.json": "4697db52e225f6103215b4bbee8b6edc8d11f1fbce76354fa227fa7269d0e7bd",
+    "results/psplit_sw128_simt_control_final_link_identity_iter42.json": "9ac9da1019f8fa130b9e410644d3791df199ebff7ed9c753805ee1dfd1995b59",
+    "results/psplit_sw128_simt_control_final_object_sass_iter42.txt": "52e75c2c364e183b2e982f782ca00b1b318c71adb6957dc035fb43834998293c",
+    "results/small_psplit_sw128_simt_control_final_sass_iter42.txt": "d982f41c6d18ba7e1d545fe866b0d785f5bc037aa7e1d248c25992a112e3a318",
+    "results/psplit_sw128_simt_control_final_test_sass_iter42.txt": "d982f41c6d18ba7e1d545fe866b0d785f5bc037aa7e1d248c25992a112e3a318",
+    "results/psplit_sw128_simt_control_final_object_resources_iter42.txt": "c6b278c804e9bf3a724cfe9507d8d76636be450a0dda14ce7cdc50996367f943",
+    "results/psplit_sw128_simt_control_final_object_elf_iter42.txt": "5d26afdec6ef3dfa30738fc8071fe4ab933c49d074e9fc58f995102d4bc43ac9",
+    "results/psplit_sw128_simt_control_final_megakernel_wgmma_psplit_sw128_simt_control_iter42.ptx": "3933a5c9cbe62e73077e9bea47f93364f5a36fb20d14418bc0e39540f68a6a39",
+    "results/psplit_sw128_simt_control_final_megakernel_wgmma_psplit_sw128_simt_control_iter42.cubin": "dec13dafd0952cc9571f606e1108d79bcd20c15e44efe848851215d77a051d66",
+    "results/psplit_sw128_simt_control_final_host_objdump_iter42.txt": "c54e7f2f01038a6145e5066c5b1c987da1019b1a0e4ae8025ac23bbbaede9bc9",
+    "results/psplit_sw128_simt_control_function_occupancy_probe_iter42.txt": "378c4e84ae3fbdc793ad432eb17f14fce3866f9f4975ee27935ec9b8fae34908",
+    "results/psplit_sw128_simt_control_function_occupancy_probe_iter42.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/psplit_sw128_simt_control_initial_build_iter42.txt": "7e505a1215037f227a0e5c468cb4023718fb45f577843e3431a0d29bbdd5d969",
+    "results/psplit_sw128_simt_control_initial_build_iter42.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/psplit_sw128_simt_control_source_normalization_iter42.json": "3f5375929f15c2a97fa5c894e67ea12a0b230bfa618e3b12e1f178ef48bcb682",
+    ".scratch/psplit_sw128_simt_control_review_iter42_cfg.py": "ca3e0a210b98816537ebaceb9229f045beef499676ddd1a29d9d8bf020c83dfe",
+    ".scratch/psplit_sw128_simt_control_review_iter42_role_cfg.json": "3301d17bfbca0b3456043885a2c1cda91ccc5a018f537562cd041ae1448ca009",
+    ".scratch/psplit_sw128_simt_control_review_iter42_init_cfg.py": "7a23e4bd02e537d12e670f49c641e5c2284f80d1a087be17d58a5bb32cfc2371",
+    ".scratch/psplit_sw128_simt_control_review_iter42_init_cfg_results.json": "5337a7f49e3cf0bda79c7a366cc2ce6a8df230503a02dce31b0090cf152c7156",
+    ".scratch/psplit_sw128_simt_control_review_iter42_grow_definite_results.json": "2547658a42193264bd56cb40e5e42c05d9bf8c8a5a1df14946410385fa65bcf0",
+    ".scratch/psplit_sw128_simt_control_review_iter42_source_preliminary.json": "a63f62e169736c4a6632cec6ddb24411f5bf63e920205c8b5807e63baefebc2b",
+    ".scratch/psplit_sw128_simt_control_test_source_delta_iter42.json": "9c5f73eb0bb02ba76bc6570ea439f8f30bc74302727bc04870a6c0178581c093",
+    ".scratch/psplit_sw128_simt_control_test_expected_coverage_iter42.json": "42776ca9957fbdb197ca794dc90fd1c35f5bb88fe0fabb7fdb2b8bb8464a3be8",
+    ".scratch/psplit_sw128_simt_control_test_actual_coverage_generator_iter42.py": "0099ed61d28b082dae336b20ce07acfe76b8dbaf3e51bba33978b3297c5cd13c",
+    ".scratch/psplit_sw128_simt_control_root_future41_manifest.json": "388e64943d82bfe0fba0adeef98a5071c64fa1c201849eda5795558d58157106",
+    "third_party/cutlass/include/cute/arch/mma_sm90_gmma.hpp": "fb7d9b9358adecb3255e051e3f46026ddf2d8851adef017633f78d4ac4242f83",
+    "third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp": "9673bc77196f52edcf0b9b824cec5d305c0738251e9b3beb39ddc308e5b37e9f",
+    "third_party/cutlass/include/cute/algorithm/gemm.hpp": "7794f06ca5977608b74c0ef244f559ca5049dc750127c46b2e726cb367a6c575",
+    "third_party/cutlass/include/cutlass/pipeline/sm90_pipeline.hpp": "550747f08887a71035f7b2da9d7c9113a1f6e6f2b81434573475745a4237d583",
+    "third_party/cutlass/include/cutlass/arch/barrier.h": "99b053b493b3b2f481b454014c9c9b821e1a3fef5ca626ca8c5c5be30fadc8c0"
+  },
+  "instances": [
+    {
+      "variant": 46,
+      "dtype": "fp16",
+      "function": "_ZN7megafmm78_GLOBAL__N__8e6b49be_45_megakernel_wgmma_psplit_sw128_simt_control_cu_7c2d4f1440winograd_wgmma_psplit_sw128_simt_controlIN7cutlass6half_tELi32EEEvNS_7ProblemENS0_26SW128SimtControlDescriptorEPKT_S8_PKfPf",
+      "status": "PASS_FRESH_COMPILED_STATIC_LAUNCH_GATE",
+      "bm": 64,
+      "bn": 32,
+      "bk": 64,
+      "threads": 384,
+      "stages": 2,
+      "k16_atoms_per_stage": 4,
+      "parent_1024_stage_count": 8,
+      "static_instruction_count": 2704,
+      "canonical_pc_predicate_instruction_sha256": "20372fc59de9d824ca5551efad704783f7f98ffbde5df5fbe603be2418a8f8ae",
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "compiled_gate_inherited_from_iteration41": false,
+      "compiled_gate_inherited_from_iteration39": false,
+      "actual_reported_registers": 168,
+      "effective_initial_registers_per_thread": 168,
+      "effective_initial_evidence": [
+        "Fresh feeding ELF EIATTR_REGCOUNT168",
+        "Actual new46 ptxas REG168 and final feeding DriverAPI registers168",
+        "Actual SASS DEC64/TRY_ALLOC192; feeding maxntid384/minnctapersm1"
+      ],
+      "producer_quota": 64,
+      "wg0_quota": 192,
+      "wg1_quota": 192,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "initial_owned_CTA_pool_registers": 64512,
+      "requested_role_pool_registers": 57344,
+      "required_legal_initial_minimum": 152,
+      "setmaxnreg_direction_legal": true,
+      "producer_gpr_highest_including_implicit": 40,
+      "wg0_gpr_highest_including_implicit": 166,
+      "wg1_gpr_highest_including_implicit": 170,
+      "consumer_gpr_highest_including_implicit": 170,
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 740,
+          "possibly_executed_instruction_count": 739,
+          "abstract_state_count": 1083,
+          "gpr_highest_including_implicit": 40,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x9530",
+              "instruction": "HADD2.F32 R40, -RZ, R11.H1_H1",
+              "highest": 40
+            },
+            {
+              "pc": "0x9560",
+              "instruction": "FADD R40, -R40, R19",
+              "highest": 40
+            },
+            {
+              "pc": "0x95a0",
+              "instruction": "F2FP.F16.F32.PACK_AB R7, R40, R7",
+              "highest": 40
+            },
+            {
+              "pc": "0x95b0",
+              "instruction": "SHF.R.U64 R40, R11, 0x3, RZ",
+              "highest": 40
+            },
+            {
+              "pc": "0x9630",
+              "instruction": "LOP3.LUT R35, R40, R35, RZ, 0x3c, !PT",
+              "highest": 40
+            },
+            {
+              "pc": "0x9530",
+              "instruction": "HADD2.F32 R40, -RZ, R11.H1_H1",
+              "highest": 40
+            },
+            {
+              "pc": "0x9560",
+              "instruction": "FADD R40, -R40, R19",
+              "highest": 40
+            },
+            {
+              "pc": "0x95a0",
+              "instruction": "F2FP.F16.F32.PACK_AB R7, R40, R7",
+              "highest": 40
+            },
+            {
+              "pc": "0x95b0",
+              "instruction": "SHF.R.U64 R40, R11, 0x3, RZ",
+              "highest": 40
+            },
+            {
+              "pc": "0x9630",
+              "instruction": "LOP3.LUT R35, R40, R35, RZ, 0x3c, !PT",
+              "highest": 40
+            }
+          ],
+          "pending_RS_A_and_P_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 1389,
+          "possibly_executed_instruction_count": 1341,
+          "abstract_state_count": 1396,
+          "gpr_highest_including_implicit": 166,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x5ef0",
+              "instruction": "SHF.R.U64 R166, R27, 0x3, RZ",
+              "highest": 166
+            },
+            {
+              "pc": "0x5f00",
+              "instruction": "LOP3.LUT R27, R166, R29, RZ, 0x3c, !PT",
+              "highest": 166
+            },
+            {
+              "pc": "0x5f20",
+              "instruction": "HADD2.F32 R166, -RZ, R103.H0_H0",
+              "highest": 166
+            },
+            {
+              "pc": "0x5f70",
+              "instruction": "FADD R29, R166, R29",
+              "highest": 166
+            },
+            {
+              "pc": "0x6450",
+              "instruction": "HADD2.F32 R166, -RZ, R25.H1_H1",
+              "highest": 166
+            },
+            {
+              "pc": "0x6480",
+              "instruction": "FADD R25, R91, R166",
+              "highest": 166
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x6ce0",
+              "last_issue_pc": "0x6fb0",
+              "covered_wait0_pc": "0x6fc0",
+              "MMA_count": 12,
+              "A_packed_register_count": 48,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                116,
+                117,
+                118,
+                119
+              ],
+              "P_register_count": 48,
+              "P_registers": [
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all complete-stage physical A words from first MMA until covered wait0,including future-issued A; actual role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 1265,
+          "possibly_executed_instruction_count": 1260,
+          "abstract_state_count": 1272,
+          "gpr_highest_including_implicit": 170,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x3150",
+              "instruction": "HADD2.F32 R170, -RZ, R103.H1_H1",
+              "highest": 170
+            },
+            {
+              "pc": "0x3180",
+              "instruction": "FADD R99, R91, R170",
+              "highest": 170
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x3200",
+              "last_issue_pc": "0x3600",
+              "covered_wait0_pc": "0x3610",
+              "MMA_count": 16,
+              "A_packed_register_count": 64,
+              "A_registers": [
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                116,
+                117,
+                118,
+                119,
+                120,
+                121,
+                122,
+                123,
+                124,
+                125,
+                126,
+                127,
+                128,
+                129,
+                130,
+                131,
+                132,
+                133,
+                134,
+                135,
+                136,
+                137,
+                138,
+                139,
+                140,
+                141,
+                142,
+                143,
+                144,
+                145,
+                146,
+                147,
+                148,
+                149,
+                150,
+                151
+              ],
+              "P_register_count": 64,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all complete-stage physical A words from first MMA until covered wait0,including future-issued A; actual role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        }
+      ],
+      "initialization_gate": {
+        "status": "PASS_FRESH_FIRST_P_ZERO_AND_QUOTA_GROW_DEFINITE_WRITE",
+        "INC_try_pc": "0x340",
+        "INC_retry_branch_pc": "0x370",
+        "successful_exit_pc": "0x380",
+        "P_zero_clear_after_INC": "common R40..87 at03a0..0550; WG1 extraR24..39 at0580..0600; WG0 uniform-zero UR3720..38f0 with IMAD/MOV P reload afterwards",
+        "all_HGMMA_entries_covered_by_zero_init": true,
+        "high_register_access_before_successful_INC": 0,
+        "grown_registers_actually_used": [
+          168,
+          170
+        ],
+        "grown_first_definitions": [
+          {
+            "function": "_ZN7megafmm78_GLOBAL__N__8e6b49be_45_megakernel_wgmma_psplit_sw128_simt_control_cu_7c2d4f1440winograd_wgmma_psplit_sw128_simt_controlIN7cutlass6half_tELi32EEEvNS_7ProblemENS0_26SW128SimtControlDescriptorEPKT_S8_PKfPf",
+            "role": "producer",
+            "abstract_states": 1083,
+            "grown_register_read_before_definition_count": 0,
+            "errors": [],
+            "first_grown_register_definition_sites": []
+          },
+          {
+            "function": "_ZN7megafmm78_GLOBAL__N__8e6b49be_45_megakernel_wgmma_psplit_sw128_simt_control_cu_7c2d4f1440winograd_wgmma_psplit_sw128_simt_controlIN7cutlass6half_tELi32EEEvNS_7ProblemENS0_26SW128SimtControlDescriptorEPKT_S8_PKfPf",
+            "role": "WG0",
+            "abstract_states": 1396,
+            "grown_register_read_before_definition_count": 0,
+            "errors": [],
+            "first_grown_register_definition_sites": []
+          },
+          {
+            "function": "_ZN7megafmm78_GLOBAL__N__8e6b49be_45_megakernel_wgmma_psplit_sw128_simt_control_cu_7c2d4f1440winograd_wgmma_psplit_sw128_simt_controlIN7cutlass6half_tELi32EEEvNS_7ProblemENS0_26SW128SimtControlDescriptorEPKT_S8_PKfPf",
+            "role": "WG1",
+            "abstract_states": 2274,
+            "grown_register_read_before_definition_count": 0,
+            "errors": [],
+            "first_grown_register_definition_sites": [
+              {
+                "pc": "0x2fe0",
+                "instruction": "LDS R168, [R163]",
+                "register": 168
+              },
+              {
+                "pc": "0x3150",
+                "instruction": "HADD2.F32 R170, -RZ, R103.H1_H1",
+                "register": 170
+              }
+            ]
+          }
+        ],
+        "independent_operand_aware_CFG": [
+          {
+            "role": "producer",
+            "abstract_states": 1898,
+            "first_accumulator_zero_definition_missing_count": 0,
+            "missing_first_zero": [],
+            "P_first_issue_fragments": [],
+            "high_register_access_before_successful_INC_count": 0,
+            "pre_INC_accesses": []
+          },
+          {
+            "role": "WG0",
+            "abstract_states": 2585,
+            "first_accumulator_zero_definition_missing_count": 0,
+            "missing_first_zero": [],
+            "P_first_issue_fragments": [
+              {
+                "pc": "0x6ce0",
+                "base_register": 72
+              },
+              {
+                "pc": "0x6df0",
+                "base_register": 56
+              },
+              {
+                "pc": "0x6ef0",
+                "base_register": 40
+              }
+            ],
+            "high_register_access_before_successful_INC_count": 0,
+            "pre_INC_accesses": []
+          },
+          {
+            "role": "WG1",
+            "abstract_states": 2510,
+            "first_accumulator_zero_definition_missing_count": 0,
+            "missing_first_zero": [],
+            "P_first_issue_fragments": [
+              {
+                "pc": "0x3200",
+                "base_register": 72
+              },
+              {
+                "pc": "0x3300",
+                "base_register": 56
+              },
+              {
+                "pc": "0x3440",
+                "base_register": 40
+              },
+              {
+                "pc": "0x3540",
+                "base_register": 24
+              }
+            ],
+            "high_register_access_before_successful_INC_count": 0,
+            "pre_INC_accesses": []
+          }
+        ]
+      },
+      "RS_A_register_operand_words_per_atom": 4,
+      "FP32_accumulator_input_and_destination_words_per_atom": 16,
+      "owning_A_backing_count_per_role": [
+        3,
+        4
+      ],
+      "full_stage_A_packed_words_per_role": [
+        48,
+        64
+      ],
+      "pending_full_stage_A_or_P_generic_accesses": 0,
+      "persistent_P_fragments_disjoint": true,
+      "stack_bytes": 0,
+      "local_bytes": 0,
+      "spill_stores_bytes": 0,
+      "spill_loads_bytes": 0,
+      "new_function_C7512_warning": false,
+      "new_function_mma_serialization_observed": false,
+      "new_function_mma_serialization_observed_scope": "Compiler warning and static group SASS only; no dynamic stall claim",
+      "dynamic_shared_bytes": 123904,
+      "static_shared_bytes": 0,
+      "static_shared_bytes_evidence": "Actual final feeding cubin DriverAPI static0; resource/ELF1024 separate alignment accounting",
+      "resource_tool_reported_SHARED_bytes": 1024,
+      "resource_tool_reported_SHARED_bytes_scope": "Alignment accounting, not asserted runtime static allocation or added twice",
+      "dynamic_plus_static_shared_bytes": 123904,
+      "operand_bank_bytes": 61440,
+      "two_operand_bank_bytes": 122880,
+      "tail_bytes": 57344,
+      "tail_bank0_bytes": 57344,
+      "tail_bank1_bytes": 0,
+      "barrier_offset_bytes": 122880,
+      "shared_alignment_bytes": 1024,
+      "full_barrier_offsets": [
+        122880,
+        122888
+      ],
+      "empty_barrier_offsets": [
+        122896,
+        122904
+      ],
+      "unused_raw_transaction_barrier_offsets": [
+        122912,
+        122920
+      ],
+      "full_barrier_arrival_count": 128,
+      "empty_barrier_arrival_count": 256,
+      "unused_raw_barrier_initial_arrival_count": 1,
+      "host_launch_and_optin_actual_immediate": 123904,
+      "occupancy_API_predicted_active_CTAs_per_SM": 1,
+      "measured_residency": null,
+      "SIMT_raw_A_gate": {
+        "status": "PASS_FRESH_SW128_VECTOR8_PUBLICATION",
+        "all_producer_lanes": 128,
+        "A_vector_tasks_per_lane": 4,
+        "B_vector_tasks_per_lane": 2,
+        "A_tasks_total": 512,
+        "B_tasks_total": 256,
+        "A_global_load_and_shared_store_vector_bytes": 16,
+        "raw_A_transform_or_cast": false,
+        "source_copy_helpers_names_only_equal_original39": true,
+        "SW128_absolute_address_geometry_independent_CPU_ONLY": true,
+        "TMA_tensor_copy_expectTX_rawwait_count": 0,
+        "raw_done_storage_and_initialization_retained_unused": true,
+        "all128_producer_proxy_fence_pc": "0x9810",
+        "full_ready_commit_pc": "0x9880",
+        "one_current_A_descriptor_bytes": 128,
+        "descriptor_parameter_alignment_bytes": 64,
+        "descriptor_KPARAM_offset": 112,
+        "descriptor_cbank_base": 528,
+        "descriptor_absolute_constant_offset": 640,
+        "descriptor_consumed_by_SIMT_kernel": false,
+        "descriptor_direct_constant_loads_in_actual_SASS": 0,
+        "explicit_current_A_KPARAM_offset": 240,
+        "B_map_count": 0,
+        "ordinary_encodes_per_native_call": 1,
+        "ordinary_encode_inside_timed_host_call": true,
+        "prepare_encodes": 0,
+        "descriptor_cache": false
+      },
+      "synchronization_gate": {
+        "status": "PASS_FRESH_THREE_COLLECTIVE_EPOCHS_AND_BOTH_BANK_DRAIN",
+        "CTA_collective_epochs": [
+          "init bar0",
+          "drain nonaligned bar6 count384",
+          "publish bar0"
+        ],
+        "initial_bar0_pc": "0x2b0",
+        "all_12_full_warps_once_same_non_aligned_bar6_count384": true,
+        "WG0_last_wait0_release_pcs": [
+          "0x6fc0",
+          "0x7010"
+        ],
+        "WG1_last_wait0_release_pcs": [
+          "0x3610",
+          "0x3640"
+        ],
+        "consumer_drain_bar6_pc": "0x7060",
+        "producer_two_bank_empty_wait_pcs": [
+          "0x9960",
+          "0x99f0"
+        ],
+        "producer_drain_bar6_pc": "0x9a10",
+        "all_tail_STS_first_last": [
+          "0x7450",
+          "0x7c10"
+        ],
+        "publish_bar0_pc": "0x9a40",
+        "all_tail_STS_after_both_bank_drain_and_before_publish": true,
+        "U_shared_reads_after_publish": true,
+        "tail_coordinate_S2R_scope": "after wholeK wait0; address math may precede drain, no tail store before collective"
+      },
+      "math_DAG_gate": "Complete7 wholeK P/perP fourascendingK16; unchanged FP32RN ST finalonecast/fullstageA3+4 wait0/postfences; fixedU/alphaRN/betaFMA",
+      "exact_C0_D_alias_gate": {
+        "active_C0_load_pcs": [
+          "0xa2a0",
+          "0xa2e0",
+          "0xa320",
+          "0xa380"
+        ],
+        "first_active_D_store_pc": "0xa560",
+        "all_four_C0_loads_before_first_D_store": true,
+        "beta_zero_and_negative_zero_null_C0_no_read": true,
+        "alpha_RN_then_beta_FMA": true
+      },
+      "native_ordinary_kernel_launches": 1,
+      "global_workspace_bytes": 0,
+      "actual_GPU_correctness_at_gate": null,
+      "original_FP64_numerical_certification_at_gate": null,
+      "performance_at_gate": null
+    },
+    {
+      "variant": 46,
+      "dtype": "bf16",
+      "function": "_ZN7megafmm78_GLOBAL__N__8e6b49be_45_megakernel_wgmma_psplit_sw128_simt_control_cu_7c2d4f1440winograd_wgmma_psplit_sw128_simt_controlIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemENS0_26SW128SimtControlDescriptorEPKT_S8_PKfPf",
+      "status": "PASS_FRESH_COMPILED_STATIC_LAUNCH_GATE",
+      "bm": 64,
+      "bn": 32,
+      "bk": 64,
+      "threads": 384,
+      "stages": 2,
+      "k16_atoms_per_stage": 4,
+      "parent_1024_stage_count": 8,
+      "static_instruction_count": 2704,
+      "canonical_pc_predicate_instruction_sha256": "5ab2530d0135728646132d88ddcaa1d71c297e46451e47289fce83e3725b49f6",
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "compiled_gate_inherited_from_iteration41": false,
+      "compiled_gate_inherited_from_iteration39": false,
+      "actual_reported_registers": 168,
+      "effective_initial_registers_per_thread": 168,
+      "effective_initial_evidence": [
+        "Fresh feeding ELF EIATTR_REGCOUNT168",
+        "Actual new46 ptxas REG168 and final feeding DriverAPI registers168",
+        "Actual SASS DEC64/TRY_ALLOC192; feeding maxntid384/minnctapersm1"
+      ],
+      "producer_quota": 64,
+      "wg0_quota": 192,
+      "wg1_quota": 192,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "initial_owned_CTA_pool_registers": 64512,
+      "requested_role_pool_registers": 57344,
+      "required_legal_initial_minimum": 152,
+      "setmaxnreg_direction_legal": true,
+      "producer_gpr_highest_including_implicit": 40,
+      "wg0_gpr_highest_including_implicit": 166,
+      "wg1_gpr_highest_including_implicit": 170,
+      "consumer_gpr_highest_including_implicit": 170,
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 740,
+          "possibly_executed_instruction_count": 739,
+          "abstract_state_count": 1083,
+          "gpr_highest_including_implicit": 40,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x9510",
+              "instruction": "LOP3.LUT R40, R11.reuse, 0xffff0000, RZ, 0xc0, !PT",
+              "highest": 40
+            },
+            {
+              "pc": "0x9550",
+              "instruction": "FADD R40, -R40, R19",
+              "highest": 40
+            },
+            {
+              "pc": "0x9590",
+              "instruction": "F2FP.BF16.F32.PACK_AB R7, R40, R7",
+              "highest": 40
+            },
+            {
+              "pc": "0x95b0",
+              "instruction": "SHF.R.U64 R40, R11, 0x3, RZ",
+              "highest": 40
+            },
+            {
+              "pc": "0x9630",
+              "instruction": "LOP3.LUT R35, R40, R35, RZ, 0x3c, !PT",
+              "highest": 40
+            },
+            {
+              "pc": "0x9510",
+              "instruction": "LOP3.LUT R40, R11.reuse, 0xffff0000, RZ, 0xc0, !PT",
+              "highest": 40
+            },
+            {
+              "pc": "0x9550",
+              "instruction": "FADD R40, -R40, R19",
+              "highest": 40
+            },
+            {
+              "pc": "0x9590",
+              "instruction": "F2FP.BF16.F32.PACK_AB R7, R40, R7",
+              "highest": 40
+            },
+            {
+              "pc": "0x95b0",
+              "instruction": "SHF.R.U64 R40, R11, 0x3, RZ",
+              "highest": 40
+            },
+            {
+              "pc": "0x9630",
+              "instruction": "LOP3.LUT R35, R40, R35, RZ, 0x3c, !PT",
+              "highest": 40
+            }
+          ],
+          "pending_RS_A_and_P_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 1389,
+          "possibly_executed_instruction_count": 1341,
+          "abstract_state_count": 1396,
+          "gpr_highest_including_implicit": 166,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x5ef0",
+              "instruction": "SHF.R.U64 R166, R27, 0x3, RZ",
+              "highest": 166
+            },
+            {
+              "pc": "0x5f10",
+              "instruction": "LOP3.LUT R27, R166, R29, RZ, 0x3c, !PT",
+              "highest": 166
+            },
+            {
+              "pc": "0x5f20",
+              "instruction": "IMAD.U32 R166, R103.reuse, 0x10000, RZ",
+              "highest": 166
+            },
+            {
+              "pc": "0x5f60",
+              "instruction": "FADD R29, R166, R29",
+              "highest": 166
+            },
+            {
+              "pc": "0x6450",
+              "instruction": "LOP3.LUT R166, R25, 0xffff0000, RZ, 0xc0, !PT",
+              "highest": 166
+            },
+            {
+              "pc": "0x6480",
+              "instruction": "FADD R25, R91, R166",
+              "highest": 166
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x6ce0",
+              "last_issue_pc": "0x6fb0",
+              "covered_wait0_pc": "0x6fc0",
+              "MMA_count": 12,
+              "A_packed_register_count": 48,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                116,
+                117,
+                118,
+                119
+              ],
+              "P_register_count": 48,
+              "P_registers": [
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all complete-stage physical A words from first MMA until covered wait0,including future-issued A; actual role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 1265,
+          "possibly_executed_instruction_count": 1260,
+          "abstract_state_count": 1272,
+          "gpr_highest_including_implicit": 170,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x3150",
+              "instruction": "LOP3.LUT R170, R103, 0xffff0000, RZ, 0xc0, !PT",
+              "highest": 170
+            },
+            {
+              "pc": "0x3180",
+              "instruction": "FADD R99, R91, R170",
+              "highest": 170
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x3200",
+              "last_issue_pc": "0x3600",
+              "covered_wait0_pc": "0x3610",
+              "MMA_count": 16,
+              "A_packed_register_count": 64,
+              "A_registers": [
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                116,
+                117,
+                118,
+                119,
+                120,
+                121,
+                122,
+                123,
+                124,
+                125,
+                126,
+                127,
+                128,
+                129,
+                130,
+                131,
+                132,
+                133,
+                134,
+                135,
+                136,
+                137,
+                138,
+                139,
+                140,
+                141,
+                142,
+                143,
+                144,
+                145,
+                146,
+                147,
+                148,
+                149,
+                150,
+                151
+              ],
+              "P_register_count": 64,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all complete-stage physical A words from first MMA until covered wait0,including future-issued A; actual role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        }
+      ],
+      "initialization_gate": {
+        "status": "PASS_FRESH_FIRST_P_ZERO_AND_QUOTA_GROW_DEFINITE_WRITE",
+        "INC_try_pc": "0x340",
+        "INC_retry_branch_pc": "0x370",
+        "successful_exit_pc": "0x380",
+        "P_zero_clear_after_INC": "common R40..87 at03a0..0550; WG1 extraR24..39 at0580..0600; WG0 uniform-zero UR3720..38f0 with IMAD/MOV P reload afterwards",
+        "all_HGMMA_entries_covered_by_zero_init": true,
+        "high_register_access_before_successful_INC": 0,
+        "grown_registers_actually_used": [
+          168,
+          170
+        ],
+        "grown_first_definitions": [
+          {
+            "function": "_ZN7megafmm78_GLOBAL__N__8e6b49be_45_megakernel_wgmma_psplit_sw128_simt_control_cu_7c2d4f1440winograd_wgmma_psplit_sw128_simt_controlIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemENS0_26SW128SimtControlDescriptorEPKT_S8_PKfPf",
+            "role": "producer",
+            "abstract_states": 1083,
+            "grown_register_read_before_definition_count": 0,
+            "errors": [],
+            "first_grown_register_definition_sites": []
+          },
+          {
+            "function": "_ZN7megafmm78_GLOBAL__N__8e6b49be_45_megakernel_wgmma_psplit_sw128_simt_control_cu_7c2d4f1440winograd_wgmma_psplit_sw128_simt_controlIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemENS0_26SW128SimtControlDescriptorEPKT_S8_PKfPf",
+            "role": "WG0",
+            "abstract_states": 1396,
+            "grown_register_read_before_definition_count": 0,
+            "errors": [],
+            "first_grown_register_definition_sites": []
+          },
+          {
+            "function": "_ZN7megafmm78_GLOBAL__N__8e6b49be_45_megakernel_wgmma_psplit_sw128_simt_control_cu_7c2d4f1440winograd_wgmma_psplit_sw128_simt_controlIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemENS0_26SW128SimtControlDescriptorEPKT_S8_PKfPf",
+            "role": "WG1",
+            "abstract_states": 2274,
+            "grown_register_read_before_definition_count": 0,
+            "errors": [],
+            "first_grown_register_definition_sites": [
+              {
+                "pc": "0x2fd0",
+                "instruction": "LDS R168, [R163]",
+                "register": 168
+              },
+              {
+                "pc": "0x3150",
+                "instruction": "LOP3.LUT R170, R103, 0xffff0000, RZ, 0xc0, !PT",
+                "register": 170
+              }
+            ]
+          }
+        ],
+        "independent_operand_aware_CFG": [
+          {
+            "role": "producer",
+            "abstract_states": 1898,
+            "first_accumulator_zero_definition_missing_count": 0,
+            "missing_first_zero": [],
+            "P_first_issue_fragments": [],
+            "high_register_access_before_successful_INC_count": 0,
+            "pre_INC_accesses": []
+          },
+          {
+            "role": "WG0",
+            "abstract_states": 2583,
+            "first_accumulator_zero_definition_missing_count": 0,
+            "missing_first_zero": [],
+            "P_first_issue_fragments": [
+              {
+                "pc": "0x6ce0",
+                "base_register": 72
+              },
+              {
+                "pc": "0x6df0",
+                "base_register": 56
+              },
+              {
+                "pc": "0x6ef0",
+                "base_register": 40
+              }
+            ],
+            "high_register_access_before_successful_INC_count": 0,
+            "pre_INC_accesses": []
+          },
+          {
+            "role": "WG1",
+            "abstract_states": 2512,
+            "first_accumulator_zero_definition_missing_count": 0,
+            "missing_first_zero": [],
+            "P_first_issue_fragments": [
+              {
+                "pc": "0x3200",
+                "base_register": 72
+              },
+              {
+                "pc": "0x3300",
+                "base_register": 56
+              },
+              {
+                "pc": "0x3440",
+                "base_register": 40
+              },
+              {
+                "pc": "0x3540",
+                "base_register": 24
+              }
+            ],
+            "high_register_access_before_successful_INC_count": 0,
+            "pre_INC_accesses": []
+          }
+        ]
+      },
+      "RS_A_register_operand_words_per_atom": 4,
+      "FP32_accumulator_input_and_destination_words_per_atom": 16,
+      "owning_A_backing_count_per_role": [
+        3,
+        4
+      ],
+      "full_stage_A_packed_words_per_role": [
+        48,
+        64
+      ],
+      "pending_full_stage_A_or_P_generic_accesses": 0,
+      "persistent_P_fragments_disjoint": true,
+      "stack_bytes": 0,
+      "local_bytes": 0,
+      "spill_stores_bytes": 0,
+      "spill_loads_bytes": 0,
+      "new_function_C7512_warning": false,
+      "new_function_mma_serialization_observed": false,
+      "new_function_mma_serialization_observed_scope": "Compiler warning and static group SASS only; no dynamic stall claim",
+      "dynamic_shared_bytes": 123904,
+      "static_shared_bytes": 0,
+      "static_shared_bytes_evidence": "Actual final feeding cubin DriverAPI static0; resource/ELF1024 separate alignment accounting",
+      "resource_tool_reported_SHARED_bytes": 1024,
+      "resource_tool_reported_SHARED_bytes_scope": "Alignment accounting, not asserted runtime static allocation or added twice",
+      "dynamic_plus_static_shared_bytes": 123904,
+      "operand_bank_bytes": 61440,
+      "two_operand_bank_bytes": 122880,
+      "tail_bytes": 57344,
+      "tail_bank0_bytes": 57344,
+      "tail_bank1_bytes": 0,
+      "barrier_offset_bytes": 122880,
+      "shared_alignment_bytes": 1024,
+      "full_barrier_offsets": [
+        122880,
+        122888
+      ],
+      "empty_barrier_offsets": [
+        122896,
+        122904
+      ],
+      "unused_raw_transaction_barrier_offsets": [
+        122912,
+        122920
+      ],
+      "full_barrier_arrival_count": 128,
+      "empty_barrier_arrival_count": 256,
+      "unused_raw_barrier_initial_arrival_count": 1,
+      "host_launch_and_optin_actual_immediate": 123904,
+      "occupancy_API_predicted_active_CTAs_per_SM": 1,
+      "measured_residency": null,
+      "SIMT_raw_A_gate": {
+        "status": "PASS_FRESH_SW128_VECTOR8_PUBLICATION",
+        "all_producer_lanes": 128,
+        "A_vector_tasks_per_lane": 4,
+        "B_vector_tasks_per_lane": 2,
+        "A_tasks_total": 512,
+        "B_tasks_total": 256,
+        "A_global_load_and_shared_store_vector_bytes": 16,
+        "raw_A_transform_or_cast": false,
+        "source_copy_helpers_names_only_equal_original39": true,
+        "SW128_absolute_address_geometry_independent_CPU_ONLY": true,
+        "TMA_tensor_copy_expectTX_rawwait_count": 0,
+        "raw_done_storage_and_initialization_retained_unused": true,
+        "all128_producer_proxy_fence_pc": "0x9810",
+        "full_ready_commit_pc": "0x9880",
+        "one_current_A_descriptor_bytes": 128,
+        "descriptor_parameter_alignment_bytes": 64,
+        "descriptor_KPARAM_offset": 112,
+        "descriptor_cbank_base": 528,
+        "descriptor_absolute_constant_offset": 640,
+        "descriptor_consumed_by_SIMT_kernel": false,
+        "descriptor_direct_constant_loads_in_actual_SASS": 0,
+        "explicit_current_A_KPARAM_offset": 240,
+        "B_map_count": 0,
+        "ordinary_encodes_per_native_call": 1,
+        "ordinary_encode_inside_timed_host_call": true,
+        "prepare_encodes": 0,
+        "descriptor_cache": false
+      },
+      "synchronization_gate": {
+        "status": "PASS_FRESH_THREE_COLLECTIVE_EPOCHS_AND_BOTH_BANK_DRAIN",
+        "CTA_collective_epochs": [
+          "init bar0",
+          "drain nonaligned bar6 count384",
+          "publish bar0"
+        ],
+        "initial_bar0_pc": "0x2b0",
+        "all_12_full_warps_once_same_non_aligned_bar6_count384": true,
+        "WG0_last_wait0_release_pcs": [
+          "0x6fc0",
+          "0x7010"
+        ],
+        "WG1_last_wait0_release_pcs": [
+          "0x3610",
+          "0x3640"
+        ],
+        "consumer_drain_bar6_pc": "0x7060",
+        "producer_two_bank_empty_wait_pcs": [
+          "0x9960",
+          "0x99f0"
+        ],
+        "producer_drain_bar6_pc": "0x9a10",
+        "all_tail_STS_first_last": [
+          "0x7450",
+          "0x7c10"
+        ],
+        "publish_bar0_pc": "0x9a40",
+        "all_tail_STS_after_both_bank_drain_and_before_publish": true,
+        "U_shared_reads_after_publish": true,
+        "tail_coordinate_S2R_scope": "after wholeK wait0; address math may precede drain, no tail store before collective"
+      },
+      "math_DAG_gate": "Complete7 wholeK P/perP fourascendingK16; unchanged FP32RN ST finalonecast/fullstageA3+4 wait0/postfences; fixedU/alphaRN/betaFMA",
+      "exact_C0_D_alias_gate": {
+        "active_C0_load_pcs": [
+          "0xa2a0",
+          "0xa2e0",
+          "0xa320",
+          "0xa380"
+        ],
+        "first_active_D_store_pc": "0xa560",
+        "all_four_C0_loads_before_first_D_store": true,
+        "beta_zero_and_negative_zero_null_C0_no_read": true,
+        "alpha_RN_then_beta_FMA": true
+      },
+      "native_ordinary_kernel_launches": 1,
+      "global_workspace_bytes": 0,
+      "actual_GPU_correctness_at_gate": null,
+      "original_FP64_numerical_certification_at_gate": null,
+      "performance_at_gate": null
+    }
+  ],
+  "disabled_instances": [
+    {
+      "variant": 37,
+      "status": "RETAINED_PUBLIC_DISABLED_BEFORE_DEGENERATE",
+      "fresh_review_of_old_machine_gate": false
+    }
+  ],
+  "source_API_tests_review": {
+    "formal_normalized_body_exact_frozen_prototype": true,
+    "Plan_dispatch": "46 properelse45, narrowedquery beforeprepare/encode; truthfulP7/Dense fallback/commoncurrent spans/alias/scalars",
+    "native_domain": "nontransposed parentM%128,N%64,K%128/currentAB16/lda,ldb%8/A-only lda<2^39 and originalrange",
+    "max_policy_before_degenerate": 46,
+    "invalid_policy": 47,
+    "Auto": "Dense unchanged",
+    "tests_source_inverse": "independently reversed all31 operations/counts and recovered old41 da1f6e fullbytes; currenta6a9658c",
+    "sameatom_reference": "39 N32/BK64 RS-A rawU plus independent specifiedRNalpha/FMA hostepilogue",
+    "stride_metadata": "10hostonly A-bound checks; noHugeBuffer/encode/run, Plan setup_unavailable must be recorded separately and never called Plan PASS",
+    "tests_at_compiled_gate": null
+  },
+  "original_FP64_gate": {
+    "certified_at_gate": null,
+    "floor_changed": false,
+    "full1830_code_domain_executed_at_gate": false
+  },
+  "limitations": [
+    "New46 two-dtype compiledgate alone does not certify GPU/SAN, originalFP64floors or performance.",
+    "Actual owned allocation168 differs from source192 consumer quotas; R168/R170 are real afterINC-defined temporaries.",
+    "Driverstatic0 and toolSHARED1024 are separate; occupancyAPI predicted1 is not measured residency.",
+    "Unused currentA map encode stays inside every ordinarynativehostcall/capture; Graph replay does not encode.",
+    "Transport comparison also changes rawwait protocol and explicitA parameter image/compiler scheduling; no isolated bank/TMA/stall/traffic cause claimed.",
+    "Old37 compiler warnings preserved separately, not attributed to new46."
+  ],
+  "issues": []
+}

@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_sw128_simt_control_root_future41_model.py", line 251, in <module>
+    pending=State(8);pending.arrivals[0]=set(range(128));pending.apply(('wait',0,0));pending.apply(('issue',0,0))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_sw128_simt_control_root_future41_model.py", line 156, in apply
+    need(self.full_phase[s&1]!=(s//2&1),'CONSUMER_FULL_PHASE_MISMATCH')
+  File "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_sw128_simt_control_root_future41_model.py", line 19, in need
+    if not ok:raise Violation(message)
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+Violation: CONSUMER_FULL_PHASE_MISMATCH

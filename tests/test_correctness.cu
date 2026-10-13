@@ -130,6 +130,13 @@ void check_packed_metadata(const megafmm::Problem& p,int variant) {
           "packed input metadata is not seven compact row-major A/B/P slots");
 }
 const char* warp_mma_name(int variant,const megafmm::Problem& p) {
+  if(variant==46) {
+    if(p.lda%8!=0 || p.ldb%8!=0)return "dense_cublaslt";
+    // Host A-map setup is retained for this SIMT control; its A-only bound does not apply to B.
+    return p.m%128==0 && p.n%64==0 && p.k%128==0 && uint64_t(p.lda)<(uint64_t(1)<<39) ?
+           "megakernel_wgmma_psplit_sw128_simt_control_64x32":
+           "megakernel_warp_mma_packed";
+  }
   if(variant==45) {
     if(p.lda%8!=0 || p.ldb%8!=0)return "dense_cublaslt";
     // Only rawA uses TMA; B remains SIMT and has no tensor-map stride bound.
@@ -452,7 +459,7 @@ template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorit
     }
   }
   if(algorithm==megafmm::Algorithm::Megakernel &&
-     (variant==28 || variant==29 || variant==30 || variant==31 || variant==32 || variant==33 || variant==34 || variant==35 || variant==36 || variant==38 || variant==39 || variant==40 || variant==41 || variant==42 || variant==43 || variant==44 || variant==45) && expected_route &&
+     (variant==28 || variant==29 || variant==30 || variant==31 || variant==32 || variant==33 || variant==34 || variant==35 || variant==36 || variant==38 || variant==39 || variant==40 || variant==41 || variant==42 || variant==43 || variant==44 || variant==45 || variant==46) && expected_route &&
      (std::string(expected_route).find("megakernel_wgmma_pipeline")==0 ||
       std::string(expected_route).find("megakernel_wgmma_tma_alias")==0 ||
       std::string(expected_route).find("megakernel_wgmma_wait1")==0 ||
@@ -1271,25 +1278,25 @@ void wgmma_pipeline_policy_suite(int variant) {
   for(int scenario=0;scenario<4;++scenario) {
     auto p=problem(128,128,128,megafmm::DType::BF16);
     if(scenario==1)p.m=0;if(scenario==2)p.alpha=0;if(scenario==3)p.k=0;
-    megafmm::Policy invalid;invalid.algorithm=algorithm;invalid.mega_variant=46;invalid.certified_range=true;
+    megafmm::Policy invalid;invalid.algorithm=algorithm;invalid.mega_variant=47;invalid.certified_range=true;
     bool rejected=false;try {auto plan=megafmm::create_plan(p,invalid);}catch(const std::exception&) {rejected=true;}
-    require(rejected,"invalid Mega46 accepted before normal/empty/alpha0/K0 dispatch");
+    require(rejected,"invalid Mega47 accepted before normal/empty/alpha0/K0 dispatch");
   }
   megafmm::Policy automatic;automatic.algorithm=megafmm::Algorithm::Auto;
   automatic.mega_variant=variant;automatic.certified_range=true;
   auto p=problem(128,128,128,megafmm::DType::BF16);
   require(megafmm::create_plan(p,automatic)->algorithm_name()=="dense_cublaslt","pipeline candidate enabled uncertified Auto SW");
   std::cout << "PASS_WGMMA_PIPELINE_POLICY variant=" << variant
-            << " invalid46_cases=20 validate_before_empty_scale=1 auto_dense=1\n";
+            << " invalid47_cases=20 validate_before_empty_scale=1 auto_dense=1\n";
 }
 const char* wgmma_scheduled_family(int variant) {
-  return variant==45 ? "PSPLIT_SELECTIVE_TMA_A":variant==44 ? "PSPLIT_MICROBATCH":variant==42 ? "PSPLIT_RSA_BN16":variant==43 ? "PSPLIT_SS_BN16":variant==41 ? "PSPLIT_HYBRID_S":variant==40 ? "PSPLIT_RSA_BK32":variant==39 ? "PSPLIT_RSA":variant==38 ? "PSPLIT_BK64":variant>=36 ? "PSPLIT":variant>=34 ? "WAIT1_THREE_STAGE":variant>=32 ? "WAIT1":"TMA_ALIAS";
+  return variant==46 ? "PSPLIT_SW128_SIMT_CONTROL":variant==45 ? "PSPLIT_SELECTIVE_TMA_A":variant==44 ? "PSPLIT_MICROBATCH":variant==42 ? "PSPLIT_RSA_BN16":variant==43 ? "PSPLIT_SS_BN16":variant==41 ? "PSPLIT_HYBRID_S":variant==40 ? "PSPLIT_RSA_BK32":variant==39 ? "PSPLIT_RSA":variant==38 ? "PSPLIT_BK64":variant>=36 ? "PSPLIT":variant>=34 ? "WAIT1_THREE_STAGE":variant>=32 ? "WAIT1":"TMA_ALIAS";
 }
 bool wgmma_scheduled_extended_bk32(int variant) {
   return variant==40 || variant==41 || variant==42 || variant==43;
 }
 bool wgmma_scheduled_bk64(int variant) {
-  return variant==38 || variant==39 || variant==44 || variant==45;
+  return variant==38 || variant==39 || variant==44 || variant==45 || variant==46;
 }
 bool wgmma_scheduled_n16(int variant) {
   // This controls parent-N32 fixtures of older N16 routes. New42/43 N16 atoms
@@ -1515,6 +1522,117 @@ void psplit_selective_tma_a_stride_metadata_suite() {
             << " native_helper_guards_all_checked=1 Plan_setup_claimed_only_if_supported=1"
             << " A_only_limit=549755813888 B_bound_not_applied=1 metadata_only=1 allocated_input_bytes=0 tensor_map_encodes=0 native_runs=0\n";
 }
+bool psplit_sw128_simt_control_route_enabled() {
+  static int cached=-1;
+  if(cached>=0)return cached!=0;
+  int enabled_dtypes=0,disabled_dtypes=0;
+  for(auto dtype:{megafmm::DType::BF16,megafmm::DType::FP16}) {
+    auto p=problem(128,64,128,dtype);
+    megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::Megakernel;
+    policy.mega_variant=46;policy.certified_range=true;policy.workspace_limit=0;
+    try {
+      auto plan=megafmm::create_plan(p,policy);
+      require(plan->algorithm_name()==warp_mma_name(46,p) && plan->workspace_bytes()==0,
+              "SW128 SIMT control46 registered route silently substituted another algorithm");
+      ++enabled_dtypes;
+    } catch(const std::invalid_argument& e) {
+      const std::string message=e.what();
+      if(message.find("disabled")==std::string::npos || message.find("46")==std::string::npos)throw;
+      ++disabled_dtypes;
+    }
+  }
+  require(enabled_dtypes==2 || disabled_dtypes==2,"SW128 SIMT control46 enable state differs between dtypes");
+  cached=enabled_dtypes==2;
+  std::cout << "SW128_SIMT_CONTROL_ROUTE_SCOPE variant=46 enabled=" << cached
+            << " dtypes=2 metadata_only=1 native_runs=0\n";
+  return cached!=0;
+}
+void psplit_sw128_simt_control_blocked_policy_suite() {
+  require(!psplit_sw128_simt_control_route_enabled(),"SW128 SIMT control blocked policy requires an explicitly disabled46 route");
+  size_t rejected_cases=0,auto_dense_cases=0;
+  for(auto dtype:{megafmm::DType::BF16,megafmm::DType::FP16}) {
+    megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::Megakernel;
+    policy.mega_variant=46;policy.certified_range=true;policy.workspace_limit=0;
+    for(int scenario=0;scenario<4;++scenario) {
+      auto p=problem(128,64,128,dtype);
+      if(scenario==1)p.m=0;if(scenario==2)p.alpha=0;if(scenario==3)p.k=0;
+      bool rejected=false;
+      try {auto plan=megafmm::create_plan(p,policy);}
+      catch(const std::invalid_argument& e) {
+        const std::string message=e.what();
+        rejected=message.find("disabled")!=std::string::npos && message.find("46")!=std::string::npos;
+      }
+      require(rejected,"disabled SW128 SIMT control46 accepted before normal/empty/alpha0/K0 dispatch");
+      ++rejected_cases;
+    }
+    policy.algorithm=megafmm::Algorithm::Auto;
+    auto p=problem(128,64,128,dtype);
+    require(megafmm::create_plan(p,policy)->algorithm_name()=="dense_cublaslt",
+            "Auto SW128 SIMT control metadata did not retain Dense policy");
+    ++auto_dense_cases;
+  }
+  std::cout << "PASS_WGMMA_PSPLIT_SW128_SIMT_CONTROL_BLOCKED_POLICY variant=46 forced_rejections=" << rejected_cases
+            << " validate_before_empty_scale=1 auto_dense_dtypes=" << auto_dense_cases << " native_runs=0\n";
+}
+void psplit_sw128_simt_control_stride_metadata_suite() {
+  // These shapes have valid finite size_t spans, but are never allocated or run.
+  // Host A-map encode is launch-only even for this SIMT control; Plan metadata setup cannot encode A.
+  constexpr int64_t limit=int64_t(1)<<39;
+  size_t cases=0,native_cases=0,packed_cases=0,dense_cases=0,setup_success=0,setup_unavailable=0;
+  for(auto dtype:{megafmm::DType::BF16,megafmm::DType::FP16})
+  for(int scenario=0;scenario<5;++scenario) {
+    auto p=problem(128,64,128,dtype);
+    if(scenario==0)p.lda=limit-8;
+    if(scenario==1)p.lda=limit;
+    if(scenario==2)p.lda=limit+8;
+    if(scenario==3)p.lda=limit+1;
+    if(scenario==4)p.ldb=limit; // B is SIMT: the A-only bound must not reject B.
+    const size_t a_span=(size_t(p.m-1)*size_t(p.lda)+size_t(p.k))*2;
+    const size_t b_span=(size_t(p.k-1)*size_t(p.ldb)+size_t(p.n))*2;
+    require(a_span<(size_t(1)<<48) && b_span<(size_t(1)<<48),"SW128 SIMT control metadata span is not safely bounded");
+    const bool native=scenario==0 || scenario==4;
+    require(megafmm::wgmma_psplit_sw128_simt_control_can_implement(p,0)==native,
+            "SW128 SIMT control guard incorrectly handles A-only stride bound or SIMT B");
+    const char* expected=warp_mma_name(46,p);
+    std::cout << "BEGIN_WGMMA_PSPLIT_SW128_SIMT_CONTROL_STRIDE_METADATA dtype=" << megafmm::dtype_name(dtype)
+              << " variant=46 scenario=" << scenario << " lda=" << p.lda << " ldb=" << p.ldb
+              << " expected=" << expected << " native_guard=" << native
+              << " safe_a_span_bytes=" << a_span << " safe_b_span_bytes=" << b_span << " metadata_only=1 native_runs=0" << std::endl;
+    megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::Megakernel;
+    policy.mega_variant=46;policy.certified_range=true;policy.workspace_limit=0;
+    std::unique_ptr<megafmm::Plan> plan;
+    std::string setup_message;
+    try {plan=megafmm::create_plan(p,policy);}
+    catch(const std::runtime_error& error) {
+      setup_message=error.what();
+      // Only independent Dense-backend layout/heuristic setup can be unavailable
+      // at these unbacked metadata strides. Predicate/prepare/route errors fail.
+      if(setup_message.find("query Lt heuristics:")!=0 &&
+         setup_message.find("create matrix layout:")!=0 &&
+         setup_message.find("cuBLASLt has no valid heuristic for this problem")==std::string::npos)throw;
+    }
+    if(plan) {
+      require(plan->algorithm_name()==expected,"SW128 SIMT control Plan stride boundary route differs before encode");
+      if(native || scenario==1 || scenario==2)require(plan->workspace_bytes()==0,"metadata native/P7 route unexpectedly allocated workspace");
+    } else {
+      std::cout << "SETUP_UNAVAILABLE_WGMMA_PSPLIT_SW128_SIMT_CONTROL_STRIDE_METADATA dtype=" << megafmm::dtype_name(dtype)
+                << " variant=46 scenario=" << scenario << " message=" << setup_message << '\n';
+    }
+    std::cout << "META_WGMMA_PSPLIT_SW128_SIMT_CONTROL_STRIDE_METADATA dtype=" << megafmm::dtype_name(dtype)
+              << " variant=46 scenario=" << scenario << " lda=" << p.lda << " ldb=" << p.ldb
+              << " actual=" << (plan ? plan->algorithm_name():"setup_unavailable") << " setup_supported=" << bool(plan)
+              << " expected=" << expected << " native_guard=" << native
+              << " safe_a_span_bytes=" << a_span << " safe_b_span_bytes=" << b_span
+              << " metadata_only=1 allocated_input_bytes=0 tensor_map_encodes=0 native_runs=0\n";
+    ++cases;native_cases+=native;packed_cases+=scenario==1 || scenario==2;dense_cases+=scenario==3;
+    setup_success+=bool(plan);setup_unavailable+=!plan;
+  }
+  std::cout << "PASS_WGMMA_PSPLIT_SW128_SIMT_CONTROL_STRIDE_METADATA variant=46 cases=" << cases
+            << " native_guard_cases=" << native_cases << " packed_guard_cases=" << packed_cases << " dense_guard_cases=" << dense_cases
+            << " setup_success_cases=" << setup_success << " setup_unavailable_cases=" << setup_unavailable
+            << " native_helper_guards_all_checked=1 Plan_setup_claimed_only_if_supported=1"
+            << " A_only_limit=549755813888 B_bound_not_applied=1 metadata_only=1 allocated_input_bytes=0 tensor_map_encodes=0 native_runs=0\n";
+}
 std::vector<int> wgmma_scheduled_parent_ks(int variant,bool bitwise=false) {
   if(wgmma_scheduled_extended_bk32(variant))return {64,128,192,256,384,448,512,576,640,1024,1088,1152,2112,2176};
   if(wgmma_scheduled_bk64(variant))return {128,256,384,512,768,896,1024,1152,1280,2048,2176,2304,4224,4352};
@@ -1524,7 +1642,7 @@ std::vector<int> wgmma_scheduled_parent_ks(int variant,bool bitwise=false) {
   return bitwise ? std::vector<int>{64,128,192}:std::vector<int>{64,128,192,256};
 }
 template<class T> void wgmma_scheduled_suite(megafmm::DType dtype,int variant) {
-  require(variant==30 || variant==31 || variant==32 || variant==33 || variant==34 || variant==35 || variant==36 || variant==38 || variant==39 || variant==40 || variant==41 || variant==42 || variant==43 || variant==44 || variant==45,"scheduled WGMMA suite needs enabled Mega30..36 or Mega38..45");
+  require(variant==30 || variant==31 || variant==32 || variant==33 || variant==34 || variant==35 || variant==36 || variant==38 || variant==39 || variant==40 || variant==41 || variant==42 || variant==43 || variant==44 || variant==45 || variant==46,"scheduled WGMMA suite needs enabled Mega30..36 or Mega38..46");
   auto exact=[dtype,variant](megafmm::Problem p,Pattern pattern,bool alias=false,bool certified=true) {
     const char* route=certified ? warp_mma_name(variant,p):"dense_cublaslt";
     std::cout << "BEGIN_WGMMA_" << wgmma_scheduled_family(variant) << " dtype=" << megafmm::dtype_name(dtype)
@@ -1575,12 +1693,12 @@ template<class T> void wgmma_scheduled_native_bitwise_suite(megafmm::DType dtype
   // Microbatch44 retains N32/BK64 and compares raw U with RS-A39.
   // RS-A39 compares with BK64 SS38; BK32 RS-A40 and Hybrid S41 use SS36, explicitly N32. These
   // compare raw U and final D; no separately observable seven-P slots are claimed.
-  require(variant==30 || variant==31 || variant==32 || variant==33 || variant==34 || variant==35 || variant==36 || variant==38 || variant==39 || variant==40 || variant==41 || variant==42 || variant==43 || variant==44 || variant==45,"scheduled WGMMA bits needs enabled Mega30..36 or Mega38..45");
+  require(variant==30 || variant==31 || variant==32 || variant==33 || variant==34 || variant==35 || variant==36 || variant==38 || variant==39 || variant==40 || variant==41 || variant==42 || variant==43 || variant==44 || variant==45 || variant==46,"scheduled WGMMA bits needs enabled Mega30..36 or Mega38..46");
   const bool bn16_candidate=variant==42 || variant==43;
   const bool sameatom_bn16=variant==42 && psplit_bn16_route_enabled(43);
   const bool crossatom_bn16=bn16_candidate && !sameatom_bn16;
   const char* bitwise_suffix=crossatom_bn16 ? "_CROSSATOM_BITWISE":"_NATIVE_BITWISE";
-  const int reference_variant=sameatom_bn16 ? 43:bn16_candidate ? 36:wgmma_scheduled_extended_bk32(variant) ? 36:variant==45 || variant==44 ? 39:variant==39 ? 38:variant==38 ? 36:variant>=36 ? 29:28+variant%2;
+  const int reference_variant=sameatom_bn16 ? 43:bn16_candidate ? 36:wgmma_scheduled_extended_bk32(variant) ? 36:variant==46 || variant==45 || variant==44 ? 39:variant==39 ? 38:variant==38 ? 36:variant>=36 ? 29:28+variant%2;
   const int identity_k=wgmma_scheduled_bk64(variant) ? 128:64;
   const int alias_k=wgmma_scheduled_bk64(variant) ? 256:128;
   const int shift_k=wgmma_scheduled_bk64(variant) ? 384:192;
@@ -1683,7 +1801,7 @@ template<class T> void wgmma_scheduled_native_bitwise_suite(megafmm::DType dtype
               << (sameatom_bn16 ? " reference=sameatom_N16_rsa_vs_ss43_raw_u+specified_host_epilogue":
                   crossatom_bn16 ? " reference=crossatom_N16_vs_N32_ss36_raw_u+specified_host_epilogue":
                   wgmma_scheduled_extended_bk32(variant) ? " reference=sameatom_product_split_bk32_ss_raw_u+specified_host_epilogue":
-                  variant==45 || variant==44 ? " reference=sameatom_N32_bk64_rsa39_raw_u+specified_host_epilogue":
+                  variant==46 || variant==45 || variant==44 ? " reference=sameatom_N32_bk64_rsa39_raw_u+specified_host_epilogue":
                   variant==39 ? " reference=sameatom_product_split_bk64_ss_raw_u+specified_host_epilogue":
                   variant==38 ? " reference=sameatom_product_split_bk32_raw_u+specified_host_epilogue":
                                  " reference=sameatom_vector_pipeline_raw_u+specified_host_epilogue")
@@ -1816,9 +1934,9 @@ void wgmma_scheduled_policy_suite(int variant) {
   for(int scenario=0;scenario<4;++scenario) {
     auto p=problem(128,128,128,megafmm::DType::BF16);
     if(scenario==1)p.m=0;if(scenario==2)p.alpha=0;if(scenario==3)p.k=0;
-    megafmm::Policy invalid;invalid.algorithm=algorithm;invalid.mega_variant=46;invalid.certified_range=true;
+    megafmm::Policy invalid;invalid.algorithm=algorithm;invalid.mega_variant=47;invalid.certified_range=true;
     bool rejected=false;try {auto plan=megafmm::create_plan(p,invalid);}catch(const std::exception&) {rejected=true;}
-    require(rejected,"invalid Mega46 accepted before normal/empty/alpha0/K0 dispatch");
+    require(rejected,"invalid Mega47 accepted before normal/empty/alpha0/K0 dispatch");
   }
   for(auto dtype:{megafmm::DType::BF16,megafmm::DType::FP16}) {
     megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::Megakernel;
@@ -1850,7 +1968,7 @@ void wgmma_scheduled_policy_suite(int variant) {
     require(megafmm::create_plan(p,policy)->algorithm_name()=="dense_cublaslt","scheduled WGMMA candidate enabled uncertified Auto SW");
   }
   std::cout << "PASS_WGMMA_" << wgmma_scheduled_family(variant) << "_POLICY variant=" << variant
-            << " invalid46_cases=20 validate_before_empty_scale=1 empty_cases=4 scale_cases=8 auto_dense_dtypes=2\n";
+            << " invalid47_cases=20 validate_before_empty_scale=1 empty_cases=4 scale_cases=8 auto_dense_dtypes=2\n";
 }
 template<class T> void wgmma_tma_alias_suite(megafmm::DType dtype,int variant) {
   wgmma_scheduled_suite<T>(dtype,variant);
@@ -2792,7 +2910,7 @@ template<class T> void cluster_graph_suite(megafmm::DType dtype,int variant=13) 
 }
 template<class T> void epilogue_output_rebind_suite(megafmm::DType dtype,int variant=14) {
   for(bool identity:{false,true}) {
-  if(identity && variant!=15 && variant!=16 && variant!=19 && variant!=20 && variant!=21 && variant!=22 && variant!=23 && variant!=24 && variant!=25 && variant!=26 && variant!=27 && variant!=28 && variant!=29 && variant!=30 && variant!=31 && variant!=32 && variant!=33 && variant!=34 && variant!=35 && variant!=36 && variant!=38 && variant!=39 && variant!=40 && variant!=41 && variant!=42 && variant!=43 && variant!=44 && variant!=45)continue;
+  if(identity && variant!=15 && variant!=16 && variant!=19 && variant!=20 && variant!=21 && variant!=22 && variant!=23 && variant!=24 && variant!=25 && variant!=26 && variant!=27 && variant!=28 && variant!=29 && variant!=30 && variant!=31 && variant!=32 && variant!=33 && variant!=34 && variant!=35 && variant!=36 && variant!=38 && variant!=39 && variant!=40 && variant!=41 && variant!=42 && variant!=43 && variant!=44 && variant!=45 && variant!=46)continue;
   auto p=problem(128,128,128,dtype);
   if(!identity) {p.alpha=.5f;p.beta=-.25f;}
   std::mt19937 rng(776655u);
@@ -2819,7 +2937,7 @@ template<class T> void epilogue_output_rebind_suite(megafmm::DType dtype,int var
   require(plan->workspace_bytes()==0,"output rebind unexpectedly requires workspace");
   for(int mode=0;mode<3;++mode) {
     if(identity && mode==1)continue;
-    std::cout << (variant==45 ? "BEGIN_WGMMA_PSPLIT_SELECTIVE_TMA_A_EPILOGUE_REBIND dtype=":variant==44 ? "BEGIN_WGMMA_PSPLIT_MICROBATCH_EPILOGUE_REBIND dtype=":variant==42 ? "BEGIN_WGMMA_PSPLIT_RSA_BN16_EPILOGUE_REBIND dtype=":variant==43 ? "BEGIN_WGMMA_PSPLIT_SS_BN16_EPILOGUE_REBIND dtype=":variant==41 ? "BEGIN_WGMMA_PSPLIT_HYBRID_S_EPILOGUE_REBIND dtype=":variant==40 ? "BEGIN_WGMMA_PSPLIT_RSA_BK32_EPILOGUE_REBIND dtype=":variant==39 ? "BEGIN_WGMMA_PSPLIT_RSA_EPILOGUE_REBIND dtype=":variant==38 ? "BEGIN_WGMMA_PSPLIT_BK64_EPILOGUE_REBIND dtype=":"BEGIN_EPILOGUE_OUTPUT_REBIND dtype=") << megafmm::dtype_name(dtype)
+    std::cout << (variant==46 ? "BEGIN_WGMMA_PSPLIT_SW128_SIMT_CONTROL_EPILOGUE_REBIND dtype=":variant==45 ? "BEGIN_WGMMA_PSPLIT_SELECTIVE_TMA_A_EPILOGUE_REBIND dtype=":variant==44 ? "BEGIN_WGMMA_PSPLIT_MICROBATCH_EPILOGUE_REBIND dtype=":variant==42 ? "BEGIN_WGMMA_PSPLIT_RSA_BN16_EPILOGUE_REBIND dtype=":variant==43 ? "BEGIN_WGMMA_PSPLIT_SS_BN16_EPILOGUE_REBIND dtype=":variant==41 ? "BEGIN_WGMMA_PSPLIT_HYBRID_S_EPILOGUE_REBIND dtype=":variant==40 ? "BEGIN_WGMMA_PSPLIT_RSA_BK32_EPILOGUE_REBIND dtype=":variant==39 ? "BEGIN_WGMMA_PSPLIT_RSA_EPILOGUE_REBIND dtype=":variant==38 ? "BEGIN_WGMMA_PSPLIT_BK64_EPILOGUE_REBIND dtype=":"BEGIN_EPILOGUE_OUTPUT_REBIND dtype=") << megafmm::dtype_name(dtype)
               << " variant=" << variant << " alpha=" << p.alpha << " beta=" << p.beta
               << " mode=" << mode << " alias=" << (mode==2) << std::endl;
     for(int shift:{0,1,0}) {
@@ -2835,7 +2953,7 @@ template<class T> void epilogue_output_rebind_suite(megafmm::DType dtype,int var
       for(size_t i=0;i<actual.size();++i)
         require(double(actual[i])==reference[i],"same-plan 4-byte output/C0 rebind returned incorrect alpha/beta output");
     }
-    std::cout << (variant==45 ? "PASS_WGMMA_PSPLIT_SELECTIVE_TMA_A_EPILOGUE_REBIND dtype=":variant==44 ? "PASS_WGMMA_PSPLIT_MICROBATCH_EPILOGUE_REBIND dtype=":variant==42 ? "PASS_WGMMA_PSPLIT_RSA_BN16_EPILOGUE_REBIND dtype=":variant==43 ? "PASS_WGMMA_PSPLIT_SS_BN16_EPILOGUE_REBIND dtype=":variant==41 ? "PASS_WGMMA_PSPLIT_HYBRID_S_EPILOGUE_REBIND dtype=":variant==40 ? "PASS_WGMMA_PSPLIT_RSA_BK32_EPILOGUE_REBIND dtype=":variant==39 ? "PASS_WGMMA_PSPLIT_RSA_EPILOGUE_REBIND dtype=":variant==38 ? "PASS_WGMMA_PSPLIT_BK64_EPILOGUE_REBIND dtype=":"PASS_EPILOGUE_OUTPUT_REBIND dtype=") << megafmm::dtype_name(dtype)
+    std::cout << (variant==46 ? "PASS_WGMMA_PSPLIT_SW128_SIMT_CONTROL_EPILOGUE_REBIND dtype=":variant==45 ? "PASS_WGMMA_PSPLIT_SELECTIVE_TMA_A_EPILOGUE_REBIND dtype=":variant==44 ? "PASS_WGMMA_PSPLIT_MICROBATCH_EPILOGUE_REBIND dtype=":variant==42 ? "PASS_WGMMA_PSPLIT_RSA_BN16_EPILOGUE_REBIND dtype=":variant==43 ? "PASS_WGMMA_PSPLIT_SS_BN16_EPILOGUE_REBIND dtype=":variant==41 ? "PASS_WGMMA_PSPLIT_HYBRID_S_EPILOGUE_REBIND dtype=":variant==40 ? "PASS_WGMMA_PSPLIT_RSA_BK32_EPILOGUE_REBIND dtype=":variant==39 ? "PASS_WGMMA_PSPLIT_RSA_EPILOGUE_REBIND dtype=":variant==38 ? "PASS_WGMMA_PSPLIT_BK64_EPILOGUE_REBIND dtype=":"PASS_EPILOGUE_OUTPUT_REBIND dtype=") << megafmm::dtype_name(dtype)
               << " variant=" << variant << " alpha=" << p.alpha << " beta=" << p.beta
               << " mode=" << mode << " alias=" << (mode==2)
               << " aligned_then_float_aligned_then_aligned=1\n";
@@ -2939,7 +3057,7 @@ void batched_policy_rejection_suite(bool lt_only=false) {
   for(auto algorithm:{megafmm::Algorithm::Auto,megafmm::Algorithm::Dense,megafmm::Algorithm::WinogradLt,
                       megafmm::Algorithm::WinogradHopper,megafmm::Algorithm::Megakernel})
   for(int scenario=0;scenario<4;++scenario) for(int family=0;family<3;++family)
-  for(int variant:{-1,family==0 ? 2:family==1 ? 13:46}) {
+  for(int variant:{-1,family==0 ? 2:family==1 ? 13:47}) {
     if(lt_only && family!=0)continue;
     megafmm::Policy policy;policy.algorithm=algorithm;policy.certified_range=true;
     if(family==0)policy.lt_variant=variant;
@@ -3048,7 +3166,7 @@ void rejection_suite() {
   } catch(const std::exception&) { overlap_rejected=true; }
   require(overlap_rejected,"runtime pointer range overflow accepted");
 }
-template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false,bool pipeline_only=false,bool tma_only=false,bool wait1_only=false,bool three_stage_only=false,bool psplit_only=false,bool psplit_bk64_only=false,bool psplit_rsa_only=false,bool psplit_rsa_bk32_only=false,bool hybrid_s_only=false,int bn16_filter=0,bool microbatch_only=false,bool selective_tma_a_only=false) {
+template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false,bool pipeline_only=false,bool tma_only=false,bool wait1_only=false,bool three_stage_only=false,bool psplit_only=false,bool psplit_bk64_only=false,bool psplit_rsa_only=false,bool psplit_rsa_bk32_only=false,bool hybrid_s_only=false,int bn16_filter=0,bool microbatch_only=false,bool selective_tma_a_only=false,bool sw128_simt_control_only=false) {
   bool pass=true;double floor=dtype==megafmm::DType::BF16 ? 1e-3:1e-4;
   struct Candidate { megafmm::Algorithm algorithm;int variant; };
   std::vector<Candidate> candidates={{megafmm::Algorithm::WinogradLt,0},{megafmm::Algorithm::WinogradLt,1}};
@@ -3074,7 +3192,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false
   candidates.push_back({megafmm::Algorithm::Megakernel,40});
   candidates.push_back({megafmm::Algorithm::Megakernel,41});
   if(!k128_only && !pipeline_only && !tma_only && !wait1_only && !three_stage_only &&
-     !psplit_only && !psplit_bk64_only && !psplit_rsa_only && !psplit_rsa_bk32_only && !hybrid_s_only && !microbatch_only && !selective_tma_a_only)
+     !psplit_only && !psplit_bk64_only && !psplit_rsa_only && !psplit_rsa_bk32_only && !hybrid_s_only && !microbatch_only && !selective_tma_a_only && !sw128_simt_control_only)
     for(int variant:{42,43})if(psplit_bn16_route_enabled(variant))
       candidates.push_back({megafmm::Algorithm::Megakernel,variant});
   if(k128_only)candidates={{megafmm::Algorithm::Megakernel,24},{megafmm::Algorithm::Megakernel,25}};
@@ -3089,7 +3207,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false
   if(hybrid_s_only)candidates={{megafmm::Algorithm::Megakernel,41}};
   if(!k128_only && !pipeline_only && !tma_only && !wait1_only && !three_stage_only &&
      !psplit_only && !psplit_bk64_only && !psplit_rsa_only && !psplit_rsa_bk32_only && !hybrid_s_only &&
-     bn16_filter==0 && !microbatch_only && !selective_tma_a_only && psplit_microbatch_route_enabled())
+     bn16_filter==0 && !microbatch_only && !selective_tma_a_only && !sw128_simt_control_only && psplit_microbatch_route_enabled())
     candidates.push_back({megafmm::Algorithm::Megakernel,44});
   if(microbatch_only) {
     require(psplit_microbatch_route_enabled(),"requested microbatch numerical scope has no enabled routes");
@@ -3097,11 +3215,19 @@ template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false
   }
   if(!k128_only && !pipeline_only && !tma_only && !wait1_only && !three_stage_only &&
      !psplit_only && !psplit_bk64_only && !psplit_rsa_only && !psplit_rsa_bk32_only && !hybrid_s_only &&
-     bn16_filter==0 && !microbatch_only && !selective_tma_a_only && psplit_selective_tma_a_route_enabled())
+     bn16_filter==0 && !microbatch_only && !selective_tma_a_only && !sw128_simt_control_only && psplit_selective_tma_a_route_enabled())
     candidates.push_back({megafmm::Algorithm::Megakernel,45});
   if(selective_tma_a_only) {
     require(psplit_selective_tma_a_route_enabled(),"requested selective TMA-A numerical scope has no enabled routes");
     candidates={{megafmm::Algorithm::Megakernel,45}};
+  }
+  if(!k128_only && !pipeline_only && !tma_only && !wait1_only && !three_stage_only &&
+     !psplit_only && !psplit_bk64_only && !psplit_rsa_only && !psplit_rsa_bk32_only && !hybrid_s_only &&
+     bn16_filter==0 && !microbatch_only && !selective_tma_a_only && !sw128_simt_control_only && psplit_sw128_simt_control_route_enabled())
+    candidates.push_back({megafmm::Algorithm::Megakernel,46});
+  if(sw128_simt_control_only) {
+    require(psplit_sw128_simt_control_route_enabled(),"requested SW128 SIMT control numerical scope has no enabled routes");
+    candidates={{megafmm::Algorithm::Megakernel,46}};
   }
   if(bn16_filter) {
     candidates.clear();
@@ -3119,7 +3245,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false
       // 256 cubed gives variant 3 complete output tiles and therefore exercises
       // its new beta=0 fast kernel rather than only its general fallback.
       auto p=problem(256,256,k128_only ? 128:256,dtype);uint32_t seed=1234567+trial*918273;
-      auto dense=run_case<T>(p,megafmm::Algorithm::Dense,pat,false,certified,seed,0,!k128_only && !pipeline_only && !tma_only && !wait1_only && !three_stage_only && !psplit_only && !psplit_bk64_only && !psplit_rsa_only && !psplit_rsa_bk32_only && !hybrid_s_only && bn16_filter==0 && !microbatch_only && !selective_tma_a_only);
+      auto dense=run_case<T>(p,megafmm::Algorithm::Dense,pat,false,certified,seed,0,!k128_only && !pipeline_only && !tma_only && !wait1_only && !three_stage_only && !psplit_only && !psplit_bk64_only && !psplit_rsa_only && !psplit_rsa_bk32_only && !hybrid_s_only && bn16_filter==0 && !microbatch_only && !selective_tma_a_only && !sw128_simt_control_only);
       dense_ef.push_back(dense.ef);
       for(size_t candidate=0;candidate<candidates.size();++candidate) {
         const auto algo=candidates[candidate].algorithm;
@@ -3130,7 +3256,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false
         const bool fused=algo==megafmm::Algorithm::WinogradHopper && variant>=9;
         const char* expected_route=fused ?
             (certified ? batched_name(algo,variant):"dense_cublaslt"):
-            (k128_only || (algo==megafmm::Algorithm::Megakernel && (variant==26 || variant==27 || variant==28 || variant==29 || variant==30 || variant==31 || variant==32 || variant==33 || variant==34 || variant==35 || variant==36 || variant==38 || variant==39 || variant==40 || variant==41 || variant==42 || variant==43 || variant==44 || variant==45))) ?
+            (k128_only || (algo==megafmm::Algorithm::Megakernel && (variant==26 || variant==27 || variant==28 || variant==29 || variant==30 || variant==31 || variant==32 || variant==33 || variant==34 || variant==35 || variant==36 || variant==38 || variant==39 || variant==40 || variant==41 || variant==42 || variant==43 || variant==44 || variant==45 || variant==46))) ?
             (certified ? warp_mma_name(variant,p):"dense_cublaslt"):nullptr;
         auto sw=run_case<T>(p,algo,pat,false,certified,seed,variant,false,size_t(8)<<30,expected_route);
         bool finite=dense.nonfinite==0 && sw.nonfinite==0;
@@ -3169,8 +3295,8 @@ template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false
 int main(int argc,char** argv) {
   try {
     std::cout << std::unitbuf;std::cerr << std::unitbuf;
-    const std::string usage="usage: test_correctness [--strict-numerics | --strict-pipeline-only | --strict-tma-only | --strict-wait1-only | --strict-three-stage-only | --strict-psplit-only | --strict-psplit-bk64-only | --strict-psplit-rsa-only | --strict-psplit-rsa-bk32-only | --strict-hybrid-s-only | --strict-bn16-only | --strict-bn16-rsa-only | --strict-bn16-ss-only | --strict-microbatch-only | --strict-selective-tma-a-only] [--smoke-batched | --smoke-candidates [--mega-only] [--mega-variant 0..45 (37 and compiled-blocked routes disabled) | --hopper-variant 0..12]]";
-    bool numeric=false,pipeline_numeric_only=false,tma_numeric_only=false,wait1_numeric_only=false,three_stage_numeric_only=false,psplit_numeric_only=false,psplit_bk64_numeric_only=false,psplit_rsa_numeric_only=false,psplit_rsa_bk32_numeric_only=false,hybrid_s_numeric_only=false,microbatch_numeric_only=false,selective_tma_a_numeric_only=false,candidates_only=false,mega_only=false,batched_only=false;
+    const std::string usage="usage: test_correctness [--strict-numerics | --strict-pipeline-only | --strict-tma-only | --strict-wait1-only | --strict-three-stage-only | --strict-psplit-only | --strict-psplit-bk64-only | --strict-psplit-rsa-only | --strict-psplit-rsa-bk32-only | --strict-hybrid-s-only | --strict-bn16-only | --strict-bn16-rsa-only | --strict-bn16-ss-only | --strict-microbatch-only | --strict-selective-tma-a-only | --strict-sw128-simt-control-only] [--smoke-batched | --smoke-candidates [--mega-only] [--mega-variant 0..46 (37 and compiled-blocked routes disabled) | --hopper-variant 0..12]]";
+    bool numeric=false,pipeline_numeric_only=false,tma_numeric_only=false,wait1_numeric_only=false,three_stage_numeric_only=false,psplit_numeric_only=false,psplit_bk64_numeric_only=false,psplit_rsa_numeric_only=false,psplit_rsa_bk32_numeric_only=false,hybrid_s_numeric_only=false,microbatch_numeric_only=false,selective_tma_a_numeric_only=false,sw128_simt_control_numeric_only=false,candidates_only=false,mega_only=false,batched_only=false;
     int hopper_filter=-1,mega_filter=-1,bn16_numeric_filter=0;
     for(int i=1;i<argc;++i) {
       if(std::string(argv[i])=="--strict-numerics")numeric=true;
@@ -3185,6 +3311,7 @@ int main(int argc,char** argv) {
       else if(std::string(argv[i])=="--strict-hybrid-s-only")hybrid_s_numeric_only=true;
       else if(std::string(argv[i])=="--strict-microbatch-only")microbatch_numeric_only=true;
       else if(std::string(argv[i])=="--strict-selective-tma-a-only")selective_tma_a_numeric_only=true;
+      else if(std::string(argv[i])=="--strict-sw128-simt-control-only")sw128_simt_control_numeric_only=true;
       else if(std::string(argv[i])=="--strict-bn16-only" || std::string(argv[i])=="--strict-bn16-rsa-only" || std::string(argv[i])=="--strict-bn16-ss-only") {
         require(bn16_numeric_filter==0,usage);
         bn16_numeric_filter=std::string(argv[i])=="--strict-bn16-only" ? -1:
@@ -3197,7 +3324,7 @@ int main(int argc,char** argv) {
         require(i+1<argc,usage);
         std::string value=argv[++i];size_t consumed=0;
         mega_filter=std::stoi(value,&consumed);
-        require(consumed==value.size() && mega_filter>=0 && mega_filter<=45,usage);
+        require(consumed==value.size() && mega_filter>=0 && mega_filter<=46,usage);
         require(mega_filter!=37,"Mega37 is disabled: asymmetric consumer register/spill gate failed before launch");
       }
       else if(std::string(argv[i])=="--hopper-variant") {
@@ -3212,30 +3339,37 @@ int main(int argc,char** argv) {
     require(!mega_only || hopper_filter<0,"--mega-only and --hopper-variant cannot be combined; "+usage);
     require(mega_filter<0 || hopper_filter<0,"--mega-variant and --hopper-variant cannot be combined; "+usage);
     require(!batched_only || !candidates_only,"--smoke-batched and --smoke-candidates cannot be combined; "+usage);
-    require(!pipeline_numeric_only || (!numeric && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !candidates_only && !batched_only),
+    require(!pipeline_numeric_only || (!numeric && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !sw128_simt_control_numeric_only && !candidates_only && !batched_only),
             "--strict-pipeline-only is a separate numerical scope; "+usage);
-    require(!tma_numeric_only || (!numeric && !pipeline_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !candidates_only && !batched_only),
+    require(!tma_numeric_only || (!numeric && !pipeline_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !sw128_simt_control_numeric_only && !candidates_only && !batched_only),
             "--strict-tma-only is a separate numerical scope; "+usage);
-    require(!wait1_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !candidates_only && !batched_only),
+    require(!wait1_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !sw128_simt_control_numeric_only && !candidates_only && !batched_only),
             "--strict-wait1-only is a separate numerical scope; "+usage);
-    require(!three_stage_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !candidates_only && !batched_only),
+    require(!three_stage_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !sw128_simt_control_numeric_only && !candidates_only && !batched_only),
             "--strict-three-stage-only is a separate numerical scope; "+usage);
-    require(!psplit_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !candidates_only && !batched_only),
+    require(!psplit_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !sw128_simt_control_numeric_only && !candidates_only && !batched_only),
             "--strict-psplit-only is a separate numerical scope; "+usage);
-    require(!psplit_bk64_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !candidates_only && !batched_only),
+    require(!psplit_bk64_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !sw128_simt_control_numeric_only && !candidates_only && !batched_only),
             "--strict-psplit-bk64-only is a separate numerical scope; "+usage);
-    require(!psplit_rsa_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !candidates_only && !batched_only),
+    require(!psplit_rsa_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !sw128_simt_control_numeric_only && !candidates_only && !batched_only),
             "--strict-psplit-rsa-only is a separate numerical scope; "+usage);
-    require(!psplit_rsa_bk32_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !candidates_only && !batched_only),
+    require(!psplit_rsa_bk32_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !sw128_simt_control_numeric_only && !candidates_only && !batched_only),
             "--strict-psplit-rsa-bk32-only is a separate numerical scope; "+usage);
-    require(!hybrid_s_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !candidates_only && !batched_only),
+    require(!hybrid_s_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && bn16_numeric_filter==0 && !microbatch_numeric_only && !selective_tma_a_numeric_only && !sw128_simt_control_numeric_only && !candidates_only && !batched_only),
             "--strict-hybrid-s-only is a separate numerical scope; "+usage);
-    require(!bn16_numeric_filter || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && !microbatch_numeric_only && !selective_tma_a_numeric_only && !candidates_only && !batched_only),
+    require(!bn16_numeric_filter || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && !microbatch_numeric_only && !selective_tma_a_numeric_only && !sw128_simt_control_numeric_only && !candidates_only && !batched_only),
             "BN16 numerical flags are separate scopes; "+usage);
-    require(!microbatch_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !selective_tma_a_numeric_only && !candidates_only && !batched_only),
+    require(!microbatch_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && bn16_numeric_filter==0 && !selective_tma_a_numeric_only && !sw128_simt_control_numeric_only && !candidates_only && !batched_only),
             "--strict-microbatch-only is a separate numerical scope; "+usage);
-    require(!selective_tma_a_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && !microbatch_numeric_only && bn16_numeric_filter==0 && !candidates_only && !batched_only),
+    require(!selective_tma_a_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && !microbatch_numeric_only && bn16_numeric_filter==0 && !sw128_simt_control_numeric_only && !candidates_only && !batched_only),
             "--strict-selective-tma-a-only is a separate numerical scope; "+usage);
+    require(!sw128_simt_control_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && !microbatch_numeric_only && !selective_tma_a_numeric_only && bn16_numeric_filter==0 && !candidates_only && !batched_only),
+            "--strict-sw128-simt-control-only is a separate numerical scope; "+usage);
+    if(sw128_simt_control_numeric_only) {
+      bool bf16_pass=strict_numerics<__nv_bfloat16>(megafmm::DType::BF16,false,false,false,false,false,false,false,false,false,false,0,false,false,true);
+      bool fp16_pass=strict_numerics<__half>(megafmm::DType::FP16,false,false,false,false,false,false,false,false,false,false,0,false,false,true);
+      return bf16_pass && fp16_pass ? 0:2;
+    }
     if(selective_tma_a_numeric_only) {
       bool bf16_pass=strict_numerics<__nv_bfloat16>(megafmm::DType::BF16,false,false,false,false,false,false,false,false,false,false,0,false,true);
       bool fp16_pass=strict_numerics<__half>(megafmm::DType::FP16,false,false,false,false,false,false,false,false,false,false,0,false,true);
@@ -3306,6 +3440,24 @@ int main(int argc,char** argv) {
       return 0;
     }
     if(candidates_only) {
+      if(mega_filter==46) {
+        require(psplit_sw128_simt_control_route_enabled(),"Mega46 is disabled: compiled SW128 SIMT control register/spill gate failed before launch");
+        wgmma_scheduled_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);
+        wgmma_scheduled_suite<__half>(megafmm::DType::FP16,mega_filter);
+        wgmma_scheduled_native_bitwise_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);
+        wgmma_scheduled_native_bitwise_suite<__half>(megafmm::DType::FP16,mega_filter);
+        wgmma_scheduled_input_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);
+        wgmma_scheduled_input_rebind_suite<__half>(megafmm::DType::FP16,mega_filter);
+        epilogue_output_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);
+        epilogue_output_rebind_suite<__half>(megafmm::DType::FP16,mega_filter);
+        wgmma_scheduled_graph_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);
+        wgmma_scheduled_graph_suite<__half>(megafmm::DType::FP16,mega_filter);
+        wgmma_scheduled_policy_suite(mega_filter);
+        psplit_sw128_simt_control_stride_metadata_suite();
+        psplit_disabled37_policy_suite();
+        std::cout << "PASS selected WGMMA SW128 SIMT control integer DAG, BK64 stage8 K1024, partial-K fallback, sameatom N32 raw U vs39, host epilogue, current inputs, scalar outputs, Graph and policy tests\n";
+        return 0;
+      }
       if(mega_filter==45) {
         require(psplit_selective_tma_a_route_enabled(),"Mega45 is disabled: compiled selective TMA-A register/spill gate failed before launch");
         wgmma_scheduled_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);
@@ -3913,6 +4065,21 @@ int main(int argc,char** argv) {
       wgmma_scheduled_graph_suite<__half>(megafmm::DType::FP16,variant);
       wgmma_scheduled_policy_suite(variant);
       psplit_selective_tma_a_stride_metadata_suite();
+    }
+    for(int variant:{46}) {
+      if(!psplit_sw128_simt_control_route_enabled()) {psplit_sw128_simt_control_blocked_policy_suite();continue;}
+      wgmma_scheduled_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      wgmma_scheduled_suite<__half>(megafmm::DType::FP16,variant);
+      wgmma_scheduled_native_bitwise_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      wgmma_scheduled_native_bitwise_suite<__half>(megafmm::DType::FP16,variant);
+      wgmma_scheduled_input_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      wgmma_scheduled_input_rebind_suite<__half>(megafmm::DType::FP16,variant);
+      epilogue_output_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      epilogue_output_rebind_suite<__half>(megafmm::DType::FP16,variant);
+      wgmma_scheduled_graph_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      wgmma_scheduled_graph_suite<__half>(megafmm::DType::FP16,variant);
+      wgmma_scheduled_policy_suite(variant);
+      psplit_sw128_simt_control_stride_metadata_suite();
     }
     stage_m2_suite<__nv_bfloat16>(megafmm::DType::BF16);
     stage_m2_suite<__half>(megafmm::DType::FP16);

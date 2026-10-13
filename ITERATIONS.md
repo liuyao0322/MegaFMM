@@ -1812,3 +1812,34 @@ Mandatory full20/200TIME/60CHECK completed;60 originalFAIL/NF0,10 innerexit2.44 
 #### Iter41 mandatory full1024 closure
 
 Full samebinary20 rows45/39/44/36/Lt1,20warm100calls5groups3fresh32Lt8GiB. Original60/60 fresh numericalFAIL/NF0 retained; strict30=18/12NF0, SAN3zero, structural tests pass. New45 own latency decreases23.6931/23.2220% ordinary and26.2506/24.2674% Graph against39; ordinary Dense/SW0.688287/0.556617 remains below1 and precision gate fails. Full primary report records all groups/CSVauthority/event/batchwall scope; no promotion/AutoDense/goalactive.
+
+### Iter42 — SW128 rawA SIMT control with unused currentA encode
+
+- **Hypothesis:** Isolate rawA delivery with parent45 SW128 geometry/math/domain/host currentA map encode retained. New46 rawA vector8 SIMT and B SIMT, all128 writers each proxyfence before fullcommit; no kernel TMA issue/rawTX wait. The encoded map is deliberately unused, not a no-encode route.
+- **Changes:** ONLY46 from frozen CPU candidate, BM64BN32BK64/2banks/wholeP3+4/ascending4K16/onecast/fixedU/RNalphaFMA/AutoDense and original floors preserved. Fresh compiled gate before first kernel, prior CAN45 not inherited.
+- **Bench:** quick20warm/20calls/5groups/1fresh, screen only; failed numerical results retained.
+
+| M,N,K | dtype | route | mode | Dense us | complete SW us | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 5.844800 | 7.120000 | 0.820899 | FAIL |
+| 128,128,128 | fp16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 5.985600 | 7.334400 | 0.816099 | FAIL |
+| 256,256,256 | bf16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 6.056000 | 9.528000 | 0.635600 | FAIL |
+| 256,256,256 | fp16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 6.108800 | 9.569600 | 0.638355 | FAIL |
+| 512,512,512 | bf16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 6.356800 | 14.236800 | 0.446505 | FAIL |
+| 512,512,512 | fp16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 6.475200 | 14.198400 | 0.456051 | FAIL |
+| 1024,1024,1024 | bf16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 13.185599 | 23.908800 | 0.551496 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 10.395200 | 23.659199 | 0.439372 | FAIL |
+| 2048,2048,2048 | bf16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 31.996799 | 189.886403 | 0.168505 | FAIL |
+| 2048,2048,2048 | fp16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 33.273599 | 189.639997 | 0.175457 | FAIL |
+| 3072,3072,3072 | bf16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 86.854398 | 687.807989 | 0.126277 | FAIL |
+| 3072,3072,3072 | fp16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 89.547199 | 685.172796 | 0.130693 | FAIL |
+| 4096,4096,4096 | bf16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 196.054399 | 1815.388870 | 0.107996 | FAIL |
+| 4096,4096,4096 | fp16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 206.263995 | 1804.337692 | 0.114316 | FAIL |
+| 1024,512,1024 | bf16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 11.721600 | 23.763201 | 0.493267 | FAIL |
+| 1024,512,1024 | fp16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 11.876800 | 23.644800 | 0.502301 | FAIL |
+| 512,1024,1024 | bf16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 8.500800 | 23.665600 | 0.359205 | FAIL |
+| 512,1024,1024 | fp16 | megakernel_wgmma_psplit_sw128_simt_control_64x32 v46 | launch | 8.828800 | 23.528001 | 0.375247 | FAIL |
+
+- **Analysis:** Own complete SW latency ranks code changes; Dense timing variation and machine/fixture/SAN PASS do not certify original FP64 numerical accuracy.
+- **Next:** Mandatory samebinaryfull20 for46/45/39/36/Lt1,100calls5groups3fresh irrespectivequick3%, originalstrict30 andserialSAN3, coverage/profile/report/twoindependentfinal audits.
+- **Archive:** trajectory/20261014_074453_iter-42/
