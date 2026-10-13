@@ -89,7 +89,7 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 30 | Single-launch producer-consumer WGMMA pipeline | 0.4094 | 0.358867 | no-change |
 
-| 31 | Single-launch TMA raw-alias two-bank WGMMA | 0.3970 | 0.292840 | no-change |
+| 31 | Single-launch TMA raw-alias two-bank WGMMA | 0.3970 | 0.292840 | regression |
 
 ## Iterations
 
@@ -1441,3 +1441,18 @@ Original BF16/FP16 precision/numerical contracts and AutoDense remain unchanged.
 - **Analysis:** Default GPU2126CASE933PASS, selected30/31 both38PASS, CPU DAG3 stage6 PASS, independent initial CTApool/direction/role CFG including implicit widths and descriptor/shared alignment PASS. This diagnostic quick uses18rows20warm20calls5groups1fresh and records all numerical failures; matched full20row1024 comparisons and host batchwall are required separately irrespective screen signal. No numerical certification or goal completion inferred from execution timing.
 - **Next:** Measure same frozen source/binary new30/31 and retained29/27/Lt1 at1024 bothdtype ordinary/Graph20warm100calls5groups3fresh, then unchanged strict60 and six serial CUDA12.8 sanitizers, independent static/data final audit and evidence closure.
 - **Archive:** trajectory/20261014_013912_iter-31/
+
+#### Iteration31 full1024 follow-up
+
+Same frozen source `20363e90a7a936e80f471fede0e16b96855ca11f` / bench SHA `9e3b6a7245217aa4f728622961e9b45640346fbf4945ed76019eef472c200785` measured five routes (newTMA30/31, retainedMega29/27, multi-launchLt1) × BF16/FP16 × ordinary/Graph,20warm100calls5groups3fresh. Raw20rows/200TIME/60freshCHECK are retained, all originalFP64gate FAIL/NF0; no Auto promotion or goal completion.
+
+| Mode | dtype | Retained29 event µs | New31 event µs | New31 own latency increase | New31 Dense/SW | Retained29/new31 batchwall µs/call |
+|---|---|---:|---:|---:|---:|---:|
+| ordinary | bf16 | 25.239041 | 25.702400 | 1.836% | 0.476880 | 25.31608/25.77972 |
+| ordinary | fp16 | 25.427520 | 26.413441 | 3.877% | 0.372029 | 25.50958/26.49597 |
+| Graph | bf16 | 24.776001 | 24.929600 | 0.620% | 0.452782 | 24.85355/25.00263 |
+| Graph | fp16 | 25.054400 | 25.605760 | 2.201% | 0.365843 | 25.13400/25.67863 |
+
+New31 beats new30, but retained29 remains faster in all four combinations. Multi-launchLt1 remains the observed allSW control winner (ordinary19.373120/19.501120µs; Graph17.002881/17.225280µs), distinct from trueMegakernel target. Ordinary includes two actual currentpointer tensor-map encodes per complete hostloop invocation then one kernel; batchwall/call includes submission and batchsync, not independent synchronized singlecall wall or isolated encode time. Graph captures fixed descriptor bindings and freshly recomputes all input transforms each replay; no host encode on replay.
+
+DefaultGPU2126CASE933PASS, selected30/31 22/24CASE38PASS, CPU DAG3+stage6 PASS, new36 sameatom rawU/host specifiedepilogue groups and40currentbindingchecks PASS, new12Graph36fresh one-node replays PASS. New strict60=36PASS24FAIL/NF0 (48native12Dense rangefallback); six targeted CUDA12.8SAN exit0,0errors/0racehazards/warnings, mem2 leak0. Structure/bitwise checks do not replace original numerical certification. Final report/profile/raw evidence and independent compiled/data audits are archived; original26 CUDA/source23–30 bytes retained. TMA31 performance status is regression against retained29, not an improvement. No floor, exhausted-direction, isolated traffic or encode causal claim.

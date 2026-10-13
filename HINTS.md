@@ -50,6 +50,14 @@
 - Do not inherit previous vector producerregister quota proof. BeforefirstGPUlaunch prove new initialREG/direction/perCTAownedpool/allroleCFG highestR includingimplicit64/128/TMA/HGMMA width and registerinitialization from finalobject/linkedSASS. Native uses512B sharedalignment/SW64A andSW32-or64B; CPU/pinned API review does not replace compiled/GPU gate.
 - Samebinary full1024 new30/31, retained29/27 and Lt1 is mandatory irrespective quick3percent signal: two dtypes, launch/Graph,20warm100calls5groups3fresh,32candidates8GiB cap. Rank newownMega latency against retained29 and same-row independentDense; allprecisiongatefails remain visible, AutoDense.
 
+## Current experimental evidence (iteration31)
+
+- Samebinary full1024 TMA31 is the faster of new30/31, but retained SIMT Mega29 remains faster in all four dtype/mode combinations. New31 ordinary BF16/FP16 event25.702400/26.413441µs versus29 25.239041/25.427520µs, regression1.836%/3.877%; Graph24.929600/25.605760µs versus29 24.776001/25.054400µs, regression0.620%/2.201%. Dense/SW31 is0.476880/0.372029 ordinary and0.452782/0.365843 Graph. Do not promote TMA or infer gain from Dense denominator variation.
+- Ordinary run encodes both currentA/currentB maps inside timedhostloop before one kernel. New31 batchwall/call25.77972/26.49597µs includes submission and batchsync; event-to-wall delta is not an isolated encode benchmark. Graph fixed descriptors consume fresh captured-address contents but do not re-encode per replay.
+- All20rows60fresh originalFP64gate FAIL/NF0; newstrict60=36PASS24FAIL/NF0,48native12Densefallback. Default2126CASE933PASS, new36 sameatom rawU/host specifiedepilogue groups and40currentmapchecks,12Graph36fresh,6CUDA12.8SAN zeroerrors. AutoDense and activegoal remain; original precision/gates retained.
+- Actual compiled TMA producer/consumer maximumR43/89 N16 and46/145 N32, initialREG96/160, ownedpool24576/40960≥20480/28672; compiled64align256B gridconstant descriptors and512alignshared reviewed before firstlaunch. Dynamicshared72192/86528B plus separateELFstatic1024B,STACK/LOCAL/spill0. Static8TMA/14HGMMA perfunction is not measured traffic or occupancy.
+- Firstbuild sentinel FAIL was proof-domain misuse of flagged byte-swizzle at element coordinates. All assertions remain; repair only uses raw layout_b element→byte layout_a→element mapping, not a device-layout change. Actual pinnedCPU exhaustivecoordinates/vector8/absolute512bases PASS and rebuilt fullcompiled gate precedeGPU. Preserve failed diagnostics and old26CUDA/source23–30 evidence bytes.
+
 <!-- User-supplied behavior directives. The skill reads this at session start
      and respects any constraint named here. Examples:
      - Optimization constraints or focus areas (e.g., "Prefer Triton over raw CUDA")
