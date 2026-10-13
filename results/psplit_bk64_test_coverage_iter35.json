@@ -1,0 +1,4424 @@
+{
+  "iteration": 35,
+  "status": "actual_validation_closed_structural_SAN_PASS_original_strict12FAIL",
+  "source_path": "tests/test_correctness.cu",
+  "source_sha256": "8ea240cff0e89269e25414e7f57cd224f88703e82b6bf62786741795dcaf4d57",
+  "base_commit": "a8113224de4a0577ca150a45511e108542097811",
+  "base_test_source_sha256": "54a26b030eb59b1f4da03d67348564536c89496ae682a84701ad0b6c94c0c7da",
+  "authorized_write_scope": [
+    ".scratch/psplit_bk64_actual_test_coverage_iter35.json"
+  ],
+  "candidate": {
+    "executable_new_variants": [
+      38
+    ],
+    "disabled_variant": 37,
+    "new_max_variant": 38,
+    "invalid_variant": 39,
+    "family": "PSPLIT_BK64",
+    "expected_algorithm_name": "megakernel_wgmma_psplit_bk64_64x32",
+    "BM": 64,
+    "BN": 32,
+    "BK": 64,
+    "stage_ring": 2,
+    "native_parentK_multiple": 128,
+    "sameatom_reference_variant": 36,
+    "N16_parity_mapping": false,
+    "consumer_partition": [
+      3,
+      4
+    ],
+    "consumer_quotas_source_expected": [
+      96,
+      96
+    ],
+    "compiler_resource_gate_actual": null
+  },
+  "cpu_source_validation": {
+    "strict_normalized_body_byte_identical": true,
+    "strict_normalized_sha256": "0905ee242aba8278172974d491e12f9824f8bb7c327817c9dfab1a7606a6e5f7",
+    "disabled37_body_byte_identical": true,
+    "input_rebind_body_byte_identical": true,
+    "old_0_to36_domains_preserved_by_conditional38_branches": true,
+    "old_invalid38_migrated_to39": true,
+    "old_PASS_prefixes_preserved_except_invalid39_metadata": true,
+    "delimiter_balance_check": true,
+    "git_diff_check_exit": 0,
+    "independent_CPU_readonly_scope_review": "/root/core32/wait1_tests/bk64_test_cpu_scope_review35; no correctness/count/scope defects found",
+    "no_GPU_build_or_git_mutation": true
+  },
+  "baseline_actually_executed_separate_identity": {
+    "source34_test_sha256": "54a26b030eb59b1f4da03d67348564536c89496ae682a84701ad0b6c94c0c7da",
+    "source34_default_CASE": 2298,
+    "source34_default_PASS": 1361,
+    "source34_graph_configs": 186,
+    "source34_fresh_graph_replays": 558,
+    "source34_new36_strict_gates": 30,
+    "source34_new36_strict_PASS": 18,
+    "source34_new36_strict_FAIL": 12,
+    "source29_full_strict_gates": 1290,
+    "source30_new_only_strict_gates": 60,
+    "source31_new_only_strict_gates": 60,
+    "source32_new_only_strict_gates": 60,
+    "source33_new_only_strict_gates": 60,
+    "source_files_sha256": {
+      "results/psplit_test_coverage_iter34.json": "6bfd71c4c410de3c2f573788d1ac36458a0b68f5294a9a956da4ea7d4242171b",
+      "results/correctness_psplit_iter34.txt": "aacb044fbfbd1ab954e087fe2d1dead42d8e73bf9f50bae3e944679eae34240d",
+      "results/correctness_psplit_iter34.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "results/strict_psplit_iter34.txt": "eb44e51fc158340e46f60ece6671ff81a294be823ff9e13b74e1904c6c4aef7b",
+      "results/strict_psplit_iter34.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    "old_results_not_current_actual_validation": true
+  },
+  "new_expected_default": {
+    "CASE_lines": 56,
+    "PASS_lines": 133,
+    "case_count_by_route": {
+      "native38": 34,
+      "packed_P7": 12,
+      "Dense": 10
+    },
+    "PASS_groups_breakdown": {
+      "native_bitwise": 84,
+      "input_rebind": 2,
+      "epilogue_rebind": 10,
+      "graph": 36,
+      "policy": 1
+    },
+    "default_total_CASE_if_complete": 2354,
+    "default_total_PASS_if_complete": 1494,
+    "old_disabled37_policy_not_duplicated": true
+  },
+  "new_expected_selected": {
+    "38": {
+      "CASE_lines": 56,
+      "PASS_lines": 135,
+      "structural_PASS_excluding_disabled37_and_completion": 133,
+      "disabled37_policy_PASS": 1,
+      "completion_banner_PASS": 1
+    },
+    "37": {
+      "expected_exit": 1,
+      "expected_CASE": 0,
+      "expected_native_runs": 0,
+      "reason": "asymmetric consumer register/spill gate failed before launch"
+    }
+  },
+  "new_expected_native_stage_case_domain": {
+    "parent_K": [
+      128,
+      256,
+      384,
+      512,
+      768,
+      896,
+      1024,
+      1152,
+      1280,
+      2048,
+      2176,
+      2304,
+      4224,
+      4352
+    ],
+    "stage_count": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      16,
+      17,
+      18,
+      33,
+      34
+    ],
+    "stage8_parentK1024": true,
+    "MN": [
+      128,
+      64
+    ],
+    "K128_K256_pattern": "OwnerRows",
+    "K384_and_larger_pattern": "bounded Integers; avoid long-K OwnerRows coefficients outside BF16 exact-integer range",
+    "dtypes": [
+      "bf16",
+      "fp16"
+    ],
+    "basic_cases_per_dtype": [
+      {
+        "shape": [
+          128,
+          64,
+          128
+        ],
+        "route": "native38",
+        "pattern": "OwnerRows",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          256
+        ],
+        "route": "native38",
+        "pattern": "OwnerRows",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          384
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          512
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          768
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          896
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          1024
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          1152
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          1280
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          2048
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          2176
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          2304
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          4224
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          4352
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          256,
+          128,
+          128
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          256,
+          128
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 0.5,
+        "beta": -0.25,
+        "alias": true,
+        "certified_range": true,
+        "padding_ld": [
+          8,
+          8,
+          1,
+          1
+        ]
+      },
+      {
+        "shape": [
+          128,
+          128,
+          384
+        ],
+        "route": "native38",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": "-0.0",
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          1,
+          1
+        ]
+      },
+      {
+        "shape": [
+          80,
+          112,
+          48
+        ],
+        "route": "packed_P7",
+        "pattern": "Integers",
+        "alpha": 0.5,
+        "beta": -0.25,
+        "alias": true,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          32
+        ],
+        "route": "packed_P7",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          32,
+          64
+        ],
+        "route": "packed_P7",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          64
+        ],
+        "route": "packed_P7",
+        "pattern": "Integers",
+        "alpha": 0.5,
+        "beta": -0.25,
+        "alias": true,
+        "certified_range": true,
+        "padding_ld": [
+          8,
+          8,
+          1,
+          1
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          64
+        ],
+        "route": "Dense",
+        "pattern": "Integers",
+        "alpha": 0.5,
+        "beta": -0.25,
+        "alias": true,
+        "certified_range": true,
+        "padding_ld": [
+          9,
+          8,
+          1,
+          1
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          192
+        ],
+        "route": "packed_P7",
+        "pattern": "Integers",
+        "alpha": 0.5,
+        "beta": -0.25,
+        "alias": true,
+        "certified_range": true,
+        "padding_ld": [
+          8,
+          8,
+          1,
+          1
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          192
+        ],
+        "route": "Dense",
+        "pattern": "Integers",
+        "alpha": 0.5,
+        "beta": -0.25,
+        "alias": true,
+        "certified_range": true,
+        "padding_ld": [
+          9,
+          8,
+          1,
+          1
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          320
+        ],
+        "route": "packed_P7",
+        "pattern": "Integers",
+        "alpha": 0.5,
+        "beta": -0.25,
+        "alias": true,
+        "certified_range": true,
+        "padding_ld": [
+          8,
+          8,
+          1,
+          1
+        ]
+      },
+      {
+        "shape": [
+          128,
+          64,
+          320
+        ],
+        "route": "Dense",
+        "pattern": "Integers",
+        "alpha": 0.5,
+        "beta": -0.25,
+        "alias": true,
+        "certified_range": true,
+        "padding_ld": [
+          9,
+          8,
+          1,
+          1
+        ]
+      },
+      {
+        "shape": [
+          128,
+          128,
+          128
+        ],
+        "route": "Dense",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": true,
+        "padding_ld": [
+          1,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "shape": [
+          128,
+          128,
+          128
+        ],
+        "route": "Dense",
+        "pattern": "Integers",
+        "alpha": 1,
+        "beta": 0,
+        "alias": false,
+        "certified_range": false,
+        "padding_ld": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "new_expected_sameatom_bitwise": {
+    "fixture_groups": 84,
+    "identity_groups": 6,
+    "active_host_epilogue_groups": 78,
+    "kernel_runs_if_complete": 246,
+    "parent_K": [
+      128,
+      256,
+      384,
+      512,
+      768,
+      896,
+      1024,
+      1152,
+      1280,
+      2048,
+      2176,
+      2304,
+      4224,
+      4352
+    ],
+    "MN": [
+      [
+        128,
+        64
+      ],
+      [
+        128,
+        256
+      ],
+      [
+        256,
+        256
+      ]
+    ],
+    "reference_variant": 36,
+    "raw_U_then_independent_host_RNalpha_betaFMA": true,
+    "host_rounding": "volatile float alpha*rawU then std::fma(float,float,float), immutable original C0",
+    "identity_K": 128,
+    "active_alias_K": 256,
+    "aligned16_input_and_float4_output_K": 384,
+    "padding_and_trailing_guard": true,
+    "PASS_reference_label": "sameatom_product_split_bk32_raw_u+specified_host_epilogue",
+    "separately_observable_sevenP_claim": false,
+    "cross_N16_N32_bitwise_claim": false
+  },
+  "new_expected_current_input_rebinding": {
+    "groups": 2,
+    "bindings": 20,
+    "native_bindings": 14,
+    "Dense_bindings": 6,
+    "shape": [
+      128,
+      128,
+      128
+    ],
+    "fresh_AB_each_binding": true,
+    "independent_A_B_allocation": true,
+    "aligned16_address_phase": true,
+    "element_only_A_B_both_Dense_then_native_recovery": true
+  },
+  "new_expected_epilogue_rebinding": {
+    "PASS_groups": 10,
+    "runs_if_complete": 30,
+    "shape": [
+      128,
+      128,
+      128
+    ],
+    "active_D_only_C0_only_alias": true,
+    "identity_D_only_alias": true,
+    "aligned_float4_aligned_sequence": true,
+    "PASS_prefix": "PASS_WGMMA_PSPLIT_BK64_EPILOGUE_REBIND"
+  },
+  "new_expected_graph": {
+    "config_groups": 36,
+    "native_groups": 28,
+    "packed_P7_fallback_groups": 8,
+    "Dense_groups": 0,
+    "fresh_AB_replays": 108,
+    "complete_call_kernel_nodes": 1,
+    "native_parent_K": [
+      128,
+      256,
+      384,
+      512,
+      768,
+      896,
+      1024,
+      1152,
+      1280,
+      2048,
+      2176,
+      2304,
+      4224,
+      4352
+    ],
+    "native_stage_counts": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      16,
+      17,
+      18,
+      33,
+      34
+    ],
+    "partial_parentK_P7": [
+      64,
+      192,
+      320
+    ],
+    "shapes_per_dtype": [
+      [
+        128,
+        64,
+        128
+      ],
+      [
+        128,
+        256,
+        384
+      ],
+      [
+        80,
+        112,
+        48
+      ],
+      [
+        128,
+        64,
+        256
+      ],
+      [
+        128,
+        64,
+        512
+      ],
+      [
+        128,
+        64,
+        768
+      ],
+      [
+        128,
+        64,
+        896
+      ],
+      [
+        128,
+        64,
+        1024
+      ],
+      [
+        128,
+        64,
+        1152
+      ],
+      [
+        128,
+        64,
+        1280
+      ],
+      [
+        128,
+        64,
+        2048
+      ],
+      [
+        128,
+        64,
+        2176
+      ],
+      [
+        128,
+        64,
+        2304
+      ],
+      [
+        128,
+        64,
+        4224
+      ],
+      [
+        128,
+        64,
+        4352
+      ],
+      [
+        128,
+        64,
+        64
+      ],
+      [
+        128,
+        64,
+        192
+      ],
+      [
+        128,
+        64,
+        320
+      ]
+    ],
+    "immutable_C0_restored_each_active_alias_replay": true,
+    "fresh_AB_each_replay": true,
+    "beta0_null_C0_prime_K": 128,
+    "active_alias_aligned16_input_and_float4_output_K": 384,
+    "default_total_config_groups_if_complete": 222,
+    "default_total_fresh_replays_if_complete": 666
+  },
+  "new_expected_policy": {
+    "groups": 1,
+    "invalid39_cases": 20,
+    "empty_valid_cases": 4,
+    "scale_valid_cases": 8,
+    "AutoDense_dtype_checks": 2,
+    "variant": 38
+  },
+  "retained_disabled37_policy_expected": {
+    "forced_rejections": 8,
+    "AutoDense_checks": 2,
+    "dtypes": 2,
+    "scenarios": [
+      "regular",
+      "empty_m",
+      "alpha0",
+      "K0"
+    ],
+    "exception_type": "std::invalid_argument",
+    "exception_message_contains": "37",
+    "reject_before_empty_scale": true,
+    "CLI_before_launch_rejection": true,
+    "native_runs": 0,
+    "new_actual_execution": null
+  },
+  "new_expected_strict_psplit_bk64_only": {
+    "gates": 30,
+    "native_gates": 24,
+    "HighHalf_Dense_fallback_gates": 6,
+    "CASE_lines": 60,
+    "candidate_variants": [
+      38
+    ],
+    "shape": [
+      256,
+      256,
+      256
+    ],
+    "dtypes": [
+      "bf16",
+      "fp16"
+    ],
+    "patterns": [
+      "uniform",
+      "positive",
+      "range",
+      "cancellation",
+      "fp16_upper_range"
+    ],
+    "fresh_trials_per_pattern": 3,
+    "gate": "finite && solution_eF <= 3*dense_eF + floor",
+    "floor_BF16": 0.001,
+    "floor_FP16": 0.0001,
+    "predicted_PASS_sameatom_chronology": 18,
+    "predicted_FAIL_sameatom_chronology": 12,
+    "predicted_nonfinite": 0,
+    "predicted_exit_sameatom_chronology": 2,
+    "actual_pending": true,
+    "Dense_reference_tuned": false,
+    "threshold_and_DAG_unchanged": true,
+    "candidate30_vs_CASE60_note": "30 new candidate gates plus30 Dense references. Old source34 numeric results have separate source identity and are not current actual."
+  },
+  "strict_code_scope_not_execution": {
+    "source35_enabled38_full1590": 1590,
+    "regular_full_gates": 1530,
+    "retained_K128_gates": 60,
+    "source35_full1590_actually_executed": false,
+    "source34_enabled36_full1560_actually_executed": false,
+    "source34_requested36_37_full1590_actually_executed": false,
+    "source33_full1530_actually_executed": false,
+    "source32_full1470_actually_executed": false,
+    "source31_full1410_actually_executed": false,
+    "source30_full1350_actually_executed": false,
+    "same_integer1590_counts_have_different_source_and_variant_domains": true
+  },
+  "target_commands": {
+    "default": [
+      "bash",
+      "scripts/on_gpu.sh",
+      "./build/test_correctness"
+    ],
+    "selected38": [
+      "bash",
+      "scripts/on_gpu.sh",
+      "./build/test_correctness",
+      "--smoke-candidates",
+      "--mega-only",
+      "--mega-variant",
+      "38"
+    ],
+    "strict_new38_only": [
+      "bash",
+      "scripts/on_gpu.sh",
+      "./build/test_correctness",
+      "--strict-psplit-bk64-only"
+    ],
+    "disabled37_cli": [
+      "bash",
+      "scripts/on_gpu.sh",
+      "./build/test_correctness",
+      "--smoke-candidates",
+      "--mega-only",
+      "--mega-variant",
+      "37"
+    ]
+  },
+  "actual_validation": {
+    "default": {
+      "path": "results/correctness_psplit_bk64_iter35.txt",
+      "sha256": "f073c7af40582f32ced8e2450da6af31a7dba627b56a5f2cca561f3d87580e1f",
+      "exit_path": "results/correctness_psplit_bk64_iter35.exit",
+      "exit_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "exit_code": 0,
+      "command": [
+        "bash",
+        "scripts/on_gpu.sh",
+        "./build/test_correctness"
+      ],
+      "CASE_lines": 2354,
+      "PASS_lines": 1494,
+      "BEGIN_lines": 3368,
+      "new38_basic_cases": {
+        "CASE_lines": 56,
+        "by_actual_route": {
+          "megakernel_wgmma_psplit_bk64_64x32": 34,
+          "megakernel_warp_mma_packed": 12,
+          "dense_cublaslt": 10
+        },
+        "all_maxabs_eF_scaled_normalized_nonfinite_zero": true,
+        "ordered_shape_pattern_params_route_match_frozen_source_domain": true,
+        "case_records": [
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "distinct_eight_row_owners",
+            "shape": [
+              128,
+              64,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "distinct_eight_row_owners",
+            "shape": [
+              128,
+              64,
+              256
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              384
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              512
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              768
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              896
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              1024
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              1152
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              1280
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              2048
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              2176
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              2304
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              4224
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              4352
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              256,
+              128,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              256,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              128,
+              384
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              80,
+              112,
+              48
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              32
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              32,
+              64
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              64
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              64
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              192
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              192
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              320
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              320
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              128,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              128,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "distinct_eight_row_owners",
+            "shape": [
+              128,
+              64,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "distinct_eight_row_owners",
+            "shape": [
+              128,
+              64,
+              256
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              384
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              512
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              768
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              896
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              1024
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              1152
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              1280
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              2048
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              2176
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              2304
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              4224
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              4352
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              256,
+              128,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              256,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              128,
+              384
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              80,
+              112,
+              48
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              32
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              32,
+              64
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              64
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              64
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              192
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              192
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              320
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              320
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              128,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              128,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          }
+        ]
+      },
+      "native_stage_domain": {
+        "dtypes": [
+          "bf16",
+          "fp16"
+        ],
+        "parent_K": [
+          128,
+          256,
+          384,
+          512,
+          768,
+          896,
+          1024,
+          1152,
+          1280,
+          2048,
+          2176,
+          2304,
+          4224,
+          4352
+        ],
+        "stage_counts": [
+          1,
+          2,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9,
+          10,
+          16,
+          17,
+          18,
+          33,
+          34
+        ],
+        "exact_one_stage_case_per_dtype_K": true,
+        "stage8_K1024": true,
+        "long_K_uses_bounded_integer_source_pattern": true
+      },
+      "sameatom_rawU_hostepilogue": {
+        "PASS_groups": 84,
+        "identity_groups": 6,
+        "active_groups": 78,
+        "kernel_runs_completed_by_bound_fixture_loop": 246,
+        "reference_variant": 36,
+        "raw_U_bits_all_checked": true,
+        "independent_host_RNalpha_betaFMA_all_checked": true,
+        "padding_guard_all_checked": true,
+        "unique_complete_domain": true,
+        "native_parent_K": [
+          128,
+          256,
+          384,
+          512,
+          768,
+          896,
+          1024,
+          1152,
+          1280,
+          2048,
+          2176,
+          2304,
+          4224,
+          4352
+        ],
+        "MN": [
+          [
+            128,
+            64
+          ],
+          [
+            128,
+            256
+          ],
+          [
+            256,
+            256
+          ]
+        ]
+      },
+      "current_A_B_rebind": {
+        "PASS_groups": 2,
+        "bindings": 20,
+        "native_bindings": 14,
+        "Dense_bindings": 6,
+        "fresh_current_pointer_and_aligned_recovery_assertions_completed": true
+      },
+      "epilogue_rebind": {
+        "PASS_groups": 10,
+        "kernel_runs_completed_by_bound_fixture_loop": 30,
+        "unique_complete_identity_active_D_C0_alias_domain": true
+      },
+      "Graph": {
+        "new38_config_groups": 36,
+        "new38_actual_routes": {
+          "megakernel_wgmma_psplit_bk64_64x32": 28,
+          "megakernel_warp_mma_packed": 8
+        },
+        "new38_fresh_AB_replays": 108,
+        "one_kernel_node_each": true,
+        "unique_complete_domain": true,
+        "native_parent_K": [
+          128,
+          256,
+          384,
+          512,
+          768,
+          896,
+          1024,
+          1152,
+          1280,
+          2048,
+          2176,
+          2304,
+          4224,
+          4352
+        ],
+        "partial_K_P7": [
+          64,
+          192,
+          320
+        ],
+        "immutable_C0_restore_verified_in_bound_fixture_source": true,
+        "all_default_or_selected_config_groups": 222,
+        "all_default_or_selected_fresh_replays": 666
+      },
+      "new38_policy": {
+        "variant": 38,
+        "invalid39_cases": 20,
+        "validate_before_empty_scale": 1,
+        "empty_cases": 4,
+        "scale_cases": 8,
+        "auto_dense_dtypes": 2
+      },
+      "retained_disabled37_policy": {
+        "variant": 37,
+        "forced_rejections": 8,
+        "validate_before_empty_scale": 1,
+        "auto_dense_dtypes": 2,
+        "native_runs": 0,
+        "register_spill_gate_blocked": 1
+      },
+      "native37_CASE_or_BEGIN": 0,
+      "new38_PASS_groups_excluding_disabled37_and_banner": 133
+    },
+    "selected38": {
+      "path": "results/correctness_psplit_bk6438_targeted_iter35.txt",
+      "sha256": "cd1095673f0b08199fbf81556b8c30df76818c31afd1462cc65bbb1427eaa697",
+      "exit_path": "results/correctness_psplit_bk6438_targeted_iter35.exit",
+      "exit_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "exit_code": 0,
+      "command": [
+        "bash",
+        "scripts/on_gpu.sh",
+        "./build/test_correctness",
+        "--smoke-candidates",
+        "--mega-only",
+        "--mega-variant",
+        "38"
+      ],
+      "CASE_lines": 56,
+      "PASS_lines": 135,
+      "BEGIN_lines": 186,
+      "new38_basic_cases": {
+        "CASE_lines": 56,
+        "by_actual_route": {
+          "megakernel_wgmma_psplit_bk64_64x32": 34,
+          "megakernel_warp_mma_packed": 12,
+          "dense_cublaslt": 10
+        },
+        "all_maxabs_eF_scaled_normalized_nonfinite_zero": true,
+        "ordered_shape_pattern_params_route_match_frozen_source_domain": true,
+        "case_records": [
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "distinct_eight_row_owners",
+            "shape": [
+              128,
+              64,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "distinct_eight_row_owners",
+            "shape": [
+              128,
+              64,
+              256
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              384
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              512
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              768
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              896
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              1024
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              1152
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              1280
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              2048
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              2176
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              2304
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              4224
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              4352
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              256,
+              128,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              256,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              128,
+              384
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              80,
+              112,
+              48
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              32
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              32,
+              64
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              64
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              64
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              192
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              192
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              320
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              320
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              128,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "bf16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              128,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "distinct_eight_row_owners",
+            "shape": [
+              128,
+              64,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "distinct_eight_row_owners",
+            "shape": [
+              128,
+              64,
+              256
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              384
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              512
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              768
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              896
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              1024
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              1152
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              1280
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              2048
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              2176
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              2304
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              4224
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              4352
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              256,
+              128,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              256,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              128,
+              384
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              80,
+              112,
+              48
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              32
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              32,
+              64
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              64
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              64
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              192
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              192
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "megakernel_warp_mma_packed",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              320
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              64,
+              320
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              128,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          },
+          {
+            "algorithm": "mega",
+            "variant": 38,
+            "actual_route": "dense_cublaslt",
+            "dtype": "fp16",
+            "pattern": "integers",
+            "shape": [
+              128,
+              128,
+              128
+            ],
+            "metrics": {
+              "maxabs": 0.0,
+              "eF": 0.0,
+              "scaled": 0.0,
+              "normalized": 0.0,
+              "nonfinite": 0.0
+            }
+          }
+        ]
+      },
+      "native_stage_domain": {
+        "dtypes": [
+          "bf16",
+          "fp16"
+        ],
+        "parent_K": [
+          128,
+          256,
+          384,
+          512,
+          768,
+          896,
+          1024,
+          1152,
+          1280,
+          2048,
+          2176,
+          2304,
+          4224,
+          4352
+        ],
+        "stage_counts": [
+          1,
+          2,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9,
+          10,
+          16,
+          17,
+          18,
+          33,
+          34
+        ],
+        "exact_one_stage_case_per_dtype_K": true,
+        "stage8_K1024": true,
+        "long_K_uses_bounded_integer_source_pattern": true
+      },
+      "sameatom_rawU_hostepilogue": {
+        "PASS_groups": 84,
+        "identity_groups": 6,
+        "active_groups": 78,
+        "kernel_runs_completed_by_bound_fixture_loop": 246,
+        "reference_variant": 36,
+        "raw_U_bits_all_checked": true,
+        "independent_host_RNalpha_betaFMA_all_checked": true,
+        "padding_guard_all_checked": true,
+        "unique_complete_domain": true,
+        "native_parent_K": [
+          128,
+          256,
+          384,
+          512,
+          768,
+          896,
+          1024,
+          1152,
+          1280,
+          2048,
+          2176,
+          2304,
+          4224,
+          4352
+        ],
+        "MN": [
+          [
+            128,
+            64
+          ],
+          [
+            128,
+            256
+          ],
+          [
+            256,
+            256
+          ]
+        ]
+      },
+      "current_A_B_rebind": {
+        "PASS_groups": 2,
+        "bindings": 20,
+        "native_bindings": 14,
+        "Dense_bindings": 6,
+        "fresh_current_pointer_and_aligned_recovery_assertions_completed": true
+      },
+      "epilogue_rebind": {
+        "PASS_groups": 10,
+        "kernel_runs_completed_by_bound_fixture_loop": 30,
+        "unique_complete_identity_active_D_C0_alias_domain": true
+      },
+      "Graph": {
+        "new38_config_groups": 36,
+        "new38_actual_routes": {
+          "megakernel_wgmma_psplit_bk64_64x32": 28,
+          "megakernel_warp_mma_packed": 8
+        },
+        "new38_fresh_AB_replays": 108,
+        "one_kernel_node_each": true,
+        "unique_complete_domain": true,
+        "native_parent_K": [
+          128,
+          256,
+          384,
+          512,
+          768,
+          896,
+          1024,
+          1152,
+          1280,
+          2048,
+          2176,
+          2304,
+          4224,
+          4352
+        ],
+        "partial_K_P7": [
+          64,
+          192,
+          320
+        ],
+        "immutable_C0_restore_verified_in_bound_fixture_source": true,
+        "all_default_or_selected_config_groups": 36,
+        "all_default_or_selected_fresh_replays": 108
+      },
+      "new38_policy": {
+        "variant": 38,
+        "invalid39_cases": 20,
+        "validate_before_empty_scale": 1,
+        "empty_cases": 4,
+        "scale_cases": 8,
+        "auto_dense_dtypes": 2
+      },
+      "retained_disabled37_policy": {
+        "variant": 37,
+        "forced_rejections": 8,
+        "validate_before_empty_scale": 1,
+        "auto_dense_dtypes": 2,
+        "native_runs": 0,
+        "register_spill_gate_blocked": 1
+      },
+      "native37_CASE_or_BEGIN": 0,
+      "new38_PASS_groups_excluding_disabled37_and_banner": 133
+    },
+    "disabled37_cli": {
+      "path": "results/disabled_psplit_bk6437_cli_iter35.txt",
+      "sha256": "a9fccfc2796ef871f2689d23d493ec40e436bdb52ea22616bcd2c8e1a256bf64",
+      "exit_path": "results/disabled_psplit_bk6437_cli_iter35.exit",
+      "exit_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "exit_code": 1,
+      "command": [
+        "bash",
+        "scripts/on_gpu.sh",
+        "./build/test_correctness",
+        "--smoke-candidates",
+        "--mega-only",
+        "--mega-variant",
+        "37"
+      ],
+      "CASE_lines": 0,
+      "PASS_lines": 0,
+      "BEGIN_lines": 0,
+      "native_runs": 0,
+      "explicit_disabled37_reason_matched": true,
+      "rejected_before_any_BEGIN_or_CASE": true
+    },
+    "strict_psplit_bk64_only": {
+      "path": "results/strict_psplit_bk64_iter35.txt",
+      "sha256": "68086d17ef21fceac12b3e61d6b5a40d562cb77846e6df369466cf96f051a44e",
+      "exit_path": "results/strict_psplit_bk64_iter35.exit",
+      "exit_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "exit_code": 2,
+      "command": [
+        "bash",
+        "scripts/on_gpu.sh",
+        "./build/test_correctness",
+        "--strict-psplit-bk64-only"
+      ],
+      "CASE_lines": 60,
+      "PASS_lines": 0,
+      "BEGIN_lines": 0,
+      "candidate_gates": 30,
+      "candidate_PASS": 18,
+      "candidate_FAIL": 12,
+      "candidate_nonfinite": 0,
+      "candidate_actual_routes": {
+        "megakernel_wgmma_psplit_bk64_64x32": 24,
+        "dense_cublaslt": 6
+      },
+      "native_gates": 24,
+      "native_PASS": 12,
+      "native_FAIL": 12,
+      "HighHalf_Dense_fallback_gates": 6,
+      "HighHalf_Dense_fallback_PASS": 6,
+      "Dense_reference_CASE": 30,
+      "unique_complete_dtype_pattern_trial_domain": true,
+      "all_gates_recomputed_from_printed_metrics": true,
+      "all_distributions_match_recomputed_gates": true,
+      "printed_metric_rounding_does_not_ambiguate_gate": true,
+      "min_absolute_gate_margin": 7.321587e-05,
+      "gate": "finite && solution_eF <= 3*dense_eF + floor",
+      "original_floor_BF16": 0.001,
+      "original_floor_FP16": 0.0001,
+      "per_dtype_pattern": {
+        "bf16/uniform": {
+          "gates": 3,
+          "PASS": 0,
+          "FAIL": 3,
+          "nonfinite": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "solution_eF": [
+            0.00597786,
+            0.00596812,
+            0.00613289
+          ],
+          "dense_eF": [
+            1.89055e-07,
+            1.90286e-07,
+            1.89496e-07
+          ]
+        },
+        "bf16/positive": {
+          "gates": 3,
+          "PASS": 3,
+          "FAIL": 0,
+          "nonfinite": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "solution_eF": [
+            0.000246534,
+            0.000246296,
+            0.000248414
+          ],
+          "dense_eF": [
+            3.16676e-07,
+            3.14847e-07,
+            3.14476e-07
+          ]
+        },
+        "bf16/range": {
+          "gates": 3,
+          "PASS": 0,
+          "FAIL": 3,
+          "nonfinite": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "solution_eF": [
+            0.00597786,
+            0.00596812,
+            0.00613289
+          ],
+          "dense_eF": [
+            1.89055e-07,
+            1.90286e-07,
+            1.89496e-07
+          ]
+        },
+        "bf16/cancellation": {
+          "gates": 3,
+          "PASS": 3,
+          "FAIL": 0,
+          "nonfinite": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "solution_eF": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "dense_eF": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "bf16/fp16_upper_range": {
+          "gates": 3,
+          "PASS": 3,
+          "FAIL": 0,
+          "nonfinite": 0,
+          "actual_route": "dense_cublaslt",
+          "solution_eF": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "dense_eF": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "fp16/uniform": {
+          "gates": 3,
+          "PASS": 0,
+          "FAIL": 3,
+          "nonfinite": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "solution_eF": [
+            0.000749013,
+            0.000756535,
+            0.000749261
+          ],
+          "dense_eF": [
+            3.4095e-07,
+            3.3969e-07,
+            3.40175e-07
+          ]
+        },
+        "fp16/positive": {
+          "gates": 3,
+          "PASS": 3,
+          "FAIL": 0,
+          "nonfinite": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "solution_eF": [
+            2.93305e-05,
+            3.01486e-05,
+            2.89703e-05
+          ],
+          "dense_eF": [
+            1.12586e-06,
+            1.12149e-06,
+            1.12404e-06
+          ]
+        },
+        "fp16/range": {
+          "gates": 3,
+          "PASS": 0,
+          "FAIL": 3,
+          "nonfinite": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "solution_eF": [
+            0.000749013,
+            0.000756535,
+            0.000749261
+          ],
+          "dense_eF": [
+            3.4095e-07,
+            3.3969e-07,
+            3.40175e-07
+          ]
+        },
+        "fp16/cancellation": {
+          "gates": 3,
+          "PASS": 3,
+          "FAIL": 0,
+          "nonfinite": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "solution_eF": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "dense_eF": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "fp16/fp16_upper_range": {
+          "gates": 3,
+          "PASS": 3,
+          "FAIL": 0,
+          "nonfinite": 0,
+          "actual_route": "dense_cublaslt",
+          "solution_eF": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "dense_eF": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "candidate_gate_records": [
+        {
+          "dtype": "bf16",
+          "pattern": "uniform",
+          "trial": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": false,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 1.89055e-07,
+          "solution_eF": 0.00597786,
+          "floor": 0.001,
+          "recomputed_limit": 0.001000567165
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "uniform",
+          "trial": 1,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": false,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 1.90286e-07,
+          "solution_eF": 0.00596812,
+          "floor": 0.001,
+          "recomputed_limit": 0.001000570858
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "uniform",
+          "trial": 2,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": false,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 1.89496e-07,
+          "solution_eF": 0.00613289,
+          "floor": 0.001,
+          "recomputed_limit": 0.001000568488
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "positive",
+          "trial": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 3.16676e-07,
+          "solution_eF": 0.000246534,
+          "floor": 0.001,
+          "recomputed_limit": 0.0010009500280000001
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "positive",
+          "trial": 1,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 3.14847e-07,
+          "solution_eF": 0.000246296,
+          "floor": 0.001,
+          "recomputed_limit": 0.001000944541
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "positive",
+          "trial": 2,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 3.14476e-07,
+          "solution_eF": 0.000248414,
+          "floor": 0.001,
+          "recomputed_limit": 0.001000943428
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "range",
+          "trial": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": false,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 1.89055e-07,
+          "solution_eF": 0.00597786,
+          "floor": 0.001,
+          "recomputed_limit": 0.001000567165
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "range",
+          "trial": 1,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": false,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 1.90286e-07,
+          "solution_eF": 0.00596812,
+          "floor": 0.001,
+          "recomputed_limit": 0.001000570858
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "range",
+          "trial": 2,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": false,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 1.89496e-07,
+          "solution_eF": 0.00613289,
+          "floor": 0.001,
+          "recomputed_limit": 0.001000568488
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "cancellation",
+          "trial": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 0.0,
+          "solution_eF": 0.0,
+          "floor": 0.001,
+          "recomputed_limit": 0.001
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "cancellation",
+          "trial": 1,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 0.0,
+          "solution_eF": 0.0,
+          "floor": 0.001,
+          "recomputed_limit": 0.001
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "cancellation",
+          "trial": 2,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 0.0,
+          "solution_eF": 0.0,
+          "floor": 0.001,
+          "recomputed_limit": 0.001
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "fp16_upper_range",
+          "trial": 0,
+          "actual_route": "dense_cublaslt",
+          "certified_range": false,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 0.0,
+          "solution_eF": 0.0,
+          "floor": 0.001,
+          "recomputed_limit": 0.001
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "fp16_upper_range",
+          "trial": 1,
+          "actual_route": "dense_cublaslt",
+          "certified_range": false,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 0.0,
+          "solution_eF": 0.0,
+          "floor": 0.001,
+          "recomputed_limit": 0.001
+        },
+        {
+          "dtype": "bf16",
+          "pattern": "fp16_upper_range",
+          "trial": 2,
+          "actual_route": "dense_cublaslt",
+          "certified_range": false,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 0.0,
+          "solution_eF": 0.0,
+          "floor": 0.001,
+          "recomputed_limit": 0.001
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "uniform",
+          "trial": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": false,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 3.4095e-07,
+          "solution_eF": 0.000749013,
+          "floor": 0.0001,
+          "recomputed_limit": 0.00010102285
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "uniform",
+          "trial": 1,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": false,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 3.3969e-07,
+          "solution_eF": 0.000756535,
+          "floor": 0.0001,
+          "recomputed_limit": 0.00010101907000000001
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "uniform",
+          "trial": 2,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": false,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 3.40175e-07,
+          "solution_eF": 0.000749261,
+          "floor": 0.0001,
+          "recomputed_limit": 0.00010102052500000001
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "positive",
+          "trial": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 1.12586e-06,
+          "solution_eF": 2.93305e-05,
+          "floor": 0.0001,
+          "recomputed_limit": 0.00010337758000000001
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "positive",
+          "trial": 1,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 1.12149e-06,
+          "solution_eF": 3.01486e-05,
+          "floor": 0.0001,
+          "recomputed_limit": 0.00010336447
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "positive",
+          "trial": 2,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 1.12404e-06,
+          "solution_eF": 2.89703e-05,
+          "floor": 0.0001,
+          "recomputed_limit": 0.00010337212000000001
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "range",
+          "trial": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": false,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 3.4095e-07,
+          "solution_eF": 0.000749013,
+          "floor": 0.0001,
+          "recomputed_limit": 0.00010102285
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "range",
+          "trial": 1,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": false,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 3.3969e-07,
+          "solution_eF": 0.000756535,
+          "floor": 0.0001,
+          "recomputed_limit": 0.00010101907000000001
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "range",
+          "trial": 2,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": false,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 3.40175e-07,
+          "solution_eF": 0.000749261,
+          "floor": 0.0001,
+          "recomputed_limit": 0.00010102052500000001
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "cancellation",
+          "trial": 0,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 0.0,
+          "solution_eF": 0.0,
+          "floor": 0.0001,
+          "recomputed_limit": 0.0001
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "cancellation",
+          "trial": 1,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 0.0,
+          "solution_eF": 0.0,
+          "floor": 0.0001,
+          "recomputed_limit": 0.0001
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "cancellation",
+          "trial": 2,
+          "actual_route": "megakernel_wgmma_psplit_bk64_64x32",
+          "certified_range": true,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 0.0,
+          "solution_eF": 0.0,
+          "floor": 0.0001,
+          "recomputed_limit": 0.0001
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "fp16_upper_range",
+          "trial": 0,
+          "actual_route": "dense_cublaslt",
+          "certified_range": false,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 0.0,
+          "solution_eF": 0.0,
+          "floor": 0.0001,
+          "recomputed_limit": 0.0001
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "fp16_upper_range",
+          "trial": 1,
+          "actual_route": "dense_cublaslt",
+          "certified_range": false,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 0.0,
+          "solution_eF": 0.0,
+          "floor": 0.0001,
+          "recomputed_limit": 0.0001
+        },
+        {
+          "dtype": "fp16",
+          "pattern": "fp16_upper_range",
+          "trial": 2,
+          "actual_route": "dense_cublaslt",
+          "certified_range": false,
+          "PASS": true,
+          "finite": true,
+          "nonfinite": 0,
+          "dense_eF": 0.0,
+          "solution_eF": 0.0,
+          "floor": 0.0001,
+          "recomputed_limit": 0.0001
+        }
+      ],
+      "source35_full1590_actually_executed": false,
+      "independent_CPU_strict_review": {
+        "reviewer": "/root/core32/wait1_tests/bk64_test_cpu_scope_review35",
+        "all30_recomputed_gates_match": true,
+        "CASE60_gates30_native24_Dense6_confirmed": true,
+        "per_pattern_native_uniform_range_FAIL_positive_cancellation_PASS_confirmed": true,
+        "historical36_printed_gate_fields_match_after_variant_only_removed": true,
+        "historical_numerical_metric_agreement_does_not_claim_raw_output_bit_identity": true
+      }
+    },
+    "sanitizers": {
+      "status": "closed_all3_variant38_reports_verified",
+      "completed_runs": 3,
+      "candidate_variants": [
+        38
+      ],
+      "no37_sanitizer_execution": true,
+      "all_exit0_errors0": true,
+      "memcheck_full_zero_leaks": true,
+      "race_hazards_warnings_zero": true,
+      "race_sync_leaks_unmeasured": true,
+      "reports": [
+        {
+          "variant": 38,
+          "tool": "memcheck",
+          "path": "results/sanitizer_psplit_bk6438_memcheck_iter35.txt",
+          "sha256": "7f5e5c52688b0b50a08567d79f549e2528a0f6ab1b80aa53da295bd6d2cf4275",
+          "exit_path": "results/sanitizer_psplit_bk6438_memcheck_iter35.exit",
+          "exit_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "exit_code": 0,
+          "command": [
+            "bash",
+            "scripts/on_gpu.sh",
+            "/share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer",
+            "--tool",
+            "memcheck",
+            "--error-exitcode",
+            "99",
+            "--leak-check",
+            "full",
+            "./build/test_correctness",
+            "--smoke-candidates",
+            "--mega-only",
+            "--mega-variant",
+            "38"
+          ],
+          "sanitizer_version": "2025.1.0.0",
+          "sanitizer_build": "35583870",
+          "CASE_lines": 56,
+          "PASS_lines": 135,
+          "BEGIN_lines": 186,
+          "complete_CASE_PASS_BEGIN_multisets_equal_closed_selected38_log": true,
+          "error_summary_kind": "ERROR SUMMARY",
+          "errors": 0,
+          "race_hazards": null,
+          "race_warnings": null,
+          "leak_check_measured": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0,
+          "new38_rawU_groups": 84,
+          "new38_Graph_configs": 36,
+          "native37_CASE_or_BEGIN": 0
+        },
+        {
+          "variant": 38,
+          "tool": "racecheck",
+          "path": "results/sanitizer_psplit_bk6438_racecheck_iter35.txt",
+          "sha256": "f8a2553cf767bb0b3114af3c3a7f3eb6a831d319b32493350298f0ef9d8ce2ea",
+          "exit_path": "results/sanitizer_psplit_bk6438_racecheck_iter35.exit",
+          "exit_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "exit_code": 0,
+          "command": [
+            "bash",
+            "scripts/on_gpu.sh",
+            "/share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer",
+            "--tool",
+            "racecheck",
+            "--error-exitcode",
+            "99",
+            "--racecheck-report",
+            "all",
+            "./build/test_correctness",
+            "--smoke-candidates",
+            "--mega-only",
+            "--mega-variant",
+            "38"
+          ],
+          "sanitizer_version": "2025.1.0.0",
+          "sanitizer_build": "35583870",
+          "CASE_lines": 56,
+          "PASS_lines": 135,
+          "BEGIN_lines": 186,
+          "complete_CASE_PASS_BEGIN_multisets_equal_closed_selected38_log": true,
+          "error_summary_kind": "RACECHECK SUMMARY",
+          "errors": 0,
+          "race_hazards": 0,
+          "race_warnings": 0,
+          "leak_check_measured": false,
+          "leaked_bytes": null,
+          "leaked_allocations": null,
+          "new38_rawU_groups": 84,
+          "new38_Graph_configs": 36,
+          "native37_CASE_or_BEGIN": 0
+        },
+        {
+          "variant": 38,
+          "tool": "synccheck",
+          "path": "results/sanitizer_psplit_bk6438_synccheck_iter35.txt",
+          "sha256": "18a570036c32d486335ab7c647f6440cd7db276b480d73ec09a97a0c1fb8b95c",
+          "exit_path": "results/sanitizer_psplit_bk6438_synccheck_iter35.exit",
+          "exit_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "exit_code": 0,
+          "command": [
+            "bash",
+            "scripts/on_gpu.sh",
+            "/share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer",
+            "--tool",
+            "synccheck",
+            "--error-exitcode",
+            "99",
+            "./build/test_correctness",
+            "--smoke-candidates",
+            "--mega-only",
+            "--mega-variant",
+            "38"
+          ],
+          "sanitizer_version": "2025.1.0.0",
+          "sanitizer_build": "35583870",
+          "CASE_lines": 56,
+          "PASS_lines": 135,
+          "BEGIN_lines": 186,
+          "complete_CASE_PASS_BEGIN_multisets_equal_closed_selected38_log": true,
+          "error_summary_kind": "ERROR SUMMARY",
+          "errors": 0,
+          "race_hazards": null,
+          "race_warnings": null,
+          "leak_check_measured": false,
+          "leaked_bytes": null,
+          "leaked_allocations": null,
+          "new38_rawU_groups": 84,
+          "new38_Graph_configs": 36,
+          "native37_CASE_or_BEGIN": 0
+        }
+      ],
+      "serial_driver": {
+        "path": "results/psplit_bk64_sanitizer_driver_iter35.txt",
+        "sha256": "a8bcd4e0d3faec5afffe398ead05e81feb1e5d190b1209b22567293ac1ea0da6",
+        "exit_path": "results/psplit_bk64_sanitizer_driver_iter35.exit",
+        "exit_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "exit_code": 0,
+        "strict_exit2_and_CLI37_exit1_preserved": true
+      }
+    },
+    "measured_source_identity": {
+      "path": "results/psplit_bk64_measured_identity_iter35.json",
+      "sha256": "a0d5f6e10020e0447c2d296de0edba9be6d98e9b59f55642053795a7807d6184",
+      "measurement_source_commit": "6d3a95ec69892828a656453ec337f5c85520cc0b",
+      "base_checkpoint": "a8113224de4a0577ca150a45511e108542097811",
+      "verified_frozen_bindings": {
+        "frozen_sources": {
+          "CMakeLists.txt": {
+            "sha256": "49db31ede494c7fe6a1c38a59c579a2896a0091a850c89bdbd86efb9c6c4c6a9",
+            "matches_frozen": true
+          },
+          "bench/benchmark.cu": {
+            "sha256": "364e92ac4c3750fb760021d7016d41eacd1ed81eb23ec56de845b47af6055906",
+            "matches_frozen": true
+          },
+          "include/megafmm/gemm.h": {
+            "sha256": "e17c2c9d9083b8632e42f962e9e236a2a7322c6631250021ec3f5600c3e8237b",
+            "matches_frozen": true
+          },
+          "include/megafmm/kernels.h": {
+            "sha256": "b6b504234402ca32220425862295e2799412e89388a767b24808dda4407d4978",
+            "matches_frozen": true
+          },
+          "solution/plan.cpp": {
+            "sha256": "f92cf18532222ec80b7a0fa4a1e0160a9a1a58b8a17df0affa3089fefe528f72",
+            "matches_frozen": true
+          },
+          "tests/test_correctness.cu": {
+            "sha256": "8ea240cff0e89269e25414e7f57cd224f88703e82b6bf62786741795dcaf4d57",
+            "matches_frozen": true
+          },
+          "solution/megakernel_wgmma_psplit_bk64.cu": {
+            "sha256": "d25ebadf929865246a231a3af363054508f376f64246a17b5194c7e7ad950a2c",
+            "matches_frozen": true
+          }
+        },
+        "frozen_binaries": {
+          "build/megafmm_bench": {
+            "sha256": "c7e60233d9413703d0a2abbdfc8951370a3e9866bb68ce4778e8cb490407aa64",
+            "matches_frozen": true
+          },
+          "build/test_correctness": {
+            "sha256": "a999feca07d08ceda48196b76171ed79e71ca22120e0880ace58f85e8c291c36",
+            "matches_frozen": true
+          }
+        }
+      },
+      "source_count": 7,
+      "binary_count": 2,
+      "predeclared_plan": {
+        "path": "results/psplit_bk641024_plan_iter35.json",
+        "sha256": "eebbe4c50a71bee61744729b78bd4aa0dd4ec297e4ba22d5b22f37b8e38525a9"
+      },
+      "referenced_independent_compiled_gate": {
+        "path": "results/psplit_bk64_static_review_initial_iter35.json",
+        "sha256": "b4cb1b7325724dc71962c5a1f630ebd5ee10ba5f2dd608cd4c7c5fff7cd6c085",
+        "status": "PASS_COMPILED_CAN_LAUNCH_38_ONLY_37_REMAINS_BLOCKED"
+      },
+      "compiled_gate_content_audit_by_this_test_agent": false,
+      "linked_identity": {
+        "path": "results/psplit_bk64_final_link_identity_iter35.json",
+        "sha256": "13e101adb4691d48a19a6c1d705561b60ad7b02ce898aabe12cf46d2232a0e2f"
+      },
+      "all7_source_commit_blobs_match_frozen_source_SHA": true
+    },
+    "compiled_test_binary_identity": {
+      "path": "build/test_correctness",
+      "sha256": "a999feca07d08ceda48196b76171ed79e71ca22120e0880ace58f85e8c291c36",
+      "source_sha256": "8ea240cff0e89269e25414e7f57cd224f88703e82b6bf62786741795dcaf4d57",
+      "matches_frozen_identity_and_linked_identity": true
+    },
+    "legacy_default_domain_reaudit": {
+      "CASE_identity_prefix_multisets_equal": true,
+      "legacy_CASE": 2298,
+      "legacy_PASS": 1361,
+      "legacy_PASS_multisets_equal_after_only_invalid38_to39_metadata_normalization": true,
+      "prior_log_path": "results/correctness_psplit_iter34.txt",
+      "prior_log_sha256": "aacb044fbfbd1ab954e087fe2d1dead42d8e73bf9f50bae3e944679eae34240d",
+      "old_numeric_metric_bitwise_identity_claim": false
+    },
+    "sanitizers_status": "all3_terminal_original_reports_verified"
+  },
+  "limitations": [
+    "Pre-execution expected snapshot88e07de1 remains frozen; original new_expected/predicted fields are preserved as historical predictions and actual_validation contains independently recounted terminal evidence.",
+    "Default, selected38, disabled37 CLI, new38-only strict and all3 sanitizer reports have terminal original log and exit files bound by SHA.",
+    "Structural integer/rawU/hostepilogue/Graph and sanitizer PASS do not certify original FP64 gate, which actually has12FAIL among30gates.",
+    "Current source35 full1590 remains unexecuted code scope; historical source29 full1290, source30-to33 new60 each and source34 new30 strict retain separate source identities.",
+    "CUDA compiled gate content audit and performance are outside this test agent lease; referenced independent gate SHA/status are identity-bound without re-auditing compiled correctness here.",
+    "Mega37 forced policy/CLI remain blocked with zero native CASE/BEGIN; no launch/timing is claimed.",
+    "Only memcheck enabled full leak checking. Racecheck and synccheck leak metrics remain null because they were not measured."
+  ],
+  "pre_execution_expected_snapshot": {
+    "path": ".scratch/psplit_bk64_test_coverage_iter35.json",
+    "sha256": "88e07de12ecb06c73818c833e7291e776cd27b9ba193a28f8a26edcdd65cabb0",
+    "original_bytes_preserved": true
+  },
+  "actual_scope_summary": {
+    "default_CASE": 2354,
+    "default_PASS": 1494,
+    "selected38_CASE": 56,
+    "selected38_PASS": 135,
+    "new38_basic_actual_native": 34,
+    "new38_basic_actual_P7": 12,
+    "new38_basic_actual_Dense": 10,
+    "rawU_groups": 84,
+    "rawU_bound_loop_kernel_runs": 246,
+    "A_B_bindings": 20,
+    "A_B_native": 14,
+    "A_B_Dense": 6,
+    "epilogue_PASS_groups": 10,
+    "epilogue_bound_loop_runs": 30,
+    "Graph_configs": 36,
+    "Graph_native": 28,
+    "Graph_P7": 8,
+    "Graph_fresh_AB_replays": 108,
+    "default_all_Graph_configs": 222,
+    "default_all_Graph_fresh_AB_replays": 666,
+    "strict_candidate_gates": 30,
+    "strict_PASS": 18,
+    "strict_FAIL": 12,
+    "strict_nonfinite": 0,
+    "strict_exit": 2,
+    "sanitizer_variant38_runs": 3,
+    "sanitizer_all_exit0": true,
+    "disabled37_CLI_exit": 1,
+    "disabled37_CLI_native_CASE": 0,
+    "source35_full1590_actually_executed": false,
+    "original_numerical_gate_certified": false,
+    "performance_claim_by_this_test_artifact": false
+  }
+}
