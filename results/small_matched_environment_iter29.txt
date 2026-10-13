@@ -1,0 +1,13 @@
+SOURCE_COMMIT bdbcdd9191072014aff7fa99dd9e19afd026d55e
+UTC 2026-10-13T13:25:45.211981+00:00
+ALLOCATION107488 HOSTg08 CUDA_APPLICATION12.4.99 CLOCKS_UNLOCKED=1
+SHA256 66bcc473b87bc5d51f46af9b9b6012ae7dace43c32d2f0c594bbf31e30206d5e build/megafmm_bench
+SHA256 fae22ec4c77586bbbc9d34fa1820903e60ebaef08756b75dbf36eec442c31671 build/test_correctness
+SAN_PATH /share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer
+NVIDIA (R) Compute Sanitizer
+Copyright (c) 2020-2025 NVIDIA Corporation
+Version 2025.1.0.0 (build 35583870) (public-release)
+COMMAND ["bash", "scripts/on_gpu.sh", "nvidia-smi", "--query-gpu=name,uuid,driver_version,pstate,clocks.current.sm,clocks.current.memory,clocks.max.sm,clocks.max.memory", "--format=csv"]
+name, uuid, driver_version, pstate, clocks.current.sm [MHz], clocks.current.memory [MHz], clocks.max.sm [MHz], clocks.max.memory [MHz]
+NVIDIA H100 80GB HBM3, GPU-78def847-b6c1-9dd4-ff30-269a9ae1a73f, 575.51.03, P0, 345 MHz, 2619 MHz, 1980 MHz, 2619 MHz
+SNAPSHOT_SCOPE after performance/validation; not within-group clocks evidence

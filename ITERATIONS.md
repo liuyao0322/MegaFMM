@@ -1301,3 +1301,40 @@ Binary SHA256: benchmark `5fc2afccc67ee63afb0e7bfc68435e855909f4447f00a9739fa36a
 - **Analysis:** Quick nine-shape two-dtype launch screen uses20warm/20calls/5groups/1fresh,32Lt candidates and8GiB shared cap. Results and original numerical failures are recorded exactly; this diagnostic does not establish certification. Same-binary second control, mandatory user full1024 six routes in both modes/dtypes, strict numerics, six CUDA12.8 sanitizers and resource audit follow before evidence checkpoint. Judge gains from own SW latency, not Dense denominator changes.
 - **Next:** Measure Hopper12 control and full1024 H9/H10/H11/H12/Lt1/H7 launch/Graph BF16/FP16 at20warm100calls5groups3fresh, then close strict/sanitizer/compiler evidence without changing frozen source.
 - **Archive:** trajectory/20261013_211356_iter-29/
+
+## Iteration29: matched packed-input versus fused-input1024 controls
+
+Measured source is `bdbcdd9191072014aff7fa99dd9e19afd026d55e`, after source28 evidence checkpoint `f08c5b3406b8d4727bfaa2f30092d437bdb82f01`. Hopper11/12 add a matched compact-input leaf with the frozen fused9/10 tile/shared/K32/MMA/full-P order. Every complete native invocation freshly packs original rounded A/B, runs the compact leaf and combines P: three launches. Original-input9/10 remain two-launch leaf+combine routes. All24 older CUDA translation units and historical23–28 evidence are byte-preserved. Policy maxH12/invalid13, actual original/compact binding guards, alias/cap/empty/scale handling, Lt tuner/config API and51-column schema retain the original contracts; Auto stays Dense.
+
+The user explicitly required a same-source/binary full1024 comparison even without a primary >=3% quick-screen signal. All six requested routes below were measured with20warm/100calls/5groups/3fresh in both dtypes and launch/Graph, with heuristic_candidates32 as the query budget and8GiB shared workspace cap. Transformations, packing, seven full-K FP32 products, P traffic and fixed U/alpha/beta are included; no input preprocessing cache. The complete24-row table with both Dense/SW p10/p90/CV and workspace is [results/1024_TWO_ROUTES_REPORT.md](results/1024_TWO_ROUTES_REPORT.md); exact original rows/configs and raw hashes are [results/small_matched_measurements_iter29.json](results/small_matched_measurements_iter29.json).
+
+|1024 ordinary launch route|dtype|same-row Dense µs|complete SW µs|Dense/SW|SW CV %|frozen numerical gate|
+|---|---|---:|---:|---:|---:|---|
+|winograd_fused_input_32x32 v9|bf16|12.3238|43.0096|0.286537|0.2506|FAIL, finite|
+|winograd_fused_input_32x32 v9|fp16|9.9984|43.0349|0.232332|0.1188|FAIL, finite|
+|winograd_fused_input_32x64 v10|bf16|12.2589|38.2541|0.320459|0.1149|FAIL, finite|
+|winograd_fused_input_32x64 v10|fp16|9.9590|38.5088|0.258617|0.0513|FAIL, finite|
+|winograd_packed_input_32x32 v11|bf16|12.2022|40.0851|0.304408|0.0984|FAIL, finite|
+|winograd_packed_input_32x32 v11|fp16|9.9734|40.3974|0.246883|0.0355|FAIL, finite|
+|winograd_packed_input_32x64 v12|bf16|12.2992|34.1165|0.360506|0.1531|FAIL, finite|
+|winograd_packed_input_32x64 v12|fp16|9.9430|34.4358|0.288741|0.1442|FAIL, finite|
+|winograd_lt_batched v1|bf16|12.2298|19.3750|0.631212|0.0608|FAIL, finite|
+|winograd_lt_batched v1|fp16|9.9302|19.7350|0.503178|0.2337|FAIL, finite|
+|winograd_sm80_batched_k64 v7|bf16|12.2003|21.8893|0.557365|0.0955|FAIL, finite|
+|winograd_sm80_batched_k64 v7|fp16|9.9338|22.3165|0.445131|0.1141|FAIL, finite|
+
+Within these six candidates, packed-once Lt1 has the smallest own SW latency for all four mode/dtype pairs; this observed selection is not a fixed dispatcher or certification. Ordinary BF16/FP16 Lt1 is19.3750/19.7350µs versus same-row Dense12.2298/9.9302µs (0.631212/0.503178×). Graph Lt1 is17.0726/17.8051µs versus11.3597/9.4397µs (0.665373/0.530167×). All24 full rows and72 fresh original-input FP64 checks fail the unchanged numerical gates withNF0. Dense speed variations do not establish code improvements.
+
+The matched32×64 H12 run is34.1165/34.4358µs in ordinary BF16/FP16 versus its same-tile fused H10 at38.2541/38.5088µs: observed own-SW decreases10.8161%/10.5767%. Graph decreases13.7719%/13.1142%. Matched32×32 H11 ordinary decreases6.7996%/6.1286% versus H9. These are input-placement controls with accompanying compiled load/resource differences, not a pure DRAM/cache experiment or a bottleneck proof. Neither new control improves the retained overall primary own-latency envelope by>=3%; there is no automatic broader full-suite trigger. The full1024 measurements were still mandatory under the user's explicit request.
+
+The H12/FP16/Graph same-row Dense group means contain an outlier: Dense CV59.0005% and p90=21.4297µs, while SW CV0.1246%. The original groups and0.299958 median ratio are retained without replacement or selecting a best rerun. That denominator does not establish a code gain; the input-placement reductions use SW's own latency. Timings used unlocked GPU clocks, and group quantiles/CV are not confidence intervals.
+
+At1024, fused9/10 P payload/reserved is7MiB. Packed11/12/Lt1/H7 have lowp7A+7B=7MiB and P=7MiB (14MiB payload); actual caller-reserved46MiB includes32MiB maximum scratch for the Dense fallback candidate pool. The custom packed leaves need0 backend scratch; the chosen Lt1 batch also reports bound_workspace0. Maximum caller allocation and selected Lt algorithm scratch are distinct quantities.
+
+Compiled matched BN32 uses40REG,16B stack and80B spill stores/loads, even though ELF LOCAL reports0; its SASS contains actual LDL/STL. BN64 uses48REG and0 stack/spill. Ptxas shared4096/6144B and ELF SHARED5120/7168B are separate tool fields; no runtime allocation attribute was queried. Four whole functions have1432/1456 static instructions across seven CTA-uniform product branches. Totals14LDG.E.128/14STS.128/28LDSM/28HMMA/14BAR/56scalarSTG are whole-switch static counts, not per-CTA dynamic issue or DRAM bytes. A CTA chooses one branch, keeps full-K P through both chronologicalK16 updates perBK32 and publishes complete P before the separate U combine. Ncu was not retried after the existing session lock failure.
+
+Default GPU validation passes with2034 CASE/803 PASS, including four new independent integer A7/B7/P fixtures and36 random same-original-input paired H11↔H9/H12↔H10 complete-seven-P/final-D bit comparisons, plus retained Mega7 final-D reference. Full default validation has88 captures/264 freshAB replays; the matched additions contribute8/24 and cover beta-zero/nullC0 and active C0=D with refreshed original A/B and reset FP64 reference outside capture on the same stream. Runtime/metadata negatives, padded/tail/transpose/budget fallbacks, AB16 rebindings and scalar D/C0+4 are checked. The independent M2 stage reference remains separate from M1 bitwise comparisons.
+
+Strict numerics records1290 unique gates/430 distributions:774 pass,516 fail (258uniform+258range),NF0,exit2. The unchanged first1230 gates and new60 matched checks are separate groups; new60 comprises48 native and12 required HighHalf Dense checks. Exact structural and paired-bitwise success does not replace this original-input numerical gate. CUDA12.8 Compute Sanitizer2025.1.0.0 independently runs H11/H12 memcheck/racecheck/synccheck, all six exit0 with zero leaks/errors/hazards/warnings. Each H11 run has44CASE/37PASS; each H12 has46CASE/37PASS; each includes2 direct input/product fixtures,18 full-P/final-D pairs and4 captures/12 freshAB replays. All runs are serial and completed before closure.
+
+Final source/binary/raw/config/test/compiler evidence is [results/small_matched_profile_iter29.json](results/small_matched_profile_iter29.json). Benchmark SHA256 `66bcc473b87bc5d51f46af9b9b6012ae7dace43c32d2f0c594bbf31e30206d5e`; tests `fae22ec4c77586bbbc9d34fa1820903e60ebaef08756b75dbf36eec442c31671`. Source remains the actual measured `bdbcdd9`, not any later evidence-only HEAD. The128/256/512/1024 faster-than-cuBLAS objective remains unmet. These results do not establish a hardware floor, exhausted directions or completion of continuous optimization.
