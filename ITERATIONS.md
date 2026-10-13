@@ -43,6 +43,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 7 | Batch seven Winograd products through one tuned Lt operation | 0.5311 | 0.075244 | improved |
 
+| 8 | Use small-tile cp.async Tensor Core batched leaves | 0.4420 | 0.121435 | regression |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -311,3 +313,35 @@ experiments have not been silently marked complete in PLAN.
 - **Analysis:** Matched original small V1 geometric latency gain=2.2975x over18 rows. 128 bf16=9.67us (Dense/winograd_lt_batched 0.407x); 128 fp16=9.98us (Dense/winograd_lt_batched 0.391x); 512 bf16=12.66us (Dense/winograd_lt_batched 0.483x); 512 fp16=11.83us (Dense/winograd_lt_batched 0.498x); 1024 bf16=19.83us (Dense/winograd_lt_batched 0.630x); 1024 fp16=19.64us (Dense/winograd_lt_batched 0.503x). Packing raw quadrants into7uniformslots reduces leaf APIcalls7to1;14n²matrix workspace includes newcopies. All outputsfinite, unchanged frozen gatesfail; automaticdispatch remainsDense.
 - **Next:** Validate batched API and compare custom small-tile cp.async batched leaves, then per-warp fused mma.sync
 - **Archive:** trajectory/20261013_131547_iter-7/
+
+### Iter 8 — Use small-tile cp.async Tensor Core batched leaves
+
+- **Hypothesis:** Three-stage Sm80 batched tiles reduce pipeline fill and descriptor overhead for small Winograd products
+- **Changes:** Add compact uniform-seven-slot CUTLASS GemmBatched with CTA64x64x32 and32x64x32 as Hoppervariants5/6; benchmark5; preserve Lt and TMA routes and fixed DAG
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.121435 ms; mean speedup=0.4420x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | winograd_sm80_batched v5 | launch | 0.003940 | 0.009769 | 0.4033 | 0.00611792 | 0 |
+| 128,128,128 | fp16 | winograd_sm80_batched v5 | launch | 0.003916 | 0.010083 | 0.3884 | 0.000774794 | 0 |
+| 256,256,256 | bf16 | winograd_sm80_batched v5 | launch | 0.005212 | 0.010993 | 0.4741 | 0.00605431 | 0 |
+| 256,256,256 | fp16 | winograd_sm80_batched v5 | launch | 0.004591 | 0.011013 | 0.4169 | 0.000755322 | 0 |
+| 512,512,512 | bf16 | winograd_sm80_batched v5 | launch | 0.005875 | 0.011872 | 0.4948 | 0.00604926 | 0 |
+| 512,512,512 | fp16 | winograd_sm80_batched v5 | launch | 0.005883 | 0.011805 | 0.4984 | 0.000756941 | 0 |
+| 1024,1024,1024 | bf16 | winograd_sm80_batched v5 | launch | 0.012445 | 0.021246 | 0.5857 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | winograd_sm80_batched v5 | launch | 0.009954 | 0.021149 | 0.4707 | 0.000754626 | 0 |
+| 2048,2048,2048 | bf16 | winograd_sm80_batched v5 | launch | 0.031236 | 0.099783 | 0.3130 | 0.00602495 | 0 |
+| 2048,2048,2048 | fp16 | winograd_sm80_batched v5 | launch | 0.031838 | 0.100167 | 0.3178 | 0.00075359 | 0 |
+| 3072,3072,3072 | bf16 | winograd_sm80_batched v5 | launch | 0.087730 | 0.278148 | 0.3154 | 0.00602605 | 0 |
+| 3072,3072,3072 | fp16 | winograd_sm80_batched v5 | launch | 0.091606 | 0.281168 | 0.3258 | 0.000753777 | 0 |
+| 4096,4096,4096 | bf16 | winograd_sm80_batched v5 | launch | 0.201291 | 0.612976 | 0.3284 | 0.0060269 | 0 |
+| 4096,4096,4096 | fp16 | winograd_sm80_batched v5 | launch | 0.207141 | 0.638997 | 0.3242 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | winograd_sm80_batched v5 | launch | 0.011003 | 0.017976 | 0.6121 | 0.00604051 | 0 |
+| 1024,512,1024 | fp16 | winograd_sm80_batched v5 | launch | 0.010106 | 0.016704 | 0.6050 | 0.000755532 | 0 |
+| 512,1024,1024 | bf16 | winograd_sm80_batched v5 | launch | 0.008641 | 0.016213 | 0.5330 | 0.00602806 | 0 |
+| 512,1024,1024 | fp16 | winograd_sm80_batched v5 | launch | 0.008653 | 0.015758 | 0.5491 | 0.000756687 | 0 |
+
+- **Analysis:** Matched Ltbatch iter7 geometric latency gain=0.8810x over18 rows. 128 bf16=9.77us (Dense/SW 0.403x); 128 fp16=10.08us (Dense/SW 0.388x); 256 bf16=10.99us (Dense/SW 0.474x); 256 fp16=11.01us (Dense/SW 0.417x); 512 bf16=11.87us (Dense/SW 0.495x); 512 fp16=11.80us (Dense/SW 0.498x); 1024 bf16=21.25us (Dense/SW 0.586x); 1024 fp16=21.15us (Dense/SW 0.471x). Variant5 has no leaf scratch or TMA descriptors; full18rows have finite outputs but fail frozen numerical gates. Relative gain at256 partly reflects earlier noisy Lt row; repeat final before interpreting.
+- **Next:** Validate both batched tiles and integrate per-warp fused mma.sync to remove all intermediate global buffers
+- **Archive:** trajectory/20261013_132150_iter-8/

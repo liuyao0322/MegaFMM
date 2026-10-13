@@ -113,7 +113,8 @@ template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorit
   check(cudaMemcpy(dc.data,c.data(),c.size()*sizeof(float),cudaMemcpyHostToDevice));
   check(cudaMemcpy(dd.data,result.data(),result.size()*sizeof(float),cudaMemcpyHostToDevice));
   megafmm::Policy policy;policy.algorithm=algorithm;policy.certified_range=certified;
-  policy.hopper_variant=variant;policy.mega_variant=variant;
+  if(algorithm==megafmm::Algorithm::WinogradHopper)policy.hopper_variant=variant;
+  if(algorithm==megafmm::Algorithm::Megakernel)policy.mega_variant=variant;
   if(algorithm==megafmm::Algorithm::WinogradLt)policy.lt_variant=variant;
   policy.workspace_limit=workspace_limit;
   auto plan=megafmm::create_plan(p,policy);
@@ -122,7 +123,15 @@ template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorit
   Buffer workspace(plan->workspace_bytes());
   float* output=alias ? dc.as<float>():dd.as<float>();
   require(!alias || p.ldc==p.ldd,"test alias needs equal C/D strides");
-  if(do_tune) megafmm::tune(*plan,da.data,db.data,p.beta==0 ? nullptr:dc.as<float>(),output,workspace.data);
+  if(do_tune) {
+    megafmm::tune(*plan,da.data,db.data,p.beta==0 ? nullptr:dc.as<float>(),output,workspace.data);
+    if(alias && pattern==Pattern::Integers) {
+      check(cudaMemcpy(result.data(),output,result.size()*sizeof(float),cudaMemcpyDeviceToHost));
+      for(int i=0;i<p.m;++i) for(int j=0;j<p.n;++j)
+        require(double(result[size_t(i)*p.ldd+j])==reference[size_t(i)*p.n+j],
+                "tuned in-place alpha/beta output incorrect");
+    }
+  }
   // Restore C0 after tuning when C0 and D share storage.
   if(alias) check(cudaMemcpy(dc.data,c.data(),c.size()*sizeof(float),cudaMemcpyHostToDevice));
   for(int repeat=0;repeat<2;++repeat) {
@@ -204,18 +213,25 @@ template<class T> void structural_suite(megafmm::DType dtype) {
     require(e.nonfinite==0 && e.maxabs==0,"streaming megakernel alpha/beta alias test failed");
   }
 }
-template<class T> void batched_suite(megafmm::DType dtype) {
-  auto exact=[dtype](megafmm::Problem p,Pattern pattern,bool alias=false,bool certified=true,
+template<class T> void batched_suite(megafmm::DType dtype,bool lt_only=false) {
+  for(auto candidate:{std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradLt,1},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,5},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,6}}) {
+  const auto algorithm=candidate.first;const int variant=candidate.second;
+  if(lt_only && algorithm!=megafmm::Algorithm::WinogradLt)continue;
+  auto exact=[dtype,algorithm,variant](megafmm::Problem p,Pattern pattern,bool alias=false,bool certified=true,
                     bool expect_batched=true,size_t workspace_limit=size_t(8)<<30,bool do_tune=false) {
-    const char* route=expect_batched ? "winograd_lt_batched":"dense_cublaslt";
+    const char* route=!expect_batched ? "dense_cublaslt":
+                     algorithm==megafmm::Algorithm::WinogradLt ? "winograd_lt_batched":"winograd_sm80_batched";
     std::cout << "BEGIN_BATCHED dtype=" << megafmm::dtype_name(dtype)
+              << " algorithm=" << algorithm_name(algorithm) << " variant=" << variant
               << " pattern=" << pattern_name(pattern) << " shape=" << p.m << ',' << p.n << ',' << p.k
               << " alpha=" << p.alpha << " beta=" << p.beta << " alias=" << alias
               << " certified_range=" << certified << " workspace_limit=" << workspace_limit
               << " expected=" << route << std::endl;
-    auto e=run_case<T>(p,megafmm::Algorithm::WinogradLt,pattern,alias,certified,1234567,1,
+    auto e=run_case<T>(p,algorithm,pattern,alias,certified,1234567,variant,
                        do_tune,workspace_limit,route);
-    require(e.nonfinite==0 && e.maxabs==0,"batched Lt structural/alias/fallback test failed");
+    require(e.nonfinite==0 && e.maxabs==0,"batched structural/alias/fallback test failed");
   };
   // Small exact operands exercise all seven slot mappings and the fixed U DAG.
   // Tune one case; the remaining scenarios also cover the untuned route.
@@ -225,19 +241,28 @@ template<class T> void batched_suite(megafmm::DType dtype) {
   exact(problem(256,256,256,dtype),Pattern::Integers);
   auto p=problem(128,128,128,dtype);p.alpha=.5f;p.beta=-.25f;
   exact(p,Pattern::Integers);
-  // Tuning C0=D must leave every trial with the same original beta input.
+  // Verify tune's output before restoring the original C0 for repeated run calls.
   exact(p,Pattern::Integers,true,true,true,size_t(8)<<30,true);
   p.lda+=8;p.ldb+=8;p.ldc+=8;p.ldd+=8;
   exact(p,Pattern::Integers);
   exact(p,Pattern::Integers,true);
-  // These cases must select Dense even though Lt variant 1 was requested.
+  // These cases must select Dense even though a batched route was requested.
   exact(problem(128,128,128,dtype),Pattern::Integers,false,false,false);
   exact(problem(65,97,33,dtype),Pattern::Integers,false,true,false);
+  for(auto dims:{std::vector<int>{130,128,128},std::vector<int>{128,130,128},std::vector<int>{128,128,130}}) {
+    p=problem(dims[0],dims[1],dims[2],dtype);p.lda=(p.lda+7)/8*8;p.ldb=(p.ldb+7)/8*8;
+    exact(p,Pattern::Integers,false,true,false);
+  }
   exact(problem(128,128,128,dtype),Pattern::Integers,false,true,false,0);
   p=problem(128,128,128,dtype);p.lda+=1;
   exact(p,Pattern::Integers,false,true,false);
+  p=problem(128,128,128,dtype);p.ldb+=1;
+  exact(p,Pattern::Integers,false,true,false);
   p=problem(128,128,128,dtype);p.trans_a=true;
   exact(p,Pattern::Integers,false,true,false);
+  p=problem(128,128,128,dtype);p.trans_b=true;
+  exact(p,Pattern::Integers,false,true,false);
+  }
 }
 template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false) {
   // Reuse a tuned plan with changed addresses: an aligned preferred SW route must
@@ -254,15 +279,20 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradLt,0},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradLt,1},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,0},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,5},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,6},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,3}}) {
     auto algo=candidate.first;int variant=candidate.second;
-    bool is_batched=algo==megafmm::Algorithm::WinogradLt && variant==1;
-    if(batched_only && !is_batched)continue;
+    bool is_batched=(algo==megafmm::Algorithm::WinogradLt && variant==1) ||
+                    (algo==megafmm::Algorithm::WinogradHopper && variant>=5);
+    if(batched_only && !(algo==megafmm::Algorithm::WinogradLt && variant==1))continue;
     megafmm::Policy policy;policy.algorithm=algo;policy.certified_range=true;
     if(algo==megafmm::Algorithm::WinogradLt)policy.lt_variant=variant;
+    if(algo==megafmm::Algorithm::WinogradHopper)policy.hopper_variant=variant;
     if(algo==megafmm::Algorithm::Megakernel)policy.mega_variant=variant;
     auto plan=megafmm::create_plan(p,policy);Buffer workspace(plan->workspace_bytes());
-    if(is_batched)require(plan->algorithm_name()=="winograd_lt_batched","batched rebind test selected Dense");
+    if(is_batched)require(plan->algorithm_name()==(algo==megafmm::Algorithm::WinogradLt ?
+                         "winograd_lt_batched":"winograd_sm80_batched"),"batched rebind test selected Dense");
     check(cudaMemcpy(da.data,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice));
     check(cudaMemcpy(db.data,b.data(),b.size()*sizeof(T),cudaMemcpyHostToDevice));
     megafmm::tune(*plan,da.data,db.data,nullptr,dd.as<float>(),workspace.data);
@@ -282,14 +312,18 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
               << " aligned_then_element_aligned_then_aligned=1\n";
   }
 }
-void batched_policy_rejection_suite() {
-  for(int variant:{-1,2}) {
-    megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::WinogradLt;
-    policy.certified_range=true;policy.lt_variant=variant;
+void batched_policy_rejection_suite(bool lt_only=false) {
+  for(auto algorithm:{megafmm::Algorithm::Auto,megafmm::Algorithm::Dense,megafmm::Algorithm::WinogradLt,
+                      megafmm::Algorithm::WinogradHopper,megafmm::Algorithm::Megakernel})
+  for(bool empty:{false,true}) for(bool hopper:{false,true}) for(int variant:{-1,hopper ? 7:2}) {
+    if(lt_only && hopper)continue;
+    megafmm::Policy policy;policy.algorithm=algorithm;policy.certified_range=true;
+    if(hopper)policy.hopper_variant=variant;
+    else policy.lt_variant=variant;
     bool rejected=false;
-    try { auto plan=megafmm::create_plan(problem(128,128,128,megafmm::DType::BF16),policy); }
+    try { auto plan=megafmm::create_plan(problem(empty ? 0:128,128,128,megafmm::DType::BF16),policy); }
     catch(const std::exception&) { rejected=true; }
-    require(rejected,"invalid Lt variant accepted");
+    require(rejected,hopper ? "invalid Hopper variant accepted":"invalid Lt variant accepted");
   }
 }
 void degenerate_suite() {
@@ -375,7 +409,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype) {
   bool pass=true;double floor=dtype==megafmm::DType::BF16 ? 1e-3:1e-4;
   struct Candidate { megafmm::Algorithm algorithm;int variant; };
   std::vector<Candidate> candidates={{megafmm::Algorithm::WinogradLt,0},{megafmm::Algorithm::WinogradLt,1}};
-  for(int variant=0;variant<=4;++variant)candidates.push_back({megafmm::Algorithm::WinogradHopper,variant});
+  for(int variant=0;variant<=6;++variant)candidates.push_back({megafmm::Algorithm::WinogradHopper,variant});
   for(int variant=0;variant<=3;++variant)candidates.push_back({megafmm::Algorithm::Megakernel,variant});
   for(auto pat:{Pattern::Uniform,Pattern::Positive,Pattern::Range,Pattern::Cancellation,Pattern::HighHalf}) {
     std::vector<std::vector<double>> ef(candidates.size());
@@ -429,7 +463,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype) {
 int main(int argc,char** argv) {
   try {
     std::cout << std::unitbuf;std::cerr << std::unitbuf;
-    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-batched | --smoke-candidates [--mega-only | --hopper-variant 0..4]]";
+    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-batched | --smoke-candidates [--mega-only | --hopper-variant 0..6]]";
     bool numeric=false, candidates_only=false,mega_only=false,batched_only=false;
     int hopper_filter=-1;
     for(int i=1;i<argc;++i) {
@@ -441,7 +475,7 @@ int main(int argc,char** argv) {
         require(i+1<argc,usage);
         std::string value=argv[++i];size_t consumed=0;
         hopper_filter=std::stoi(value,&consumed);
-        require(consumed==value.size() && hopper_filter>=0 && hopper_filter<=4,usage);
+        require(consumed==value.size() && hopper_filter>=0 && hopper_filter<=6,usage);
       } else throw std::runtime_error(usage);
     }
     require((!mega_only && hopper_filter<0) || candidates_only,
@@ -449,11 +483,11 @@ int main(int argc,char** argv) {
     require(!mega_only || hopper_filter<0,"--mega-only and --hopper-variant cannot be combined; "+usage);
     require(!batched_only || !candidates_only,"--smoke-batched and --smoke-candidates cannot be combined; "+usage);
     if(batched_only) {
-      batched_suite<__nv_bfloat16>(megafmm::DType::BF16);
-      batched_suite<__half>(megafmm::DType::FP16);
+      batched_suite<__nv_bfloat16>(megafmm::DType::BF16,true);
+      batched_suite<__half>(megafmm::DType::FP16,true);
       rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,true);
       rebind_suite<__half>(megafmm::DType::FP16,true);
-      batched_policy_rejection_suite();
+      batched_policy_rejection_suite(true);
       std::cout << "PASS batched Lt slot mappings, rectangles, strides, alpha/beta alias, Dense fallback, rebind and policy rejection\n";
       return 0;
     }
@@ -468,12 +502,14 @@ int main(int argc,char** argv) {
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,1},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,2},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,3},
-                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,4}}) {
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,4},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,5},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,6}}) {
           if(mega_only && candidate.first!=megafmm::Algorithm::Megakernel)continue;
           if(hopper_filter>=0 && (candidate.first!=megafmm::Algorithm::WinogradHopper ||
                                   candidate.second!=hopper_filter))continue;
           for(int scenario=0;scenario<3;++scenario) {
-            if(scenario==2 && candidate.first!=megafmm::Algorithm::Megakernel)continue;
+            if(scenario==2 && candidate.first!=megafmm::Algorithm::Megakernel && candidate.second<5)continue;
             auto p=scenario==2 ? problem(128,64,256,dtype):problem(256,256,256,dtype);
             bool alias=scenario==1;
             if(alias) {p.alpha=.5f;p.beta=-.25f;}
@@ -483,7 +519,8 @@ int main(int argc,char** argv) {
                       << " alpha=" << p.alpha << " beta=" << p.beta << " alias=" << alias << std::endl;
             megafmm::Policy policy;
             policy.algorithm=candidate.first;policy.certified_range=true;
-            policy.mega_variant=policy.hopper_variant=candidate.second;
+            if(candidate.first==megafmm::Algorithm::Megakernel)policy.mega_variant=candidate.second;
+            if(candidate.first==megafmm::Algorithm::WinogradHopper)policy.hopper_variant=candidate.second;
             auto planned=megafmm::create_plan(p,policy);
             require(planned->algorithm_name().find("dense")==std::string::npos,
                     "supported candidate unexpectedly fell back to Dense");

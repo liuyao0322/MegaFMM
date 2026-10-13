@@ -9,7 +9,8 @@ if(NOT EXISTS "${CUTLASS_ROOT}/include/cutlass/cutlass.h")
   message(FATAL_ERROR "CUTLASS missing: run scripts/setup_dependencies.sh on the login node")
 endif()
 add_library(megafmm STATIC solution/plan.cpp solution/pack_winograd.cu
-  solution/combine_fp32.cu solution/gemm_hopper.cu solution/megakernel_hopper.cu)
+  solution/combine_fp32.cu solution/gemm_hopper.cu solution/gemm_batched.cu
+  solution/megakernel_hopper.cu)
 target_include_directories(megafmm PUBLIC include PRIVATE solution "${CUTLASS_ROOT}/include" "${CUTLASS_ROOT}/tools/util/include")
 target_link_libraries(megafmm PUBLIC CUDA::cudart CUDA::cublasLt CUDA::cublas CUDA::cuda_driver)
 target_compile_options(megafmm PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_90a,code=sm_90a;--expt-relaxed-constexpr;--expt-extended-lambda;-lineinfo;-Xptxas=-v>)

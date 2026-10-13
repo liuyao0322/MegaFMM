@@ -25,7 +25,8 @@ struct Policy {
   // Lt: 0=seven separate products using views, 1=uniform slots and one batch.
   int lt_variant=0;
   // Hopper: 0=128x128, 1=128x256, 2=64x128 warp-specialized,
-  // 3=source-free 128x256, 4=source-free with B multicast.
+  // 3=source-free 128x256, 4=source-free with B multicast,
+  // 5/6=uniform seven-batch SM80 leaves with CTA64x64/CTA32x64.
   int hopper_variant=0;
   // Mega: 0/1=seven live P tiles, 2=three live P/U tiles,
   // 3=full-tile beta-zero two-stage pipeline (otherwise variant 2).
