@@ -288,15 +288,24 @@ def route_style_key(series: tuple) -> tuple:
 
 
 def select_envelope(records: list[Record]) -> dict[tuple, Record]:
-    # This intentionally describes selection after measurement. It is not a
-    # fixed dispatcher or evidence of independent out-of-sample performance.
+    # Select the smallest observed candidate duration after measurement. Dense
+    # fluctuations must not promote a slower candidate through a larger ratio.
+    # This is not a fixed dispatcher or independent out-of-sample performance.
     result = {}
     for r in records:
         if r.backend != "sw" or not r.checked:
             continue
+        duration = r.number("solution_event_ms")
+        if not math.isfinite(duration) or duration <= 0:
+            raise ValueError("envelope requires a finite positive solution_event_ms")
         key = r.panel, r.shape
         previous = result.get(key)
-        if previous is None or (r.speedup, str(r.source), -r.line) > (previous.speedup, str(previous.source), -previous.line):
+        # Immutable source/row identity breaks exact ties independently of input
+        # order; route and variant make synthetic duplicate identities stable.
+        candidate_key = (duration, str(r.source), r.line, r.actual, r.integer("variant"))
+        previous_key = (previous.number("solution_event_ms"), str(previous.source), previous.line,
+                        previous.actual, previous.integer("variant")) if previous else None
+        if previous is None or candidate_key < previous_key:
             result[key] = r
     return result
 
@@ -426,7 +435,7 @@ def export_figures(records: list[Record], candidates: list[Record], baseline: Ba
                         if selected:
                             ax.plot([positions[r.shape] for r in selected],[r.speedup for r in selected],
                                     color="black",linestyle="-.",linewidth=1.7,
-                                    marker="*",markersize=7,label="Empirical envelope: selected on measurement")
+                                    marker="*",markersize=7,label="Observed minimum SW latency; selected on measurement")
                     dtype,mode,cache,rotations,_ = panel
                     category_text = {"sw":"Actual SW routes; numerical status in tables",
                                      "dense_fallback":"Actual Dense fallback; no SW acceptance",
@@ -522,7 +531,7 @@ def write_report(records: list[Record], candidates: list[Record], baseline: Base
             errors = f"{min(finite_sw):.6g}–{max(finite_sw):.6g}" if finite_sw else "无有限 SW 数据"
             lines += [f"{dtype.upper()}：候选已检查 {len(checked)} 行，实际 SW eF 范围 {errors}；floor={FLOORS[dtype]:g}。", ""]
     lines += ["## 128–1024 主表：测量后选择的经验包络", "",
-              "每个 dtype/mode/cache/地址对数/形状，在明确指定候选中的已检查 SW 行选择最大逐行 Dense/候选比；此包络为 **selected-on-measurement**，可能逐尺寸切换 variant，也会受到 Dense 调优/运行波动影响。它不是预先固定的 dispatcher、独立验证收益或数值认证。主表耗时和比值仅列组均值分布的 median；完整逐行表保留所有原始实际 route、来源、p10/p90、CV 和数值结果，包括失败和 unchecked。", ""]
+              "每个 dtype/mode/cache/地址对数/形状，在明确指定候选中的已检查 SW 行选择最小候选自身耗时，即 **observed-minimum-latency / selected-on-measurement**；精确平局按 source 路径、CSV 行号、actual route、variant 确定。Dense/候选仍使用获选行的 Dense 时间，不以较慢 Dense 的较大比值选择 SW。此包络可能逐尺寸切换 variant，受 GPU 时钟和运行波动影响；它不是预先固定的 dispatcher、独立验证收益或数值认证。主表耗时和比值仅列组均值分布的 median；完整逐行表保留所有原始实际 route、来源、p10/p90、CV 和数值结果，包括失败和 unchecked。", ""]
     envelope = select_envelope(candidates)
     panels = sorted({r.panel for r in sw if r.checked}, key=lambda p:(p[1],p[2],p[3],p[0]))
     for panel in panels:

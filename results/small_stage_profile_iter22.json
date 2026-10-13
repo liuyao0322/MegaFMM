@@ -1,0 +1,5444 @@
+{
+  "schema_version": 1,
+  "iteration": 22,
+  "kind": "CPU-only exact-source/SASS/resource/log audit; static order/counts and scalar arithmetic witnesses are not dynamic GPU timing or numerical certification",
+  "generated_utc": "2026-10-13T08:02:44.797855+00:00",
+  "parent_reported_measured_source_commit": "df323da",
+  "source_commit_independently_verified_with_git": false,
+  "measured_test_source": {
+    "path": ".scratch/test_correctness_iter22.cu",
+    "sha256": "cc7b453e4db69079cfe46829653733a892942988e52b11686d75f786c86b8cc7",
+    "provenance": "Parent extracted git object df323da to this archive. Reviewer independently hashed/read archive, without running git. Formal tests may now contain iteration23 edits and are not used for iteration22 coverage."
+  },
+  "binary_identity_observed_while_parent_kept_iteration22_build": {
+    "bench": {
+      "path": "build/megafmm_bench",
+      "bytes": 8892552,
+      "sha256": "e2eda161a4fad1b3efd80e0d448c4ede1af66c42d2d7ee704fda0630fc06b352"
+    },
+    "test": {
+      "path": "build/test_correctness",
+      "bytes": 9000704,
+      "sha256": "20d360435f9883f0a5766c666ec5aad38e77c4ec756e6c9a8262ce2ab2d38a2f"
+    },
+    "captured_hash_file": {
+      "path": ".scratch/small_binary_iter22.sha256",
+      "bytes": 175,
+      "sha256": "da4ebcb12b01e56c421017955348719d10656711dcff7a7d1d0cbfd7535dd997"
+    },
+    "both_current_hashes_match_captured_file": true
+  },
+  "inputs": [
+    {
+      "path": ".scratch/small_sass_iter22.txt",
+      "bytes": 24383793,
+      "sha256": "df34c952d691fbfd7a68aa236b2b908ae7ff1d4e8848f54716eb79df81f5c30e"
+    },
+    {
+      "path": ".scratch/small_resources_iter22.txt",
+      "bytes": 43529,
+      "sha256": "a13a148ff991a5ccb16369f02c2cbfa7bacffbaccacaf200bce61f55c2f221f1"
+    },
+    {
+      "path": ".scratch/small_binary_iter22.sha256",
+      "bytes": 175,
+      "sha256": "da4ebcb12b01e56c421017955348719d10656711dcff7a7d1d0cbfd7535dd997"
+    },
+    {
+      "path": "solution/small_mma_stage.cu",
+      "bytes": 17278,
+      "sha256": "5253a8efab561f8f3935f0df05a05d06c428ffd8759919d6c7938a952a382da5"
+    },
+    {
+      "path": "solution/small_mma_fast.cu",
+      "bytes": 16540,
+      "sha256": "8fddc0a59e8ed2b1ec7fbc78baa206261a952c492c8b8d94e4511b8ec1e45924"
+    },
+    {
+      "path": ".scratch/test_correctness_iter22.cu",
+      "bytes": 76272,
+      "sha256": "cc7b453e4db69079cfe46829653733a892942988e52b11686d75f786c86b8cc7"
+    },
+    {
+      "path": "tests/test_stage_m2.py",
+      "bytes": 12595,
+      "sha256": "35bc07b5be623ee54e0c6f018066bdbef7d9811f6db60fd9baa7579365659006"
+    },
+    {
+      "path": "trajectory/20261013_154902_iter-22/results.csv",
+      "bytes": 14451,
+      "sha256": "49ffdf8826966a3716bd579c2c0d972f87c1512cb73be871fe98119d7ede81df"
+    },
+    {
+      "path": "results/correctness_iter22.txt",
+      "bytes": 312343,
+      "sha256": "d9bef4de0e225aae93601395fd9ac05fd904762153f922bd884937f97e0522e2"
+    },
+    {
+      "path": "results/correctness_stage18_iter22.txt",
+      "bytes": 11063,
+      "sha256": "acf29565967f0db1b953e2d8b5d75d4fedb4fa0b08c8470c2acf4aa042502441"
+    },
+    {
+      "path": "results/sanitizer_small_stage18_memcheck.txt",
+      "bytes": 11125,
+      "sha256": "1a256a5ce9a4e7d30ed2e696bb7a69342f6a449c6343450627dbda62bf901fec"
+    },
+    {
+      "path": "results/sanitizer_small_stage18_racecheck.txt",
+      "bytes": 11163,
+      "sha256": "be6b6be422f5a2b41c5a7fdbb38a7e321e092b598c88163b6b4334e6bda5dab7"
+    },
+    {
+      "path": "results/sanitizer_small_stage18_synccheck.txt",
+      "bytes": 11125,
+      "sha256": "1a256a5ce9a4e7d30ed2e696bb7a69342f6a449c6343450627dbda62bf901fec"
+    }
+  ],
+  "parser_contract": "Counts every offset-bearing instruction including @!UPT predicate-false UIADD3, terminal self-BRA and NOP padding; excludes encoding-only lines. No unrecognized selected instruction lines. Both runtime beta epilogues count statically; counts880/856 are not dynamic per-launch totals. Earlier879 paired8 count omitted predicate-false UIADD3.",
+  "targets": [
+    {
+      "variant": 8,
+      "dtype": "fp16",
+      "symbol": "_ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass6half_tELb1EEEvNS_7ProblemEPKT_S7_PKfPf",
+      "resource_usage": {
+        "REG": 126,
+        "STACK": 0,
+        "SHARED": 8192,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 7168,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "compiled_extra_shared_origin_verified": false,
+      "static_instruction_count_including_padding_and_predicate_false": 880,
+      "opcode_counts": {
+        "BRA": 5,
+        "CS2R": 56,
+        "EXIT": 2,
+        "F2FP.F16.F32.PACK_AB": 32,
+        "FADD": 169,
+        "FFMA": 32,
+        "FMUL": 60,
+        "FSETP.NEU.AND": 1,
+        "HADD2.F32": 64,
+        "HMMA.16816.F32": 14,
+        "IADD3": 44,
+        "IADD3.X": 27,
+        "IMAD": 32,
+        "IMAD.IADD": 3,
+        "IMAD.SHL.U32": 6,
+        "IMAD.U32": 2,
+        "IMAD.WIDE.U32": 22,
+        "IMAD.X": 5,
+        "ISETP.GE.AND.EX": 1,
+        "ISETP.GT.AND.EX": 1,
+        "ISETP.GT.U32.AND": 1,
+        "ISETP.LE.U32.AND": 1,
+        "LDC": 1,
+        "LDC.64": 3,
+        "LDG.E": 32,
+        "LDG.E.128.CONSTANT": 8,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.4": 7,
+        "LEA": 22,
+        "LEA.HI": 2,
+        "LEA.HI.X": 14,
+        "LOP3.LUT": 29,
+        "MOV": 6,
+        "NOP": 13,
+        "S2R": 7,
+        "S2UR": 3,
+        "SHF.L.U32": 2,
+        "SHF.L.U64.HI": 3,
+        "SHF.R.S32.HI": 1,
+        "SHF.R.S64": 1,
+        "SHF.R.U32.HI": 12,
+        "SHF.R.U64": 1,
+        "STG.E": 64,
+        "STS.128": 14,
+        "UIADD3": 3,
+        "UIADD3.X": 5,
+        "UIMAD.WIDE.U32": 2,
+        "ULDC.64": 14,
+        "ULEA.HI": 3,
+        "ULOP3.LUT": 1,
+        "UMOV": 3,
+        "UPRMT": 1,
+        "USHF.L.U32": 3,
+        "USHF.L.U64.HI": 3,
+        "USHF.R.S32.HI": 2,
+        "USHF.R.S64": 2,
+        "VIADD": 6
+      },
+      "spill_load_store_opcodes_observed": false,
+      "HMMA_instructions": [
+        {
+          "offset": "0x18b0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R4, R60, R64, R4"
+        },
+        {
+          "offset": "0x18d0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R8, R60, R66, R8"
+        },
+        {
+          "offset": "0x18f0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R12, R68, R72, R12"
+        },
+        {
+          "offset": "0x1910",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R16, R68, R74, R16"
+        },
+        {
+          "offset": "0x1950",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R20, R60, R64, R20"
+        },
+        {
+          "offset": "0x1960",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R24, R60, R66, R24"
+        },
+        {
+          "offset": "0x1970",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R28, R68, R72, R28"
+        },
+        {
+          "offset": "0x19a0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R32, R68, R74, R32"
+        },
+        {
+          "offset": "0x19b0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R36, R76, R80, R36"
+        },
+        {
+          "offset": "0x19c0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R40, R76, R82, R40"
+        },
+        {
+          "offset": "0x19d0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R44, R84, R88, R44"
+        },
+        {
+          "offset": "0x19e0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R48, R84, R90, R48"
+        },
+        {
+          "offset": "0x19f0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R52, R92, R96, R52"
+        },
+        {
+          "offset": "0x1a00",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R56, R92, R98, R56"
+        }
+      ],
+      "LDSM_instructions": [
+        {
+          "offset": "0x1820",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R60, [R0]"
+        },
+        {
+          "offset": "0x1830",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R64, [R0+0xe00]"
+        },
+        {
+          "offset": "0x1840",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R68, [R0+0x200]"
+        },
+        {
+          "offset": "0x1850",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R72, [R0+0x1000]"
+        },
+        {
+          "offset": "0x1860",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R76, [R0+0x800]"
+        },
+        {
+          "offset": "0x1870",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R80, [R0+0x1600]"
+        },
+        {
+          "offset": "0x1880",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R84, [R0+0xa00]"
+        },
+        {
+          "offset": "0x1890",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R88, [R0+0x1800]"
+        },
+        {
+          "offset": "0x18a0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R92, [R0+0xc00]"
+        },
+        {
+          "offset": "0x18c0",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R96, [R0+0x1a00]"
+        },
+        {
+          "offset": "0x18e0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R60, [R0+0x400]"
+        },
+        {
+          "offset": "0x1900",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R64, [R0+0x1200]"
+        },
+        {
+          "offset": "0x1920",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R68, [R0+0x600]"
+        },
+        {
+          "offset": "0x1930",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R72, [R0+0x1400]"
+        }
+      ],
+      "global_input_cache_policy": "8 LDG.E.128.CONSTANT sites in stage loop; no raw lookahead/cp.async pipeline",
+      "epilogue_static_scope": "32 LDG.E C0 sites and64 scalar STG.E sites across two alternative runtime beta branches; each selected branch stores32 scalars per lane. beta0 skips the C0 branch."
+    },
+    {
+      "variant": 8,
+      "dtype": "bf16",
+      "symbol": "_ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass10bfloat16_tELb1EEEvNS_7ProblemEPKT_S7_PKfPf",
+      "resource_usage": {
+        "REG": 126,
+        "STACK": 0,
+        "SHARED": 8192,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 7168,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "compiled_extra_shared_origin_verified": false,
+      "static_instruction_count_including_padding_and_predicate_false": 880,
+      "opcode_counts": {
+        "BRA": 5,
+        "CS2R": 56,
+        "EXIT": 2,
+        "F2FP.BF16.F32.PACK_AB": 32,
+        "FADD": 169,
+        "FFMA": 32,
+        "FMUL": 60,
+        "FSETP.NEU.AND": 1,
+        "HMMA.16816.F32.BF16": 14,
+        "IADD3": 44,
+        "IADD3.X": 27,
+        "IMAD": 32,
+        "IMAD.IADD": 3,
+        "IMAD.MOV.U32": 3,
+        "IMAD.SHL.U32": 6,
+        "IMAD.U32": 25,
+        "IMAD.WIDE.U32": 22,
+        "IMAD.X": 5,
+        "ISETP.GE.AND.EX": 1,
+        "ISETP.GT.AND.EX": 1,
+        "ISETP.GT.U32.AND": 1,
+        "ISETP.LE.U32.AND": 1,
+        "LDC": 1,
+        "LDC.64": 3,
+        "LDG.E": 32,
+        "LDG.E.128.CONSTANT": 8,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.4": 7,
+        "LEA": 22,
+        "LEA.HI": 2,
+        "LEA.HI.X": 14,
+        "LOP3.LUT": 61,
+        "MOV": 2,
+        "NOP": 13,
+        "S2R": 7,
+        "S2UR": 3,
+        "SHF.L.U32": 12,
+        "SHF.L.U64.HI": 3,
+        "SHF.R.S32.HI": 1,
+        "SHF.R.S64": 1,
+        "SHF.R.U32.HI": 12,
+        "SHF.R.U64": 1,
+        "STG.E": 64,
+        "STS.128": 14,
+        "UIADD3": 3,
+        "UIADD3.X": 5,
+        "UIMAD.WIDE.U32": 2,
+        "ULDC.64": 14,
+        "ULEA.HI": 3,
+        "ULOP3.LUT": 1,
+        "UMOV": 3,
+        "UPRMT": 1,
+        "USHF.L.U32": 3,
+        "USHF.L.U64.HI": 3,
+        "USHF.R.S32.HI": 2,
+        "USHF.R.S64": 2,
+        "VIADD": 6
+      },
+      "spill_load_store_opcodes_observed": false,
+      "HMMA_instructions": [
+        {
+          "offset": "0x18b0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R4, R60, R64, R4"
+        },
+        {
+          "offset": "0x18d0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R8, R60, R66, R8"
+        },
+        {
+          "offset": "0x18f0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R12, R68, R72, R12"
+        },
+        {
+          "offset": "0x1910",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R16, R68, R74, R16"
+        },
+        {
+          "offset": "0x1950",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R20, R60, R64, R20"
+        },
+        {
+          "offset": "0x1960",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R24, R60, R66, R24"
+        },
+        {
+          "offset": "0x1970",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R28, R68, R72, R28"
+        },
+        {
+          "offset": "0x1990",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R32, R68, R74, R32"
+        },
+        {
+          "offset": "0x19b0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R36, R76, R80, R36"
+        },
+        {
+          "offset": "0x19c0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R40, R76, R82, R40"
+        },
+        {
+          "offset": "0x19d0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R44, R84, R88, R44"
+        },
+        {
+          "offset": "0x19e0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R48, R84, R90, R48"
+        },
+        {
+          "offset": "0x19f0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R52, R92, R96, R52"
+        },
+        {
+          "offset": "0x1a00",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R56, R92, R98, R56"
+        }
+      ],
+      "LDSM_instructions": [
+        {
+          "offset": "0x1820",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R60, [R0]"
+        },
+        {
+          "offset": "0x1830",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R64, [R0+0xe00]"
+        },
+        {
+          "offset": "0x1840",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R68, [R0+0x200]"
+        },
+        {
+          "offset": "0x1850",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R72, [R0+0x1000]"
+        },
+        {
+          "offset": "0x1860",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R76, [R0+0x800]"
+        },
+        {
+          "offset": "0x1870",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R80, [R0+0x1600]"
+        },
+        {
+          "offset": "0x1880",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R84, [R0+0xa00]"
+        },
+        {
+          "offset": "0x1890",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R88, [R0+0x1800]"
+        },
+        {
+          "offset": "0x18a0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R92, [R0+0xc00]"
+        },
+        {
+          "offset": "0x18c0",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R96, [R0+0x1a00]"
+        },
+        {
+          "offset": "0x18e0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R60, [R0+0x400]"
+        },
+        {
+          "offset": "0x1900",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R64, [R0+0x1200]"
+        },
+        {
+          "offset": "0x1920",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R68, [R0+0x600]"
+        },
+        {
+          "offset": "0x1930",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R72, [R0+0x1400]"
+        }
+      ],
+      "global_input_cache_policy": "8 LDG.E.128.CONSTANT sites in stage loop; no raw lookahead/cp.async pipeline",
+      "epilogue_static_scope": "32 LDG.E C0 sites and64 scalar STG.E sites across two alternative runtime beta branches; each selected branch stores32 scalars per lane. beta0 skips the C0 branch."
+    },
+    {
+      "variant": 18,
+      "dtype": "fp16",
+      "symbol": "_ZN7megafmm51_GLOBAL__N__c452aaf9_18_small_mma_stage_cu_e9f3c62318small_stage_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf",
+      "resource_usage": {
+        "REG": 95,
+        "STACK": 0,
+        "SHARED": 8192,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 7168,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "compiled_extra_shared_origin_verified": false,
+      "static_instruction_count_including_padding_and_predicate_false": 856,
+      "opcode_counts": {
+        "BRA": 5,
+        "CS2R": 28,
+        "EXIT": 2,
+        "F2FP.F16.F32.PACK_AB": 32,
+        "FADD": 176,
+        "FFMA": 32,
+        "FMUL": 60,
+        "FSETP.NEU.AND": 1,
+        "HADD2.F32": 64,
+        "HMMA.16816.F32": 14,
+        "IADD3": 42,
+        "IADD3.X": 24,
+        "IMAD": 33,
+        "IMAD.IADD": 3,
+        "IMAD.MOV.U32": 10,
+        "IMAD.SHL.U32": 6,
+        "IMAD.WIDE.U32": 25,
+        "IMAD.X": 5,
+        "ISETP.GE.AND.EX": 1,
+        "ISETP.GT.AND.EX": 1,
+        "ISETP.GT.U32.AND": 1,
+        "ISETP.LE.U32.AND": 1,
+        "LDC": 1,
+        "LDC.64": 1,
+        "LDG.E": 32,
+        "LDG.E.128.CONSTANT": 8,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.4": 7,
+        "LEA": 22,
+        "LEA.HI": 1,
+        "LEA.HI.X": 14,
+        "LOP3.LUT": 24,
+        "MOV": 9,
+        "NOP": 13,
+        "S2R": 4,
+        "S2UR": 1,
+        "SHF.L.U32": 1,
+        "SHF.L.U64.HI": 3,
+        "SHF.R.S32.HI": 1,
+        "SHF.R.S64": 1,
+        "SHF.R.U32.HI": 10,
+        "STG.E": 64,
+        "STS.128": 14,
+        "UIADD3": 3,
+        "UIADD3.X": 6,
+        "ULDC.64": 16,
+        "ULEA.HI": 4,
+        "ULOP3.LUT": 1,
+        "UMOV": 3,
+        "UPRMT": 1,
+        "USHF.L.U32": 3,
+        "USHF.L.U64.HI": 3,
+        "USHF.R.S32.HI": 2,
+        "USHF.R.S64": 2,
+        "USHF.R.U32.HI": 1,
+        "USHF.R.U64": 1,
+        "VIADD": 6
+      },
+      "spill_load_store_opcodes_observed": false,
+      "HMMA_instructions": [
+        {
+          "offset": "0x1760",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R4, R8, R12, RZ"
+        },
+        {
+          "offset": "0x1770",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R8, R8, R14, RZ"
+        },
+        {
+          "offset": "0x1780",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R12, R16, R20, RZ"
+        },
+        {
+          "offset": "0x19f0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R4, R16, R22, RZ"
+        },
+        {
+          "offset": "0x1a00",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R16, R24, R28, RZ"
+        },
+        {
+          "offset": "0x1a10",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R20, R24, R30, RZ"
+        },
+        {
+          "offset": "0x1a30",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R8, R32, R36, RZ"
+        },
+        {
+          "offset": "0x1a50",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R12, R32, R38, RZ"
+        },
+        {
+          "offset": "0x1be0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R4, R24, R28, RZ"
+        },
+        {
+          "offset": "0x1bf0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R16, R24, R30, RZ"
+        },
+        {
+          "offset": "0x1c10",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R20, R32, R36, RZ"
+        },
+        {
+          "offset": "0x1c40",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R8, R32, R38, RZ"
+        },
+        {
+          "offset": "0x1dd0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R4, R24, R28, RZ"
+        },
+        {
+          "offset": "0x1e10",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R12, R24, R30, RZ"
+        }
+      ],
+      "LDSM_instructions": [
+        {
+          "offset": "0x16f0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R8, [R0]"
+        },
+        {
+          "offset": "0x1700",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R12, [R0+0xe00]"
+        },
+        {
+          "offset": "0x1710",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R16, [R0+0x200]"
+        },
+        {
+          "offset": "0x1720",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R20, [R0+0x1000]"
+        },
+        {
+          "offset": "0x1730",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R24, [R0+0x400]"
+        },
+        {
+          "offset": "0x1740",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R28, [R0+0x1200]"
+        },
+        {
+          "offset": "0x1750",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R32, [R0+0x600]"
+        },
+        {
+          "offset": "0x17f0",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R36, [R0+0x1400]"
+        },
+        {
+          "offset": "0x1a20",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R24, [R0+0x800]"
+        },
+        {
+          "offset": "0x1a40",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R28, [R0+0x1600]"
+        },
+        {
+          "offset": "0x1a60",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R32, [R0+0xa00]"
+        },
+        {
+          "offset": "0x1aa0",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R36, [R0+0x1800]"
+        },
+        {
+          "offset": "0x1c00",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R24, [R0+0xc00]"
+        },
+        {
+          "offset": "0x1c20",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R28, [R0+0x1a00]"
+        }
+      ],
+      "global_input_cache_policy": "8 LDG.E.128.CONSTANT sites in stage loop; no raw lookahead/cp.async pipeline",
+      "epilogue_static_scope": "32 LDG.E C0 sites and64 scalar STG.E sites across two alternative runtime beta branches; each selected branch stores32 scalars per lane. beta0 skips the C0 branch.",
+      "actual_compiled_M2_order": {
+        "stage_loop_backedge": "0x1ff0 @!P2 BRA0x9f0",
+        "all14_HMMA_use_zero_C": true,
+        "product_N8_half_issue_order": [
+          {
+            "offset": "0x1760",
+            "product": 1,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1770",
+            "product": 1,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1780",
+            "product": 2,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x19f0",
+            "product": 2,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1a00",
+            "product": 3,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1a10",
+            "product": 3,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1a30",
+            "product": 4,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1a50",
+            "product": 4,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1be0",
+            "product": 5,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1bf0",
+            "product": 5,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1c10",
+            "product": 6,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1c40",
+            "product": 6,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1dd0",
+            "product": 7,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1e10",
+            "product": 7,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          }
+        ],
+        "transform_FADD_count": 64,
+        "stage_contribution_FADD_count": 112,
+        "post_stage_U_FADD_count": 0,
+        "long_C_incoming_register_count": 32,
+        "all_long_C_initialized_zero_on_valid_path": true,
+        "valid_path_C_zero_initialization": [
+          {
+            "offset": "0x0270",
+            "predicate": null,
+            "opcode": "IMAD.MOV.U32",
+            "operands": "R45, RZ, RZ, RZ"
+          },
+          {
+            "offset": "0x0310",
+            "predicate": null,
+            "opcode": "IMAD.MOV.U32",
+            "operands": "R57, RZ, RZ, RZ"
+          },
+          {
+            "offset": "0x03e0",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R48, SRZ"
+          },
+          {
+            "offset": "0x0410",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R46, SRZ"
+          },
+          {
+            "offset": "0x0420",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R64, SRZ"
+          },
+          {
+            "offset": "0x0440",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R68, SRZ"
+          },
+          {
+            "offset": "0x0460",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R70, SRZ"
+          },
+          {
+            "offset": "0x0480",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R72, SRZ"
+          },
+          {
+            "offset": "0x04d0",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R36, SRZ"
+          },
+          {
+            "offset": "0x04e0",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R66, SRZ"
+          },
+          {
+            "offset": "0x0590",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R74, SRZ"
+          },
+          {
+            "offset": "0x0630",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R78, SRZ"
+          },
+          {
+            "offset": "0x0820",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R76, SRZ"
+          },
+          {
+            "offset": "0x0830",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R80, SRZ"
+          },
+          {
+            "offset": "0x0870",
+            "predicate": null,
+            "opcode": "IMAD.MOV.U32",
+            "operands": "R50, RZ, RZ, RZ"
+          },
+          {
+            "offset": "0x0890",
+            "predicate": null,
+            "opcode": "IMAD.MOV.U32",
+            "operands": "R63, RZ, RZ, RZ"
+          },
+          {
+            "offset": "0x08c0",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R82, SRZ"
+          },
+          {
+            "offset": "0x08d0",
+            "predicate": null,
+            "opcode": "IMAD.MOV.U32",
+            "operands": "R55, RZ, RZ, RZ"
+          },
+          {
+            "offset": "0x08e0",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R38, SRZ"
+          },
+          {
+            "offset": "0x08f0",
+            "predicate": null,
+            "opcode": "IMAD.MOV.U32",
+            "operands": "R84, RZ, RZ, RZ"
+          }
+        ],
+        "symbolic_final_C_states": [
+          {
+            "quadrant": "C11",
+            "final_register": "R55",
+            "incoming_register": "R55",
+            "coordinate": 0,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R47",
+            "incoming_register": "R47",
+            "coordinate": 4,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R48",
+            "incoming_register": "R48",
+            "coordinate": 5,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R49",
+            "incoming_register": "R49",
+            "coordinate": 6,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R50",
+            "incoming_register": "R50",
+            "coordinate": 7,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R63",
+            "incoming_register": "R63",
+            "coordinate": 1,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R64",
+            "incoming_register": "R64",
+            "coordinate": 2,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R46",
+            "incoming_register": "R46",
+            "coordinate": 3,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R36",
+            "incoming_register": "R36",
+            "coordinate": 0,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R37",
+            "incoming_register": "R37",
+            "coordinate": 1,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R70",
+            "incoming_register": "R70",
+            "coordinate": 4,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R71",
+            "incoming_register": "R71",
+            "coordinate": 5,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R68",
+            "incoming_register": "R68",
+            "coordinate": 6,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R65",
+            "incoming_register": "R65",
+            "coordinate": 7,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R69",
+            "incoming_register": "R69",
+            "coordinate": 2,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R72",
+            "incoming_register": "R72",
+            "coordinate": 3,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R38",
+            "incoming_register": "R38",
+            "coordinate": 0,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R76",
+            "incoming_register": "R76",
+            "coordinate": 4,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R78",
+            "incoming_register": "R78",
+            "coordinate": 5,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R74",
+            "incoming_register": "R74",
+            "coordinate": 6,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R66",
+            "incoming_register": "R66",
+            "coordinate": 7,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R83",
+            "incoming_register": "R83",
+            "coordinate": 1,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R82",
+            "incoming_register": "R82",
+            "coordinate": 2,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R80",
+            "incoming_register": "R80",
+            "coordinate": 3,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R39",
+            "incoming_register": "R39",
+            "coordinate": 0,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R77",
+            "incoming_register": "R77",
+            "coordinate": 4,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R73",
+            "incoming_register": "R73",
+            "coordinate": 5,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R75",
+            "incoming_register": "R75",
+            "coordinate": 6,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R67",
+            "incoming_register": "R67",
+            "coordinate": 7,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R84",
+            "incoming_register": "R84",
+            "coordinate": 1,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R79",
+            "incoming_register": "R79",
+            "coordinate": 2,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R81",
+            "incoming_register": "R81",
+            "coordinate": 3,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          }
+        ],
+        "contribution_update_trace": [
+          {
+            "offset": "0x17a0",
+            "destination": "R91",
+            "incoming_C_identity": "R36",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x17b0",
+            "destination": "R90",
+            "incoming_C_identity": "R38",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x17c0",
+            "destination": "R85",
+            "incoming_C_identity": "R39",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x17d0",
+            "destination": "R92",
+            "incoming_C_identity": "R37",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x17e0",
+            "destination": "R55",
+            "incoming_C_identity": "R55",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1800",
+            "destination": "R47",
+            "incoming_C_identity": "R47",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1810",
+            "destination": "R70",
+            "incoming_C_identity": "R70",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1820",
+            "destination": "R76",
+            "incoming_C_identity": "R76",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1830",
+            "destination": "R77",
+            "incoming_C_identity": "R77",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1840",
+            "destination": "R48",
+            "incoming_C_identity": "R48",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1850",
+            "destination": "R71",
+            "incoming_C_identity": "R71",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1860",
+            "destination": "R78",
+            "incoming_C_identity": "R78",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1870",
+            "destination": "R73",
+            "incoming_C_identity": "R73",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1880",
+            "destination": "R49",
+            "incoming_C_identity": "R49",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1890",
+            "destination": "R68",
+            "incoming_C_identity": "R68",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x18a0",
+            "destination": "R74",
+            "incoming_C_identity": "R74",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x18b0",
+            "destination": "R75",
+            "incoming_C_identity": "R75",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x18c0",
+            "destination": "R50",
+            "incoming_C_identity": "R50",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x18d0",
+            "destination": "R65",
+            "incoming_C_identity": "R65",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x18e0",
+            "destination": "R66",
+            "incoming_C_identity": "R66",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x18f0",
+            "destination": "R67",
+            "incoming_C_identity": "R67",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1900",
+            "destination": "R55",
+            "incoming_C_identity": "R55",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1910",
+            "destination": "R63",
+            "incoming_C_identity": "R63",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1920",
+            "destination": "R83",
+            "incoming_C_identity": "R83",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1930",
+            "destination": "R84",
+            "incoming_C_identity": "R84",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1940",
+            "destination": "R64",
+            "incoming_C_identity": "R64",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1950",
+            "destination": "R63",
+            "incoming_C_identity": "R63",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1960",
+            "destination": "R69",
+            "incoming_C_identity": "R69",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1970",
+            "destination": "R82",
+            "incoming_C_identity": "R82",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1980",
+            "destination": "R64",
+            "incoming_C_identity": "R64",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1990",
+            "destination": "R79",
+            "incoming_C_identity": "R79",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x19a0",
+            "destination": "R46",
+            "incoming_C_identity": "R46",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x19b0",
+            "destination": "R72",
+            "incoming_C_identity": "R72",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x19c0",
+            "destination": "R80",
+            "incoming_C_identity": "R80",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x19d0",
+            "destination": "R81",
+            "incoming_C_identity": "R81",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x19e0",
+            "destination": "R46",
+            "incoming_C_identity": "R46",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1a70",
+            "destination": "R47",
+            "incoming_C_identity": "R47",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1a80",
+            "destination": "R48",
+            "incoming_C_identity": "R48",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1a90",
+            "destination": "R49",
+            "incoming_C_identity": "R49",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1ab0",
+            "destination": "R50",
+            "incoming_C_identity": "R50",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1ac0",
+            "destination": "R91",
+            "incoming_C_identity": "R36",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1ad0",
+            "destination": "R92",
+            "incoming_C_identity": "R37",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1ae0",
+            "destination": "R69",
+            "incoming_C_identity": "R69",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1af0",
+            "destination": "R72",
+            "incoming_C_identity": "R72",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1b00",
+            "destination": "R70",
+            "incoming_C_identity": "R70",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1b20",
+            "destination": "R71",
+            "incoming_C_identity": "R71",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1b30",
+            "destination": "R68",
+            "incoming_C_identity": "R68",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1b40",
+            "destination": "R65",
+            "incoming_C_identity": "R65",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1b60",
+            "destination": "R90",
+            "incoming_C_identity": "R38",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1b70",
+            "destination": "R83",
+            "incoming_C_identity": "R83",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1b80",
+            "destination": "R82",
+            "incoming_C_identity": "R82",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1b90",
+            "destination": "R80",
+            "incoming_C_identity": "R80",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1ba0",
+            "destination": "R76",
+            "incoming_C_identity": "R76",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1bb0",
+            "destination": "R78",
+            "incoming_C_identity": "R78",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1bc0",
+            "destination": "R74",
+            "incoming_C_identity": "R74",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1bd0",
+            "destination": "R66",
+            "incoming_C_identity": "R66",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1c50",
+            "destination": "R85",
+            "incoming_C_identity": "R39",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1c60",
+            "destination": "R91",
+            "incoming_C_identity": "R36",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1c70",
+            "destination": "R84",
+            "incoming_C_identity": "R84",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1c80",
+            "destination": "R92",
+            "incoming_C_identity": "R37",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1c90",
+            "destination": "R79",
+            "incoming_C_identity": "R79",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1ca0",
+            "destination": "R69",
+            "incoming_C_identity": "R69",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1cb0",
+            "destination": "R81",
+            "incoming_C_identity": "R81",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1cc0",
+            "destination": "R72",
+            "incoming_C_identity": "R72",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1cd0",
+            "destination": "R77",
+            "incoming_C_identity": "R77",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1ce0",
+            "destination": "R73",
+            "incoming_C_identity": "R73",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1cf0",
+            "destination": "R75",
+            "incoming_C_identity": "R75",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1d00",
+            "destination": "R67",
+            "incoming_C_identity": "R67",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1d10",
+            "destination": "R70",
+            "incoming_C_identity": "R70",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1d20",
+            "destination": "R71",
+            "incoming_C_identity": "R71",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1d30",
+            "destination": "R68",
+            "incoming_C_identity": "R68",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1d40",
+            "destination": "R65",
+            "incoming_C_identity": "R65",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1d50",
+            "destination": "R90",
+            "incoming_C_identity": "R38",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1d60",
+            "destination": "R85",
+            "incoming_C_identity": "R39",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1d70",
+            "destination": "R83",
+            "incoming_C_identity": "R83",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1d80",
+            "destination": "R84",
+            "incoming_C_identity": "R84",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1d90",
+            "destination": "R82",
+            "incoming_C_identity": "R82",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1da0",
+            "destination": "R79",
+            "incoming_C_identity": "R79",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1db0",
+            "destination": "R80",
+            "incoming_C_identity": "R80",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1dc0",
+            "destination": "R81",
+            "incoming_C_identity": "R81",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1de0",
+            "destination": "R76",
+            "incoming_C_identity": "R76",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1df0",
+            "destination": "R77",
+            "incoming_C_identity": "R77",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1e00",
+            "destination": "R78",
+            "incoming_C_identity": "R78",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1e20",
+            "destination": "R73",
+            "incoming_C_identity": "R73",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1e30",
+            "destination": "R74",
+            "incoming_C_identity": "R74",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1e40",
+            "destination": "R75",
+            "incoming_C_identity": "R75",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1e50",
+            "destination": "R66",
+            "incoming_C_identity": "R66",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1e60",
+            "destination": "R67",
+            "incoming_C_identity": "R67",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1e70",
+            "destination": "R36",
+            "incoming_C_identity": "R36",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1e80",
+            "destination": "R37",
+            "incoming_C_identity": "R37",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1e90",
+            "destination": "R69",
+            "incoming_C_identity": "R69",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1ea0",
+            "destination": "R72",
+            "incoming_C_identity": "R72",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1eb0",
+            "destination": "R70",
+            "incoming_C_identity": "R70",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1ec0",
+            "destination": "R71",
+            "incoming_C_identity": "R71",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1ed0",
+            "destination": "R68",
+            "incoming_C_identity": "R68",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1ee0",
+            "destination": "R65",
+            "incoming_C_identity": "R65",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1ef0",
+            "destination": "R38",
+            "incoming_C_identity": "R38",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1f00",
+            "destination": "R39",
+            "incoming_C_identity": "R39",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1f10",
+            "destination": "R83",
+            "incoming_C_identity": "R83",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1f20",
+            "destination": "R84",
+            "incoming_C_identity": "R84",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1f30",
+            "destination": "R82",
+            "incoming_C_identity": "R82",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1f40",
+            "destination": "R79",
+            "incoming_C_identity": "R79",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1f50",
+            "destination": "R80",
+            "incoming_C_identity": "R80",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1f60",
+            "destination": "R81",
+            "incoming_C_identity": "R81",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1f70",
+            "destination": "R76",
+            "incoming_C_identity": "R76",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1f80",
+            "destination": "R77",
+            "incoming_C_identity": "R77",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1f90",
+            "destination": "R78",
+            "incoming_C_identity": "R78",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1fa0",
+            "destination": "R73",
+            "incoming_C_identity": "R73",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1fb0",
+            "destination": "R74",
+            "incoming_C_identity": "R74",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1fc0",
+            "destination": "R75",
+            "incoming_C_identity": "R75",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1fd0",
+            "destination": "R66",
+            "incoming_C_identity": "R66",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1fe0",
+            "destination": "R67",
+            "incoming_C_identity": "R67",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 7
+          }
+        ],
+        "proof_scope": "Static register-dataflow trace of both dtype compiled stage bodies; one signed product and one C state per FADD. Preserves each output coordinate’s14-contribution map and ordering. Source stage reset corresponds to HMMA C=RZ. This is not an executed instruction count, timing measurement, or a model of MMA internal K16 reduction."
+      },
+      "beta_branch": {
+        "compare_offset": "0x2030",
+        "branch_offset": "0x2190",
+        "active_beta_destination": "0x2820",
+        "compare": "FSETP.NEU.AND P0,PT,RZ,UR13,PT",
+        "zero_beta_path_C0_LDG_count": 0,
+        "active_beta_path_C0_LDG_count": 32
+      }
+    },
+    {
+      "variant": 18,
+      "dtype": "bf16",
+      "symbol": "_ZN7megafmm51_GLOBAL__N__c452aaf9_18_small_mma_stage_cu_e9f3c62318small_stage_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf",
+      "resource_usage": {
+        "REG": 95,
+        "STACK": 0,
+        "SHARED": 8192,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 7168,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "compiled_extra_shared_origin_verified": false,
+      "static_instruction_count_including_padding_and_predicate_false": 856,
+      "opcode_counts": {
+        "BRA": 5,
+        "CS2R": 28,
+        "EXIT": 2,
+        "F2FP.BF16.F32.PACK_AB": 32,
+        "FADD": 176,
+        "FFMA": 32,
+        "FMUL": 60,
+        "FSETP.NEU.AND": 1,
+        "HMMA.16816.F32.BF16": 14,
+        "IADD3": 42,
+        "IADD3.X": 24,
+        "IMAD": 33,
+        "IMAD.IADD": 3,
+        "IMAD.MOV.U32": 10,
+        "IMAD.SHL.U32": 6,
+        "IMAD.WIDE.U32": 25,
+        "IMAD.X": 5,
+        "ISETP.GE.AND.EX": 1,
+        "ISETP.GT.AND.EX": 1,
+        "ISETP.GT.U32.AND": 1,
+        "ISETP.LE.U32.AND": 1,
+        "LDC": 1,
+        "LDC.64": 1,
+        "LDG.E": 32,
+        "LDG.E.128.CONSTANT": 8,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.4": 7,
+        "LEA": 22,
+        "LEA.HI": 1,
+        "LEA.HI.X": 14,
+        "LOP3.LUT": 56,
+        "MOV": 9,
+        "NOP": 13,
+        "S2R": 4,
+        "S2UR": 1,
+        "SHF.L.U32": 33,
+        "SHF.L.U64.HI": 3,
+        "SHF.R.S32.HI": 1,
+        "SHF.R.S64": 1,
+        "SHF.R.U32.HI": 10,
+        "STG.E": 64,
+        "STS.128": 14,
+        "UIADD3": 3,
+        "UIADD3.X": 6,
+        "ULDC.64": 16,
+        "ULEA.HI": 4,
+        "ULOP3.LUT": 1,
+        "UMOV": 3,
+        "UPRMT": 1,
+        "USHF.L.U32": 3,
+        "USHF.L.U64.HI": 3,
+        "USHF.R.S32.HI": 2,
+        "USHF.R.S64": 2,
+        "USHF.R.U32.HI": 1,
+        "USHF.R.U64": 1,
+        "VIADD": 6
+      },
+      "spill_load_store_opcodes_observed": false,
+      "HMMA_instructions": [
+        {
+          "offset": "0x1760",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R4, R8, R12, RZ"
+        },
+        {
+          "offset": "0x1770",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R8, R8, R14, RZ"
+        },
+        {
+          "offset": "0x1780",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R12, R16, R20, RZ"
+        },
+        {
+          "offset": "0x19f0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R4, R16, R22, RZ"
+        },
+        {
+          "offset": "0x1a00",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R16, R24, R28, RZ"
+        },
+        {
+          "offset": "0x1a10",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R20, R24, R30, RZ"
+        },
+        {
+          "offset": "0x1a30",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R8, R32, R36, RZ"
+        },
+        {
+          "offset": "0x1a50",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R12, R32, R38, RZ"
+        },
+        {
+          "offset": "0x1be0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R4, R24, R28, RZ"
+        },
+        {
+          "offset": "0x1bf0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R16, R24, R30, RZ"
+        },
+        {
+          "offset": "0x1c10",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R20, R32, R36, RZ"
+        },
+        {
+          "offset": "0x1c40",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R8, R32, R38, RZ"
+        },
+        {
+          "offset": "0x1dd0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R4, R24, R28, RZ"
+        },
+        {
+          "offset": "0x1e10",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R12, R24, R30, RZ"
+        }
+      ],
+      "LDSM_instructions": [
+        {
+          "offset": "0x16f0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R8, [R0]"
+        },
+        {
+          "offset": "0x1700",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R12, [R0+0xe00]"
+        },
+        {
+          "offset": "0x1710",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R16, [R0+0x200]"
+        },
+        {
+          "offset": "0x1720",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R20, [R0+0x1000]"
+        },
+        {
+          "offset": "0x1730",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R24, [R0+0x400]"
+        },
+        {
+          "offset": "0x1740",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R28, [R0+0x1200]"
+        },
+        {
+          "offset": "0x1750",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R32, [R0+0x600]"
+        },
+        {
+          "offset": "0x17f0",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R36, [R0+0x1400]"
+        },
+        {
+          "offset": "0x1a20",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R24, [R0+0x800]"
+        },
+        {
+          "offset": "0x1a40",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R28, [R0+0x1600]"
+        },
+        {
+          "offset": "0x1a60",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R32, [R0+0xa00]"
+        },
+        {
+          "offset": "0x1aa0",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R36, [R0+0x1800]"
+        },
+        {
+          "offset": "0x1c00",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R24, [R0+0xc00]"
+        },
+        {
+          "offset": "0x1c20",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R28, [R0+0x1a00]"
+        }
+      ],
+      "global_input_cache_policy": "8 LDG.E.128.CONSTANT sites in stage loop; no raw lookahead/cp.async pipeline",
+      "epilogue_static_scope": "32 LDG.E C0 sites and64 scalar STG.E sites across two alternative runtime beta branches; each selected branch stores32 scalars per lane. beta0 skips the C0 branch.",
+      "actual_compiled_M2_order": {
+        "stage_loop_backedge": "0x1ff0 @!P2 BRA0x9f0",
+        "all14_HMMA_use_zero_C": true,
+        "product_N8_half_issue_order": [
+          {
+            "offset": "0x1760",
+            "product": 1,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1770",
+            "product": 1,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1780",
+            "product": 2,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x19f0",
+            "product": 2,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1a00",
+            "product": 3,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1a10",
+            "product": 3,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1a30",
+            "product": 4,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1a50",
+            "product": 4,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1be0",
+            "product": 5,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1bf0",
+            "product": 5,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1c10",
+            "product": 6,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1c40",
+            "product": 6,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1dd0",
+            "product": 7,
+            "N8_half": 0,
+            "accumulator_input": "RZ"
+          },
+          {
+            "offset": "0x1e10",
+            "product": 7,
+            "N8_half": 1,
+            "accumulator_input": "RZ"
+          }
+        ],
+        "transform_FADD_count": 64,
+        "stage_contribution_FADD_count": 112,
+        "post_stage_U_FADD_count": 0,
+        "long_C_incoming_register_count": 32,
+        "all_long_C_initialized_zero_on_valid_path": true,
+        "valid_path_C_zero_initialization": [
+          {
+            "offset": "0x0270",
+            "predicate": null,
+            "opcode": "IMAD.MOV.U32",
+            "operands": "R45, RZ, RZ, RZ"
+          },
+          {
+            "offset": "0x0310",
+            "predicate": null,
+            "opcode": "IMAD.MOV.U32",
+            "operands": "R57, RZ, RZ, RZ"
+          },
+          {
+            "offset": "0x03e0",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R48, SRZ"
+          },
+          {
+            "offset": "0x0410",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R46, SRZ"
+          },
+          {
+            "offset": "0x0420",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R64, SRZ"
+          },
+          {
+            "offset": "0x0440",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R68, SRZ"
+          },
+          {
+            "offset": "0x0460",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R70, SRZ"
+          },
+          {
+            "offset": "0x0480",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R72, SRZ"
+          },
+          {
+            "offset": "0x04d0",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R36, SRZ"
+          },
+          {
+            "offset": "0x04e0",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R66, SRZ"
+          },
+          {
+            "offset": "0x0590",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R74, SRZ"
+          },
+          {
+            "offset": "0x0630",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R78, SRZ"
+          },
+          {
+            "offset": "0x0820",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R76, SRZ"
+          },
+          {
+            "offset": "0x0830",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R80, SRZ"
+          },
+          {
+            "offset": "0x0870",
+            "predicate": null,
+            "opcode": "IMAD.MOV.U32",
+            "operands": "R50, RZ, RZ, RZ"
+          },
+          {
+            "offset": "0x0890",
+            "predicate": null,
+            "opcode": "IMAD.MOV.U32",
+            "operands": "R63, RZ, RZ, RZ"
+          },
+          {
+            "offset": "0x08c0",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R82, SRZ"
+          },
+          {
+            "offset": "0x08d0",
+            "predicate": null,
+            "opcode": "IMAD.MOV.U32",
+            "operands": "R55, RZ, RZ, RZ"
+          },
+          {
+            "offset": "0x08e0",
+            "predicate": null,
+            "opcode": "CS2R",
+            "operands": "R38, SRZ"
+          },
+          {
+            "offset": "0x08f0",
+            "predicate": null,
+            "opcode": "IMAD.MOV.U32",
+            "operands": "R84, RZ, RZ, RZ"
+          }
+        ],
+        "symbolic_final_C_states": [
+          {
+            "quadrant": "C11",
+            "final_register": "R55",
+            "incoming_register": "R55",
+            "coordinate": 0,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R47",
+            "incoming_register": "R47",
+            "coordinate": 4,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R48",
+            "incoming_register": "R48",
+            "coordinate": 5,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R49",
+            "incoming_register": "R49",
+            "coordinate": 6,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R50",
+            "incoming_register": "R50",
+            "coordinate": 7,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R63",
+            "incoming_register": "R63",
+            "coordinate": 1,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R64",
+            "incoming_register": "R64",
+            "coordinate": 2,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C11",
+            "final_register": "R46",
+            "incoming_register": "R46",
+            "coordinate": 3,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R36",
+            "incoming_register": "R36",
+            "coordinate": 0,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R37",
+            "incoming_register": "R37",
+            "coordinate": 1,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R70",
+            "incoming_register": "R70",
+            "coordinate": 4,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R71",
+            "incoming_register": "R71",
+            "coordinate": 5,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R68",
+            "incoming_register": "R68",
+            "coordinate": 6,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R65",
+            "incoming_register": "R65",
+            "coordinate": 7,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R69",
+            "incoming_register": "R69",
+            "coordinate": 2,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C12",
+            "final_register": "R72",
+            "incoming_register": "R72",
+            "coordinate": 3,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R38",
+            "incoming_register": "R38",
+            "coordinate": 0,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R76",
+            "incoming_register": "R76",
+            "coordinate": 4,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R78",
+            "incoming_register": "R78",
+            "coordinate": 5,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R74",
+            "incoming_register": "R74",
+            "coordinate": 6,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R66",
+            "incoming_register": "R66",
+            "coordinate": 7,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R83",
+            "incoming_register": "R83",
+            "coordinate": 1,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R82",
+            "incoming_register": "R82",
+            "coordinate": 2,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C21",
+            "final_register": "R80",
+            "incoming_register": "R80",
+            "coordinate": 3,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                -1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R39",
+            "incoming_register": "R39",
+            "coordinate": 0,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R77",
+            "incoming_register": "R77",
+            "coordinate": 4,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R73",
+            "incoming_register": "R73",
+            "coordinate": 5,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R75",
+            "incoming_register": "R75",
+            "coordinate": 6,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R67",
+            "incoming_register": "R67",
+            "coordinate": 7,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R84",
+            "incoming_register": "R84",
+            "coordinate": 1,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R79",
+            "incoming_register": "R79",
+            "coordinate": 2,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          },
+          {
+            "quadrant": "C22",
+            "final_register": "R81",
+            "incoming_register": "R81",
+            "coordinate": 3,
+            "ordered_signed_products": [
+              [
+                1,
+                1
+              ],
+              [
+                5,
+                1
+              ],
+              [
+                6,
+                1
+              ],
+              [
+                7,
+                1
+              ]
+            ]
+          }
+        ],
+        "contribution_update_trace": [
+          {
+            "offset": "0x17a0",
+            "destination": "R91",
+            "incoming_C_identity": "R36",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x17b0",
+            "destination": "R90",
+            "incoming_C_identity": "R38",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x17c0",
+            "destination": "R85",
+            "incoming_C_identity": "R39",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x17d0",
+            "destination": "R92",
+            "incoming_C_identity": "R37",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x17e0",
+            "destination": "R55",
+            "incoming_C_identity": "R55",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1800",
+            "destination": "R47",
+            "incoming_C_identity": "R47",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1810",
+            "destination": "R70",
+            "incoming_C_identity": "R70",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1820",
+            "destination": "R76",
+            "incoming_C_identity": "R76",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1830",
+            "destination": "R77",
+            "incoming_C_identity": "R77",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1840",
+            "destination": "R48",
+            "incoming_C_identity": "R48",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1850",
+            "destination": "R71",
+            "incoming_C_identity": "R71",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1860",
+            "destination": "R78",
+            "incoming_C_identity": "R78",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1870",
+            "destination": "R73",
+            "incoming_C_identity": "R73",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1880",
+            "destination": "R49",
+            "incoming_C_identity": "R49",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1890",
+            "destination": "R68",
+            "incoming_C_identity": "R68",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x18a0",
+            "destination": "R74",
+            "incoming_C_identity": "R74",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x18b0",
+            "destination": "R75",
+            "incoming_C_identity": "R75",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x18c0",
+            "destination": "R50",
+            "incoming_C_identity": "R50",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x18d0",
+            "destination": "R65",
+            "incoming_C_identity": "R65",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x18e0",
+            "destination": "R66",
+            "incoming_C_identity": "R66",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x18f0",
+            "destination": "R67",
+            "incoming_C_identity": "R67",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1900",
+            "destination": "R55",
+            "incoming_C_identity": "R55",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1910",
+            "destination": "R63",
+            "incoming_C_identity": "R63",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1920",
+            "destination": "R83",
+            "incoming_C_identity": "R83",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1930",
+            "destination": "R84",
+            "incoming_C_identity": "R84",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1940",
+            "destination": "R64",
+            "incoming_C_identity": "R64",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1950",
+            "destination": "R63",
+            "incoming_C_identity": "R63",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1960",
+            "destination": "R69",
+            "incoming_C_identity": "R69",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1970",
+            "destination": "R82",
+            "incoming_C_identity": "R82",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1980",
+            "destination": "R64",
+            "incoming_C_identity": "R64",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1990",
+            "destination": "R79",
+            "incoming_C_identity": "R79",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x19a0",
+            "destination": "R46",
+            "incoming_C_identity": "R46",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x19b0",
+            "destination": "R72",
+            "incoming_C_identity": "R72",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x19c0",
+            "destination": "R80",
+            "incoming_C_identity": "R80",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x19d0",
+            "destination": "R81",
+            "incoming_C_identity": "R81",
+            "product": 1,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x19e0",
+            "destination": "R46",
+            "incoming_C_identity": "R46",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1a70",
+            "destination": "R47",
+            "incoming_C_identity": "R47",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1a80",
+            "destination": "R48",
+            "incoming_C_identity": "R48",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1a90",
+            "destination": "R49",
+            "incoming_C_identity": "R49",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1ab0",
+            "destination": "R50",
+            "incoming_C_identity": "R50",
+            "product": 2,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1ac0",
+            "destination": "R91",
+            "incoming_C_identity": "R36",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1ad0",
+            "destination": "R92",
+            "incoming_C_identity": "R37",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1ae0",
+            "destination": "R69",
+            "incoming_C_identity": "R69",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1af0",
+            "destination": "R72",
+            "incoming_C_identity": "R72",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1b00",
+            "destination": "R70",
+            "incoming_C_identity": "R70",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1b20",
+            "destination": "R71",
+            "incoming_C_identity": "R71",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1b30",
+            "destination": "R68",
+            "incoming_C_identity": "R68",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1b40",
+            "destination": "R65",
+            "incoming_C_identity": "R65",
+            "product": 3,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1b60",
+            "destination": "R90",
+            "incoming_C_identity": "R38",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1b70",
+            "destination": "R83",
+            "incoming_C_identity": "R83",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1b80",
+            "destination": "R82",
+            "incoming_C_identity": "R82",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1b90",
+            "destination": "R80",
+            "incoming_C_identity": "R80",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1ba0",
+            "destination": "R76",
+            "incoming_C_identity": "R76",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1bb0",
+            "destination": "R78",
+            "incoming_C_identity": "R78",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1bc0",
+            "destination": "R74",
+            "incoming_C_identity": "R74",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1bd0",
+            "destination": "R66",
+            "incoming_C_identity": "R66",
+            "product": 4,
+            "sign": -1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1c50",
+            "destination": "R85",
+            "incoming_C_identity": "R39",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1c60",
+            "destination": "R91",
+            "incoming_C_identity": "R36",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1c70",
+            "destination": "R84",
+            "incoming_C_identity": "R84",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1c80",
+            "destination": "R92",
+            "incoming_C_identity": "R37",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1c90",
+            "destination": "R79",
+            "incoming_C_identity": "R79",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1ca0",
+            "destination": "R69",
+            "incoming_C_identity": "R69",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1cb0",
+            "destination": "R81",
+            "incoming_C_identity": "R81",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1cc0",
+            "destination": "R72",
+            "incoming_C_identity": "R72",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1cd0",
+            "destination": "R77",
+            "incoming_C_identity": "R77",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1ce0",
+            "destination": "R73",
+            "incoming_C_identity": "R73",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1cf0",
+            "destination": "R75",
+            "incoming_C_identity": "R75",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1d00",
+            "destination": "R67",
+            "incoming_C_identity": "R67",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1d10",
+            "destination": "R70",
+            "incoming_C_identity": "R70",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1d20",
+            "destination": "R71",
+            "incoming_C_identity": "R71",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1d30",
+            "destination": "R68",
+            "incoming_C_identity": "R68",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1d40",
+            "destination": "R65",
+            "incoming_C_identity": "R65",
+            "product": 5,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1d50",
+            "destination": "R90",
+            "incoming_C_identity": "R38",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1d60",
+            "destination": "R85",
+            "incoming_C_identity": "R39",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1d70",
+            "destination": "R83",
+            "incoming_C_identity": "R83",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1d80",
+            "destination": "R84",
+            "incoming_C_identity": "R84",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1d90",
+            "destination": "R82",
+            "incoming_C_identity": "R82",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1da0",
+            "destination": "R79",
+            "incoming_C_identity": "R79",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1db0",
+            "destination": "R80",
+            "incoming_C_identity": "R80",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1dc0",
+            "destination": "R81",
+            "incoming_C_identity": "R81",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1de0",
+            "destination": "R76",
+            "incoming_C_identity": "R76",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1df0",
+            "destination": "R77",
+            "incoming_C_identity": "R77",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1e00",
+            "destination": "R78",
+            "incoming_C_identity": "R78",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1e20",
+            "destination": "R73",
+            "incoming_C_identity": "R73",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1e30",
+            "destination": "R74",
+            "incoming_C_identity": "R74",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1e40",
+            "destination": "R75",
+            "incoming_C_identity": "R75",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1e50",
+            "destination": "R66",
+            "incoming_C_identity": "R66",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1e60",
+            "destination": "R67",
+            "incoming_C_identity": "R67",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1e70",
+            "destination": "R36",
+            "incoming_C_identity": "R36",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1e80",
+            "destination": "R37",
+            "incoming_C_identity": "R37",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1e90",
+            "destination": "R69",
+            "incoming_C_identity": "R69",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1ea0",
+            "destination": "R72",
+            "incoming_C_identity": "R72",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1eb0",
+            "destination": "R70",
+            "incoming_C_identity": "R70",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1ec0",
+            "destination": "R71",
+            "incoming_C_identity": "R71",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1ed0",
+            "destination": "R68",
+            "incoming_C_identity": "R68",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1ee0",
+            "destination": "R65",
+            "incoming_C_identity": "R65",
+            "product": 6,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1ef0",
+            "destination": "R38",
+            "incoming_C_identity": "R38",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1f00",
+            "destination": "R39",
+            "incoming_C_identity": "R39",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 0
+          },
+          {
+            "offset": "0x1f10",
+            "destination": "R83",
+            "incoming_C_identity": "R83",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1f20",
+            "destination": "R84",
+            "incoming_C_identity": "R84",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 1
+          },
+          {
+            "offset": "0x1f30",
+            "destination": "R82",
+            "incoming_C_identity": "R82",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1f40",
+            "destination": "R79",
+            "incoming_C_identity": "R79",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 2
+          },
+          {
+            "offset": "0x1f50",
+            "destination": "R80",
+            "incoming_C_identity": "R80",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1f60",
+            "destination": "R81",
+            "incoming_C_identity": "R81",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 3
+          },
+          {
+            "offset": "0x1f70",
+            "destination": "R76",
+            "incoming_C_identity": "R76",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1f80",
+            "destination": "R77",
+            "incoming_C_identity": "R77",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 4
+          },
+          {
+            "offset": "0x1f90",
+            "destination": "R78",
+            "incoming_C_identity": "R78",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1fa0",
+            "destination": "R73",
+            "incoming_C_identity": "R73",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 5
+          },
+          {
+            "offset": "0x1fb0",
+            "destination": "R74",
+            "incoming_C_identity": "R74",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1fc0",
+            "destination": "R75",
+            "incoming_C_identity": "R75",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 6
+          },
+          {
+            "offset": "0x1fd0",
+            "destination": "R66",
+            "incoming_C_identity": "R66",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 7
+          },
+          {
+            "offset": "0x1fe0",
+            "destination": "R67",
+            "incoming_C_identity": "R67",
+            "product": 7,
+            "sign": 1,
+            "fragment_coordinate": 7
+          }
+        ],
+        "proof_scope": "Static register-dataflow trace of both dtype compiled stage bodies; one signed product and one C state per FADD. Preserves each output coordinate’s14-contribution map and ordering. Source stage reset corresponds to HMMA C=RZ. This is not an executed instruction count, timing measurement, or a model of MMA internal K16 reduction."
+      },
+      "beta_branch": {
+        "compare_offset": "0x2030",
+        "branch_offset": "0x2190",
+        "active_beta_destination": "0x2820",
+        "compare": "FSETP.NEU.AND P0,PT,RZ,UR13,PT",
+        "zero_beta_path_C0_LDG_count": 0,
+        "active_beta_path_C0_LDG_count": 32
+      }
+    }
+  ],
+  "source_M2_contract": {
+    "same_traits_read_S_T_rounding_copy_and_leaf_prefix_as_paired8": true,
+    "one_warp_CTA_threads": 32,
+    "owner_tile_M_N_K": [
+      16,
+      16,
+      16
+    ],
+    "operand_shared_bytes": 7168,
+    "logical_long_C_FP32_values_per_lane": 32,
+    "logical_scratch_P_FP32_values_per_lane": 8,
+    "logical_accumulator_storage_values_per_lane": 40,
+    "logical_storage_is_not_compiled_register_count": true,
+    "contribution_matrix_rows_C11_C12_C21_C22": [
+      [
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        -1,
+        0,
+        1,
+        1
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
+    ],
+    "per_coordinate_stage_order": {
+      "C11": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "C12": [
+        [
+          1,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          6,
+          1
+        ]
+      ],
+      "C21": [
+        [
+          1,
+          1
+        ],
+        [
+          4,
+          -1
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          1
+        ]
+      ],
+      "C22": [
+        [
+          1,
+          1
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          1
+        ]
+      ]
+    },
+    "scratch_reset": "Each of seven products clears its8-value scratch, computes exactly one native K16 stage, then applies explicit __fadd_rn/__fsub_rn contributions. All14 compiled HMMA use RZ as incoming accumulator, independently confirming fresh stage products.",
+    "stage_count": "parentK/32 for specialized full tiles, with each half-K16 stage updating four persistent C fragments.",
+    "epilogue": "After all stages, alpha __fmul_rn and active-beta fmaf once per logical output; four C0 reads for the coordinate precede output stores. beta0 has no C0 dereference and nullC0 is allowed.",
+    "alias": "C0/D are not restrict-qualified; unique owner coordinates write four disjoint quadrants. Exact alias uses the validated equal-stride contract; partial overlap is rejected by public binding validation.",
+    "shared_reuse": "One transformed buffer, full-warp publication before all seven synchronous LDSM/MMA products and full-warp reuse barrier after stage contributions; no cp.async/WGMMA async proxy path.",
+    "specialized_guard": "Variant18 delegates packed7 validity; actual stage fast path requires all parent dimensions multiples32, lda/ldb multiples8 and aligned16-byte A/B. D and active C0 require float alignment. Pointer-dependent conditions are rechecked on launch.",
+    "fallback_scope": "Unsupported full tiles use generic packed7(M1), and incompatible public bindings may use Dense. Fallback CASE/PASS cannot be attributed to M2.",
+    "run_setup": "Static shared/no runtime allocations or host synchronization in specialized launch; supplied stream respected; prepare only prepares existing packed7 fallback."
+  },
+  "resource_comparison": {
+    "same_frozen_binary_comparator": "paired8 FullTiles M1, both dtype",
+    "registers_paired8": 126,
+    "registers_stage18": 95,
+    "register_reduction": 31,
+    "compiled_shared_both_bytes": 8192,
+    "source_operand_shared_both_bytes": 7168,
+    "compiled_extra_shared_bytes": 1024,
+    "compiled_extra_shared_origin": "Unattributed; do not substitute compiled8192 for source7168.",
+    "stack_and_local_all_zero": true,
+    "spill_opcodes_observed": false,
+    "register_causality_limit": "Source logical32C+8scratch and compiled95 registers describe different quantities. Compiler schedules/reuses operands and scratch registers; the31-register difference is measured allocation, not a proof of exactly one simultaneously live8-value scratch or of higher achieved occupancy.",
+    "arithmetic_static_difference": "M2 has64 transform FADD plus112 stage contribution FADD, with zero post-stage U FADD; paired8 has169 static FADD including alternative epilogues. M2 and paired8 both have14 HMMA,14 LDSM,32 pair converters and14 transformed STS. This does not imply fewer dynamic arithmetic instructions for allK."
+  },
+  "CPU_model_validation": {
+    "command": "python -B tests/test_stage_m2.py",
+    "observed_exit_code": 0,
+    "observed_unittest_methods": 6,
+    "source_sha256": "35bc07b5be623ee54e0c6f018066bdbef7d9811f6db60fd9baa7579365659006",
+    "fixtures": "Ordered bilinear coefficient expansion;512 noncommuting2x2 block-basis pairs; integer multistage/rectangular/short-final-stage examples; RN ties and unrounded S/T dependencies; original-input contribution-order and fresh-stage-dot witnesses separating scalar M1/M2.",
+    "arithmetic_scope": "Sequential RN scalar FP32 multiply-add arithmetic model, explicitly not a bitwise oracle for native SM80 MMA internal K16 reduction. Non-tile CPU model shapes are algebra fixtures; GPU specialized path still requires full tiles.",
+    "gate_scope": "Some scalar fixtures apply the unchanged original-input ordinaryAB/frozen-floor formula. Their scalar Dense reference is not cuBLASLt and does not certify GPU M2.",
+    "GPU_exact_fixture_limit": "Exact integer GPU cases and noncommuting-block weights test reset/sign/product/algebra and stage coverage, but they cannot distinguish all floating schedules that agree in exact arithmetic. The compiled RZ accumulator and112-update register-dataflow audit supplies the actual runtime-order evidence; no GPU rounding-witness bitwise oracle is claimed."
+  },
+  "validation_logs": [
+    {
+      "path": "results/correctness_iter22.txt",
+      "line_count": 2378,
+      "complete_final_newline": true,
+      "CASE_count": 1236,
+      "CASE_by_dtype": {
+        "bf16": 618,
+        "fp16": 618
+      },
+      "explicit_PASS_count": 129,
+      "PASS_marker_counts": {
+        "PASS_MMA_BITWISE": 24,
+        "PASS_CLUSTER_GRAPH": 6,
+        "PASS_CPASYNC_GRAPH": 6,
+        "PASS_STAGE_M2_GRAPH": 6,
+        "PASS_POINTER_REBIND": 48,
+        "PASS_EPILOGUE_OUTPUT_REBIND": 38,
+        "PASS": 1
+      },
+      "Mega18_CASE_count": 64,
+      "Mega18_actual_route_counts": {
+        "megakernel_stage_m2": 34,
+        "megakernel_warp_mma_packed": 12,
+        "dense_cublaslt": 18
+      },
+      "all_CASE_metrics_finite": true,
+      "all_CASE_nonfinite_zero": true,
+      "all_Mega18_CASE_metrics_zero": true,
+      "footer": "Forced SW mixed-precision certification is a separate gate: use --strict-numerics or megafmm_bench",
+      "exit_status": "parent-reported0; independent audit reads logs rather than a captured exit-code file"
+    },
+    {
+      "path": "results/correctness_stage18_iter22.txt",
+      "line_count": 103,
+      "complete_final_newline": true,
+      "CASE_count": 38,
+      "CASE_by_dtype": {
+        "bf16": 19,
+        "fp16": 19
+      },
+      "explicit_PASS_count": 15,
+      "PASS_marker_counts": {
+        "PASS_EPILOGUE_OUTPUT_REBIND": 6,
+        "PASS_STAGE_M2_GRAPH": 6,
+        "PASS_POINTER_REBIND": 2,
+        "PASS": 1
+      },
+      "Mega18_CASE_count": 38,
+      "Mega18_actual_route_counts": {
+        "megakernel_stage_m2": 28,
+        "megakernel_warp_mma_packed": 10
+      },
+      "all_CASE_metrics_finite": true,
+      "all_CASE_nonfinite_zero": true,
+      "all_Mega18_CASE_metrics_zero": true,
+      "footer": "PASS selected candidate kernel paths, beta0, alpha/beta alias and rectangular fallback",
+      "exit_status": "parent-reported0; independent audit reads logs rather than a captured exit-code file"
+    },
+    {
+      "path": "results/sanitizer_small_stage18_memcheck.txt",
+      "line_count": 105,
+      "complete_final_newline": true,
+      "CASE_count": 38,
+      "CASE_by_dtype": {
+        "bf16": 19,
+        "fp16": 19
+      },
+      "explicit_PASS_count": 15,
+      "PASS_marker_counts": {
+        "PASS_EPILOGUE_OUTPUT_REBIND": 6,
+        "PASS_STAGE_M2_GRAPH": 6,
+        "PASS_POINTER_REBIND": 2,
+        "PASS": 1
+      },
+      "Mega18_CASE_count": 38,
+      "Mega18_actual_route_counts": {
+        "megakernel_stage_m2": 28,
+        "megakernel_warp_mma_packed": 10
+      },
+      "all_CASE_metrics_finite": true,
+      "all_CASE_nonfinite_zero": true,
+      "all_Mega18_CASE_metrics_zero": true,
+      "footer": "========= ERROR SUMMARY: 0 errors",
+      "exit_status": "parent-reported0; independent audit reads logs rather than a captured exit-code file"
+    },
+    {
+      "path": "results/sanitizer_small_stage18_racecheck.txt",
+      "line_count": 105,
+      "complete_final_newline": true,
+      "CASE_count": 38,
+      "CASE_by_dtype": {
+        "bf16": 19,
+        "fp16": 19
+      },
+      "explicit_PASS_count": 15,
+      "PASS_marker_counts": {
+        "PASS_EPILOGUE_OUTPUT_REBIND": 6,
+        "PASS_STAGE_M2_GRAPH": 6,
+        "PASS_POINTER_REBIND": 2,
+        "PASS": 1
+      },
+      "Mega18_CASE_count": 38,
+      "Mega18_actual_route_counts": {
+        "megakernel_stage_m2": 28,
+        "megakernel_warp_mma_packed": 10
+      },
+      "all_CASE_metrics_finite": true,
+      "all_CASE_nonfinite_zero": true,
+      "all_Mega18_CASE_metrics_zero": true,
+      "footer": "========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)",
+      "exit_status": "parent-reported0; independent audit reads logs rather than a captured exit-code file"
+    },
+    {
+      "path": "results/sanitizer_small_stage18_synccheck.txt",
+      "line_count": 105,
+      "complete_final_newline": true,
+      "CASE_count": 38,
+      "CASE_by_dtype": {
+        "bf16": 19,
+        "fp16": 19
+      },
+      "explicit_PASS_count": 15,
+      "PASS_marker_counts": {
+        "PASS_EPILOGUE_OUTPUT_REBIND": 6,
+        "PASS_STAGE_M2_GRAPH": 6,
+        "PASS_POINTER_REBIND": 2,
+        "PASS": 1
+      },
+      "Mega18_CASE_count": 38,
+      "Mega18_actual_route_counts": {
+        "megakernel_stage_m2": 28,
+        "megakernel_warp_mma_packed": 10
+      },
+      "all_CASE_metrics_finite": true,
+      "all_CASE_nonfinite_zero": true,
+      "all_Mega18_CASE_metrics_zero": true,
+      "footer": "========= ERROR SUMMARY: 0 errors",
+      "exit_status": "parent-reported0; independent audit reads logs rather than a captured exit-code file"
+    }
+  ],
+  "validation_coverage": {
+    "full_correctness_CASE_count": 1236,
+    "full_correctness_explicit_PASS_count": 129,
+    "expected_actual_warp_route_checks": 674,
+    "route_mismatches": 0,
+    "Mega18_full_CASE_actual_M2": 34,
+    "Mega18_full_CASE_packed_M1_fallback": 12,
+    "Mega18_full_CASE_Dense_fallback": 18,
+    "M2_stage_CASE_count": 12,
+    "noncommuting_block_basis_CASE_count": 6,
+    "stage_test_matrix": "Both dtype ×K32/64/96 ×128x128 random integers or32x32 noncommuting block basis with unequal integer stage weights; all actualM2.",
+    "stage_full_log_lines": [
+      2145,
+      2168
+    ],
+    "stage_reference": "Measured archive lines154–178 independently builds double-precision per-stage bilinear products and expanded14 contributions from original small integer operands; run_case checks this against ordinaryFP64AB and GPU exact output. This reference deliberately does not model nativeMMA dot rounding.",
+    "M2_Graph_PASS_count": 6,
+    "M2_Graph_actual_M2_cases": 4,
+    "M2_Graph_packed_fallback_cases": 2,
+    "M2_Graph_total_replays_reported": 18,
+    "M2_Graph_actual_M2_replays": 12,
+    "M2_Graph_fallback_replays": 6,
+    "M2_Graph_full_log_lines": [
+      2242,
+      2252
+    ],
+    "M2_Graph_contract": "Both dtype,32³/96³ actualM2 plus80x112x48 packedfallback; alpha0.5 beta-0.25 C0=D;3replays restoring freshC0 eachtime. Exact measured source independently compares stage-expandedAB to ordinaryFP64AB and GPU logical outputs, with allld+8 and sentinel-777 padding check after every replay. Padding is source+PASS evidence, not a separately printed log marker.",
+    "M2_input_rebind_PASS_count": 2,
+    "M2_input_rebind_full_log_lines": [
+      2276,
+      2300
+    ],
+    "M2_input_rebind_scope": "Sameplan aligned→element-aligned→aligned; source exercises fast-route restoration and Dense fallback. PASS marker does not print each intermediate actual backend.",
+    "M2_output_rebind_PASS_count": 6,
+    "M2_output_rebind_full_log_lines": [
+      2366,
+      2376
+    ],
+    "M2_output_rebind_scope": "Both dtype ×D-only/C0-only/exactalias modes0/1/2, dynamicalpha0.5beta-0.25, aligned→float-aligned→aligned.",
+    "M1_bitwise_PASS_count": 24,
+    "Mega18_excluded_from_all_M1_bitwise_lists": true,
+    "bitwise_meaning": "M2 changesFP32 order and is intentionally not asserted bitwise equal toM1. M1 regression success is not M2 rounding proof.",
+    "filtered_and_sanitizer_payloads_identical": true,
+    "each_filtered_sanitizer_CASE_count": 38,
+    "each_filtered_sanitizer_actual_M2_CASE_count": 28,
+    "each_filtered_sanitizer_packed_fallback_CASE_count": 10,
+    "each_filtered_sanitizer_PASS_count": 15,
+    "filtered_process_exit_status": "Parent reports0; reviewer checks payload completeness/metrics and sanitizer footers independently.",
+    "sanitizer_footers": "memcheck/synccheck0errors; racecheck0hazards,0errors,0warnings.",
+    "strict_certification": "Full correctness final line explicitly separates strict mixed-precision certification. Structural/integer/model/Graph/sanitizer success does not relax the original-inputFP64 gate."
+  },
+  "quick_performance": {
+    "path": "trajectory/20261013_154902_iter-22/results.csv",
+    "rows": 18,
+    "CSV_columns": 51,
+    "protocol": {
+      "warmup": "20 per parent quick invocation, not a CSV column",
+      "calls_per_group": 20,
+      "groups": 5,
+      "fresh_correctness_trials": 1,
+      "mode": "launch",
+      "cache": "warm_cache",
+      "rotate_inputs": 1
+    },
+    "all_actual_stage18": true,
+    "numerical_failure_rows": 18,
+    "nonfinite_elements_total": 0,
+    "observations": [
+      {
+        "dtype": "bf16",
+        "shape": [
+          128,
+          128,
+          128
+        ],
+        "candidate_median_us": 5.51679991186,
+        "same_row_Dense_median_us": 4.16480004787,
+        "same_row_Dense_over_candidate": 0.754930415171,
+        "solution_eF": 0.00605215872387,
+        "gate_limit": 0.00100028838501,
+        "frozen_floor": 0.001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=21;tile=5;split_k=1;reduction=0;swizzle=0;stages=19;custom=0;inner=0;cluster=0;bound_candidate=1/6;tuned_candidate=1;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.004227;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          128,
+          128,
+          128
+        ],
+        "candidate_median_us": 5.8384001255,
+        "same_row_Dense_median_us": 4.06560003757,
+        "same_row_Dense_over_candidate": 0.696355157266,
+        "solution_eF": 0.00074432512617,
+        "gate_limit": 0.000100546932244,
+        "frozen_floor": 0.0001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=21;tile=11;split_k=1;reduction=0;swizzle=0;stages=19;custom=0;inner=0;cluster=0;bound_candidate=0/12;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.004166;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          256,
+          256,
+          256
+        ],
+        "candidate_median_us": 8.58879983425,
+        "same_row_Dense_median_us": 5.23520000279,
+        "same_row_Dense_over_candidate": 0.609538015068,
+        "solution_eF": 0.00597913635983,
+        "gate_limit": 0.00100055952052,
+        "frozen_floor": 0.001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=21;tile=11;split_k=1;reduction=0;swizzle=0;stages=20;custom=0;inner=0;cluster=0;bound_candidate=0/11;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.005389;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          256,
+          256,
+          256
+        ],
+        "candidate_median_us": 8.75839963555,
+        "same_row_Dense_median_us": 4.841599985959999,
+        "same_row_Dense_over_candidate": 0.552795052455,
+        "solution_eF": 0.000737166073282,
+        "gate_limit": 0.000101013577662,
+        "frozen_floor": 0.0001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=21;tile=11;split_k=1;reduction=0;swizzle=0;stages=19;custom=0;inner=0;cluster=0;bound_candidate=0/13;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.004899;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          512,
+          512,
+          512
+        ],
+        "candidate_median_us": 14.7520005703,
+        "same_row_Dense_median_us": 6.08320012689,
+        "same_row_Dense_over_candidate": 0.412364417822,
+        "solution_eF": 0.00598238600489,
+        "gate_limit": 0.00100117345784,
+        "frozen_floor": 0.001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/13;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.006211;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          512,
+          512,
+          512
+        ],
+        "candidate_median_us": 15.0912001729,
+        "same_row_Dense_median_us": 6.07840009034,
+        "same_row_Dense_over_candidate": 0.402777779149,
+        "solution_eF": 0.000753205301798,
+        "gate_limit": 0.000101925941157,
+        "frozen_floor": 0.0001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/12;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.006237;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          1024,
+          1024,
+          1024
+        ],
+        "candidate_median_us": 45.035201311099996,
+        "same_row_Dense_median_us": 12.9296004772,
+        "same_row_Dense_over_candidate": 0.287099870785,
+        "solution_eF": 0.00600975399168,
+        "gate_limit": 0.00100255569724,
+        "frozen_floor": 0.001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=39;tile=20;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.013101;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          1024,
+          1024,
+          1024
+        ],
+        "candidate_median_us": 45.241600275,
+        "same_row_Dense_median_us": 10.0528001785,
+        "same_row_Dense_over_candidate": 0.222202577217,
+        "solution_eF": 0.000751819544696,
+        "gate_limit": 0.000103745541295,
+        "frozen_floor": 0.0001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010282;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          2048,
+          2048,
+          2048
+        ],
+        "candidate_median_us": 338.556790352,
+        "same_row_Dense_median_us": 32.0767998695,
+        "same_row_Dense_over_candidate": 0.094745699344,
+        "solution_eF": 0.00602393266016,
+        "gate_limit": 0.00100557006784,
+        "frozen_floor": 0.001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=39;tile=23;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.031763;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          2048,
+          2048,
+          2048
+        ],
+        "candidate_median_us": 339.779210091,
+        "same_row_Dense_median_us": 32.6191991568,
+        "same_row_Dense_over_candidate": 0.0960011624845,
+        "solution_eF": 0.000752200124313,
+        "gate_limit": 0.000107367248671,
+        "frozen_floor": 0.0001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=39;tile=20;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=1/14;tuned_candidate=1;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.032090;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          3072,
+          3072,
+          3072
+        ],
+        "candidate_median_us": 1022.97439575,
+        "same_row_Dense_median_us": 86.3312005997,
+        "same_row_Dense_over_candidate": 0.0843923376364,
+        "solution_eF": 0.00601824226576,
+        "gate_limit": 0.00100877688424,
+        "frozen_floor": 0.001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=39;tile=20;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=9;bound_candidate=2/16;tuned_candidate=2;bound_workspace=131;tuned=1;tune=4w/3x10median;tuning_ms=0.086432;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          3072,
+          3072,
+          3072
+        ],
+        "candidate_median_us": 1008.02240372,
+        "same_row_Dense_median_us": 88.6016011238,
+        "same_row_Dense_over_candidate": 0.0878964602345,
+        "solution_eF": 0.000752810852416,
+        "gate_limit": 0.000111001680376,
+        "frozen_floor": 0.0001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=9;bound_candidate=0/15;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/3x10median;tuning_ms=0.089114;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "candidate_median_us": 2346.8000411999997,
+        "same_row_Dense_median_us": 195.439994335,
+        "same_row_Dense_over_candidate": 0.0832793552515,
+        "solution_eF": 0.00602272817962,
+        "gate_limit": 0.00101207001828,
+        "frozen_floor": 0.001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=39;tile=20;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=9;bound_candidate=1/16;tuned_candidate=1;bound_workspace=131;tuned=1;tune=4w/3x10median;tuning_ms=0.194944;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "candidate_median_us": 2356.11362457,
+        "same_row_Dense_median_us": 206.854391098,
+        "same_row_Dense_over_candidate": 0.0877947434031,
+        "solution_eF": 0.000753128701799,
+        "gate_limit": 0.000114626024442,
+        "frozen_floor": 0.0001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/9;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/3x10median;tuning_ms=0.206474;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          1024,
+          512,
+          1024
+        ],
+        "candidate_median_us": 30.4143995047,
+        "same_row_Dense_median_us": 9.46400016546,
+        "same_row_Dense_over_candidate": 0.311168404427,
+        "solution_eF": 0.00599042502237,
+        "gate_limit": 0.00100255228328,
+        "frozen_floor": 0.001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=39;tile=17;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=4;bound_candidate=0/14;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.009587;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          1024,
+          512,
+          1024
+        ],
+        "candidate_median_us": 30.726400017699998,
+        "same_row_Dense_median_us": 9.53439995646,
+        "same_row_Dense_over_candidate": 0.310299935917,
+        "solution_eF": 0.000749332916322,
+        "gate_limit": 0.000103742130999,
+        "frozen_floor": 0.0001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=39;tile=17;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=11;bound_candidate=2/15;tuned_candidate=2;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.009754;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          512,
+          1024,
+          1024
+        ],
+        "candidate_median_us": 30.212798714599998,
+        "same_row_Dense_median_us": 8.252800256010001,
+        "same_row_Dense_over_candidate": 0.273155768652,
+        "solution_eF": 0.00601884816903,
+        "gate_limit": 0.00100255979226,
+        "frozen_floor": 0.001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=2/14;tuned_candidate=2;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.008397;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          512,
+          1024,
+          1024
+        ],
+        "candidate_median_us": 30.713599920300002,
+        "same_row_Dense_median_us": 8.61440002918,
+        "same_row_Dense_over_candidate": 0.280475100657,
+        "solution_eF": 0.000751512964492,
+        "gate_limit": 0.00010374806206,
+        "frozen_floor": 0.0001,
+        "numerical_pass": false,
+        "nonfinite_elements": 0,
+        "dense_lt_config": "dense:id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=25;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.008749;align0=16;align1=16;align2=16;align3=16",
+        "solution_lt_config": "none"
+      }
+    ],
+    "qualification": "Diagnostic20/5/1, not final100/5/3. Same-row Dense ratios are retained; historical comparison is not a controlled source/tuning/state ablation. Lower compiled registers alone have not established performance gain, and no physical latencyfloor is inferred.",
+    "Auto_dispatch": "RemainsDense by parent policy. ForcedM2 experimental timing is not numerical certification."
+  },
+  "closing_assessment": "No new concrete correctness blocker found. Source, actual compiled zero-scratch/order, exact-fixtureGPU coverage, Graph/alias/rebind and sanitizer results support the delivered M2 implementation within full-tile guards. All18 quick rows still fail frozen numerical gates; performance gain/Auto eligibility has not been established."
+}

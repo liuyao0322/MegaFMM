@@ -111,4 +111,13 @@ void prepare_small_stage(const Problem& p, int variant=18);
 void launch_small_stage(const Problem& p, const void* A, const void* B,
                         const float* C0, float* D, cudaStream_t stream,
                         int variant=18);
+// Identity 8x8 logical output owner using native 16x8 MMA and raw prefetch.
+// Plan rechecks current pointers, then falls back through 16/15/14/12/7.
+bool mma8x8_prefetch_can_implement(const Problem& p, int variant=19);
+bool mma8x8_prefetch_full_tiles(const Problem& p, const void* A, const void* B,
+                              const float* C0, const float* D);
+void prepare_mma8x8_prefetch(const Problem& p, int variant=19);
+void launch_mma8x8_prefetch(const Problem& p, const void* A, const void* B,
+                          const float* C0, float* D, cudaStream_t stream,
+                          int variant=19);
 }

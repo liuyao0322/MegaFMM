@@ -43,7 +43,9 @@ struct Policy {
   // 16=identity output with raw register prefetch (otherwise variant 15/14/12/7),
   // 17=raw input cp.async double buffering (otherwise packed variant 7),
   // 18=PLAN M2 per-K16 product contributions into four long C accumulators
-  //    with distinct FP32 stage order (otherwise packed M1 variant 7).
+  //    with distinct FP32 stage order (otherwise packed M1 variant 7),
+  // 19=identity 8x8 output owners with raw register prefetch
+  //    (otherwise variants 16/15/14/12/7 using current pointer guards).
   int mega_variant=0;
 };
 class Plan {

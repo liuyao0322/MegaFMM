@@ -73,6 +73,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 22 | Accumulate per-stage Winograd contributions in four C fragments | 0.3137 | 0.426841 | screen-numerical-fail |
 
+| 23 | Split prefetched warp owners into eight-by-eight outputs | 0.3041 | 1.037819 | screen-numerical-fail |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -899,3 +901,37 @@ Viable directions remain, so continue:22 PLAN6.5M2 fourlongC+onePscratch stageco
 - **Analysis:** Quick20warm/20calls/5groups/1fresh completed18 finite rows, all frozen numerical gates fail exit2. Compiled stage kernel uses95 registers, source shared7168 bytes, zero ptxas stack/spills. Its128 BF5.5168us and FP5.84us are slower than prior prefetch16 screening; lowered register count alone does not establish speedup. Per-primary envelope analysis, GPU structure/Graph/sanitizers and compiled SASS audit follow closure.
 - **Next:** Validate Mega18 with full structural/API tests and three standalone CUDA12.8 sanitizers, then integrate separately frozen Mega19 smaller8x8 owners and measure full same-binary launch/Graph candidates.
 - **Archive:** trajectory/20261013_154902_iter-22/
+
+Iter22 post-closure primary comparison (quick20/5/1, mixed historical full protocols, diagnostic only): BF16/FP16 stage18 latency at128 is5.5168/5.8384us versus prior observed4.1264/4.3392us;256 is8.5888/8.7584us versus6.3456/6.4064us;512 is14.7520/15.0912us versus10.9936/11.0864us;1024 is45.0352/45.2416us versus19.8298/19.6378us;2048 is338.5568/339.7792us versus73.0704/67.5408us. No primary shape gains3%. Physicalregister count falls from paired8's126 to95, but source-derived counts/occupancy are not a measured speed mechanism. All18 frozen numerical gates fail, finite; no Auto change. Root full structural/API/integer-stage/M1-bitwise-excluding18/Graph validation, isolated18 shortK/alias/rebind, and standaloneCUDA12.8memcheck/racecheck/synccheck all exit0. Exact measuredtest source snapshot is .scratch/test_correctness_iter22.cu fromdf323da; compiler/test evidence audit inprogress while additive23integration proceeds.
+
+### Iter 23 — Split prefetched warp owners into eight-by-eight outputs
+
+- **Hypothesis:** More logical owners can improve tiny-matrix SM coverage despite redundant lower-half native MMA work, with fewer raw registers and casts per owner.
+- **Changes:** Added strict Mega19 native16x8MMA with bottom8A initialized zero and only top8x8 output, raw16u32 lookahead, seven complete P fragments and fixed U, current-pointer fallback19to16to15to14to12to7; isolated shortK/owner/signedzero/alias/rebind/Graph and M1-bitwise tests; strict31routes930; report envelope now chooses own minimum latency with same-row Dense ratio.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=1.037819 ms; mean speedup=0.3041x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.004115 | 0.004062 | 1.0130 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.004066 | 0.004198 | 0.9684 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.005288 | 0.006446 | 0.8203 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.004830 | 0.006485 | 0.7449 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.006122 | 0.015302 | 0.4000 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.006080 | 0.015269 | 0.3982 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.012810 | 0.109635 | 0.1168 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.010126 | 0.109402 | 0.0926 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.031363 | 0.744059 | 0.0422 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.033333 | 0.743530 | 0.0448 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.085571 | 2.447918 | 0.0350 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.088675 | 2.453768 | 0.0361 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.194704 | 5.880285 | 0.0331 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.206230 | 5.940480 | 0.0347 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.009110 | 0.049939 | 0.1824 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.009182 | 0.050101 | 0.1833 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.008032 | 0.049917 | 0.1609 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_warp_mma_8x8_prefetch v19 | launch | 0.008325 | 0.049941 | 0.1667 | 0.00075151 | 0 |
+
+- **Analysis:** Quick20warm/20calls/5groups/1fresh completed18 finite rows with all frozen numerical gatesfailed exit2. At128 the screen shows approximately4.06us BF16 and4.20us FP16, same-row Dense ratio near unity; physical96registers source5376shared and zero ptxas stack/spills. Grid doubles relative16 while aggregate nativeMMA/Bwork also doubles; full comparisons and GPU safety/compiler evidence follow closure. No threshold or Auto change.
+- **Next:** Validate19 structure/bitwise/Graph and three standalone CUDA12.8 sanitizers, inspect native fragment/shared/prefetch SASS and warmed GPU128 timeline, then full same-binary40-label launch/Graph suite and31-route strict verification with final evidence/report.
+- **Archive:** trajectory/20261013_160132_iter-23/
