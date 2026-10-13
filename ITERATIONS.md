@@ -93,6 +93,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 32 | Overlap WGMMA consumer groups with vector producer | 0.5005 | 0.384269 | regression |
 
+| 33 | Add third operand bank to vector wait1 pipeline | 0.4091 | 0.364720 | no-change |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -1535,3 +1537,20 @@ Default2188CASE1075PASS, new62CASE142PASS; selected32/33 actual30/32CASE72PASS. 
 - **Analysis:** Quicksignal only. Compare ownlatency againstsamebinary retained29 andsamewidthtwo-bank33, notslowerDense denominator. Structural/rawU/hostepilogue/Graph checks separateoriginalFP64gate.
 - **Next:** Mandatory full1024 new34/35+29+two-bank33+Lt1 bothdtype ordinary/Graph20warm100calls5groups3fresh, strictnew60 andsixserialCUDA12.8SAN, independentstatic/datafinal audit andcompleteevidenceclosure.
 - **Archive:** trajectory/20261014_023614_iter-33/
+
+#### Iter33 full1024 and validation closure
+
+Same measured source `96938eb558dd031d37ffc6f7f3ff74f57736de9c`, one frozen bench and original precision/FP64 gates; new34/35, retained29, two-bank33 and multi-launchLt1, both dtypes/ordinary+Graph. All20rows/200TIME/60freshCHECK complete; numerical60FAIL/NF0, no certification or Auto switch. Times are median5group means of100 completecalls,20warm,3fresh,32 independentcuBLASLt heuristics8GiB. Batchhostwall includes submission+batchsync divided100, not independently measured singlecallwall.
+
+| Mode | dtype | 3bank35 µs | 2bank33 µs | own decrease vs33 | retained29 µs | own change vs29 | same-row Dense/SW35 |
+|---|---|---:|---:|---:|---:|---:|---:|
+| launch | bf16 | 25.407679 | 29.096961 | 12.679269% | 25.163200 | +0.971574% | 0.483596 |
+| launch | fp16 | 25.605760 | 29.248321 | 12.453916% | 25.537920 | +0.265643% | 0.384863 |
+| graph | bf16 | 24.951680 | 28.640001 | 12.878216% | 24.869440 | +0.330687% | 0.454959 |
+| graph | fp16 | 25.332479 | 28.880639 | 12.285599% | 25.033600 | +1.193912% | 0.371785 |
+
+A third bank recovers12.29–12.88% of35latency versus sameBN32 two-bank33, while observedmedians are0.27–1.19% slower thanretained29. This shows this implementation benefits from the thirdbank; it does not isolate an individual hardware stall mechanism or prove a performance floor. AllSW fastest is Lt1 multiplelaunchcontrol, not trueMegakernelgoal.
+
+Actual GPU default2262CASE1269PASS, selected34=36CASE98PASS and35=38CASE98PASS, all exit0; new74CASE194PASS,132sameatom rawU+specifiedhostepilogue,40currentABchecks,20outputrebindgroups60runs,new36Graph108fresh(all168/504), singlekernel node and stages1/2/3/4/6/7/16/17/18/33/34 verified. Strictnew60=36PASS24FAILNF0exit2,48native12Densefallback; source29actualfull1290 andsource30/31/32actualnew60 retained by separateidentity; source30full1350/31full1410/32full1470/currentfull1530 remain unexecuted fullscopecounts. SixserialCUDA12.8SANexit0, memcheckerrors/leakedbytes0,racehazards/errors/warnings0,synccheckerrors0; leaktestonlymemcheck.
+
+Freshfourinstancecompiledgate independentlyPASS, completeobject/bench/test address+predicate+instructionstreams5424 (raw objectheaderflags differ), REG96/160, prodhighestR58/54 conshighestR89/145 includingimplicitwidth, initialownedCTA24576/40960 meetsrolepool20480/28672, directionslegal, allaccinitialized andgenericPaccess0 untiltailwait0. Dynamic107648/129152B+static1024B align128, stack/local/spill0; actualmod3phase/six8Bbarriers/3producertailacquires checked. CPUabstractmodelstdout+realexit0 archived14279states27569transitions395523phasecrosschecks; notGPUhardwarecertificate. All28oldCUDA/source23–32 evidence bytepreserved. ncu not retried after priorlockfailure. Fullrowstats and allrawbinds: results/small_three_stage_measurements_iter33.json, results/small_three_stage_profile_iter33.json, results/1024_MEGAKERNEL_THREE_STAGE_REPORT.md. Independentfinalaudits freeze separately. Originalgoal remainsactive andAutoDense.
