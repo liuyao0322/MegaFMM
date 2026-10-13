@@ -67,6 +67,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 19 | Compact seven-batch BK64 pipeline controls | 0.4534 | 0.122446 | screen-numerical-fail |
 
+| 20 | Double-buffer raw quadrants through cp.async | 0.3526 | 0.497472 | screen-numerical-fail |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -763,3 +765,39 @@ correctness_iter17.txt has936 finite CASE rows (468/dtype),85 explicit PASS mark
 - **Analysis:** H7 quick20/5/1 completed18 finite rows, all frozen numerical gates fail, exit2. H7/H8 compare both pipeline implementation and global-load path, not a pure stage-count ablation. Parent owns A/B/P workspace; zero workspace applies only to leaf helpers. Per-shape prior-envelope comparison and H8 same-binary screening follow closure.
 - **Next:** Screen H8 using unchanged binary, validate both routes with full structural tests and three standaloneCUDA12.8sanitizers, then test raw cp.async two-bank Mega17.
 - **Archive:** trajectory/20261013_145706_iter-19/
+
+Iter19 post-closure H7/H8 quick20/5/1 signal on same binary: H7: bf16 128^3 9.912us Dense/SW=0.424x priorbest/SW=0.416x; fp16 128^3 10.360us Dense/SW=0.398x priorbest/SW=0.419x; bf16 256^3 10.939us Dense/SW=0.484x priorbest/SW=0.580x; fp16 256^3 10.954us Dense/SW=0.439x priorbest/SW=0.585x; bf16 512^3 11.752us Dense/SW=0.529x priorbest/SW=0.935x; fp16 512^3 11.680us Dense/SW=0.525x priorbest/SW=0.949x; bf16 1024^3 22.458us Dense/SW=0.575x priorbest/SW=0.883x; fp16 1024^3 22.424us Dense/SW=0.456x priorbest/SW=0.876x | H8: bf16 128^3 10.243us Dense/SW=0.555x priorbest/SW=0.403x; fp16 128^3 10.698us Dense/SW=0.514x priorbest/SW=0.406x; bf16 256^3 11.389us Dense/SW=0.513x priorbest/SW=0.557x; fp16 256^3 11.438us Dense/SW=0.495x priorbest/SW=0.560x; bf16 512^3 12.890us Dense/SW=0.505x priorbest/SW=0.853x; fp16 512^3 12.822us Dense/SW=0.498x priorbest/SW=0.865x; bf16 1024^3 29.154us Dense/SW=0.461x priorbest/SW=0.680x; fp16 1024^3 29.254us Dense/SW=0.356x priorbest/SW=0.671x. Neither path improves a primary prior SW envelope by3%. All36rows finite and frozen numeric gatesfail; H8 direct screening uses the unchanged binary built from source36d9b45; concurrent next-iteration source edits do not modify that executable. No separate source iteration was introduced by this control run. Full finalprotocol still required.
+
+Iter19 validation: full structural/API/M1bits through16 PASS; Hopper7 and8 each14isolatedcases including leafK8/24/72 and paddedalpha/betaalias, plus samePlaninputpointerrebind. StandaloneCUDA12.8 memcheck/synccheck zeroerrors; racecheck zerohazards/errors/warnings for both. Allsixsuccessful logs retained.
+
+### Iter 20 — Double-buffer raw quadrants through cp.async
+
+- **Hypothesis:** Global-to-shared async copies into two raw banks can overlap the next tile with current transforms and seven complete products while avoiding raw register residency.
+- **Changes:** Added Mega17 one-warp16x16 owner with two4KiBrawbanks and7KiBtransformedoperands, ca-policy cp.async commit/wait/syncwarp, general alpha/beta scalar output, actualinputguard fallback7, shortK/bankflip/alias/rebind/Graph/bitwise4..17 coverage. Older paths retained.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.497472 ms; mean speedup=0.3526x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_warp_mma_cpasync v17 | launch | 0.004147 | 0.004566 | 0.9082 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_warp_mma_cpasync v17 | launch | 0.004136 | 0.004787 | 0.8640 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_warp_mma_cpasync v17 | launch | 0.005283 | 0.006354 | 0.8315 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_warp_mma_cpasync v17 | launch | 0.004813 | 0.006522 | 0.7380 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_warp_mma_cpasync v17 | launch | 0.006182 | 0.013378 | 0.4621 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_warp_mma_cpasync v17 | launch | 0.006120 | 0.013221 | 0.4629 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_warp_mma_cpasync v17 | launch | 0.012899 | 0.051638 | 0.2498 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_warp_mma_cpasync v17 | launch | 0.010122 | 0.051066 | 0.1982 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_warp_mma_cpasync v17 | launch | 0.031829 | 0.360085 | 0.0884 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_warp_mma_cpasync v17 | launch | 0.032490 | 0.360557 | 0.0901 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_warp_mma_cpasync v17 | launch | 0.086101 | 1.204648 | 0.0715 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_warp_mma_cpasync v17 | launch | 0.089114 | 1.195299 | 0.0746 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_warp_mma_cpasync v17 | launch | 0.194424 | 2.779274 | 0.0700 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_warp_mma_cpasync v17 | launch | 0.204472 | 2.780109 | 0.0735 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_warp_mma_cpasync v17 | launch | 0.009445 | 0.030638 | 0.3083 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_warp_mma_cpasync v17 | launch | 0.009486 | 0.030944 | 0.3066 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_warp_mma_cpasync v17 | launch | 0.008259 | 0.030813 | 0.2680 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_warp_mma_cpasync v17 | launch | 0.008586 | 0.030600 | 0.2806 | 0.00075151 | 0 |
+
+- **Analysis:** Quick20/5/1 screening completed18 finite rows, all frozen numeric gatesfail exit2. This tests a16x16 owner rather than16x8 prefetch16, with extra shared raw loads and different cache policy; per-primary prior-envelope comparison follows closure. No numerical threshold or completeP/fixedU order changed.
+- **Next:** Validate17 full structural/bitwise/Graph plus three standaloneCUDA12.8sanitizers and actual LDGSTS/wait/shared resources, then strengthen setup-only smallLt tuning and record bound algorithm identities before final comparison.
+- **Archive:** trajectory/20261013_150459_iter-20/

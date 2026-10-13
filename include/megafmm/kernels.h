@@ -94,4 +94,12 @@ void prepare_mma16x8_prefetch(const Problem& p, int variant=16);
 void launch_mma16x8_prefetch(const Problem& p, const void* A, const void* B,
                             const float* C0, float* D, cudaStream_t stream,
                             int variant=16);
+// Raw quadrant cp.async double buffering; noncomplete inputs use packed 7.
+// General alpha/beta and scalar FP32 C0/D retain four-byte alignment support.
+bool small_cpasync_can_implement(const Problem& p, int variant=17);
+bool small_cpasync_full_tiles(const Problem& p, const void* A, const void* B);
+void prepare_small_cpasync(const Problem& p, int variant=17);
+void launch_small_cpasync(const Problem& p, const void* A, const void* B,
+                          const float* C0, float* D, cudaStream_t stream,
+                          int variant=17);
 }
