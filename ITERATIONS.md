@@ -59,6 +59,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 15 | Spread seven complete products over eight-CTA Hopper clusters | 0.2237 | 1.616020 | screened; numerical gate failed; cluster validation pending |
 
+| 16 | Vectorize native16x8 output and use bounded int tile counters | 0.4140 | 0.678297 | screened; numerical gate failed; output validation pending |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -597,3 +599,41 @@ Iter14 compiler mechanism check (same3902367 binary): native16x8 vec4 has24stati
 - **Analysis:** Build and quick 20-call five-group screening completed for all 18 finite rows; all frozen numerical gates failed, exit2. Per-shape performance must be compared against the prior best envelope after closure, and final acceptance requires the full same-binary protocol. No numerical threshold or product completion order changed.
 - **Next:** Run complete structural/bitwise and Graph tests plus cluster memcheck/racecheck/synccheck, then test the independent float2 output epilogue.
 - **Archive:** trajectory/20261013_141750_iter-15/
+
+Iter15 post-closure primary comparison (quick signal, some historicalfull protocols, no acceptance): bf16 128^3 6.624us Dense/SW=0.857x prior(iter12)/SW=0.701x; fp16 128^3 6.838us Dense/SW=0.820x prior(iter12)/SW=0.699x; bf16 256^3 9.632us Dense/SW=0.587x prior(iter12)/SW=0.663x; fp16 256^3 9.618us Dense/SW=0.594x prior(iter12)/SW=0.666x; bf16 512^3 30.488us Dense/SW=0.209x prior(iter8)/SW=0.389x; fp16 512^3 30.726us Dense/SW=0.208x prior(iter8)/SW=0.384x; bf16 1024^3 152.165us Dense/SW=0.089x prior(iter7)/SW=0.130x; fp16 1024^3 151.435us Dense/SW=0.068x prior(iter7)/SW=0.130x.
+
+Iter15 GPU closure: complete structural/bitwise4,7,8,9,10,11,12,13 and independent clusterGraphreplay PASS; CUDA12.4memcheck andsynccheck PASS. CUDA12.4racecheck abortedwithhostSIGSEGV(exit11), genericUnifiedMemorydiagnostic beforefirstcasefinish; zero reportedhazards is not a pass. Same unchanged CUDA12.4binary passed cluster racecheck under standalone CUDA12.8ComputeSanitizer2025.1.0.0, zeroerrors/warnings/hazards includingGraphreplays. Preserve failedlog andsuccessfulnewertoollog. Finalverification now supports explicitMEGAFMM_SANITIZER and records toolpath/version, whilebuild/runtime stayCUDA12.4.
+
+Iter15 once-only NsightSystems128BF13: GPUkernel5.792us vs6.624us ordinaryquickmedian; one kernel andnoGPUmemoryoperations. Captured API~91us is instrumentation-inflated, notsteadyhostlatency. This gives no measuredbreakdown ofDSM/barriers andno physicalfloor; retain as direction-cost evidence. Source28e9b15/binaryhash recordedinresults/small_cluster_profile_iter15.json.
+
+### Iter 16 — Vectorize native16x8 output and use bounded int tile counters
+
+- **Hypothesis:** Adjacent native16x8 output pairs permit float2 C0 loads and D stores, with shorter tile address arithmetic and unchanged arithmetic order.
+- **Changes:** Added Mega14 float2 epilogue from Mega12, explicit output and active-C0 alignment/stride guards, int coordinates with int64 stride products, and per-run fallback14 to12 to7. Added output/C0 four-byte rebinding, odd output/source strides, beta0 unused-C0, alias and bitwise tests.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.678297 ms; mean speedup=0.4140x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.007619 | 0.005347 | 1.4249 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.007360 | 0.005530 | 1.3310 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.007648 | 0.008098 | 0.9445 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.007624 | 0.008126 | 0.9382 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.007640 | 0.014293 | 0.5345 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.007706 | 0.014326 | 0.5379 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.014440 | 0.065474 | 0.2205 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.010480 | 0.065350 | 0.1604 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.032250 | 0.517125 | 0.0624 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.032979 | 0.523274 | 0.0630 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.087059 | 1.595080 | 0.0546 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.089547 | 1.572221 | 0.0570 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.194594 | 3.821192 | 0.0509 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.205878 | 3.852611 | 0.0534 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.009472 | 0.035200 | 0.2691 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.009562 | 0.035357 | 0.2704 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.008283 | 0.035434 | 0.2338 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_warp_mma_16x8_epilogue v14 | launch | 0.008638 | 0.035307 | 0.2447 | 0.00075151 | 0 |
+
+- **Analysis:** Quick20/5/1 screening completed for18 finite rows; all frozen numerical gates failed, exit2. This is diagnostic performance evidence and not certified speedup. All older variants remain available. Cluster13 full structural/bitwise/Graph/mem/sync passed; racecheck host crash onCUDA12.4 was preserved and resolved with standaloneCUDA12.8 on the sameCUDA12.4binary.
+- **Next:** Validate14 including pointer rebinding and three sanitizers, inspect generated vector stores and resources, and reassess logs/compiler/timeline/primary sources before the next identity specialization.
+- **Archive:** trajectory/20261013_142612_iter-16/

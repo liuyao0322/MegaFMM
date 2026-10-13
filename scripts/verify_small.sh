@@ -10,6 +10,7 @@ if [[ "${1:-}" == --help || "${1:-}" == -h ]]; then
   printf 'Build first; run DAG, full structural/API tests, memcheck, all-candidate\n'
   printf 'racecheck/synccheck, and frozen strict numerics in the existing allocation.\n'
   printf 'Writes results/small_*.txt/.exit and small_verify_runs.csv.\n'
+  printf 'MEGAFMM_SANITIZER may select a newer standalone compute-sanitizer.\n'
   exit 0
 fi
 if (( $# != 0 )); then
@@ -31,6 +32,15 @@ for label in dag correctness memcheck racecheck synccheck strict_numerics; do
   : > "results/small_${label}.exit"
 done
 numeric_failure=0
+sanitizer=${MEGAFMM_SANITIZER:-compute-sanitizer}
+run_sanitizer() {
+  local tool=$1
+  shift
+  printf 'SANITIZER_EXECUTABLE=%s\n' "$sanitizer"
+  bash scripts/on_gpu.sh "$sanitizer" --version || return
+  bash scripts/on_gpu.sh "$sanitizer" --tool "$tool" --error-exitcode 1 \
+    ./build/test_correctness "$@"
+}
 run_check() {
   local label=$1 allow_numeric=$2
   shift 2
@@ -65,12 +75,9 @@ run_check() {
 
 run_check dag 0 python3 tests/test_dag.py
 run_check correctness 0 bash scripts/on_gpu.sh ./build/test_correctness
-run_check memcheck 0 bash scripts/on_gpu.sh compute-sanitizer --tool memcheck --error-exitcode 1 \
-  ./build/test_correctness
+run_check memcheck 0 run_sanitizer memcheck
 # No candidate filters: coverage follows the complete current test candidate list.
-run_check racecheck 0 bash scripts/on_gpu.sh compute-sanitizer --tool racecheck --error-exitcode 1 \
-  ./build/test_correctness --smoke-candidates
-run_check synccheck 0 bash scripts/on_gpu.sh compute-sanitizer --tool synccheck --error-exitcode 1 \
-  ./build/test_correctness --smoke-candidates
+run_check racecheck 0 run_sanitizer racecheck --smoke-candidates
+run_check synccheck 0 run_sanitizer synccheck --smoke-candidates
 run_check strict_numerics 1 bash scripts/on_gpu.sh ./build/test_correctness --strict-numerics
 exit "$numeric_failure"

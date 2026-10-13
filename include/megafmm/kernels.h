@@ -63,4 +63,12 @@ void prepare_small_product_cluster(const Problem& p, int variant=13);
 void launch_small_product_cluster(const Problem& p, const void* A, const void* B,
                                   const float* C0, float* D, cudaStream_t stream,
                                   int variant=13);
+// Float2 epilogue; Plan rechecks actual D and active C0 alignment on every run.
+bool mma16x8_epilogue_can_implement(const Problem& p, int variant=14);
+bool mma16x8_epilogue_full_tiles(const Problem& p, const void* A, const void* B,
+                                const float* C0, const float* D);
+void prepare_mma16x8_epilogue(const Problem& p, int variant=14);
+void launch_mma16x8_epilogue(const Problem& p, const void* A, const void* B,
+                            const float* C0, float* D, cudaStream_t stream,
+                            int variant=14);
 }

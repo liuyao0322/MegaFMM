@@ -288,6 +288,11 @@ def collect_verification(results: Path, rows: list[dict],root: Path,test_text: s
         require(int(exit_path.read_text().strip())==status,f"exit file/metadata disagree: {label}")
         text=path.read_text(encoding="utf-8",errors="replace")
         item=artifact(path,root,label=label,exit_code=status,exit_artifact=artifact(exit_path,root))
+        if label in {"memcheck","racecheck","synccheck"}:
+            executable=re.search(r"^SANITIZER_EXECUTABLE=(.+)$",text,re.M)
+            version=re.search(r"^Version (.+)$",text,re.M)
+            item["sanitizer_executable"]=executable.group(1) if executable else "not recorded"
+            item["sanitizer_version"]=version.group(1) if version else "not recorded"
         if label=="dag":
             require(re.search(r"^OK\s*$",text,re.M) is not None and "FAILED" not in text,"DAG log lacks successful completion")
         elif label in {"correctness","memcheck","strict_numerics"}:

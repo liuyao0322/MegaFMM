@@ -9,6 +9,7 @@ cd "$(dirname "$0")/.."
 all_labels=(
   lt0_launch lt0_graph lt1_launch lt1_graph
   batch5_launch batch5_graph batch6_launch batch6_graph
+  batch7_launch batch7_graph batch8_launch batch8_graph
   warp4_launch warp4_graph packed7_launch packed7_graph
   fast8_launch fast8_graph product9_launch product9_graph
   product10_launch product10_graph narrow11_launch narrow11_graph
@@ -16,6 +17,7 @@ all_labels=(
   cluster13_launch cluster13_graph epilogue14_launch epilogue14_graph
   coefficients15_launch coefficients15_graph
   prefetch16_launch prefetch16_graph
+  pipeline17_launch pipeline17_graph
 )
 if [[ "${1:-}" == --help || "${1:-}" == -h ]]; then
   printf 'Usage: bash scripts/small_suite.sh [LABEL ...]\n'
@@ -161,6 +163,10 @@ run_case batch5_launch --algorithm hopper --hopper-variant 5
 run_case batch5_graph --algorithm hopper --hopper-variant 5 --graph
 run_case batch6_launch --algorithm hopper --hopper-variant 6
 run_case batch6_graph --algorithm hopper --hopper-variant 6 --graph
+run_case batch7_launch --algorithm hopper --hopper-variant 7
+run_case batch7_graph --algorithm hopper --hopper-variant 7 --graph
+run_case batch8_launch --algorithm hopper --hopper-variant 8
+run_case batch8_graph --algorithm hopper --hopper-variant 8 --graph
 run_case warp4_launch --algorithm mega --mega-variant 4
 run_case warp4_graph --algorithm mega --mega-variant 4 --graph
 run_case packed7_launch --algorithm mega --mega-variant 7
@@ -176,12 +182,14 @@ run_case narrow11_launch --algorithm mega --mega-variant 11
 run_case narrow11_graph --algorithm mega --mega-variant 11 --graph
 run_case narrow12_launch --algorithm mega --mega-variant 12
 run_case narrow12_graph --algorithm mega --mega-variant 12 --graph
-run_case cluster13_launch --algorithm hopper --hopper-variant 13
-run_case cluster13_graph --algorithm hopper --hopper-variant 13 --graph
+run_case cluster13_launch --algorithm mega --mega-variant 13
+run_case cluster13_graph --algorithm mega --mega-variant 13 --graph
 run_case epilogue14_launch --algorithm mega --mega-variant 14
 run_case epilogue14_graph --algorithm mega --mega-variant 14 --graph
 run_case coefficients15_launch --algorithm mega --mega-variant 15
 run_case coefficients15_graph --algorithm mega --mega-variant 15 --graph
 run_case prefetch16_launch --algorithm mega --mega-variant 16
 run_case prefetch16_graph --algorithm mega --mega-variant 16 --graph
+run_case pipeline17_launch --algorithm mega --mega-variant 17
+run_case pipeline17_graph --algorithm mega --mega-variant 17 --graph
 exit "$numeric_failure"
