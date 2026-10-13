@@ -1,0 +1,199 @@
+{
+  "status": "PASS_CPU_LITERAL_SS_BN16_GEOMETRY_ONLY_UNCOMPILED_UNREGISTERED",
+  "CUTLASS_HEAD": "f7b19de32c5d1f3cedfc735c2849f12b537522ee",
+  "script_sha256": "1c0dd25504b8d27628eff9d3e894aaec6eb260b51c8615a07a36d57564220385",
+  "source_identity": {
+    "scope": "CPU_ONLY_UNCOMPILED_SS_N16_COMPANION",
+    "base_path": "/share/home/liuyao/workspace/MegaFMM/solution/megakernel_wgmma_psplit.cu",
+    "base_sha256": "fdaae75a80893ee161a9db202d4746e86daf3d38135332759098bd9f7faa7f91",
+    "candidate_path": "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_bn16_ss_future38_candidate.cu",
+    "candidate_sha256": "94c482bc73a4e5dfa32436b9931f300242afd89058d817522c898a1ccd009ab6",
+    "inverse_restores_base_byte_for_byte": true,
+    "replacements": [
+      {
+        "old": "// Iteration34 P3+4 consumer split, consumer budget96 restored after scope repair.\n// Original prototype and intermediate128-budget evidence are archived separately.\n// One ordinary launch, zero global ST/P workspace, full seven P then fixed U.\n// Preserves source30 vector producer and source-level per-P ascending K order.\n",
+        "new": "// CPU-only future38 SS BN16 companion; uncompiled and not registered.\n// BM64 BN16 BK32, final shared A7/B7; wholeP3+4 and two banks retained.\n// Hypothesis q64/80/80 and minblocks2; no inherited compiler/resource gate.\n// Original ordered producer final onecast ST and fixedU/alphaRN/betaFMA.\n",
+        "count": 1
+      },
+      {
+        "old": "psplit",
+        "new": "psplit_bn16_ss_future38",
+        "count": 87
+      },
+      {
+        "old": "PSplit",
+        "new": "PSplitBN16SSFuture38",
+        "count": 14
+      },
+      {
+        "old": "static_assert(Cols == 32,\"this prototype uses BN32 only\");",
+        "new": "static_assert(Cols == 16,\"this uncompiled SS companion uses typed BN16 only\");\n  static_assert(std::is_same_v<Element,cutlass::half_t> ||\n      std::is_same_v<Element,cutlass::bfloat16_t>,\"FP16/BF16 operands only\");",
+        "count": 1
+      },
+      {
+        "old": "// Identical atom/tiling construction to the existing M1. Each bank has its",
+        "new": "// Shared layout construction uses existing SW32 atoms. Each bank has its",
+        "count": 1
+      },
+      {
+        "old": "  using Op = decltype(GMMA::ss_op_selector<Element,Element,float,Tile,\n      GMMA::Major::K,GMMA::Major::MN>());",
+        "new": "  using Op = std::conditional_t<std::is_same_v<Element,cutlass::half_t>,\n      SM90_64x16x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>,\n      SM90_64x16x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>>;",
+        "count": 1
+      },
+      {
+        "old": "CUTE_DEVICE int psplit_bn16_ss_future38_tail_word(int product,int row,int col) {\n  const int xor_mask = (row&1) | ((row&6)<<2);\n  return product*2048+row*32+(col^xor_mask);\n}",
+        "new": "template <int Rows,int Cols>\nCUTE_DEVICE int psplit_bn16_ss_future38_tail_word(int product,int row,int col) {\n  static_assert(Cols >= 4 && (Cols&(Cols-1)) == 0,\"power-of-two tail columns\");\n  const int xor_mask = row & (Cols/4-1);\n  return product*Rows*Cols+row*Cols+(col^xor_mask);\n}",
+        "count": 1
+      },
+      {
+        "old": "tail[psplit_bn16_ss_future38_tail_word(",
+        "new": "tail[psplit_bn16_ss_future38_tail_word<T::BM,T::BN>(",
+        "count": 11
+      },
+      {
+        "old": "__launch_bounds__(384,1)",
+        "new": "__launch_bounds__(384,2)",
+        "count": 1
+      },
+      {
+        "old": "static_assert(size(q0) == 16,\"each assigned full P has 16 floats/thread\");",
+        "new": "static_assert(size(q0) == T::BM*T::BN/T::ConsumerThreads,\n        \"each assigned full P has BM*BN/128 floats/thread (8 at BN16)\");",
+        "count": 1
+      },
+      {
+        "old": "// Final pool need=128*(64+96+96)=32768; legal uniform initial quota88..96,",
+        "new": "// Source pool need=128*(64+80+80)=28672; hypothetical I80 owns30720,",
+        "count": 1
+      },
+      {
+        "old": "warpgroup_reg_alloc<96>();",
+        "new": "warpgroup_reg_alloc<80>();",
+        "count": 1
+      },
+      {
+        "old": "// Complete all14336 FP32 P words",
+        "new": "// Complete all7168 FP32 P words",
+        "count": 1
+      },
+      {
+        "old": "PSplitBN16SSFuture38Traits<Element,32>",
+        "new": "PSplitBN16SSFuture38Traits<Element,16>",
+        "count": 2
+      },
+      {
+        "old": "winograd_wgmma_psplit_bn16_ss_future38<Element,32>",
+        "new": "winograd_wgmma_psplit_bn16_ss_future38<Element,16>",
+        "count": 2
+      }
+    ]
+  },
+  "evidence_sha256": {
+    "/share/home/liuyao/workspace/MegaFMM/solution/megakernel_wgmma_psplit.cu": "fdaae75a80893ee161a9db202d4746e86daf3d38135332759098bd9f7faa7f91",
+    "/share/home/liuyao/workspace/MegaFMM/results/psplit_revision6_megakernel_wgmma_psplit_iter34.cu": "fdaae75a80893ee161a9db202d4746e86daf3d38135332759098bd9f7faa7f91",
+    "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_bn16_future38_manifest.json": "a3c5f94b8a454c8ae84748eda9bb40096fa102592806964df8cf26d877127a95",
+    "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/arch/mma_sm90_gmma.hpp": "fb7d9b9358adecb3255e051e3f46026ddf2d8851adef017633f78d4ac4242f83",
+    "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp": "9673bc77196f52edcf0b9b824cec5d305c0738251e9b3beb39ddc308e5b37e9f",
+    "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cutlass/pipeline/sm90_pipeline.hpp": "550747f08887a71035f7b2da9d7c9113a1f6e6f2b81434573475745a4237d583",
+    "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cutlass/arch/barrier.h": "99b053b493b3b2f481b454014c9c9b821e1a3fef5ca626ca8c5c5be30fadc8c0"
+  },
+  "raw_frozen_artifact_sha256": {
+    "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_bn16_future38_candidate.cu": "ab97837744a071341f7c4b7f21f8009171e4bfc471180eca7c07c37b408c3b90",
+    "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_bn16_future38_model.py": "a202bcb36fd16e8c602e5058beac265bd63f7e2e582bfa220b42e4502f7dda3d",
+    "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_bn16_future38_source_delta.json": "69ac5f12d7a45865511173515a7551d80d5d103ff677b62469481ac36d2bbf6c",
+    "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_bn16_future38_review.json": "6e4755dc2bfdf30e2eba8570a06bb79ed779ba29bf0ea658ddeed4b5f74b5327",
+    "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_bn16_future38_stdout.json": "aa9b5fde612be235f9a62d46e16e20a5b2774271a85f40eb5fdb0435edf0b7ea",
+    "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_bn16_future38_stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_bn16_future38_exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_bn16_future38_protocol.md": "8b8214deb1c2303c76c8cef82c9a15dd2ad0f9905627ad4d7f77b57126fe0915"
+  },
+  "geometry_scope": "Independent literal CPU interpretation; no CuTe or CUDA instantiation",
+  "geometry": {
+    "aligned_contiguous_vector8_checks": 17920,
+    "P_coords_per_WG": 1024,
+    "P_unique_words": 7168,
+    "P_words_per_thread_per_product": 8,
+    "WG0_P_payload_words": 24,
+    "WG1_P_payload_words": 32,
+    "RS_A_register_payload_words": 0,
+    "U_unique_owners": 1024,
+    "each_P_word_read_count": 1,
+    "full1024_unique_outputs": 1048576,
+    "each_output_store_count": 1,
+    "old_tail_negative_control_max_word": 14335,
+    "old_tail_exceeds_typed_tail_and_bank0_rejected": true
+  },
+  "predicted_shared_bytes": {
+    "A7": 28672,
+    "B7": 7168,
+    "one_bank": 35840,
+    "two_banks": 71680,
+    "tail": 28672,
+    "barriers": 32,
+    "sizeof_align128": 71808,
+    "tail_bank0_overlap": 28672,
+    "tail_bank1_overlap": 0,
+    "barrier_union_overlap": 0,
+    "actual_host_ABI_proved": false
+  },
+  "quota_hypothesis": {
+    "producer": 64,
+    "WG0": 80,
+    "WG1": 80,
+    "requested_pool_words": 28672,
+    "hypothetical_initial": 80,
+    "hypothetical_initial_owned_pool_words": 30720,
+    "producer_dec_release_words": 2048,
+    "consumer_each_inc_request_words": 0,
+    "pool_surplus_words": 2048,
+    "source_minblocks": 2,
+    "ptxas_initial_role_width_no_spill_qfit": null,
+    "two_CTA_residency": null
+  },
+  "barriers_source": {
+    "full_arrivals": 128,
+    "empty_arrivals": 256,
+    "CTA_bar0_and_bar6": 384,
+    "both_banks_drained_before_tail": true,
+    "hardware_proved": false
+  },
+  "native_host_domain": {
+    "m_modulus": 128,
+    "n_modulus": 64,
+    "k_modulus": 64,
+    "lda_ldb_modulus": 8,
+    "A_B_alignment_bytes": 16,
+    "n_modulus32_expansion_deferred": true
+  },
+  "source_final_ST_U_alphaRN_betaFMA_normalized_byte_equal_to_old34": true,
+  "producer_A_final_RN_operations_per_cell": 4,
+  "producer_A_derived_final_onecasts_per_cell": 4,
+  "consumer_has_no_RS_A_stage_array_or_builder": true,
+  "N16_pair_scope": "SS/RS same m64n16k16 dtype/accumulator shape and K-atom order, distinct A source forms; fresh compiled/numerical paired evidence still required.",
+  "reference36_N32_is_not_same_atom": true,
+  "changed_axes": [
+    "BN32 to16 with typed SS atoms/layouts/tail",
+    "consumer source q96 to80",
+    "minblocks1 to2"
+  ],
+  "logical_source_reads_1024_bytes": {
+    "A": 67108864,
+    "B": 16777216,
+    "actual_L2_DRAM": null
+  },
+  "grid_1024": [
+    8,
+    32
+  ],
+  "CTAs_1024": 256,
+  "not_proved": [
+    "CuTe/CUDA actual instantiation and layouts/sizeof",
+    "new initial/role allocation and complete SASS widths",
+    "qfit/zero local or spill/physical async synchronization",
+    "physical two CTA residency/occupancy",
+    "GPU precision and original FP64 gate",
+    "Graph/sanitizer/forward progress",
+    "performance or actual traffic"
+  ],
+  "writes_restricted_to_own_SS_prefix": true,
+  "old34_and_frozen_raw_future_unchanged": true
+}

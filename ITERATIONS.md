@@ -1709,3 +1709,34 @@ Freshfourinstancecompiledgate independentlyPASS, completeobject/bench/test addre
 - **Analysis:** Own complete SW latency determines code benefit; same-row tuned Dense/SW reports the comparison. Numerical/structural/SAN evidence stays separate. Missing unsafe routes will have explicit compiled-safety exclusions rather than invented rows.
 - **Next:** Mandatoryfull1024 measured41 plus retainedRSBK64best39/matchedrawBK32RS40/SS36/Lt1,100calls5groups3fresh; actual validation scope, independent implementation/data audits and source/raw/report/Git closure.
 - **Archive:** trajectory/20261014_054901_iter-38/
+
+### Iter 39 — Paired BN16 RS-A and shared/shared seven-product kernels
+
+- **Hypothesis:** Compare BN16 RS-A42 and SS43 with complete ascending-K seven P and fixed U. Source quotas/min2 alone are hypotheses; fresh per-route compiled proof precedes launch.
+- **Changes:** Two new BM64BN16BK32/two-bank384-thread TUs. RS42 quotas48/96/96 and SS43 quotas64/80/80; both min2. New literal tail permutation preserves unique P/U coordinates. Initial42 three scalar state words spilled; equivalent PipelineState derived from the unchanged int64 K counter removes persistent phase liveness. Initial failed source and scheduling error remain archived. Four final instances have actual REG80 zero stack/local/spill; all-role/pending-A-P/init/ABI/drain and object/bench/test identity are independently checked. OccupancyAPI resource prediction is separate from measured residency. Original ST onecast/DAG/alphaRNbetaFMA/floors/AutoDense remain unchanged.
+- **Bench:** quick20warm20calls5groups1fresh; original numerical results retained.
+
+| M,N,K | dtype | route | mode | Dense µs | complete SW µs | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 5.608000 | 5.851200 | 0.958436 | FAIL |
+| 128,128,128 | fp16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 5.606400 | 6.011200 | 0.932659 | FAIL |
+| 256,256,256 | bf16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 5.654400 | 8.555200 | 0.660931 | FAIL |
+| 256,256,256 | fp16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 5.614400 | 8.630400 | 0.650538 | FAIL |
+| 512,512,512 | bf16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 6.276800 | 13.432001 | 0.467302 | FAIL |
+| 512,512,512 | fp16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 6.312000 | 13.596800 | 0.464227 | FAIL |
+| 1024,1024,1024 | bf16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 13.251200 | 29.948801 | 0.442462 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 10.292800 | 30.017599 | 0.342892 | FAIL |
+| 2048,2048,2048 | bf16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 31.777599 | 214.979196 | 0.147817 | FAIL |
+| 2048,2048,2048 | fp16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 32.916799 | 220.736003 | 0.149123 | FAIL |
+| 3072,3072,3072 | bf16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 87.015998 | 847.192001 | 0.102711 | FAIL |
+| 3072,3072,3072 | fp16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 89.499199 | 855.126381 | 0.104662 | FAIL |
+| 4096,4096,4096 | bf16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 195.387197 | 2095.262337 | 0.093252 | FAIL |
+| 4096,4096,4096 | fp16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 205.876803 | 2119.743919 | 0.097123 | FAIL |
+| 1024,512,1024 | bf16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 11.587200 | 22.468799 | 0.515702 | FAIL |
+| 1024,512,1024 | fp16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 11.670400 | 22.942400 | 0.508683 | FAIL |
+| 512,1024,1024 | bf16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 8.398400 | 22.428800 | 0.374447 | FAIL |
+| 512,1024,1024 | fp16 | megakernel_wgmma_psplit_ss_bn16_64x16 v43 | launch | 8.462400 | 22.164799 | 0.381795 | FAIL |
+
+- **Analysis:** Compare own complete SW latency, then same-row tuned Dense/SW. Machine safety, structural fixtures and sanitizers do not certify the original FP64 numerical gate.
+- **Next:** Mandatorysamebinary full24 for42/43/39/40/36/Lt1,100calls5groups3fresh irrespective quick3%; enabled strict30 per newroute and serialsanitizers, actualcoverage/report/profile/independentaudits.
+- **Archive:** trajectory/20261014_062200_iter-39/

@@ -1,0 +1,85 @@
+{
+  "scope": "CPU_ONLY_UNCOMPILED_SS_N16_COMPANION",
+  "base_path": "/share/home/liuyao/workspace/MegaFMM/solution/megakernel_wgmma_psplit.cu",
+  "base_sha256": "fdaae75a80893ee161a9db202d4746e86daf3d38135332759098bd9f7faa7f91",
+  "candidate_path": "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_bn16_ss_future38_candidate.cu",
+  "candidate_sha256": "94c482bc73a4e5dfa32436b9931f300242afd89058d817522c898a1ccd009ab6",
+  "inverse_restores_base_byte_for_byte": true,
+  "replacements": [
+    {
+      "old": "// Iteration34 P3+4 consumer split, consumer budget96 restored after scope repair.\n// Original prototype and intermediate128-budget evidence are archived separately.\n// One ordinary launch, zero global ST/P workspace, full seven P then fixed U.\n// Preserves source30 vector producer and source-level per-P ascending K order.\n",
+      "new": "// CPU-only future38 SS BN16 companion; uncompiled and not registered.\n// BM64 BN16 BK32, final shared A7/B7; wholeP3+4 and two banks retained.\n// Hypothesis q64/80/80 and minblocks2; no inherited compiler/resource gate.\n// Original ordered producer final onecast ST and fixedU/alphaRN/betaFMA.\n",
+      "count": 1
+    },
+    {
+      "old": "psplit",
+      "new": "psplit_bn16_ss_future38",
+      "count": 87
+    },
+    {
+      "old": "PSplit",
+      "new": "PSplitBN16SSFuture38",
+      "count": 14
+    },
+    {
+      "old": "static_assert(Cols == 32,\"this prototype uses BN32 only\");",
+      "new": "static_assert(Cols == 16,\"this uncompiled SS companion uses typed BN16 only\");\n  static_assert(std::is_same_v<Element,cutlass::half_t> ||\n      std::is_same_v<Element,cutlass::bfloat16_t>,\"FP16/BF16 operands only\");",
+      "count": 1
+    },
+    {
+      "old": "// Identical atom/tiling construction to the existing M1. Each bank has its",
+      "new": "// Shared layout construction uses existing SW32 atoms. Each bank has its",
+      "count": 1
+    },
+    {
+      "old": "  using Op = decltype(GMMA::ss_op_selector<Element,Element,float,Tile,\n      GMMA::Major::K,GMMA::Major::MN>());",
+      "new": "  using Op = std::conditional_t<std::is_same_v<Element,cutlass::half_t>,\n      SM90_64x16x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>,\n      SM90_64x16x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>>;",
+      "count": 1
+    },
+    {
+      "old": "CUTE_DEVICE int psplit_bn16_ss_future38_tail_word(int product,int row,int col) {\n  const int xor_mask = (row&1) | ((row&6)<<2);\n  return product*2048+row*32+(col^xor_mask);\n}",
+      "new": "template <int Rows,int Cols>\nCUTE_DEVICE int psplit_bn16_ss_future38_tail_word(int product,int row,int col) {\n  static_assert(Cols >= 4 && (Cols&(Cols-1)) == 0,\"power-of-two tail columns\");\n  const int xor_mask = row & (Cols/4-1);\n  return product*Rows*Cols+row*Cols+(col^xor_mask);\n}",
+      "count": 1
+    },
+    {
+      "old": "tail[psplit_bn16_ss_future38_tail_word(",
+      "new": "tail[psplit_bn16_ss_future38_tail_word<T::BM,T::BN>(",
+      "count": 11
+    },
+    {
+      "old": "__launch_bounds__(384,1)",
+      "new": "__launch_bounds__(384,2)",
+      "count": 1
+    },
+    {
+      "old": "static_assert(size(q0) == 16,\"each assigned full P has 16 floats/thread\");",
+      "new": "static_assert(size(q0) == T::BM*T::BN/T::ConsumerThreads,\n        \"each assigned full P has BM*BN/128 floats/thread (8 at BN16)\");",
+      "count": 1
+    },
+    {
+      "old": "// Final pool need=128*(64+96+96)=32768; legal uniform initial quota88..96,",
+      "new": "// Source pool need=128*(64+80+80)=28672; hypothetical I80 owns30720,",
+      "count": 1
+    },
+    {
+      "old": "warpgroup_reg_alloc<96>();",
+      "new": "warpgroup_reg_alloc<80>();",
+      "count": 1
+    },
+    {
+      "old": "// Complete all14336 FP32 P words",
+      "new": "// Complete all7168 FP32 P words",
+      "count": 1
+    },
+    {
+      "old": "PSplitBN16SSFuture38Traits<Element,32>",
+      "new": "PSplitBN16SSFuture38Traits<Element,16>",
+      "count": 2
+    },
+    {
+      "old": "winograd_wgmma_psplit_bn16_ss_future38<Element,32>",
+      "new": "winograd_wgmma_psplit_bn16_ss_future38<Element,16>",
+      "count": 2
+    }
+  ]
+}

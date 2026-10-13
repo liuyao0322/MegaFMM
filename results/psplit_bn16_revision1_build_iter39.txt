@@ -1,0 +1,17 @@
+COMMAND ["bash", "scripts/on_gpu.sh", "cmake", "--build", "build", "--target", "megafmm_bench", "megafmm_tests", "-j4"]
+[  2%] Building CUDA object CMakeFiles/megafmm.dir/solution/megakernel_wgmma_psplit_rsa_bn16.cu.o
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm68_GLOBAL__N__6601b768_35_megakernel_wgmma_psplit_rsa_bn16_cu_5e1a6c4d30winograd_wgmma_psplit_rsa_bn16IN7cutlass6half_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm68_GLOBAL__N__6601b768_35_megakernel_wgmma_psplit_rsa_bn16_cu_5e1a6c4d30winograd_wgmma_psplit_rsa_bn16IN7cutlass6half_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 80 registers
+ptxas info    : Compiling entry function '_ZN7megafmm68_GLOBAL__N__6601b768_35_megakernel_wgmma_psplit_rsa_bn16_cu_5e1a6c4d30winograd_wgmma_psplit_rsa_bn16IN7cutlass10bfloat16_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm68_GLOBAL__N__6601b768_35_megakernel_wgmma_psplit_rsa_bn16_cu_5e1a6c4d30winograd_wgmma_psplit_rsa_bn16IN7cutlass10bfloat16_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 80 registers
+[  4%] Linking CXX static library libmegafmm.a
+[ 95%] Built target megafmm
+[ 97%] Linking CXX executable megafmm_bench
+[100%] Built target megafmm_bench
+gmake: *** No rule to make target 'megafmm_tests'.  Stop.
+srun: error: g08: task 0: Exited with exit code 2

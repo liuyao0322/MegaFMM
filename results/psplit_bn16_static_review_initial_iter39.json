@@ -1,0 +1,1587 @@
+{
+  "schema": "megafmm.iter39.bn16-independent-compiled-gate.v1",
+  "status": "PASS_COMPILED_CAN_LAUNCH_42_43",
+  "reviewer": "/root/pipeline_review30",
+  "compiled_gate_inherited_from_iteration38": false,
+  "compiled_gate_inherited_from_older_iterations": false,
+  "scope": "Fresh final revisedraw42 plus SS43 two dtype object/bench/test streams, role CFG including waitstubs/loopbacks/commonU, implicit widths/P init/highR write-before-read, pending physicalA/P, actual shared ABI and three collectiveepochs. CPU static gate only; GPU tests and timing are distinct later evidence.",
+  "base_checkpoint": "d0ea861605612d0e4d95e2e6596ff352a2d264dd",
+  "frozen_bindings": {
+    "CMakeLists.txt": "c0069535000ccb5a3995a4d8a25a37b6498be9835ac00705c7b956c8fd377bab",
+    "bench/benchmark.cu": "a5a47f6269d23c34949748567f338ffd9855017d59698602a90d88ba458987bd",
+    "include/megafmm/gemm.h": "417b19f94c25878d4d3adeecfaf38bef6ab210789c0c30c49e9574a5c538a347",
+    "include/megafmm/kernels.h": "e4ddf9704efe094a3756a6961326e546a6daff5f5668b00bc26242e4717ccc52",
+    "solution/plan.cpp": "74a23ade08790fac625db69c8aedfb9deb684aeae0736a03e3dd98b58e7eb2a1",
+    "tests/test_correctness.cu": "fde45df2bdf6239a175e45dcf4668da31005c67d890ce68252a088ba97016222",
+    "solution/megakernel_wgmma_psplit_rsa_bn16.cu": "a17b7f8f4c1938378c3655c6db2aa420dfdd173e22c9f9de142d887710d44e84",
+    "solution/megakernel_wgmma_psplit_ss_bn16.cu": "9427713174fc2204ec5f9bf5f5b3a4f5bf63d66eed25a8e10b79ed9b2684c723",
+    "build/megafmm_bench": "149bf628e3201be18e591c6f72d6ea00da58c051bcacbc2487f401954e74bb6b",
+    "build/test_correctness": "4a45e6aa1c85d702390d6f7274ecc2364ea1b15922fb8f789f006d87c1c26f04",
+    "build/CMakeFiles/megafmm.dir/solution/megakernel_wgmma_psplit_rsa_bn16.cu.o": "369885063ffd176f4cd3b80fdc5201f77961423ff42f0b173e1ec9fd014fe26a",
+    "results/psplit_bn16_final_megakernel_wgmma_psplit_rsa_bn16_iter39.ptx": "831ee14ac4e149b00297b8feeda4d01502245ea2c80bedce2e00814a85b0b13f",
+    "results/psplit_bn16_final_megakernel_wgmma_psplit_rsa_bn16_iter39.cubin": "5ac8d00ac81aa3edee71e27709b80c14308d679a5dfda302d9ebd6f9adaf8933",
+    "build/CMakeFiles/megafmm.dir/solution/megakernel_wgmma_psplit_ss_bn16.cu.o": "98a795cd490a425f728c095d80f254f9fa6b3ef1f7e04b8c7db6fb2bb0d9583d",
+    "results/psplit_bn16_final_megakernel_wgmma_psplit_ss_bn16_iter39.ptx": "b6c25af34d8649ce13c2627e776431b7a3d730f71cadc77f158c1d0f226eb5eb",
+    "results/psplit_bn16_final_megakernel_wgmma_psplit_ss_bn16_iter39.cubin": "5b4ab84b14e2d3254ba404598e249b3bfbcd90c82425280f18d6c1b0b38c438e",
+    "results/psplit_bn16_initial_frozen_identity_iter39.json": "33d786525c2678244b8c8530b2dc32825f27df4e4ede9f383ac592512d3f7f43",
+    "results/psplit_bn16_final_link_identity_iter39.json": "a6222df936cc27810bfc96b4074047c01c0fb988c4a6f25b38e4137296ab802a",
+    "results/psplit_bn16_final_object_sass_iter39.txt": "e74a334e81ea3e6af1f0603bae5f183edc601628589f3aeb2a9f70013ef60ddc",
+    "results/small_psplit_bn16_final_sass_iter39.txt": "a0e9cfc68a1a003df62844ed5ce066ffa09d36b2d0e922d0dedf4eb050c549d5",
+    "results/psplit_bn16_final_test_sass_iter39.txt": "a0e9cfc68a1a003df62844ed5ce066ffa09d36b2d0e922d0dedf4eb050c549d5",
+    "results/psplit_bn16_final_object_resources_iter39.txt": "e7f529022ca12a79e627f8a9f0d85094b2a19467fa5df3e65508a4d4532ef1e3",
+    "results/psplit_bn16_final_object_elf_iter39.txt": "1658970ad2411ad0e112b58e19873c75c5991178bb186d5b8728327f7025dc5f",
+    "results/psplit_bn16_final_host_objdump_iter39.txt": "75a66d3d540a91977c09291c8848131f314da814dde1aafcb0b41057cb868728",
+    "results/psplit_bn16_function_occupancy_probe_iter39.txt": "ad065ebaca84b7a920ebb17ba50a225fb50a35d56d995daa742203635051614b",
+    "results/psplit_bn16_function_occupancy_probe_iter39.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    ".scratch/psplit_bn16_final_role_cfg_iter39.json": "27c0578e9f4a229330e563ef754745ba92c929200664232f204488980a1aa859",
+    ".scratch/psplit_bn16_static_review_cfg_iter39.py": "950125bfed0b0d09607c81ecbbb500be2de4519fe52b67df79f62142d7c3cfcf",
+    ".scratch/psplit_bn16_source_review_iter39.json": "be5302324f5e4fd25fd43d758699e4cda600be38509bbf7871f578d85d8cce21",
+    ".scratch/psplit_bn16_initial_raw_failure_review_iter39.json": "38a63ee9866c84312c61275ca4d3747b6099ace9a1c05a40a61ea5d3f4fce4df",
+    "results/psplit_bn16_initial_megakernel_wgmma_psplit_rsa_bn16_iter39.cu": "ec97630bf28161580f1c3cf6610b8409d65c644007c4e888bd96ebec0345190c",
+    "results/psplit_bn16_initial_megakernel_wgmma_psplit_ss_bn16_iter39.cu": "9427713174fc2204ec5f9bf5f5b3a4f5bf63d66eed25a8e10b79ed9b2684c723",
+    ".scratch/psplit_bn16_expected_test_coverage_iter39.json": "afcd4dc1fce5ad4a544e3d0182f0eb73a845d0d03bb69a9de81808b935e1cbc7",
+    ".scratch/psplit_bn16_test_source_delta_iter39.json": "685f3c46b7122288baf2a50f66e337caa00b6db9c100cef8f5c1e26bc2208e2b"
+  },
+  "instances": [
+    {
+      "variant": 42,
+      "dtype": "FP16",
+      "function": "_ZN7megafmm68_GLOBAL__N__6601b768_35_megakernel_wgmma_psplit_rsa_bn16_cu_5e1a6c4d30winograd_wgmma_psplit_rsa_bn16IN7cutlass6half_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf",
+      "status": "PASS_FRESH_COMPILED_STATIC_LAUNCH_GATE",
+      "bm": 64,
+      "bn": 16,
+      "bk": 32,
+      "threads": 384,
+      "banks": 2,
+      "k16_atoms": 2,
+      "parent_1024_stage_count": 16,
+      "static_instruction_count": 1744,
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "canonical_instruction_stream_sha256": "ccd2bd67a956582a017d8b25ed514548f30ba5789f74105b33611fcdad126372",
+      "actual_reported_registers": 80,
+      "effective_initial_registers_per_thread": 80,
+      "effective_initial_evidence": [
+        "fresh feeding ELF EIATTR_REGCOUNT80",
+        "actual ptxas/resource REG80 and queried DriverAPI function numRegs80"
+      ],
+      "producer_quota": 48,
+      "consumer_quotas": [
+        96,
+        96
+      ],
+      "initial_owned_cta_register_pool": 30720,
+      "required_role_register_pool": 30720,
+      "owned_pool_spare": 0,
+      "legal_setmaxnreg_directions": true,
+      "prequota_highest_register": 3,
+      "role_highest_including_implicit": {
+        "producer": 44,
+        "WG0": 93,
+        "WG1": 93
+      },
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 592,
+          "possibly_executed_instruction_count": 590,
+          "abstract_state_count": 775,
+          "gpr_highest_including_implicit": 44,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x5710",
+              "instruction": "HADD2.F32 R44, -RZ, R21.H1_H1",
+              "highest": 44
+            },
+            {
+              "pc": "0x5750",
+              "instruction": "FADD R9, -R9, R44",
+              "highest": 44
+            },
+            {
+              "pc": "0x57e0",
+              "instruction": "FADD R13, R44, -R17",
+              "highest": 44
+            },
+            {
+              "pc": "0x5830",
+              "instruction": "HADD2.F32 R44, -RZ, R23.H0_H0",
+              "highest": 44
+            },
+            {
+              "pc": "0x5910",
+              "instruction": "FADD R37, -R37, R44",
+              "highest": 44
+            },
+            {
+              "pc": "0x5940",
+              "instruction": "FADD R44, R44, -R39",
+              "highest": 44
+            },
+            {
+              "pc": "0x5a90",
+              "instruction": "FADD R38, -R5, R44",
+              "highest": 44
+            },
+            {
+              "pc": "0x5af0",
+              "instruction": "F2FP.F16.F32.PACK_AB R15, R15, R44",
+              "highest": 44
+            }
+          ],
+          "pending_A_and_P_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 889,
+          "possibly_executed_instruction_count": 865,
+          "abstract_state_count": 945,
+          "gpr_highest_including_implicit": 93,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x2e20",
+              "instruction": "HADD2.F32 R93, -RZ, R64.H1_H1",
+              "highest": 93
+            },
+            {
+              "pc": "0x3930",
+              "instruction": "FADD R60, R93, -R70",
+              "highest": 93
+            },
+            {
+              "pc": "0x39b0",
+              "instruction": "LOP3.LUT R93, R24, 0x80, RZ, 0xc0, !PT",
+              "highest": 93
+            },
+            {
+              "pc": "0x39d0",
+              "instruction": "SHF.R.U64 R93, R93, 0x3, RZ",
+              "highest": 93
+            },
+            {
+              "pc": "0x39e0",
+              "instruction": "LOP3.LUT R24, R93, R24, RZ, 0x3c, !PT",
+              "highest": 93
+            }
+          ],
+          "pending_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x3fa0",
+              "last_issue_pc": "0x40f0",
+              "covered_wait0_pc": "0x4100",
+              "MMA_count": 6,
+              "operand_kind": "RS",
+              "A_packed_register_count": 24,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71
+              ],
+              "P_register_count": 24,
+              "P_registers": [
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of entire stage physical RS A words including future-issued A and all owned P, until coveredwait0; SS has no register stageA. Full roleCFG loops/waitstubs/commonU included."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 838,
+          "possibly_executed_instruction_count": 833,
+          "abstract_state_count": 894,
+          "gpr_highest_including_implicit": 93,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x9c0",
+              "instruction": "SHF.R.U64 R93, R3, 0x5, R0",
+              "highest": 93
+            },
+            {
+              "pc": "0x9f0",
+              "instruction": "IMAD.SHL.U32 R56, R93.reuse, 0x8, RZ",
+              "highest": 93
+            },
+            {
+              "pc": "0xa00",
+              "instruction": "LOP3.LUT R93, R93, 0x1, RZ, 0xc0, !PT",
+              "highest": 93
+            },
+            {
+              "pc": "0xa90",
+              "instruction": "IMAD R58, R93.reuse, 0x2e00, RZ",
+              "highest": 93
+            },
+            {
+              "pc": "0xaa0",
+              "instruction": "IMAD R71, R93, 0x2e00, RZ",
+              "highest": 93
+            },
+            {
+              "pc": "0x1ad0",
+              "instruction": "IMAD R93, R93, 0x5c00, R92",
+              "highest": 93
+            },
+            {
+              "pc": "0x1af0",
+              "instruction": "VIADD R93, R93, 0x4000",
+              "highest": 93
+            },
+            {
+              "pc": "0x1b10",
+              "instruction": "SHF.R.U32.HI R93, RZ, 0x4, R93",
+              "highest": 93
+            },
+            {
+              "pc": "0x1b30",
+              "instruction": "LOP3.LUT R93, R93, 0x3ff8, RZ, 0xc0, !PT",
+              "highest": 93
+            },
+            {
+              "pc": "0x1c50",
+              "instruction": "R2UR UR12, R93",
+              "highest": 93
+            },
+            {
+              "pc": "0x1ce0",
+              "instruction": "HADD2.F32 R93, -RZ, R71.H0_H0",
+              "highest": 93
+            },
+            {
+              "pc": "0x1d10",
+              "instruction": "FADD R93, R91, R93",
+              "highest": 93
+            }
+          ],
+          "pending_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x1e00",
+              "last_issue_pc": "0x2030",
+              "covered_wait0_pc": "0x2040",
+              "MMA_count": 8,
+              "operand_kind": "RS",
+              "A_packed_register_count": 32,
+              "A_registers": [
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "P_register_count": 32,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of entire stage physical RS A words including future-issued A and all owned P, until coveredwait0; SS has no register stageA. Full roleCFG loops/waitstubs/commonU included."
+            }
+          ]
+        }
+      ],
+      "initialization_gate": {
+        "status": "PASS_ALL_ROLE_PATHS",
+        "scope": "successINC precedes owned P clear and all grow-register accesses; P8 accumulators all first definite-zero, all later reads definite-written including loopbacks; role write-before-read independently reviewed",
+        "INC_pc": "0x230",
+        "INC_success_pc": "0x270",
+        "high_R80_93_all_path_write_before_read": true,
+        "pre_INC_owned_P_or_grow_accesses": 0
+      },
+      "RS_A_operand_packed_width": 4,
+      "P_accumulator_source_and_destination_width": 8,
+      "whole_stage_pending_generic_A_or_P_accesses": 0,
+      "STACK": 0,
+      "LOCAL": 0,
+      "spill_stores": 0,
+      "spill_loads": 0,
+      "new_function_C7512": false,
+      "serialization_warning_for_new_function": false,
+      "dynamic_shared_bytes": 47232,
+      "static_shared_bytes": 0,
+      "static_shared_bytes_evidence": "actual cuFuncGetAttribute(SHARED_SIZE_BYTES) on exact final feeding cubin",
+      "dynamic_plus_static_shared_bytes": 47232,
+      "resource_tool_reported_SHARED_bytes": 1024,
+      "resource_tool_reported_SHARED_bytes_scope": "ELF/resource-tool accounting is preserved separately from actual DriverAPI static_shared_bytes0; no assertion that both should be summed",
+      "shared_bank_bytes": 23552,
+      "two_banks_bytes": 47104,
+      "P_tail_bytes": 28672,
+      "tail_bank0_bytes": 23552,
+      "tail_bank1_bytes": 5120,
+      "shared_alignment_bytes": 128,
+      "actual_compact_layout_proof": "compiled cosize equality asserts + union sizeof + actual host sizeof optin/launch immediate",
+      "full_barrier_offsets": [
+        47104,
+        47112
+      ],
+      "empty_barrier_offsets": [
+        47120,
+        47128
+      ],
+      "full_barrier_arrival_count": 128,
+      "empty_barrier_arrival_count": 256,
+      "host_launch_and_optin_actual_immediate": 47232,
+      "native_ordinary_kernel_launches": 1,
+      "global_workspace_bytes": 0,
+      "occupancy_API_predicted_active_CTAs_per_SM": 2,
+      "measured_residency": null,
+      "synchronization_gate": {
+        "status": "PASS",
+        "collective_epochs": [
+          0,
+          6,
+          0
+        ],
+        "drain_barrier": "nonaligned barrier.sync6,count384; all12 full warps once",
+        "all_banks_drained_before_any_tail_STS": true,
+        "both_WG_wait0_before_release": true,
+        "all_P_stores_before_publish_bar0_before_U": true,
+        "raw_actual_PC_sequence": {
+          "WG1_wait0": "0x2040",
+          "WG0_wait0": "0x4100",
+          "consumer_drain": "0x4160",
+          "tail_STS_first": "0x4510",
+          "tail_STS_last": "0x4850",
+          "producer_two_empty_waits": [
+            "0x5ce0",
+            "0x5d80"
+          ],
+          "producer_drain": "0x5da0",
+          "publish": "0x5dd0"
+        }
+      },
+      "math_DAG_gate": "complete7P,ascending wholeK,twoK16atoms,original FP32RN ST DAG one final input casts, fixedU, alphaRN, activebetaFMA",
+      "alias_epilogue_gate": {
+        "status": "PASS",
+        "active_four_C0_loads_precede_first_D_store": true,
+        "beta0_null_does_not_read_C0": true,
+        "raw_C0_loads": [
+          "0x6660",
+          "0x66a0",
+          "0x66e0",
+          "0x6740"
+        ],
+        "raw_first_D_store": "0x6920"
+      },
+      "GPU_validation_at_compiled_gate": null,
+      "original_precision_certification_at_compiled_gate": null,
+      "performance_at_compiled_gate": null,
+      "producer_gpr_highest_including_implicit": 44,
+      "consumer_gpr_highest_including_implicit": 93
+    },
+    {
+      "variant": 42,
+      "dtype": "BF16",
+      "function": "_ZN7megafmm68_GLOBAL__N__6601b768_35_megakernel_wgmma_psplit_rsa_bn16_cu_5e1a6c4d30winograd_wgmma_psplit_rsa_bn16IN7cutlass10bfloat16_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf",
+      "status": "PASS_FRESH_COMPILED_STATIC_LAUNCH_GATE",
+      "bm": 64,
+      "bn": 16,
+      "bk": 32,
+      "threads": 384,
+      "banks": 2,
+      "k16_atoms": 2,
+      "parent_1024_stage_count": 16,
+      "static_instruction_count": 1744,
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "canonical_instruction_stream_sha256": "7b8732a1a9fbaf47f8bff27e179fb2e48e99e8f5c246c64bc765a96f70427e4a",
+      "actual_reported_registers": 80,
+      "effective_initial_registers_per_thread": 80,
+      "effective_initial_evidence": [
+        "fresh feeding ELF EIATTR_REGCOUNT80",
+        "actual ptxas/resource REG80 and queried DriverAPI function numRegs80"
+      ],
+      "producer_quota": 48,
+      "consumer_quotas": [
+        96,
+        96
+      ],
+      "initial_owned_cta_register_pool": 30720,
+      "required_role_register_pool": 30720,
+      "owned_pool_spare": 0,
+      "legal_setmaxnreg_directions": true,
+      "prequota_highest_register": 3,
+      "role_highest_including_implicit": {
+        "producer": 44,
+        "WG0": 93,
+        "WG1": 93
+      },
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 592,
+          "possibly_executed_instruction_count": 590,
+          "abstract_state_count": 775,
+          "gpr_highest_including_implicit": 44,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x5730",
+              "instruction": "LOP3.LUT R44, R21, 0xffff0000, RZ, 0xc0, !PT",
+              "highest": 44
+            },
+            {
+              "pc": "0x5770",
+              "instruction": "FADD R9, -R9, R44",
+              "highest": 44
+            },
+            {
+              "pc": "0x57e0",
+              "instruction": "FADD R13, R44, -R17",
+              "highest": 44
+            },
+            {
+              "pc": "0x5810",
+              "instruction": "SHF.L.U32 R44, R23, 0x10, RZ",
+              "highest": 44
+            },
+            {
+              "pc": "0x5910",
+              "instruction": "FADD R37, -R37, R44",
+              "highest": 44
+            },
+            {
+              "pc": "0x5960",
+              "instruction": "FADD R44, R44, -R39",
+              "highest": 44
+            },
+            {
+              "pc": "0x5a80",
+              "instruction": "FADD R38, -R5, R44",
+              "highest": 44
+            },
+            {
+              "pc": "0x5b10",
+              "instruction": "F2FP.BF16.F32.PACK_AB R15, R15, R44",
+              "highest": 44
+            }
+          ],
+          "pending_A_and_P_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 889,
+          "possibly_executed_instruction_count": 865,
+          "abstract_state_count": 945,
+          "gpr_highest_including_implicit": 93,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x3640",
+              "instruction": "LOP3.LUT R93, R64, 0xffff0000, RZ, 0xc0, !PT",
+              "highest": 93
+            },
+            {
+              "pc": "0x3930",
+              "instruction": "FADD R60, R93, -R70",
+              "highest": 93
+            },
+            {
+              "pc": "0x39c0",
+              "instruction": "LOP3.LUT R93, R24, 0x80, RZ, 0xc0, !PT",
+              "highest": 93
+            },
+            {
+              "pc": "0x39d0",
+              "instruction": "SHF.R.U64 R93, R93, 0x3, RZ",
+              "highest": 93
+            },
+            {
+              "pc": "0x39e0",
+              "instruction": "LOP3.LUT R24, R93, R24, RZ, 0x3c, !PT",
+              "highest": 93
+            }
+          ],
+          "pending_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x3fa0",
+              "last_issue_pc": "0x40f0",
+              "covered_wait0_pc": "0x4100",
+              "MMA_count": 6,
+              "operand_kind": "RS",
+              "A_packed_register_count": 24,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71
+              ],
+              "P_register_count": 24,
+              "P_registers": [
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of entire stage physical RS A words including future-issued A and all owned P, until coveredwait0; SS has no register stageA. Full roleCFG loops/waitstubs/commonU included."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 838,
+          "possibly_executed_instruction_count": 833,
+          "abstract_state_count": 894,
+          "gpr_highest_including_implicit": 93,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x9c0",
+              "instruction": "SHF.R.U64 R93, R3, 0x5, R0",
+              "highest": 93
+            },
+            {
+              "pc": "0x9f0",
+              "instruction": "IMAD.SHL.U32 R56, R93.reuse, 0x8, RZ",
+              "highest": 93
+            },
+            {
+              "pc": "0xa00",
+              "instruction": "LOP3.LUT R93, R93, 0x1, RZ, 0xc0, !PT",
+              "highest": 93
+            },
+            {
+              "pc": "0xa90",
+              "instruction": "IMAD R58, R93.reuse, 0x2e00, RZ",
+              "highest": 93
+            },
+            {
+              "pc": "0xaa0",
+              "instruction": "IMAD R71, R93, 0x2e00, RZ",
+              "highest": 93
+            },
+            {
+              "pc": "0x1ad0",
+              "instruction": "IMAD R93, R93, 0x5c00, R92",
+              "highest": 93
+            },
+            {
+              "pc": "0x1af0",
+              "instruction": "VIADD R93, R93, 0x4000",
+              "highest": 93
+            },
+            {
+              "pc": "0x1b10",
+              "instruction": "SHF.R.U32.HI R93, RZ, 0x4, R93",
+              "highest": 93
+            },
+            {
+              "pc": "0x1b30",
+              "instruction": "LOP3.LUT R93, R93, 0x3ff8, RZ, 0xc0, !PT",
+              "highest": 93
+            },
+            {
+              "pc": "0x1c50",
+              "instruction": "R2UR UR12, R93",
+              "highest": 93
+            },
+            {
+              "pc": "0x1ce0",
+              "instruction": "SHF.L.U32 R93, R71, 0x10, RZ",
+              "highest": 93
+            },
+            {
+              "pc": "0x1d20",
+              "instruction": "FADD R93, R91, R93",
+              "highest": 93
+            }
+          ],
+          "pending_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x1df0",
+              "last_issue_pc": "0x2030",
+              "covered_wait0_pc": "0x2040",
+              "MMA_count": 8,
+              "operand_kind": "RS",
+              "A_packed_register_count": 32,
+              "A_registers": [
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "P_register_count": 32,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of entire stage physical RS A words including future-issued A and all owned P, until coveredwait0; SS has no register stageA. Full roleCFG loops/waitstubs/commonU included."
+            }
+          ]
+        }
+      ],
+      "initialization_gate": {
+        "status": "PASS_ALL_ROLE_PATHS",
+        "scope": "successINC precedes owned P clear and all grow-register accesses; P8 accumulators all first definite-zero, all later reads definite-written including loopbacks; role write-before-read independently reviewed",
+        "INC_pc": "0x230",
+        "INC_success_pc": "0x270",
+        "high_R80_93_all_path_write_before_read": true,
+        "pre_INC_owned_P_or_grow_accesses": 0
+      },
+      "RS_A_operand_packed_width": 4,
+      "P_accumulator_source_and_destination_width": 8,
+      "whole_stage_pending_generic_A_or_P_accesses": 0,
+      "STACK": 0,
+      "LOCAL": 0,
+      "spill_stores": 0,
+      "spill_loads": 0,
+      "new_function_C7512": false,
+      "serialization_warning_for_new_function": false,
+      "dynamic_shared_bytes": 47232,
+      "static_shared_bytes": 0,
+      "static_shared_bytes_evidence": "actual cuFuncGetAttribute(SHARED_SIZE_BYTES) on exact final feeding cubin",
+      "dynamic_plus_static_shared_bytes": 47232,
+      "resource_tool_reported_SHARED_bytes": 1024,
+      "resource_tool_reported_SHARED_bytes_scope": "ELF/resource-tool accounting is preserved separately from actual DriverAPI static_shared_bytes0; no assertion that both should be summed",
+      "shared_bank_bytes": 23552,
+      "two_banks_bytes": 47104,
+      "P_tail_bytes": 28672,
+      "tail_bank0_bytes": 23552,
+      "tail_bank1_bytes": 5120,
+      "shared_alignment_bytes": 128,
+      "actual_compact_layout_proof": "compiled cosize equality asserts + union sizeof + actual host sizeof optin/launch immediate",
+      "full_barrier_offsets": [
+        47104,
+        47112
+      ],
+      "empty_barrier_offsets": [
+        47120,
+        47128
+      ],
+      "full_barrier_arrival_count": 128,
+      "empty_barrier_arrival_count": 256,
+      "host_launch_and_optin_actual_immediate": 47232,
+      "native_ordinary_kernel_launches": 1,
+      "global_workspace_bytes": 0,
+      "occupancy_API_predicted_active_CTAs_per_SM": 2,
+      "measured_residency": null,
+      "synchronization_gate": {
+        "status": "PASS",
+        "collective_epochs": [
+          0,
+          6,
+          0
+        ],
+        "drain_barrier": "nonaligned barrier.sync6,count384; all12 full warps once",
+        "all_banks_drained_before_any_tail_STS": true,
+        "both_WG_wait0_before_release": true,
+        "all_P_stores_before_publish_bar0_before_U": true,
+        "raw_actual_PC_sequence": {
+          "WG1_wait0": "0x2040",
+          "WG0_wait0": "0x4100",
+          "consumer_drain": "0x4160",
+          "tail_STS_first": "0x4510",
+          "tail_STS_last": "0x4850",
+          "producer_two_empty_waits": [
+            "0x5ce0",
+            "0x5d80"
+          ],
+          "producer_drain": "0x5da0",
+          "publish": "0x5dd0"
+        }
+      },
+      "math_DAG_gate": "complete7P,ascending wholeK,twoK16atoms,original FP32RN ST DAG one final input casts, fixedU, alphaRN, activebetaFMA",
+      "alias_epilogue_gate": {
+        "status": "PASS",
+        "active_four_C0_loads_precede_first_D_store": true,
+        "beta0_null_does_not_read_C0": true,
+        "raw_C0_loads": [
+          "0x6660",
+          "0x66a0",
+          "0x66e0",
+          "0x6740"
+        ],
+        "raw_first_D_store": "0x6920"
+      },
+      "GPU_validation_at_compiled_gate": null,
+      "original_precision_certification_at_compiled_gate": null,
+      "performance_at_compiled_gate": null,
+      "producer_gpr_highest_including_implicit": 44,
+      "consumer_gpr_highest_including_implicit": 93
+    },
+    {
+      "variant": 43,
+      "dtype": "FP16",
+      "function": "_ZN7megafmm67_GLOBAL__N__4db7ea63_34_megakernel_wgmma_psplit_ss_bn16_cu_06492c2229winograd_wgmma_psplit_ss_bn16IN7cutlass6half_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf",
+      "status": "PASS_FRESH_COMPILED_STATIC_LAUNCH_GATE",
+      "bm": 64,
+      "bn": 16,
+      "bk": 32,
+      "threads": 384,
+      "banks": 2,
+      "k16_atoms": 2,
+      "parent_1024_stage_count": 16,
+      "static_instruction_count": 1056,
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "canonical_instruction_stream_sha256": "bbe3a44fc02da29b03c1261e2d24442b7557c1e00b0aa62ea4cc7b61f6fb5389",
+      "actual_reported_registers": 80,
+      "effective_initial_registers_per_thread": 80,
+      "effective_initial_evidence": [
+        "fresh feeding ELF EIATTR_REGCOUNT80",
+        "actual ptxas/resource REG80 and queried DriverAPI function numRegs80"
+      ],
+      "producer_quota": 64,
+      "consumer_quotas": [
+        80,
+        80
+      ],
+      "initial_owned_cta_register_pool": 30720,
+      "required_role_register_pool": 28672,
+      "owned_pool_spare": 2048,
+      "legal_setmaxnreg_directions": true,
+      "prequota_highest_register": 2,
+      "role_highest_including_implicit": {
+        "producer": 58,
+        "WG0": 55,
+        "WG1": 55
+      },
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 665,
+          "possibly_executed_instruction_count": 663,
+          "abstract_state_count": 711,
+          "gpr_highest_including_implicit": 58,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x2d00",
+              "instruction": "FADD R58, -R19, R8",
+              "highest": 58
+            },
+            {
+              "pc": "0x2f70",
+              "instruction": "FADD R54, R51, -R58",
+              "highest": 58
+            },
+            {
+              "pc": "0x3080",
+              "instruction": "F2FP.F16.F32.PACK_AB R19, R19, R58",
+              "highest": 58
+            }
+          ],
+          "pending_A_and_P_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 475,
+          "possibly_executed_instruction_count": 451,
+          "abstract_state_count": 737,
+          "gpr_highest_including_implicit": 55,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x250",
+              "instruction": "CS2R R54, SRZ",
+              "highest": 55
+            },
+            {
+              "pc": "0xb90",
+              "instruction": "IMAD.U32 R55, RZ, RZ, UR13",
+              "highest": 55
+            },
+            {
+              "pc": "0xee0",
+              "instruction": "HGMMA.64x16x16.F32 R48, gdesc[UR4].tnspB, R48",
+              "highest": 55
+            },
+            {
+              "pc": "0xf70",
+              "instruction": "HGMMA.64x16x16.F32 R48, gdesc[UR4].tnspB, R48",
+              "highest": 55
+            },
+            {
+              "pc": "0x1840",
+              "instruction": "STS [R4], R55",
+              "highest": 55
+            },
+            {
+              "pc": "0x1840",
+              "instruction": "STS [R4], R55",
+              "highest": 55
+            }
+          ],
+          "pending_A_and_P_regions": [
+            {
+              "first_issue_pc": "0xee0",
+              "last_issue_pc": "0x1130",
+              "covered_wait0_pc": "0x1140",
+              "MMA_count": 6,
+              "operand_kind": "SS",
+              "A_packed_register_count": 0,
+              "A_registers": [],
+              "P_register_count": 24,
+              "P_registers": [
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of entire stage physical RS A words including future-issued A and all owned P, until coveredwait0; SS has no register stageA. Full roleCFG loops/waitstubs/commonU included."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 484,
+          "possibly_executed_instruction_count": 479,
+          "abstract_state_count": 754,
+          "gpr_highest_including_implicit": 55,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x250",
+              "instruction": "CS2R R54, SRZ",
+              "highest": 55
+            },
+            {
+              "pc": "0x410",
+              "instruction": "CS2R R54, SRZ",
+              "highest": 55
+            },
+            {
+              "pc": "0x720",
+              "instruction": "HGMMA.64x16x16.F32 R48, gdesc[UR4].tnspB, R48",
+              "highest": 55
+            },
+            {
+              "pc": "0x790",
+              "instruction": "HGMMA.64x16x16.F32 R48, gdesc[UR4].tnspB, R48",
+              "highest": 55
+            },
+            {
+              "pc": "0x1840",
+              "instruction": "STS [R4], R55",
+              "highest": 55
+            },
+            {
+              "pc": "0x1840",
+              "instruction": "STS [R4], R55",
+              "highest": 55
+            }
+          ],
+          "pending_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x720",
+              "last_issue_pc": "0xa30",
+              "covered_wait0_pc": "0xa40",
+              "MMA_count": 8,
+              "operand_kind": "SS",
+              "A_packed_register_count": 0,
+              "A_registers": [],
+              "P_register_count": 32,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of entire stage physical RS A words including future-issued A and all owned P, until coveredwait0; SS has no register stageA. Full roleCFG loops/waitstubs/commonU included."
+            }
+          ]
+        }
+      ],
+      "initialization_gate": {
+        "status": "PASS_ALL_ROLE_PATHS",
+        "scope": "successINC precedes owned P clear and all grow-register accesses; P8 accumulators all first definite-zero, all later reads definite-written including loopbacks; role write-before-read independently reviewed",
+        "INC_pc": "0x1f0",
+        "INC_success_pc": "0x230",
+        "high_R80_93_all_path_write_before_read": null,
+        "pre_INC_owned_P_or_grow_accesses": 0
+      },
+      "RS_A_operand_packed_width": null,
+      "P_accumulator_source_and_destination_width": 8,
+      "whole_stage_pending_generic_A_or_P_accesses": 0,
+      "STACK": 0,
+      "LOCAL": 0,
+      "spill_stores": 0,
+      "spill_loads": 0,
+      "new_function_C7512": false,
+      "serialization_warning_for_new_function": false,
+      "dynamic_shared_bytes": 71808,
+      "static_shared_bytes": 0,
+      "static_shared_bytes_evidence": "actual cuFuncGetAttribute(SHARED_SIZE_BYTES) on exact final feeding cubin",
+      "dynamic_plus_static_shared_bytes": 71808,
+      "resource_tool_reported_SHARED_bytes": 1024,
+      "resource_tool_reported_SHARED_bytes_scope": "ELF/resource-tool accounting is preserved separately from actual DriverAPI static_shared_bytes0; no assertion that both should be summed",
+      "shared_bank_bytes": 35840,
+      "two_banks_bytes": 71680,
+      "P_tail_bytes": 28672,
+      "tail_bank0_bytes": 28672,
+      "tail_bank1_bytes": 0,
+      "shared_alignment_bytes": 128,
+      "actual_compact_layout_proof": "compiled cosize equality asserts + union sizeof + actual host sizeof optin/launch immediate",
+      "full_barrier_offsets": [
+        71680,
+        71688
+      ],
+      "empty_barrier_offsets": [
+        71696,
+        71704
+      ],
+      "full_barrier_arrival_count": 128,
+      "empty_barrier_arrival_count": 256,
+      "host_launch_and_optin_actual_immediate": 71808,
+      "native_ordinary_kernel_launches": 1,
+      "global_workspace_bytes": 0,
+      "occupancy_API_predicted_active_CTAs_per_SM": 2,
+      "measured_residency": null,
+      "synchronization_gate": {
+        "status": "PASS",
+        "collective_epochs": [
+          0,
+          6,
+          0
+        ],
+        "drain_barrier": "nonaligned barrier.sync6,count384; all12 full warps once",
+        "all_banks_drained_before_any_tail_STS": true,
+        "both_WG_wait0_before_release": true,
+        "all_P_stores_before_publish_bar0_before_U": true,
+        "raw_actual_PC_sequence": {
+          "WG1_wait0": "0xa40",
+          "WG0_wait0": "0x1140",
+          "consumer_drain": "0x11b0",
+          "tail_STS_first": "0x1560",
+          "tail_STS_last": "0x18a0",
+          "producer_two_empty_waits": [
+            "0x3260",
+            "0x32f0"
+          ],
+          "producer_drain": "0x3310",
+          "publish": "0x3340"
+        }
+      },
+      "math_DAG_gate": "complete7P,ascending wholeK,twoK16atoms,original FP32RN ST DAG one final input casts, fixedU, alphaRN, activebetaFMA",
+      "alias_epilogue_gate": {
+        "status": "PASS",
+        "active_four_C0_loads_precede_first_D_store": true,
+        "beta0_null_does_not_read_C0": true,
+        "raw_C0_loads": [
+          "0x3bd0",
+          "0x3c10",
+          "0x3c50",
+          "0x3cb0"
+        ],
+        "raw_first_D_store": "0x3e90"
+      },
+      "GPU_validation_at_compiled_gate": null,
+      "original_precision_certification_at_compiled_gate": null,
+      "performance_at_compiled_gate": null,
+      "producer_gpr_highest_including_implicit": 58,
+      "consumer_gpr_highest_including_implicit": 55
+    },
+    {
+      "variant": 43,
+      "dtype": "BF16",
+      "function": "_ZN7megafmm67_GLOBAL__N__4db7ea63_34_megakernel_wgmma_psplit_ss_bn16_cu_06492c2229winograd_wgmma_psplit_ss_bn16IN7cutlass10bfloat16_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf",
+      "status": "PASS_FRESH_COMPILED_STATIC_LAUNCH_GATE",
+      "bm": 64,
+      "bn": 16,
+      "bk": 32,
+      "threads": 384,
+      "banks": 2,
+      "k16_atoms": 2,
+      "parent_1024_stage_count": 16,
+      "static_instruction_count": 1056,
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "canonical_instruction_stream_sha256": "2f45acd037140c8737e84f5acc272f66e84341f0d334e4f57ce779d73c0c1190",
+      "actual_reported_registers": 80,
+      "effective_initial_registers_per_thread": 80,
+      "effective_initial_evidence": [
+        "fresh feeding ELF EIATTR_REGCOUNT80",
+        "actual ptxas/resource REG80 and queried DriverAPI function numRegs80"
+      ],
+      "producer_quota": 64,
+      "consumer_quotas": [
+        80,
+        80
+      ],
+      "initial_owned_cta_register_pool": 30720,
+      "required_role_register_pool": 28672,
+      "owned_pool_spare": 2048,
+      "legal_setmaxnreg_directions": true,
+      "prequota_highest_register": 2,
+      "role_highest_including_implicit": {
+        "producer": 58,
+        "WG0": 55,
+        "WG1": 55
+      },
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 665,
+          "possibly_executed_instruction_count": 663,
+          "abstract_state_count": 711,
+          "gpr_highest_including_implicit": 58,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x2cd0",
+              "instruction": "FADD R58, -R19, R8",
+              "highest": 58
+            },
+            {
+              "pc": "0x2f70",
+              "instruction": "FADD R54, R51, -R58",
+              "highest": 58
+            },
+            {
+              "pc": "0x3080",
+              "instruction": "F2FP.BF16.F32.PACK_AB R19, R19, R58",
+              "highest": 58
+            }
+          ],
+          "pending_A_and_P_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 475,
+          "possibly_executed_instruction_count": 451,
+          "abstract_state_count": 737,
+          "gpr_highest_including_implicit": 55,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x250",
+              "instruction": "CS2R R54, SRZ",
+              "highest": 55
+            },
+            {
+              "pc": "0xb90",
+              "instruction": "IMAD.U32 R55, RZ, RZ, UR13",
+              "highest": 55
+            },
+            {
+              "pc": "0xee0",
+              "instruction": "HGMMA.64x16x16.F32.BF16 R48, gdesc[UR4].tnspB, R48",
+              "highest": 55
+            },
+            {
+              "pc": "0xf70",
+              "instruction": "HGMMA.64x16x16.F32.BF16 R48, gdesc[UR4].tnspB, R48",
+              "highest": 55
+            },
+            {
+              "pc": "0x1840",
+              "instruction": "STS [R4], R55",
+              "highest": 55
+            },
+            {
+              "pc": "0x1840",
+              "instruction": "STS [R4], R55",
+              "highest": 55
+            }
+          ],
+          "pending_A_and_P_regions": [
+            {
+              "first_issue_pc": "0xee0",
+              "last_issue_pc": "0x1130",
+              "covered_wait0_pc": "0x1140",
+              "MMA_count": 6,
+              "operand_kind": "SS",
+              "A_packed_register_count": 0,
+              "A_registers": [],
+              "P_register_count": 24,
+              "P_registers": [
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of entire stage physical RS A words including future-issued A and all owned P, until coveredwait0; SS has no register stageA. Full roleCFG loops/waitstubs/commonU included."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 484,
+          "possibly_executed_instruction_count": 479,
+          "abstract_state_count": 754,
+          "gpr_highest_including_implicit": 55,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x250",
+              "instruction": "CS2R R54, SRZ",
+              "highest": 55
+            },
+            {
+              "pc": "0x410",
+              "instruction": "CS2R R54, SRZ",
+              "highest": 55
+            },
+            {
+              "pc": "0x720",
+              "instruction": "HGMMA.64x16x16.F32.BF16 R48, gdesc[UR4].tnspB, R48",
+              "highest": 55
+            },
+            {
+              "pc": "0x790",
+              "instruction": "HGMMA.64x16x16.F32.BF16 R48, gdesc[UR4].tnspB, R48",
+              "highest": 55
+            },
+            {
+              "pc": "0x1840",
+              "instruction": "STS [R4], R55",
+              "highest": 55
+            },
+            {
+              "pc": "0x1840",
+              "instruction": "STS [R4], R55",
+              "highest": 55
+            }
+          ],
+          "pending_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x720",
+              "last_issue_pc": "0xa30",
+              "covered_wait0_pc": "0xa40",
+              "MMA_count": 8,
+              "operand_kind": "SS",
+              "A_packed_register_count": 0,
+              "A_registers": [],
+              "P_register_count": 32,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of entire stage physical RS A words including future-issued A and all owned P, until coveredwait0; SS has no register stageA. Full roleCFG loops/waitstubs/commonU included."
+            }
+          ]
+        }
+      ],
+      "initialization_gate": {
+        "status": "PASS_ALL_ROLE_PATHS",
+        "scope": "successINC precedes owned P clear and all grow-register accesses; P8 accumulators all first definite-zero, all later reads definite-written including loopbacks; role write-before-read independently reviewed",
+        "INC_pc": "0x1f0",
+        "INC_success_pc": "0x230",
+        "high_R80_93_all_path_write_before_read": null,
+        "pre_INC_owned_P_or_grow_accesses": 0
+      },
+      "RS_A_operand_packed_width": null,
+      "P_accumulator_source_and_destination_width": 8,
+      "whole_stage_pending_generic_A_or_P_accesses": 0,
+      "STACK": 0,
+      "LOCAL": 0,
+      "spill_stores": 0,
+      "spill_loads": 0,
+      "new_function_C7512": false,
+      "serialization_warning_for_new_function": false,
+      "dynamic_shared_bytes": 71808,
+      "static_shared_bytes": 0,
+      "static_shared_bytes_evidence": "actual cuFuncGetAttribute(SHARED_SIZE_BYTES) on exact final feeding cubin",
+      "dynamic_plus_static_shared_bytes": 71808,
+      "resource_tool_reported_SHARED_bytes": 1024,
+      "resource_tool_reported_SHARED_bytes_scope": "ELF/resource-tool accounting is preserved separately from actual DriverAPI static_shared_bytes0; no assertion that both should be summed",
+      "shared_bank_bytes": 35840,
+      "two_banks_bytes": 71680,
+      "P_tail_bytes": 28672,
+      "tail_bank0_bytes": 28672,
+      "tail_bank1_bytes": 0,
+      "shared_alignment_bytes": 128,
+      "actual_compact_layout_proof": "compiled cosize equality asserts + union sizeof + actual host sizeof optin/launch immediate",
+      "full_barrier_offsets": [
+        71680,
+        71688
+      ],
+      "empty_barrier_offsets": [
+        71696,
+        71704
+      ],
+      "full_barrier_arrival_count": 128,
+      "empty_barrier_arrival_count": 256,
+      "host_launch_and_optin_actual_immediate": 71808,
+      "native_ordinary_kernel_launches": 1,
+      "global_workspace_bytes": 0,
+      "occupancy_API_predicted_active_CTAs_per_SM": 2,
+      "measured_residency": null,
+      "synchronization_gate": {
+        "status": "PASS",
+        "collective_epochs": [
+          0,
+          6,
+          0
+        ],
+        "drain_barrier": "nonaligned barrier.sync6,count384; all12 full warps once",
+        "all_banks_drained_before_any_tail_STS": true,
+        "both_WG_wait0_before_release": true,
+        "all_P_stores_before_publish_bar0_before_U": true,
+        "raw_actual_PC_sequence": {
+          "WG1_wait0": "0xa40",
+          "WG0_wait0": "0x1140",
+          "consumer_drain": "0x11b0",
+          "tail_STS_first": "0x1560",
+          "tail_STS_last": "0x18a0",
+          "producer_two_empty_waits": [
+            "0x3260",
+            "0x32f0"
+          ],
+          "producer_drain": "0x3310",
+          "publish": "0x3340"
+        }
+      },
+      "math_DAG_gate": "complete7P,ascending wholeK,twoK16atoms,original FP32RN ST DAG one final input casts, fixedU, alphaRN, activebetaFMA",
+      "alias_epilogue_gate": {
+        "status": "PASS",
+        "active_four_C0_loads_precede_first_D_store": true,
+        "beta0_null_does_not_read_C0": true,
+        "raw_C0_loads": [
+          "0x3bd0",
+          "0x3c10",
+          "0x3c50",
+          "0x3cb0"
+        ],
+        "raw_first_D_store": "0x3e90"
+      },
+      "GPU_validation_at_compiled_gate": null,
+      "original_precision_certification_at_compiled_gate": null,
+      "performance_at_compiled_gate": null,
+      "producer_gpr_highest_including_implicit": 58,
+      "consumer_gpr_highest_including_implicit": 55
+    }
+  ],
+  "disabled_instances": [
+    {
+      "variant": 37,
+      "status": "RETAINED_HISTORICAL_DISABLED_BEFORE_DEGENERATE",
+      "native_launch_allowed": false
+    }
+  ],
+  "source_API_tests_review": {
+    "status": "PASS",
+    "native_MNK_divisibility": [
+      128,
+      64,
+      64
+    ],
+    "atom_bn": 16,
+    "parent_N32_actual_fallback": "packedP7",
+    "current_AB_alignment_bytes": 16,
+    "original_DAG_and_onecast": true,
+    "max_variant": 43,
+    "invalid_variant": 44,
+    "validation_before_empty_scale": true,
+    "old37_disabled": true,
+    "Auto": "Dense",
+    "8_source_2_binary_bindings_actual": true,
+    "test_inverse_normalization_full_byte_exact_to_source38": true,
+    "raw42_reference": "enabledSS43 sameN16; otherwise explicitcrossatom36",
+    "SS43_reference": "SS36 explicitN16-vs-N32 crossatom empirical bitcheck; notsameatom/selfreference",
+    "private_test_CUDA_reference_added": false,
+    "strict_original_floors_unchanged": true,
+    "strict_code_full_domain_is_not_actual_execution": true
+  },
+  "early_diagnostics_preserved": {
+    "initial42_failure_status": "FAIL_STACK16_SPILL12_12_NO_LAUNCH",
+    "initial42_source_sha256": "ec97630bf28161580f1c3cf6610b8409d65c644007c4e888bd96ebec0345190c",
+    "initial42_source_archived_path": "results/psplit_bn16_initial_megakernel_wgmma_psplit_rsa_bn16_iter39.cu",
+    "initial42_diagnostic_path": ".scratch/psplit_bn16_initial_raw_failure_review_iter39.json",
+    "initial42_diagnostic_original_source_path_scope": "logical path in historical initial snapshot; current formal source is distinct revision1 SHAa17b",
+    "revision1_source_sha256": "a17b7f8f4c1938378c3655c6db2aa420dfdd173e22c9f9de142d887710d44e84",
+    "revision1_scope": "only two consumer states derived from full int64 k_base: index(stage&1),phase((stage>>1)&1),count0; producer original bytes and math unchanged",
+    "pinned_consumer_count_unused": true,
+    "revision1_driver_exit2_scope": "bench compiled actual0; driver requested nonexistent megafmm_tests target; true subsequent test_correctness build0; notnew resource failure"
+  },
+  "original_FP64_gate": {
+    "checked_by_compiled_gate": false,
+    "original_thresholds_relaxed": false,
+    "Auto_promoted": false,
+    "goal_achieved": false
+  },
+  "allowed_native_launch_variants": [
+    42,
+    43
+  ]
+}

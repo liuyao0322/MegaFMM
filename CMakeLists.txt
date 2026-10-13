@@ -22,7 +22,7 @@ add_library(megafmm STATIC solution/plan.cpp solution/pack_winograd.cu
   solution/small_mma_k128_specialized.cu
   solution/small_mma_cooperative.cu solution/megakernel_wgmma_pipeline.cu
   solution/megakernel_wgmma_tma_alias.cu solution/megakernel_wgmma_wait1.cu solution/megakernel_wgmma_wait1_three_stage.cu
-  solution/megakernel_wgmma_psplit.cu solution/megakernel_wgmma_psplit_asymmetric.cu solution/megakernel_wgmma_psplit_bk64.cu solution/megakernel_wgmma_psplit_rsa.cu solution/megakernel_wgmma_psplit_rsa_bk32.cu solution/megakernel_wgmma_psplit_hybrid_s.cu)
+  solution/megakernel_wgmma_psplit.cu solution/megakernel_wgmma_psplit_asymmetric.cu solution/megakernel_wgmma_psplit_bk64.cu solution/megakernel_wgmma_psplit_rsa.cu solution/megakernel_wgmma_psplit_rsa_bk32.cu solution/megakernel_wgmma_psplit_hybrid_s.cu solution/megakernel_wgmma_psplit_rsa_bn16.cu solution/megakernel_wgmma_psplit_ss_bn16.cu)
 target_include_directories(megafmm PUBLIC include PRIVATE solution "${CUTLASS_ROOT}/include" "${CUTLASS_ROOT}/tools/util/include")
 target_link_libraries(megafmm PUBLIC CUDA::cudart CUDA::cublasLt CUDA::cublas CUDA::cuda_driver)
 target_compile_options(megafmm PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_90a,code=sm_90a;--expt-relaxed-constexpr;--expt-extended-lambda;-lineinfo;-Xptxas=-v>)
@@ -58,3 +58,8 @@ set_source_files_properties(solution/megakernel_wgmma_psplit_rsa_bk32.cu
 
 set_source_files_properties(solution/megakernel_wgmma_psplit_hybrid_s.cu
   PROPERTIES COMPILE_OPTIONS "--keep;--keep-dir=${CMAKE_CURRENT_SOURCE_DIR}/.scratch/psplit_hybrid_s_nvcc_keep_iter38")
+
+set_source_files_properties(solution/megakernel_wgmma_psplit_rsa_bn16.cu
+  PROPERTIES COMPILE_OPTIONS "--keep;--keep-dir=${CMAKE_CURRENT_SOURCE_DIR}/.scratch/psplit_bn16_rsa_nvcc_keep_iter39")
+set_source_files_properties(solution/megakernel_wgmma_psplit_ss_bn16.cu
+  PROPERTIES COMPILE_OPTIONS "--keep;--keep-dir=${CMAKE_CURRENT_SOURCE_DIR}/.scratch/psplit_bn16_ss_nvcc_keep_iter39")

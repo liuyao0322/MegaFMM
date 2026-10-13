@@ -75,6 +75,9 @@ struct Policy {
   // Complete onecast A transform in registers, whole7P then fixedU, no globalSTP.
   // 40=RS-A P3+4 BK32,64x32; rawA4/finalB7 shared, quotas64/192/192, parentK%64.
   // 41=hybrid S RS-A P3+4 BK32,64x32; shared finalS1/FP32S2 planes, rawA4/finalB7.
+  // 42=RS-A BN16 BK32 P3+4, rawA4/finalB7; initial quotas48/96/96 and minCTAs2.
+  // 43=SS BN16 BK32 P3+4, finalA7/finalB7; initial quotas64/80/80 and minCTAs2.
+  // WholeK/fixedU/onecast and currentAB16/parentK%64; actual fresh gate required.
   int mega_variant=0;
 };
 class Plan {
