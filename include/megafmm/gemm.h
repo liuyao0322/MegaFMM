@@ -33,7 +33,8 @@ struct Policy {
   // 4/5/6=warp mma.sync with one/two/four owners per 32/64/128-thread CTA,
   // 7=paired operand conversions, 8=paired full tiles (otherwise variant 7),
   // 9=product-parallel M1 with seven product warps and final fixed U merge,
-  // 10=complete-tile product warps (otherwise variant 9).
+  // 10=complete-tile product warps (otherwise variant 9),
+  // 11=complete 16x8 warp MMA tiles (otherwise packed variant 7).
   int mega_variant=0;
 };
 class Plan {

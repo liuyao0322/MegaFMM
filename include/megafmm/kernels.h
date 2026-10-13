@@ -43,4 +43,11 @@ void prepare_small_product_fast(const Problem& p, int variant=10);
 void launch_small_product_fast(const Problem& p, const void* A, const void* B,
                                const float* C0, float* D, cudaStream_t stream,
                                int variant=10);
+// One warp owns a complete 16x8 tile; Plan uses packed variant 7 for tails.
+bool mma16x8_can_implement(const Problem& p, int variant=11);
+bool mma16x8_full_tiles(const Problem& p, const void* A, const void* B);
+void prepare_mma16x8(const Problem& p, int variant=11);
+void launch_mma16x8(const Problem& p, const void* A, const void* B,
+                    const float* C0, float* D, cudaStream_t stream,
+                    int variant=11);
 }

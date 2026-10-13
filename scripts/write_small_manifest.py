@@ -64,7 +64,7 @@ def declared_cases(path: Path) -> dict[str, dict]:
     match = re.search(r"^all_labels=\((.*?)^\)",text,re.M|re.S)
     require(match is not None, f"cannot read predeclared all_labels from {path}")
     labels = shlex.split(match.group(1))
-    require(len(labels) == len(set(labels)) == 22, "closure requires all 22 unique declared labels")
+    require(labels and len(labels) == len(set(labels)), "closure requires unique predeclared labels")
     cases = {}
     for line in text.splitlines():
         if not line.startswith("run_case "):
@@ -82,6 +82,11 @@ def declared_cases(path: Path) -> dict[str, dict]:
         require(tokens[4:] == (["--graph"] if mode == "graph" else []), f"extra case flags: {label}")
         cases[label] = {"algorithm": algorithm, "variant": int(tokens[3]), "mode": mode}
     require(set(cases) == set(labels), "all_labels and run_case declarations disagree")
+    modes=defaultdict(set)
+    for case in cases.values():
+        modes[case["algorithm"],case["variant"]].add(case["mode"])
+    require(all(value=={"launch","graph"} for value in modes.values()),
+            "each declared algorithm/variant needs separate launch and Graph cases")
     return {label:cases[label] for label in labels}
 
 
@@ -193,7 +198,8 @@ def source_test_profile(text: str) -> tuple[set[tuple[str,int]],list[str],int,se
     block=text[start:end]
     candidate_end=block.find("for(auto pat:")
     require(candidate_end>0,"cannot identify strict candidate list")
-    candidates={("lt",int(v)) for v in re.findall(r"Algorithm::WinogradLt\s*,\s*(\d+)",block[:candidate_end])}
+    candidates={(ALGORITHM_NAMES[a],int(v)) for a,v in re.findall(
+        r"Algorithm::(WinogradLt|WinogradHopper|Megakernel)\s*,\s*(\d+)",block[:candidate_end])}
     loops=re.findall(r"for\s*\(\s*int\s+variant\s*=\s*0\s*;\s*variant\s*<=\s*(\d+)\s*;\s*\+\+variant\s*\)\s*"
                      r"candidates\.push_back\(\{megafmm::Algorithm::(WinogradHopper|Megakernel),\s*variant\}\)",block[:candidate_end])
     for maximum,algorithm in loops:

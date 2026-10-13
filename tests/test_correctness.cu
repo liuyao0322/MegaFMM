@@ -61,6 +61,8 @@ std::string algorithm_name(megafmm::Algorithm algorithm) {
   } return "unknown";
 }
 const char* warp_mma_name(int variant,const megafmm::Problem& p) {
+  if(variant==11)return p.m%32==0 && p.n%16==0 && p.k%32==0 && p.lda%8==0 && p.ldb%8==0 ?
+                         "megakernel_warp_mma_16x8":"megakernel_warp_mma_packed";
   if(variant==10)return p.m%32==0 && p.n%32==0 && p.k%32==0 &&
                          p.lda%8==0 && p.ldb%8==0 && p.ldc%8==0 && p.ldd%8==0 ?
                          "megakernel_product_warps_fast":"megakernel_product_warps";
@@ -221,6 +223,7 @@ template<class T> void structural_suite(megafmm::DType dtype) {
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,8},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,9},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,10},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,11},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,1},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,2}}) {
     auto e=run_case<T>(problem(256,256,256,dtype),candidate.first,Pattern::Integers,false,true,1234567,candidate.second);
@@ -285,7 +288,7 @@ template<class T> void batched_suite(megafmm::DType dtype,bool lt_only=false) {
   }
 }
 template<class T> void warp_mma_suite(megafmm::DType dtype) {
-  for(int variant=4;variant<=10;++variant) {
+  for(int variant=4;variant<=11;++variant) {
     auto exact=[dtype,variant](megafmm::Problem p,Pattern pattern,bool alias=false,bool certified=true,
                               bool expect_warp=true,bool do_tune=false) {
       const char* route=expect_warp ? warp_mma_name(variant,p):"dense_cublaslt";
@@ -337,7 +340,8 @@ template<class T> void warp_mma_suite(megafmm::DType dtype) {
   }
 }
 template<class T> void warp_mma_bitwise_suite(megafmm::DType dtype) {
-  for(auto dims:{std::vector<int>{128,128,128},std::vector<int>{80,112,48}})
+  for(auto dims:{std::vector<int>{128,128,128},std::vector<int>{80,112,48},
+                std::vector<int>{32,16,32},std::vector<int>{32,48,32}})
   for(int scenario=0;scenario<3;++scenario) {
     auto p=problem(dims[0],dims[1],dims[2],dtype);
     bool alias=scenario==2;
@@ -358,7 +362,7 @@ template<class T> void warp_mma_bitwise_suite(megafmm::DType dtype) {
     std::cout << "BEGIN_MMA_BITWISE dtype=" << megafmm::dtype_name(dtype)
               << " shape=" << p.m << ',' << p.n << ',' << p.k << " alpha=" << p.alpha
               << " beta=" << p.beta << " alias=" << alias << " seed=" << seed << std::endl;
-    for(int variant:{4,7,8,9,10}) {
+    for(int variant:{4,7,8,9,10,11}) {
       megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::Megakernel;
       policy.certified_range=true;policy.mega_variant=variant;
       auto plan=megafmm::create_plan(p,policy);
@@ -377,7 +381,7 @@ template<class T> void warp_mma_bitwise_suite(megafmm::DType dtype) {
     }
     std::cout << "PASS_MMA_BITWISE dtype=" << megafmm::dtype_name(dtype)
               << " shape=" << p.m << ',' << p.n << ',' << p.k << " alpha=" << p.alpha
-              << " beta=" << p.beta << " alias=" << alias << " variants=4,7,8,9,10\n";
+              << " beta=" << p.beta << " alias=" << alias << " variants=4,7,8,9,10,11\n";
   }
 }
 template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false) {
@@ -404,7 +408,8 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,7},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,8},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,9},
-                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,10}}) {
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,10},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,11}}) {
     auto algo=candidate.first;int variant=candidate.second;
     bool is_batched=(algo==megafmm::Algorithm::WinogradLt && variant==1) ||
                     (algo==megafmm::Algorithm::WinogradHopper && variant>=5);
@@ -442,7 +447,7 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
 void batched_policy_rejection_suite(bool lt_only=false) {
   for(auto algorithm:{megafmm::Algorithm::Auto,megafmm::Algorithm::Dense,megafmm::Algorithm::WinogradLt,
                       megafmm::Algorithm::WinogradHopper,megafmm::Algorithm::Megakernel})
-  for(bool empty:{false,true}) for(int family=0;family<3;++family) for(int variant:{-1,family==0 ? 2:family==1 ? 7:11}) {
+  for(bool empty:{false,true}) for(int family=0;family<3;++family) for(int variant:{-1,family==0 ? 2:family==1 ? 7:12}) {
     if(lt_only && family!=0)continue;
     megafmm::Policy policy;policy.algorithm=algorithm;policy.certified_range=true;
     if(family==0)policy.lt_variant=variant;
@@ -539,7 +544,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype) {
   struct Candidate { megafmm::Algorithm algorithm;int variant; };
   std::vector<Candidate> candidates={{megafmm::Algorithm::WinogradLt,0},{megafmm::Algorithm::WinogradLt,1}};
   for(int variant=0;variant<=6;++variant)candidates.push_back({megafmm::Algorithm::WinogradHopper,variant});
-  for(int variant=0;variant<=10;++variant)candidates.push_back({megafmm::Algorithm::Megakernel,variant});
+  for(int variant=0;variant<=11;++variant)candidates.push_back({megafmm::Algorithm::Megakernel,variant});
   for(auto pat:{Pattern::Uniform,Pattern::Positive,Pattern::Range,Pattern::Cancellation,Pattern::HighHalf}) {
     std::vector<std::vector<double>> ef(candidates.size());
     std::vector<double> dense_ef;
@@ -592,7 +597,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype) {
 int main(int argc,char** argv) {
   try {
     std::cout << std::unitbuf;std::cerr << std::unitbuf;
-    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-batched | --smoke-candidates [--mega-only] [--mega-variant 0..10 | --hopper-variant 0..6]]";
+    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-batched | --smoke-candidates [--mega-only] [--mega-variant 0..11 | --hopper-variant 0..6]]";
     bool numeric=false, candidates_only=false,mega_only=false,batched_only=false;
     int hopper_filter=-1,mega_filter=-1;
     for(int i=1;i<argc;++i) {
@@ -604,7 +609,7 @@ int main(int argc,char** argv) {
         require(i+1<argc,usage);
         std::string value=argv[++i];size_t consumed=0;
         mega_filter=std::stoi(value,&consumed);
-        require(consumed==value.size() && mega_filter>=0 && mega_filter<=10,usage);
+        require(consumed==value.size() && mega_filter>=0 && mega_filter<=11,usage);
       }
       else if(std::string(argv[i])=="--hopper-variant") {
         require(i+1<argc,usage);
@@ -641,6 +646,7 @@ int main(int argc,char** argv) {
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,8},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,9},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,10},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,11},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,0},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,1},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,2},
@@ -654,18 +660,21 @@ int main(int argc,char** argv) {
           if(mega_filter>=0 && (candidate.first!=megafmm::Algorithm::Megakernel ||
                                 candidate.second!=mega_filter))continue;
           bool warp_mma=candidate.first==megafmm::Algorithm::Megakernel && candidate.second>=4;
-          for(int scenario=0;scenario<8;++scenario) {
+          for(int scenario=0;scenario<10;++scenario) {
             if(scenario==2 && candidate.first!=megafmm::Algorithm::Megakernel && candidate.second<5)continue;
             if(scenario>=3 && !warp_mma)continue;
             if(scenario==6 && candidate.second<7)continue;
             if(scenario==7 && candidate.second!=10)continue;
+            if(scenario>=8 && candidate.second!=11)continue;
             auto p=scenario==2 ? problem(128,64,256,dtype):problem(256,256,256,dtype);
             if(scenario==3 || scenario==4)p=problem(80,112,48,dtype);
             if(scenario==5)p=problem(80,80,48,dtype);
             if(scenario==6 || scenario==7)p=problem(128,128,128,dtype);
+            if(scenario==8)p=problem(32,16,32,dtype);
+            if(scenario==9)p=problem(32,48,32,dtype);
             if(scenario==4 || scenario==6) {p.lda+=8;p.ldb+=8;p.ldc+=8;p.ldd+=8;}
             if(scenario==7) {p.ldc+=1;p.ldd+=1;}
-            bool alias=scenario==1 || scenario==4 || scenario==6 || scenario==7;
+            bool alias=scenario==1 || scenario==4 || scenario==6 || scenario==7 || scenario==9;
             if(alias) {p.alpha=.5f;p.beta=-.25f;}
             std::cout << "BEGIN_CANDIDATE dtype=" << megafmm::dtype_name(dtype)
                       << " algorithm=" << algorithm_name(candidate.first) << " variant=" << candidate.second

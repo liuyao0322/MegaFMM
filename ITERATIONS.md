@@ -53,6 +53,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 12 | Remove complete-tile checks from parallel product warps | 0.3034 | 0.914679 | regression |
 
+| 13 | Reduce fused output owners to native16x8 Tensor Core tiles | 0.2953 | 0.681080 | regression |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -481,3 +483,35 @@ experiments have not been silently marked complete in PLAN.
 - **Analysis:** Predeclared quick20/5/1 launch. Primary128..1024 geometric gain vs best fast8=0.863764x; vs product9=1.207139x. bf16 128^3 4.642us Dense/SW=0.900x; fp16 128^3 4.782us Dense/SW=0.867x; bf16 256^3 6.390us Dense/SW=0.852x; fp16 256^3 6.406us Dense/SW=0.757x; bf16 512^3 13.835us Dense/SW=0.457x; fp16 512^3 13.856us Dense/SW=0.446x; bf16 1024^3 107.262us Dense/SW=0.121x; fp16 1024^3 107.382us Dense/SW=0.095x. FullTile productfast does not overcome repeated operand loading and product-warp branch cost; retain additive comparison. All18numerical gatesfail finite. Iter11 full GPU structural/bitwise4/7/8/9 PASS; three9sanitizers0errors0warnings. Rounding fix verified without weakening tests.
 - **Next:** Validate10 and integrate native16x8owners11; if third no-improvement iteration occurs, reassess profiler/compiler and primary literature before next edit.
 - **Archive:** trajectory/20261013_135104_iter-12/
+
+### Iter 13 — Reduce fused output owners to native16x8 Tensor Core tiles
+
+- **Hypothesis:** 28persistentFP32 values/lane and twice as many ownerCTAs improve small-grid coverage despite repeated A transforms.
+- **Changes:** Add Mega11 16x8x16 Sm80 MMA,5.25KiBshared,0workspace; packed7fallback; minimalN16/N48 and existing exactdyadicbitwise tests.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.681080 ms; mean speedup=0.2953x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_warp_mma_16x8 v11 | launch | 0.004150 | 0.005139 | 0.8076 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_warp_mma_16x8 v11 | launch | 0.004123 | 0.005373 | 0.7674 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_warp_mma_16x8 v11 | launch | 0.005286 | 0.008170 | 0.6471 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_warp_mma_16x8 v11 | launch | 0.004830 | 0.008296 | 0.5823 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_warp_mma_16x8 v11 | launch | 0.006138 | 0.014478 | 0.4239 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_warp_mma_16x8 v11 | launch | 0.006109 | 0.014622 | 0.4178 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_warp_mma_16x8 v11 | launch | 0.012910 | 0.065978 | 0.1957 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_warp_mma_16x8 v11 | launch | 0.010141 | 0.065354 | 0.1552 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_warp_mma_16x8 v11 | launch | 0.031982 | 0.518272 | 0.0617 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_warp_mma_16x8 v11 | launch | 0.031931 | 0.525723 | 0.0607 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_warp_mma_16x8 v11 | launch | 0.086106 | 1.565026 | 0.0550 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_warp_mma_16x8 v11 | launch | 0.089197 | 1.610131 | 0.0554 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_warp_mma_16x8 v11 | launch | 0.194962 | 3.843285 | 0.0507 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_warp_mma_16x8 v11 | launch | 0.205952 | 3.867382 | 0.0533 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_warp_mma_16x8 v11 | launch | 0.009240 | 0.035670 | 0.2590 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_warp_mma_16x8 v11 | launch | 0.009275 | 0.035597 | 0.2606 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_warp_mma_16x8 v11 | launch | 0.008048 | 0.035456 | 0.2270 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_warp_mma_16x8 v11 | launch | 0.008368 | 0.035480 | 0.2359 | 0.00075151 | 0 |
+
+- **Analysis:** Predeclared quick20/5/1 launch signal. Primary128..1024 geometric gain vs prior observed envelope=0.642482x (prior includes full100-call batch samples, signal-only cross-protocol comparison; final same-binary full repeat required). bf16 128^3 5.139us Dense/SW=0.808x best-prior/SW=0.903x; fp16 128^3 5.373us Dense/SW=0.767x best-prior/SW=0.890x; bf16 256^3 8.170us Dense/SW=0.647x best-prior/SW=0.782x; fp16 256^3 8.296us Dense/SW=0.582x best-prior/SW=0.772x; bf16 512^3 14.478us Dense/SW=0.424x best-prior/SW=0.820x; fp16 512^3 14.622us Dense/SW=0.418x best-prior/SW=0.807x; bf16 1024^3 65.978us Dense/SW=0.196x best-prior/SW=0.301x; fp16 1024^3 65.354us Dense/SW=0.155x best-prior/SW=0.300x. Narrow owner doubles CTA coverage and halves P fragment, but repeats A transforms and retains B lane<16 instruction sequence. All18numerical gatesfail finite. Iter12 complete GPU structural/bitwise4/7/8/9/10 PASS and three10sanitizers0errors0warnings. Reassess current compiler/timeline, primary CUDA/CUTLASS docs and logs before next source iteration; viable next B all-lane four-element vector optimization is already CPU-reviewed.
+- **Next:** Reassess and GPUvalidate11; then measure all-lane four-element B fill variant12.
+- **Archive:** trajectory/20261013_135613_iter-13/

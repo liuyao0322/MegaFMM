@@ -13,10 +13,12 @@ all_labels=(
   fast8_launch fast8_graph product9_launch product9_graph
   product10_launch product10_graph narrow11_launch narrow11_graph
   narrow12_launch narrow12_graph
+  cluster13_launch cluster13_graph epilogue14_launch epilogue14_graph
+  coefficients15_launch coefficients15_graph
 )
 if [[ "${1:-}" == --help || "${1:-}" == -h ]]; then
   printf 'Usage: bash scripts/small_suite.sh [LABEL ...]\n'
-  printf 'No labels runs all 22 cases; selected labels use the same full protocol.\n'
+  printf 'No labels runs all %s cases; selected labels use the same full protocol.\n' "${#all_labels[@]}"
   printf 'Labels: %s\n' "${all_labels[*]}"
   printf 'Build first. Uses the current MEGAFMM_JOB_ID / existing allocation.\n'
   exit 0
@@ -68,16 +70,17 @@ metadata=results/small_final_runs.csv
 
 # Preserve unselected rows on a partial rerun, replace selected rows, and reject
 # a mixed-binary archive. Selecting all labels deliberately starts a fresh suite.
-python3 - "$metadata" "$binary_sha256" "${selected[@]}" <<'PY'
+python3 - "$metadata" "$binary_sha256" "${#all_labels[@]}" "${selected[@]}" <<'PY'
 import csv
 import sys
 from pathlib import Path
 path = Path(sys.argv[1])
 binary = sys.argv[2]
-selected = set(sys.argv[3:])
+case_count = int(sys.argv[3])
+selected = set(sys.argv[4:])
 fields = ['label', 'source_commit', 'binary_sha256', 'exit_code']
 retained = []
-if len(selected) < 22 and path.is_file() and path.stat().st_size:
+if len(selected) < case_count and path.is_file() and path.stat().st_size:
     with path.open(newline='', encoding='utf-8') as stream:
         reader = csv.DictReader(stream)
         if reader.fieldnames != fields:
@@ -172,4 +175,10 @@ run_case narrow11_launch --algorithm mega --mega-variant 11
 run_case narrow11_graph --algorithm mega --mega-variant 11 --graph
 run_case narrow12_launch --algorithm mega --mega-variant 12
 run_case narrow12_graph --algorithm mega --mega-variant 12 --graph
+run_case cluster13_launch --algorithm hopper --hopper-variant 13
+run_case cluster13_graph --algorithm hopper --hopper-variant 13 --graph
+run_case epilogue14_launch --algorithm mega --mega-variant 14
+run_case epilogue14_graph --algorithm mega --mega-variant 14 --graph
+run_case coefficients15_launch --algorithm mega --mega-variant 15
+run_case coefficients15_graph --algorithm mega --mega-variant 15 --graph
 exit "$numeric_failure"
