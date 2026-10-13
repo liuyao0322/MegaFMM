@@ -255,12 +255,35 @@ void rejection_suite() {
 template<class T> bool strict_numerics(megafmm::DType dtype) {
   bool pass=true;double floor=dtype==megafmm::DType::BF16 ? 1e-3:1e-4;
   for(auto algo:{megafmm::Algorithm::WinogradLt,megafmm::Algorithm::WinogradHopper,megafmm::Algorithm::Megakernel}) {
-    for(auto pat:{Pattern::Uniform,Pattern::Positive,Pattern::Range}) for(int trial=0;trial<3;++trial) {
-      auto p=problem(128,128,128,dtype);uint32_t seed=1234567+trial*918273;
-      auto dense=run_case<T>(p,megafmm::Algorithm::Dense,pat,false,true,seed);
-      auto sw=run_case<T>(p,algo,pat,false,true,seed);
-      bool gate=sw.nonfinite==0 && sw.ef<=3*dense.ef+floor;pass=gate && pass;
-      std::cout << "NUMERICAL_GATE pass=" << gate << " limit=" << 3*dense.ef+floor << '\n';
+    for(auto pat:{Pattern::Uniform,Pattern::Positive,Pattern::Range,Pattern::Cancellation,Pattern::HighHalf}) {
+      std::vector<double> ef,dense_ef;
+      size_t failures=0,nonfinite=0;
+      // Near the FP16 limit is outside the certified fast-path range and must use fallback.
+      bool certified=pat!=Pattern::HighHalf;
+      for(int trial=0;trial<3;++trial) {
+        auto p=problem(128,128,128,dtype);uint32_t seed=1234567+trial*918273;
+        auto dense=run_case<T>(p,megafmm::Algorithm::Dense,pat,false,certified,seed);
+        auto sw=run_case<T>(p,algo,pat,false,certified,seed);
+        bool finite=dense.nonfinite==0 && sw.nonfinite==0;
+        bool gate=finite && sw.ef<=3*dense.ef+floor;
+        pass=gate && pass;failures+=!gate;nonfinite+=dense.nonfinite+sw.nonfinite;
+        ef.push_back(sw.ef);dense_ef.push_back(dense.ef);
+        std::cout << "NUMERICAL_GATE dtype=" << megafmm::dtype_name(dtype)
+                  << " algorithm=" << algorithm_name(algo) << " pattern=" << pattern_name(pat)
+                  << " trial=" << trial << " certified_range=" << certified << " pass=" << gate
+                  << " finite=" << finite << " nonfinite=" << dense.nonfinite+sw.nonfinite
+                  << " dense_ef=" << dense.ef << " solution_ef=" << sw.ef
+                  << " maxabs=" << sw.maxabs << " scaled=" << sw.scaled
+                  << " normalized=" << sw.normalized << " nearzero_abs=" << sw.nearzero
+                  << " floor=" << floor << " limit=" << 3*dense.ef+floor << '\n';
+      }
+      std::sort(ef.begin(),ef.end());std::sort(dense_ef.begin(),dense_ef.end());
+      std::cout << "NUMERICAL_DISTRIBUTION dtype=" << megafmm::dtype_name(dtype)
+                << " algorithm=" << algorithm_name(algo) << " pattern=" << pattern_name(pat)
+                << " trials=" << ef.size() << " failures=" << failures << " nonfinite=" << nonfinite
+                << " ef_min=" << ef.front() << " ef_median=" << ef[ef.size()/2]
+                << " ef_max=" << ef.back() << " dense_ef_median=" << dense_ef[dense_ef.size()/2]
+                << " gate_floor=" << floor << '\n';
     }
   }
   return pass;
@@ -278,7 +301,11 @@ int main(int argc,char** argv) {
     degenerate_suite();rejection_suite();
     std::cout << "PASS structural DAG, fallback numerics, strides/transposes, alias, degenerate and rejection tests\n";
     bool pass=true;
-    if(numeric) { pass=strict_numerics<__nv_bfloat16>(megafmm::DType::BF16);pass=strict_numerics<__half>(megafmm::DType::FP16) && pass; }
+    if(numeric) {
+      bool bf16_pass=strict_numerics<__nv_bfloat16>(megafmm::DType::BF16);
+      bool fp16_pass=strict_numerics<__half>(megafmm::DType::FP16);
+      pass=bf16_pass && fp16_pass;
+    }
     else std::cout << "Forced SW mixed-precision certification is a separate gate: use --strict-numerics or megafmm_bench\n";
     return pass ? 0:2;
   } catch(const std::exception& e) { std::cerr << "FAIL " << e.what() << '\n';return 1; }

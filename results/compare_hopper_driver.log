@@ -1,0 +1,55 @@
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 60%] Built target megafmm
+gmake[2]: Warning: File 'CMakeFiles/test_correctness.dir/compiler_depend.make' has modification time 0.0031 s in the future
+[ 80%] Building CUDA object CMakeFiles/megafmm_bench.dir/bench/benchmark.cu.o
+[ 80%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(64): warning #177-D: variable "ac" was declared but never referenced
+    int ar=p.trans_a ? p.k:p.m, ac=p.trans_a ? p.m:p.k;
+                                ^
+          detected during instantiation of "void <unnamed>::structural_suite<T>(megafmm::DType) [with T=__nv_bfloat16]" at line 299
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(65): warning #177-D: variable "bc" was declared but never referenced
+    int br=p.trans_b ? p.n:p.k, bc=p.trans_b ? p.k:p.n;
+                                ^
+          detected during instantiation of "void <unnamed>::structural_suite<T>(megafmm::DType) [with T=__nv_bfloat16]" at line 299
+
+[ 90%] Linking CXX executable megafmm_bench
+[ 90%] Built target megafmm_bench
+[100%] Linking CXX executable test_correctness
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+[100%] Built target test_correctness
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+CHECK 4096,4096,4096 bf16 trial=0 dense_eF=4.02334e-06 solution_eF=0.00602272 gate=0.00101207 pass=0
+TIME shape=4096,4096,4096 dtype=bf16 group=0 case=dense event_ms=0.19427 wall_ms=0.194755
+TIME shape=4096,4096,4096 dtype=bf16 group=0 case=solution event_ms=0.339722 wall_ms=0.340153
+TIME shape=4096,4096,4096 dtype=bf16 group=1 case=solution event_ms=0.340733 wall_ms=0.341205
+TIME shape=4096,4096,4096 dtype=bf16 group=1 case=dense event_ms=0.195258 wall_ms=0.19568
+TIME shape=4096,4096,4096 dtype=bf16 group=2 case=solution event_ms=0.340403 wall_ms=0.340816
+TIME shape=4096,4096,4096 dtype=bf16 group=2 case=dense event_ms=0.194958 wall_ms=0.195358
+CHECK 4096,4096,4096 fp16 trial=0 dense_eF=4.87534e-06 solution_eF=0.000753133 gate=0.000114626 pass=0
+TIME shape=4096,4096,4096 dtype=fp16 group=0 case=dense event_ms=0.205926 wall_ms=0.206357
+TIME shape=4096,4096,4096 dtype=fp16 group=0 case=solution event_ms=0.343635 wall_ms=0.344035
+TIME shape=4096,4096,4096 dtype=fp16 group=1 case=solution event_ms=0.34391 wall_ms=0.344313
+TIME shape=4096,4096,4096 dtype=fp16 group=1 case=dense event_ms=0.205974 wall_ms=0.206379
+TIME shape=4096,4096,4096 dtype=fp16 group=2 case=solution event_ms=0.34351 wall_ms=0.343918
+TIME shape=4096,4096,4096 dtype=fp16 group=2 case=dense event_ms=0.206626 wall_ms=0.207031
+CHECK 8192,8192,8192 bf16 trial=0 dense_eF=8.54807e-06 solution_eF=0.00602247 gate=0.00102564 pass=0
+TIME shape=8192,8192,8192 dtype=bf16 group=0 case=solution event_ms=2.05998 wall_ms=2.06053
+TIME shape=8192,8192,8192 dtype=bf16 group=0 case=dense event_ms=1.62769 wall_ms=1.62818
+TIME shape=8192,8192,8192 dtype=bf16 group=1 case=solution event_ms=2.1054 wall_ms=2.10585
+TIME shape=8192,8192,8192 dtype=bf16 group=1 case=dense event_ms=1.64206 wall_ms=1.64247
+TIME shape=8192,8192,8192 dtype=bf16 group=2 case=dense event_ms=1.62785 wall_ms=1.62831
+TIME shape=8192,8192,8192 dtype=bf16 group=2 case=solution event_ms=2.09719 wall_ms=2.09761
+CHECK 8192,8192,8192 fp16 trial=0 dense_eF=9.68663e-06 solution_eF=0.000753411 gate=0.00012906 pass=0
+TIME shape=8192,8192,8192 dtype=fp16 group=0 case=solution event_ms=2.16834 wall_ms=2.16882
+TIME shape=8192,8192,8192 dtype=fp16 group=0 case=dense event_ms=1.72106 wall_ms=1.72149
+TIME shape=8192,8192,8192 dtype=fp16 group=1 case=solution event_ms=2.19006 wall_ms=2.19048
+TIME shape=8192,8192,8192 dtype=fp16 group=1 case=dense event_ms=1.72328 wall_ms=1.72368
+TIME shape=8192,8192,8192 dtype=fp16 group=2 case=dense event_ms=1.72501 wall_ms=1.72561
+TIME shape=8192,8192,8192 dtype=fp16 group=2 case=solution event_ms=2.18792 wall_ms=2.18839
+srun: error: g08: task 0: Exited with exit code 2
+Trajectory saved to: trajectory/20261013_115045_compare-hopper

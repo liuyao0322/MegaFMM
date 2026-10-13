@@ -1,6 +1,7 @@
 #include "megafmm/gemm.h"
 #include <cuda_bf16.h>
 #include <cuda_fp16.h>
+#include <cuda_profiler_api.h>
 #include <cublas_v2.h>
 #include <algorithm>
 #include <chrono>
@@ -318,8 +319,10 @@ template <class T> bool benchmark(const Options& o, int m, int n, int k, megafmm
   double tune_ms=std::chrono::duration<double,std::milli>(Clock::now()-tune_start).count();
   if (o.profile) {
     // Exactly one complete measured invocation; tune kernels precede this invocation.
+    check(cudaProfilerStart());
     megafmm::run(*solution,a.data,b.data,nullptr,sd.as<float>(),workspace.data,stream.value);
     check(cudaStreamSynchronize(stream.value));
+    check(cudaProfilerStop());
     std::cerr << "PROFILE " << m << ',' << n << ',' << k << ' ' << megafmm::dtype_name(dtype)
               << ' ' << solution->algorithm_name() << " workspace=" << solution_workspace << '\n';
     return true;
