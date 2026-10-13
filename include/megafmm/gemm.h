@@ -37,7 +37,8 @@ struct Policy {
   // 11=complete 16x8 warp MMA tiles (otherwise packed variant 7),
   // 12=same complete tiles with four-element B vectors (otherwise variant 7),
   // 13=eight-CTA product cluster (otherwise variant 9),
-  // 14=float2 epilogue (otherwise variant 12 or packed variant 7).
+  // 14=float2 epilogue (otherwise variant 12 or packed variant 7),
+  // 15=alpha-one beta-zero float2 output (otherwise variant 14, 12, or 7).
   int mega_variant=0;
 };
 class Plan {

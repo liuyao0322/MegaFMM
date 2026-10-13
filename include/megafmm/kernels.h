@@ -71,4 +71,12 @@ void prepare_mma16x8_epilogue(const Problem& p, int variant=14);
 void launch_mma16x8_epilogue(const Problem& p, const void* A, const void* B,
                             const float* C0, float* D, cudaStream_t stream,
                             int variant=14);
+// Identity alpha/beta float2 output; Plan uses 14, 12, then 7 for other bindings.
+bool mma16x8_identity_can_implement(const Problem& p, int variant=15);
+bool mma16x8_identity_full_tiles(const Problem& p, const void* A, const void* B,
+                                const float* C0, const float* D);
+void prepare_mma16x8_identity(const Problem& p, int variant=15);
+void launch_mma16x8_identity(const Problem& p, const void* A, const void* B,
+                            const float* C0, float* D, cudaStream_t stream,
+                            int variant=15);
 }

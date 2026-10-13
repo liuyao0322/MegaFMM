@@ -61,6 +61,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 16 | Vectorize native16x8 output and use bounded int tile counters | 0.4140 | 0.678297 | screened; numerical gate failed; output validation pending |
 
+| 17 | Specialize native16x8 output for immutable alpha1 beta0 | 0.3082 | 0.678775 | screened; numerical gate failed; identity validation pending |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -637,3 +639,47 @@ Iter15 once-only NsightSystems128BF13: GPUkernel5.792us vs6.624us ordinaryquickm
 - **Analysis:** Quick20/5/1 screening completed for18 finite rows; all frozen numerical gates failed, exit2. This is diagnostic performance evidence and not certified speedup. All older variants remain available. Cluster13 full structural/bitwise/Graph/mem/sync passed; racecheck host crash onCUDA12.4 was preserved and resolved with standaloneCUDA12.8 on the sameCUDA12.4binary.
 - **Next:** Validate14 including pointer rebinding and three sanitizers, inspect generated vector stores and resources, and reassess logs/compiler/timeline/primary sources before the next identity specialization.
 - **Archive:** trajectory/20261013_142612_iter-16/
+
+Iter16 post-closure primary comparison (quick signal, some historical full protocols, no acceptance): bf16 128^3 5.347us Dense/SW=1.425x prior(iter12)/SW=0.868x; fp16 128^3 5.530us Dense/SW=1.331x prior(iter12)/SW=0.865x; bf16 256^3 8.098us Dense/SW=0.944x prior(iter12)/SW=0.789x; fp16 256^3 8.126us Dense/SW=0.938x prior(iter12)/SW=0.788x; bf16 512^3 14.293us Dense/SW=0.535x prior(iter8)/SW=0.831x; fp16 512^3 14.326us Dense/SW=0.538x prior(iter8)/SW=0.824x; bf16 1024^3 65.474us Dense/SW=0.221x prior(iter7)/SW=0.303x; fp16 1024^3 65.350us Dense/SW=0.160x prior(iter7)/SW=0.300x.
+
+### Reassessment after iterations14–16 (before17)
+
+No primary128/256/512/1024 shape improved the prior observed SW envelope by3% in three consecutive sourceiterations:14 all-lane B fill,15 productcluster,16 float2/int-coordinate output. Prior envelope still10 on128/256 andH5/Lt1 on512/1024; mixed historical20/100-call runs remain signals requiring finalsamebinary repeats. Re-read these per-shape logs and once-only timelines:13clusterGPU5.792us,14epilogueGPU4.352us, versus earlier10GPU4.032us at128BF. InstrumentedhostAPIduration is notsteady launchlatency. No timer/bandwidth/launchphysicalfloor is established. Complete14 structural/bitwise/rebind and three CUDA12.8sanitizers passed zeroerrors/warnings.
+
+Compiled14 preserves24packedcasts and7HMMA/K16, now16STG.E.64 instead of12's32scalarstores;583staticinstructions vs655,94registers, noLOCAL/STACK. Static instruction reduction alone did not improve the bestlatency. Source405376f, currentbinaryhash/resourceblocks and successful epilogue profile capture inresults/small_reassessment_iter16.json. Dense128quickmedian jumped again (~7.6us), so reference ratios alone are insufficient to rank kernel changes on unlockedclocks; ownlatency and finalGraph/controlmeasurements remainessential. Two profiler attempts using --algorithm dense and --algorithm auto were rejected beforecapture because the CLI accepts only lt/hopper/mega. Both failedlogs are preserved; no Dense GPU duration was measured. Future final profiling needs an explicit Dense capture option, and this tooling limitation is not a stop reason.
+
+Primary-source reassessment: CUDA12.4.1 BestPractices async-copy avoids intermediate global-to-shared registers and permits overlap; implementation must wait beforeconsuming and preserve currentbank lifetime (https://docs.nvidia.com/cuda/archive/12.4.1/cuda-c-best-practices-guide/index.html#asynchronous-copy-from-global-memory-to-shared-memory). Pinned CUTLASS3.5.1 MmaPipelined is two-stage and excludes two warpK groups, hence proposedwarpK64 has four instructionK16groups (https://github.com/NVIDIA/cutlass/blob/v3.5.1/include/cutlass/gemm/threadblock/mma_pipelined.h).
+
+Viable separately reviewed directions remain: immutablealpha1/beta0 specialization(17/Mega15); rawregister lookahead(18/Mega16) with SASSissue/cache-policy checks; compactseven-batch BK64stage3/stage2 controls(19/H7,H8); rawquadrant cp.async double-bank16x16 owner(20/Mega17). Continue these rather than claimexhaustion or a provenfloor. Strengthen smallLt setup-onlytuning and recordactualboundconfiguration in a separatefinalsourceiteration beforethefullcomparison; do not change32heuristics/budget/dedup/gates.
+
+### Iter 17 — Specialize native16x8 output for immutable alpha1 beta0
+
+- **Hypothesis:** A plan with alpha exactly one and beta zero can write U directly and omit coefficient operations and C0 addresses without changing its bit patterns.
+- **Changes:** Added Mega15 identity-only native16x8 path and guarded chain15 to14 to12 to7 using actual rebound pointers. Retained general coefficients and all earlier routes; extended identity, signed-zero, alias, stride, rebind and bitwise tests.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.678775 ms; mean speedup=0.3082x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.004245 | 0.004925 | 0.8619 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.004187 | 0.005109 | 0.8196 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.005285 | 0.007842 | 0.6739 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.004838 | 0.007976 | 0.6066 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.006131 | 0.014005 | 0.4378 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.006150 | 0.014109 | 0.4359 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.012888 | 0.064856 | 0.1987 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.010227 | 0.064760 | 0.1579 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.032283 | 0.521126 | 0.0619 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.032965 | 0.511320 | 0.0645 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.086144 | 1.603035 | 0.0537 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.089424 | 1.598578 | 0.0559 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.195013 | 3.831363 | 0.0509 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.206277 | 3.831589 | 0.0538 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.009206 | 0.034064 | 0.2703 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.009256 | 0.034430 | 0.2688 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.008024 | 0.034414 | 0.2332 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_warp_mma_16x8_identity v15 | launch | 0.008358 | 0.034454 | 0.2426 | 0.00075151 | 0 |
+
+- **Analysis:** Build and quick20/5/1 screening completed with18 finite rows; all frozen numerical gates fail, exit2. Dynamic input transforms remain inside every call. This screening is not full acceptance. The earlier 14-16 stall reassessment is logged, with GPU timeline and static SASS evidence and remaining separately reviewed directions.
+- **Next:** Run full structural/bitwise and three15sanitizers, then test raw register lookahead as a separate iteration.
+- **Archive:** trajectory/20261013_144105_iter-17/

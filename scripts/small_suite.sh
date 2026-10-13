@@ -18,6 +18,7 @@ all_labels=(
   coefficients15_launch coefficients15_graph
   prefetch16_launch prefetch16_graph
   pipeline17_launch pipeline17_graph
+  stage18_launch stage18_graph
 )
 if [[ "${1:-}" == --help || "${1:-}" == -h ]]; then
   printf 'Usage: bash scripts/small_suite.sh [LABEL ...]\n'
@@ -192,4 +193,7 @@ run_case prefetch16_launch --algorithm mega --mega-variant 16
 run_case prefetch16_graph --algorithm mega --mega-variant 16 --graph
 run_case pipeline17_launch --algorithm mega --mega-variant 17
 run_case pipeline17_graph --algorithm mega --mega-variant 17 --graph
+# M2 stages FP32 C updates per K16 and has a separate structural reference.
+run_case stage18_launch --algorithm mega --mega-variant 18
+run_case stage18_graph --algorithm mega --mega-variant 18 --graph
 exit "$numeric_failure"
