@@ -935,3 +935,40 @@ Iter22 post-closure primary comparison (quick20/5/1, mixed historical full proto
 - **Analysis:** Quick20warm/20calls/5groups/1fresh completed18 finite rows with all frozen numerical gatesfailed exit2. At128 the screen shows approximately4.06us BF16 and4.20us FP16, same-row Dense ratio near unity; physical96registers source5376shared and zero ptxas stack/spills. Grid doubles relative16 while aggregate nativeMMA/Bwork also doubles; full comparisons and GPU safety/compiler evidence follow closure. No threshold or Auto change.
 - **Next:** Validate19 structure/bitwise/Graph and three standalone CUDA12.8 sanitizers, inspect native fragment/shared/prefetch SASS and warmed GPU128 timeline, then full same-binary40-label launch/Graph suite and31-route strict verification with final evidence/report.
 - **Archive:** trajectory/20261013_160132_iter-23/
+
+Iter23 post-closure primary comparison (quick20/5/1, mixed historicalfull protocols, diagnostic only): bf16 128^3 4.0624us prior-envelope/SW=1.0158 Dense/SW=1.0130; fp16 128^3 4.1984us prior-envelope/SW=1.0335 Dense/SW=0.9684; bf16 256^3 6.4464us prior-envelope/SW=0.9844 Dense/SW=0.8203; fp16 256^3 6.4848us prior-envelope/SW=0.9879 Dense/SW=0.7449; bf16 512^3 15.3024us prior-envelope/SW=0.7184 Dense/SW=0.4000; fp16 512^3 15.2688us prior-envelope/SW=0.7261 Dense/SW=0.3982; bf16 1024^3 109.6352us prior-envelope/SW=0.1809 Dense/SW=0.1168; fp16 1024^3 109.4016us prior-envelope/SW=0.1795 Dense/SW=0.0926; bf16 2048^3 744.0592us prior-envelope/SW=0.0982 Dense/SW=0.0422; fp16 2048^3 743.5296us prior-envelope/SW=0.0908 Dense/SW=0.0448. 128FP crosses3% over prior observedSWenvelope;128BF improves about1.6%, otherprimarysizes do not gain. No independent performance or numerical acceptance. Lower96registers vs16's120 and moretinyowners coexist with redundant nativeMMA/Bwork; actual compiler/timeline evidence inprogress. Sourceea4dc50/binaryfrozen for final40-label/720-row fullsuite and31-route/930 strict checks, no source edits during measurement.
+
+### Full small-matrix performance checkpoint after iteration23
+
+This is a phase snapshot and not an optimization stop or completion of PLAN. The complete measurement source is `ea4dc50c57b08b4dee98c23c024a01bb94f836db`; later documentation/evidence commits do not replace that identity. Forty launch/Graph labels cover twenty routes, nine shapes and two dtypes, totaling720 checked SW rows. Every command uses20warmup/100calls/5alternatinggroups/3fresh correctness trials. All720 fixed numerical gates fail, all values are finite, with no unchecked or Dense fallback rows. Benchmark SHA256 is `a89d8cadf7f3dcbbecd41e6d7fac30de24ce55827bcbacf372126beaaf807d42`. Eighty before/after telemetry files identify the same H100 UUID; clocks are unlocked and telemetry does not establish within-group clock stability.
+
+The observed envelope selects minimum SW latency per shape/dtype/mode, then reports that winner's same-row independently tuned ordinary cuBLASLt Dense comparison. It does not select the largest Dense/SW ratio. Times below are medians of five group means in microseconds, not single-call tails. Selecting on these measurements does not create an independently validated dispatch rule.
+
+| Mode | dtype | square N | fastest observed SW | Dense us | SW us | same-row Dense/SW |
+|---|---|---:|---|---:|---:|---:|
+| launch | bf16 | 128 | Mega19 | 3.938 | 3.915 | 1.006 |
+| launch | fp16 | 128 | Mega19 | 3.833 | 4.008 | 0.956 |
+| launch | bf16 | 256 | Mega10 | 5.028 | 6.203 | 0.811 |
+| launch | fp16 | 256 | Mega10 | 4.752 | 6.259 | 0.759 |
+| launch | bf16 | 512 | Mega16 | 5.935 | 10.829 | 0.548 |
+| launch | fp16 | 512 | Mega16 | 5.902 | 11.061 | 0.534 |
+| launch | bf16 | 1024 | Lt1 | 12.364 | 19.643 | 0.629 |
+| launch | fp16 | 1024 | Lt1 | 9.813 | 19.350 | 0.507 |
+| Graph | bf16 | 128 | Mega19 | 3.483 | 3.629 | 0.960 |
+| Graph | fp16 | 128 | Mega19 | 3.404 | 3.819 | 0.891 |
+| Graph | bf16 | 256 | Mega16 | 4.470 | 5.844 | 0.765 |
+| Graph | fp16 | 256 | Mega10 | 4.027 | 5.875 | 0.685 |
+| Graph | bf16 | 512 | Hopper7 compactBK64 | 5.432 | 9.210 | 0.590 |
+| Graph | fp16 | 512 | Hopper7 compactBK64 | 5.391 | 9.373 | 0.575 |
+| Graph | bf16 | 1024 | Lt1 | 11.223 | 17.364 | 0.646 |
+| Graph | fp16 | 1024 | Lt1 | 9.282 | 17.092 | 0.543 |
+
+The BF128launch 0.6% observed gap is below the1.05 performance threshold and comparable to Dense's1.06% group CV (SW0.23%); it is not a stable accepted benefit. Historical originalLt0/SW=9.029 at that row is a separate cross-run implementation comparison, subject to clock/tuner/submission variation. The user's earlier128 Dense/SW≈0.90 refers specifically to iteration12 Mega10 BF128launch: same-row Dense4.17760014534us / SW4.64159995317us =0.900034511264, or11.10685% longer SW latency. That old quick20/5/1 numeric-failing observation must not be compared as if it shares the current full protocol.
+
+Verification identity uses the same measurement source and test SHA256 `51791901d93f465db30d41f419f1bc2f7334b02936c9e8c0365e21130679d392`. Six labels complete: DAG, structural/API, full memcheck, racecheck smoke and synccheck smoke exit0; strict numerics exit2. CPU DAG3 and M2model6 checks PASS. Structural and memcheck each have1310CASE/147PASS and include shortK, Graph, rebinding and M1bits. Racecheck and synccheck each cover374candidate smoke CASE; zero errors/hazards/warnings do not imply those tools ran the extended suites. Standalone CUDA12.8 sanitizer2025.1.0.0 is used with unchanged CUDA12.4 application binaries. Strict31 requested configurations ×2dtypes×5patterns×3fresh =930 checks,558pass/372fail/nonfinite0. Mega18 M2 remains excluded from the M1bitset. Auto remains Dense and no gate is widened.
+
+Evidence closure: `results/SMALL_REPORT.md` SHA256 `3bb95c7affae89f1503e4da92af7b788f06ce6b92d3e2682c1da161b42a29a3f`; `results/small_manifest.json` SHA256 `908a0dcbf02b0dc13e0eaead16e08e4a2644c1cedb72702c38a0f78eef58f904`; eight plots in both PNG/SVG; raw51-column CSVs,1440 matching TUNE configurations and2160 fresh CHECK metrics; all measurement-source file hashes match the declared commit. Full commands, actual bound algorithms, numerical failures, telemetry and coverage limits remain auditable in the report/manifest. Original large-matrix94-row/300-check history is retained unchanged.
+
+Compiler/timeline audits remain separate from timing claims. Mega18 has95regs and no local spill, but its M2 RN contribution order is verified by SASS and is slower than the observed primary envelope. Mega19 has96regs, source/CUPTI5376B shared versus cuobjdump6400B, zero LOCAL/STACK or LDL/STL; seven of eight next-block loads precede the firstHMMA, with the eighth after it and consumption at the next stage. Single warmed128GPU captures are BF3.200us/FP3.232us; instrumented host APIs are inflated and cannot be subtracted from separate group measurements. Logical8x8 owners double aggregate nativeMMA/Bwork and add one-third original input bytes versus16x8; these are not measured DRAM traffic or floor evidence.
+
+Next viable axis: direct native MMA register operands, separately testing16x8 and8x8 owners, removes shared S/T delivery/LDSM/barriers but increases source warp-load instructions (M16:8→32; M8:8→24), with cache-dependent sector repetition and uncompiled operand liveness. Frozen scratch prototype SHA256 `0e65d636194e501a94f55e713d1a5c37360a5331517a76494c91c4589fc41736` and independent15PASS CPU ABI/DAG/sector checks support an additive experiment, not a promised gain. First compile/resources/SASS, then M1 GPU bits and fixed numerical gates, structural/shortK/Graph/rebind/sanitizer validation and own-latency screens. Existing fastest paths remain available verbatim. No cap, physical floor or exhaustion condition is established; continue the authorized optimization loop.

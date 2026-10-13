@@ -1,0 +1,272 @@
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=128,128,128 dtype=bf16 case=dense config=dense:id=21;tile=5;split_k=1;reduction=0;swizzle=0;stages=19;custom=0;inner=0;cluster=0;bound_candidate=1/6;tuned_candidate=1;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.004269;align0=16;align1=16;align2=16;align3=16
+TUNE shape=128,128,128 dtype=bf16 case=solution config=none
+CHECK 128,128,128 bf16 trial=0 dense_eF=9.61283e-08 solution_eF=0.00605216 gate=0.00100029 pass=0
+CHECK 128,128,128 bf16 trial=1 dense_eF=9.45722e-08 solution_eF=0.00611792 gate=0.00100028 pass=0
+CHECK 128,128,128 bf16 trial=2 dense_eF=9.71373e-08 solution_eF=0.00602742 gate=0.00100029 pass=0
+TIME shape=128,128,128 dtype=bf16 group=0 case=dense event_ms=0.00390208 wall_ms=0.00400047
+TIME shape=128,128,128 dtype=bf16 group=0 case=solution event_ms=0.0047408 wall_ms=0.00481885
+TIME shape=128,128,128 dtype=bf16 group=1 case=dense event_ms=0.00392512 wall_ms=0.00400128
+TIME shape=128,128,128 dtype=bf16 group=1 case=solution event_ms=0.0047632 wall_ms=0.0048418
+TIME shape=128,128,128 dtype=bf16 group=2 case=dense event_ms=0.00396672 wall_ms=0.00404397
+TIME shape=128,128,128 dtype=bf16 group=2 case=solution event_ms=0.00472864 wall_ms=0.00480516
+TIME shape=128,128,128 dtype=bf16 group=3 case=solution event_ms=0.00471776 wall_ms=0.00479442
+TIME shape=128,128,128 dtype=bf16 group=3 case=dense event_ms=0.0039184 wall_ms=0.0039945
+TIME shape=128,128,128 dtype=bf16 group=4 case=solution event_ms=0.00474784 wall_ms=0.00482873
+TIME shape=128,128,128 dtype=bf16 group=4 case=dense event_ms=0.00393536 wall_ms=0.00401156
+TUNE shape=128,128,128 dtype=fp16 case=dense config=dense:id=21;tile=11;split_k=1;reduction=0;swizzle=0;stages=19;custom=0;inner=0;cluster=0;bound_candidate=0/12;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.004186;align0=16;align1=16;align2=16;align3=16
+TUNE shape=128,128,128 dtype=fp16 case=solution config=none
+CHECK 128,128,128 fp16 trial=0 dense_eF=1.82311e-07 solution_eF=0.000744325 gate=0.000100547 pass=0
+CHECK 128,128,128 fp16 trial=1 dense_eF=1.85327e-07 solution_eF=0.000774794 gate=0.000100556 pass=0
+CHECK 128,128,128 fp16 trial=2 dense_eF=1.85529e-07 solution_eF=0.000746976 gate=0.000100557 pass=0
+TIME shape=128,128,128 dtype=fp16 group=0 case=dense event_ms=0.00378464 wall_ms=0.00386997
+TIME shape=128,128,128 dtype=fp16 group=0 case=solution event_ms=0.00494432 wall_ms=0.00502128
+TIME shape=128,128,128 dtype=fp16 group=1 case=dense event_ms=0.00393248 wall_ms=0.00401089
+TIME shape=128,128,128 dtype=fp16 group=1 case=solution event_ms=0.00491968 wall_ms=0.005003
+TIME shape=128,128,128 dtype=fp16 group=2 case=dense event_ms=0.00383616 wall_ms=0.00391238
+TIME shape=128,128,128 dtype=fp16 group=2 case=solution event_ms=0.00493088 wall_ms=0.00500731
+TIME shape=128,128,128 dtype=fp16 group=3 case=solution event_ms=0.00491488 wall_ms=0.00499151
+TIME shape=128,128,128 dtype=fp16 group=3 case=dense event_ms=0.00383424 wall_ms=0.00391069
+TIME shape=128,128,128 dtype=fp16 group=4 case=solution event_ms=0.00494208 wall_ms=0.00501936
+TIME shape=128,128,128 dtype=fp16 group=4 case=dense event_ms=0.0038544 wall_ms=0.0039301
+TUNE shape=256,256,256 dtype=bf16 case=dense config=dense:id=21;tile=11;split_k=1;reduction=0;swizzle=0;stages=20;custom=0;inner=0;cluster=0;bound_candidate=0/11;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.005424;align0=16;align1=16;align2=16;align3=16
+TUNE shape=256,256,256 dtype=bf16 case=solution config=none
+CHECK 256,256,256 bf16 trial=0 dense_eF=1.86507e-07 solution_eF=0.00597914 gate=0.00100056 pass=0
+CHECK 256,256,256 bf16 trial=1 dense_eF=1.8632e-07 solution_eF=0.00595672 gate=0.00100056 pass=0
+CHECK 256,256,256 bf16 trial=2 dense_eF=1.88679e-07 solution_eF=0.00605431 gate=0.00100057 pass=0
+TIME shape=256,256,256 dtype=bf16 group=0 case=solution event_ms=0.007664 wall_ms=0.0077445
+TIME shape=256,256,256 dtype=bf16 group=0 case=dense event_ms=0.0276618 wall_ms=0.0277452
+TIME shape=256,256,256 dtype=bf16 group=1 case=solution event_ms=0.00766848 wall_ms=0.00774577
+TIME shape=256,256,256 dtype=bf16 group=1 case=dense event_ms=0.00500608 wall_ms=0.00508268
+TIME shape=256,256,256 dtype=bf16 group=2 case=dense event_ms=0.00503616 wall_ms=0.00511263
+TIME shape=256,256,256 dtype=bf16 group=2 case=solution event_ms=0.00765792 wall_ms=0.00773845
+TIME shape=256,256,256 dtype=bf16 group=3 case=solution event_ms=0.00766976 wall_ms=0.00774676
+TIME shape=256,256,256 dtype=bf16 group=3 case=dense event_ms=0.0049968 wall_ms=0.00507143
+TIME shape=256,256,256 dtype=bf16 group=4 case=solution event_ms=0.00766752 wall_ms=0.00774965
+TIME shape=256,256,256 dtype=bf16 group=4 case=dense event_ms=0.00501536 wall_ms=0.00509122
+TUNE shape=256,256,256 dtype=fp16 case=dense config=dense:id=21;tile=11;split_k=1;reduction=0;swizzle=0;stages=19;custom=0;inner=0;cluster=0;bound_candidate=0/13;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.004963;align0=16;align1=16;align2=16;align3=16
+TUNE shape=256,256,256 dtype=fp16 case=solution config=none
+CHECK 256,256,256 fp16 trial=0 dense_eF=3.37859e-07 solution_eF=0.000737165 gate=0.000101014 pass=0
+CHECK 256,256,256 fp16 trial=1 dense_eF=3.4081e-07 solution_eF=0.000751655 gate=0.000101022 pass=0
+CHECK 256,256,256 fp16 trial=2 dense_eF=3.3926e-07 solution_eF=0.000755322 gate=0.000101018 pass=0
+TIME shape=256,256,256 dtype=fp16 group=0 case=solution event_ms=0.00778688 wall_ms=0.00786796
+TIME shape=256,256,256 dtype=fp16 group=0 case=dense event_ms=0.00459968 wall_ms=0.00467843
+TIME shape=256,256,256 dtype=fp16 group=1 case=solution event_ms=0.0078016 wall_ms=0.00787734
+TIME shape=256,256,256 dtype=fp16 group=1 case=dense event_ms=0.00459968 wall_ms=0.00467461
+TIME shape=256,256,256 dtype=fp16 group=2 case=dense event_ms=0.00457568 wall_ms=0.00465425
+TIME shape=256,256,256 dtype=fp16 group=2 case=solution event_ms=0.00781408 wall_ms=0.00789345
+TIME shape=256,256,256 dtype=fp16 group=3 case=solution event_ms=0.00781696 wall_ms=0.00789238
+TIME shape=256,256,256 dtype=fp16 group=3 case=dense event_ms=0.0045936 wall_ms=0.00466966
+TIME shape=256,256,256 dtype=fp16 group=4 case=solution event_ms=0.0078128 wall_ms=0.00788864
+TIME shape=256,256,256 dtype=fp16 group=4 case=dense event_ms=0.0045824 wall_ms=0.00465791
+TUNE shape=512,512,512 dtype=bf16 case=dense config=dense:id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/13;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.006272;align0=16;align1=16;align2=16;align3=16
+TUNE shape=512,512,512 dtype=bf16 case=solution config=none
+CHECK 512,512,512 bf16 trial=0 dense_eF=3.91153e-07 solution_eF=0.00598238 gate=0.00100117 pass=0
+CHECK 512,512,512 bf16 trial=1 dense_eF=3.91086e-07 solution_eF=0.00604926 gate=0.00100117 pass=0
+CHECK 512,512,512 bf16 trial=2 dense_eF=3.94063e-07 solution_eF=0.00599634 gate=0.00100118 pass=0
+TIME shape=512,512,512 dtype=bf16 group=0 case=solution event_ms=0.0138506 wall_ms=0.0139336
+TIME shape=512,512,512 dtype=bf16 group=0 case=dense event_ms=0.00587776 wall_ms=0.00595591
+TIME shape=512,512,512 dtype=bf16 group=1 case=dense event_ms=0.0058688 wall_ms=0.0059447
+TIME shape=512,512,512 dtype=bf16 group=1 case=solution event_ms=0.0138288 wall_ms=0.0139051
+TIME shape=512,512,512 dtype=bf16 group=2 case=solution event_ms=0.0138112 wall_ms=0.0138892
+TIME shape=512,512,512 dtype=bf16 group=2 case=dense event_ms=0.006 wall_ms=0.00607756
+TIME shape=512,512,512 dtype=bf16 group=3 case=solution event_ms=0.0138144 wall_ms=0.0138923
+TIME shape=512,512,512 dtype=bf16 group=3 case=dense event_ms=0.00587008 wall_ms=0.005946
+TIME shape=512,512,512 dtype=bf16 group=4 case=solution event_ms=0.0138086 wall_ms=0.0138864
+TIME shape=512,512,512 dtype=bf16 group=4 case=dense event_ms=0.00585312 wall_ms=0.00593002
+TUNE shape=512,512,512 dtype=fp16 case=dense config=dense:id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/12;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.006246;align0=16;align1=16;align2=16;align3=16
+TUNE shape=512,512,512 dtype=fp16 case=solution config=none
+CHECK 512,512,512 fp16 trial=0 dense_eF=6.4198e-07 solution_eF=0.000753207 gate=0.000101926 pass=0
+CHECK 512,512,512 fp16 trial=1 dense_eF=6.43226e-07 solution_eF=0.000756941 gate=0.00010193 pass=0
+CHECK 512,512,512 fp16 trial=2 dense_eF=6.44261e-07 solution_eF=0.000755766 gate=0.000101933 pass=0
+TIME shape=512,512,512 dtype=fp16 group=0 case=solution event_ms=0.0139014 wall_ms=0.0139916
+TIME shape=512,512,512 dtype=fp16 group=0 case=dense event_ms=0.0058432 wall_ms=0.00591939
+TIME shape=512,512,512 dtype=fp16 group=1 case=dense event_ms=0.00582912 wall_ms=0.0059061
+TIME shape=512,512,512 dtype=fp16 group=1 case=solution event_ms=0.0139309 wall_ms=0.0140078
+TIME shape=512,512,512 dtype=fp16 group=2 case=solution event_ms=0.0139254 wall_ms=0.0140035
+TIME shape=512,512,512 dtype=fp16 group=2 case=dense event_ms=0.0058256 wall_ms=0.00590441
+TIME shape=512,512,512 dtype=fp16 group=3 case=solution event_ms=0.0139197 wall_ms=0.0139972
+TIME shape=512,512,512 dtype=fp16 group=3 case=dense event_ms=0.00584032 wall_ms=0.00591779
+TIME shape=512,512,512 dtype=fp16 group=4 case=solution event_ms=0.0139229 wall_ms=0.0140012
+TIME shape=512,512,512 dtype=fp16 group=4 case=dense event_ms=0.00582208 wall_ms=0.0058984
+TUNE shape=1024,1024,1024 dtype=bf16 case=dense config=dense:id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=10;bound_candidate=4/16;tuned_candidate=4;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.012899;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=none
+CHECK 1024,1024,1024 bf16 trial=0 dense_eF=8.51899e-07 solution_eF=0.00600975 gate=0.00100256 pass=0
+CHECK 1024,1024,1024 bf16 trial=1 dense_eF=8.52266e-07 solution_eF=0.0060152 gate=0.00100256 pass=0
+CHECK 1024,1024,1024 bf16 trial=2 dense_eF=8.50027e-07 solution_eF=0.00601153 gate=0.00100255 pass=0
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.0641594 wall_ms=0.0642455
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0122618 wall_ms=0.0123399
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.0122522 wall_ms=0.0123313
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.0641411 wall_ms=0.0642183
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.0641654 wall_ms=0.0642438
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.0122474 wall_ms=0.0123257
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.0641718 wall_ms=0.064251
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.012263 wall_ms=0.0123394
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.0122461 wall_ms=0.0123261
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.0641814 wall_ms=0.0642602
+TUNE shape=1024,1024,1024 dtype=fp16 case=dense config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010144;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=none
+CHECK 1024,1024,1024 fp16 trial=0 dense_eF=1.24851e-06 solution_eF=0.000751819 gate=0.000103746 pass=0
+CHECK 1024,1024,1024 fp16 trial=1 dense_eF=1.25092e-06 solution_eF=0.000753235 gate=0.000103753 pass=0
+CHECK 1024,1024,1024 fp16 trial=2 dense_eF=1.24799e-06 solution_eF=0.000754626 gate=0.000103744 pass=0
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.0641139 wall_ms=0.0642006
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.00980128 wall_ms=0.00987959
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.00978208 wall_ms=0.00985683
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.0640867 wall_ms=0.0641629
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.0641117 wall_ms=0.0641868
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.00980128 wall_ms=0.00987826
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.0640976 wall_ms=0.0641743
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.00979712 wall_ms=0.00987296
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.00977472 wall_ms=0.00985158
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.0640301 wall_ms=0.0641069
+TUNE shape=2048,2048,2048 dtype=bf16 case=dense config=dense:id=39;tile=23;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.031664;align0=16;align1=16;align2=16;align3=16
+TUNE shape=2048,2048,2048 dtype=bf16 case=solution config=none
+CHECK 2048,2048,2048 bf16 trial=0 dense_eF=1.85669e-06 solution_eF=0.00602393 gate=0.00100557 pass=0
+CHECK 2048,2048,2048 bf16 trial=1 dense_eF=1.85611e-06 solution_eF=0.00601892 gate=0.00100557 pass=0
+CHECK 2048,2048,2048 bf16 trial=2 dense_eF=1.85608e-06 solution_eF=0.00602495 gate=0.00100557 pass=0
+TIME shape=2048,2048,2048 dtype=bf16 group=0 case=dense event_ms=0.0309536 wall_ms=0.0310432
+TIME shape=2048,2048,2048 dtype=bf16 group=0 case=solution event_ms=0.522468 wall_ms=0.522555
+TIME shape=2048,2048,2048 dtype=bf16 group=1 case=dense event_ms=0.0316077 wall_ms=0.0316899
+TIME shape=2048,2048,2048 dtype=bf16 group=1 case=solution event_ms=0.52285 wall_ms=0.522937
+TIME shape=2048,2048,2048 dtype=bf16 group=2 case=dense event_ms=0.0317661 wall_ms=0.031857
+TIME shape=2048,2048,2048 dtype=bf16 group=2 case=solution event_ms=0.522468 wall_ms=0.522551
+TIME shape=2048,2048,2048 dtype=bf16 group=3 case=dense event_ms=0.0315715 wall_ms=0.0316507
+TIME shape=2048,2048,2048 dtype=bf16 group=3 case=solution event_ms=0.52378 wall_ms=0.523892
+TIME shape=2048,2048,2048 dtype=bf16 group=4 case=dense event_ms=0.0320122 wall_ms=0.0320927
+TIME shape=2048,2048,2048 dtype=bf16 group=4 case=solution event_ms=0.52262 wall_ms=0.522734
+TUNE shape=2048,2048,2048 dtype=fp16 case=dense config=dense:id=39;tile=20;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=1/14;tuned_candidate=1;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.032662;align0=16;align1=16;align2=16;align3=16
+TUNE shape=2048,2048,2048 dtype=fp16 case=solution config=none
+CHECK 2048,2048,2048 fp16 trial=0 dense_eF=2.45575e-06 solution_eF=0.000752202 gate=0.000107367 pass=0
+CHECK 2048,2048,2048 fp16 trial=1 dense_eF=2.45746e-06 solution_eF=0.00075359 gate=0.000107372 pass=0
+CHECK 2048,2048,2048 fp16 trial=2 dense_eF=2.45816e-06 solution_eF=0.000752812 gate=0.000107374 pass=0
+TIME shape=2048,2048,2048 dtype=fp16 group=0 case=dense event_ms=0.0317389 wall_ms=0.0318264
+TIME shape=2048,2048,2048 dtype=fp16 group=0 case=solution event_ms=0.524276 wall_ms=0.524363
+TIME shape=2048,2048,2048 dtype=fp16 group=1 case=dense event_ms=0.0319296 wall_ms=0.0320274
+TIME shape=2048,2048,2048 dtype=fp16 group=1 case=solution event_ms=0.524295 wall_ms=0.524385
+TIME shape=2048,2048,2048 dtype=fp16 group=2 case=dense event_ms=0.0320109 wall_ms=0.0321041
+TIME shape=2048,2048,2048 dtype=fp16 group=2 case=solution event_ms=0.52299 wall_ms=0.52307
+TIME shape=2048,2048,2048 dtype=fp16 group=3 case=dense event_ms=0.0320269 wall_ms=0.0321101
+TIME shape=2048,2048,2048 dtype=fp16 group=3 case=solution event_ms=0.523757 wall_ms=0.523838
+TIME shape=2048,2048,2048 dtype=fp16 group=4 case=dense event_ms=0.0319277 wall_ms=0.0320111
+TIME shape=2048,2048,2048 dtype=fp16 group=4 case=solution event_ms=0.523239 wall_ms=0.523323
+TUNE shape=3072,3072,3072 dtype=bf16 case=dense config=dense:id=39;tile=20;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=9;bound_candidate=2/16;tuned_candidate=2;bound_workspace=131;tuned=1;tune=4w/3x10median;tuning_ms=0.086832;align0=16;align1=16;align2=16;align3=16
+TUNE shape=3072,3072,3072 dtype=bf16 case=solution config=none
+CHECK 3072,3072,3072 bf16 trial=0 dense_eF=2.92563e-06 solution_eF=0.00601824 gate=0.00100878 pass=0
+CHECK 3072,3072,3072 bf16 trial=1 dense_eF=2.92476e-06 solution_eF=0.0060228 gate=0.00100877 pass=0
+CHECK 3072,3072,3072 bf16 trial=2 dense_eF=2.9257e-06 solution_eF=0.00602605 gate=0.00100878 pass=0
+TIME shape=3072,3072,3072 dtype=bf16 group=0 case=dense event_ms=0.0862083 wall_ms=0.086302
+TIME shape=3072,3072,3072 dtype=bf16 group=0 case=solution event_ms=1.6084 wall_ms=1.60852
+TIME shape=3072,3072,3072 dtype=bf16 group=1 case=dense event_ms=0.0863334 wall_ms=0.0864354
+TIME shape=3072,3072,3072 dtype=bf16 group=1 case=solution event_ms=1.59861 wall_ms=1.59875
+TIME shape=3072,3072,3072 dtype=bf16 group=2 case=dense event_ms=0.0863654 wall_ms=0.0864956
+TIME shape=3072,3072,3072 dtype=bf16 group=2 case=solution event_ms=1.60495 wall_ms=1.60504
+TIME shape=3072,3072,3072 dtype=bf16 group=3 case=solution event_ms=1.58982 wall_ms=1.58992
+TIME shape=3072,3072,3072 dtype=bf16 group=3 case=dense event_ms=0.0864595 wall_ms=0.0865524
+TIME shape=3072,3072,3072 dtype=bf16 group=4 case=dense event_ms=0.086369 wall_ms=0.0864526
+TIME shape=3072,3072,3072 dtype=bf16 group=4 case=solution event_ms=1.60162 wall_ms=1.60171
+TUNE shape=3072,3072,3072 dtype=fp16 case=dense config=dense:id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=9;bound_candidate=0/15;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/3x10median;tuning_ms=0.089354;align0=16;align1=16;align2=16;align3=16
+TUNE shape=3072,3072,3072 dtype=fp16 case=solution config=none
+CHECK 3072,3072,3072 fp16 trial=0 dense_eF=3.66723e-06 solution_eF=0.000752812 gate=0.000111002 pass=0
+CHECK 3072,3072,3072 fp16 trial=1 dense_eF=3.66851e-06 solution_eF=0.000752036 gate=0.000111006 pass=0
+CHECK 3072,3072,3072 fp16 trial=2 dense_eF=3.66844e-06 solution_eF=0.000753777 gate=0.000111005 pass=0
+TIME shape=3072,3072,3072 dtype=fp16 group=0 case=dense event_ms=0.0891635 wall_ms=0.0892522
+TIME shape=3072,3072,3072 dtype=fp16 group=0 case=solution event_ms=1.60419 wall_ms=1.60428
+TIME shape=3072,3072,3072 dtype=fp16 group=1 case=dense event_ms=0.0892192 wall_ms=0.0893517
+TIME shape=3072,3072,3072 dtype=fp16 group=1 case=solution event_ms=1.61384 wall_ms=1.61393
+TIME shape=3072,3072,3072 dtype=fp16 group=2 case=dense event_ms=0.089225 wall_ms=0.0893163
+TIME shape=3072,3072,3072 dtype=fp16 group=2 case=solution event_ms=1.59632 wall_ms=1.59641
+TIME shape=3072,3072,3072 dtype=fp16 group=3 case=solution event_ms=1.59221 wall_ms=1.5923
+TIME shape=3072,3072,3072 dtype=fp16 group=3 case=dense event_ms=0.0896896 wall_ms=0.0897708
+TIME shape=3072,3072,3072 dtype=fp16 group=4 case=dense event_ms=0.0897251 wall_ms=0.089809
+TIME shape=3072,3072,3072 dtype=fp16 group=4 case=solution event_ms=1.63905 wall_ms=1.63919
+TUNE shape=4096,4096,4096 dtype=bf16 case=dense config=dense:id=39;tile=20;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=9;bound_candidate=1/16;tuned_candidate=1;bound_workspace=131;tuned=1;tune=4w/3x10median;tuning_ms=0.196816;align0=16;align1=16;align2=16;align3=16
+TUNE shape=4096,4096,4096 dtype=bf16 case=solution config=none
+CHECK 4096,4096,4096 bf16 trial=0 dense_eF=4.02334e-06 solution_eF=0.00602272 gate=0.00101207 pass=0
+CHECK 4096,4096,4096 bf16 trial=1 dense_eF=4.02328e-06 solution_eF=0.00602569 gate=0.00101207 pass=0
+CHECK 4096,4096,4096 bf16 trial=2 dense_eF=4.02375e-06 solution_eF=0.0060269 gate=0.00101207 pass=0
+TIME shape=4096,4096,4096 dtype=bf16 group=0 case=dense event_ms=0.196847 wall_ms=0.196972
+TIME shape=4096,4096,4096 dtype=bf16 group=0 case=solution event_ms=3.86038 wall_ms=3.86049
+TIME shape=4096,4096,4096 dtype=bf16 group=1 case=solution event_ms=3.77103 wall_ms=3.77114
+TIME shape=4096,4096,4096 dtype=bf16 group=1 case=dense event_ms=0.19785 wall_ms=0.197952
+TIME shape=4096,4096,4096 dtype=bf16 group=2 case=solution event_ms=3.83974 wall_ms=3.83985
+TIME shape=4096,4096,4096 dtype=bf16 group=2 case=dense event_ms=0.197125 wall_ms=0.197221
+TIME shape=4096,4096,4096 dtype=bf16 group=3 case=dense event_ms=0.203853 wall_ms=0.203936
+TIME shape=4096,4096,4096 dtype=bf16 group=3 case=solution event_ms=3.89158 wall_ms=3.89168
+TIME shape=4096,4096,4096 dtype=bf16 group=4 case=solution event_ms=3.77298 wall_ms=3.7731
+TIME shape=4096,4096,4096 dtype=bf16 group=4 case=dense event_ms=0.197215 wall_ms=0.197375
+TUNE shape=4096,4096,4096 dtype=fp16 case=dense config=dense:id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/9;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/3x10median;tuning_ms=0.210909;align0=16;align1=16;align2=16;align3=16
+TUNE shape=4096,4096,4096 dtype=fp16 case=solution config=none
+CHECK 4096,4096,4096 fp16 trial=0 dense_eF=4.87534e-06 solution_eF=0.000753133 gate=0.000114626 pass=0
+CHECK 4096,4096,4096 fp16 trial=1 dense_eF=4.87603e-06 solution_eF=0.000752695 gate=0.000114628 pass=0
+CHECK 4096,4096,4096 fp16 trial=2 dense_eF=4.87674e-06 solution_eF=0.000753062 gate=0.00011463 pass=0
+TIME shape=4096,4096,4096 dtype=fp16 group=0 case=dense event_ms=0.209956 wall_ms=0.210072
+TIME shape=4096,4096,4096 dtype=fp16 group=0 case=solution event_ms=3.9375 wall_ms=3.93761
+TIME shape=4096,4096,4096 dtype=fp16 group=1 case=solution event_ms=3.77543 wall_ms=3.77555
+TIME shape=4096,4096,4096 dtype=fp16 group=1 case=dense event_ms=0.209605 wall_ms=0.209713
+TIME shape=4096,4096,4096 dtype=fp16 group=2 case=solution event_ms=3.93166 wall_ms=3.93176
+TIME shape=4096,4096,4096 dtype=fp16 group=2 case=dense event_ms=0.209231 wall_ms=0.209339
+TIME shape=4096,4096,4096 dtype=fp16 group=3 case=dense event_ms=0.229692 wall_ms=0.229778
+TIME shape=4096,4096,4096 dtype=fp16 group=3 case=solution event_ms=3.98349 wall_ms=3.98359
+TIME shape=4096,4096,4096 dtype=fp16 group=4 case=solution event_ms=3.77424 wall_ms=3.77435
+TIME shape=4096,4096,4096 dtype=fp16 group=4 case=dense event_ms=0.209684 wall_ms=0.209787
+TUNE shape=1024,512,1024 dtype=bf16 case=dense config=dense:id=39;tile=17;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=4;bound_candidate=0/14;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.009603;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,512,1024 dtype=bf16 case=solution config=none
+CHECK 1024,512,1024 bf16 trial=0 dense_eF=8.50761e-07 solution_eF=0.00599042 gate=0.00100255 pass=0
+CHECK 1024,512,1024 bf16 trial=1 dense_eF=8.5262e-07 solution_eF=0.00604051 gate=0.00100256 pass=0
+CHECK 1024,512,1024 bf16 trial=2 dense_eF=8.51464e-07 solution_eF=0.00600487 gate=0.00100255 pass=0
+TIME shape=1024,512,1024 dtype=bf16 group=0 case=solution event_ms=0.049568 wall_ms=0.0496537
+TIME shape=1024,512,1024 dtype=bf16 group=0 case=dense event_ms=0.0120691 wall_ms=0.0121532
+TIME shape=1024,512,1024 dtype=bf16 group=1 case=solution event_ms=0.0446474 wall_ms=0.044726
+TIME shape=1024,512,1024 dtype=bf16 group=1 case=dense event_ms=0.0101939 wall_ms=0.0102714
+TIME shape=1024,512,1024 dtype=bf16 group=2 case=solution event_ms=0.0414378 wall_ms=0.0415151
+TIME shape=1024,512,1024 dtype=bf16 group=2 case=dense event_ms=0.0101808 wall_ms=0.0102598
+TIME shape=1024,512,1024 dtype=bf16 group=3 case=dense event_ms=0.0102349 wall_ms=0.0103115
+TIME shape=1024,512,1024 dtype=bf16 group=3 case=solution event_ms=0.0414058 wall_ms=0.0414839
+TIME shape=1024,512,1024 dtype=bf16 group=4 case=dense event_ms=0.0101814 wall_ms=0.0102601
+TIME shape=1024,512,1024 dtype=bf16 group=4 case=solution event_ms=0.0413818 wall_ms=0.0414595
+TUNE shape=1024,512,1024 dtype=fp16 case=dense config=dense:id=39;tile=17;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=11;bound_candidate=2/15;tuned_candidate=2;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010976;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,512,1024 dtype=fp16 case=solution config=none
+CHECK 1024,512,1024 fp16 trial=0 dense_eF=1.24738e-06 solution_eF=0.000749333 gate=0.000103742 pass=0
+CHECK 1024,512,1024 fp16 trial=1 dense_eF=1.25137e-06 solution_eF=0.000755532 gate=0.000103754 pass=0
+CHECK 1024,512,1024 fp16 trial=2 dense_eF=1.24781e-06 solution_eF=0.000751683 gate=0.000103743 pass=0
+TIME shape=1024,512,1024 dtype=fp16 group=0 case=solution event_ms=0.0383901 wall_ms=0.0384728
+TIME shape=1024,512,1024 dtype=fp16 group=0 case=dense event_ms=0.00965856 wall_ms=0.0097393
+TIME shape=1024,512,1024 dtype=fp16 group=1 case=solution event_ms=0.0371107 wall_ms=0.0372452
+TIME shape=1024,512,1024 dtype=fp16 group=1 case=dense event_ms=0.00932864 wall_ms=0.00942619
+TIME shape=1024,512,1024 dtype=fp16 group=2 case=solution event_ms=0.0366586 wall_ms=0.036734
+TIME shape=1024,512,1024 dtype=fp16 group=2 case=dense event_ms=0.00934368 wall_ms=0.00942115
+TIME shape=1024,512,1024 dtype=fp16 group=3 case=dense event_ms=0.00931616 wall_ms=0.00939314
+TIME shape=1024,512,1024 dtype=fp16 group=3 case=solution event_ms=0.0366054 wall_ms=0.0366886
+TIME shape=1024,512,1024 dtype=fp16 group=4 case=dense event_ms=0.00933184 wall_ms=0.00940875
+TIME shape=1024,512,1024 dtype=fp16 group=4 case=solution event_ms=0.0366205 wall_ms=0.0367004
+TUNE shape=512,1024,1024 dtype=bf16 case=dense config=dense:id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=2/14;tuned_candidate=2;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.008650;align0=16;align1=16;align2=16;align3=16
+TUNE shape=512,1024,1024 dtype=bf16 case=solution config=none
+CHECK 512,1024,1024 bf16 trial=0 dense_eF=8.53264e-07 solution_eF=0.00601885 gate=0.00100256 pass=0
+CHECK 512,1024,1024 bf16 trial=1 dense_eF=8.52627e-07 solution_eF=0.00601275 gate=0.00100256 pass=0
+CHECK 512,1024,1024 bf16 trial=2 dense_eF=8.5021e-07 solution_eF=0.00602806 gate=0.00100255 pass=0
+TIME shape=512,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.035769 wall_ms=0.0358567
+TIME shape=512,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0081328 wall_ms=0.00820962
+TIME shape=512,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.00812192 wall_ms=0.00820181
+TIME shape=512,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.0357651 wall_ms=0.0358439
+TIME shape=512,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.00823936 wall_ms=0.0083164
+TIME shape=512,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.0353078 wall_ms=0.0353852
+TIME shape=512,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.0352285 wall_ms=0.0353067
+TIME shape=512,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.00804384 wall_ms=0.00812006
+TIME shape=512,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.0352067 wall_ms=0.0352845
+TIME shape=512,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.00803584 wall_ms=0.00811079
+TUNE shape=512,1024,1024 dtype=fp16 case=dense config=dense:id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=25;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.008790;align0=16;align1=16;align2=16;align3=16
+TUNE shape=512,1024,1024 dtype=fp16 case=solution config=none
+CHECK 512,1024,1024 fp16 trial=0 dense_eF=1.24935e-06 solution_eF=0.00075151 gate=0.000103748 pass=0
+CHECK 512,1024,1024 fp16 trial=1 dense_eF=1.25202e-06 solution_eF=0.00075166 gate=0.000103756 pass=0
+CHECK 512,1024,1024 fp16 trial=2 dense_eF=1.24846e-06 solution_eF=0.000756687 gate=0.000103745 pass=0
+TIME shape=512,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.0350886 wall_ms=0.0351713
+TIME shape=512,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.0083568 wall_ms=0.00843683
+TIME shape=512,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.00834528 wall_ms=0.00842093
+TIME shape=512,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.0350694 wall_ms=0.035149
+TIME shape=512,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.00836928 wall_ms=0.00844626
+TIME shape=512,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.0350093 wall_ms=0.03509
+TIME shape=512,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.0351094 wall_ms=0.0351849
+TIME shape=512,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.00834528 wall_ms=0.00842269
+TIME shape=512,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.0350288 wall_ms=0.0351042
+TIME shape=512,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.00834976 wall_ms=0.00842646
+srun: error: g08: task 0: Exited with exit code 2

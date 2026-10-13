@@ -1,0 +1,35 @@
+WARNING: CPU context switch tracing not supported, disabling.
+Try the 'nsys status --environment' command to learn more.
+
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=128,128,128 dtype=bf16 case=solution config=none
+Capture range started in the application.
+Capture range ended in the application.
+Generating '/tmp/nsys-report-2958.qdstrm'
+[1/1] [0%                          ] small_owner19_128_bf16_iter23.nsys-rep[1/1] [0%                          ] small_owner19_128_bf16_iter23.nsys-rep[1/1] [===========51%              ] small_owner19_128_bf16_iter23.nsys-rep[1/1] [========================99% ] small_owner19_128_bf16_iter23.nsys-rep[1/1] [========================100%] small_owner19_128_bf16_iter23.nsys-rep[1/1] [========================100%] small_owner19_128_bf16_iter23.nsys-rep
+PROFILE 128,128,128 bf16 megakernel_warp_mma_8x8_prefetch workspace=0 target=solution lt_config=none
+Generated:
+    /share/home/liuyao/workspace/MegaFMM/.scratch/small_owner19_128_bf16_iter23.nsys-rep
+Generating SQLite file .scratch/small_owner19_128_bf16_iter23.sqlite from .scratch/small_owner19_128_bf16_iter23.nsys-rep
+Processing [.scratch/small_owner19_128_bf16_iter23.sqlite] with [/share/app/cuda/cuda-12.4/nsight-systems-2023.4.4/host-linux-x64/reports/cuda_gpu_kern_sum.py]... 
+
+ ** CUDA GPU Kernel Summary (cuda_gpu_kern_sum):
+
++----------+-----------------+-----------+----------+----------+----------+----------+-------------+------------------------------------------------------------------------------------------------------+
+| Time (%) | Total Time (ns) | Instances | Avg (ns) | Med (ns) | Min (ns) | Max (ns) | StdDev (ns) |                                                 Name                                                 |
++----------+-----------------+-----------+----------+----------+----------+----------+-------------+------------------------------------------------------------------------------------------------------+
+|    100.0 |            3200 |         1 |   3200.0 |   3200.0 |     3200 |     3200 |         0.0 | void megafmm::<unnamed>::mma8x8_prefetch_kernel<cutlass::bfloat16_t>(megafmm::Problem, const T1 *, … |
++----------+-----------------+-----------+----------+----------+----------+----------+-------------+------------------------------------------------------------------------------------------------------+
+
+Processing [.scratch/small_owner19_128_bf16_iter23.sqlite] with [/share/app/cuda/cuda-12.4/nsight-systems-2023.4.4/host-linux-x64/reports/cuda_api_sum.py]... 
+
+ ** CUDA API Summary (cuda_api_sum):
+
++----------+-----------------+-----------+----------+----------+----------+----------+-------------+-----------------------+
+| Time (%) | Total Time (ns) | Num Calls | Avg (ns) | Med (ns) | Min (ns) | Max (ns) | StdDev (ns) |         Name          |
++----------+-----------------+-----------+----------+----------+----------+----------+-------------+-----------------------+
+|     57.9 |           73566 |         1 |  73566.0 |  73566.0 |    73566 |    73566 |         0.0 | cudaLaunchKernel      |
+|     37.6 |           47743 |         1 |  47743.0 |  47743.0 |    47743 |    47743 |         0.0 | cudaStreamSynchronize |
+|      4.5 |            5728 |         1 |   5728.0 |   5728.0 |     5728 |     5728 |         0.0 | cuProfilerStart       |
++----------+-----------------+-----------+----------+----------+----------+----------+-------------+-----------------------+
+

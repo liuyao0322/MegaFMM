@@ -1,15 +1,26 @@
 # MegaFMM：面向 H100 的高性能 Strassen–Winograd 实现计划
 
-日期：2026-10-13。下文保留实施前的设计与验收合同；实际执行状态见本段及最终证据。
+日期：2026-10-13。下文保留实施前的设计与验收合同，新增实施状态与实验快照。
 
-执行更新：已建立 CUDA/C++ 工程，实现完整单层 V1、Hopper V2 与 M1/M3
-megakernel，完成 AKO4ALL 的5轮修改、测量、记录和提交。最终结构/API 测试及
-memcheck/racecheck/synccheck 均通过；原始输入 FP64 参考下的固定数值门限
-仍失败，完整性能复测也未达到相邻大形状至少1.05×的加速关口。因此自动
-dispatcher 保持 Dense，强制 SW 保留为实验接口。双层、M2、较广的 V3/V4、
-batch/scheduler、tail peeling 和同合同 SubCuber 性能复现尚未完成；本次
-没有把 P0–P5 的全部验收标为通过。详见 [README.md](README.md)、
-[ITERATIONS.md](ITERATIONS.md) 与 [results/REPORT.md](results/REPORT.md)。
+当前执行更新为 iteration23，测量源 commit 为
+`ea4dc50c57b08b4dee98c23c024a01bb94f836db`。工程保留完整单层 V1、Hopper
+V2、Lt batch7、Sm80 batched leaves，以及 M1/M2/M3、warp/product/cluster
+megakernel。较快函数与对照 variant 使用独立入口并存，以同一冻结二进制复测。
+小矩阵预声明九形状、两种dtype、20个请求配置各自 launch/Graph，共40 datasets、
+720行，全部是已检查的实际SW、全部固定数值失败，nonfinite、unchecked和Dense
+fallback均为零。更广 strict 集合31个请求配置（23个实际route名称）、930次检查为558通过/372失败/
+nonfinite零；DAG、完整结构/API、memcheck、racecheck、synccheck五项均exit0。
+完整协议为20次warmup、每组100次调用、5组随机交替、每行3轮新输入正确性。
+结构通过不能替代随机数值门限，Auto继续使用调优Dense，强制SW用于实验。
+
+这是一份当前性能快照，持续优化仍获授权，不表示已达到延迟下限、穷尽可行方向或
+完成P0–P5。直接寄存器operand等scratch方向仍待接入与同合同验证。双层、较广
+V3/V4、通用product-aware scheduler、专用tail peeling与同合同SubCuber性能
+复现仍开放。详见 [README.md](README.md)、[ITERATIONS.md](ITERATIONS.md)、
+[当前小矩阵报告](results/SMALL_REPORT.md) 与
+[当前源/二进制/证据manifest](results/small_manifest.json)。
+第5轮大矩阵94行/strict300次的 [旧报告](results/REPORT.md) 和
+[旧manifest](results/final_manifest.json) 属于历史阶段，不替代新增路线的当前覆盖。
 
 ## 1. 实现方向与目标合同
 
@@ -34,7 +45,7 @@ A\in\mathbb{R}^{M\times K},\ B\in\mathbb{R}^{K\times N},\ C_0,D\in\mathbb{R}^{M\
 
 ## 2. 仓库与现场环境
 
-本次只读检查得到：
+实施开始前的只读检查得到，以下表格描述起始现场：
 
 | 项目 | 2026-10-13 检查结果 | 实施影响 |
 |---|---|---|
@@ -51,6 +62,14 @@ A\in\mathbb{R}^{M\times K},\ B\in\mathbb{R}^{K\times N},\ C_0,D\in\mathbb{R}^{M\
 CUTLASS 3.5.1 官方列出 CUDA 12.2.2 兼容性，并推荐 12.4/12.5u1 的代码生成；现场已确认 12.4.99 可用，因此先锁 3.5.1 tag，记录解析出的 commit 和编译器版本，再做最小编译验证。[CUTLASS 3.5.1 README](https://github.com/NVIDIA/cutlass/blob/v3.5.1/README.md)
 
 现有驱动满足 CUDA 12.4 路线。CUDA 13.x 的普通兼容路径要求驱动至少 580；本计划不把现有 13.2 模块作为默认运行环境。SubCuber 的新依赖在独立构建目录核验，可先考察 CUDA 12.8；不以安装模块或更换驱动代替兼容性验证。[CUDA 兼容性](https://docs.nvidia.com/deploy/cuda-compatibility/minor-version-compatibility.html)、[CUDA 13.2 release notes](https://docs.nvidia.com/cuda/archive/13.2.0/cuda-toolkit-release-notes/index.html)
+
+iteration23应用仍由CUDA12.4.99/CUTLASS3.5.1/C++17构建为`sm_90a`并运行于
+H100。验证使用独立CUDA12.8 Compute Sanitizer 2025.1.0.0，实际路径为
+`/share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer`；它没有改变应用的
+CUDA12.4构建/runtime。三个当前工具日志均记录路径/version与exit0。早先12.4
+racecheck host SIGSEGV属于历史工具失败，不能算通过；设备与版本的实际证据见
+[small_environment.txt](results/small_environment.txt) 和
+[small_verify_runs.csv](results/small_verify_runs.csv)。
 
 ## 3. 文档和研究支持的关键决策
 
@@ -201,6 +220,26 @@ warp specialization 采用合法的连续四 warp consumer 分组；一个起步
 
 M1 不保证与 cuBLASLt 逐 bit 相同，但保留每个 P 的全 K 累加、同一次输入量化策略和最终 U 重组结构。M2 是另一种 FP32 累加策略；不能把逐 K-stage 的线性重组视为浮点下无成本地等价于先完整算 P。M3 若完全内联每个产品的输入表达式，输入加减为 14 次、输出为 7 次；不能仍标为十五加减。
 
+当前已实现M1/M3大tile对照及小tile warp/product路线。小矩阵完整套件包括
+Lt0/1、Hopper5–8、Mega4及Mega7–19；严格集合还包含Hopper0–4和Mega0–3/5/6。
+Hopper5/6分别为64×64×32与32×64×32 Sm80 batch7，7/8为32×64×64的三stage
+multistage与两stage pipelined家族。它们的实际schedule不同，不作为纯stage数对照。
+当前路线和fallback条件见 [README路线表](README.md#api与实验路线) 与
+[plan.cpp](solution/plan.cpp)，不能只凭请求的variant认定实际快路径执行。
+
+Mega18是已接入的M2：四个长期C和一个P scratch，每K16 stage按14项展开贡献
+更新C，FP32重组顺序与M1不同。它排除于M1逐位回归4、7–17、19之外，并使用
+[独立stage/整数CPU模型](tests/test_stage_m2.py)及结构/API/alpha-beta/alias/Graph
+验证。模型的标量RN dot不声称与SM80内部K16归约逐位相同；所有路线仍须接受
+原始量化输入的FP64普通AB参考及相同冻结随机误差门限。
+
+Mega19以8×8 owner使用native16×8 MMA，下半A置零；全部32 lanes和每产品四个
+native C寄存器仍参与MMA，输出只使用上8×8槽。相对Mega16的16×8 owner，CTA、
+逻辑B载入和HMMA发射约翻倍，全问题A读取近似不变；粒度变细伴随冗余工作。
+RawInputs从每lane 96降至64 bytes，shared源码5376 bytes，七P accumulator仍为每lane
+28个FP32。资源和指令证据见 [iteration23 profile](results/small_owner_profile_iter23.json)。
+这组结果不证明直接寄存器operand等后续方向无收益。
+
 **M1 的第一组资源预算**：单 consumer warpgroup、128 个线程，七个 FP32 accumulator 的平均寄存器数为 `7*BM*BN/128`。暂保留四个原始 A 加四个 S、四个原始 B 加四个 T，则 BF16/FP16 数据 scratch 为 `16*BK*(BM+BN)` bytes/stage，另计 barrier、对齐和 epilogue。
 
 | `(BM,BN,BK)` | 七 P accumulator regs/consumer thread | 数据 scratch/stage | 双缓冲数据 | 首轮用途 |
@@ -268,7 +307,13 @@ FP32 accumulator 不会恢复 S/T 转换丢失的精度。FP16 要覆盖变换�
 
 测试集合包含：随机正负/正值输入、zero、identity、非方阵、相近象限差值、强消去、不同动态范围、接近 FP16 上限、奇数/非 tile 对齐维度、不同 leading dimension，以及一般 alpha/beta、原位 C0/D 和连续调用。
 
-验收先按 BF16/FP16 与 0/1/2 层建立独立误差分布。初始工程门槛可用常规样本 `eF_SW ≤ 3*eF_dense + floor`，floor 暂取 BF16 `1e-3`、FP16 `1e-4`；这只是开始调优的候选标准，须在查看高精度结果后固定，并记录应用级 atol/rtol，不能事后只为通过某方案放宽。高风险范围若无法满足合同，限制 fast path 或采用计入时间的缩放方案。
+验收按BF16/FP16和递归层数分别记录误差分布；当前只实现0/1层，2层显式拒绝。
+已从初始基线冻结每轮门限 `eF_SW ≤ 3*eF_dense + floor`，BF16 floor=`1e-3`、
+FP16 floor=`1e-4`。每轮使用新输入，所有trial的pass取conjunction，双方均须无
+nonfinite。CSV最大eF与最大gate不能替代逐trial检查，不能事后为通过某方案放宽。
+CHECK日志默认六位有效数字与CSV十二位的审计使用舍入区间；接近边界时保留
+uncertain状态，不虚构原始精确metric。当前720行SW均失败，Auto保持Dense。
+高风险范围若无法满足合同，限制fast path或另行验证计入时间的缩放方案。
 
 对有限、位于声明输入范围内的数据，不能接受算法产生 NaN/Inf。NaN/Inf 输入的语义单独定义；初期走普通 GEMM。sanitizer 检查越界、race 和同步；异步协议仍需代码审查，不能只凭 sanitizer 通过宣称正确。
 
@@ -281,7 +326,19 @@ FP32 accumulator 不会恢复 S/T 转换丢失的精度。FP16 要覆盖变换�
 - 功能边界：例如 `(1025,1537,769)`，以及象限基址不满足 fast-path 对齐的 stride/view。
 - BF16、FP16 分别测 FP32 输出；低精度输出另建表。所有 baseline 使用相同 layout、alpha/beta 和输出 dtype。
 
+上述大矩阵集合是原计划与历史阶段。当前小矩阵研究的预声明集合单独固定于
+[small_shapes.json](bench/small_shapes.json)：128/256/512/1024/2048/3072/4096
+方阵和`(1024,512,1024)`、`(512,1024,1024)`。每条路线分开launch/Graph、两种
+dtype；完整协议20warm/100calls×5groups/3correctness trials，诊断协议20warm/
+20calls×5groups/1trial。最终套件40labels/720rows，不混入诊断或历史数据。
+
 cuBLASLt 根据形状、dtype、stride、workspace 上限查询多个合法 heuristic 候选，例如最多 32 个，预热并实测取优、缓存决策。baseline 与候选允许相同总 workspace 上限，实际各自使用量分别记录。普通 cuBLAS GEMM 和 stock CUTLASS 作为诊断对照。[cuBLASLt heuristics 与 API](https://docs.nvidia.com/cuda/archive/12.2.0/cublas/index.html#cublasltmatmulalgogetheuristic)
+
+当前两侧总workspace上限均为8GiB，实际bytes分别记录。Lt保留32个heuristic、
+实际绑定的alignment pool与dedup；小问题Lt调优为4次warmup、3组各10次调用的
+median，大问题保留1warm/3calls。调优在正式计时与Graph capture之外。51列CSV
+保存Dense/solution实际bound config与protocol，TUNE日志精确对应；custom核的
+Lt config为`none`，未调优/重绑定/query不可得时明确NA，不能虚构算法或score。
 
 ### 9.2 计时合同
 
@@ -290,6 +347,24 @@ cuBLASLt 根据形状、dtype、stride、workspace 上限查询多个合法 heur
 分别提供 Graph 和普通 launch 的端到端表，双方采用相同计时模式。CUDA Event 起止之间包含所有相关 stream，通过明确 event join 包含全部 GPU 工作；另外用主机 wall clock 报告 CPU 调度影响。多 stream 时间不能只在一条 stream 上记录事件。
 
 预热例如 20 次，测量例如 100 次，独立重复至少 5 组并随机交替测 baseline/候选；单组总计时应足够长。报告 median、分位数和离散度，不能仅报告最小值。常规 warm-cache 与轮换输入的大工作集模式分别报告。输入更新和正确性检查在计时外，但所有依赖输入的算法工作在计时内。
+
+当前完整表固定20warm/100calls/5groups/3correctness；p10/median/p90/CV取五组
+每调用均值的分布，不是100次单调用的尾延迟或置信区间。小矩阵最终集合是
+warm_cache/rotate_inputs=1，各候选同一行Dense才是主要普通GEMM基线。GPU频率
+未锁定，before/after telemetry不能证明组内时钟稳定。
+
+跨variant经验包络按候选自身最低观测`solution_event_ms`选择，不按最大Dense/SW
+选择；精确平局按source路径/CSV行号/actual route/variant确定。获选行的Dense
+用于计算Dense/SW。它是selected-on-measurement的观测最小值，不是独立dispatcher
+收益或数值认证。历史原始Lt0/SW另列跨运行比值，严格匹配形状、dtype、mode、
+cache、rotate_inputs和工作集；旧packing/tuner/时钟/host状态可能不同，不能解释
+为同行Dense收益。缺失/歧义显示N/A，actual-route历史匹配为家族层次。
+
+相邻预声明尺寸的性能资格须保持同一源、actual route、variant、dtype、mode、cache
+和rotate_inputs场景，各shape工作集符合声明；固定数值门限和完整采样须同时
+通过。`Dense p10 / SW p90`只作保守组间离散度筛查，不是统计保证。当前BF16
+128 launch经验包络为同行Dense3.938µs/SW3.915µs≈1.006×，是微小观测差异且
+数值失败，没有达到≥1.05×并通过精度的认证要求。
 
 固定 B 的权重复用场景单独报告 `T_precompute_B`、每次 amortized 时间与复用次数，不能混入动态 GEMM 结果。固定 beta≠0 时保证每次都使用同一个逻辑 C0；不能无意反复将上一次 D 当 C0。
 
@@ -328,22 +403,27 @@ cuBLASLt 根据形状、dtype、stride、workspace 上限查询多个合法 heur
 
 ## 11. 工程结构与里程碑
 
-建议结构，实施时再创建：
+原计划的模块划分已落为以下主要入口；其余优化以独立TU保留，完整source hash由
+manifest记录：
 
 ```text
 CMakeLists.txt
-include/megafmm/{gemm.h,policy.h}
-src/{plan.cpp,dispatch.cpp}
-src/cuda/{pack_winograd.cu,combine_fp32.cu,gemm_hopper.cu}
-src/cuda/{fused_hopper.cu,megakernel_hopper.cu,winograd_l2.cu}
-tests/{test_dag.py,test_correctness.cpp}
-bench/{benchmark.cpp,shapes.json}
-scripts/{build.sh,bench.sh,profile.sh}
+include/megafmm/gemm.h
+solution/{plan.cpp,internal.h,pack_winograd.cu,combine_fp32.cu}
+solution/{gemm_hopper.cu,megakernel_hopper.cu,gemm_batched*.cu}
+solution/{small_mma*.cu,small_product*.cu}
+tests/{test_dag.py,test_stage_m2.py,test_correctness.cu}
+bench/{benchmark.cu,shapes.json,small_shapes.json}
+scripts/{build.sh,bench.sh,profile.sh,small_suite.sh,verify_small.sh}
+scripts/{summarize_small.py,write_small_manifest.py}
 third_party/cutlass/          # 固定依赖版本
 results/                     # 元数据、CSV/JSON、profile 索引
 ```
 
-核心 API 区分 `workspace_bytes(problem, policy)`、plan 创建/地址绑定、`run(plan, A, B, C0, D, workspace, stream)`。run 不动态分配或隐式 host synchronize。tensor map/Graph 指针绑定成本单独记录；地址或 leading dimension 改变时正确更新 descriptor。0/1/2 层策略可强制，便于 benchmark 与回归。
+当前公共API为plan创建、`plan->workspace_bytes()`、显式`tune`和
+`run(plan, A, B, C0, D, workspace, stream)`；run不动态分配或隐式host synchronize。
+tensor map/Graph指针绑定成本单独记录；地址或leading dimension改变时正确更新
+descriptor。0/1层可强制用于benchmark/回归，2层尚未实现并显式拒绝。
 
 | 阶段 | 交付物 | 必须通过的关口 |
 |---|---|---|
@@ -358,7 +438,7 @@ results/                     # 元数据、CSV/JSON、profile 索引
 
 双层只在 leaf、workspace、误差与总时间同时允许时进入。递归深度采用 host 侧固定展开，不引入 device dynamic parallelism。FP8、稀疏 Tensor Core、多 GPU/NVLink 属于后续扩展，不能当作本次稠密 BF16/FP16 合同的加速来源。
 
-## 12. 计算节点执行与本阶段完成情况
+## 12. 计算节点执行与当前实验状态
 
 实施开始先重新确认现有 allocation，使用其分配的设备和 CPU；需要 Slurm 建立设备环境时可在登录节点进入已有 allocation 的 step：
 
@@ -375,3 +455,19 @@ nvidia-smi
 若采用 SSH，g08 使用端口 2222，并核验 allocation 对应的 GPU；不能假定任意 SSH 会话继承 Slurm 设备绑定。现有分配失效时先查 `scontrol show partition h100`，按集群默认使用长驻 `salloc`，允许时请求 UNLIMITED，并保持 allocation shell。下载依赖在登录节点完成，计算节点承担构建、测试与 profiling。
 
 实施前阶段已经完成：仓库/现场只读检查、官方文档与原始研究检索、最新 SubCuber 源码边界核验、算法双线性恒等检查，以及成本与 workspace 推导。该阶段尚未进行 CUDA 实现和 H100 测量；后续执行结果见开头的执行更新，验收合同仍由上述 P0–P5 定义。
+
+iteration23当前快照的 [run metadata](results/small_final_runs.csv) 与
+[verify metadata](results/small_verify_runs.csv) 均记录源commit
+`ea4dc50c57b08b4dee98c23c024a01bb94f836db`。benchmark SHA256为
+`a89d8cadf7f3dcbbecd41e6d7fac30de24ce55827bcbacf372126beaaf807d42`，
+correctness SHA256为`51791901d93f465db30d41f419f1bc2f7334b02936c9e8c0365e21130679d392`；
+两个角色各自全程同binary。当前manifest核对30个source hashes、720行、80份
+telemetry、1,440条TUNE与2,160轮CHECK；不以文档后来的HEAD冒充测量版本。
+五项验证exit0，strict exit2且930次中558通过/372失败/nonfinite零。历史大矩阵
+94行中88实际SW失败/6Dense fallback通过，strict300中120失败/nonfinite零，
+保留于旧报告/manifest，不混入本快照。
+
+完整复现命令及独立工具选择见 [README](README.md#构建验证与复现)。当前结构、
+资源和实验覆盖并不把未通过精度与性能验收的P1/P3/P5关口标为完成。Auto继续
+调优Dense；持续优化将依据新假设、资源、完整延迟与同一冻结数值合同继续，直接
+寄存器operand等候选仍可接入验证，不将本快照视为停止或穷尽声明。
