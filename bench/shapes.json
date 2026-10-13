@@ -1,0 +1,16 @@
+{
+  "tuple_order": ["M", "N", "K"],
+  "dtypes": ["bf16", "fp16"],
+  "output_dtype": "fp32",
+  "workspace_limit_bytes": 8589934592,
+  "warmup": 20,
+  "trials": 100,
+  "groups": 5,
+  "correctness_trials": 3,
+  "squares": [[512,512,512],[1024,1024,1024],[2048,2048,2048],[4096,4096,4096],[8192,8192,8192],[16384,16384,16384]],
+  "rectangles": [[8192,4096,8192],[4096,8192,8192],[8192,8192,4096],[8192,1024,512],[1024,8192,512]],
+  "boundaries": [[1025,1537,769],[514,770,258],[1,1,1]],
+  "numeric_gate": {"expression": "eF_solution <= 3*eF_dense + floor", "bf16_floor": 0.001, "fp16_floor": 0.0001, "nonfinite_allowed": false},
+  "elementwise_report_only": {"bf16_atol": 0.001, "bf16_rtol": 0.01, "fp16_atol": 0.0001, "fp16_rtol": 0.001},
+  "reference": "FP64 GEMM from original rounded BF16/FP16 inputs; no S/T transform"
+}
