@@ -57,4 +57,10 @@ void prepare_mma16x8_vec4(const Problem& p, int variant=12);
 void launch_mma16x8_vec4(const Problem& p, const void* A, const void* B,
                         const float* C0, float* D, cudaStream_t stream,
                         int variant=12);
+// Eight-CTA product cluster, with variant 9 for generic tails and strides.
+bool small_product_cluster_can_implement(const Problem& p, int variant=13);
+void prepare_small_product_cluster(const Problem& p, int variant=13);
+void launch_small_product_cluster(const Problem& p, const void* A, const void* B,
+                                  const float* C0, float* D, cudaStream_t stream,
+                                  int variant=13);
 }

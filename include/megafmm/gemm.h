@@ -35,7 +35,8 @@ struct Policy {
   // 9=product-parallel M1 with seven product warps and final fixed U merge,
   // 10=complete-tile product warps (otherwise variant 9),
   // 11=complete 16x8 warp MMA tiles (otherwise packed variant 7),
-  // 12=same complete tiles with four-element B vectors (otherwise variant 7).
+  // 12=same complete tiles with four-element B vectors (otherwise variant 7),
+  // 13=eight-CTA product cluster (otherwise variant 9).
   int mega_variant=0;
 };
 class Plan {

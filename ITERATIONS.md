@@ -57,6 +57,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 14 | 16x8 B fill across a full warp | 0.3673 | 0.678265 | screened; numerical gate failed; structural validation pending |
 
+| 15 | Spread seven complete products over eight-CTA Hopper clusters | 0.2237 | 1.616020 | screened; numerical gate failed; cluster validation pending |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -559,3 +561,39 @@ Viable directions remain and are CPU-reviewed: (1) all32 B lanes each4elements i
 - **Analysis:** Quick 20-call five-group screening completed for all 18 rows; all rows are finite and all frozen numerical gates fail, yielding exit 2. Results are archived at trajectory/20261013_140256_iter-14. Performance must be compared per primary shape against the prior best envelope after closure; this quick run is a screening signal and does not certify speedup. The preceding CUDA/CUTLASS, SASS, and Nsight Systems reassessment identified remaining measurable GPU work and further viable directions.
 - **Next:** Validate Mega12 structural and bitwise behavior with all three sanitizers, then test portable eight-CTA product clusters as the next separate iteration.
 - **Archive:** trajectory/20261013_140256_iter-14/
+
+Iter14 post-closure primary analysis (quick screening, mixed historical protocols, no certification): bf16 128^3 4.992us vs priorbest iter12 4.642us; prior/SW=0.930x; same-row Dense/SW=1.200x; fp16 128^3 5.179us vs priorbest iter12 4.782us; prior/SW=0.923x; same-row Dense/SW=1.155x; bf16 256^3 7.541us vs priorbest iter12 6.390us; prior/SW=0.847x; same-row Dense/SW=0.797x; fp16 256^3 7.566us vs priorbest iter12 6.406us; prior/SW=0.847x; same-row Dense/SW=0.792x; bf16 512^3 13.683us vs priorbest iter8 11.872us; prior/SW=0.868x; same-row Dense/SW=0.479x; fp16 512^3 13.669us vs priorbest iter8 11.805us; prior/SW=0.864x; same-row Dense/SW=0.484x; bf16 1024^3 66.320us vs priorbest iter7 19.830us; prior/SW=0.299x; same-row Dense/SW=0.208x; fp16 1024^3 66.200us vs priorbest iter7 19.638us; prior/SW=0.297x; same-row Dense/SW=0.157x. Complete GPU structural/bitwise4,7,8,9,10,11,12 PASS; variant12 memcheck/racecheck/synccheck each zero errors and warnings. Same-row Dense128 is ~6us here versus ~4us in previous screens, reinforcing need for final same-binary full alternating repeats.
+
+Iter14 compiler mechanism check (same3902367 binary): native16x8 vec4 has24staticpacked final casts vs32 for variant11, 655static instructions vs679; both7HMMA/K16. This confirms narrower B conversion issue count but does not imply dynamic utilization or a speedup. Resource blocks and binary hash recorded in results/small_sass_iter14.json.
+
+### Iter 15 — Spread seven complete products over eight-CTA Hopper clusters
+
+- **Hypothesis:** An eight-CTA portable cluster can spread sparse tiny product work over more SMs and combine completed FP32 P values through DSM.
+- **Changes:** Added Mega13 product cluster with seven single-warp product CTAs, one barrier-only CTA, two unconditional cluster barriers, rank0 fixed U, zero workspace, prepare-only capability queries, and generic Mega9 fallback. Added explicit Graph replay tests.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=1.616020 ms; mean speedup=0.2237x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_product_cluster v13 | launch | 0.005678 | 0.006624 | 0.8572 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_product_cluster v13 | launch | 0.005610 | 0.006838 | 0.8203 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_product_cluster v13 | launch | 0.005656 | 0.009632 | 0.5872 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_product_cluster v13 | launch | 0.005709 | 0.009618 | 0.5936 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_product_cluster v13 | launch | 0.006387 | 0.030488 | 0.2095 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_product_cluster v13 | launch | 0.006402 | 0.030726 | 0.2083 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_product_cluster v13 | launch | 0.013498 | 0.152165 | 0.0887 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_product_cluster v13 | launch | 0.010370 | 0.151435 | 0.0685 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_product_cluster v13 | launch | 0.032067 | 1.005120 | 0.0319 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_product_cluster v13 | launch | 0.032526 | 1.022578 | 0.0318 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_product_cluster v13 | launch | 0.086064 | 3.204152 | 0.0269 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_product_cluster v13 | launch | 0.088834 | 3.239051 | 0.0274 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_product_cluster v13 | launch | 0.196355 | 9.857846 | 0.0199 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_product_cluster v13 | launch | 0.206280 | 10.042958 | 0.0205 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_product_cluster v13 | launch | 0.009154 | 0.079622 | 0.1150 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_product_cluster v13 | launch | 0.009206 | 0.080040 | 0.1150 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_product_cluster v13 | launch | 0.008006 | 0.079578 | 0.1006 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_product_cluster v13 | launch | 0.008347 | 0.079896 | 0.1045 | 0.00075151 | 0 |
+
+- **Analysis:** Build and quick 20-call five-group screening completed for all 18 finite rows; all frozen numerical gates failed, exit2. Per-shape performance must be compared against the prior best envelope after closure, and final acceptance requires the full same-binary protocol. No numerical threshold or product completion order changed.
+- **Next:** Run complete structural/bitwise and Graph tests plus cluster memcheck/racecheck/synccheck, then test the independent float2 output epilogue.
+- **Archive:** trajectory/20261013_141750_iter-15/
