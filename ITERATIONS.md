@@ -89,6 +89,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 30 | Single-launch producer-consumer WGMMA pipeline | 0.4094 | 0.358867 | no-change |
 
+| 31 | Single-launch TMA raw-alias two-bank WGMMA | 0.3970 | 0.292840 | no-change |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -1407,3 +1409,35 @@ Default2080CASE859PASS, selected29 24CASE38PASS, CPU3DAG+6stage PASS; independen
 Newstrict60 scope retains original floors/patterns:36PASS24FAIL/NF0,48native12Dense-rangefallback; old1290gates and25oldCUDA TUs/source23–29 evidence remain bytepreserved, not a repeated1350suite. SixCUDA12.8sanitizers for28/29 eachmemcheck/racecheck/synccheck exit0 withzeroerrors/hazards/warnings/leaks. Static gate beforelaunch proves BN16REG96/pool24576≥role20480, producer64/consumer96 withmaxR58/89; BN32REG160/pool40960≥28672, quotas64/160 maxR54/145 includingimplicitwidths andwaitstubs. STACK/LOCAL/spill0; formal dynamicshared71808/86144B versusELFstaticSHARED1024B separately recorded. Four linkedinstructionstreams equal finalobject; resource conditions forBN16twoCTA are not measuredoccupancy. Ncu not retried.
 
 Original BF16/FP16 precision/numerical contracts and AutoDense remain unchanged. Continue optimizing the actual1024 single-launch kernel; no next implementation started in this lease before evidence closure.
+
+### Iter 31 — Single-launch TMA raw-alias two-bank WGMMA
+
+- **Hypothesis:** Eight direct TMA copies and raw shared-slot aliases replace repeated producer SIMT global loads and original-slot re-stores while preserving whole seven-product one-level SW.
+- **Changes:** Add native Mega30/31 BM64 BN16/32 BK32 producer128 consumer128 PipelineAsync2; two current-pointer tensor-map encodes per complete ordinary invocation; original precision and fixed FP64 gate, truthful packed7/Dense fallback and AutoDense retained. Actual pinned-layout assertion domain repaired without changing executable host/device paths; full new object/linked quota and descriptor lowering independently reviewed before GPU.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.292840 ms; mean speedup=0.3970x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.005621 | 0.006515 | 0.8627 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.005574 | 0.006728 | 0.8285 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.005677 | 0.009056 | 0.6269 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.005696 | 0.009256 | 0.6154 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.006349 | 0.013518 | 0.4696 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.006394 | 0.013870 | 0.4610 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.013240 | 0.027469 | 0.4820 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.010250 | 0.027630 | 0.3710 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.031845 | 0.197074 | 0.1616 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.032891 | 0.200723 | 0.1639 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.086694 | 0.653165 | 0.1327 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.088802 | 0.651856 | 0.1362 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.195477 | 1.644518 | 0.1189 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.205923 | 1.713634 | 0.1202 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.011522 | 0.023886 | 0.4823 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.009880 | 0.024395 | 0.4050 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.008323 | 0.023563 | 0.3532 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_wgmma_tma_alias_64x16 v30 | launch | 0.008632 | 0.024262 | 0.3558 | 0.00075151 | 0 |
+
+- **Analysis:** Default GPU2126CASE933PASS, selected30/31 both38PASS, CPU DAG3 stage6 PASS, independent initial CTApool/direction/role CFG including implicit widths and descriptor/shared alignment PASS. This diagnostic quick uses18rows20warm20calls5groups1fresh and records all numerical failures; matched full20row1024 comparisons and host batchwall are required separately irrespective screen signal. No numerical certification or goal completion inferred from execution timing.
+- **Next:** Measure same frozen source/binary new30/31 and retained29/27/Lt1 at1024 bothdtype ordinary/Graph20warm100calls5groups3fresh, then unchanged strict60 and six serial CUDA12.8 sanitizers, independent static/data final audit and evidence closure.
+- **Archive:** trajectory/20261014_013912_iter-31/

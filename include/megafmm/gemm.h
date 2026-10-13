@@ -60,6 +60,9 @@ struct Policy {
   // 28/29=dedicated producer/consumer M1 WGMMA64x16/64x32 K32, two banks,
   // full seven P and fixed U in one launch (otherwise packed7; common AB16
   // current binding failure uses Dense). No global S/T/P or caller workspace.
+  // 30/31=TMA raw aliases in final banks64x16/64x32, one launch; two
+  // current-pointer tensor-map encodes occur in each run/capture, not setup.
+  // Same packed7/Dense fallbacks; no global S/T/P or native workspace.
   int mega_variant=0;
 };
 class Plan {

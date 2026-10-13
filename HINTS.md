@@ -43,6 +43,13 @@
 - Compiled native initialREG96/160 and perCTAownedpool24576/40960 safely support producer64/consumer96-or160; independentfullCFG/implicitwidth audits maxR58/89 or54/145 and linked/objectinstruction equality PASS. Dynamiclaunchshared71808/86144B and ELFstaticSHARED1024B are distinct. Resource-based possibleCTA residency is not measuredoccupancy.
 - Default2080CASE859PASS, newstrict60=36PASS24FAIL/NF0, six targetedCUDA12.8sanitizers zeroerrors. The rawU/finalD native29 reference uses matchingN32oldMega0 atalpha1beta0 followed by independenthostRNmul/floatFMA for specifiedactiveepilogue; oldactivebetaM1 contraction differs and is retained asdiagnostic. Do not replace the original FP64 numerical gate with these implementation-consistency tests.
 
+## Current experimental direction (iteration31)
+
+- Add native TMA raw-alias Mega30/31 BM64 BN16/32 BK32 with256threads split128producer/128consumer; two finalbanks, eight real TMA copies perCTA/stage, rawbarriers, complete7P/fixedU, no globalSTP/nativeworkspace. Keep old26CUDA TUs and source23–30 evidence bytepreserved.
+- Ordinary currentbindingrun performs two real cuTensorMapEncodeTiled calls then one kernel; both encodes remain inside repeated timedhostloop. Graph captures fixeddescriptoraddresses and each replay consumes freshcontents with all transforms insidekernel; report event and batchwall/call medians separately, not single-callwall.
+- Do not inherit previous vector producerregister quota proof. BeforefirstGPUlaunch prove new initialREG/direction/perCTAownedpool/allroleCFG highestR includingimplicit64/128/TMA/HGMMA width and registerinitialization from finalobject/linkedSASS. Native uses512B sharedalignment/SW64A andSW32-or64B; CPU/pinned API review does not replace compiled/GPU gate.
+- Samebinary full1024 new30/31, retained29/27 and Lt1 is mandatory irrespective quick3percent signal: two dtypes, launch/Graph,20warm100calls5groups3fresh,32candidates8GiB cap. Rank newownMega latency against retained29 and same-row independentDense; allprecisiongatefails remain visible, AutoDense.
+
 <!-- User-supplied behavior directives. The skill reads this at session start
      and respects any constraint named here. Examples:
      - Optimization constraints or focus areas (e.g., "Prefer Triton over raw CUDA")

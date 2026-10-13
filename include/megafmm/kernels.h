@@ -199,4 +199,14 @@ void launch_wgmma_pipeline(const Problem& p, const void* A, const void* B,
                            const float* C0, float* D, cudaStream_t stream,
                            int configuration=0);
 
+// TMA raw aliases into two final banks, native-only configs0/1 map to30/31.
+// Every native host run encodes current A/B then launches one kernel.
+bool wgmma_tma_alias_can_implement(const Problem& p, int configuration=0);
+bool wgmma_tma_alias_full_tiles(const Problem& p, const void* A, const void* B,
+                                int configuration=0);
+void prepare_wgmma_tma_alias(const Problem& p, int configuration=0);
+void launch_wgmma_tma_alias(const Problem& p, const void* A, const void* B,
+                            const float* C0, float* D, cudaStream_t stream,
+                            int configuration=0);
+
 }
