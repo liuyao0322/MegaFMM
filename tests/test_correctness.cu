@@ -61,7 +61,8 @@ std::string algorithm_name(megafmm::Algorithm algorithm) {
 }
 template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorithm,
                                   Pattern pattern,bool alias,bool certified,uint32_t seed=1234567,int variant=0,
-                                  bool do_tune=true) {
+                                  bool do_tune=true,size_t workspace_limit=size_t(8)<<30,
+                                  const char* expected_route=nullptr) {
   int ar=p.trans_a ? p.k:p.m, ac=p.trans_a ? p.m:p.k;
   int br=p.trans_b ? p.n:p.k, bc=p.trans_b ? p.k:p.n;
   std::vector<T> a(size_t(ar)*p.lda),b(size_t(br)*p.ldb);
@@ -113,7 +114,11 @@ template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorit
   check(cudaMemcpy(dd.data,result.data(),result.size()*sizeof(float),cudaMemcpyHostToDevice));
   megafmm::Policy policy;policy.algorithm=algorithm;policy.certified_range=certified;
   policy.hopper_variant=variant;policy.mega_variant=variant;
+  if(algorithm==megafmm::Algorithm::WinogradLt)policy.lt_variant=variant;
+  policy.workspace_limit=workspace_limit;
   auto plan=megafmm::create_plan(p,policy);
+  if(expected_route)require(plan->algorithm_name()==expected_route,
+                           std::string("unexpected route: expected ")+expected_route+", got "+plan->algorithm_name());
   Buffer workspace(plan->workspace_bytes());
   float* output=alias ? dc.as<float>():dd.as<float>();
   require(!alias || p.ldc==p.ldd,"test alias needs equal C/D strides");
@@ -133,8 +138,8 @@ template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorit
             << megafmm::dtype_name(p.dtype) << ' ' << pattern_name(pattern) << ' '
             << p.m << ',' << p.n << ',' << p.k << " maxabs=" << e.maxabs << " eF=" << e.ef
             << " scaled=" << e.scaled << " normalized=" << e.normalized << " nonfinite=" << e.nonfinite << '\n';
-  if(!alias) for(int i=0;i<p.m;++i) for(int j=p.n;j<p.ldd;++j)
-    require(result[size_t(i)*p.ldd+j]==-777.0f,"output padding overwritten");
+  for(int i=0;i<p.m;++i) for(int j=p.n;j<p.ldd;++j)
+    require(result[size_t(i)*p.ldd+j]==(alias ? c[size_t(i)*p.ldc+j]:-777.0f),"output padding overwritten");
   return e;
 }
 megafmm::Problem problem(int m,int n,int k,megafmm::DType dtype) {
@@ -199,7 +204,42 @@ template<class T> void structural_suite(megafmm::DType dtype) {
     require(e.nonfinite==0 && e.maxabs==0,"streaming megakernel alpha/beta alias test failed");
   }
 }
-template<class T> void rebind_suite(megafmm::DType dtype) {
+template<class T> void batched_suite(megafmm::DType dtype) {
+  auto exact=[dtype](megafmm::Problem p,Pattern pattern,bool alias=false,bool certified=true,
+                    bool expect_batched=true,size_t workspace_limit=size_t(8)<<30,bool do_tune=false) {
+    const char* route=expect_batched ? "winograd_lt_batched":"dense_cublaslt";
+    std::cout << "BEGIN_BATCHED dtype=" << megafmm::dtype_name(dtype)
+              << " pattern=" << pattern_name(pattern) << " shape=" << p.m << ',' << p.n << ',' << p.k
+              << " alpha=" << p.alpha << " beta=" << p.beta << " alias=" << alias
+              << " certified_range=" << certified << " workspace_limit=" << workspace_limit
+              << " expected=" << route << std::endl;
+    auto e=run_case<T>(p,megafmm::Algorithm::WinogradLt,pattern,alias,certified,1234567,1,
+                       do_tune,workspace_limit,route);
+    require(e.nonfinite==0 && e.maxabs==0,"batched Lt structural/alias/fallback test failed");
+  };
+  // Small exact operands exercise all seven slot mappings and the fixed U DAG.
+  // Tune one case; the remaining scenarios also cover the untuned route.
+  for(auto pattern:{Pattern::Integers,Pattern::Zero,Pattern::Identity,Pattern::Cancellation})
+    exact(problem(128,128,128,dtype),pattern,false,true,true,size_t(8)<<30,pattern==Pattern::Integers);
+  exact(problem(128,64,256,dtype),Pattern::Integers);
+  exact(problem(256,256,256,dtype),Pattern::Integers);
+  auto p=problem(128,128,128,dtype);p.alpha=.5f;p.beta=-.25f;
+  exact(p,Pattern::Integers);
+  // Tuning C0=D must leave every trial with the same original beta input.
+  exact(p,Pattern::Integers,true,true,true,size_t(8)<<30,true);
+  p.lda+=8;p.ldb+=8;p.ldc+=8;p.ldd+=8;
+  exact(p,Pattern::Integers);
+  exact(p,Pattern::Integers,true);
+  // These cases must select Dense even though Lt variant 1 was requested.
+  exact(problem(128,128,128,dtype),Pattern::Integers,false,false,false);
+  exact(problem(65,97,33,dtype),Pattern::Integers,false,true,false);
+  exact(problem(128,128,128,dtype),Pattern::Integers,false,true,false,0);
+  p=problem(128,128,128,dtype);p.lda+=1;
+  exact(p,Pattern::Integers,false,true,false);
+  p=problem(128,128,128,dtype);p.trans_a=true;
+  exact(p,Pattern::Integers,false,true,false);
+}
+template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false) {
   // Reuse a tuned plan with changed addresses: an aligned preferred SW route must
   // safely choose Dense when the new input views have only element alignment.
   auto p=problem(256,256,256,dtype);
@@ -210,19 +250,26 @@ template<class T> void rebind_suite(megafmm::DType dtype) {
     b[size_t(l)*p.n+j]=round_value<T>(float(j%7-3));
   Buffer da((a.size()+1)*sizeof(T)),db((b.size()+1)*sizeof(T)),dd(size_t(p.m)*p.n*sizeof(float));
   std::vector<float> actual(size_t(p.m)*p.n);
-  for(auto algo:{megafmm::Algorithm::Dense,megafmm::Algorithm::WinogradLt,
-                 megafmm::Algorithm::WinogradHopper,megafmm::Algorithm::Megakernel}) {
-    megafmm::Policy policy;policy.algorithm=algo;policy.certified_range=true;policy.mega_variant=3;
+  for(auto candidate:{std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Dense,0},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradLt,0},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradLt,1},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,0},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,3}}) {
+    auto algo=candidate.first;int variant=candidate.second;
+    bool is_batched=algo==megafmm::Algorithm::WinogradLt && variant==1;
+    if(batched_only && !is_batched)continue;
+    megafmm::Policy policy;policy.algorithm=algo;policy.certified_range=true;
+    if(algo==megafmm::Algorithm::WinogradLt)policy.lt_variant=variant;
+    if(algo==megafmm::Algorithm::Megakernel)policy.mega_variant=variant;
     auto plan=megafmm::create_plan(p,policy);Buffer workspace(plan->workspace_bytes());
+    if(is_batched)require(plan->algorithm_name()=="winograd_lt_batched","batched rebind test selected Dense");
     check(cudaMemcpy(da.data,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice));
     check(cudaMemcpy(db.data,b.data(),b.size()*sizeof(T),cudaMemcpyHostToDevice));
     megafmm::tune(*plan,da.data,db.data,nullptr,dd.as<float>(),workspace.data);
-    for(bool shifted:{false,true}) {
+    for(bool shifted:{false,true,false}) {
       T* left=da.as<T>()+int(shifted),*right=db.as<T>()+int(shifted);
-      if(shifted) {
-        check(cudaMemcpy(left,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice));
-        check(cudaMemcpy(right,b.data(),b.size()*sizeof(T),cudaMemcpyHostToDevice));
-      }
+      check(cudaMemcpy(left,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice));
+      check(cudaMemcpy(right,b.data(),b.size()*sizeof(T),cudaMemcpyHostToDevice));
       megafmm::run(*plan,left,right,nullptr,dd.as<float>(),workspace.data);
       check(cudaDeviceSynchronize());
       check(cudaMemcpy(actual.data(),dd.data,actual.size()*sizeof(float),cudaMemcpyDeviceToHost));
@@ -231,7 +278,18 @@ template<class T> void rebind_suite(megafmm::DType dtype) {
                 "same-plan pointer alignment rebind returned an incorrect product");
     }
     std::cout << "PASS_POINTER_REBIND dtype=" << megafmm::dtype_name(dtype)
-              << " algorithm=" << algorithm_name(algo) << " aligned_then_element_aligned=1\n";
+              << " algorithm=" << algorithm_name(algo) << " variant=" << variant
+              << " aligned_then_element_aligned_then_aligned=1\n";
+  }
+}
+void batched_policy_rejection_suite() {
+  for(int variant:{-1,2}) {
+    megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::WinogradLt;
+    policy.certified_range=true;policy.lt_variant=variant;
+    bool rejected=false;
+    try { auto plan=megafmm::create_plan(problem(128,128,128,megafmm::DType::BF16),policy); }
+    catch(const std::exception&) { rejected=true; }
+    require(rejected,"invalid Lt variant accepted");
   }
 }
 void degenerate_suite() {
@@ -316,7 +374,7 @@ void rejection_suite() {
 template<class T> bool strict_numerics(megafmm::DType dtype) {
   bool pass=true;double floor=dtype==megafmm::DType::BF16 ? 1e-3:1e-4;
   struct Candidate { megafmm::Algorithm algorithm;int variant; };
-  std::vector<Candidate> candidates={{megafmm::Algorithm::WinogradLt,0}};
+  std::vector<Candidate> candidates={{megafmm::Algorithm::WinogradLt,0},{megafmm::Algorithm::WinogradLt,1}};
   for(int variant=0;variant<=4;++variant)candidates.push_back({megafmm::Algorithm::WinogradHopper,variant});
   for(int variant=0;variant<=3;++variant)candidates.push_back({megafmm::Algorithm::Megakernel,variant});
   for(auto pat:{Pattern::Uniform,Pattern::Positive,Pattern::Range,Pattern::Cancellation,Pattern::HighHalf}) {
@@ -371,11 +429,12 @@ template<class T> bool strict_numerics(megafmm::DType dtype) {
 int main(int argc,char** argv) {
   try {
     std::cout << std::unitbuf;std::cerr << std::unitbuf;
-    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-candidates [--mega-only | --hopper-variant 0..4]]";
-    bool numeric=false, candidates_only=false,mega_only=false;
+    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-batched | --smoke-candidates [--mega-only | --hopper-variant 0..4]]";
+    bool numeric=false, candidates_only=false,mega_only=false,batched_only=false;
     int hopper_filter=-1;
     for(int i=1;i<argc;++i) {
       if(std::string(argv[i])=="--strict-numerics")numeric=true;
+      else if(std::string(argv[i])=="--smoke-batched")batched_only=true;
       else if(std::string(argv[i])=="--smoke-candidates")candidates_only=true;
       else if(std::string(argv[i])=="--mega-only")mega_only=true;
       else if(std::string(argv[i])=="--hopper-variant") {
@@ -388,6 +447,16 @@ int main(int argc,char** argv) {
     require((!mega_only && hopper_filter<0) || candidates_only,
             "candidate filters require --smoke-candidates; "+usage);
     require(!mega_only || hopper_filter<0,"--mega-only and --hopper-variant cannot be combined; "+usage);
+    require(!batched_only || !candidates_only,"--smoke-batched and --smoke-candidates cannot be combined; "+usage);
+    if(batched_only) {
+      batched_suite<__nv_bfloat16>(megafmm::DType::BF16);
+      batched_suite<__half>(megafmm::DType::FP16);
+      rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,true);
+      rebind_suite<__half>(megafmm::DType::FP16,true);
+      batched_policy_rejection_suite();
+      std::cout << "PASS batched Lt slot mappings, rectangles, strides, alpha/beta alias, Dense fallback, rebind and policy rejection\n";
+      return 0;
+    }
     if(candidates_only) {
       auto check_candidates=[mega_only,hopper_filter](auto input_tag,megafmm::DType dtype) {
         using T=decltype(input_tag);
@@ -430,9 +499,11 @@ int main(int argc,char** argv) {
     }
     structural_suite<__nv_bfloat16>(megafmm::DType::BF16);
     structural_suite<__half>(megafmm::DType::FP16);
+    batched_suite<__nv_bfloat16>(megafmm::DType::BF16);
+    batched_suite<__half>(megafmm::DType::FP16);
     rebind_suite<__nv_bfloat16>(megafmm::DType::BF16);
     rebind_suite<__half>(megafmm::DType::FP16);
-    degenerate_suite();rejection_suite();
+    degenerate_suite();rejection_suite();batched_policy_rejection_suite();
     std::cout << "PASS structural DAG, fallback numerics, strides/transposes, alias, degenerate and rejection tests\n";
     bool pass=true;
     if(numeric) {

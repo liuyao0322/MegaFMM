@@ -84,6 +84,8 @@ struct LtOp {
   cublasLtMatrixLayout_t a = nullptr, b = nullptr, c = nullptr, d = nullptr;
   std::vector<cublasLtMatmulHeuristicResult_t> candidates;
   std::vector<std::array<uint32_t, 4>> alignments;
+  int32_t batch_count = 1;
+  std::array<size_t, 4> batch_stride_bytes{};
   size_t selected = 0;
   float alpha = 1.0f, beta = 0.0f;
   LtOp() = default;
@@ -110,8 +112,10 @@ void make_layout(cublasLtMatrixLayout_t* layout, cudaDataType_t dtype,
       &order, sizeof(order)), "set row-major matrix layout");
 }
 std::unique_ptr<LtOp> make_lt_op(cublasLtHandle_t handle, const Problem& p,
-                               size_t scratch_limit, int requested) {
+                               size_t scratch_limit, int requested, int32_t batch_count=1,
+                               std::array<int64_t, 4> batch_strides={}) {
   auto op = std::make_unique<LtOp>();
+  op->batch_count = batch_count;
   op->alpha = p.alpha;
   op->beta = p.beta;
   lt_check(cublasLtMatmulDescCreate(&op->operation, CUBLAS_COMPUTE_32F, CUDA_R_32F), "create matmul descriptor");
@@ -124,6 +128,18 @@ std::unique_ptr<LtOp> make_lt_op(cublasLtHandle_t handle, const Problem& p,
   make_layout(&op->b, input_type, p.trans_b ? p.n : p.k, p.trans_b ? p.k : p.n, p.ldb);
   make_layout(&op->c, CUDA_R_32F, p.m, p.n, p.beta == 0.0f ? p.ldd : p.ldc);
   make_layout(&op->d, CUDA_R_32F, p.m, p.n, p.ldd);
+  if (batch_count != 1) {
+    if (batch_count < 1) throw std::invalid_argument("Lt batch count must be positive");
+    const cublasLtMatrixLayout_t layouts[4] = {op->a, op->b, op->c, op->d};
+    for (int i = 0; i < 4; ++i) {
+      if (batch_strides[i] <= 0) throw std::invalid_argument("uniform Lt batch strides must be positive");
+      op->batch_stride_bytes[i] = checked_mul(size_t(batch_strides[i]), i < 2 ? 2 : 4);
+      lt_check(cublasLtMatrixLayoutSetAttribute(layouts[i], CUBLASLT_MATRIX_LAYOUT_BATCH_COUNT,
+          &batch_count, sizeof(batch_count)), "set Lt batch count");
+      lt_check(cublasLtMatrixLayoutSetAttribute(layouts[i], CUBLASLT_MATRIX_LAYOUT_STRIDED_BATCH_OFFSET,
+          &batch_strides[i], sizeof(batch_strides[i])), "set Lt batch stride");
+    }
+  }
   cublasLtMatmulPreference_t preference = nullptr;
   lt_check(cublasLtMatmulPreferenceCreate(&preference), "create matmul preference");
   try {
@@ -144,11 +160,19 @@ std::unique_ptr<LtOp> make_lt_op(cublasLtHandle_t handle, const Problem& p,
           CUBLASLT_MATMUL_PREF_MIN_ALIGNMENT_D_BYTES, &output_alignment, sizeof(output_alignment)), "set D alignment");
       std::vector<cublasLtMatmulHeuristicResult_t> pool(static_cast<size_t>(requested));
       int returned = 0;
-      lt_check(cublasLtMatmulAlgoGetHeuristic(handle, op->operation, op->a, op->b, op->c, op->d,
-          preference, requested, pool.data(), &returned), "query Lt heuristics");
+      const auto query_status = cublasLtMatmulAlgoGetHeuristic(handle, op->operation, op->a, op->b, op->c, op->d,
+          preference, requested, pool.data(), &returned);
+      if (batch_count > 1 && query_status == CUBLAS_STATUS_NOT_SUPPORTED) continue;
+      lt_check(query_status, "query Lt heuristics");
       for (int i = 0; i < returned; ++i) {
         const auto& candidate = pool[size_t(i)];
         if (candidate.state != CUBLAS_STATUS_SUCCESS || candidate.workspaceSize > scratch_limit) continue;
+        if (batch_count > 1) {
+          int32_t supported = 0;
+          size_t written = 0;
+          if (cublasLtMatmulAlgoCapGetAttribute(&candidate.algo, CUBLASLT_ALGO_CAP_STRIDED_BATCH_SUPPORT,
+              &supported, sizeof(supported), &written) != CUBLAS_STATUS_SUCCESS || !supported) continue;
+        }
         const bool duplicate = std::any_of(op->candidates.begin(), op->candidates.end(), [&](const auto& existing) {
           return std::memcmp(&candidate.algo, &existing.algo, sizeof(candidate.algo)) == 0;
         });
@@ -164,6 +188,12 @@ std::unique_ptr<LtOp> make_lt_op(cublasLtHandle_t handle, const Problem& p,
               sizeof(requirement), &written) == CUBLAS_STATUS_SUCCESS && requirement)
             requirements[operand] = requirement;
         }
+        if (batch_count > 1) {
+          bool aligned_batches = true;
+          for (int operand = 0; operand < 4; ++operand)
+            aligned_batches = aligned_batches && op->batch_stride_bytes[operand] % requirements[operand] == 0;
+          if (!aligned_batches) continue;
+        }
         op->candidates.push_back(candidate);
         op->alignments.push_back(requirements);
       }
@@ -173,14 +203,18 @@ std::unique_ptr<LtOp> make_lt_op(cublasLtHandle_t handle, const Problem& p,
     throw;
   }
   cublasLtMatmulPreferenceDestroy(preference);
-  if (op->candidates.empty()) throw std::runtime_error("cuBLASLt has no valid heuristic for this problem and workspace budget");
+  if (op->candidates.empty()) {
+    if (batch_count > 1) return nullptr;  // The planner can use the ordinary GEMM fallback.
+    throw std::runtime_error("cuBLASLt has no valid heuristic for this problem and workspace budget");
+  }
   return op;
 }
 bool compatible(const LtOp& op, size_t candidate, const void* A, const void* B,
                 const float* C0, const float* D) {
   const void* pointers[4] = {A, B, op.beta == 0.0f ? D : C0, D};
   for (int i = 0; i < 4; ++i)
-    if (reinterpret_cast<uintptr_t>(pointers[i]) % op.alignments[candidate][i]) return false;
+    if (reinterpret_cast<uintptr_t>(pointers[i]) % op.alignments[candidate][i] ||
+        (op.batch_count > 1 && op.batch_stride_bytes[i] % op.alignments[candidate][i])) return false;
   return true;
 }
 size_t bound_candidate(const LtOp& op, const void* A, const void* B,
@@ -240,10 +274,12 @@ struct Plan::Impl {
   size_t bytes = 0, s_offset = 0, t_offset = 0, p_offset = 0, scratch_offset = 0;
   cublasLtHandle_t handle = nullptr;
   std::unique_ptr<LtOp> dense;
+  std::unique_ptr<LtOp> batched;
   std::array<std::unique_ptr<LtOp>, 7> leaves;
   std::array<Problem, 7> leaf_problems;
   ~Impl() {
     dense.reset();
+    batched.reset();
     for (auto& leaf : leaves) leaf.reset();
     if (handle) cublasLtDestroy(handle);
   }
@@ -322,12 +358,25 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     return;
   }
   auto* base = static_cast<unsigned char*>(workspace);
+  float* products = reinterpret_cast<float*>(base + plan.p_offset);
+  if (plan.batched) {
+    const void* left = base + plan.s_offset;
+    const void* right = base + plan.t_offset;
+    detail::pack_winograd_batched_inputs(p, A, B, base + plan.s_offset,
+                                       base + plan.t_offset, stream);
+    cuda_check(cudaPeekAtLastError(), "launch uniform Winograd operand packing");
+    lt_check(execute_lt(plan.handle, *plan.batched,
+        bound_candidate(*plan.batched, left, right, nullptr, products),
+        left, right, nullptr, products, scratch, stream), "run batched Winograd products");
+    detail::combine_winograd(p, products, C0, D, stream);
+    cuda_check(cudaPeekAtLastError(), "launch batched Winograd combine");
+    return;
+  }
   detail::pack_winograd_inputs(p, A, B, base + plan.s_offset,
                              base + plan.t_offset, stream);
   cuda_check(cudaPeekAtLastError(), "launch Winograd packing kernels");
   std::array<const void*, 7> left, right;
   operands(plan, A, B, workspace, left, right);
-  float* products = reinterpret_cast<float*>(base + plan.p_offset);
   const size_t product_elements = size_t(p.m / 2) * size_t(p.n / 2);
   for (int i = 0; i < 7; ++i) {
     float* output = products + i * product_elements;
@@ -353,7 +402,7 @@ std::string Plan::algorithm_name() const {
   if (impl_->empty) return "empty";
   if (impl_->scale) return "degenerate_scale";
   switch (impl_->algorithm) {
-    case Algorithm::WinogradLt: return "winograd_lt_v1";
+    case Algorithm::WinogradLt: return impl_->batched ? "winograd_lt_batched" : "winograd_lt_v1";
     case Algorithm::WinogradHopper: return "winograd_hopper_v2";
     case Algorithm::Megakernel:
       if (impl_->policy.mega_variant == 3) {
@@ -373,6 +422,8 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     throw std::invalid_argument("only levels=0 (dense) and levels=1 are implemented; levels=2 requires separate validation");
   if (policy.heuristic_candidates < 1 || policy.heuristic_candidates > 128)
     throw std::invalid_argument("heuristic_candidates must be between 1 and 128");
+  if (policy.lt_variant < 0 || policy.lt_variant > 1)
+    throw std::invalid_argument("lt_variant must be 0 (views) or 1 (uniform batched operands)");
   if (policy.algorithm < Algorithm::Auto || policy.algorithm > Algorithm::Megakernel)
     throw std::invalid_argument("unsupported algorithm policy");
   auto impl = std::make_unique<Plan::Impl>();
@@ -386,20 +437,22 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   if (desired == Algorithm::Auto || policy.levels == 0 || !winograd_shape(p, policy)) desired = Algorithm::Dense;
   if (desired == Algorithm::Megakernel && !megakernel_can_implement(p, policy.mega_variant)) desired = Algorithm::Dense;
   if (desired != Algorithm::Dense && desired != Algorithm::Megakernel) {
+    const bool batched = desired == Algorithm::WinogradLt && policy.lt_variant == 1;
+    const size_t input_slots = batched ? 7 : 4;
     const size_t a_block = checked_mul(checked_mul(size_t(p.m / 2), size_t(p.k / 2)), 2);
     const size_t b_block = checked_mul(checked_mul(size_t(p.k / 2), size_t(p.n / 2)), 2);
     const size_t p_block = checked_mul(checked_mul(size_t(p.m / 2), size_t(p.n / 2)), 4);
     impl->s_offset = 0;
-    impl->t_offset = aligned(checked_mul(a_block, 4));
-    impl->p_offset = aligned(checked_add(impl->t_offset, checked_mul(b_block, 4)));
+    impl->t_offset = aligned(checked_mul(a_block, input_slots));
+    impl->p_offset = aligned(checked_add(impl->t_offset, checked_mul(b_block, input_slots)));
     impl->scratch_offset = aligned(checked_add(impl->p_offset, checked_mul(p_block, 7)));
     if (impl->scratch_offset > policy.workspace_limit) desired = Algorithm::Dense;
     for (int i = 0; i < 7; ++i) {
       Problem leaf;
       leaf.m = p.m / 2; leaf.n = p.n / 2; leaf.k = p.k / 2;
       leaf.dtype = p.dtype;
-      leaf.lda = (i == 0 || i == 1 || i == 3) ? p.lda : leaf.k;
-      leaf.ldb = (i == 0 || i == 1 || i == 2) ? p.ldb : leaf.n;
+      leaf.lda = !batched && (i == 0 || i == 1 || i == 3) ? p.lda : leaf.k;
+      leaf.ldb = !batched && (i == 0 || i == 1 || i == 2) ? p.ldb : leaf.n;
       leaf.ldc = leaf.ldd = leaf.n;
       impl->leaf_problems[i] = leaf;
       if (desired == Algorithm::WinogradHopper && !hopper_can_implement(leaf, policy.hopper_variant)) desired = Algorithm::Dense;
@@ -421,19 +474,32 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     const size_t available = policy.workspace_limit - impl->scratch_offset;
     impl->dense = make_lt_op(impl->handle, p, available, policy.heuristic_candidates);
     size_t scratch = impl->dense->scratch_bytes();
-    for (int i = 0; i < 7; ++i) {
-      if (desired == Algorithm::WinogradHopper)
-        scratch = std::max(scratch, hopper_workspace_bytes(impl->leaf_problems[i], policy.hopper_variant));
-      else {
-        impl->leaves[i] = make_lt_op(impl->handle, impl->leaf_problems[i], available, policy.heuristic_candidates);
-        scratch = std::max(scratch, impl->leaves[i]->scratch_bytes());
+    bool backend_available = true;
+    if (desired == Algorithm::WinogradLt && policy.lt_variant == 1) {
+      const auto& leaf = impl->leaf_problems[0];
+      const int64_t a_stride = leaf.m * leaf.k;
+      const int64_t b_stride = leaf.k * leaf.n;
+      const int64_t p_stride = leaf.m * leaf.n;
+      impl->batched = make_lt_op(impl->handle, leaf, available, policy.heuristic_candidates,
+                                7, {a_stride, b_stride, p_stride, p_stride});
+      backend_available = bool(impl->batched);
+      if (impl->batched) scratch = std::max(scratch, impl->batched->scratch_bytes());
+    } else {
+      for (int i = 0; i < 7; ++i) {
+        if (desired == Algorithm::WinogradHopper)
+          scratch = std::max(scratch, hopper_workspace_bytes(impl->leaf_problems[i], policy.hopper_variant));
+        else {
+          impl->leaves[i] = make_lt_op(impl->handle, impl->leaf_problems[i], available, policy.heuristic_candidates);
+          scratch = std::max(scratch, impl->leaves[i]->scratch_bytes());
+        }
       }
     }
-    if (scratch > available) {
+    if (!backend_available || scratch > available) {
       // A backend's metadata budget can exceed the nominal matrix-buffer budget.
       impl->algorithm = Algorithm::Dense;
       impl->scratch_offset = 0;
       for (auto& leaf : impl->leaves) leaf.reset();
+      impl->batched.reset();
       impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);
       impl->bytes = impl->dense->scratch_bytes();
     } else impl->bytes = checked_add(impl->scratch_offset, scratch);
@@ -467,16 +533,24 @@ void tune(Plan& plan, const void* A, const void* B, const float* C0,
         tune_lt(impl.handle, *impl.dense, A, B, original_c, D, scratch, stream);
       else if (impl.algorithm == Algorithm::WinogradLt) {
         auto* base = static_cast<unsigned char*>(workspace);
-        detail::pack_winograd_inputs(impl.problem, A, B, base + impl.s_offset,
-                                   base + impl.t_offset, stream);
-        cuda_check(cudaPeekAtLastError(), "launch tuning transforms");
-        std::array<const void*, 7> left, right;
-        operands(impl, A, B, workspace, left, right);
         float* products = reinterpret_cast<float*>(base + impl.p_offset);
-        const size_t elements = size_t(impl.problem.m / 2) * size_t(impl.problem.n / 2);
-        for (int i = 0; i < 7; ++i)
-          tune_lt(impl.handle, *impl.leaves[i], left[i], right[i], nullptr,
-                  products + i * elements, scratch, stream);
+        if (impl.batched) {
+          detail::pack_winograd_batched_inputs(impl.problem, A, B, base + impl.s_offset,
+                                             base + impl.t_offset, stream);
+          cuda_check(cudaPeekAtLastError(), "launch uniform tuning operands");
+          tune_lt(impl.handle, *impl.batched, base + impl.s_offset, base + impl.t_offset,
+                  nullptr, products, scratch, stream);
+        } else {
+          detail::pack_winograd_inputs(impl.problem, A, B, base + impl.s_offset,
+                                     base + impl.t_offset, stream);
+          cuda_check(cudaPeekAtLastError(), "launch tuning transforms");
+          std::array<const void*, 7> left, right;
+          operands(impl, A, B, workspace, left, right);
+          const size_t elements = size_t(impl.problem.m / 2) * size_t(impl.problem.n / 2);
+          for (int i = 0; i < 7; ++i)
+            tune_lt(impl.handle, *impl.leaves[i], left[i], right[i], nullptr,
+                    products + i * elements, scratch, stream);
+        }
       }
     }
     run_internal(impl, A, B, original_c, D, workspace, stream);

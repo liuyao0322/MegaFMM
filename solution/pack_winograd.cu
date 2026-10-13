@@ -13,7 +13,7 @@ template<class T> __device__ inline T from_float(float x);
 template<> __device__ inline __half from_float(float x) { return __float2half_rn(x); }
 template<> __device__ inline __nv_bfloat16 from_float(float x) { return __float2bfloat16_rn(x); }
 
-template<class T, bool IsA>
+template<class T, bool IsA, bool UniformSlots=false>
 __device__ __forceinline__ void pack_vectors(const T* __restrict__ input, T* __restrict__ packed,
                                   int64_t rows, int64_t cols, int64_t ld,
                                   uint64_t first, uint64_t step) {
@@ -46,10 +46,22 @@ __device__ __forceinline__ void pack_vectors(const T* __restrict__ input, T* __r
       reinterpret_cast<T*>(&z4)[lane] = from_float<T>(y4);
     }
     const uint64_t i = row * cols + col;
-    *reinterpret_cast<uint4*>(packed + i) = z1;
-    *reinterpret_cast<uint4*>(packed + count + i) = z2;
-    *reinterpret_cast<uint4*>(packed + 2 * count + i) = z3;
-    *reinterpret_cast<uint4*>(packed + 3 * count + i) = z4;
+    if constexpr (UniformSlots) {
+      // Original quadrants are copied bit-for-bit, with no conversion roundtrip.
+      // The four transformed operands still use the shared FP32 DAG above.
+      *reinterpret_cast<uint4*>(packed + i) = q11;
+      *reinterpret_cast<uint4*>(packed + count + i) = IsA ? q12 : q21;
+      *reinterpret_cast<uint4*>(packed + 2 * count + i) = IsA ? z4 : q22;
+      *reinterpret_cast<uint4*>(packed + 3 * count + i) = IsA ? q22 : z4;
+      *reinterpret_cast<uint4*>(packed + 4 * count + i) = z1;
+      *reinterpret_cast<uint4*>(packed + 5 * count + i) = z2;
+      *reinterpret_cast<uint4*>(packed + 6 * count + i) = z3;
+    } else {
+      *reinterpret_cast<uint4*>(packed + i) = z1;
+      *reinterpret_cast<uint4*>(packed + count + i) = z2;
+      *reinterpret_cast<uint4*>(packed + 2 * count + i) = z3;
+      *reinterpret_cast<uint4*>(packed + 3 * count + i) = z4;
+    }
   }
 }
 
@@ -63,16 +75,16 @@ __global__ void pack_vector_kernel(const T* __restrict__ input, T* __restrict__ 
 
 // Each CTA belongs to exactly one input. Both independent DAGs share one
 // launch without requiring any cross-CTA communication or extra storage.
-template<class T>
+template<class T, bool UniformSlots=false>
 __global__ void pack_inputs_kernel(Problem p, const T* __restrict__ A,
     const T* __restrict__ B, T* __restrict__ S, T* __restrict__ Tpacked,
     unsigned a_blocks, unsigned b_blocks) {
   if (blockIdx.x < a_blocks) {
-    pack_vectors<T, true>(A, S, p.m / 2, p.k / 2, p.lda,
+    pack_vectors<T, true, UniformSlots>(A, S, p.m / 2, p.k / 2, p.lda,
         uint64_t(blockIdx.x) * blockDim.x + threadIdx.x,
         uint64_t(blockDim.x) * a_blocks);
   } else {
-    pack_vectors<T, false>(B, Tpacked, p.k / 2, p.n / 2, p.ldb,
+    pack_vectors<T, false, UniformSlots>(B, Tpacked, p.k / 2, p.n / 2, p.ldb,
         uint64_t(blockIdx.x - a_blocks) * blockDim.x + threadIdx.x,
         uint64_t(blockDim.x) * b_blocks);
   }
@@ -151,5 +163,20 @@ void pack_winograd_inputs(const Problem& p, const void* A, const void* B,
     pack_inputs_kernel<__half><<<ab + bb, 256, 0, stream>>>(p,
         static_cast<const __half*>(A), static_cast<const __half*>(B),
         static_cast<__half*>(S), static_cast<__half*>(T), ab, bb);
+}
+void pack_winograd_batched_inputs(const Problem& p, const void* A, const void* B,
+                                  void* left, void* right, cudaStream_t stream) {
+  const uint64_t av = uint64_t(p.m / 2) * uint64_t(p.k / 16);
+  const uint64_t bv = uint64_t(p.k / 2) * uint64_t(p.n / 16);
+  const unsigned ab = static_cast<unsigned>(std::min<uint64_t>((av + 255) / 256, 65535));
+  const unsigned bb = static_cast<unsigned>(std::min<uint64_t>((bv + 255) / 256, 65535));
+  if (p.dtype == DType::BF16)
+    pack_inputs_kernel<__nv_bfloat16, true><<<ab + bb, 256, 0, stream>>>(p,
+        static_cast<const __nv_bfloat16*>(A), static_cast<const __nv_bfloat16*>(B),
+        static_cast<__nv_bfloat16*>(left), static_cast<__nv_bfloat16*>(right), ab, bb);
+  else
+    pack_inputs_kernel<__half, true><<<ab + bb, 256, 0, stream>>>(p,
+        static_cast<const __half*>(A), static_cast<const __half*>(B),
+        static_cast<__half*>(left), static_cast<__half*>(right), ab, bb);
 }
 }  // namespace megafmm::detail

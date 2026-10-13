@@ -18,6 +18,7 @@ set +e
   --algorithm "${MEGAFMM_ALGORITHM:-lt}" \
   --shapes "${MEGAFMM_SHAPES:-4096,4096,4096;8192,8192,8192;16384,16384,16384}" \
   --dtype "${MEGAFMM_DTYPE:-both}" \
+  --lt-variant "${MEGAFMM_LT_VARIANT:-0}" \
   --mega-variant "${MEGAFMM_MEGA_VARIANT:-0}" \
   --hopper-variant "${MEGAFMM_HOPPER_VARIANT:-0}" \
   --rotate-inputs "${MEGAFMM_ROTATE_INPUTS:-1}" \
