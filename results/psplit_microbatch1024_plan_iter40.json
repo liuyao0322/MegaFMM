@@ -1,0 +1,253 @@
+{
+  "shapes": [
+    [
+      1024,
+      1024,
+      1024
+    ]
+  ],
+  "dtypes": [
+    "bf16",
+    "fp16"
+  ],
+  "modes": [
+    "launch",
+    "graph"
+  ],
+  "warmup": 20,
+  "trials": 100,
+  "groups": 5,
+  "correct_trials": 3,
+  "rotate_inputs": 1,
+  "heuristic_candidates": 32,
+  "workspace_limit": 8589934592,
+  "reference": "Independently tuned same-row cuBLASLt beforecapture,32candidates/8GiB; Dense/SW same ordinary/Graphmode; noGraph-specifictuning.",
+  "schema": "megafmm.iter40.full1024-plan.v1",
+  "declared_before_measurement": true,
+  "reason": "Mandatory microbatch44 vs retained RS-A BK6439/raw BK3240/SS BK3236/Lt1 full20; compiled blocks retain exact missing keys, irrespective quick outcomes.",
+  "routes": [
+    {
+      "label": "psplit_microbatch44",
+      "algorithm": "mega",
+      "variant": 44,
+      "actual_name": "megakernel_wgmma_psplit_rsa_microbatch_64x32",
+      "enabled": true,
+      "native": true
+    },
+    {
+      "label": "psplit_rsa39",
+      "algorithm": "mega",
+      "variant": 39,
+      "actual_name": "megakernel_wgmma_psplit_rsa_64x32",
+      "enabled": true,
+      "native": true
+    },
+    {
+      "label": "psplit_rsa_bk3240",
+      "algorithm": "mega",
+      "variant": 40,
+      "actual_name": "megakernel_wgmma_psplit_rsa_bk32_64x32",
+      "enabled": true,
+      "native": true
+    },
+    {
+      "label": "psplit36",
+      "algorithm": "mega",
+      "variant": 36,
+      "actual_name": "megakernel_wgmma_psplit_64x32",
+      "enabled": true,
+      "native": true
+    },
+    {
+      "label": "packed_lt1",
+      "algorithm": "lt",
+      "variant": 1,
+      "actual_name": "winograd_lt_batched",
+      "enabled": true,
+      "native": false
+    }
+  ],
+  "frozen_sources": {
+    "CMakeLists.txt": "1175767fbc3ca80e735fa74952faa32d41fcebff6ecd78d1e8075a7eca4144bb",
+    "bench/benchmark.cu": "cea3a6e1b23e5cb3ee7f55027381e66d89743c538c93b45beff5d4856eba1294",
+    "include/megafmm/gemm.h": "a2afd0c87e356d7b05159fcb84df042cdf076fe2d1cbda35bf0b38c5f3e33ea0",
+    "include/megafmm/kernels.h": "e5634acdeed29dd1681d321cfad12a017189acb8ca51ef065b0c02f01b3d763c",
+    "solution/plan.cpp": "fc4bee56843fefd4a15a9dd1de21bc4216ee0c5ce2d9352a110d04817dce5c3e",
+    "tests/test_correctness.cu": "e4de81a44de4931ad3f227ff25f245bb9f3181186670e26dd9f0607c543123b7",
+    "solution/megakernel_wgmma_psplit_rsa_microbatch.cu": "a02b4af263619b1d25601f968b41abc3db364afb00da1031e6258b71458c2922"
+  },
+  "frozen_binaries": {
+    "build/megafmm_bench": "3ecb269a0bf91a667c54d0f11efa6bacdd830330ba385c35c2b8462252e765db",
+    "build/test_correctness": "87e98b506510f1105bd8ac4f54c0b7b8bd9559e104ce7a143fcf0f984321ae1a"
+  },
+  "route_configurations": {
+    "39": {
+      "actual_name": "megakernel_wgmma_psplit_rsa_64x32",
+      "producer_quota": 64,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "launch_bounds_min_ctas": 1,
+      "enabled": true,
+      "BM": 64,
+      "BN": 32,
+      "BK": 64,
+      "threads": 384,
+      "dynamic_shared_bytes": 123008,
+      "predicted_dynamic_shared_bytes": 123008,
+      "static_shared_bytes": 1024,
+      "drain_barrier": "nonaligned barrier.sync6,384; CTAepochs0/6/0",
+      "compiled_gate": {
+        "path": "results/psplit_rsa_static_review_initial_iter36.json",
+        "sha256": "46db33836552063d31dd3cfde249ddb472cf0bdd252e2a9e4f790690362a1488",
+        "status": "PASS_COMPILED_CAN_LAUNCH_39_ONLY_37_REMAINS_BLOCKED"
+      },
+      "initial_registers_per_thread": 168,
+      "initial_owned_CTA_pool_registers": 64512,
+      "requested_role_pool_registers": 57344,
+      "producer_gpr_highest_including_implicit": 52,
+      "wg0_gpr_highest_including_implicit": 185,
+      "wg1_gpr_highest_including_implicit": 186,
+      "resource_metadata_scope": "retained legacy compiled metadata; not a new function-attribute query this iteration"
+    },
+    "40": {
+      "actual_name": "megakernel_wgmma_psplit_rsa_bk32_64x32",
+      "producer_quota": 64,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "launch_bounds_min_ctas": 1,
+      "enabled": true,
+      "BM": 64,
+      "BN": 32,
+      "BK": 32,
+      "threads": 384,
+      "dynamic_shared_bytes": 61568,
+      "predicted_dynamic_shared_bytes": 61568,
+      "static_shared_bytes": 1024,
+      "drain_barrier": "nonaligned barrier.sync6,384; collective epochs0/6/0",
+      "compiled_gate": {
+        "path": "results/psplit_rsa_bk32_static_review_initial_iter37.json",
+        "sha256": "842e07f61015d2ef811c183f24843894e722a2f2dfc0bd92e937b43ce049578c",
+        "status": "PASS_COMPILED_CAN_LAUNCH_40_ONLY_37_REMAINS_BLOCKED"
+      },
+      "initial_registers_per_thread": 168,
+      "initial_owned_CTA_pool_registers": 64512,
+      "requested_role_pool_registers": 57344,
+      "producer_gpr_highest_including_implicit": 39,
+      "wg0_gpr_highest_including_implicit_by_dtype": {
+        "fp16": 124,
+        "bf16": 150
+      },
+      "wg1_gpr_highest_including_implicit": 141,
+      "resource_metadata_scope": "retained legacy compiled metadata; not a new function-attribute query this iteration"
+    },
+    "36": {
+      "actual_name": "megakernel_wgmma_psplit_64x32",
+      "producer_quota": 64,
+      "consumer_quotas": [
+        96,
+        96
+      ],
+      "launch_bounds_min_ctas": 1,
+      "enabled": true,
+      "BM": 64,
+      "BN": 32,
+      "BK": 32,
+      "threads": 384,
+      "dynamic_shared_bytes": 86144,
+      "static_shared_bytes": 1024,
+      "resource_metadata_scope": "retained legacy compiled metadata; not a new function-attribute query this iteration"
+    },
+    "44": {
+      "actual_name": "megakernel_wgmma_psplit_rsa_microbatch_64x32",
+      "enabled": true,
+      "producer_quota": 64,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "launch_bounds_min_ctas": 1,
+      "BM": 64,
+      "BN": 32,
+      "BK": 64,
+      "threads": 384,
+      "dynamic_shared_bytes": 123008,
+      "static_shared_bytes": 0,
+      "tool_resource_shared_bytes": 1024,
+      "device_reserved_shared_bytes_per_CTA": 1024,
+      "initial_registers_per_thread": 168,
+      "initial_owned_CTA_pool_registers": 64512,
+      "requested_role_pool_registers": 57344,
+      "drain_barrier": "nonaligned barrier.sync6,384; epochs0/6/0; BOTH banks drained",
+      "occupancy_API_predicted_active_CTAs_per_SM": 1,
+      "actual_measured_CTA_residency": null,
+      "function_probe_path": "results/psplit_microbatch_function_occupancy_probe_iter40.txt"
+    }
+  },
+  "independent_compiled_gate": {
+    "path": "results/psplit_microbatch_static_review_initial_iter40.json",
+    "sha256": "d369155f5dcd35218ec1cf554852f9128f40fb748a816f49bf525618eb1bfe8c",
+    "status": "PASS_COMPILED_CAN_LAUNCH_44_ONLY"
+  },
+  "initial_identity": {
+    "path": "results/psplit_microbatch_initial_frozen_identity_iter40.json",
+    "sha256": "9f89cd61f5ebc6228e847128b1ae316ef3f3b06f5285d69023e1be704d163679"
+  },
+  "route_configuration_input": {
+    "path": "results/psplit_microbatch_route_configurations_iter40.json",
+    "sha256": "82c45c9c9f6fa96ee89b0936e959e4a1117679d2e977926da364c73957edbb31"
+  },
+  "csv_paths": [
+    "results/small_psplit_microbatch44_launch_iter40_full1024.csv",
+    "results/small_psplit_microbatch44_graph_iter40_full1024.csv",
+    "results/small_psplit_rsa39_launch_iter40_full1024.csv",
+    "results/small_psplit_rsa39_graph_iter40_full1024.csv",
+    "results/small_psplit_rsa_bk3240_launch_iter40_full1024.csv",
+    "results/small_psplit_rsa_bk3240_graph_iter40_full1024.csv",
+    "results/small_psplit36_launch_iter40_full1024.csv",
+    "results/small_psplit36_graph_iter40_full1024.csv",
+    "results/small_packed_lt1_launch_iter40_full1024.csv",
+    "results/small_packed_lt1_graph_iter40_full1024.csv"
+  ],
+  "timing_contract": "Complete invocation including all input transforms/products/output epilogue. Independent same-row cuBLASLt tuning before capture, no Graph-specific tuning. Ordinary/Graph each20warmup/100calls/5groups/3fresh; full GPU event and synchronized100-call batch wall/100, tune/setup/capture excluded. Original FP64 gates/floors unchanged.",
+  "freeze_status": "Fresh terminal iteration40 gate bound before mandatory timing; actual enabled scope comes from current route configurations. Initial pending snapshot remains historical; compiled safety is separate from numerical/performance certification.",
+  "expected_row_count": 20,
+  "enabled_row_count": 20,
+  "new_variants": [
+    44
+  ],
+  "new_source_paths": [
+    "solution/megakernel_wgmma_psplit_rsa_microbatch.cu"
+  ],
+  "comparison_pairs": [
+    {
+      "candidate_algorithm": "mega",
+      "candidate_variant": 44,
+      "baseline_algorithm": "mega",
+      "baseline_variant": 39,
+      "axis": "MICROBATCH44_vs_RETAINED39",
+      "controlled_axis_claimed": false
+    },
+    {
+      "candidate_algorithm": "mega",
+      "candidate_variant": 44,
+      "baseline_algorithm": "mega",
+      "baseline_variant": 40,
+      "axis": "MICROBATCH44_vs_RETAINED40",
+      "controlled_axis_claimed": false
+    },
+    {
+      "candidate_algorithm": "mega",
+      "candidate_variant": 44,
+      "baseline_algorithm": "mega",
+      "baseline_variant": 36,
+      "axis": "MICROBATCH44_vs_RETAINED36",
+      "controlled_axis_claimed": false
+    }
+  ],
+  "retained_control_resource_scope": "Legacy controls retain previously frozen attributes; these are not new iteration40 function resource or residency queries.",
+  "compiled_blocked_rows": []
+}

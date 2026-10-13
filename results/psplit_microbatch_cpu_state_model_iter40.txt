@@ -1,0 +1,34 @@
+{
+  "status": "PASS_CPU_BOUNDED_RN_DAG_AND_MICROBATCH_REUSE_ONLY",
+  "source_path": "solution/megakernel_wgmma_psplit_rsa_microbatch.cu",
+  "source_sha256": "a02b4af263619b1d25601f968b41abc3db364afb00da1031e6258b71458c2922",
+  "geometry": [
+    64,
+    32,
+    64
+  ],
+  "k16_atoms_per_P_stage": 4,
+  "stage_domains": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    7,
+    8,
+    9,
+    10,
+    16,
+    17,
+    18,
+    33,
+    34
+  ],
+  "bounded_final_A_bit_comparisons": 140000,
+  "abstract_product_retirements": 1176,
+  "abstract_K16_events": 4704,
+  "negative_pending_controls_rejected": 4,
+  "actual_GPU_memory_order_or_thread_convergence_proven": false,
+  "register_pool_or_quota_fit_proven": false,
+  "FP64_numerical_certification_proven": false
+}

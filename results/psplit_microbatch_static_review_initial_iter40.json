@@ -1,0 +1,1338 @@
+{
+  "schema": "megafmm.iter40.microbatch-static-compiled-review.v1",
+  "status": "PASS_COMPILED_CAN_LAUNCH_44_ONLY",
+  "reviewer": "/root/pipeline_review30",
+  "compiled_gate_inherited_from_iteration39": false,
+  "compiled_gate_inherited_from_older_iterations": false,
+  "allowed_native_launch_variants": [
+    44
+  ],
+  "scope": "Fresh two-dtype44 compiled source7/bin2/all-role implicit register initialization/pool, seven perP pendingRS windows, actual sharedABI/barriers/alias and complete objectbenchtest instruction equality; no GPU, benchmark, precision or performance certificate. Only44,45unregistered.",
+  "frozen_bindings": {
+    "CMakeLists.txt": "1175767fbc3ca80e735fa74952faa32d41fcebff6ecd78d1e8075a7eca4144bb",
+    "bench/benchmark.cu": "cea3a6e1b23e5cb3ee7f55027381e66d89743c538c93b45beff5d4856eba1294",
+    "include/megafmm/gemm.h": "a2afd0c87e356d7b05159fcb84df042cdf076fe2d1cbda35bf0b38c5f3e33ea0",
+    "include/megafmm/kernels.h": "e5634acdeed29dd1681d321cfad12a017189acb8ca51ef065b0c02f01b3d763c",
+    "solution/plan.cpp": "fc4bee56843fefd4a15a9dd1de21bc4216ee0c5ce2d9352a110d04817dce5c3e",
+    "tests/test_correctness.cu": "e4de81a44de4931ad3f227ff25f245bb9f3181186670e26dd9f0607c543123b7",
+    "solution/megakernel_wgmma_psplit_rsa_microbatch.cu": "a02b4af263619b1d25601f968b41abc3db364afb00da1031e6258b71458c2922",
+    "build/megafmm_bench": "3ecb269a0bf91a667c54d0f11efa6bacdd830330ba385c35c2b8462252e765db",
+    "build/test_correctness": "87e98b506510f1105bd8ac4f54c0b7b8bd9559e104ce7a143fcf0f984321ae1a",
+    "results/psplit_microbatch_initial_frozen_identity_iter40.json": "9f89cd61f5ebc6228e847128b1ae316ef3f3b06f5285d69023e1be704d163679",
+    "results/psplit_microbatch_final_link_identity_iter40.json": "2940c28ee273573ab3b02ff4ec661ec91eda3368b5b05c4454c67d00d439e9b2",
+    "results/psplit_microbatch_final_object_sass_iter40.txt": "f278b6eb471b335cac7379bb9448ad51b841a38986a5d0d97fa826b8ff43c0aa",
+    "results/small_psplit_microbatch_final_sass_iter40.txt": "6ce5d056c1084defb55dc6e1b84d8d09041ede2fd030cce1d9326d1826af2974",
+    "results/psplit_microbatch_final_test_sass_iter40.txt": "6ce5d056c1084defb55dc6e1b84d8d09041ede2fd030cce1d9326d1826af2974",
+    "results/psplit_microbatch_final_object_resources_iter40.txt": "b836ce45f3c53f4a49b02a43a286ab87a2dcf7ab2dd1a244d30049dbe1c3e962",
+    "results/psplit_microbatch_final_object_elf_iter40.txt": "fc02f1e5de805253f2c75e283408f7d46ae68949af507f9af9cecac406743308",
+    "results/psplit_microbatch_final_megakernel_wgmma_psplit_rsa_microbatch_iter40.ptx": "0eee0c1305b8efaaf3ae6ec4492f108bf06055ec5bc79681b2062f07be9f17fc",
+    "results/psplit_microbatch_final_megakernel_wgmma_psplit_rsa_microbatch_iter40.cubin": "5c47e365fbf261826958f1819f2f4fd77dda1e3ea4933d38035ae8055c61912f",
+    "results/psplit_microbatch_final_host_objdump_iter40.txt": "b9e8d53e7c90564272155b20e9e5d51b09f5f09d593a49e84caa8215237a265b",
+    "results/psplit_microbatch_function_occupancy_probe_iter40.txt": "e096d74878a6c285c23ca94e3e47247833e99c83d0127741661d2382eeaec4c5",
+    "results/psplit_microbatch_function_occupancy_probe_iter40.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/psplit_microbatch_initial_build_iter40.txt": "ca9d6af1f96b0a4e914ea5faffb25d702c931311101117d5f4664392fc503e9e",
+    "results/psplit_microbatch_initial_build_iter40.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/psplit_microbatch_initial_test_build_iter40.txt": "89ef873a51a2bad0f6cfb40787ddaeb929e7028036aebf37ec8aa856930248da",
+    "results/psplit_microbatch_initial_test_build_iter40.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/psplit_microbatch_old_cuda_map_iter40.json": "10fd5b2ff2ac98a24d1c0b27156bb9dd407b3769eb6fc1e266f8a0c4d37b017f",
+    "results/psplit_microbatch_initial_source_scope_iter40.json": "f9aee8d97b82836cab75b2565d0e57eb60fecc7d0fcbdeb12d4ef406759ae23d",
+    ".scratch/psplit_microbatch_static_review_cfg_iter40.py": "a78db1f1c129d85813030e53c630a8b14af5a0aabc4c7d24fd5ebed68deb0c20",
+    ".scratch/psplit_microbatch_static_role_cfg_iter40.json": "675e67a24bc7be11a6e858965ad2430c989053321e63213a80ae4ab6d84b3457",
+    ".scratch/psplit_microbatch_init_cfg_iter40.py": "8981874818f6a1f4a92b37897034ddc382e1d0ca0d0487bfef8a9ec1e3e22d97",
+    ".scratch/psplit_microbatch_init_cfg_results_iter40.json": "a85b2171c05348a48b7a7a9eff2c6b93e4bf25c63063436b30f59d047c346b99",
+    ".scratch/psplit_microbatch_test_source_delta_iter40.json": "d0701aff5457f1889112c4bf6429693b82580dd9f8d683b800df2b4e266b1301",
+    ".scratch/psplit_microbatch_test_expected_coverage_iter40.json": "91c33ba628aba793f4c65e2ae8c5e6f7d828a84ccef6976b488f55b9fdf21e43",
+    ".scratch/psplit_microbatch_test_actual_coverage_generator_iter40.py": "2271b6a3dd06f89357dd09f73dba7ad96d5e6be37bc26114eb34c7f820d358a0",
+    "third_party/cutlass/include/cute/arch/mma_sm90_gmma.hpp": "fb7d9b9358adecb3255e051e3f46026ddf2d8851adef017633f78d4ac4242f83",
+    "third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp": "9673bc77196f52edcf0b9b824cec5d305c0738251e9b3beb39ddc308e5b37e9f",
+    "third_party/cutlass/include/cute/algorithm/gemm.hpp": "7794f06ca5977608b74c0ef244f559ca5049dc750127c46b2e726cb367a6c575",
+    "third_party/cutlass/include/cutlass/pipeline/sm90_pipeline.hpp": "550747f08887a71035f7b2da9d7c9113a1f6e6f2b81434573475745a4237d583"
+  },
+  "instances": [
+    {
+      "variant": 44,
+      "dtype": "fp16",
+      "function": "_ZN7megafmm74_GLOBAL__N__9d02337e_41_megakernel_wgmma_psplit_rsa_microbatch_cu_743570c836winograd_wgmma_psplit_rsa_microbatchIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf",
+      "status": "PASS_FRESH_COMPILED_STATIC_LAUNCH_GATE",
+      "bm": 64,
+      "bn": 32,
+      "bk": 64,
+      "threads": 384,
+      "stages": 2,
+      "k16_atoms_per_stage": 4,
+      "parent_1024_stage_count": 8,
+      "static_instruction_count": 2928,
+      "canonical_pc_predicate_instruction_sha256": "ce4f633ec09f70e18aaad6f2638dd5cb3316c98fa79c0c17dd081fdc8d69e5b4",
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "compiled_gate_inherited_from_iteration39": false,
+      "actual_reported_registers": 168,
+      "effective_initial_registers_per_thread": 168,
+      "effective_initial_evidence": [
+        "fresh feeding ELF EIATTR_REGCOUNT168",
+        "actual object/linked ptxasREG168 and DriverAPI numRegs168",
+        "PTX maxntid384/minnctapersm1; multiple-of8 initial168 is not requested consumer192"
+      ],
+      "producer_quota": 64,
+      "wg0_quota": 192,
+      "wg1_quota": 192,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "initial_owned_CTA_pool_registers": 64512,
+      "requested_role_pool_registers": 57344,
+      "required_legal_initial_minimum": 152,
+      "setmaxnreg_direction_legal": true,
+      "producer_gpr_highest_including_implicit": 49,
+      "wg0_gpr_highest_including_implicit": 189,
+      "wg1_gpr_highest_including_implicit": 188,
+      "consumer_gpr_highest_including_implicit": 189,
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 597,
+          "possibly_executed_instruction_count": 596,
+          "abstract_state_count": 857,
+          "gpr_highest_including_implicit": 49,
+          "highest_instruction_examples": [
+            {
+              "pc": "0xa3e0",
+              "instruction": "FADD R49, -R45, R6",
+              "highest": 49
+            },
+            {
+              "pc": "0xa590",
+              "instruction": "F2FP.F16.F32.PACK_AB R11, R49, R42",
+              "highest": 49
+            },
+            {
+              "pc": "0xa3e0",
+              "instruction": "FADD R49, -R45, R6",
+              "highest": 49
+            },
+            {
+              "pc": "0xa590",
+              "instruction": "F2FP.F16.F32.PACK_AB R11, R49, R42",
+              "highest": 49
+            }
+          ],
+          "pending_A_and_P_product_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 1460,
+          "possibly_executed_instruction_count": 1412,
+          "abstract_state_count": 1864,
+          "gpr_highest_including_implicit": 189,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x55d0",
+              "instruction": "IADD3 R189, R153, R14, RZ",
+              "highest": 189
+            },
+            {
+              "pc": "0x64a0",
+              "instruction": "LEA R189, R189, R134, 0x1",
+              "highest": 189
+            },
+            {
+              "pc": "0x6cc0",
+              "instruction": "LOP3.LUT R25, R189, 0x80, RZ, 0xc0, !PT",
+              "highest": 189
+            },
+            {
+              "pc": "0x6d50",
+              "instruction": "LOP3.LUT R189, R25, R189, RZ, 0x3c, !PT",
+              "highest": 189
+            },
+            {
+              "pc": "0x77d0",
+              "instruction": "IADD3 R189, -R135, R189, RZ",
+              "highest": 189
+            },
+            {
+              "pc": "0x7870",
+              "instruction": "LDS R189, [R189]",
+              "highest": 189
+            },
+            {
+              "pc": "0x7c50",
+              "instruction": "HADD2.F32 R144, -RZ, R189.H0_H0",
+              "highest": 189
+            },
+            {
+              "pc": "0x7dc0",
+              "instruction": "HADD2.F32 R189, -RZ, R189.H1_H1",
+              "highest": 189
+            },
+            {
+              "pc": "0x7e30",
+              "instruction": "FADD R180, R189, R24",
+              "highest": 189
+            }
+          ],
+          "pending_A_and_P_product_regions": [
+            {
+              "first_issue_pc": "0x6150",
+              "last_issue_pc": "0x6590",
+              "covered_wait0_pc": "0x65a0",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            },
+            {
+              "first_issue_pc": "0x66f0",
+              "last_issue_pc": "0x67b0",
+              "covered_wait0_pc": "0x67c0",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            },
+            {
+              "first_issue_pc": "0x8530",
+              "last_issue_pc": "0x85f0",
+              "covered_wait0_pc": "0x8600",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 1536,
+          "possibly_executed_instruction_count": 1531,
+          "abstract_state_count": 1579,
+          "gpr_highest_including_implicit": 188,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x2340",
+              "instruction": "LDS R188, [R161]",
+              "highest": 188
+            },
+            {
+              "pc": "0x26e0",
+              "instruction": "HADD2.F32 R183, -RZ, R188.H0_H0",
+              "highest": 188
+            },
+            {
+              "pc": "0x2700",
+              "instruction": "HADD2.F32 R188, -RZ, R188.H1_H1",
+              "highest": 188
+            },
+            {
+              "pc": "0x2750",
+              "instruction": "FADD R91, R188, R91",
+              "highest": 188
+            }
+          ],
+          "pending_A_and_P_product_regions": [
+            {
+              "first_issue_pc": "0x1920",
+              "last_issue_pc": "0x1ae0",
+              "covered_wait0_pc": "0x1af0",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            },
+            {
+              "first_issue_pc": "0x27c0",
+              "last_issue_pc": "0x2880",
+              "covered_wait0_pc": "0x2890",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            },
+            {
+              "first_issue_pc": "0x3c10",
+              "last_issue_pc": "0x3cd0",
+              "covered_wait0_pc": "0x3ce0",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            },
+            {
+              "first_issue_pc": "0x4630",
+              "last_issue_pc": "0x46f0",
+              "covered_wait0_pc": "0x4700",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            }
+          ]
+        }
+      ],
+      "initialization_gate": {
+        "status": "PASS_ALL_ROLE_PATHS",
+        "INC_try_pc": "0x230",
+        "INC_retry_branch_pc": "0x260",
+        "successful_exit_pc": "0x270",
+        "WG0_P_zero_clear_after_INC": "CS2R SRZ R40..R87 at0x290..0x440",
+        "WG1_P_zero_clear_after_INC": "sameR40..87 plusR24..39 at0x470..0x4f0",
+        "all_HGMMA_entries_covered_by_zero_init": true,
+        "high_R168_through_R191_missing_definite_reads": 0,
+        "high_register_access_before_successful_INC": 0,
+        "independent_operand_aware_CFG": [
+          {
+            "role": "producer",
+            "abstract_states": 857,
+            "new_R168_through_R191_missing_read_count": 0,
+            "missing_reads": [],
+            "high_register_access_before_successful_INC_count": 0,
+            "pre_INC_accesses": []
+          },
+          {
+            "role": "WG0",
+            "abstract_states": 2432,
+            "new_R168_through_R191_missing_read_count": 0,
+            "missing_reads": [],
+            "high_register_access_before_successful_INC_count": 0,
+            "pre_INC_accesses": []
+          },
+          {
+            "role": "WG1",
+            "abstract_states": 2561,
+            "new_R168_through_R191_missing_read_count": 0,
+            "missing_reads": [],
+            "high_register_access_before_successful_INC_count": 0,
+            "pre_INC_accesses": []
+          }
+        ]
+      },
+      "RS_A_register_operand_words_per_atom": 4,
+      "FP32_accumulator_input_and_destination_words_per_atom": 16,
+      "owning_A_backing_count_per_role": 1,
+      "current_product_stage_A_packed_words": 16,
+      "pending_product_windows_per_role": [
+        3,
+        4
+      ],
+      "pending_A_or_current_P_generic_accesses": 0,
+      "persistent_P_fragments_disjoint": true,
+      "stack_bytes": 0,
+      "local_bytes": 0,
+      "spill_stores_bytes": 0,
+      "spill_loads_bytes": 0,
+      "new_function_C7512_warning": false,
+      "new_function_mma_serialization_observed": false,
+      "dynamic_shared_bytes": 123008,
+      "static_shared_bytes": 0,
+      "static_shared_bytes_evidence": "Actual DriverAPI exact final feedingcubin; resource/ELF1024 remains separate accounting",
+      "resource_tool_reported_SHARED_bytes": 1024,
+      "resource_tool_reported_SHARED_bytes_scope": "Preserved separately; not asserted runtime static bytes nor added twice",
+      "dynamic_plus_static_shared_bytes": 123008,
+      "operand_bank_bytes": 61440,
+      "two_operand_bank_bytes": 122880,
+      "tail_bytes": 57344,
+      "tail_bank0_bytes": 57344,
+      "tail_bank1_bytes": 0,
+      "barrier_offset_bytes": 122880,
+      "shared_alignment_bytes": 128,
+      "full_barrier_offsets": [
+        122880,
+        122888
+      ],
+      "empty_barrier_offsets": [
+        122896,
+        122904
+      ],
+      "full_barrier_arrival_count": 128,
+      "empty_barrier_arrival_count": 256,
+      "host_launch_and_optin_actual_immediate": 123008,
+      "occupancy_API_predicted_active_CTAs_per_SM": 1,
+      "measured_residency": null,
+      "synchronization_gate": {
+        "status": "PASS",
+        "CTA_collective_epochs": [
+          0,
+          6,
+          0
+        ],
+        "initial_bar0_pc": "0x1a0",
+        "all_12_full_warps_once_same_non_aligned_bar6_count384": true,
+        "WG0_last_wait0_release_pcs": [
+          "0x8600",
+          "0x8620"
+        ],
+        "WG1_last_wait0_release_pcs": [
+          "0x4700",
+          "0x4710"
+        ],
+        "consumer_drain_bar6_pc": "0x8680",
+        "producer_two_bank_empty_wait_pcs": [
+          "0xa770",
+          "0xa800"
+        ],
+        "producer_drain_bar6_pc": "0xa820",
+        "WG0_tail_STS_first_last": [
+          "0x8a70",
+          "0x91f0"
+        ],
+        "WG1_tail_STS_first_last": [
+          "0x8a70",
+          "0x9230"
+        ],
+        "publish_bar0_pc": "0xa850",
+        "all_tail_STS_after_both_bank_drain_and_before_publish": true,
+        "U_shared_reads_after_publish": true,
+        "tail_coordinate_S2R_scope": "Only wholeK-complete is required; no artificial strict postbarPC condition"
+      },
+      "math_DAG_gate": "Complete7 wholeK P, perP fourascendingK16, originalFP32RN ST and finalonecast; reusedA perP build/wait0/postfence, fixedU/alphaRN/betaFMA",
+      "exact_C0_D_alias_gate": {
+        "active_C0_load_pcs": [
+          "0xb0e0",
+          "0xb120",
+          "0xb160",
+          "0xb1c0"
+        ],
+        "first_active_D_store_pc": "0xb3a0",
+        "all_four_C0_loads_before_first_D_store": true,
+        "beta_zero_and_negative_zero_null_C0_no_read": true,
+        "alpha_RN_then_beta_FMA": true
+      },
+      "native_ordinary_kernel_launches": 1,
+      "global_workspace_bytes": 0,
+      "actual_GPU_correctness_at_gate": null,
+      "original_FP64_numerical_certification_at_gate": null,
+      "performance_at_gate": null
+    },
+    {
+      "variant": 44,
+      "dtype": "bf16",
+      "function": "_ZN7megafmm74_GLOBAL__N__9d02337e_41_megakernel_wgmma_psplit_rsa_microbatch_cu_743570c836winograd_wgmma_psplit_rsa_microbatchIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf",
+      "status": "PASS_FRESH_COMPILED_STATIC_LAUNCH_GATE",
+      "bm": 64,
+      "bn": 32,
+      "bk": 64,
+      "threads": 384,
+      "stages": 2,
+      "k16_atoms_per_stage": 4,
+      "parent_1024_stage_count": 8,
+      "static_instruction_count": 2928,
+      "canonical_pc_predicate_instruction_sha256": "c319c0a83a42141ff24a6a58ecf9cc0b16f22832a1852a0f12e94b2badeca2d8",
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "compiled_gate_inherited_from_iteration39": false,
+      "actual_reported_registers": 168,
+      "effective_initial_registers_per_thread": 168,
+      "effective_initial_evidence": [
+        "fresh feeding ELF EIATTR_REGCOUNT168",
+        "actual object/linked ptxasREG168 and DriverAPI numRegs168",
+        "PTX maxntid384/minnctapersm1; multiple-of8 initial168 is not requested consumer192"
+      ],
+      "producer_quota": 64,
+      "wg0_quota": 192,
+      "wg1_quota": 192,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "initial_owned_CTA_pool_registers": 64512,
+      "requested_role_pool_registers": 57344,
+      "required_legal_initial_minimum": 152,
+      "setmaxnreg_direction_legal": true,
+      "producer_gpr_highest_including_implicit": 49,
+      "wg0_gpr_highest_including_implicit": 189,
+      "wg1_gpr_highest_including_implicit": 188,
+      "consumer_gpr_highest_including_implicit": 189,
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 597,
+          "possibly_executed_instruction_count": 596,
+          "abstract_state_count": 857,
+          "gpr_highest_including_implicit": 49,
+          "highest_instruction_examples": [
+            {
+              "pc": "0xa400",
+              "instruction": "FADD R49, -R45, R6",
+              "highest": 49
+            },
+            {
+              "pc": "0xa590",
+              "instruction": "F2FP.BF16.F32.PACK_AB R11, R49, R42",
+              "highest": 49
+            },
+            {
+              "pc": "0xa400",
+              "instruction": "FADD R49, -R45, R6",
+              "highest": 49
+            },
+            {
+              "pc": "0xa590",
+              "instruction": "F2FP.BF16.F32.PACK_AB R11, R49, R42",
+              "highest": 49
+            }
+          ],
+          "pending_A_and_P_product_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 1460,
+          "possibly_executed_instruction_count": 1412,
+          "abstract_state_count": 1864,
+          "gpr_highest_including_implicit": 189,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x5ab0",
+              "instruction": "IMAD.IADD R189, R153, 0x1, R14",
+              "highest": 189
+            },
+            {
+              "pc": "0x5c70",
+              "instruction": "IMAD.U32 R189, R189, 0x2, R134",
+              "highest": 189
+            },
+            {
+              "pc": "0x6d20",
+              "instruction": "LOP3.LUT R25, R189, 0x80, RZ, 0xc0, !PT",
+              "highest": 189
+            },
+            {
+              "pc": "0x6da0",
+              "instruction": "LOP3.LUT R189, R25, R189, RZ, 0x3c, !PT",
+              "highest": 189
+            },
+            {
+              "pc": "0x6e30",
+              "instruction": "IMAD.IADD R189, R189, 0x1, -R135.reuse",
+              "highest": 189
+            },
+            {
+              "pc": "0x7340",
+              "instruction": "LDS R189, [R189]",
+              "highest": 189
+            },
+            {
+              "pc": "0x7bc0",
+              "instruction": "IMAD.U32 R144, R189, 0x10000, RZ",
+              "highest": 189
+            },
+            {
+              "pc": "0x7d10",
+              "instruction": "LOP3.LUT R189, R189, 0xffff0000, RZ, 0xc0, !PT",
+              "highest": 189
+            },
+            {
+              "pc": "0x7dd0",
+              "instruction": "FADD R180, R189, R24",
+              "highest": 189
+            }
+          ],
+          "pending_A_and_P_product_regions": [
+            {
+              "first_issue_pc": "0x6100",
+              "last_issue_pc": "0x6590",
+              "covered_wait0_pc": "0x65a0",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            },
+            {
+              "first_issue_pc": "0x66f0",
+              "last_issue_pc": "0x67b0",
+              "covered_wait0_pc": "0x67c0",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            },
+            {
+              "first_issue_pc": "0x8530",
+              "last_issue_pc": "0x85f0",
+              "covered_wait0_pc": "0x8600",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 1536,
+          "possibly_executed_instruction_count": 1531,
+          "abstract_state_count": 1579,
+          "gpr_highest_including_implicit": 188,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x2400",
+              "instruction": "LDS R188, [R161]",
+              "highest": 188
+            },
+            {
+              "pc": "0x26c0",
+              "instruction": "IMAD.U32 R183, R188.reuse, 0x10000, RZ",
+              "highest": 188
+            },
+            {
+              "pc": "0x26d0",
+              "instruction": "LOP3.LUT R188, R188, 0xffff0000, RZ, 0xc0, !PT",
+              "highest": 188
+            },
+            {
+              "pc": "0x2740",
+              "instruction": "FADD R91, R188, R91",
+              "highest": 188
+            },
+            {
+              "pc": "0x3a50",
+              "instruction": "IMAD.U32 R188, R136.reuse, 0x10000, RZ",
+              "highest": 188
+            },
+            {
+              "pc": "0x3a70",
+              "instruction": "FADD R136, -R188, R141",
+              "highest": 188
+            }
+          ],
+          "pending_A_and_P_product_regions": [
+            {
+              "first_issue_pc": "0x19c0",
+              "last_issue_pc": "0x1ae0",
+              "covered_wait0_pc": "0x1af0",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            },
+            {
+              "first_issue_pc": "0x27c0",
+              "last_issue_pc": "0x2880",
+              "covered_wait0_pc": "0x2890",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            },
+            {
+              "first_issue_pc": "0x3c10",
+              "last_issue_pc": "0x3cd0",
+              "covered_wait0_pc": "0x3ce0",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            },
+            {
+              "first_issue_pc": "0x4630",
+              "last_issue_pc": "0x46f0",
+              "covered_wait0_pc": "0x4700",
+              "MMA_count": 4,
+              "bn": 32,
+              "A_packed_register_count": 16,
+              "A_registers": [
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103
+              ],
+              "P_register_count": 16,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39
+              ],
+              "generic_current_product_whole_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of this product entire stage physical RS A words, including future-issued K16 A, and its persistent wholeK P until coveredwait0. Other P accumulators are distinct and are separately tracked."
+            }
+          ]
+        }
+      ],
+      "initialization_gate": {
+        "status": "PASS_ALL_ROLE_PATHS",
+        "INC_try_pc": "0x230",
+        "INC_retry_branch_pc": "0x260",
+        "successful_exit_pc": "0x270",
+        "WG0_P_zero_clear_after_INC": "CS2R SRZ R40..R87 at0x290..0x440",
+        "WG1_P_zero_clear_after_INC": "sameR40..87 plusR24..39 at0x470..0x4f0",
+        "all_HGMMA_entries_covered_by_zero_init": true,
+        "high_R168_through_R191_missing_definite_reads": 0,
+        "high_register_access_before_successful_INC": 0,
+        "independent_operand_aware_CFG": [
+          {
+            "role": "producer",
+            "abstract_states": 857,
+            "new_R168_through_R191_missing_read_count": 0,
+            "missing_reads": [],
+            "high_register_access_before_successful_INC_count": 0,
+            "pre_INC_accesses": []
+          },
+          {
+            "role": "WG0",
+            "abstract_states": 2429,
+            "new_R168_through_R191_missing_read_count": 0,
+            "missing_reads": [],
+            "high_register_access_before_successful_INC_count": 0,
+            "pre_INC_accesses": []
+          },
+          {
+            "role": "WG1",
+            "abstract_states": 2500,
+            "new_R168_through_R191_missing_read_count": 0,
+            "missing_reads": [],
+            "high_register_access_before_successful_INC_count": 0,
+            "pre_INC_accesses": []
+          }
+        ]
+      },
+      "RS_A_register_operand_words_per_atom": 4,
+      "FP32_accumulator_input_and_destination_words_per_atom": 16,
+      "owning_A_backing_count_per_role": 1,
+      "current_product_stage_A_packed_words": 16,
+      "pending_product_windows_per_role": [
+        3,
+        4
+      ],
+      "pending_A_or_current_P_generic_accesses": 0,
+      "persistent_P_fragments_disjoint": true,
+      "stack_bytes": 0,
+      "local_bytes": 0,
+      "spill_stores_bytes": 0,
+      "spill_loads_bytes": 0,
+      "new_function_C7512_warning": false,
+      "new_function_mma_serialization_observed": false,
+      "dynamic_shared_bytes": 123008,
+      "static_shared_bytes": 0,
+      "static_shared_bytes_evidence": "Actual DriverAPI exact final feedingcubin; resource/ELF1024 remains separate accounting",
+      "resource_tool_reported_SHARED_bytes": 1024,
+      "resource_tool_reported_SHARED_bytes_scope": "Preserved separately; not asserted runtime static bytes nor added twice",
+      "dynamic_plus_static_shared_bytes": 123008,
+      "operand_bank_bytes": 61440,
+      "two_operand_bank_bytes": 122880,
+      "tail_bytes": 57344,
+      "tail_bank0_bytes": 57344,
+      "tail_bank1_bytes": 0,
+      "barrier_offset_bytes": 122880,
+      "shared_alignment_bytes": 128,
+      "full_barrier_offsets": [
+        122880,
+        122888
+      ],
+      "empty_barrier_offsets": [
+        122896,
+        122904
+      ],
+      "full_barrier_arrival_count": 128,
+      "empty_barrier_arrival_count": 256,
+      "host_launch_and_optin_actual_immediate": 123008,
+      "occupancy_API_predicted_active_CTAs_per_SM": 1,
+      "measured_residency": null,
+      "synchronization_gate": {
+        "status": "PASS",
+        "CTA_collective_epochs": [
+          0,
+          6,
+          0
+        ],
+        "initial_bar0_pc": "0x1a0",
+        "all_12_full_warps_once_same_non_aligned_bar6_count384": true,
+        "WG0_last_wait0_release_pcs": [
+          "0x8600",
+          "0x8620"
+        ],
+        "WG1_last_wait0_release_pcs": [
+          "0x4700",
+          "0x4710"
+        ],
+        "consumer_drain_bar6_pc": "0x8680",
+        "producer_two_bank_empty_wait_pcs": [
+          "0xa770",
+          "0xa800"
+        ],
+        "producer_drain_bar6_pc": "0xa820",
+        "WG0_tail_STS_first_last": [
+          "0x8a70",
+          "0x91f0"
+        ],
+        "WG1_tail_STS_first_last": [
+          "0x8a70",
+          "0x9230"
+        ],
+        "publish_bar0_pc": "0xa850",
+        "all_tail_STS_after_both_bank_drain_and_before_publish": true,
+        "U_shared_reads_after_publish": true,
+        "tail_coordinate_S2R_scope": "Only wholeK-complete is required; no artificial strict postbarPC condition"
+      },
+      "math_DAG_gate": "Complete7 wholeK P, perP fourascendingK16, originalFP32RN ST and finalonecast; reusedA perP build/wait0/postfence, fixedU/alphaRN/betaFMA",
+      "exact_C0_D_alias_gate": {
+        "active_C0_load_pcs": [
+          "0xb0e0",
+          "0xb120",
+          "0xb160",
+          "0xb1c0"
+        ],
+        "first_active_D_store_pc": "0xb3a0",
+        "all_four_C0_loads_before_first_D_store": true,
+        "beta_zero_and_negative_zero_null_C0_no_read": true,
+        "alpha_RN_then_beta_FMA": true
+      },
+      "native_ordinary_kernel_launches": 1,
+      "global_workspace_bytes": 0,
+      "actual_GPU_correctness_at_gate": null,
+      "original_FP64_numerical_certification_at_gate": null,
+      "performance_at_gate": null
+    }
+  ],
+  "disabled_instances": [
+    {
+      "variant": 37,
+      "status": "RETAINED_HOST_DISABLED_PRIOR_STACK_SPILL_GATE_FAILURE",
+      "new_native_launch_authorized": false
+    }
+  ],
+  "source_API_tests_review": {
+    "status": "PASS_CURRENT_FROZEN_SOURCE",
+    "max_variant": 44,
+    "invalid45_rejected_before_empty_scale": true,
+    "variant37_blocked_before_empty_scale": true,
+    "native_parent_guards": "M%128,N%64,K%128,currentAB16,lda/ldb%8,config0 and common binding/alignment/span/alias checks",
+    "fallback": "Truthful real packed7 orDense; partialK64/192/320 remain nonnative",
+    "Auto": "Dense",
+    "old_CUDA_count_onsite_hash_checked": 37,
+    "old_CUDA_hash_mismatches": 0,
+    "old_CUDA_map_scope": "Current onsite bytes per frozen ownerbase map; historicalGit independently audited byROOT/data",
+    "test_whole_inverse_operations": 30,
+    "test_inverse_normalized_sha256": "fde45df2bdf6239a175e45dcf4668da31005c67d890ce68252a088ba97016222",
+    "new44_reference": "Sameatom N32/BK64 RS-A39 rawU plus specified host RNalpha/FMAepilogue",
+    "testscope_at_gate": "Expected/source-only; stage14/BK64stage8at1024,partialK,currentAB,alias,freshGraph/newstrict44-only30 require actualGPUfinal records",
+    "full1770_execution_claim": false
+  },
+  "original_FP64_gate": {
+    "new_original_gate_certified": false,
+    "goal_complete": false,
+    "scope": "No initial GPU/originalprecision evidence exists in this compiled certificate; all actual final metrics remain separately required."
+  },
+  "limitations": [
+    "No inherited parent39/futureBN16/oldSS compiled gate.",
+    "Perproductsourcebacking and actual physical A registers are distinguished; windows track current physical16words including future-issuedK16 A.",
+    "Static resources/occupancyAPI prediction do not measure dynamic residency, stalls, transactions or causal speedup.",
+    "Originalmath/floors remain fixed; structural or sanitizerPASS cannot certify originalFP64 tolerance."
+  ]
+}

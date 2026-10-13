@@ -1740,3 +1740,35 @@ Freshfourinstancecompiledgate independentlyPASS, completeobject/bench/test addre
 - **Analysis:** Compare own complete SW latency, then same-row tuned Dense/SW. Machine safety, structural fixtures and sanitizers do not certify the original FP64 numerical gate.
 - **Next:** Mandatorysamebinary full24 for42/43/39/40/36/Lt1,100calls5groups3fresh irrespective quick3%; enabled strict30 per newroute and serialsanitizers, actualcoverage/report/profile/independentaudits.
 - **Archive:** trajectory/20261014_062200_iter-39/
+
+### Iter40 — BK64 RS-A single owning A microbatch
+
+- **Hypothesis:** Reuse one complete-stage register A after each P commit/wait0, reducing owning A payload while preserving BM64BN32BK64/2banks/64-192-192/min1. More shared reads, RN S1 recomputation and waits can offset lifetime savings; no occupancy/performance improvement assumed.
+- **Changes:** New44 only, each P four ascendingK16 then commit/wait0/postA-P fences; stage shared release only after all3/4P retired. Original producer/shared/tail/U, onecast/wholeK/alphaRNbetaFMA/floors/currentguards/AutoDense/blocked37 preserved. Fresh new44 all-role/initialpool/genericpending/init/ABI/linked gate precedes actual GPU.
+- **Stall re-assessment:** Iter37–39 showed no >=3% own-latency gain; there is no measured physical-floor claim and prior ncu IPC failure is not retried. NVIDIA Hopper Tuning Guide describes TMA as reducing transfer instructions/register use; this iteration tests A lifetime instead. Strassen DAG fusion must be evaluated for the actual shape/GPU; published A100/H200 results are not H100 acceptance evidence. Sources: https://docs.nvidia.com/cuda/hopper-tuning-guide/ ; https://www.microsoft.com/en-us/research/publication/compiling-strassen-like-matrix-multiplication-algorithms-to-fast-cuda-kernels/ ; https://github.com/microsoft/subcuber/blob/main/README.md .
+- **Bench:** quick20warm/20calls/5groups/1fresh, screen only; failed numerical results retained.
+
+| M,N,K | dtype | route | mode | Dense us | complete SW us | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 5.640000 | 7.192000 | 0.784205 | FAIL |
+| 128,128,128 | fp16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 5.595200 | 7.388800 | 0.757254 | FAIL |
+| 256,256,256 | bf16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 5.723200 | 9.603200 | 0.595968 | FAIL |
+| 256,256,256 | fp16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 5.652800 | 9.678400 | 0.584063 | FAIL |
+| 512,512,512 | bf16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 6.348800 | 14.705600 | 0.431727 | FAIL |
+| 512,512,512 | fp16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 6.432000 | 14.430401 | 0.445726 | FAIL |
+| 1024,1024,1024 | bf16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 13.222399 | 24.257600 | 0.545083 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 10.422400 | 23.710400 | 0.439571 | FAIL |
+| 2048,2048,2048 | bf16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 31.809601 | 193.569601 | 0.164332 | FAIL |
+| 2048,2048,2048 | fp16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 33.025599 | 189.668798 | 0.174122 | FAIL |
+| 3072,3072,3072 | bf16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 86.769599 | 710.915184 | 0.122053 | FAIL |
+| 3072,3072,3072 | fp16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 89.716798 | 698.963213 | 0.128357 | FAIL |
+| 4096,4096,4096 | bf16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 195.443201 | 1845.166397 | 0.105922 | FAIL |
+| 4096,4096,4096 | fp16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 206.692791 | 1823.572731 | 0.113345 | FAIL |
+| 1024,512,1024 | bf16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 11.627200 | 24.211200 | 0.480241 | FAIL |
+| 1024,512,1024 | fp16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 11.612800 | 23.768000 | 0.488590 | FAIL |
+| 512,1024,1024 | bf16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 8.438400 | 24.171200 | 0.349110 | FAIL |
+| 512,1024,1024 | fp16 | megakernel_wgmma_psplit_rsa_microbatch_64x32 v44 | launch | 8.793600 | 23.641600 | 0.371955 | FAIL |
+
+- **Analysis:** Own complete SW latency ranks code changes; Dense timing variation and machine/fixture/SAN PASS do not certify original FP64 numerical accuracy.
+- **Next:** Mandatory samebinaryfull20 for44/39/40/36/Lt1,100calls5groups3fresh irrespectivequick3%, originalstrict30 andserialSAN3, coverage/profile/report/twoindependentfinal audits.
+- **Archive:** trajectory/20261014_065139_iter-40/
