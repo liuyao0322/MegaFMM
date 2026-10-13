@@ -6486,12 +6486,27 @@
   },
   "independent_data_audit": {
     "agent": "pipeline_data30",
-    "raw_status": "pending independent audit",
-    "final_profile_status": "pending readonly audit"
+    "raw_status": "PASS",
+    "final_profile_status": "PASS_INDEPENDENT_FROZEN_PRESTATUS_EVIDENCE_AUDIT",
+    "path": "results/psplit_bk64_data_audit_iter35.json",
+    "sha256": "1fec737c552f1475d57626d6d0b44222dfbfd5901bd00a00f0c9812e64c69aa6",
+    "frozen_prestatus_profile_sha256": "88ff555fd0e40fe9c77600ad92ab648dcf74fb271b86d38435eb9ec67969dd69",
+    "frozen_prestatus_checkpoint": "b55f9815ddc9f5e6c34f20df23b74a2bea50f5e9",
+    "issues": [],
+    "precision_certified": false,
+    "goal_complete": false,
+    "scope": "Independent frozen prestatus raw/statistical/source/bin/Git/report/coverage/CPU/strict30/SAN3 audit. Mandatory16/16 rows; all48 fresh original gates FAIL/NF0, strict18PASS12FAIL, new38 slower than samebinary36. Final status metadata is not numerical certification or goal completion."
   },
   "independent_static_final_audit": {
     "agent": "pipeline_review30",
-    "status": "pending final review"
+    "status": "PASS_FINAL_EVIDENCE_CONTRACT_ORIGINAL_FP64_GATE_FAIL_NO_PROMOTION",
+    "path": "results/psplit_bk64_static_review_final_iter35.json",
+    "sha256": "5d9414035cef302ab69482067064ce9d029468b8c37ad384b7f03957bb50e7dd",
+    "markdown_path": "results/psplit_bk64_static_review_final_iter35.md",
+    "markdown_sha256": "1e66fc499a7ce83edc49da268f3dcab044ca622414bf386f48c8f143b0a2812b",
+    "frozen_prestatus_profile_sha256": "88ff555fd0e40fe9c77600ad92ab648dcf74fb271b86d38435eb9ec67969dd69",
+    "frozen_prestatus_checkpoint": "b55f9815ddc9f5e6c34f20df23b74a2bea50f5e9",
+    "scope": "Independent fresh compiled/API/implementation/evidence audit of final frozen38-only launch gate and actual GPU/report evidence. Original FP64 numerical gate FAIL,37 remains disabled,AutoDense and goalactive. No numerical promotion, occupancy/stall attribution or goal completion."
   },
   "interpretation": [
     "Rank new38 SW own latency vs samebinary36 and29 only when actually measured; BK64vsBK32 performance is not an isolated hardware-cause claim.",
