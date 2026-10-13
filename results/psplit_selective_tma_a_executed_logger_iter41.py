@@ -1,0 +1,15 @@
+from pathlib import Path
+import csv
+rows=list(csv.DictReader(Path('results/current.csv').open()))
+archive=sorted(Path('trajectory').glob('*_iter-41'))[-1]
+for suffix,src in [('csv',Path('results/current.csv')),('log',archive/'output.txt'),('exit',Path('results/psplit_selective_tma_a_bench_iter41.exit'))]:Path(f'results/small_psplit_selective_tma_a44_launch_iter41.{suffix}').write_bytes(src.read_bytes())
+proto=archive/'prototype';proto.mkdir(exist_ok=True)
+for p in Path('results').glob('psplit_selective_tma_a_frozen_*_iter41.*'):(proto/p.name).write_bytes(p.read_bytes())
+text='\n### Iter41 — BK64 selective rawA4 TMA / B SIMT\n\n'
+text+='- **Hypothesis:** Selective four raw A TMA transfers avoid SIMT A loads/stores; B transforms remain SIMT. Four8192-byte boxes and a separate raw32768-byte TX barrier, SW128/absolute1024 alignment; extra wait/encode costs can offset producer savings.\n'
+text+='- **Changes:** New45 only, parent39 BM64BN32BK64/2banks/wholeP3+4/ascendingK16/onecast/fixedU/RNalphaFMA and original floors preserved. A-only lda<2^39 checked before map encode; ordinary each run encodes one current A map, Graph captures fixed bindings then replays fresh contents. Fresh standalone gate and original failure archives remain distinct.\n'
+text+='- **Stall re-assessment:** Iter38–40 produced no observed >=3% own complete-call improvement; current39/44 SW CV in40 was0.0147–0.0907% with44 below0.063%, without a measured physical-floor claim. No repeat ncu after prior IPC failure. NVIDIA Hopper Tuning Guide describes one-thread TMA bulk transfer reducing SM transfer instructions/register payload; selective rawA4 differs from historical all-eight TMA31. Published Strassen-like A100/H200 results do not prove this H100 acceptance gate. Sources: https://docs.nvidia.com/cuda/hopper-tuning-guide/ ; https://www.microsoft.com/en-us/research/publication/compiling-strassen-like-matrix-multiplication-algorithms-to-fast-cuda-kernels/ ; https://github.com/microsoft/subcuber/blob/main/README.md .\n'
+text+='- **Bench:** quick20warm/20calls/5groups/1fresh, screen only; failed numerical results retained.\n\n| M,N,K | dtype | route | mode | Dense us | complete SW us | Dense/SW | originalgate |\n|---|---|---|---|---:|---:|---:|---|\n'
+for x in rows:text+=f"| {x['m']},{x['n']},{x['k']} | {x['dtype']} | {x['actual']} v{x['variant']} | {x['mode']} | {float(x['dense_event_ms'])*1000:.6f} | {float(x['solution_event_ms'])*1000:.6f} | {float(x['speedup']):.6f} | {'PASS' if x['numerical_pass']=='1' else 'FAIL'} |\n"
+text+='\n- **Analysis:** Own complete SW latency ranks code changes; Dense timing variation and machine/fixture/SAN PASS do not certify original FP64 numerical accuracy.\n- **Next:** Mandatory samebinaryfull20 for45/39/44/36/Lt1,100calls5groups3fresh irrespectivequick3%, originalstrict30 andserialSAN3, coverage/profile/report/twoindependentfinal audits.\n- **Archive:** '+str(archive)+'/\n'
+p=Path('ITERATIONS.md');p.write_text(p.read_text()+text);Path('.scratch/psplit_selective_tma_a_data_quick_archive_iter41.txt').write_text(str(archive)+'\n');print('ITER41_LOGGER_COMPLETE',len(rows),'rows',archive)

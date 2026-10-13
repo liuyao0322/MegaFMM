@@ -1808,3 +1808,7 @@ Mandatory full20/200TIME/60CHECK completed;60 originalFAIL/NF0,10 innerexit2.44 
 - **Analysis:** Own complete SW latency ranks code changes; Dense timing variation and machine/fixture/SAN PASS do not certify original FP64 numerical accuracy.
 - **Next:** Mandatory samebinaryfull20 for45/39/44/36/Lt1,100calls5groups3fresh irrespectivequick3%, originalstrict30 andserialSAN3, coverage/profile/report/twoindependentfinal audits.
 - **Archive:** trajectory/20261014_071808_iter-41/
+
+#### Iter41 mandatory full1024 closure
+
+Full samebinary20 rows45/39/44/36/Lt1,20warm100calls5groups3fresh32Lt8GiB. Original60/60 fresh numericalFAIL/NF0 retained; strict30=18/12NF0, SAN3zero, structural tests pass. New45 own latency decreases23.6931/23.2220% ordinary and26.2506/24.2674% Graph against39; ordinary Dense/SW0.688287/0.556617 remains below1 and precision gate fails. Full primary report records all groups/CSVauthority/event/batchwall scope; no promotion/AutoDense/goalactive.
