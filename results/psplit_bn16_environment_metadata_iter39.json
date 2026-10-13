@@ -1,0 +1,199 @@
+{
+  "path": "results/small_psplit_bn16_environment_iter39.txt",
+  "exit_path": "results/small_psplit_bn16_environment_iter39.exit",
+  "sha256": "8b7737b8f2b94d939ad043f2798b10326d9de9884c221e2e1cdacaaef3432a18",
+  "exit": 0,
+  "allocation": 107488,
+  "host": "g08",
+  "GPU": "NVIDIA H100 80GB HBM3",
+  "gpu_uuid": "GPU-78def847-b6c1-9dd4-ff30-269a9ae1a73f",
+  "SMs": 132,
+  "SMs_evidence": "actual archived driver API cuDeviceGetAttribute(MULTIPROCESSOR_COUNT)",
+  "application_cuda": "12.4.99",
+  "driver": "575.51.03",
+  "CUTLASS": "3.5.1 commit f7b19de32c5d1f3cedfc735c2849f12b537522ee",
+  "sanitizer_path": "/share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer",
+  "sanitizer_version": "2025.1.0.0 build35583870",
+  "clocks_locked": false,
+  "snapshot_scope": "Actual read-only snapshot after all iteration39 performance and six serial SAN runs. No device kernel launched; no within-group clock stability or measured residency proof.",
+  "function_attributes_and_occupancy_API": {
+    "path": "results/psplit_bn16_function_occupancy_probe_iter39.txt",
+    "sha256": "ad065ebaca84b7a920ebb17ba50a225fb50a35d56d995daa742203635051614b",
+    "exit": 0,
+    "records": [
+      {
+        "variant": 42,
+        "dtype": "fp16",
+        "symbol": "_ZN7megafmm68_GLOBAL__N__6601b768_35_megakernel_wgmma_psplit_rsa_bn16_cu_5e1a6c4d30winograd_wgmma_psplit_rsa_bn16IN7cutlass6half_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf",
+        "cubin_path": "results/psplit_bn16_final_megakernel_wgmma_psplit_rsa_bn16_iter39.cubin",
+        "cubin_sha256": "5ac8d00ac81aa3edee71e27709b80c14308d679a5dfda302d9ebd6f9adaf8933",
+        "queried_dynamic_shared_bytes": 47232,
+        "queried_threads": 384,
+        "function_attributes": {
+          "max_threads_per_block": 384,
+          "static_shared_bytes": 0,
+          "local_bytes": 0,
+          "registers_per_thread": 80,
+          "max_dynamic_shared_bytes_before_optin": 49152,
+          "max_dynamic_shared_bytes_after_optin": 47232
+        },
+        "occupancy_API_predicted_active_CTAs_per_SM": 2,
+        "measured_residency": null
+      },
+      {
+        "variant": 42,
+        "dtype": "bf16",
+        "symbol": "_ZN7megafmm68_GLOBAL__N__6601b768_35_megakernel_wgmma_psplit_rsa_bn16_cu_5e1a6c4d30winograd_wgmma_psplit_rsa_bn16IN7cutlass10bfloat16_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf",
+        "cubin_path": "results/psplit_bn16_final_megakernel_wgmma_psplit_rsa_bn16_iter39.cubin",
+        "cubin_sha256": "5ac8d00ac81aa3edee71e27709b80c14308d679a5dfda302d9ebd6f9adaf8933",
+        "queried_dynamic_shared_bytes": 47232,
+        "queried_threads": 384,
+        "function_attributes": {
+          "max_threads_per_block": 384,
+          "static_shared_bytes": 0,
+          "local_bytes": 0,
+          "registers_per_thread": 80,
+          "max_dynamic_shared_bytes_before_optin": 49152,
+          "max_dynamic_shared_bytes_after_optin": 47232
+        },
+        "occupancy_API_predicted_active_CTAs_per_SM": 2,
+        "measured_residency": null
+      },
+      {
+        "variant": 43,
+        "dtype": "fp16",
+        "symbol": "_ZN7megafmm67_GLOBAL__N__4db7ea63_34_megakernel_wgmma_psplit_ss_bn16_cu_06492c2229winograd_wgmma_psplit_ss_bn16IN7cutlass6half_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf",
+        "cubin_path": "results/psplit_bn16_final_megakernel_wgmma_psplit_ss_bn16_iter39.cubin",
+        "cubin_sha256": "5b4ab84b14e2d3254ba404598e249b3bfbcd90c82425280f18d6c1b0b38c438e",
+        "queried_dynamic_shared_bytes": 71808,
+        "queried_threads": 384,
+        "function_attributes": {
+          "max_threads_per_block": 384,
+          "static_shared_bytes": 0,
+          "local_bytes": 0,
+          "registers_per_thread": 80,
+          "max_dynamic_shared_bytes_before_optin": 49152,
+          "max_dynamic_shared_bytes_after_optin": 71808
+        },
+        "occupancy_API_predicted_active_CTAs_per_SM": 2,
+        "measured_residency": null
+      },
+      {
+        "variant": 43,
+        "dtype": "bf16",
+        "symbol": "_ZN7megafmm67_GLOBAL__N__4db7ea63_34_megakernel_wgmma_psplit_ss_bn16_cu_06492c2229winograd_wgmma_psplit_ss_bn16IN7cutlass10bfloat16_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf",
+        "cubin_path": "results/psplit_bn16_final_megakernel_wgmma_psplit_ss_bn16_iter39.cubin",
+        "cubin_sha256": "5b4ab84b14e2d3254ba404598e249b3bfbcd90c82425280f18d6c1b0b38c438e",
+        "queried_dynamic_shared_bytes": 71808,
+        "queried_threads": 384,
+        "function_attributes": {
+          "max_threads_per_block": 384,
+          "static_shared_bytes": 0,
+          "local_bytes": 0,
+          "registers_per_thread": 80,
+          "max_dynamic_shared_bytes_before_optin": 49152,
+          "max_dynamic_shared_bytes_after_optin": 71808
+        },
+        "occupancy_API_predicted_active_CTAs_per_SM": 2,
+        "measured_residency": null
+      }
+    ],
+    "scope": "Only current new42/new43 final exact feeding cubins queried without a kernel launch. Driver static shared attribute0; resource/ELF SHARED1024 and device reserve1024 are separate accounting. API2CTA/SM is a prediction, not measured residency or causal performance evidence. Retained control config shared fields preserve earlier tool-accounting declarations, not these new Driver function queries."
+  },
+  "timing_noise_observations": [
+    {
+      "csv_path": "results/small_psplit_rsa39_launch_iter39_full1024.csv",
+      "csv_sha256": "d7444b40d23a23f391c5d58e3de0b43f9668f352d2e4128b913953380e799932",
+      "variant": "39",
+      "dtype": "fp16",
+      "mode": "launch",
+      "dense_population_CV": 0.539882776039,
+      "solution_population_CV": 0.00127346747953,
+      "dense_event_ms": 0.00994112014771,
+      "dense_p90_group_mean_ms": 0.0209621763229,
+      "all_raw_groups": [
+        {
+          "shape": "1024,1024,1024",
+          "dtype": "fp16",
+          "group": "0",
+          "case": "solution",
+          "event_ms": "0.0230634",
+          "wall_ms": "0.0231441"
+        },
+        {
+          "shape": "1024,1024,1024",
+          "dtype": "fp16",
+          "group": "0",
+          "case": "dense",
+          "event_ms": "0.00994112",
+          "wall_ms": "0.0100134"
+        },
+        {
+          "shape": "1024,1024,1024",
+          "dtype": "fp16",
+          "group": "1",
+          "case": "dense",
+          "event_ms": "0.00990496",
+          "wall_ms": "0.00997754"
+        },
+        {
+          "shape": "1024,1024,1024",
+          "dtype": "fp16",
+          "group": "1",
+          "case": "solution",
+          "event_ms": "0.0230688",
+          "wall_ms": "0.0231402"
+        },
+        {
+          "shape": "1024,1024,1024",
+          "dtype": "fp16",
+          "group": "2",
+          "case": "solution",
+          "event_ms": "0.0230589",
+          "wall_ms": "0.0231322"
+        },
+        {
+          "shape": "1024,1024,1024",
+          "dtype": "fp16",
+          "group": "2",
+          "case": "dense",
+          "event_ms": "0.00995232",
+          "wall_ms": "0.0100267"
+        },
+        {
+          "shape": "1024,1024,1024",
+          "dtype": "fp16",
+          "group": "3",
+          "case": "solution",
+          "event_ms": "0.0230675",
+          "wall_ms": "0.0231411"
+        },
+        {
+          "shape": "1024,1024,1024",
+          "dtype": "fp16",
+          "group": "3",
+          "case": "dense",
+          "event_ms": "0.00994112",
+          "wall_ms": "0.0100131"
+        },
+        {
+          "shape": "1024,1024,1024",
+          "dtype": "fp16",
+          "group": "4",
+          "case": "dense",
+          "event_ms": "0.0283021",
+          "wall_ms": "0.0283834"
+        },
+        {
+          "shape": "1024,1024,1024",
+          "dtype": "fp16",
+          "group": "4",
+          "case": "solution",
+          "event_ms": "0.0231376",
+          "wall_ms": "0.0232149"
+        }
+      ],
+      "scope": "All five original groups retained, authority CSV unchanged. Dense denominator fluctuation is not own SW code benefit; this ratio is not a stable speedup certification."
+    }
+  ]
+}
