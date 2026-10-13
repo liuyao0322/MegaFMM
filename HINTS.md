@@ -29,6 +29,12 @@
 - Keep the original FP32 S/T DAG and one final RN conversion, complete seven FP32 P products, original FP64 numerical gate, caller-owned workspace, current binding guards, tuned Lt protocol/metadata and Auto Dense unchanged. Rank changes by their own SW latency, rather than a slower Dense denominator.
 - Full1024 is required irrespective of the usual >=3% quick-screen trigger: same source/binary Hopper9/10/11/12 and packed-once Lt1/H7, both dtypes, launch/Graph,20warm/100calls/5groups/3fresh,8GiB cap and32 Lt candidates. Report all24 same-row Dense/SW results, p10/p90/CV, workspace and failed numerical gates. This is a matched leaf control for input placement; it is not a dispatcher certification or completion of the four-size goal.
 
+## Active goal (2026-10-14)
+
+- From the user's explicit active objective: continuously optimize the megakernel at square size1024 until it is faster than independently tuned cuBLAS under the existing dtype/output, numerical and complete-call timing contracts. Prioritize the single-launch megakernel path; packed-once/multiple-launch SW and ordinary Dense remain controls, not substitutes for this objective.
+- Keep BF16 and FP16 results separate, preserve the original FP64 reference and fixed numerical gates, and include fresh input-dependent transforms in every measured invocation. Numerical failures stay visible and do not stop execution-performance experiments, but a failing candidate cannot certify completion or enable Auto SW.
+- The earlier four-size request and its frozen evidence remain recorded. This active goal focuses the next implementation work on1024; it does not certify the earlier four-size objective as achieved.
+
 <!-- User-supplied behavior directives. The skill reads this at session start
      and respects any constraint named here. Examples:
      - Optimization constraints or focus areas (e.g., "Prefer Triton over raw CUDA")

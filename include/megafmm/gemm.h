@@ -57,6 +57,9 @@ struct Policy {
   //    (otherwise original19 then16/15/14/12/7; no mutual fallback).
   // 26/27=cooperative32x16/32x32 transformed operand tiles, complete seven P
   //    then fixed U (otherwise packed7; common input binding guard uses Dense).
+  // 28/29=dedicated producer/consumer M1 WGMMA64x16/64x32 K32, two banks,
+  // full seven P and fixed U in one launch (otherwise packed7; common AB16
+  // current binding failure uses Dense). No global S/T/P or caller workspace.
   int mega_variant=0;
 };
 class Plan {

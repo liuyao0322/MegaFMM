@@ -188,4 +188,15 @@ void launch_cooperative_mma(const Problem& p, const void* A, const void* B,
                             const float* C0, float* D, cudaStream_t stream,
                             int variant=26);
 
+// Dedicated producer/consumer WGMMA M1, two final operand banks, one launch.
+// Internal configs0/1 map to policies28/29 with BM64,BN16/32,BK32.
+// Raw APIs accept native metadata/bindings only; Plan chooses packed7/Dense.
+bool wgmma_pipeline_can_implement(const Problem& p, int configuration=0);
+bool wgmma_pipeline_full_tiles(const Problem& p, const void* A, const void* B,
+                               int configuration=0);
+void prepare_wgmma_pipeline(const Problem& p, int configuration=0);
+void launch_wgmma_pipeline(const Problem& p, const void* A, const void* B,
+                           const float* C0, float* D, cudaStream_t stream,
+                           int configuration=0);
+
 }

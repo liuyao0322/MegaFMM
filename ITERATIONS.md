@@ -87,6 +87,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 29 | Matched packed-input seven-product leaves | 0.3329 | 0.288007 | measured-not-certified |
 
+| 30 | Single-launch producer-consumer WGMMA pipeline | 0.4094 | 0.358867 | no-change |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -1338,3 +1340,51 @@ Default GPU validation passes with2034 CASE/803 PASS, including four new indepen
 Strict numerics records1290 unique gates/430 distributions:774 pass,516 fail (258uniform+258range),NF0,exit2. The unchanged first1230 gates and new60 matched checks are separate groups; new60 comprises48 native and12 required HighHalf Dense checks. Exact structural and paired-bitwise success does not replace this original-input numerical gate. CUDA12.8 Compute Sanitizer2025.1.0.0 independently runs H11/H12 memcheck/racecheck/synccheck, all six exit0 with zero leaks/errors/hazards/warnings. Each H11 run has44CASE/37PASS; each H12 has46CASE/37PASS; each includes2 direct input/product fixtures,18 full-P/final-D pairs and4 captures/12 freshAB replays. All runs are serial and completed before closure.
 
 Final source/binary/raw/config/test/compiler evidence is [results/small_matched_profile_iter29.json](results/small_matched_profile_iter29.json). Benchmark SHA256 `66bcc473b87bc5d51f46af9b9b6012ae7dace43c32d2f0c594bbf31e30206d5e`; tests `fae22ec4c77586bbbc9d34fa1820903e60ebaef08756b75dbf36eec442c31671`. Source remains the actual measured `bdbcdd9`, not any later evidence-only HEAD. The128/256/512/1024 faster-than-cuBLAS objective remains unmet. These results do not establish a hardware floor, exhausted directions or completion of continuous optimization.
+
+### Reassessment before iteration30 — active1024 megakernel goal
+
+The new explicit user goal is to keep optimizing the1024 megakernel until it exceeds independently tuned cuBLAS. The preceding goal turn made progress: it integrated and verified matched input-placement controls, produced24 full1024 rows with72 fresh checks and immutable evidence, and closed checkpoint `62798a9`. It did not achieve the goal. Packed Lt1 or a Dense fallback is not a substitute for the requested single-launch megakernel.
+
+Iterations27–29 produced no >=3% improvement over the overall historical own-SW envelope. AKO4ALL reassessment therefore precedes another formal implementation. The current same-source29 ordinary-launch fastest SW is Lt1 at19.3750/19.7350us (BF16/FP16), versus its independently tuned Dense12.2298/9.9302us; all original numerical gates fail. The controlled32x64 leaf experiment lowers complete SW latency38.2541/38.5088→34.1165/34.4358us when transforms move to once-per-call packing. This validates input placement as a useful axis but does not explain dynamic stall percentages or close the leaf-throughput gap. Source27 cooperative Mega27 is still a true single-launch option, while the current packed controls require multiple launches.
+
+The existing ncu lock failure is not re-probed. Fresh Nsight Systems2023.4.4 CUDA-profiler capture-range diagnostics instead ran the unchanged source29 binary on allocation107488/g08, verified H100 UUID `GPU-78def847-b6c1-9dd4-ff30-269a9ae1a73f`,132SM,CUDA runtime12040. Both captures contain exactly one complete native megakernel and zero workspace: Mega0 grid8x16/128threads,150 registers/thread,dynamic shared reported0.043MB; Mega27 grid16x16/128threads,128 registers/thread,static shared0.014MB. The captured single diagnostic durations130911ns/30591ns are instrumented observations, not full benchmark medians, speedup scores, or stall attribution. Raw reports and trace CSVs are `results/reassessment_mega{0,27}_1024_20261014*` and retain the unchanged benchmark binary SHA above.
+
+Source inspection confirms the old M1 still has a single128-thread warpgroup doing scalar input transforms, seven WGMMA products, immediate wait and stage reuse; no dedicated producer pipeline exists. Prior axes include small owner/product/cluster routes, raw-lookahead/cp.async owners, cooperative SM80 sharing, and two-/three-launch input-placement controls. A distinct next axis is a single-launch256-thread M1 with a128-thread producer warpgroup and128-thread consumer warpgroup, two final A7/B7 operand banks, vectorized original-quadrant loads/stores, and pinned `PipelineAsync<2>` full/empty handoff. Compare BM64 BN16/32 BK32:256/128 ownerCTAs at1024,56/112 theoretical P registers/consumer,70/84KiB final operand banks. BN16 adds parallelism but also increases logical original requests80MiB versus48MiB and FP32 input-DAG work41,943,040 versus25,165,824; none of these static counts predicts a win. Producer64/consumer160 dynamic-register settings remain a hypothesis until compilation and role-specific safety checks.
+
+Primary-source rereading supports the implementation mechanism, not an H100 FMM speedup promise: [Hopper tuning guide](https://docs.nvidia.com/cuda/archive/12.4.0/hopper-tuning-guide/index.html), [PTX8.4 WGMMA/fence/register protocols](https://docs.nvidia.com/cuda/archive/12.4.0/parallel-thread-execution/index.html), [pinned CUTLASS3.5.1 PipelineAsync](https://github.com/NVIDIA/cutlass/blob/v3.5.1/include/cutlass/pipeline/sm90_pipeline.hpp), and [GPU Strassen fusion research](https://arxiv.org/abs/1808.07984). TMA aliasing raw A21/B12 into future transformed slots, further stages/outstanding groups, and larger cooperativeSM80 tiles are retained independent later axes; they are not claimed implemented in this first pipeline experiment. No evidence establishes a performance floor or exhausted viable directions.
+
+The original one-cast BF16/FP16 strategy and fixed gate remain in force. Read-only reevaluation of the existing exact-leaf witness matches its frozen JSON; lifting each2x2 coefficient matrix withI512 gives legal1024 metadata and the same Frobenius cast-error witness (a mathematical lifting, not a new GPU check). This explains why faster rounded-leaf execution alone cannot certify the full declared numerical range. An asynchronous user preference question about adding a separate higher-precision/compensation strategy is pending; until an answer, no such strategy is substituted. Execution-performance experiments continue, and numerical failures remain visible. This limitation does not establish a kernel-time floor.
+
+The next iteration must preserve single-launch ownership/full-K sevenP/fixedU/alpha-beta/currentbinding/Graph-fresh-input semantics, the original FP64 reference and fixed gates, the old25CUDA files and frozen source23–29 evidence. Same-source full1024 comparison of newMega28/29, oldMega0/Mega27 and Lt1 controls in both dtypes/modes is required; own-Mega latency and the overall SW envelope are reported separately. Full20warm/100calls/5groups/3fresh, original checks and tuned same-row Dense must precede any winner or completion claim.
+
+### Iter 30 — Single-launch producer-consumer WGMMA pipeline
+
+- **Hypothesis:** Overlap FP32-RN input transformation and complete seven-P WGMMA through two final shared-memory banks without global S/T/P materialization.
+- **Changes:** Add native Mega28/29 BM64 BN16/32 BK32 128-producer/128-consumer PipelineAsync2, safe compiled64/96-or160 register quotas, common current-binding Plan fallback and focused integer/raw-U/host-epilogue/Graph tests; preserve25oldCUDA sources, original numerical gate and AutoDense.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.358867 ms; mean speedup=0.4094x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.005854 | 0.006222 | 0.9409 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.005944 | 0.006392 | 0.9299 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.005952 | 0.008853 | 0.6723 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.005840 | 0.008949 | 0.6526 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.006322 | 0.013643 | 0.4634 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.006390 | 0.013869 | 0.4608 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.013205 | 0.031597 | 0.4179 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.010294 | 0.031763 | 0.3241 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.032037 | 0.216226 | 0.1482 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.032958 | 0.221128 | 0.1490 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.087035 | 0.820659 | 0.1061 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.089110 | 0.811558 | 0.1098 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.195374 | 2.080285 | 0.0939 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.205389 | 2.097142 | 0.0979 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.012040 | 0.022675 | 0.5310 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.011894 | 0.023114 | 0.5146 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.008438 | 0.022570 | 0.3739 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_wgmma_pipeline_64x16 v28 | launch | 0.008816 | 0.022966 | 0.3839 | 0.00075151 | 0 |
+
+- **Analysis:** Predeclared nine-shape two-dtype launch screen20warm20calls5groups1fresh completed18finite numerical-failing rows exit2 after defaultGPU2080CASE859PASS and selected29same-input18raw-U/host-epilogue groups PASS. Native source and binary identities were frozen before measurement. This diagnostic alone establishes no certification or own-latency envelope gain; mandatory same-binary control and20row1024 full comparison follow.
+- **Next:** Measure Mega29 same-binary quick control and both new pipelines, Mega0/Mega27/Lt1 in launch/Graph20warm100calls5groups3fresh; finish original strict60scope, sixCUDA12.8sanitizers, compiled resource and independent evidence audit, then report actual endpoint latency and numerical failure.
+- **Archive:** trajectory/20261014_005808_iter-30/
