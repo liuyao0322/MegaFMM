@@ -91,6 +91,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 31 | Single-launch TMA raw-alias two-bank WGMMA | 0.3970 | 0.292840 | regression |
 
+| 32 | Overlap WGMMA consumer groups with vector producer | 0.5005 | 0.384269 | regression |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -1487,3 +1489,18 @@ DefaultGPU2126CASE933PASS, selected30/31 22/24CASE38PASS, CPU DAG3+stage6 PASS, 
 - **Analysis:** Quick signal only. Rank new own latency against frozen29 samebinary, not Dense denominator. Default/targeted structural checks remain separate from original numerical gate.
 - **Next:** Mandatory full1024 20rows new32/33 retained29/TMA31/Lt1 bothdtype ordinary/Graph20warm100calls5groups3fresh, unchanged newstrict60 and six serial CUDA12.8 sanitizers; independent static/data audit and full evidence closure.
 - **Archive:** trajectory/20261014_020836_iter-32/
+
+#### Iteration32 full1024 evidence closure
+
+Same frozen source `f396662f498af7998b2401da49506184b96904ae` / bench SHA `8fe268ef4a42f51bcea88478d3451c69bc963b245a267db288ef24d5de1f3dab` measured20rows200TIME60freshCHECK with newwait1 Mega32/33, retained29/TMA31 and multi-launchLt1, bothdtypes ordinary/Graph20warm100calls5groups3fresh. All60originalFP64gateFAIL/NF0; noAutochange orgoalcompletion.
+
+| Mode | dtype | Retained29 event µs | Bestnew33 event µs | New33 ownlatency increase | New33 Dense/SW | Retained29/new33 batchwall µs/call |
+|---|---|---:|---:|---:|---:|---:|
+| launch | bf16 | 25.134721 | 29.158080 | 16.007% | 0.420703 | 25.21137/29.25172 |
+| launch | fp16 | 25.401919 | 29.407041 | 15.767% | 0.337084 | 25.47930/29.48424 |
+| graph | bf16 | 24.854400 | 28.604801 | 15.089% | 0.396633 | 24.93586/28.68783 |
+| graph | fp16 | 25.129600 | 28.983040 | 15.334% | 0.325929 | 25.20803/29.07212 |
+
+New33 beatsnew32 butregressesretained29 inallfour combos. New33vs29 sameBM64BN32BK32 vectorproducer isolates consumerschedule;32vs29 differentBN cannotaloneattribute schedulecost. Lt1 remainsfastestobservedmulti-launchcontrol andcannotcomplete trueMegakernelgoal. Ordinarywait1/retained29 nohostencode; retainedTMA31 two currentpointerencodeinsidehostloop; Graphcapturedaddresses freshcontents eachreplay. Eventmayincludehostsubmissionidle; batchwall/call includes100submissions+batchsync, notindependentsinglecallwall.
+
+Default2188CASE1075PASS, new62CASE142PASS; selected32/33 actual30/32CASE72PASS. New96sameatom rawU/host specifiedepiloguegroups,40currentABchecks,20Graph60freshnode1 replays allPASS, coveringstage1/2/3/4/16/17/32/33 andtail/phasewrap. Strictnew60=36PASS24FAILNF0 (48native12Denserangefallback); six serialCUDA12.8SANexit0zeroerrors/racehazardswarnings/memleaks. Originalsinglecastprecision andgates retained. Historicalsource29full1290 plus30/31actualnew60each preserved underindividualidentity; source30full1350/source31full1410/currentfull1470 areunexecuted code-scopecounts. Newownedpool/rolefullCFG/implicitwidth/accinit/zero genericPaccesswhileinflight/linkedobject exactinstruction gatePASS beforelaunch; no31/30safetyinheritance. Compiled1168/1504staticinstructions andquota96/160 do notmeasuredoccupancy/traffic. Nohardwarefloor orcausalstallproof claimed. Finalprofile/report/independentdataandstaticaudit closurefollows; nextaxis notstartedunderthislease.
