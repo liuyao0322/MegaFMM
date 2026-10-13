@@ -183,10 +183,17 @@ template<class T> void structural_suite(megafmm::DType dtype) {
     }
   }
   for(auto candidate:{std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,1},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,2},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,1},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,2}}) {
     auto e=run_case<T>(problem(256,256,256,dtype),candidate.first,Pattern::Integers,false,true,1234567,candidate.second);
     require(e.nonfinite==0 && e.maxabs==0,"candidate variant structural test failed");
+  }
+  {
+    auto p=problem(256,256,256,dtype);
+    p.alpha=.5f;p.beta=-.25f;
+    auto e=run_case<T>(p,megafmm::Algorithm::Megakernel,Pattern::Integers,true,true,1234567,2);
+    require(e.nonfinite==0 && e.maxabs==0,"streaming megakernel alpha/beta alias test failed");
   }
 }
 void degenerate_suite() {
