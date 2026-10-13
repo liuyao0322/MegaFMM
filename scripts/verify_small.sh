@@ -73,7 +73,11 @@ run_check() {
   fi
 }
 
-run_check dag 0 python3 tests/test_dag.py
+run_dag() {
+  python3 tests/test_dag.py || return
+  python3 tests/test_stage_m2.py
+}
+run_check dag 0 run_dag
 run_check correctness 0 bash scripts/on_gpu.sh ./build/test_correctness
 run_check memcheck 0 run_sanitizer memcheck
 # No candidate filters: coverage follows the complete current test candidate list.

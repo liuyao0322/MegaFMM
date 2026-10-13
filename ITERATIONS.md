@@ -71,6 +71,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 21 | Strengthen smallLt tuning and record actual bound algorithms | 0.5287 | 0.072138 | measurement-traceability-numerical-fail |
 
+| 22 | Accumulate per-stage Winograd contributions in four C fragments | 0.3137 | 0.426841 | screen-numerical-fail |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -851,3 +853,49 @@ Iter20 GPUvalidation: complete structural/API/M1bitwise through17 and Graph full
 - **Analysis:** Quick20/5/1 Lt1 screen completed18 finite rows, all frozen numerical gatesfailed exit2. Configurations now record actual IDs/tile/stage/index/workspace and explicit tuning protocol. Candidate pool/alignment/dedup/budget/numerics/steady timing and immutable aliased C0snapshot unchanged. This does not by itself establish that earlier Dense anomalies are solved; per-primary envelope analysis and exact Dense GPU capture follow closure.
 - **Next:** Validate API/aliases/rebounds, capture Dense128GPU, reassess three-iteration outcomes and compiler/timeline/primary-source evidence before separately testing PLAN M2 stage contributions.
 - **Archive:** trajectory/20261013_153023_iter-21/
+
+Iter21 post-closure primary comparison (quick20/5/1, mixed historicalfull protocols, notacceptance): bf16 128^3 9.987us Dense/SW=0.420x priorbest/SW=0.413x; fp16 128^3 10.195us Dense/SW=0.397x priorbest/SW=0.426x; bf16 256^3 11.078us Dense/SW=0.478x priorbest/SW=0.573x; fp16 256^3 10.955us Dense/SW=0.441x priorbest/SW=0.585x; bf16 512^3 12.027us Dense/SW=0.506x priorbest/SW=0.914x; fp16 512^3 11.946us Dense/SW=0.513x priorbest/SW=0.928x; bf16 1024^3 20.034us Dense/SW=0.640x priorbest/SW=0.990x; fp16 1024^3 19.824us Dense/SW=0.512x priorbest/SW=0.991x. Configuration/TUNE evidence is now complete, numeric gatesremainfailed.
+
+### Reassessment after iterations19–21 (before22)
+
+Per-primary128/256/512/1024 prior-envelope latency did not improve by3% in three sourceiterations:19 compactBK64 seven-batch pipeline controls,20 rawcp.async doublebank16x16 owners,21 stronger setup-only smallLt tuning. Earlier16prefetch remains tiny/512 winner in diagnostic screens; Lt1 remains1024 winner. Inspect all per-shape entries; cross20/100-call historical measurements are not final acceptance. Full structural/API/alias/rebind tests through17 passed after21, and new51column records preserve actualboundDense/leaf/batch algorithm configuration. A single quick run with stronger tuning does not prove earlier Dense variation is eliminated.
+
+Re-profiled exact Dense128 with the new singlePlan --profile-dense route: BF16GPU3.072us and FP16GPU3.008us, one warmed invocation each; selected IDs21, tile5/BF andtile11/FP, stage19, zero boundworkspace. The plan-wide maximumallocation is131072bytes and remains distinct. SQLite contains one GPUkernel and noGPUmemcpy/memset table; CUDA API includes cudaMemsetAsync but no captured device-memory activity. Captured hostAPI83/94us is inflated and notsteady submission overhead. Historical16SWGPU3.392us and bulkquick4.126us cannot be subtracted acrosscaptures to manufacture a breakdown. MaterialGPUwork remains; no physical launch/timer/bandwidthfloor established. Source661e878, binary/log identities and primaryrow configs inresults/small_reassessment_iter21.json. ncu is not retried after the original failure.
+
+Compiler evidence:16registerprefetch has120regs vs15's96, actualnextLDG noearlyrawscoreboardwait until after7HMMA, but different cachepolicy;19H7/H8 have128/164regs, source-derived dynamic36/24KiB vsstatic1024byte resourcefields;20cpasync has145regs vs paired8's126 and16KiB compiledshared vs8KiB, withwait moved after3 of14HMMA. The last path therefore neither reduces physical registers nor overlaps the entireseven-productgroup. Allpaths passed their targeted threeCUDA12.8sanitizers. These observations constrain hypotheses, not dynamic occupancy attribution.
+
+Re-read exact primaryCUDA12.4.1 [register pressure](https://docs.nvidia.com/cuda/archive/12.4.1/cuda-c-best-practices-guide/index.html#register-pressure), [occupancy](https://docs.nvidia.com/cuda/archive/12.4.1/cuda-c-best-practices-guide/index.html#occupancy), and [async copy](https://docs.nvidia.com/cuda/archive/12.4.1/cuda-c-best-practices-guide/index.html#asynchronous-copy-from-global-memory-to-shared-memory) sections from its official HTML. Async copies remove their intermediate global-to-shared registers, but this does not guarantee lower whole-kernel registers; higher occupancy alone does not guarantee speed. OfficialHTML snapshothash recorded inJSON; stalledwebfind cancelled, exactHTML retrieved onlogin with20secondbound.
+
+Viable directions remain, so continue:22 PLAN6.5M2 fourlongC+onePscratch stagecontributions (explicit different FP32order, separateinteger/stagereference andunchangedoriginalFP64gate);23 newlyproposed8x8outputowners with bottom8Azero fornative16x8MMA (moretinyCTAs/fewerAcasts, doubledredundantTensorCorework, scratchCPUreviewpending). Neither is a promised improvement. Final frozenbinary launch/Graph full20warm/100calls/5groups/3fresh comparison remains required. No exhaustion or physicalfloor claim.
+
+### Iter 22 — Accumulate per-stage Winograd contributions in four C fragments
+
+- **Hypothesis:** PLAN M2 can lower physical accumulator register pressure while preserving FP32 S/T edges and testing its distinct per-stage FP32 order independently.
+- **Changes:** Added Mega18 one-warp16x16 K16 stage products with four long C fragments plus one cleared P scratch, thirteen RN adds and one RN subtraction, general coefficients and alias-safe scalar output; separate integer/stage reference, CPU M2 model and Graph/rebind tests; small-suite future Mega19 mappings and combined CPU DAG/M2 verification frozen.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.426841 ms; mean speedup=0.3137x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_stage_m2 v18 | launch | 0.004165 | 0.005517 | 0.7549 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_stage_m2 v18 | launch | 0.004066 | 0.005838 | 0.6964 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_stage_m2 v18 | launch | 0.005235 | 0.008589 | 0.6095 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_stage_m2 v18 | launch | 0.004842 | 0.008758 | 0.5528 | 0.000737166 | 0 |
+| 512,512,512 | bf16 | megakernel_stage_m2 v18 | launch | 0.006083 | 0.014752 | 0.4124 | 0.00598239 | 0 |
+| 512,512,512 | fp16 | megakernel_stage_m2 v18 | launch | 0.006078 | 0.015091 | 0.4028 | 0.000753205 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_stage_m2 v18 | launch | 0.012930 | 0.045035 | 0.2871 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_stage_m2 v18 | launch | 0.010053 | 0.045242 | 0.2222 | 0.00075182 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_stage_m2 v18 | launch | 0.032077 | 0.338557 | 0.0947 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_stage_m2 v18 | launch | 0.032619 | 0.339779 | 0.0960 | 0.0007522 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_stage_m2 v18 | launch | 0.086331 | 1.022974 | 0.0844 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_stage_m2 v18 | launch | 0.088602 | 1.008022 | 0.0879 | 0.000752811 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_stage_m2 v18 | launch | 0.195440 | 2.346800 | 0.0833 | 0.00602273 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_stage_m2 v18 | launch | 0.206854 | 2.356114 | 0.0878 | 0.000753129 | 0 |
+| 1024,512,1024 | bf16 | megakernel_stage_m2 v18 | launch | 0.009464 | 0.030414 | 0.3112 | 0.00599043 | 0 |
+| 1024,512,1024 | fp16 | megakernel_stage_m2 v18 | launch | 0.009534 | 0.030726 | 0.3103 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_stage_m2 v18 | launch | 0.008253 | 0.030213 | 0.2732 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_stage_m2 v18 | launch | 0.008614 | 0.030714 | 0.2805 | 0.000751513 | 0 |
+
+- **Analysis:** Quick20warm/20calls/5groups/1fresh completed18 finite rows, all frozen numerical gates fail exit2. Compiled stage kernel uses95 registers, source shared7168 bytes, zero ptxas stack/spills. Its128 BF5.5168us and FP5.84us are slower than prior prefetch16 screening; lowered register count alone does not establish speedup. Per-primary envelope analysis, GPU structure/Graph/sanitizers and compiled SASS audit follow closure.
+- **Next:** Validate Mega18 with full structural/API tests and three standalone CUDA12.8 sanitizers, then integrate separately frozen Mega19 smaller8x8 owners and measure full same-binary launch/Graph candidates.
+- **Archive:** trajectory/20261013_154902_iter-22/

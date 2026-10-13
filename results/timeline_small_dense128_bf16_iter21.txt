@@ -1,0 +1,22 @@
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=128,128,128 dtype=bf16 case=solution config=dense:id=21;tile=5;split_k=1;reduction=0;swizzle=0;stages=19;custom=0;inner=0;cluster=0;bound_candidate=1/6;tuned_candidate=1;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.006067;align0=16;align1=16;align2=16;align3=16
+Capture range started in the application.
+Capture range ended in the application.
+Generating '/tmp/nsys-report-4fca.qdstrm'
+[1/1] [0%                          ] small_dense128_bf16_iter21.nsys-rep[1/1] [0%                          ] small_dense128_bf16_iter21.nsys-rep[1/1] [===========51%              ] small_dense128_bf16_iter21.nsys-rep[1/1] [========================99% ] small_dense128_bf16_iter21.nsys-rep[1/1] [========================100%] small_dense128_bf16_iter21.nsys-rep[1/1] [========================100%] small_dense128_bf16_iter21.nsys-rep
+PROFILE 128,128,128 bf16 dense_cublaslt workspace=131072 target=dense lt_config=dense:id=21;tile=5;split_k=1;reduction=0;swizzle=0;stages=19;custom=0;inner=0;cluster=0;bound_candidate=1/6;tuned_candidate=1;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.006067;align0=16;align1=16;align2=16;align3=16
+Generated:
+    /share/home/liuyao/workspace/MegaFMM/.scratch/small_dense128_bf16_iter21.nsys-rep
+Generating SQLite file .scratch/small_dense128_bf16_iter21.sqlite from .scratch/small_dense128_bf16_iter21.nsys-rep
+Processing [.scratch/small_dense128_bf16_iter21.sqlite] with [/share/app/cuda/cuda-12.4/nsight-systems-2023.4.4/host-linux-x64/reports/cuda_gpu_kern_sum.py]... 
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+100.0,3072,1,3072.0,3072.0,3072,3072,0.0,void cutlass::Kernel2<cutlass_80_wmma_tensorop_s161616gemm_bf16_16x16_128x1_nn_align8>(T1::Params)
+
+Processing [.scratch/small_dense128_bf16_iter21.sqlite] with [/share/app/cuda/cuda-12.4/nsight-systems-2023.4.4/host-linux-x64/reports/cuda_api_sum.py]... 
+Time (%),Total Time (ns),Num Calls,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+46.4,83053,1,83053.0,83053.0,83053,83053,0.0,cuLaunchKernel
+37.2,66518,1,66518.0,66518.0,66518,66518,0.0,cudaStreamSynchronize
+9.4,16866,1,16866.0,16866.0,16866,16866,0.0,cuKernelGetFunction
+5.4,9641,1,9641.0,9641.0,9641,9641,0.0,cuProfilerStart
+1.6,2872,1,2872.0,2872.0,2872,2872,0.0,cudaMemsetAsync
+

@@ -16,7 +16,7 @@ add_library(megafmm STATIC solution/plan.cpp solution/pack_winograd.cu
   solution/small_mma_16x8.cu solution/small_mma_16x8_vec4.cu
   solution/small_product_cluster.cu solution/small_mma_16x8_epilogue.cu
   solution/small_mma_16x8_identity.cu solution/small_mma_16x8_prefetch.cu
-  solution/small_mma_cpasync.cu)
+  solution/small_mma_cpasync.cu solution/small_mma_stage.cu)
 target_include_directories(megafmm PUBLIC include PRIVATE solution "${CUTLASS_ROOT}/include" "${CUTLASS_ROOT}/tools/util/include")
 target_link_libraries(megafmm PUBLIC CUDA::cudart CUDA::cublasLt CUDA::cublas CUDA::cuda_driver)
 target_compile_options(megafmm PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_90a,code=sm_90a;--expt-relaxed-constexpr;--expt-extended-lambda;-lineinfo;-Xptxas=-v>)
@@ -31,4 +31,5 @@ add_test(NAME gpu_correctness COMMAND test_correctness)
 find_package(Python3 COMPONENTS Interpreter)
 if(Python3_FOUND)
   add_test(NAME exact_winograd_dag COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_dag.py")
+  add_test(NAME stage_m2_model COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_stage_m2.py")
 endif()

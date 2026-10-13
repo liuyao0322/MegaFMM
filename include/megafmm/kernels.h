@@ -102,4 +102,13 @@ void prepare_small_cpasync(const Problem& p, int variant=17);
 void launch_small_cpasync(const Problem& p, const void* A, const void* B,
                           const float* C0, float* D, cudaStream_t stream,
                           int variant=17);
+// PLAN M2: independently complete each K16 product and apply fourteen RN
+// contributions to four long C accumulators; noncomplete inputs use packed 7.
+// This FP32 stage order differs from M1's complete-P accumulation and U DAG.
+bool small_stage_can_implement(const Problem& p, int variant=18);
+bool small_stage_full_tiles(const Problem& p, const void* A, const void* B);
+void prepare_small_stage(const Problem& p, int variant=18);
+void launch_small_stage(const Problem& p, const void* A, const void* B,
+                        const float* C0, float* D, cudaStream_t stream,
+                        int variant=18);
 }
