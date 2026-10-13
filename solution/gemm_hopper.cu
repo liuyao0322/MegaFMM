@@ -171,9 +171,12 @@ size_t dispatch_variant(const Problem& p, int variant, Operation operation,
               p, operation, A, B, C0, D, workspace, stream);
     case 2:
       // Cooperative requires BM >= 128.  A 64-row tile uses the legal
-      // pingpong mainloop and its non-cooperative warp-specialized epilogue.
+      // ordinary warp-specialized mainloop and matching epilogue.  The
+      // previous Pingpong schedule reported unresolved math-order barrier
+      // initialization errors in isolated synccheck runs, despite explicit
+      // init and CTA synchronization in the pinned CUTLASS implementation.
       return HopperGemm<Input, 64, 128,
-          cutlass::gemm::KernelTmaWarpSpecializedPingpong,
+          cutlass::gemm::KernelTmaWarpSpecialized,
           cutlass::epilogue::TmaWarpSpecialized>::execute(
               p, operation, A, B, C0, D, workspace, stream);
     case 3:

@@ -22,7 +22,7 @@ struct Policy {
   int levels=1;
   size_t workspace_limit=size_t(8)<<30;
   int heuristic_candidates=32;
-  // Hopper: 0=128x128, 1=128x256, 2=64x128 pingpong,
+  // Hopper: 0=128x128, 1=128x256, 2=64x128 warp-specialized,
   // 3=source-free 128x256, 4=source-free with B multicast.
   int hopper_variant=0;
   // Mega: 0/1=seven live P tiles, 2=three live P/U tiles,
