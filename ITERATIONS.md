@@ -79,6 +79,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 25 | Coalesce native MMA inputs with vector64 register routing | 0.3587 | 0.872000 | screened |
 
+| 26 | Specialize original owner8 MMA at parent K128 | 0.3493 | 1.036923 | screened |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -1075,3 +1077,35 @@ Six separate CUDA12.8 Compute Sanitizer2025.1.0.0 processes (each22/23 ×memchec
 Independent compiler audit: new BF/FP M16 uses96regs and M8 uses72, SHARED/LOCAL/STACK0 and no shared/LDSM/local-spill/barrier instructions. Each stage has7self-C HMMA,24/16final packed RN conversions,12/8LDG.E.64,20/16SHFL.BFLY and8PRMT. Full seven P accumulators survive the K16 loop; post-loop fixedU accounts for28/14FADD and8/4STG.E.64. Static totalinstructions440/344, compared with direct20'sFP472/BF480 and21's376. Old20/21 SASS instructions/encodings are unchanged. These static counts are not dynamic issue, DRAM bytes, achieved occupancy or a demonstrated latency cause. ncu is not retried under the session lock.
 
 Evidence `results/small_coalesced_profile_iter25.json` binds the seven actual source hashes, both binary hashes, new raw25 logs/CSVs/exits, strict counts, sanitizer coverage, exact configurations and compiled functions to9c9c188 rather than later documentationHEAD. Source23 report/manifest and source24 profile remain byte-frozen. All36 new diagnostic rows fail the numerical gate; no unqualified speedup or floor/exhaustion/completion claim follows. Next authorized test axis is original19'sK128 fixedkh64 no-unroll versus full-unroll, with unchanged helpers/P/U and current-binding fallback. It will be a separate source26 iteration after this evidence checkpoint, preserving all previous fastest paths.
+
+### Iter 26 — Specialize original owner8 MMA at parent K128
+
+- **Hypothesis:** A fixed four-stage leaf bound, independently tested with no-unroll and full-unroll, may reduce loop-control and address scheduling cost while retaining original19 raw lookahead and complete-P fixed-U arithmetic.
+- **Changes:** Added Mega24 fixedkh64 no-unroll and Mega25 fixedkh64 full-unroll, exactK128 plus original19guards, current-binding fallback19to16to15to14to12to7, immutable old CUDA functions and Lt metadata, max25 validation, K128 native bits and stage weights, refreshed-AB Graph and rebind, and60new strict candidate checks including requiredHighHalfDense fallback.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=1.036923 ms; mean speedup=0.3493x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_warp_mma_8x8_k128_no_unroll v24 | launch | 0.005638 | 0.004210 | 1.3394 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_warp_mma_8x8_k128_no_unroll v24 | launch | 0.005541 | 0.004344 | 1.2755 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.005584 | 0.006536 | 0.8543 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.005637 | 0.006557 | 0.8597 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.006346 | 0.015370 | 0.4129 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.006309 | 0.015402 | 0.4096 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.013246 | 0.108346 | 0.1223 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.010277 | 0.109470 | 0.0939 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.031629 | 0.743805 | 0.0425 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.032744 | 0.761750 | 0.0430 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.086381 | 2.464696 | 0.0350 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.089274 | 2.452762 | 0.0364 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.195453 | 5.918488 | 0.0330 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.206690 | 5.853033 | 0.0353 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.009141 | 0.049944 | 0.1830 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.009230 | 0.050082 | 0.1843 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.008002 | 0.049894 | 0.1604 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_warp_mma_8x8_prefetch v24 | launch | 0.008330 | 0.049930 | 0.1668 | 0.00075151 | 0 |
+
+- **Analysis:** The predeclared diagnostic nine-shape20warm20calls5groups1fresh Mega24 launch screen completed18finite numerical-failing rows exit2 after default GPU structural/API/M1 native-bit and refreshed-input Graph validation exit0. OnlyK128rows use the new specialization; otherKrows retain the original19chain. Compiler/source evidence, independent Mega25 same-binary control, strict1110 and six targeted CUDA12.8 sanitizer checks follow mandatory closure; same-row Dense shifts and quick/full historical differences do not establish own-code gain.
+- **Next:** Measure unchanged-binary Mega25, audit actualloop/unroll resources and lookahead, validate strict and targeted sanitizers, and expand same-binary original19/new24/new25 full launchGraph only if primary ownlatency improves3percent. Reassess three consecutive nonimproving delivery/control axes before source27.
+- **Archive:** trajectory/20261013_184447_iter-26/

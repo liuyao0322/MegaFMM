@@ -138,4 +138,16 @@ void prepare_coalesced_mma(const Problem& p, int variant=22);
 void launch_coalesced_mma(const Problem& p, const void* A, const void* B,
                          const float* C0, float* D, cudaStream_t stream,
                          int variant=22);
+// Original19 identity owners with an exact parent-K128, four-stage leaf bound.
+// Policy24/25 choose only outer-loop no-unroll/full-unroll; other bindings use
+// the unchanged19 ->16/15/14/12/7 Plan fallback chain.
+enum class K128OuterLoop { FixedBoundNoUnroll, FixedBoundFullUnroll };
+bool mma8x8_k128_specialized_can_implement(const Problem& p);
+bool mma8x8_k128_specialized_full_tiles(const Problem& p, const void* A,
+    const void* B, const float* C0, const float* D);
+void prepare_mma8x8_k128_specialized(const Problem& p);
+void launch_mma8x8_k128_specialized(const Problem& p, const void* A,
+    const void* B, const float* C0, float* D, cudaStream_t stream,
+    K128OuterLoop control);
+
 }

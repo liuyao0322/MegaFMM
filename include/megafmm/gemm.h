@@ -50,6 +50,8 @@ struct Policy {
   //    (each otherwise uses 16/15/14/12/7; no mutual fallback),
   // 22/23=vector64 original inputs with butterfly/PRMT native register routing
   //    and 16x8/8x8 identity owners (each otherwise 16/15/14/12/7; no mutual fallback).
+  // 24/25=original19 parent-K128 fixed four-stage no-unroll/full-unroll
+  //    (otherwise original19 then16/15/14/12/7; no mutual fallback).
   int mega_variant=0;
 };
 class Plan {
