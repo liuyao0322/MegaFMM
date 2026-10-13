@@ -415,7 +415,20 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     return;
   }
   if (plan.algorithm == Algorithm::Megakernel) {
-    if (plan.policy.mega_variant == 19) {
+    if (plan.policy.mega_variant == 20 || plan.policy.mega_variant == 21) {
+      if (direct_mma_full_tiles(p, A, B, C0, D, plan.policy.mega_variant))
+        launch_direct_mma(p, A, B, C0, D, stream, plan.policy.mega_variant);
+      else if (mma16x8_prefetch_full_tiles(p, A, B, C0, D))
+        launch_mma16x8_prefetch(p, A, B, C0, D, stream, 16);
+      else if (mma16x8_identity_full_tiles(p, A, B, C0, D))
+        launch_mma16x8_identity(p, A, B, C0, D, stream, 15);
+      else if (mma16x8_epilogue_full_tiles(p, A, B, C0, D))
+        launch_mma16x8_epilogue(p, A, B, C0, D, stream, 14);
+      else if (mma16x8_vec4_full_tiles(p, A, B))
+        launch_mma16x8_vec4(p, A, B, C0, D, stream, 12);
+      else
+        launch_packed_mma(p, A, B, C0, D, stream, 7);
+    } else if (plan.policy.mega_variant == 19) {
       if (mma8x8_prefetch_full_tiles(p, A, B, C0, D))
         launch_mma8x8_prefetch(p, A, B, C0, D, stream, 19);
       else if (mma16x8_prefetch_full_tiles(p, A, B, C0, D))
@@ -569,6 +582,19 @@ std::string Plan::algorithm_name() const {
       return impl_->small_batched ? (impl_->policy.hopper_variant >= 7
         ? "winograd_sm80_batched_k64" : "winograd_sm80_batched") : "winograd_hopper_v2";
     case Algorithm::Megakernel:
+      if (impl_->policy.mega_variant == 20 || impl_->policy.mega_variant == 21) {
+        if (direct_mma_can_implement(impl_->problem, impl_->policy.mega_variant))
+          return impl_->policy.mega_variant == 20
+            ? "megakernel_warp_mma_direct_16x8" : "megakernel_warp_mma_direct_8x8";
+        if (mma16x8_prefetch_can_implement(impl_->problem, 16))
+          return "megakernel_warp_mma_16x8_prefetch";
+        if (mma16x8_identity_can_implement(impl_->problem, 15))
+          return "megakernel_warp_mma_16x8_identity";
+        if (mma16x8_epilogue_can_implement(impl_->problem, 14))
+          return "megakernel_warp_mma_16x8_epilogue";
+        return mma16x8_vec4_can_implement(impl_->problem, 12)
+          ? "megakernel_warp_mma_16x8_vec4" : "megakernel_warp_mma_packed";
+      }
       if (impl_->policy.mega_variant == 19) {
         if (mma8x8_prefetch_can_implement(impl_->problem, 19))
           return "megakernel_warp_mma_8x8_prefetch";
@@ -663,8 +689,8 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     throw std::invalid_argument("lt_variant must be 0 (views) or 1 (uniform batched operands)");
   if (policy.hopper_variant < 0 || policy.hopper_variant > 8)
     throw std::invalid_argument("hopper_variant must be between 0 and 8");
-  if (policy.mega_variant < 0 || policy.mega_variant > 19)
-    throw std::invalid_argument("mega_variant must be between 0 and 19");
+  if (policy.mega_variant < 0 || policy.mega_variant > 21)
+    throw std::invalid_argument("mega_variant must be between 0 and 21");
   if (policy.algorithm < Algorithm::Auto || policy.algorithm > Algorithm::Megakernel)
     throw std::invalid_argument("unsupported algorithm policy");
   auto impl = std::make_unique<Plan::Impl>();
@@ -677,7 +703,13 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   Algorithm desired = policy.algorithm;
   if (desired == Algorithm::Auto || policy.levels == 0 || !winograd_shape(p, policy)) desired = Algorithm::Dense;
   if (desired == Algorithm::Megakernel) {
-    const bool supported = policy.mega_variant == 19 ? (mma8x8_prefetch_can_implement(p, 19) ||
+    const bool supported = (policy.mega_variant == 20 || policy.mega_variant == 21)
+                             ? (direct_mma_can_implement(p, policy.mega_variant) ||
+                                mma16x8_prefetch_can_implement(p, 16) ||
+                                mma16x8_identity_can_implement(p, 15) ||
+                                mma16x8_epilogue_can_implement(p, 14) ||
+                                mma16x8_vec4_can_implement(p, 12) || packed_mma_can_implement(p, 7))
+                           : policy.mega_variant == 19 ? (mma8x8_prefetch_can_implement(p, 19) ||
                                mma16x8_prefetch_can_implement(p, 16) ||
                                mma16x8_identity_can_implement(p, 15) ||
                                mma16x8_epilogue_can_implement(p, 14) ||
@@ -738,7 +770,14 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);
     impl->bytes = impl->dense->scratch_bytes();
   } else if (desired == Algorithm::Megakernel) {
-    if (policy.mega_variant == 19) {
+    if (policy.mega_variant == 20 || policy.mega_variant == 21) {
+      if (direct_mma_can_implement(p, policy.mega_variant)) prepare_direct_mma(p, policy.mega_variant);
+      else if (mma16x8_prefetch_can_implement(p, 16)) prepare_mma16x8_prefetch(p, 16);
+      else if (mma16x8_identity_can_implement(p, 15)) prepare_mma16x8_identity(p, 15);
+      else if (mma16x8_epilogue_can_implement(p, 14)) prepare_mma16x8_epilogue(p, 14);
+      else if (mma16x8_vec4_can_implement(p, 12)) prepare_mma16x8_vec4(p, 12);
+      else prepare_packed_mma(p, 7);
+    } else if (policy.mega_variant == 19) {
       if (mma8x8_prefetch_can_implement(p, 19)) prepare_mma8x8_prefetch(p, 19);
       else if (mma16x8_prefetch_can_implement(p, 16)) prepare_mma16x8_prefetch(p, 16);
       else if (mma16x8_identity_can_implement(p, 15)) prepare_mma16x8_identity(p, 15);

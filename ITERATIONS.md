@@ -75,6 +75,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 23 | Split prefetched warp owners into eight-by-eight outputs | 0.3041 | 1.037819 | screen-numerical-fail |
 
+| 24 | Construct native MMA operands directly in registers | 0.3401 | 0.617107 | screen-numerical-fail |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -972,3 +974,35 @@ Evidence closure: `results/SMALL_REPORT.md` SHA256 `3bb95c7affae89f1503e4da92af7
 Compiler/timeline audits remain separate from timing claims. Mega18 has95regs and no local spill, but its M2 RN contribution order is verified by SASS and is slower than the observed primary envelope. Mega19 has96regs, source/CUPTI5376B shared versus cuobjdump6400B, zero LOCAL/STACK or LDL/STL; seven of eight next-block loads precede the firstHMMA, with the eighth after it and consumption at the next stage. Single warmed128GPU captures are BF3.200us/FP3.232us; instrumented host APIs are inflated and cannot be subtracted from separate group measurements. Logical8x8 owners double aggregate nativeMMA/Bwork and add one-third original input bytes versus16x8; these are not measured DRAM traffic or floor evidence.
 
 Next viable axis: direct native MMA register operands, separately testing16x8 and8x8 owners, removes shared S/T delivery/LDSM/barriers but increases source warp-load instructions (M16:8→32; M8:8→24), with cache-dependent sector repetition and uncompiled operand liveness. Frozen scratch prototype SHA256 `0e65d636194e501a94f55e713d1a5c37360a5331517a76494c91c4589fc41736` and independent15PASS CPU ABI/DAG/sector checks support an additive experiment, not a promised gain. First compile/resources/SASS, then M1 GPU bits and fixed numerical gates, structural/shortK/Graph/rebind/sanitizer validation and own-latency screens. Existing fastest paths remain available verbatim. No cap, physical floor or exhaustion condition is established; continue the authorized optimization loop.
+
+### Iter 24 — Construct native MMA operands directly in registers
+
+- **Hypothesis:** Removing shared delivery and warp barriers may reduce small-tile latency despite more global load instructions and operand register liveness.
+- **Changes:** Added direct native M16/M8 controls Mega20/21 preserving FP32 DAG and complete M1 products, explicit variant mapping and current-binding fallback16to15to14to12to7; new shortK/random native bits/Graph/rebind/guard coverage and max21 policy validation; no gate or timing changes.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.617107 ms; mean speedup=0.3401x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.004178 | 0.004496 | 0.9292 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.004066 | 0.004666 | 0.8714 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.005294 | 0.007054 | 0.7505 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.004848 | 0.007066 | 0.6861 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.006141 | 0.012245 | 0.5015 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.006086 | 0.012256 | 0.4966 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.012883 | 0.059294 | 0.2173 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.010150 | 0.059230 | 0.1714 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.031315 | 0.438918 | 0.0713 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.032586 | 0.445530 | 0.0731 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.086395 | 1.497859 | 0.0577 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.089011 | 1.494301 | 0.0596 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.195075 | 3.453959 | 0.0565 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.206101 | 3.486920 | 0.0591 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.009170 | 0.030942 | 0.2963 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.009232 | 0.031176 | 0.2961 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.008048 | 0.030930 | 0.2602 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_warp_mma_direct_16x8 v20 | launch | 0.008346 | 0.031090 | 0.2684 | 0.00075151 | 0 |
+
+- **Analysis:** Mega20 quick20warm20calls5groups1fresh completed18 finite rows with frozen numerical gates failed exit2. At128 BF4.496us FP4.6656us are slower than frozen source23 observed envelope. Compiler reports M16 REG128 and M8 REG120 with zero stack/spills and no source shared allocation; this is not a demonstrated occupancy mechanism. Cache and load granularity change versus15, while prefetch also changes versus16/19. M8 control and full GPU correctness/resources analysis follow closure.
+- **Next:** Measure unchanged-binary Mega21 control, validate full M1 bits and shortK Graph rebinding, inspect generated LD widths/shared removal/P-U order, and run targeted standalone sanitizers; retain source23 snapshot and all earlier best paths.
+- **Archive:** trajectory/20261013_171152_iter-24/

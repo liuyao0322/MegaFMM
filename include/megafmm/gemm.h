@@ -45,7 +45,9 @@ struct Policy {
   // 18=PLAN M2 per-K16 product contributions into four long C accumulators
   //    with distinct FP32 stage order (otherwise packed M1 variant 7),
   // 19=identity 8x8 output owners with raw register prefetch
-  //    (otherwise variants 16/15/14/12/7 using current pointer guards).
+  //    (otherwise variants 16/15/14/12/7 using current pointer guards),
+  // 20/21=direct native register operands with 16x8/8x8 identity owners
+  //    (each otherwise uses 16/15/14/12/7; no mutual fallback).
   int mega_variant=0;
 };
 class Plan {

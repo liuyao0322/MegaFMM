@@ -120,4 +120,13 @@ void prepare_mma8x8_prefetch(const Problem& p, int variant=19);
 void launch_mma8x8_prefetch(const Problem& p, const void* A, const void* B,
                           const float* C0, float* D, cudaStream_t stream,
                           int variant=19);
+// Direct native fragments: 20 owns 16x8, 21 owns 8x8 with lower A words zero.
+// Identity output only; each current binding falls back through 16/15/14/12/7.
+bool direct_mma_can_implement(const Problem& p, int variant=20);
+bool direct_mma_full_tiles(const Problem& p, const void* A, const void* B,
+                           const float* C0, const float* D, int variant=20);
+void prepare_direct_mma(const Problem& p, int variant=20);
+void launch_direct_mma(const Problem& p, const void* A, const void* B,
+                       const float* C0, float* D, cudaStream_t stream,
+                       int variant=20);
 }
