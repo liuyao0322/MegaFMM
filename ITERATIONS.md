@@ -1504,3 +1504,34 @@ Same frozen source `f396662f498af7998b2401da49506184b96904ae` / bench SHA `8fe26
 New33 beatsnew32 butregressesretained29 inallfour combos. New33vs29 sameBM64BN32BK32 vectorproducer isolates consumerschedule;32vs29 differentBN cannotaloneattribute schedulecost. Lt1 remainsfastestobservedmulti-launchcontrol andcannotcomplete trueMegakernelgoal. Ordinarywait1/retained29 nohostencode; retainedTMA31 two currentpointerencodeinsidehostloop; Graphcapturedaddresses freshcontents eachreplay. Eventmayincludehostsubmissionidle; batchwall/call includes100submissions+batchsync, notindependentsinglecallwall.
 
 Default2188CASE1075PASS, new62CASE142PASS; selected32/33 actual30/32CASE72PASS. New96sameatom rawU/host specifiedepiloguegroups,40currentABchecks,20Graph60freshnode1 replays allPASS, coveringstage1/2/3/4/16/17/32/33 andtail/phasewrap. Strictnew60=36PASS24FAILNF0 (48native12Denserangefallback); six serialCUDA12.8SANexit0zeroerrors/racehazardswarnings/memleaks. Originalsinglecastprecision andgates retained. Historicalsource29full1290 plus30/31actualnew60each preserved underindividualidentity; source30full1350/source31full1410/currentfull1470 areunexecuted code-scopecounts. Newownedpool/rolefullCFG/implicitwidth/accinit/zero genericPaccesswhileinflight/linkedobject exactinstruction gatePASS beforelaunch; no31/30safetyinheritance. Compiled1168/1504staticinstructions andquota96/160 do notmeasuredoccupancy/traffic. Nohardwarefloor orcausalstallproof claimed. Finalprofile/report/independentdataandstaticaudit closurefollows; nextaxis notstartedunderthislease.
+
+### Iter 33 — Add third operand bank to vector wait1 pipeline
+
+- **Hypothesis:** A third producer-filled bank offers additional producer slack while two committed WGMMA groups remain unretired; prior timing did not isolate a two-bank stall mechanism.
+- **Changes:** Native Mega34/35 BM64 BN16/32 BK32 PipelineAsync3, full128/empty128, separate read/retire states and finalwait0 before genericP/U. Only bankcount changed; no TMA/release1/twoConsumer/Psplit. OriginalsinglecastRN S/T, complete7P/fixedU, alphaRNbetaFMA, currentbinding/overlap, packed7/Dense fallback andAutoDense preserved. Old28CUDA bytefrozen. Independentnewcompiled quota/modulo3/tail3/inflight-P/object-linked gate beforefirstlaunch.
+- **Bench:** Compiled=True; quick18rows20warm20calls5groups1fresh; original numericalFAIL retained, no certification.
+
+| M,N,K | dtype | route | mode | Dense µs | complete SW µs | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 5.939200 | 6.337600 | 0.937137 | FAIL |
+| 128,128,128 | fp16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 5.924800 | 6.508800 | 0.910275 | FAIL |
+| 256,256,256 | bf16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 5.977600 | 8.926400 | 0.669654 | FAIL |
+| 256,256,256 | fp16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 5.897600 | 9.043200 | 0.652158 | FAIL |
+| 512,512,512 | bf16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 6.566400 | 13.480000 | 0.487122 | FAIL |
+| 512,512,512 | fp16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 6.598400 | 13.769600 | 0.479201 | FAIL |
+| 1024,1024,1024 | bf16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 13.257600 | 31.817600 | 0.416675 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 10.249600 | 32.275200 | 0.317569 | FAIL |
+| 2048,2048,2048 | bf16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 31.756800 | 219.774389 | 0.144497 | FAIL |
+| 2048,2048,2048 | fp16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 32.784000 | 225.364804 | 0.145471 | FAIL |
+| 3072,3072,3072 | bf16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 87.238401 | 850.044823 | 0.102628 | FAIL |
+| 3072,3072,3072 | fp16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 89.286399 | 838.216019 | 0.106520 | FAIL |
+| 4096,4096,4096 | bf16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 195.673597 | 2096.174431 | 0.093348 | FAIL |
+| 4096,4096,4096 | fp16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 206.547189 | 2123.124886 | 0.097285 | FAIL |
+| 1024,512,1024 | bf16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 11.518400 | 22.300801 | 0.516502 | FAIL |
+| 1024,512,1024 | fp16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 11.972800 | 22.920001 | 0.522373 | FAIL |
+| 512,1024,1024 | bf16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 8.419200 | 22.156800 | 0.379983 | FAIL |
+| 512,1024,1024 | fp16 | megakernel_wgmma_wait1_three_stage_64x16 v34 | launch | 8.769600 | 22.728001 | 0.385850 | FAIL |
+
+- **Analysis:** Quicksignal only. Compare ownlatency againstsamebinary retained29 andsamewidthtwo-bank33, notslowerDense denominator. Structural/rawU/hostepilogue/Graph checks separateoriginalFP64gate.
+- **Next:** Mandatory full1024 new34/35+29+two-bank33+Lt1 bothdtype ordinary/Graph20warm100calls5groups3fresh, strictnew60 andsixserialCUDA12.8SAN, independentstatic/datafinal audit andcompleteevidenceclosure.
+- **Archive:** trajectory/20261014_023614_iter-33/

@@ -1,0 +1,82 @@
+{
+  "schema": "megafmm.iter33.full1024-plan.v1",
+  "declared_before_measurement": true,
+  "reason": "Active true single-launch1024 goal; isolate Stages2to3 vs samebinary two-bankwait1Mega33 andretainedwait0Mega29, Lt1multiplelaunchcontrol; fullmandatoryregardlessquick.",
+  "shapes": [
+    [
+      1024,
+      1024,
+      1024
+    ]
+  ],
+  "dtypes": [
+    "bf16",
+    "fp16"
+  ],
+  "modes": [
+    "launch",
+    "graph"
+  ],
+  "warmup": 20,
+  "trials": 100,
+  "groups": 5,
+  "correct_trials": 3,
+  "rotate_inputs": 1,
+  "heuristic_candidates": 32,
+  "workspace_limit": 8589934592,
+  "routes": [
+    {
+      "label": "three_stage34",
+      "algorithm": "mega",
+      "variant": 34
+    },
+    {
+      "label": "three_stage35",
+      "algorithm": "mega",
+      "variant": 35
+    },
+    {
+      "label": "pipeline29",
+      "algorithm": "mega",
+      "variant": 29
+    },
+    {
+      "label": "wait133",
+      "algorithm": "mega",
+      "variant": 33
+    },
+    {
+      "label": "packed_lt1",
+      "algorithm": "lt",
+      "variant": 1
+    }
+  ],
+  "timing_contract": "All measured Megakernelroutes vectorload fresh currentA/B inside exactlyonekernel, originalRN S/T/finalonecast/whole7P/fixedU/alphaRNbetaFMA; nohostencode/globalSTP/nativeworkspace. New34/35 onlythirdsharedbank while wait1pending2retireoldbank/tailwait0 kept. Graphcapturedfixedbindingfreshcontents; recordevent+medianbatchwall/call, noindependentsinglecallwall. OriginalFP64gate.",
+  "reference": "Same-row independently tuned ordinarycuBLASLt32candidate8GiB, originalroundedAB FP64plainGEMMgate.",
+  "frozen_sources": {
+    "solution/megakernel_wgmma_wait1_three_stage.cu": "f78b1fbf1541583315ce084cac3e05afd7b5d5887f64b928c0f504c9902afd23",
+    "solution/plan.cpp": "2ba11c4a22bf8005e1a96e03241ce6126306cdc1d3f099b72faf41167d1c598c",
+    "include/megafmm/kernels.h": "b3789114248296157357298308f95b456c47870243102e9a6d157e2c8605f002",
+    "include/megafmm/gemm.h": "0982d382cc4edaa055fc5084721ada4d43426944ea03e1a4285dca4bc422ec5d",
+    "CMakeLists.txt": "b76417d057bcc32770b35b47e9aa8f8480e2a310e110d1760daa5c0c55a1dd73",
+    "bench/benchmark.cu": "3c3bcb723eb1d8e5e13aea43a5fde6da078ccab7cc328185575b5fe8a2aa047b",
+    "tests/test_correctness.cu": "e3b8764141ba87730e2c78ff153842b18b6c4223399ec9a485114956512f3e54"
+  },
+  "frozen_binaries": {
+    "build/megafmm_bench": "8d0d7ad7b728537962c78c880cbb67df8dcef59c283a895764cff4b383d0dd0b",
+    "build/test_correctness": "d31a70941bf7212abbff172bc2e54eb0960c3b9f9c5b7d1c0ef7ad61ba6879de"
+  },
+  "csv_paths": [
+    "results/small_three_stage34_launch_iter33_full1024.csv",
+    "results/small_three_stage34_graph_iter33_full1024.csv",
+    "results/small_three_stage35_launch_iter33_full1024.csv",
+    "results/small_three_stage35_graph_iter33_full1024.csv",
+    "results/small_pipeline29_launch_iter33_full1024.csv",
+    "results/small_pipeline29_graph_iter33_full1024.csv",
+    "results/small_wait133_launch_iter33_full1024.csv",
+    "results/small_wait133_graph_iter33_full1024.csv",
+    "results/small_packed_lt1_launch_iter33_full1024.csv",
+    "results/small_packed_lt1_graph_iter33_full1024.csv"
+  ],
+  "freeze_status": "Frozen before firstGPU after independent new four-instance compiled CAN_LAUNCH PASS; timing protocol/routes unchanged from predeclaration."
+}

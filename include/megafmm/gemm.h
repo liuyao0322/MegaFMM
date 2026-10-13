@@ -66,6 +66,8 @@ struct Policy {
   // 32/33=vector producer64x16/64x32 with two WGMMA groups in flight,
   // wait1 retires only the old bank; tail wait0 precedes fixed U. One launch.
   // Original precision and packed7/Dense guards; no native matrix workspace.
+  // 34/35=three-bank vector64x16/64x32 wait1; old bank retirement
+  // and tail wait0 remain, original precision and packed7/Dense guards.
   int mega_variant=0;
 };
 class Plan {

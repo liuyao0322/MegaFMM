@@ -429,7 +429,12 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     return;
   }
   if (plan.algorithm == Algorithm::Megakernel) {
-    if (plan.policy.mega_variant == 32 || plan.policy.mega_variant == 33) {
+    if (plan.policy.mega_variant == 34 || plan.policy.mega_variant == 35) {
+      const int configuration = plan.policy.mega_variant - 34;
+      if (wgmma_wait1_three_stage_full_tiles(p, A, B, configuration))
+        launch_wgmma_wait1_three_stage(p, A, B, C0, D, stream, configuration);
+      else launch_packed_mma(p, A, B, C0, D, stream, 7);
+    } else if (plan.policy.mega_variant == 32 || plan.policy.mega_variant == 33) {
       const int configuration = plan.policy.mega_variant - 32;
       if (wgmma_wait1_full_tiles(p, A, B, configuration))
         launch_wgmma_wait1(p, A, B, C0, D, stream, configuration);
@@ -667,6 +672,12 @@ std::string Plan::algorithm_name() const {
       return impl_->small_batched ? (impl_->policy.hopper_variant >= 7
         ? "winograd_sm80_batched_k64" : "winograd_sm80_batched") : "winograd_hopper_v2";
     case Algorithm::Megakernel:
+      if (impl_->policy.mega_variant == 34 || impl_->policy.mega_variant == 35) {
+        if (wgmma_wait1_three_stage_can_implement(impl_->problem, impl_->policy.mega_variant - 34))
+          return impl_->policy.mega_variant == 34
+            ? "megakernel_wgmma_wait1_three_stage_64x16" : "megakernel_wgmma_wait1_three_stage_64x32";
+        return "megakernel_warp_mma_packed";
+      }
       if (impl_->policy.mega_variant == 32 || impl_->policy.mega_variant == 33) {
         if (wgmma_wait1_can_implement(impl_->problem, impl_->policy.mega_variant - 32))
           return impl_->policy.mega_variant == 32
@@ -826,8 +837,8 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     throw std::invalid_argument("lt_variant must be 0 (views) or 1 (uniform batched operands)");
   if (policy.hopper_variant < 0 || policy.hopper_variant > 12)
     throw std::invalid_argument("hopper_variant must be between 0 and 12");
-  if (policy.mega_variant < 0 || policy.mega_variant > 33)
-    throw std::invalid_argument("mega_variant must be between 0 and 33");
+  if (policy.mega_variant < 0 || policy.mega_variant > 35)
+    throw std::invalid_argument("mega_variant must be between 0 and 35");
   if (policy.algorithm < Algorithm::Auto || policy.algorithm > Algorithm::Megakernel)
     throw std::invalid_argument("unsupported algorithm policy");
   auto impl = std::make_unique<Plan::Impl>();
@@ -840,7 +851,9 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   Algorithm desired = policy.algorithm;
   if (desired == Algorithm::Auto || policy.levels == 0 || !winograd_shape(p, policy)) desired = Algorithm::Dense;
   if (desired == Algorithm::Megakernel) {
-    const bool supported = (policy.mega_variant == 32 || policy.mega_variant == 33)
+    const bool supported = (policy.mega_variant == 34 || policy.mega_variant == 35)
+                             ? (wgmma_wait1_three_stage_can_implement(p, policy.mega_variant - 34) || packed_mma_can_implement(p, 7))
+                           : (policy.mega_variant == 32 || policy.mega_variant == 33)
                              ? (wgmma_wait1_can_implement(p, policy.mega_variant - 32) || packed_mma_can_implement(p, 7))
                            : (policy.mega_variant == 30 || policy.mega_variant == 31)
                              ? (wgmma_tma_alias_can_implement(p, policy.mega_variant - 30) || packed_mma_can_implement(p, 7))
@@ -955,7 +968,11 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);
     impl->bytes = impl->dense->scratch_bytes();
   } else if (desired == Algorithm::Megakernel) {
-    if (policy.mega_variant == 32 || policy.mega_variant == 33) {
+    if (policy.mega_variant == 34 || policy.mega_variant == 35) {
+      if (wgmma_wait1_three_stage_can_implement(p, policy.mega_variant - 34))
+        prepare_wgmma_wait1_three_stage(p, policy.mega_variant - 34);
+      else prepare_packed_mma(p, 7);
+    } else if (policy.mega_variant == 32 || policy.mega_variant == 33) {
       if (wgmma_wait1_can_implement(p, policy.mega_variant - 32))
         prepare_wgmma_wait1(p, policy.mega_variant - 32);
       else prepare_packed_mma(p, 7);

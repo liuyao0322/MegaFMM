@@ -1,0 +1,1442 @@
+
+build/CMakeFiles/megafmm.dir/solution/megakernel_wgmma_wait1_three_stage.cu.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <__cudaUnregisterBinaryUtil()>:
+   0:	48 8b 3d 00 00 00 00 	mov    0x0(%rip),%rdi        # 7 <__cudaUnregisterBinaryUtil()+0x7>
+   7:	e9 00 00 00 00       	jmp    c <__cudaUnregisterBinaryUtil()+0xc>
+   c:	0f 1f 40 00          	nopl   0x0(%rax)
+
+0000000000000010 <megafmm::wgmma_wait1_three_stage_can_implement(megafmm::Problem const&, int)>:
+  10:	83 fe 01             	cmp    $0x1,%esi
+  13:	76 0b                	jbe    20 <megafmm::wgmma_wait1_three_stage_can_implement(megafmm::Problem const&, int)+0x10>
+  15:	31 c0                	xor    %eax,%eax
+  17:	c3                   	ret
+  18:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  1f:	00 
+  20:	55                   	push   %rbp
+  21:	48 89 fd             	mov    %rdi,%rbp
+  24:	53                   	push   %rbx
+  25:	89 f3                	mov    %esi,%ebx
+  27:	31 f6                	xor    %esi,%esi
+  29:	48 83 ec 08          	sub    $0x8,%rsp
+  2d:	e8 00 00 00 00       	call   32 <megafmm::wgmma_wait1_three_stage_can_implement(megafmm::Problem const&, int)+0x22>
+  32:	84 c0                	test   %al,%al
+  34:	74 3a                	je     70 <megafmm::wgmma_wait1_three_stage_can_implement(megafmm::Problem const&, int)+0x60>
+  36:	83 fb 01             	cmp    $0x1,%ebx
+  39:	48 19 c9             	sbb    %rcx,%rcx
+  3c:	48 83 e1 e0          	and    $0xffffffffffffffe0,%rcx
+  40:	48 83 c1 40          	add    $0x40,%rcx
+  44:	f6 45 00 7f          	testb  $0x7f,0x0(%rbp)
+  48:	75 26                	jne    70 <megafmm::wgmma_wait1_three_stage_can_implement(megafmm::Problem const&, int)+0x60>
+  4a:	48 8b 45 08          	mov    0x8(%rbp),%rax
+  4e:	48 99                	cqto
+  50:	48 f7 f9             	idiv   %rcx
+  53:	48 85 d2             	test   %rdx,%rdx
+  56:	75 18                	jne    70 <megafmm::wgmma_wait1_three_stage_can_implement(megafmm::Problem const&, int)+0x60>
+  58:	f6 45 10 3f          	testb  $0x3f,0x10(%rbp)
+  5c:	75 12                	jne    70 <megafmm::wgmma_wait1_three_stage_can_implement(megafmm::Problem const&, int)+0x60>
+  5e:	f6 45 18 07          	testb  $0x7,0x18(%rbp)
+  62:	75 0c                	jne    70 <megafmm::wgmma_wait1_three_stage_can_implement(megafmm::Problem const&, int)+0x60>
+  64:	f6 45 20 07          	testb  $0x7,0x20(%rbp)
+  68:	0f 94 c0             	sete   %al
+  6b:	eb 05                	jmp    72 <megafmm::wgmma_wait1_three_stage_can_implement(megafmm::Problem const&, int)+0x62>
+  6d:	0f 1f 00             	nopl   (%rax)
+  70:	31 c0                	xor    %eax,%eax
+  72:	48 83 c4 08          	add    $0x8,%rsp
+  76:	5b                   	pop    %rbx
+  77:	5d                   	pop    %rbp
+  78:	c3                   	ret
+  79:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+
+0000000000000080 <megafmm::wgmma_wait1_three_stage_full_tiles(megafmm::Problem const&, void const*, void const*, int)>:
+  80:	83 f9 01             	cmp    $0x1,%ecx
+  83:	76 0b                	jbe    90 <megafmm::wgmma_wait1_three_stage_full_tiles(megafmm::Problem const&, void const*, void const*, int)+0x10>
+  85:	31 c0                	xor    %eax,%eax
+  87:	c3                   	ret
+  88:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  8f:	00 
+  90:	41 55                	push   %r13
+  92:	49 89 fd             	mov    %rdi,%r13
+  95:	41 54                	push   %r12
+  97:	49 89 d4             	mov    %rdx,%r12
+  9a:	55                   	push   %rbp
+  9b:	89 cd                	mov    %ecx,%ebp
+  9d:	53                   	push   %rbx
+  9e:	48 89 f3             	mov    %rsi,%rbx
+  a1:	31 f6                	xor    %esi,%esi
+  a3:	48 83 ec 08          	sub    $0x8,%rsp
+  a7:	e8 00 00 00 00       	call   ac <megafmm::wgmma_wait1_three_stage_full_tiles(megafmm::Problem const&, void const*, void const*, int)+0x2c>
+  ac:	84 c0                	test   %al,%al
+  ae:	74 68                	je     118 <megafmm::wgmma_wait1_three_stage_full_tiles(megafmm::Problem const&, void const*, void const*, int)+0x98>
+  b0:	83 fd 01             	cmp    $0x1,%ebp
+  b3:	48 19 f6             	sbb    %rsi,%rsi
+  b6:	48 83 e6 e0          	and    $0xffffffffffffffe0,%rsi
+  ba:	48 83 c6 40          	add    $0x40,%rsi
+  be:	41 f6 45 00 7f       	testb  $0x7f,0x0(%r13)
+  c3:	75 53                	jne    118 <megafmm::wgmma_wait1_three_stage_full_tiles(megafmm::Problem const&, void const*, void const*, int)+0x98>
+  c5:	49 8b 4d 08          	mov    0x8(%r13),%rcx
+  c9:	48 89 c8             	mov    %rcx,%rax
+  cc:	48 99                	cqto
+  ce:	48 f7 fe             	idiv   %rsi
+  d1:	48 85 d2             	test   %rdx,%rdx
+  d4:	75 42                	jne    118 <megafmm::wgmma_wait1_three_stage_full_tiles(megafmm::Problem const&, void const*, void const*, int)+0x98>
+  d6:	41 f6 45 10 3f       	testb  $0x3f,0x10(%r13)
+  db:	75 3b                	jne    118 <megafmm::wgmma_wait1_three_stage_full_tiles(megafmm::Problem const&, void const*, void const*, int)+0x98>
+  dd:	41 f6 45 18 07       	testb  $0x7,0x18(%r13)
+  e2:	75 34                	jne    118 <megafmm::wgmma_wait1_three_stage_full_tiles(megafmm::Problem const&, void const*, void const*, int)+0x98>
+  e4:	41 f6 45 20 07       	testb  $0x7,0x20(%r13)
+  e9:	75 2d                	jne    118 <megafmm::wgmma_wait1_three_stage_full_tiles(megafmm::Problem const&, void const*, void const*, int)+0x98>
+  eb:	48 85 db             	test   %rbx,%rbx
+  ee:	74 28                	je     118 <megafmm::wgmma_wait1_three_stage_full_tiles(megafmm::Problem const&, void const*, void const*, int)+0x98>
+  f0:	4d 85 e4             	test   %r12,%r12
+  f3:	74 23                	je     118 <megafmm::wgmma_wait1_three_stage_full_tiles(megafmm::Problem const&, void const*, void const*, int)+0x98>
+  f5:	4c 09 e3             	or     %r12,%rbx
+  f8:	83 e3 0f             	and    $0xf,%ebx
+  fb:	85 ed                	test   %ebp,%ebp
+  fd:	75 29                	jne    128 <megafmm::wgmma_wait1_three_stage_full_tiles(megafmm::Problem const&, void const*, void const*, int)+0xa8>
+  ff:	83 e1 1f             	and    $0x1f,%ecx
+ 102:	48 09 d9             	or     %rbx,%rcx
+ 105:	0f 94 c0             	sete   %al
+ 108:	48 83 c4 08          	add    $0x8,%rsp
+ 10c:	5b                   	pop    %rbx
+ 10d:	5d                   	pop    %rbp
+ 10e:	41 5c                	pop    %r12
+ 110:	41 5d                	pop    %r13
+ 112:	c3                   	ret
+ 113:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+ 118:	48 83 c4 08          	add    $0x8,%rsp
+ 11c:	31 c0                	xor    %eax,%eax
+ 11e:	5b                   	pop    %rbx
+ 11f:	5d                   	pop    %rbp
+ 120:	41 5c                	pop    %r12
+ 122:	41 5d                	pop    %r13
+ 124:	c3                   	ret
+ 125:	0f 1f 00             	nopl   (%rax)
+ 128:	83 e1 3f             	and    $0x3f,%ecx
+ 12b:	48 09 d9             	or     %rbx,%rcx
+ 12e:	0f 94 c0             	sete   %al
+ 131:	48 83 c4 08          	add    $0x8,%rsp
+ 135:	5b                   	pop    %rbx
+ 136:	5d                   	pop    %rbp
+ 137:	41 5c                	pop    %r12
+ 139:	41 5d                	pop    %r13
+ 13b:	c3                   	ret
+ 13c:	0f 1f 40 00          	nopl   0x0(%rax)
+
+0000000000000140 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)>:
+ 140:	41 57                	push   %r15
+ 142:	41 56                	push   %r14
+ 144:	41 55                	push   %r13
+ 146:	41 54                	push   %r12
+ 148:	55                   	push   %rbp
+ 149:	53                   	push   %rbx
+ 14a:	48 81 ec 28 01 00 00 	sub    $0x128,%rsp
+ 151:	83 bc 24 60 01 00 00 	cmpl   $0x1,0x160(%rsp)
+ 158:	01 
+ 159:	0f 87 00 00 00 00    	ja     15f <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1f>
+ 15f:	49 89 f4             	mov    %rsi,%r12
+ 162:	31 f6                	xor    %esi,%esi
+ 164:	48 89 fb             	mov    %rdi,%rbx
+ 167:	48 89 d5             	mov    %rdx,%rbp
+ 16a:	49 89 ce             	mov    %rcx,%r14
+ 16d:	4d 89 c5             	mov    %r8,%r13
+ 170:	4d 89 cf             	mov    %r9,%r15
+ 173:	e8 00 00 00 00       	call   178 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x38>
+ 178:	84 c0                	test   %al,%al
+ 17a:	0f 84 00 00 00 00    	je     180 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x40>
+ 180:	83 bc 24 60 01 00 00 	cmpl   $0x1,0x160(%rsp)
+ 187:	01 
+ 188:	48 19 c9             	sbb    %rcx,%rcx
+ 18b:	48 83 e1 e0          	and    $0xffffffffffffffe0,%rcx
+ 18f:	48 83 c1 40          	add    $0x40,%rcx
+ 193:	f6 03 7f             	testb  $0x7f,(%rbx)
+ 196:	0f 85 00 00 00 00    	jne    19c <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x5c>
+ 19c:	48 8b 43 08          	mov    0x8(%rbx),%rax
+ 1a0:	48 99                	cqto
+ 1a2:	48 f7 f9             	idiv   %rcx
+ 1a5:	48 85 d2             	test   %rdx,%rdx
+ 1a8:	0f 85 00 00 00 00    	jne    1ae <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x6e>
+ 1ae:	f6 43 10 3f          	testb  $0x3f,0x10(%rbx)
+ 1b2:	0f 85 00 00 00 00    	jne    1b8 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x78>
+ 1b8:	f6 43 18 07          	testb  $0x7,0x18(%rbx)
+ 1bc:	0f 85 00 00 00 00    	jne    1c2 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x82>
+ 1c2:	f6 43 20 07          	testb  $0x7,0x20(%rbx)
+ 1c6:	0f 85 00 00 00 00    	jne    1cc <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x8c>
+ 1cc:	48 85 ed             	test   %rbp,%rbp
+ 1cf:	0f 94 c0             	sete   %al
+ 1d2:	4d 85 ed             	test   %r13,%r13
+ 1d5:	0f 94 c2             	sete   %dl
+ 1d8:	08 d0                	or     %dl,%al
+ 1da:	0f 85 00 00 00 00    	jne    1e0 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0xa0>
+ 1e0:	4d 85 e4             	test   %r12,%r12
+ 1e3:	0f 84 81 07 00 00    	je     96a <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x82a>
+ 1e9:	66 0f ef c0          	pxor   %xmm0,%xmm0
+ 1ed:	0f 2e 43 44          	ucomiss 0x44(%rbx),%xmm0
+ 1f1:	ba 01 00 00 00       	mov    $0x1,%edx
+ 1f6:	0f 9a c0             	setp   %al
+ 1f9:	0f 45 c2             	cmovne %edx,%eax
+ 1fc:	84 c0                	test   %al,%al
+ 1fe:	0f 85 1c 01 00 00    	jne    320 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1e0>
+ 204:	31 f6                	xor    %esi,%esi
+ 206:	48 89 df             	mov    %rbx,%rdi
+ 209:	48 89 4c 24 08       	mov    %rcx,0x8(%rsp)
+ 20e:	e8 00 00 00 00       	call   213 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0xd3>
+ 213:	84 c0                	test   %al,%al
+ 215:	0f 84 00 00 00 00    	je     21b <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0xdb>
+ 21b:	48 8b 3b             	mov    (%rbx),%rdi
+ 21e:	40 f6 c7 7f          	test   $0x7f,%dil
+ 222:	0f 85 00 00 00 00    	jne    228 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0xe8>
+ 228:	48 8b 73 08          	mov    0x8(%rbx),%rsi
+ 22c:	48 8b 4c 24 08       	mov    0x8(%rsp),%rcx
+ 231:	48 89 f0             	mov    %rsi,%rax
+ 234:	48 99                	cqto
+ 236:	48 f7 f9             	idiv   %rcx
+ 239:	48 85 d2             	test   %rdx,%rdx
+ 23c:	0f 85 00 00 00 00    	jne    242 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x102>
+ 242:	f6 43 10 3f          	testb  $0x3f,0x10(%rbx)
+ 246:	0f 85 00 00 00 00    	jne    24c <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x10c>
+ 24c:	f6 43 18 07          	testb  $0x7,0x18(%rbx)
+ 250:	0f 85 00 00 00 00    	jne    256 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x116>
+ 256:	f6 43 20 07          	testb  $0x7,0x20(%rbx)
+ 25a:	0f 85 00 00 00 00    	jne    260 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x120>
+ 260:	4c 89 e2             	mov    %r12,%rdx
+ 263:	44 8b 84 24 60 01 00 	mov    0x160(%rsp),%r8d
+ 26a:	00 
+ 26b:	48 89 f0             	mov    %rsi,%rax
+ 26e:	48 09 ea             	or     %rbp,%rdx
+ 271:	83 e2 0f             	and    $0xf,%edx
+ 274:	45 85 c0             	test   %r8d,%r8d
+ 277:	0f 85 3f 02 00 00    	jne    4bc <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x37c>
+ 27d:	83 e0 1f             	and    $0x1f,%eax
+ 280:	48 09 d0             	or     %rdx,%rax
+ 283:	0f 85 00 00 00 00    	jne    289 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x149>
+ 289:	48 85 f6             	test   %rsi,%rsi
+ 28c:	48 8d 46 1f          	lea    0x1f(%rsi),%rax
+ 290:	48 8d 57 7f          	lea    0x7f(%rdi),%rdx
+ 294:	8b 4b 3c             	mov    0x3c(%rbx),%ecx
+ 297:	48 0f 49 c6          	cmovns %rsi,%rax
+ 29b:	48 c1 f8 05          	sar    $0x5,%rax
+ 29f:	48 85 ff             	test   %rdi,%rdi
+ 2a2:	48 0f 49 d7          	cmovns %rdi,%rdx
+ 2a6:	66 0f 6e e0          	movd   %eax,%xmm4
+ 2aa:	48 c1 fa 07          	sar    $0x7,%rdx
+ 2ae:	66 0f 6e c2          	movd   %edx,%xmm0
+ 2b2:	66 0f 62 c4          	punpckldq %xmm4,%xmm0
+ 2b6:	85 c9                	test   %ecx,%ecx
+ 2b8:	75 76                	jne    330 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1f0>
+ 2ba:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 2c1 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x181>
+ 2c1:	66 48 0f 7e c7       	movq   %xmm0,%rdi
+ 2c6:	4d 89 f9             	mov    %r15,%r9
+ 2c9:	41 b8 80 a4 01 00    	mov    $0x1a480,%r8d
+ 2cf:	48 ba 00 01 00 00 01 	movabs $0x100000100,%rdx
+ 2d6:	00 00 00 
+ 2d9:	b9 01 00 00 00       	mov    $0x1,%ecx
+ 2de:	be 01 00 00 00       	mov    $0x1,%esi
+ 2e3:	c7 44 24 50 01 00 00 	movl   $0x1,0x50(%rsp)
+ 2ea:	00 
+ 2eb:	48 89 44 24 58       	mov    %rax,0x58(%rsp)
+ 2f0:	c7 44 24 60 01 00 00 	movl   $0x1,0x60(%rsp)
+ 2f7:	00 
+ 2f8:	66 0f d6 44 24 48    	movq   %xmm0,0x48(%rsp)
+ 2fe:	e8 00 00 00 00       	call   303 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1c3>
+ 303:	85 c0                	test   %eax,%eax
+ 305:	0f 84 1d 05 00 00    	je     828 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x6e8>
+ 30b:	48 81 c4 28 01 00 00 	add    $0x128,%rsp
+ 312:	5b                   	pop    %rbx
+ 313:	5d                   	pop    %rbp
+ 314:	41 5c                	pop    %r12
+ 316:	41 5d                	pop    %r13
+ 318:	41 5e                	pop    %r14
+ 31a:	41 5f                	pop    %r15
+ 31c:	c3                   	ret
+ 31d:	0f 1f 00             	nopl   (%rax)
+ 320:	4d 85 f6             	test   %r14,%r14
+ 323:	0f 85 db fe ff ff    	jne    204 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0xc4>
+ 329:	e9 00 00 00 00       	jmp    32e <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1ee>
+ 32e:	66 90                	xchg   %ax,%ax
+ 330:	89 54 24 78          	mov    %edx,0x78(%rsp)
+ 334:	4d 89 f9             	mov    %r15,%r9
+ 337:	b9 01 00 00 00       	mov    $0x1,%ecx
+ 33c:	41 b8 80 a4 01 00    	mov    $0x1a480,%r8d
+ 342:	89 44 24 7c          	mov    %eax,0x7c(%rsp)
+ 346:	48 8b 7c 24 78       	mov    0x78(%rsp),%rdi
+ 34b:	48 ba 00 01 00 00 01 	movabs $0x100000100,%rdx
+ 352:	00 00 00 
+ 355:	be 01 00 00 00       	mov    $0x1,%esi
+ 35a:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 361 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x221>
+ 361:	c7 44 24 50 01 00 00 	movl   $0x1,0x50(%rsp)
+ 368:	00 
+ 369:	c7 84 24 80 00 00 00 	movl   $0x1,0x80(%rsp)
+ 370:	01 00 00 00 
+ 374:	48 89 44 24 48       	mov    %rax,0x48(%rsp)
+ 379:	e8 00 00 00 00       	call   37e <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x23e>
+ 37e:	85 c0                	test   %eax,%eax
+ 380:	75 89                	jne    30b <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1cb>
+ 382:	48 8b 43 40          	mov    0x40(%rbx),%rax
+ 386:	f3 0f 6f 33          	movdqu (%rbx),%xmm6
+ 38a:	48 8d 4c 24 40       	lea    0x40(%rsp),%rcx
+ 38f:	48 8d 54 24 38       	lea    0x38(%rsp),%rdx
+ 394:	f3 0f 6f 7b 10       	movdqu 0x10(%rbx),%xmm7
+ 399:	f3 0f 6f 4b 20       	movdqu 0x20(%rbx),%xmm1
+ 39e:	48 8d 74 24 68       	lea    0x68(%rsp),%rsi
+ 3a3:	48 8d 7c 24 58       	lea    0x58(%rsp),%rdi
+ 3a8:	48 89 84 24 10 01 00 	mov    %rax,0x110(%rsp)
+ 3af:	00 
+ 3b0:	48 8d 84 24 d0 00 00 	lea    0xd0(%rsp),%rax
+ 3b7:	00 
+ 3b8:	f3 0f 6f 53 30       	movdqu 0x30(%rbx),%xmm2
+ 3bd:	66 48 0f 6e c0       	movq   %rax,%xmm0
+ 3c2:	48 8d 44 24 28       	lea    0x28(%rsp),%rax
+ 3c7:	4c 89 74 24 18       	mov    %r14,0x18(%rsp)
+ 3cc:	66 48 0f 6e d8       	movq   %rax,%xmm3
+ 3d1:	48 8d 44 24 30       	lea    0x30(%rsp),%rax
+ 3d6:	4c 89 6c 24 20       	mov    %r13,0x20(%rsp)
+ 3db:	66 0f 6c c3          	punpcklqdq %xmm3,%xmm0
+ 3df:	4c 89 64 24 28       	mov    %r12,0x28(%rsp)
+ 3e4:	0f 29 84 24 a0 00 00 	movaps %xmm0,0xa0(%rsp)
+ 3eb:	00 
+ 3ec:	66 48 0f 6e c0       	movq   %rax,%xmm0
+ 3f1:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+ 3f6:	66 48 0f 6e e0       	movq   %rax,%xmm4
+ 3fb:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+ 400:	48 89 6c 24 30       	mov    %rbp,0x30(%rsp)
+ 405:	48 89 84 24 c0 00 00 	mov    %rax,0xc0(%rsp)
+ 40c:	00 
+ 40d:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 414 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x2d4>
+ 414:	66 0f 6c c4          	punpcklqdq %xmm4,%xmm0
+ 418:	c7 44 24 60 01 00 00 	movl   $0x1,0x60(%rsp)
+ 41f:	00 
+ 420:	48 89 44 24 58       	mov    %rax,0x58(%rsp)
+ 425:	48 89 44 24 68       	mov    %rax,0x68(%rsp)
+ 42a:	c7 44 24 70 01 00 00 	movl   $0x1,0x70(%rsp)
+ 431:	00 
+ 432:	0f 29 b4 24 d0 00 00 	movaps %xmm6,0xd0(%rsp)
+ 439:	00 
+ 43a:	0f 29 bc 24 e0 00 00 	movaps %xmm7,0xe0(%rsp)
+ 441:	00 
+ 442:	0f 29 8c 24 f0 00 00 	movaps %xmm1,0xf0(%rsp)
+ 449:	00 
+ 44a:	0f 29 94 24 00 01 00 	movaps %xmm2,0x100(%rsp)
+ 451:	00 
+ 452:	0f 29 84 24 b0 00 00 	movaps %xmm0,0xb0(%rsp)
+ 459:	00 
+ 45a:	e8 00 00 00 00       	call   45f <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x31f>
+ 45f:	85 c0                	test   %eax,%eax
+ 461:	0f 85 a4 fe ff ff    	jne    30b <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1cb>
+ 467:	48 8b 74 24 58       	mov    0x58(%rsp),%rsi
+ 46c:	8b 54 24 60          	mov    0x60(%rsp),%edx
+ 470:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 477 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x337>
+ 477:	48 8b 4c 24 68       	mov    0x68(%rsp),%rcx
+ 47c:	44 8b 44 24 70       	mov    0x70(%rsp),%r8d
+ 481:	48 89 b4 24 94 00 00 	mov    %rsi,0x94(%rsp)
+ 488:	00 
+ 489:	89 94 24 9c 00 00 00 	mov    %edx,0x9c(%rsp)
+ 490:	48 89 8c 24 88 00 00 	mov    %rcx,0x88(%rsp)
+ 497:	00 
+ 498:	44 89 84 24 90 00 00 	mov    %r8d,0x90(%rsp)
+ 49f:	00 
+ 4a0:	ff 74 24 40          	push   0x40(%rsp)
+ 4a4:	ff 74 24 40          	push   0x40(%rsp)
+ 4a8:	4c 8d 8c 24 b0 00 00 	lea    0xb0(%rsp),%r9
+ 4af:	00 
+ 4b0:	e8 00 00 00 00       	call   4b5 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x375>
+ 4b5:	59                   	pop    %rcx
+ 4b6:	5e                   	pop    %rsi
+ 4b7:	e9 4f fe ff ff       	jmp    30b <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1cb>
+ 4bc:	83 e0 3f             	and    $0x3f,%eax
+ 4bf:	48 09 d0             	or     %rdx,%rax
+ 4c2:	0f 85 00 00 00 00    	jne    4c8 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x388>
+ 4c8:	48 85 f6             	test   %rsi,%rsi
+ 4cb:	48 8d 46 3f          	lea    0x3f(%rsi),%rax
+ 4cf:	48 8d 57 7f          	lea    0x7f(%rdi),%rdx
+ 4d3:	44 8b 5b 3c          	mov    0x3c(%rbx),%r11d
+ 4d7:	48 0f 49 c6          	cmovns %rsi,%rax
+ 4db:	48 c1 f8 06          	sar    $0x6,%rax
+ 4df:	48 85 ff             	test   %rdi,%rdi
+ 4e2:	48 0f 49 d7          	cmovns %rdi,%rdx
+ 4e6:	66 0f 6e e8          	movd   %eax,%xmm5
+ 4ea:	48 c1 fa 07          	sar    $0x7,%rdx
+ 4ee:	66 0f 6e c2          	movd   %edx,%xmm0
+ 4f2:	66 0f 62 c5          	punpckldq %xmm5,%xmm0
+ 4f6:	45 85 db             	test   %r11d,%r11d
+ 4f9:	0f 85 92 01 00 00    	jne    691 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x551>
+ 4ff:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 506 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x3c6>
+ 506:	66 48 0f 7e c7       	movq   %xmm0,%rdi
+ 50b:	4d 89 f9             	mov    %r15,%r9
+ 50e:	41 b8 80 f8 01 00    	mov    $0x1f880,%r8d
+ 514:	48 ba 00 01 00 00 01 	movabs $0x100000100,%rdx
+ 51b:	00 00 00 
+ 51e:	b9 01 00 00 00       	mov    $0x1,%ecx
+ 523:	be 01 00 00 00       	mov    $0x1,%esi
+ 528:	c7 44 24 50 01 00 00 	movl   $0x1,0x50(%rsp)
+ 52f:	00 
+ 530:	48 89 44 24 58       	mov    %rax,0x58(%rsp)
+ 535:	c7 44 24 60 01 00 00 	movl   $0x1,0x60(%rsp)
+ 53c:	00 
+ 53d:	66 0f d6 44 24 48    	movq   %xmm0,0x48(%rsp)
+ 543:	e8 00 00 00 00       	call   548 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x408>
+ 548:	85 c0                	test   %eax,%eax
+ 54a:	0f 85 bb fd ff ff    	jne    30b <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1cb>
+ 550:	48 8b 43 40          	mov    0x40(%rbx),%rax
+ 554:	f3 0f 6f 3b          	movdqu (%rbx),%xmm7
+ 558:	48 8d 4c 24 40       	lea    0x40(%rsp),%rcx
+ 55d:	48 8d 54 24 38       	lea    0x38(%rsp),%rdx
+ 562:	f3 0f 6f 4b 10       	movdqu 0x10(%rbx),%xmm1
+ 567:	f3 0f 6f 53 20       	movdqu 0x20(%rbx),%xmm2
+ 56c:	48 8d 74 24 78       	lea    0x78(%rsp),%rsi
+ 571:	48 8d 7c 24 68       	lea    0x68(%rsp),%rdi
+ 576:	48 89 84 24 10 01 00 	mov    %rax,0x110(%rsp)
+ 57d:	00 
+ 57e:	48 8d 84 24 d0 00 00 	lea    0xd0(%rsp),%rax
+ 585:	00 
+ 586:	f3 0f 6f 5b 30       	movdqu 0x30(%rbx),%xmm3
+ 58b:	66 48 0f 6e c0       	movq   %rax,%xmm0
+ 590:	48 8d 44 24 28       	lea    0x28(%rsp),%rax
+ 595:	4c 89 74 24 18       	mov    %r14,0x18(%rsp)
+ 59a:	66 48 0f 6e e0       	movq   %rax,%xmm4
+ 59f:	48 8d 44 24 30       	lea    0x30(%rsp),%rax
+ 5a4:	4c 89 6c 24 20       	mov    %r13,0x20(%rsp)
+ 5a9:	66 0f 6c c4          	punpcklqdq %xmm4,%xmm0
+ 5ad:	4c 89 64 24 28       	mov    %r12,0x28(%rsp)
+ 5b2:	0f 29 84 24 a0 00 00 	movaps %xmm0,0xa0(%rsp)
+ 5b9:	00 
+ 5ba:	66 48 0f 6e c0       	movq   %rax,%xmm0
+ 5bf:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+ 5c4:	66 48 0f 6e e8       	movq   %rax,%xmm5
+ 5c9:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+ 5ce:	48 89 6c 24 30       	mov    %rbp,0x30(%rsp)
+ 5d3:	48 89 84 24 c0 00 00 	mov    %rax,0xc0(%rsp)
+ 5da:	00 
+ 5db:	66 0f 6c c5          	punpcklqdq %xmm5,%xmm0
+ 5df:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 5e6 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x4a6>
+ 5e6:	c7 44 24 70 01 00 00 	movl   $0x1,0x70(%rsp)
+ 5ed:	00 
+ 5ee:	48 89 44 24 68       	mov    %rax,0x68(%rsp)
+ 5f3:	48 89 44 24 78       	mov    %rax,0x78(%rsp)
+ 5f8:	c7 84 24 80 00 00 00 	movl   $0x1,0x80(%rsp)
+ 5ff:	01 00 00 00 
+ 603:	0f 29 bc 24 d0 00 00 	movaps %xmm7,0xd0(%rsp)
+ 60a:	00 
+ 60b:	0f 29 8c 24 e0 00 00 	movaps %xmm1,0xe0(%rsp)
+ 612:	00 
+ 613:	0f 29 94 24 f0 00 00 	movaps %xmm2,0xf0(%rsp)
+ 61a:	00 
+ 61b:	0f 29 9c 24 00 01 00 	movaps %xmm3,0x100(%rsp)
+ 622:	00 
+ 623:	0f 29 84 24 b0 00 00 	movaps %xmm0,0xb0(%rsp)
+ 62a:	00 
+ 62b:	e8 00 00 00 00       	call   630 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x4f0>
+ 630:	85 c0                	test   %eax,%eax
+ 632:	0f 85 d3 fc ff ff    	jne    30b <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1cb>
+ 638:	48 8b 74 24 68       	mov    0x68(%rsp),%rsi
+ 63d:	8b 54 24 70          	mov    0x70(%rsp),%edx
+ 641:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 648 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x508>
+ 648:	48 8b 4c 24 78       	mov    0x78(%rsp),%rcx
+ 64d:	44 8b 84 24 80 00 00 	mov    0x80(%rsp),%r8d
+ 654:	00 
+ 655:	48 89 b4 24 94 00 00 	mov    %rsi,0x94(%rsp)
+ 65c:	00 
+ 65d:	89 94 24 9c 00 00 00 	mov    %edx,0x9c(%rsp)
+ 664:	48 89 8c 24 88 00 00 	mov    %rcx,0x88(%rsp)
+ 66b:	00 
+ 66c:	44 89 84 24 90 00 00 	mov    %r8d,0x90(%rsp)
+ 673:	00 
+ 674:	ff 74 24 40          	push   0x40(%rsp)
+ 678:	ff 74 24 40          	push   0x40(%rsp)
+ 67c:	4c 8d 8c 24 b0 00 00 	lea    0xb0(%rsp),%r9
+ 683:	00 
+ 684:	e8 00 00 00 00       	call   689 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x549>
+ 689:	5f                   	pop    %rdi
+ 68a:	41 58                	pop    %r8
+ 68c:	e9 7a fc ff ff       	jmp    30b <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1cb>
+ 691:	89 54 24 78          	mov    %edx,0x78(%rsp)
+ 695:	4d 89 f9             	mov    %r15,%r9
+ 698:	b9 01 00 00 00       	mov    $0x1,%ecx
+ 69d:	41 b8 80 f8 01 00    	mov    $0x1f880,%r8d
+ 6a3:	89 44 24 7c          	mov    %eax,0x7c(%rsp)
+ 6a7:	48 8b 7c 24 78       	mov    0x78(%rsp),%rdi
+ 6ac:	48 ba 00 01 00 00 01 	movabs $0x100000100,%rdx
+ 6b3:	00 00 00 
+ 6b6:	be 01 00 00 00       	mov    $0x1,%esi
+ 6bb:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 6c2 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x582>
+ 6c2:	c7 44 24 50 01 00 00 	movl   $0x1,0x50(%rsp)
+ 6c9:	00 
+ 6ca:	c7 84 24 80 00 00 00 	movl   $0x1,0x80(%rsp)
+ 6d1:	01 00 00 00 
+ 6d5:	48 89 44 24 48       	mov    %rax,0x48(%rsp)
+ 6da:	e8 00 00 00 00       	call   6df <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x59f>
+ 6df:	85 c0                	test   %eax,%eax
+ 6e1:	0f 85 24 fc ff ff    	jne    30b <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1cb>
+ 6e7:	48 8b 43 40          	mov    0x40(%rbx),%rax
+ 6eb:	f3 0f 6f 2b          	movdqu (%rbx),%xmm5
+ 6ef:	48 8d 4c 24 40       	lea    0x40(%rsp),%rcx
+ 6f4:	48 8d 54 24 38       	lea    0x38(%rsp),%rdx
+ 6f9:	f3 0f 6f 73 10       	movdqu 0x10(%rbx),%xmm6
+ 6fe:	f3 0f 6f 7b 20       	movdqu 0x20(%rbx),%xmm7
+ 703:	48 8d 74 24 68       	lea    0x68(%rsp),%rsi
+ 708:	48 8d 7c 24 58       	lea    0x58(%rsp),%rdi
+ 70d:	48 89 84 24 10 01 00 	mov    %rax,0x110(%rsp)
+ 714:	00 
+ 715:	48 8d 84 24 d0 00 00 	lea    0xd0(%rsp),%rax
+ 71c:	00 
+ 71d:	f3 0f 6f 4b 30       	movdqu 0x30(%rbx),%xmm1
+ 722:	66 48 0f 6e c0       	movq   %rax,%xmm0
+ 727:	48 8d 44 24 28       	lea    0x28(%rsp),%rax
+ 72c:	4c 89 74 24 18       	mov    %r14,0x18(%rsp)
+ 731:	66 48 0f 6e d0       	movq   %rax,%xmm2
+ 736:	48 8d 44 24 30       	lea    0x30(%rsp),%rax
+ 73b:	4c 89 6c 24 20       	mov    %r13,0x20(%rsp)
+ 740:	66 0f 6c c2          	punpcklqdq %xmm2,%xmm0
+ 744:	4c 89 64 24 28       	mov    %r12,0x28(%rsp)
+ 749:	0f 29 84 24 a0 00 00 	movaps %xmm0,0xa0(%rsp)
+ 750:	00 
+ 751:	66 48 0f 6e c0       	movq   %rax,%xmm0
+ 756:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+ 75b:	66 48 0f 6e d8       	movq   %rax,%xmm3
+ 760:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+ 765:	48 89 6c 24 30       	mov    %rbp,0x30(%rsp)
+ 76a:	48 89 84 24 c0 00 00 	mov    %rax,0xc0(%rsp)
+ 771:	00 
+ 772:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 779 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x639>
+ 779:	66 0f 6c c3          	punpcklqdq %xmm3,%xmm0
+ 77d:	c7 44 24 60 01 00 00 	movl   $0x1,0x60(%rsp)
+ 784:	00 
+ 785:	48 89 44 24 58       	mov    %rax,0x58(%rsp)
+ 78a:	48 89 44 24 68       	mov    %rax,0x68(%rsp)
+ 78f:	c7 44 24 70 01 00 00 	movl   $0x1,0x70(%rsp)
+ 796:	00 
+ 797:	0f 29 ac 24 d0 00 00 	movaps %xmm5,0xd0(%rsp)
+ 79e:	00 
+ 79f:	0f 29 b4 24 e0 00 00 	movaps %xmm6,0xe0(%rsp)
+ 7a6:	00 
+ 7a7:	0f 29 bc 24 f0 00 00 	movaps %xmm7,0xf0(%rsp)
+ 7ae:	00 
+ 7af:	0f 29 8c 24 00 01 00 	movaps %xmm1,0x100(%rsp)
+ 7b6:	00 
+ 7b7:	0f 29 84 24 b0 00 00 	movaps %xmm0,0xb0(%rsp)
+ 7be:	00 
+ 7bf:	e8 00 00 00 00       	call   7c4 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x684>
+ 7c4:	85 c0                	test   %eax,%eax
+ 7c6:	0f 85 3f fb ff ff    	jne    30b <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1cb>
+ 7cc:	48 8b 74 24 58       	mov    0x58(%rsp),%rsi
+ 7d1:	8b 54 24 60          	mov    0x60(%rsp),%edx
+ 7d5:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 7dc <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x69c>
+ 7dc:	48 8b 4c 24 68       	mov    0x68(%rsp),%rcx
+ 7e1:	44 8b 44 24 70       	mov    0x70(%rsp),%r8d
+ 7e6:	48 89 b4 24 94 00 00 	mov    %rsi,0x94(%rsp)
+ 7ed:	00 
+ 7ee:	89 94 24 9c 00 00 00 	mov    %edx,0x9c(%rsp)
+ 7f5:	48 89 8c 24 88 00 00 	mov    %rcx,0x88(%rsp)
+ 7fc:	00 
+ 7fd:	44 89 84 24 90 00 00 	mov    %r8d,0x90(%rsp)
+ 804:	00 
+ 805:	ff 74 24 40          	push   0x40(%rsp)
+ 809:	ff 74 24 40          	push   0x40(%rsp)
+ 80d:	4c 8d 8c 24 b0 00 00 	lea    0xb0(%rsp),%r9
+ 814:	00 
+ 815:	e8 00 00 00 00       	call   81a <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x6da>
+ 81a:	58                   	pop    %rax
+ 81b:	5a                   	pop    %rdx
+ 81c:	e9 ea fa ff ff       	jmp    30b <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1cb>
+ 821:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+ 828:	48 8b 43 40          	mov    0x40(%rbx),%rax
+ 82c:	f3 0f 6f 0b          	movdqu (%rbx),%xmm1
+ 830:	48 8d 4c 24 40       	lea    0x40(%rsp),%rcx
+ 835:	48 8d 54 24 38       	lea    0x38(%rsp),%rdx
+ 83a:	f3 0f 6f 53 10       	movdqu 0x10(%rbx),%xmm2
+ 83f:	f3 0f 6f 5b 20       	movdqu 0x20(%rbx),%xmm3
+ 844:	48 8d 74 24 78       	lea    0x78(%rsp),%rsi
+ 849:	48 8d 7c 24 68       	lea    0x68(%rsp),%rdi
+ 84e:	48 89 84 24 10 01 00 	mov    %rax,0x110(%rsp)
+ 855:	00 
+ 856:	48 8d 84 24 d0 00 00 	lea    0xd0(%rsp),%rax
+ 85d:	00 
+ 85e:	f3 0f 6f 63 30       	movdqu 0x30(%rbx),%xmm4
+ 863:	66 48 0f 6e c0       	movq   %rax,%xmm0
+ 868:	48 8d 44 24 28       	lea    0x28(%rsp),%rax
+ 86d:	4c 89 74 24 18       	mov    %r14,0x18(%rsp)
+ 872:	66 48 0f 6e e8       	movq   %rax,%xmm5
+ 877:	48 8d 44 24 30       	lea    0x30(%rsp),%rax
+ 87c:	4c 89 6c 24 20       	mov    %r13,0x20(%rsp)
+ 881:	66 0f 6c c5          	punpcklqdq %xmm5,%xmm0
+ 885:	4c 89 64 24 28       	mov    %r12,0x28(%rsp)
+ 88a:	0f 29 84 24 a0 00 00 	movaps %xmm0,0xa0(%rsp)
+ 891:	00 
+ 892:	66 48 0f 6e c0       	movq   %rax,%xmm0
+ 897:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+ 89c:	66 48 0f 6e f0       	movq   %rax,%xmm6
+ 8a1:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+ 8a6:	48 89 6c 24 30       	mov    %rbp,0x30(%rsp)
+ 8ab:	48 89 84 24 c0 00 00 	mov    %rax,0xc0(%rsp)
+ 8b2:	00 
+ 8b3:	66 0f 6c c6          	punpcklqdq %xmm6,%xmm0
+ 8b7:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 8be <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x77e>
+ 8be:	c7 44 24 70 01 00 00 	movl   $0x1,0x70(%rsp)
+ 8c5:	00 
+ 8c6:	48 89 44 24 68       	mov    %rax,0x68(%rsp)
+ 8cb:	48 89 44 24 78       	mov    %rax,0x78(%rsp)
+ 8d0:	c7 84 24 80 00 00 00 	movl   $0x1,0x80(%rsp)
+ 8d7:	01 00 00 00 
+ 8db:	0f 29 8c 24 d0 00 00 	movaps %xmm1,0xd0(%rsp)
+ 8e2:	00 
+ 8e3:	0f 29 94 24 e0 00 00 	movaps %xmm2,0xe0(%rsp)
+ 8ea:	00 
+ 8eb:	0f 29 9c 24 f0 00 00 	movaps %xmm3,0xf0(%rsp)
+ 8f2:	00 
+ 8f3:	0f 29 a4 24 00 01 00 	movaps %xmm4,0x100(%rsp)
+ 8fa:	00 
+ 8fb:	0f 29 84 24 b0 00 00 	movaps %xmm0,0xb0(%rsp)
+ 902:	00 
+ 903:	e8 00 00 00 00       	call   908 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x7c8>
+ 908:	85 c0                	test   %eax,%eax
+ 90a:	0f 85 fb f9 ff ff    	jne    30b <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1cb>
+ 910:	48 8b 74 24 68       	mov    0x68(%rsp),%rsi
+ 915:	8b 54 24 70          	mov    0x70(%rsp),%edx
+ 919:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 920 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x7e0>
+ 920:	48 8b 4c 24 78       	mov    0x78(%rsp),%rcx
+ 925:	44 8b 84 24 80 00 00 	mov    0x80(%rsp),%r8d
+ 92c:	00 
+ 92d:	48 89 b4 24 94 00 00 	mov    %rsi,0x94(%rsp)
+ 934:	00 
+ 935:	89 94 24 9c 00 00 00 	mov    %edx,0x9c(%rsp)
+ 93c:	48 89 8c 24 88 00 00 	mov    %rcx,0x88(%rsp)
+ 943:	00 
+ 944:	44 89 84 24 90 00 00 	mov    %r8d,0x90(%rsp)
+ 94b:	00 
+ 94c:	ff 74 24 40          	push   0x40(%rsp)
+ 950:	ff 74 24 40          	push   0x40(%rsp)
+ 954:	4c 8d 8c 24 b0 00 00 	lea    0xb0(%rsp),%r9
+ 95b:	00 
+ 95c:	e8 00 00 00 00       	call   961 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x821>
+ 961:	41 59                	pop    %r9
+ 963:	41 5a                	pop    %r10
+ 965:	e9 a1 f9 ff ff       	jmp    30b <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1cb>
+ 96a:	e9 00 00 00 00       	jmp    96f <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x82f>
+ 96f:	90                   	nop
+
+0000000000000970 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)>:
+ 970:	55                   	push   %rbp
+ 971:	53                   	push   %rbx
+ 972:	48 83 ec 08          	sub    $0x8,%rsp
+ 976:	83 fe 01             	cmp    $0x1,%esi
+ 979:	0f 87 00 00 00 00    	ja     97f <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0xf>
+ 97f:	89 f3                	mov    %esi,%ebx
+ 981:	31 f6                	xor    %esi,%esi
+ 983:	48 89 fd             	mov    %rdi,%rbp
+ 986:	e8 00 00 00 00       	call   98b <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0x1b>
+ 98b:	84 c0                	test   %al,%al
+ 98d:	0f 84 00 00 00 00    	je     993 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0x23>
+ 993:	83 fb 01             	cmp    $0x1,%ebx
+ 996:	48 19 c9             	sbb    %rcx,%rcx
+ 999:	48 83 e1 e0          	and    $0xffffffffffffffe0,%rcx
+ 99d:	48 83 c1 40          	add    $0x40,%rcx
+ 9a1:	f6 45 00 7f          	testb  $0x7f,0x0(%rbp)
+ 9a5:	0f 85 00 00 00 00    	jne    9ab <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0x3b>
+ 9ab:	48 8b 45 08          	mov    0x8(%rbp),%rax
+ 9af:	48 99                	cqto
+ 9b1:	48 f7 f9             	idiv   %rcx
+ 9b4:	48 85 d2             	test   %rdx,%rdx
+ 9b7:	0f 85 00 00 00 00    	jne    9bd <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0x4d>
+ 9bd:	f6 45 10 3f          	testb  $0x3f,0x10(%rbp)
+ 9c1:	0f 85 00 00 00 00    	jne    9c7 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0x57>
+ 9c7:	f6 45 18 07          	testb  $0x7,0x18(%rbp)
+ 9cb:	0f 85 00 00 00 00    	jne    9d1 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0x61>
+ 9d1:	f6 45 20 07          	testb  $0x7,0x20(%rbp)
+ 9d5:	0f 85 00 00 00 00    	jne    9db <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0x6b>
+ 9db:	8b 45 3c             	mov    0x3c(%rbp),%eax
+ 9de:	85 c0                	test   %eax,%eax
+ 9e0:	75 26                	jne    a08 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0x98>
+ 9e2:	85 db                	test   %ebx,%ebx
+ 9e4:	75 12                	jne    9f8 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0x88>
+ 9e6:	48 83 c4 08          	add    $0x8,%rsp
+ 9ea:	5b                   	pop    %rbx
+ 9eb:	5d                   	pop    %rbp
+ 9ec:	e9 00 00 00 00       	jmp    9f1 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0x81>
+ 9f1:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+ 9f8:	48 83 c4 08          	add    $0x8,%rsp
+ 9fc:	5b                   	pop    %rbx
+ 9fd:	5d                   	pop    %rbp
+ 9fe:	e9 00 00 00 00       	jmp    a03 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0x93>
+ a03:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+ a08:	85 db                	test   %ebx,%ebx
+ a0a:	75 14                	jne    a20 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0xb0>
+ a0c:	48 83 c4 08          	add    $0x8,%rsp
+ a10:	5b                   	pop    %rbx
+ a11:	5d                   	pop    %rbp
+ a12:	e9 00 00 00 00       	jmp    a17 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0xa7>
+ a17:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+ a1e:	00 00 
+ a20:	48 83 c4 08          	add    $0x8,%rsp
+ a24:	5b                   	pop    %rbx
+ a25:	5d                   	pop    %rbp
+ a26:	e9 00 00 00 00       	jmp    a2b <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int)+0xbb>
+
+Disassembly of section .text._ZN7megafmm70_GLOBAL__N__ecdfa312_37_megakernel_wgmma_wait1_three_stage_cu_d359bbda32winograd_wgmma_wait1_three_stageIN7cutlass10bfloat16_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf:
+
+0000000000000000 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::bfloat16_t, 16>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)>:
+   0:	48 81 ec a8 00 00 00 	sub    $0xa8,%rsp
+   7:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+   c:	48 89 54 24 08       	mov    %rdx,0x8(%rsp)
+  11:	48 8d 94 24 b0 00 00 	lea    0xb0(%rsp),%rdx
+  18:	00 
+  19:	66 48 0f 6e c2       	movq   %rdx,%xmm0
+  1e:	66 48 0f 6e c8       	movq   %rax,%xmm1
+  23:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+  28:	48 89 4c 24 10       	mov    %rcx,0x10(%rsp)
+  2d:	66 0f 6c c1          	punpcklqdq %xmm1,%xmm0
+  31:	48 89 7c 24 18       	mov    %rdi,0x18(%rsp)
+  36:	48 8d 4c 24 30       	lea    0x30(%rsp),%rcx
+  3b:	48 8d 54 24 28       	lea    0x28(%rsp),%rdx
+  40:	0f 29 44 24 70       	movaps %xmm0,0x70(%rsp)
+  45:	66 48 0f 6e c0       	movq   %rax,%xmm0
+  4a:	48 8d 44 24 08       	lea    0x8(%rsp),%rax
+  4f:	48 8d 7c 24 38       	lea    0x38(%rsp),%rdi
+  54:	66 48 0f 6e d0       	movq   %rax,%xmm2
+  59:	48 8d 44 24 10       	lea    0x10(%rsp),%rax
+  5e:	48 89 74 24 20       	mov    %rsi,0x20(%rsp)
+  63:	48 8d 74 24 48       	lea    0x48(%rsp),%rsi
+  68:	48 89 84 24 90 00 00 	mov    %rax,0x90(%rsp)
+  6f:	00 
+  70:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 77 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::bfloat16_t, 16>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)+0x77>
+  77:	66 0f 6c c2          	punpcklqdq %xmm2,%xmm0
+  7b:	c7 44 24 40 01 00 00 	movl   $0x1,0x40(%rsp)
+  82:	00 
+  83:	48 89 44 24 38       	mov    %rax,0x38(%rsp)
+  88:	48 89 44 24 48       	mov    %rax,0x48(%rsp)
+  8d:	c7 44 24 50 01 00 00 	movl   $0x1,0x50(%rsp)
+  94:	00 
+  95:	0f 29 84 24 80 00 00 	movaps %xmm0,0x80(%rsp)
+  9c:	00 
+  9d:	e8 00 00 00 00       	call   a2 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::bfloat16_t, 16>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)+0xa2>
+  a2:	85 c0                	test   %eax,%eax
+  a4:	75 31                	jne    d7 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::bfloat16_t, 16>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)+0xd7>
+  a6:	ff 74 24 30          	push   0x30(%rsp)
+  aa:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # b1 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::bfloat16_t, 16>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)+0xb1>
+  b1:	ff 74 24 30          	push   0x30(%rsp)
+  b5:	48 8b 4c 24 58       	mov    0x58(%rsp),%rcx
+  ba:	44 8b 44 24 60       	mov    0x60(%rsp),%r8d
+  bf:	48 8b 74 24 48       	mov    0x48(%rsp),%rsi
+  c4:	8b 54 24 50          	mov    0x50(%rsp),%edx
+  c8:	4c 8d 8c 24 80 00 00 	lea    0x80(%rsp),%r9
+  cf:	00 
+  d0:	e8 00 00 00 00       	call   d5 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::bfloat16_t, 16>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)+0xd5>
+  d5:	58                   	pop    %rax
+  d6:	5a                   	pop    %rdx
+  d7:	48 81 c4 a8 00 00 00 	add    $0xa8,%rsp
+  de:	c3                   	ret
+
+Disassembly of section .text._ZN7megafmm70_GLOBAL__N__ecdfa312_37_megakernel_wgmma_wait1_three_stage_cu_d359bbda32winograd_wgmma_wait1_three_stageIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf:
+
+0000000000000000 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::bfloat16_t, 32>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)>:
+   0:	48 81 ec a8 00 00 00 	sub    $0xa8,%rsp
+   7:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+   c:	48 89 54 24 08       	mov    %rdx,0x8(%rsp)
+  11:	48 8d 94 24 b0 00 00 	lea    0xb0(%rsp),%rdx
+  18:	00 
+  19:	66 48 0f 6e c2       	movq   %rdx,%xmm0
+  1e:	66 48 0f 6e c8       	movq   %rax,%xmm1
+  23:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+  28:	48 89 4c 24 10       	mov    %rcx,0x10(%rsp)
+  2d:	66 0f 6c c1          	punpcklqdq %xmm1,%xmm0
+  31:	48 89 7c 24 18       	mov    %rdi,0x18(%rsp)
+  36:	48 8d 4c 24 30       	lea    0x30(%rsp),%rcx
+  3b:	48 8d 54 24 28       	lea    0x28(%rsp),%rdx
+  40:	0f 29 44 24 70       	movaps %xmm0,0x70(%rsp)
+  45:	66 48 0f 6e c0       	movq   %rax,%xmm0
+  4a:	48 8d 44 24 08       	lea    0x8(%rsp),%rax
+  4f:	48 8d 7c 24 38       	lea    0x38(%rsp),%rdi
+  54:	66 48 0f 6e d0       	movq   %rax,%xmm2
+  59:	48 8d 44 24 10       	lea    0x10(%rsp),%rax
+  5e:	48 89 74 24 20       	mov    %rsi,0x20(%rsp)
+  63:	48 8d 74 24 48       	lea    0x48(%rsp),%rsi
+  68:	48 89 84 24 90 00 00 	mov    %rax,0x90(%rsp)
+  6f:	00 
+  70:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 77 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::bfloat16_t, 32>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)+0x77>
+  77:	66 0f 6c c2          	punpcklqdq %xmm2,%xmm0
+  7b:	c7 44 24 40 01 00 00 	movl   $0x1,0x40(%rsp)
+  82:	00 
+  83:	48 89 44 24 38       	mov    %rax,0x38(%rsp)
+  88:	48 89 44 24 48       	mov    %rax,0x48(%rsp)
+  8d:	c7 44 24 50 01 00 00 	movl   $0x1,0x50(%rsp)
+  94:	00 
+  95:	0f 29 84 24 80 00 00 	movaps %xmm0,0x80(%rsp)
+  9c:	00 
+  9d:	e8 00 00 00 00       	call   a2 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::bfloat16_t, 32>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)+0xa2>
+  a2:	85 c0                	test   %eax,%eax
+  a4:	75 31                	jne    d7 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::bfloat16_t, 32>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)+0xd7>
+  a6:	ff 74 24 30          	push   0x30(%rsp)
+  aa:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # b1 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::bfloat16_t, 32>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)+0xb1>
+  b1:	ff 74 24 30          	push   0x30(%rsp)
+  b5:	48 8b 4c 24 58       	mov    0x58(%rsp),%rcx
+  ba:	44 8b 44 24 60       	mov    0x60(%rsp),%r8d
+  bf:	48 8b 74 24 48       	mov    0x48(%rsp),%rsi
+  c4:	8b 54 24 50          	mov    0x50(%rsp),%edx
+  c8:	4c 8d 8c 24 80 00 00 	lea    0x80(%rsp),%r9
+  cf:	00 
+  d0:	e8 00 00 00 00       	call   d5 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::bfloat16_t, 32>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)+0xd5>
+  d5:	58                   	pop    %rax
+  d6:	5a                   	pop    %rdx
+  d7:	48 81 c4 a8 00 00 00 	add    $0xa8,%rsp
+  de:	c3                   	ret
+
+Disassembly of section .text._ZN7megafmm70_GLOBAL__N__ecdfa312_37_megakernel_wgmma_wait1_three_stage_cu_d359bbda32winograd_wgmma_wait1_three_stageIN7cutlass6half_tELi16EEEvNS_7ProblemEPKT_S7_PKfPf:
+
+0000000000000000 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::half_t, 16>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)>:
+   0:	48 81 ec a8 00 00 00 	sub    $0xa8,%rsp
+   7:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+   c:	48 89 54 24 08       	mov    %rdx,0x8(%rsp)
+  11:	48 8d 94 24 b0 00 00 	lea    0xb0(%rsp),%rdx
+  18:	00 
+  19:	66 48 0f 6e c2       	movq   %rdx,%xmm0
+  1e:	66 48 0f 6e c8       	movq   %rax,%xmm1
+  23:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+  28:	48 89 4c 24 10       	mov    %rcx,0x10(%rsp)
+  2d:	66 0f 6c c1          	punpcklqdq %xmm1,%xmm0
+  31:	48 89 7c 24 18       	mov    %rdi,0x18(%rsp)
+  36:	48 8d 4c 24 30       	lea    0x30(%rsp),%rcx
+  3b:	48 8d 54 24 28       	lea    0x28(%rsp),%rdx
+  40:	0f 29 44 24 70       	movaps %xmm0,0x70(%rsp)
+  45:	66 48 0f 6e c0       	movq   %rax,%xmm0
+  4a:	48 8d 44 24 08       	lea    0x8(%rsp),%rax
+  4f:	48 8d 7c 24 38       	lea    0x38(%rsp),%rdi
+  54:	66 48 0f 6e d0       	movq   %rax,%xmm2
+  59:	48 8d 44 24 10       	lea    0x10(%rsp),%rax
+  5e:	48 89 74 24 20       	mov    %rsi,0x20(%rsp)
+  63:	48 8d 74 24 48       	lea    0x48(%rsp),%rsi
+  68:	48 89 84 24 90 00 00 	mov    %rax,0x90(%rsp)
+  6f:	00 
+  70:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 77 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::half_t, 16>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)+0x77>
+  77:	66 0f 6c c2          	punpcklqdq %xmm2,%xmm0
+  7b:	c7 44 24 40 01 00 00 	movl   $0x1,0x40(%rsp)
+  82:	00 
+  83:	48 89 44 24 38       	mov    %rax,0x38(%rsp)
+  88:	48 89 44 24 48       	mov    %rax,0x48(%rsp)
+  8d:	c7 44 24 50 01 00 00 	movl   $0x1,0x50(%rsp)
+  94:	00 
+  95:	0f 29 84 24 80 00 00 	movaps %xmm0,0x80(%rsp)
+  9c:	00 
+  9d:	e8 00 00 00 00       	call   a2 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::half_t, 16>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)+0xa2>
+  a2:	85 c0                	test   %eax,%eax
+  a4:	75 31                	jne    d7 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::half_t, 16>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)+0xd7>
+  a6:	ff 74 24 30          	push   0x30(%rsp)
+  aa:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # b1 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::half_t, 16>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)+0xb1>
+  b1:	ff 74 24 30          	push   0x30(%rsp)
+  b5:	48 8b 4c 24 58       	mov    0x58(%rsp),%rcx
+  ba:	44 8b 44 24 60       	mov    0x60(%rsp),%r8d
+  bf:	48 8b 74 24 48       	mov    0x48(%rsp),%rsi
+  c4:	8b 54 24 50          	mov    0x50(%rsp),%edx
+  c8:	4c 8d 8c 24 80 00 00 	lea    0x80(%rsp),%r9
+  cf:	00 
+  d0:	e8 00 00 00 00       	call   d5 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::half_t, 16>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)+0xd5>
+  d5:	58                   	pop    %rax
+  d6:	5a                   	pop    %rdx
+  d7:	48 81 c4 a8 00 00 00 	add    $0xa8,%rsp
+  de:	c3                   	ret
+
+Disassembly of section .text._ZN7megafmm70_GLOBAL__N__ecdfa312_37_megakernel_wgmma_wait1_three_stage_cu_d359bbda32winograd_wgmma_wait1_three_stageIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf:
+
+0000000000000000 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::half_t, 32>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)>:
+   0:	48 81 ec a8 00 00 00 	sub    $0xa8,%rsp
+   7:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+   c:	48 89 54 24 08       	mov    %rdx,0x8(%rsp)
+  11:	48 8d 94 24 b0 00 00 	lea    0xb0(%rsp),%rdx
+  18:	00 
+  19:	66 48 0f 6e c2       	movq   %rdx,%xmm0
+  1e:	66 48 0f 6e c8       	movq   %rax,%xmm1
+  23:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+  28:	48 89 4c 24 10       	mov    %rcx,0x10(%rsp)
+  2d:	66 0f 6c c1          	punpcklqdq %xmm1,%xmm0
+  31:	48 89 7c 24 18       	mov    %rdi,0x18(%rsp)
+  36:	48 8d 4c 24 30       	lea    0x30(%rsp),%rcx
+  3b:	48 8d 54 24 28       	lea    0x28(%rsp),%rdx
+  40:	0f 29 44 24 70       	movaps %xmm0,0x70(%rsp)
+  45:	66 48 0f 6e c0       	movq   %rax,%xmm0
+  4a:	48 8d 44 24 08       	lea    0x8(%rsp),%rax
+  4f:	48 8d 7c 24 38       	lea    0x38(%rsp),%rdi
+  54:	66 48 0f 6e d0       	movq   %rax,%xmm2
+  59:	48 8d 44 24 10       	lea    0x10(%rsp),%rax
+  5e:	48 89 74 24 20       	mov    %rsi,0x20(%rsp)
+  63:	48 8d 74 24 48       	lea    0x48(%rsp),%rsi
+  68:	48 89 84 24 90 00 00 	mov    %rax,0x90(%rsp)
+  6f:	00 
+  70:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 77 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::half_t, 32>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)+0x77>
+  77:	66 0f 6c c2          	punpcklqdq %xmm2,%xmm0
+  7b:	c7 44 24 40 01 00 00 	movl   $0x1,0x40(%rsp)
+  82:	00 
+  83:	48 89 44 24 38       	mov    %rax,0x38(%rsp)
+  88:	48 89 44 24 48       	mov    %rax,0x48(%rsp)
+  8d:	c7 44 24 50 01 00 00 	movl   $0x1,0x50(%rsp)
+  94:	00 
+  95:	0f 29 84 24 80 00 00 	movaps %xmm0,0x80(%rsp)
+  9c:	00 
+  9d:	e8 00 00 00 00       	call   a2 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::half_t, 32>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)+0xa2>
+  a2:	85 c0                	test   %eax,%eax
+  a4:	75 31                	jne    d7 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::half_t, 32>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)+0xd7>
+  a6:	ff 74 24 30          	push   0x30(%rsp)
+  aa:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # b1 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::half_t, 32>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)+0xb1>
+  b1:	ff 74 24 30          	push   0x30(%rsp)
+  b5:	48 8b 4c 24 58       	mov    0x58(%rsp),%rcx
+  ba:	44 8b 44 24 60       	mov    0x60(%rsp),%r8d
+  bf:	48 8b 74 24 48       	mov    0x48(%rsp),%rsi
+  c4:	8b 54 24 50          	mov    0x50(%rsp),%edx
+  c8:	4c 8d 8c 24 80 00 00 	lea    0x80(%rsp),%r9
+  cf:	00 
+  d0:	e8 00 00 00 00       	call   d5 <void megafmm::(anonymous namespace)::winograd_wgmma_wait1_three_stage<cutlass::half_t, 32>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)+0xd5>
+  d5:	58                   	pop    %rax
+  d6:	5a                   	pop    %rdx
+  d7:	48 81 c4 a8 00 00 00 	add    $0xa8,%rsp
+  de:	c3                   	ret
+
+Disassembly of section .text.unlikely:
+
+0000000000000000 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>:
+   0:	bf 10 00 00 00       	mov    $0x10,%edi
+   5:	e8 00 00 00 00       	call   a <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0xa>
+   a:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 11 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x11>
+  11:	48 89 c7             	mov    %rax,%rdi
+  14:	48 89 c3             	mov    %rax,%rbx
+  17:	e8 00 00 00 00       	call   1c <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x1c>
+  1c:	48 8b 15 00 00 00 00 	mov    0x0(%rip),%rdx        # 23 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x23>
+  23:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 2a <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x2a>
+  2a:	48 89 df             	mov    %rbx,%rdi
+  2d:	e8 00 00 00 00       	call   32 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x32>
+  32:	48 89 c5             	mov    %rax,%rbp
+  35:	48 89 df             	mov    %rbx,%rdi
+  38:	e8 00 00 00 00       	call   3d <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x3d>
+  3d:	48 89 ef             	mov    %rbp,%rdi
+  40:	e8 00 00 00 00       	call   45 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x45>
+  45:	bf 10 00 00 00       	mov    $0x10,%edi
+  4a:	e8 00 00 00 00       	call   4f <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x4f>
+  4f:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 56 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x56>
+  56:	48 89 c7             	mov    %rax,%rdi
+  59:	48 89 c3             	mov    %rax,%rbx
+  5c:	e8 00 00 00 00       	call   61 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x61>
+  61:	48 8b 15 00 00 00 00 	mov    0x0(%rip),%rdx        # 68 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x68>
+  68:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 6f <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x6f>
+  6f:	48 89 df             	mov    %rbx,%rdi
+  72:	e8 00 00 00 00       	call   77 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x77>
+  77:	bf 10 00 00 00       	mov    $0x10,%edi
+  7c:	e8 00 00 00 00       	call   81 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x81>
+  81:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 88 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x88>
+  88:	48 89 c7             	mov    %rax,%rdi
+  8b:	48 89 c3             	mov    %rax,%rbx
+  8e:	e8 00 00 00 00       	call   93 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x93>
+  93:	48 8b 15 00 00 00 00 	mov    0x0(%rip),%rdx        # 9a <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x9a>
+  9a:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # a1 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0xa1>
+  a1:	48 89 df             	mov    %rbx,%rdi
+  a4:	e8 00 00 00 00       	call   a9 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0xa9>
+  a9:	48 89 c5             	mov    %rax,%rbp
+  ac:	48 89 df             	mov    %rbx,%rdi
+  af:	e8 00 00 00 00       	call   b4 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0xb4>
+  b4:	48 89 ef             	mov    %rbp,%rdi
+  b7:	e8 00 00 00 00       	call   bc <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0xbc>
+  bc:	48 89 c5             	mov    %rax,%rbp
+  bf:	48 89 df             	mov    %rbx,%rdi
+  c2:	e8 00 00 00 00       	call   c7 <megafmm::launch_wgmma_wait1_three_stage(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0xc7>
+  c7:	48 89 ef             	mov    %rbp,%rdi
+  ca:	e8 00 00 00 00       	call   cf <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]>
+
+00000000000000cf <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]>:
+  cf:	bf 10 00 00 00       	mov    $0x10,%edi
+  d4:	e8 00 00 00 00       	call   d9 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]+0xa>
+  d9:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # e0 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]+0x11>
+  e0:	48 89 c7             	mov    %rax,%rdi
+  e3:	48 89 c3             	mov    %rax,%rbx
+  e6:	e8 00 00 00 00       	call   eb <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]+0x1c>
+  eb:	48 8b 15 00 00 00 00 	mov    0x0(%rip),%rdx        # f2 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]+0x23>
+  f2:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # f9 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]+0x2a>
+  f9:	48 89 df             	mov    %rbx,%rdi
+  fc:	e8 00 00 00 00       	call   101 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]+0x32>
+ 101:	48 89 c5             	mov    %rax,%rbp
+ 104:	48 89 df             	mov    %rbx,%rdi
+ 107:	e8 00 00 00 00       	call   10c <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]+0x3d>
+ 10c:	48 89 ef             	mov    %rbp,%rdi
+ 10f:	e8 00 00 00 00       	call   114 <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]+0x45>
+
+Disassembly of section .text.startup:
+
+0000000000000000 <__sti____cudaRegisterAll()>:
+   0:	53                   	push   %rbx
+   1:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 8 <__sti____cudaRegisterAll()+0x8>
+   8:	e8 00 00 00 00       	call   d <__sti____cudaRegisterAll()+0xd>
+   d:	6a 00                	push   $0x0
+   f:	45 31 c9             	xor    %r9d,%r9d
+  12:	41 b8 ff ff ff ff    	mov    $0xffffffff,%r8d
+  18:	6a 00                	push   $0x0
+  1a:	48 8d 15 00 00 00 00 	lea    0x0(%rip),%rdx        # 21 <__sti____cudaRegisterAll()+0x21>
+  21:	48 89 c7             	mov    %rax,%rdi
+  24:	48 89 c3             	mov    %rax,%rbx
+  27:	6a 00                	push   $0x0
+  29:	48 89 d1             	mov    %rdx,%rcx
+  2c:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 33 <__sti____cudaRegisterAll()+0x33>
+  33:	6a 00                	push   $0x0
+  35:	48 89 05 00 00 00 00 	mov    %rax,0x0(%rip)        # 3c <__sti____cudaRegisterAll()+0x3c>
+  3c:	e8 00 00 00 00       	call   41 <__sti____cudaRegisterAll()+0x41>
+  41:	48 83 c4 20          	add    $0x20,%rsp
+  45:	48 89 df             	mov    %rbx,%rdi
+  48:	45 31 c9             	xor    %r9d,%r9d
+  4b:	6a 00                	push   $0x0
+  4d:	48 8d 15 00 00 00 00 	lea    0x0(%rip),%rdx        # 54 <__sti____cudaRegisterAll()+0x54>
+  54:	41 b8 ff ff ff ff    	mov    $0xffffffff,%r8d
+  5a:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 61 <__sti____cudaRegisterAll()+0x61>
+  61:	6a 00                	push   $0x0
+  63:	48 89 d1             	mov    %rdx,%rcx
+  66:	6a 00                	push   $0x0
+  68:	6a 00                	push   $0x0
+  6a:	e8 00 00 00 00       	call   6f <__sti____cudaRegisterAll()+0x6f>
+  6f:	48 83 c4 20          	add    $0x20,%rsp
+  73:	48 89 df             	mov    %rbx,%rdi
+  76:	45 31 c9             	xor    %r9d,%r9d
+  79:	6a 00                	push   $0x0
+  7b:	48 8d 15 00 00 00 00 	lea    0x0(%rip),%rdx        # 82 <__sti____cudaRegisterAll()+0x82>
+  82:	41 b8 ff ff ff ff    	mov    $0xffffffff,%r8d
+  88:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 8f <__sti____cudaRegisterAll()+0x8f>
+  8f:	6a 00                	push   $0x0
+  91:	48 89 d1             	mov    %rdx,%rcx
+  94:	6a 00                	push   $0x0
+  96:	6a 00                	push   $0x0
+  98:	e8 00 00 00 00       	call   9d <__sti____cudaRegisterAll()+0x9d>
+  9d:	48 83 c4 20          	add    $0x20,%rsp
+  a1:	48 89 df             	mov    %rbx,%rdi
+  a4:	45 31 c9             	xor    %r9d,%r9d
+  a7:	6a 00                	push   $0x0
+  a9:	48 8d 15 00 00 00 00 	lea    0x0(%rip),%rdx        # b0 <__sti____cudaRegisterAll()+0xb0>
+  b0:	41 b8 ff ff ff ff    	mov    $0xffffffff,%r8d
+  b6:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # bd <__sti____cudaRegisterAll()+0xbd>
+  bd:	6a 00                	push   $0x0
+  bf:	48 89 d1             	mov    %rdx,%rcx
+  c2:	6a 00                	push   $0x0
+  c4:	6a 00                	push   $0x0
+  c6:	e8 00 00 00 00       	call   cb <__sti____cudaRegisterAll()+0xcb>
+  cb:	48 83 c4 20          	add    $0x20,%rsp
+  cf:	48 89 df             	mov    %rbx,%rdi
+  d2:	45 31 c0             	xor    %r8d,%r8d
+  d5:	6a 00                	push   $0x0
+  d7:	48 8d 15 00 00 00 00 	lea    0x0(%rip),%rdx        # de <__sti____cudaRegisterAll()+0xde>
+  de:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+  e4:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # eb <__sti____cudaRegisterAll()+0xeb>
+  eb:	6a 00                	push   $0x0
+  ed:	48 89 d1             	mov    %rdx,%rcx
+  f0:	e8 00 00 00 00       	call   f5 <__sti____cudaRegisterAll()+0xf5>
+  f5:	58                   	pop    %rax
+  f6:	5a                   	pop    %rdx
+  f7:	6a 00                	push   $0x0
+  f9:	6a 00                	push   $0x0
+  fb:	48 8d 15 00 00 00 00 	lea    0x0(%rip),%rdx        # 102 <__sti____cudaRegisterAll()+0x102>
+ 102:	48 89 df             	mov    %rbx,%rdi
+ 105:	45 31 c0             	xor    %r8d,%r8d
+ 108:	48 89 d1             	mov    %rdx,%rcx
+ 10b:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+ 111:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 118 <__sti____cudaRegisterAll()+0x118>
+ 118:	e8 00 00 00 00       	call   11d <__sti____cudaRegisterAll()+0x11d>
+ 11d:	48 8b 3d 00 00 00 00 	mov    0x0(%rip),%rdi        # 124 <__sti____cudaRegisterAll()+0x124>
+ 124:	59                   	pop    %rcx
+ 125:	5e                   	pop    %rsi
+ 126:	e8 00 00 00 00       	call   12b <__sti____cudaRegisterAll()+0x12b>
+ 12b:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 132 <__sti____cudaRegisterAll()+0x132>
+ 132:	5b                   	pop    %rbx
+ 133:	e9 00 00 00 00       	jmp    138 <__sti____cudaRegisterAll()+0x138>
+ 138:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+ 13f:	00 
+
+0000000000000140 <_GLOBAL__sub_I__ZN7megafmm37wgmma_wait1_three_stage_can_implementERKNS_7ProblemEi>:
+ 140:	53                   	push   %rbx
+ 141:	48 8d 1d 00 00 00 00 	lea    0x0(%rip),%rbx        # 148 <_GLOBAL__sub_I__ZN7megafmm37wgmma_wait1_three_stage_can_implementERKNS_7ProblemEi+0x8>
+ 148:	48 89 df             	mov    %rbx,%rdi
+ 14b:	e8 00 00 00 00       	call   150 <_GLOBAL__sub_I__ZN7megafmm37wgmma_wait1_three_stage_can_implementERKNS_7ProblemEi+0x10>
+ 150:	48 8b 3d 00 00 00 00 	mov    0x0(%rip),%rdi        # 157 <_GLOBAL__sub_I__ZN7megafmm37wgmma_wait1_three_stage_can_implementERKNS_7ProblemEi+0x17>
+ 157:	48 89 de             	mov    %rbx,%rsi
+ 15a:	5b                   	pop    %rbx
+ 15b:	48 8d 15 00 00 00 00 	lea    0x0(%rip),%rdx        # 162 <_GLOBAL__sub_I__ZN7megafmm37wgmma_wait1_three_stage_can_implementERKNS_7ProblemEi+0x22>
+ 162:	e9 00 00 00 00       	jmp    167 <_GLOBAL__sub_I__ZN7megafmm37wgmma_wait1_three_stage_can_implementERKNS_7ProblemEi+0x27>
+
+Disassembly of section .text._ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC2IS3_EEPKcRKS3_:
+
+0000000000000000 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)>:
+   0:	41 55                	push   %r13
+   2:	4c 8d 6f 10          	lea    0x10(%rdi),%r13
+   6:	41 54                	push   %r12
+   8:	55                   	push   %rbp
+   9:	53                   	push   %rbx
+   a:	48 83 ec 18          	sub    $0x18,%rsp
+   e:	4c 89 2f             	mov    %r13,(%rdi)
+  11:	48 85 f6             	test   %rsi,%rsi
+  14:	0f 84 8c 00 00 00    	je     a6 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)+0xa6>
+  1a:	48 89 fb             	mov    %rdi,%rbx
+  1d:	48 89 f7             	mov    %rsi,%rdi
+  20:	49 89 f4             	mov    %rsi,%r12
+  23:	e8 00 00 00 00       	call   28 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)+0x28>
+  28:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
+  2d:	48 89 c5             	mov    %rax,%rbp
+  30:	48 83 f8 0f          	cmp    $0xf,%rax
+  34:	77 3a                	ja     70 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)+0x70>
+  36:	48 83 f8 01          	cmp    $0x1,%rax
+  3a:	75 24                	jne    60 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)+0x60>
+  3c:	41 0f b6 14 24       	movzbl (%r12),%edx
+  41:	88 53 10             	mov    %dl,0x10(%rbx)
+  44:	48 89 43 08          	mov    %rax,0x8(%rbx)
+  48:	41 c6 44 05 00 00    	movb   $0x0,0x0(%r13,%rax,1)
+  4e:	48 83 c4 18          	add    $0x18,%rsp
+  52:	5b                   	pop    %rbx
+  53:	5d                   	pop    %rbp
+  54:	41 5c                	pop    %r12
+  56:	41 5d                	pop    %r13
+  58:	c3                   	ret
+  59:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+  60:	48 85 c0             	test   %rax,%rax
+  63:	74 df                	je     44 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)+0x44>
+  65:	eb 27                	jmp    8e <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)+0x8e>
+  67:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+  6e:	00 00 
+  70:	48 8d 74 24 08       	lea    0x8(%rsp),%rsi
+  75:	31 d2                	xor    %edx,%edx
+  77:	48 89 df             	mov    %rbx,%rdi
+  7a:	e8 00 00 00 00       	call   7f <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)+0x7f>
+  7f:	48 89 03             	mov    %rax,(%rbx)
+  82:	49 89 c5             	mov    %rax,%r13
+  85:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
+  8a:	48 89 43 10          	mov    %rax,0x10(%rbx)
+  8e:	4c 89 ef             	mov    %r13,%rdi
+  91:	48 89 ea             	mov    %rbp,%rdx
+  94:	4c 89 e6             	mov    %r12,%rsi
+  97:	e8 00 00 00 00       	call   9c <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)+0x9c>
+  9c:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
+  a1:	4c 8b 2b             	mov    (%rbx),%r13
+  a4:	eb 9e                	jmp    44 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)+0x44>
+  a6:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # ad <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)+0xad>
+  ad:	e8 00 00 00 00       	call   b2 <.LC7+0x1a>
+
+Disassembly of section .text._ZN7megafmm70_GLOBAL__N__ecdfa312_37_megakernel_wgmma_wait1_three_stage_cu_d359bbda37prepare_wgmma_wait1_three_stage_typedIN7cutlass10bfloat16_tELi16EEEvv:
+
+0000000000000000 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()>:
+   0:	41 54                	push   %r12
+   2:	ba 80 a4 01 00       	mov    $0x1a480,%edx
+   7:	be 08 00 00 00       	mov    $0x8,%esi
+   c:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 13 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x13>
+  13:	55                   	push   %rbp
+  14:	53                   	push   %rbx
+  15:	48 83 ec 50          	sub    $0x50,%rsp
+  19:	e8 00 00 00 00       	call   1e <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x1e>
+  1e:	85 c0                	test   %eax,%eax
+  20:	75 09                	jne    2b <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x2b>
+  22:	48 83 c4 50          	add    $0x50,%rsp
+  26:	5b                   	pop    %rbx
+  27:	5d                   	pop    %rbp
+  28:	41 5c                	pop    %r12
+  2a:	c3                   	ret
+  2b:	89 c3                	mov    %eax,%ebx
+  2d:	bf 10 00 00 00       	mov    $0x10,%edi
+  32:	e8 00 00 00 00       	call   37 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x37>
+  37:	89 df                	mov    %ebx,%edi
+  39:	48 89 c5             	mov    %rax,%rbp
+  3c:	e8 00 00 00 00       	call   41 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x41>
+  41:	4c 8d 64 24 10       	lea    0x10(%rsp),%r12
+  46:	48 8d 54 24 0f       	lea    0xf(%rsp),%rdx
+  4b:	48 89 c3             	mov    %rax,%rbx
+  4e:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 55 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x55>
+  55:	4c 89 e7             	mov    %r12,%rdi
+  58:	e8 00 00 00 00       	call   5d <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x5d>
+  5d:	48 89 de             	mov    %rbx,%rsi
+  60:	4c 89 e7             	mov    %r12,%rdi
+  63:	e8 00 00 00 00       	call   68 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x68>
+  68:	48 8d 5c 24 30       	lea    0x30(%rsp),%rbx
+  6d:	48 89 c6             	mov    %rax,%rsi
+  70:	48 89 df             	mov    %rbx,%rdi
+  73:	e8 00 00 00 00       	call   78 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x78>
+  78:	48 89 de             	mov    %rbx,%rsi
+  7b:	48 89 ef             	mov    %rbp,%rdi
+  7e:	e8 00 00 00 00       	call   83 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x83>
+  83:	48 8b 7c 24 30       	mov    0x30(%rsp),%rdi
+  88:	48 8d 44 24 40       	lea    0x40(%rsp),%rax
+  8d:	48 39 c7             	cmp    %rax,%rdi
+  90:	74 0e                	je     a0 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0xa0>
+  92:	48 8b 44 24 40       	mov    0x40(%rsp),%rax
+  97:	48 8d 70 01          	lea    0x1(%rax),%rsi
+  9b:	e8 00 00 00 00       	call   a0 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0xa0>
+  a0:	48 8b 7c 24 10       	mov    0x10(%rsp),%rdi
+  a5:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+  aa:	48 39 c7             	cmp    %rax,%rdi
+  ad:	74 0e                	je     bd <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0xbd>
+  af:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+  b4:	48 8d 70 01          	lea    0x1(%rax),%rsi
+  b8:	e8 00 00 00 00       	call   bd <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0xbd>
+  bd:	48 8b 15 00 00 00 00 	mov    0x0(%rip),%rdx        # c4 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0xc4>
+  c4:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # cb <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0xcb>
+  cb:	48 89 ef             	mov    %rbp,%rdi
+  ce:	e8 00 00 00 00       	call   d3 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0xd3>
+  d3:	48 89 c3             	mov    %rax,%rbx
+  d6:	eb 44                	jmp    11c <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x11c>
+  d8:	48 89 c3             	mov    %rax,%rbx
+  db:	eb 05                	jmp    e2 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0xe2>
+  dd:	48 89 c3             	mov    %rax,%rbx
+  e0:	eb 1d                	jmp    ff <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0xff>
+  e2:	48 8b 7c 24 30       	mov    0x30(%rsp),%rdi
+  e7:	48 8d 44 24 40       	lea    0x40(%rsp),%rax
+  ec:	48 39 c7             	cmp    %rax,%rdi
+  ef:	74 0e                	je     ff <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0xff>
+  f1:	48 8b 44 24 40       	mov    0x40(%rsp),%rax
+  f6:	48 8d 70 01          	lea    0x1(%rax),%rsi
+  fa:	e8 00 00 00 00       	call   ff <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0xff>
+  ff:	48 8b 7c 24 10       	mov    0x10(%rsp),%rdi
+ 104:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+ 109:	48 39 c7             	cmp    %rax,%rdi
+ 10c:	74 0e                	je     11c <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x11c>
+ 10e:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+ 113:	48 8d 70 01          	lea    0x1(%rax),%rsi
+ 117:	e8 00 00 00 00       	call   11c <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x11c>
+ 11c:	48 89 ef             	mov    %rbp,%rdi
+ 11f:	e8 00 00 00 00       	call   124 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 16>()+0x124>
+ 124:	48 89 df             	mov    %rbx,%rdi
+ 127:	e8 00 00 00 00       	call   12c <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]+0x5d>
+
+Disassembly of section .text._ZN7megafmm70_GLOBAL__N__ecdfa312_37_megakernel_wgmma_wait1_three_stage_cu_d359bbda37prepare_wgmma_wait1_three_stage_typedIN7cutlass10bfloat16_tELi32EEEvv:
+
+0000000000000000 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()>:
+   0:	41 54                	push   %r12
+   2:	ba 80 f8 01 00       	mov    $0x1f880,%edx
+   7:	be 08 00 00 00       	mov    $0x8,%esi
+   c:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 13 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x13>
+  13:	55                   	push   %rbp
+  14:	53                   	push   %rbx
+  15:	48 83 ec 50          	sub    $0x50,%rsp
+  19:	e8 00 00 00 00       	call   1e <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x1e>
+  1e:	85 c0                	test   %eax,%eax
+  20:	75 09                	jne    2b <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x2b>
+  22:	48 83 c4 50          	add    $0x50,%rsp
+  26:	5b                   	pop    %rbx
+  27:	5d                   	pop    %rbp
+  28:	41 5c                	pop    %r12
+  2a:	c3                   	ret
+  2b:	89 c3                	mov    %eax,%ebx
+  2d:	bf 10 00 00 00       	mov    $0x10,%edi
+  32:	e8 00 00 00 00       	call   37 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x37>
+  37:	89 df                	mov    %ebx,%edi
+  39:	48 89 c5             	mov    %rax,%rbp
+  3c:	e8 00 00 00 00       	call   41 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x41>
+  41:	4c 8d 64 24 10       	lea    0x10(%rsp),%r12
+  46:	48 8d 54 24 0f       	lea    0xf(%rsp),%rdx
+  4b:	48 89 c3             	mov    %rax,%rbx
+  4e:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 55 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x55>
+  55:	4c 89 e7             	mov    %r12,%rdi
+  58:	e8 00 00 00 00       	call   5d <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x5d>
+  5d:	48 89 de             	mov    %rbx,%rsi
+  60:	4c 89 e7             	mov    %r12,%rdi
+  63:	e8 00 00 00 00       	call   68 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x68>
+  68:	48 8d 5c 24 30       	lea    0x30(%rsp),%rbx
+  6d:	48 89 c6             	mov    %rax,%rsi
+  70:	48 89 df             	mov    %rbx,%rdi
+  73:	e8 00 00 00 00       	call   78 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x78>
+  78:	48 89 de             	mov    %rbx,%rsi
+  7b:	48 89 ef             	mov    %rbp,%rdi
+  7e:	e8 00 00 00 00       	call   83 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x83>
+  83:	48 8b 7c 24 30       	mov    0x30(%rsp),%rdi
+  88:	48 8d 44 24 40       	lea    0x40(%rsp),%rax
+  8d:	48 39 c7             	cmp    %rax,%rdi
+  90:	74 0e                	je     a0 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0xa0>
+  92:	48 8b 44 24 40       	mov    0x40(%rsp),%rax
+  97:	48 8d 70 01          	lea    0x1(%rax),%rsi
+  9b:	e8 00 00 00 00       	call   a0 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0xa0>
+  a0:	48 8b 7c 24 10       	mov    0x10(%rsp),%rdi
+  a5:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+  aa:	48 39 c7             	cmp    %rax,%rdi
+  ad:	74 0e                	je     bd <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0xbd>
+  af:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+  b4:	48 8d 70 01          	lea    0x1(%rax),%rsi
+  b8:	e8 00 00 00 00       	call   bd <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0xbd>
+  bd:	48 8b 15 00 00 00 00 	mov    0x0(%rip),%rdx        # c4 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0xc4>
+  c4:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # cb <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0xcb>
+  cb:	48 89 ef             	mov    %rbp,%rdi
+  ce:	e8 00 00 00 00       	call   d3 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0xd3>
+  d3:	48 89 c3             	mov    %rax,%rbx
+  d6:	eb 44                	jmp    11c <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x11c>
+  d8:	48 89 c3             	mov    %rax,%rbx
+  db:	eb 05                	jmp    e2 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0xe2>
+  dd:	48 89 c3             	mov    %rax,%rbx
+  e0:	eb 1d                	jmp    ff <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0xff>
+  e2:	48 8b 7c 24 30       	mov    0x30(%rsp),%rdi
+  e7:	48 8d 44 24 40       	lea    0x40(%rsp),%rax
+  ec:	48 39 c7             	cmp    %rax,%rdi
+  ef:	74 0e                	je     ff <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0xff>
+  f1:	48 8b 44 24 40       	mov    0x40(%rsp),%rax
+  f6:	48 8d 70 01          	lea    0x1(%rax),%rsi
+  fa:	e8 00 00 00 00       	call   ff <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0xff>
+  ff:	48 8b 7c 24 10       	mov    0x10(%rsp),%rdi
+ 104:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+ 109:	48 39 c7             	cmp    %rax,%rdi
+ 10c:	74 0e                	je     11c <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x11c>
+ 10e:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+ 113:	48 8d 70 01          	lea    0x1(%rax),%rsi
+ 117:	e8 00 00 00 00       	call   11c <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x11c>
+ 11c:	48 89 ef             	mov    %rbp,%rdi
+ 11f:	e8 00 00 00 00       	call   124 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::bfloat16_t, 32>()+0x124>
+ 124:	48 89 df             	mov    %rbx,%rdi
+ 127:	e8 00 00 00 00       	call   12c <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]+0x5d>
+
+Disassembly of section .text._ZN7megafmm70_GLOBAL__N__ecdfa312_37_megakernel_wgmma_wait1_three_stage_cu_d359bbda37prepare_wgmma_wait1_three_stage_typedIN7cutlass6half_tELi16EEEvv:
+
+0000000000000000 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()>:
+   0:	41 54                	push   %r12
+   2:	ba 80 a4 01 00       	mov    $0x1a480,%edx
+   7:	be 08 00 00 00       	mov    $0x8,%esi
+   c:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 13 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x13>
+  13:	55                   	push   %rbp
+  14:	53                   	push   %rbx
+  15:	48 83 ec 50          	sub    $0x50,%rsp
+  19:	e8 00 00 00 00       	call   1e <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x1e>
+  1e:	85 c0                	test   %eax,%eax
+  20:	75 09                	jne    2b <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x2b>
+  22:	48 83 c4 50          	add    $0x50,%rsp
+  26:	5b                   	pop    %rbx
+  27:	5d                   	pop    %rbp
+  28:	41 5c                	pop    %r12
+  2a:	c3                   	ret
+  2b:	89 c3                	mov    %eax,%ebx
+  2d:	bf 10 00 00 00       	mov    $0x10,%edi
+  32:	e8 00 00 00 00       	call   37 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x37>
+  37:	89 df                	mov    %ebx,%edi
+  39:	48 89 c5             	mov    %rax,%rbp
+  3c:	e8 00 00 00 00       	call   41 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x41>
+  41:	4c 8d 64 24 10       	lea    0x10(%rsp),%r12
+  46:	48 8d 54 24 0f       	lea    0xf(%rsp),%rdx
+  4b:	48 89 c3             	mov    %rax,%rbx
+  4e:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 55 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x55>
+  55:	4c 89 e7             	mov    %r12,%rdi
+  58:	e8 00 00 00 00       	call   5d <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x5d>
+  5d:	48 89 de             	mov    %rbx,%rsi
+  60:	4c 89 e7             	mov    %r12,%rdi
+  63:	e8 00 00 00 00       	call   68 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x68>
+  68:	48 8d 5c 24 30       	lea    0x30(%rsp),%rbx
+  6d:	48 89 c6             	mov    %rax,%rsi
+  70:	48 89 df             	mov    %rbx,%rdi
+  73:	e8 00 00 00 00       	call   78 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x78>
+  78:	48 89 de             	mov    %rbx,%rsi
+  7b:	48 89 ef             	mov    %rbp,%rdi
+  7e:	e8 00 00 00 00       	call   83 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x83>
+  83:	48 8b 7c 24 30       	mov    0x30(%rsp),%rdi
+  88:	48 8d 44 24 40       	lea    0x40(%rsp),%rax
+  8d:	48 39 c7             	cmp    %rax,%rdi
+  90:	74 0e                	je     a0 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0xa0>
+  92:	48 8b 44 24 40       	mov    0x40(%rsp),%rax
+  97:	48 8d 70 01          	lea    0x1(%rax),%rsi
+  9b:	e8 00 00 00 00       	call   a0 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0xa0>
+  a0:	48 8b 7c 24 10       	mov    0x10(%rsp),%rdi
+  a5:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+  aa:	48 39 c7             	cmp    %rax,%rdi
+  ad:	74 0e                	je     bd <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0xbd>
+  af:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+  b4:	48 8d 70 01          	lea    0x1(%rax),%rsi
+  b8:	e8 00 00 00 00       	call   bd <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0xbd>
+  bd:	48 8b 15 00 00 00 00 	mov    0x0(%rip),%rdx        # c4 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0xc4>
+  c4:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # cb <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0xcb>
+  cb:	48 89 ef             	mov    %rbp,%rdi
+  ce:	e8 00 00 00 00       	call   d3 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0xd3>
+  d3:	48 89 c3             	mov    %rax,%rbx
+  d6:	eb 44                	jmp    11c <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x11c>
+  d8:	48 89 c3             	mov    %rax,%rbx
+  db:	eb 05                	jmp    e2 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0xe2>
+  dd:	48 89 c3             	mov    %rax,%rbx
+  e0:	eb 1d                	jmp    ff <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0xff>
+  e2:	48 8b 7c 24 30       	mov    0x30(%rsp),%rdi
+  e7:	48 8d 44 24 40       	lea    0x40(%rsp),%rax
+  ec:	48 39 c7             	cmp    %rax,%rdi
+  ef:	74 0e                	je     ff <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0xff>
+  f1:	48 8b 44 24 40       	mov    0x40(%rsp),%rax
+  f6:	48 8d 70 01          	lea    0x1(%rax),%rsi
+  fa:	e8 00 00 00 00       	call   ff <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0xff>
+  ff:	48 8b 7c 24 10       	mov    0x10(%rsp),%rdi
+ 104:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+ 109:	48 39 c7             	cmp    %rax,%rdi
+ 10c:	74 0e                	je     11c <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x11c>
+ 10e:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+ 113:	48 8d 70 01          	lea    0x1(%rax),%rsi
+ 117:	e8 00 00 00 00       	call   11c <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x11c>
+ 11c:	48 89 ef             	mov    %rbp,%rdi
+ 11f:	e8 00 00 00 00       	call   124 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 16>()+0x124>
+ 124:	48 89 df             	mov    %rbx,%rdi
+ 127:	e8 00 00 00 00       	call   12c <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]+0x5d>
+
+Disassembly of section .text._ZN7megafmm70_GLOBAL__N__ecdfa312_37_megakernel_wgmma_wait1_three_stage_cu_d359bbda37prepare_wgmma_wait1_three_stage_typedIN7cutlass6half_tELi32EEEvv:
+
+0000000000000000 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()>:
+   0:	41 54                	push   %r12
+   2:	ba 80 f8 01 00       	mov    $0x1f880,%edx
+   7:	be 08 00 00 00       	mov    $0x8,%esi
+   c:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 13 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x13>
+  13:	55                   	push   %rbp
+  14:	53                   	push   %rbx
+  15:	48 83 ec 50          	sub    $0x50,%rsp
+  19:	e8 00 00 00 00       	call   1e <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x1e>
+  1e:	85 c0                	test   %eax,%eax
+  20:	75 09                	jne    2b <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x2b>
+  22:	48 83 c4 50          	add    $0x50,%rsp
+  26:	5b                   	pop    %rbx
+  27:	5d                   	pop    %rbp
+  28:	41 5c                	pop    %r12
+  2a:	c3                   	ret
+  2b:	89 c3                	mov    %eax,%ebx
+  2d:	bf 10 00 00 00       	mov    $0x10,%edi
+  32:	e8 00 00 00 00       	call   37 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x37>
+  37:	89 df                	mov    %ebx,%edi
+  39:	48 89 c5             	mov    %rax,%rbp
+  3c:	e8 00 00 00 00       	call   41 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x41>
+  41:	4c 8d 64 24 10       	lea    0x10(%rsp),%r12
+  46:	48 8d 54 24 0f       	lea    0xf(%rsp),%rdx
+  4b:	48 89 c3             	mov    %rax,%rbx
+  4e:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 55 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x55>
+  55:	4c 89 e7             	mov    %r12,%rdi
+  58:	e8 00 00 00 00       	call   5d <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x5d>
+  5d:	48 89 de             	mov    %rbx,%rsi
+  60:	4c 89 e7             	mov    %r12,%rdi
+  63:	e8 00 00 00 00       	call   68 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x68>
+  68:	48 8d 5c 24 30       	lea    0x30(%rsp),%rbx
+  6d:	48 89 c6             	mov    %rax,%rsi
+  70:	48 89 df             	mov    %rbx,%rdi
+  73:	e8 00 00 00 00       	call   78 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x78>
+  78:	48 89 de             	mov    %rbx,%rsi
+  7b:	48 89 ef             	mov    %rbp,%rdi
+  7e:	e8 00 00 00 00       	call   83 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x83>
+  83:	48 8b 7c 24 30       	mov    0x30(%rsp),%rdi
+  88:	48 8d 44 24 40       	lea    0x40(%rsp),%rax
+  8d:	48 39 c7             	cmp    %rax,%rdi
+  90:	74 0e                	je     a0 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0xa0>
+  92:	48 8b 44 24 40       	mov    0x40(%rsp),%rax
+  97:	48 8d 70 01          	lea    0x1(%rax),%rsi
+  9b:	e8 00 00 00 00       	call   a0 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0xa0>
+  a0:	48 8b 7c 24 10       	mov    0x10(%rsp),%rdi
+  a5:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+  aa:	48 39 c7             	cmp    %rax,%rdi
+  ad:	74 0e                	je     bd <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0xbd>
+  af:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+  b4:	48 8d 70 01          	lea    0x1(%rax),%rsi
+  b8:	e8 00 00 00 00       	call   bd <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0xbd>
+  bd:	48 8b 15 00 00 00 00 	mov    0x0(%rip),%rdx        # c4 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0xc4>
+  c4:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # cb <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0xcb>
+  cb:	48 89 ef             	mov    %rbp,%rdi
+  ce:	e8 00 00 00 00       	call   d3 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0xd3>
+  d3:	48 89 c3             	mov    %rax,%rbx
+  d6:	eb 44                	jmp    11c <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x11c>
+  d8:	48 89 c3             	mov    %rax,%rbx
+  db:	eb 05                	jmp    e2 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0xe2>
+  dd:	48 89 c3             	mov    %rax,%rbx
+  e0:	eb 1d                	jmp    ff <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0xff>
+  e2:	48 8b 7c 24 30       	mov    0x30(%rsp),%rdi
+  e7:	48 8d 44 24 40       	lea    0x40(%rsp),%rax
+  ec:	48 39 c7             	cmp    %rax,%rdi
+  ef:	74 0e                	je     ff <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0xff>
+  f1:	48 8b 44 24 40       	mov    0x40(%rsp),%rax
+  f6:	48 8d 70 01          	lea    0x1(%rax),%rsi
+  fa:	e8 00 00 00 00       	call   ff <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0xff>
+  ff:	48 8b 7c 24 10       	mov    0x10(%rsp),%rdi
+ 104:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+ 109:	48 39 c7             	cmp    %rax,%rdi
+ 10c:	74 0e                	je     11c <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x11c>
+ 10e:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+ 113:	48 8d 70 01          	lea    0x1(%rax),%rsi
+ 117:	e8 00 00 00 00       	call   11c <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x11c>
+ 11c:	48 89 ef             	mov    %rbp,%rdi
+ 11f:	e8 00 00 00 00       	call   124 <void megafmm::(anonymous namespace)::prepare_wgmma_wait1_three_stage_typed<cutlass::half_t, 32>()+0x124>
+ 124:	48 89 df             	mov    %rbx,%rdi
+ 127:	e8 00 00 00 00       	call   12c <megafmm::prepare_wgmma_wait1_three_stage(megafmm::Problem const&, int) [clone .cold]+0x5d>
