@@ -202,6 +202,13 @@ void launch_wgmma_pipeline(const Problem& p, const void* A, const void* B,
 // Three-bank vector producer wait1 consumer, native configs0/1 map to34/35.
 // Full/empty128 participation preserved; modulo3 phases and three tail acquires.
 // P3+4 independent consumer WGs; both native variants use BN32.
+// Native RS-A P3+4 BK64: raw A4 shared, final B7 shared, A transform in registers.
+// Config0 maps to39, BN32; parentK%128 and current AB16 guards are required.
+bool wgmma_psplit_rsa_can_implement(const Problem& p, int configuration=0);
+bool wgmma_psplit_rsa_full_tiles(const Problem& p, const void* A, const void* B, int configuration=0);
+void prepare_wgmma_psplit_rsa(const Problem& p, int configuration=0);
+void launch_wgmma_psplit_rsa(const Problem& p, const void* A, const void* B,
+    const float* C0, float* D, cudaStream_t stream, int configuration=0);
 // Native P3+4 BK64; parent K must be a multiple of128, same N32 atom.
 bool wgmma_psplit_bk64_can_implement(const Problem& p, int configuration=0);
 bool wgmma_psplit_bk64_full_tiles(const Problem& p, const void* A, const void* B, int configuration=0);

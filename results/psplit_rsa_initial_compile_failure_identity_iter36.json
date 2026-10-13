@@ -1,0 +1,24 @@
+{
+  "status": "FAIL_FRONTEND_SCALED_BASIS_FRAGMENT_LAYOUT",
+  "frozen_sources": {
+    "CMakeLists.txt": "0ef6d7c98ed77a6219e167b736f1be0dd444a5dd9c98d08181c449ef17be90aa",
+    "bench/benchmark.cu": "fbef3ab33e06a8da84a7374910d6479b13453d0ca3fb6b66077b6de38d18a087",
+    "include/megafmm/gemm.h": "85b33cb17987d331af8976a22fae8685902d52ef6b473d2b4a40e511ab031478",
+    "include/megafmm/kernels.h": "5dba548f0d8f06e93f0715de876748dcb96eccef1324b9d48d6bb81538719518",
+    "solution/plan.cpp": "49093988281bc7d6dd10b45211462494cde32c5276e9cede19601337331d627e",
+    "tests/test_correctness.cu": "4158a44c10d06bf9eb10278c5b4efbdae22ce010298a8db7c8dd3daef1c4eb69",
+    "solution/megakernel_wgmma_psplit_rsa.cu": "0cd222703ec5e1bfe5ef1221ccf23f414a1b57d65d2fdbb71921bbea0f694e5f"
+  },
+  "previous_unrebuilt_binaries": {
+    "build/megafmm_bench": "c7e60233d9413703d0a2abbdfc8951370a3e9866bb68ce4778e8cb490407aa64",
+    "build/test_correctness": "a999feca07d08ceda48196b76171ed79e71ca22120e0880ace58f85e8c291c36"
+  },
+  "raw_sha256": {
+    "results/psplit_rsa_initial_source_iter36.cu": "0cd222703ec5e1bfe5ef1221ccf23f414a1b57d65d2fdbb71921bbea0f694e5f",
+    "results/psplit_rsa_initial_build_iter36.txt": "efbbf35af457b3d908b5cd0e5232ddf03738b3d2339b6960f988c1ea6e4f326e",
+    "results/psplit_rsa_initial_build_iter36.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+  },
+  "build_exit": 2,
+  "diagnosis": "make_fragment_A(partition_A(identity)) forwards symbolic ScaledBasis coordinate strides into make_fragment_like numeric ordering; first operator< failure and cascaded gemm error-type failures. No new39 PTX/cubin/object produced, no new39 register/spill measurement. Old37 C7512 is retained old disabled native only.",
+  "new39_GPU_launches": 0
+}

@@ -1,0 +1,33 @@
+[  2%] Building CUDA object CMakeFiles/megafmm.dir/solution/megakernel_wgmma_psplit_rsa.cu.o
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm63_GLOBAL__N__b82550da_30_megakernel_wgmma_psplit_rsa_cu_5b5bb9d225winograd_wgmma_psplit_rsaIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm63_GLOBAL__N__b82550da_30_megakernel_wgmma_psplit_rsa_cu_5b5bb9d225winograd_wgmma_psplit_rsaIN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers
+ptxas info    : Compiling entry function '_ZN7megafmm63_GLOBAL__N__b82550da_30_megakernel_wgmma_psplit_rsa_cu_5b5bb9d225winograd_wgmma_psplit_rsaIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm63_GLOBAL__N__b82550da_30_megakernel_wgmma_psplit_rsa_cu_5b5bb9d225winograd_wgmma_psplit_rsaIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers
+[  5%] Linking CXX static library libmegafmm.a
+[ 94%] Built target megafmm
+gmake[3]: Warning: File 'CMakeFiles/megafmm_bench.dir/compiler_depend.make' has modification time 0.009 s in the future
+[ 97%] Building CUDA object CMakeFiles/megafmm_bench.dir/bench/benchmark.cu.o
+[100%] Linking CXX executable megafmm_bench
+gmake[3]: warning:  Clock skew detected.  Your build may be incomplete.
+[100%] Built target megafmm_bench
+[ 94%] Built target megafmm
+gmake[3]: Warning: File 'CMakeFiles/test_correctness.dir/compiler_depend.make' has modification time 0.01 s in the future
+[ 97%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(340): warning #177-D: variable "ac" was declared but never referenced
+    int ar=p.trans_a ? p.k:p.m, ac=p.trans_a ? p.m:p.k;
+                                ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(341): warning #177-D: variable "bc" was declared but never referenced
+    int br=p.trans_b ? p.n:p.k, bc=p.trans_b ? p.k:p.n;
+                                ^
+
+[100%] Linking CXX executable test_correctness
+gmake[3]: warning:  Clock skew detected.  Your build may be incomplete.
+[100%] Built target test_correctness

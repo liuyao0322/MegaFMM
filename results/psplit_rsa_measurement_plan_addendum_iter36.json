@@ -1,0 +1,45 @@
+{
+  "schema": "megafmm.iter36.premeasurement-plan-expansion.v1",
+  "chronology": "Owner received ROOT explicit scope expansion before any iteration36 timing/GPU launch. Original16 sourcepredeclaration is retained unmodified; expanded24source/binary finalfreeze and completedgate will be pinned before firsttiming.",
+  "original_plan": {
+    "path": "results/psplit_rsa1024_plan_iter36.json",
+    "sha256": "e484a3eb525b46fbb1e21f778510d0458064592332ef7c0624ebf7bc4ad2c44a",
+    "expected_rows": 16
+  },
+  "expanded_plan": {
+    "path": "results/psplit_rsa1024_expanded_plan_iter36.json",
+    "sha256_before_gate": "062bff18d5c94e07554f44a7162afb40b4b0bb9f20a76387ac617ab789e6ec6a",
+    "expected_rows": 24,
+    "before_gate_snapshot_path": "results/psplit_rsa_expanded_precompiled_plan_snapshot_iter36.json",
+    "before_gate_snapshot_provenance": "Byte-exact reconstruction verified against owner observed SHA062bff18 after routine premeasurement actual-name/launch-count additions; not a runtime backup. Original16 plan itself is preserved original bytes.",
+    "final_sha256": "b3054f6da2addbf872d066e0c925c73c89c2639208c11b5d1c7c3b21f99046e8"
+  },
+  "additional_routes": [
+    {
+      "algorithm": "hopper",
+      "variant": 10,
+      "label": "fused10",
+      "complete_launches": 2
+    },
+    {
+      "algorithm": "hopper",
+      "variant": 12,
+      "label": "matched12",
+      "complete_launches": 3
+    }
+  ],
+  "same_protocol": true,
+  "warmup": 20,
+  "calls_per_group": 100,
+  "groups": 5,
+  "fresh_checks": 3,
+  "heuristic_candidates": 32,
+  "workspace_limit": 8589934592,
+  "new_timing_runs_before_addendum": 0,
+  "completed_compiled_gate": {
+    "path": "results/psplit_rsa_static_review_initial_iter36.json",
+    "sha256": "46db33836552063d31dd3cfde249ddb472cf0bdd252e2a9e4f790690362a1488",
+    "status": "PASS_COMPILED_CAN_LAUNCH_39_ONLY_37_REMAINS_BLOCKED"
+  },
+  "new_timing_runs_before_finalfreeze": 0
+}

@@ -1616,3 +1616,34 @@ Freshfourinstancecompiledgate independentlyPASS, completeobject/bench/test addre
 - **Analysis:** Own complete SW latency determines code benefit; same-row tuned Dense/SW reports the comparison. Numerical/structural/SAN evidence stays separate. Missing unsafe routes will have explicit compiled-safety exclusions rather than invented rows.
 - **Next:** Mandatoryfull1024 measured38 plus retainedbest36/29/Lt1,100calls5groups3fresh; actual validation scope, independent implementation/data audits and source/raw/report/Git closure.
 - **Archive:** trajectory/20261014_040812_iter-35/
+
+### Iter 36 — RS-A producer rawA4/sharedB7 and consumer register A
+
+- **Hypothesis:** Place A transformation in consumers using RS-A while preserving whole-K seven P and fixed U; each stage builds distinct packed A words before issue and retains every A operand until wait0.
+- **Changes:** New39 uses BM64 BN32 BK64,384threads/producer64/WG192/WG192,full128/empty256/two banks; producer rawA4 and finalB7, consumer complete-stage packed A48/64 plus P48/64 words. Actual initial quota/resource/full pendingA+P gate precedes any GPU launch. Original onecast/fixedU/alphaRNbetaFMA/nonaligned drain6/zeroGWS unchanged. ParentK%128 and truthful fallback. Old32CUDA preserved, registered37 disabled. Originalnumericalgate/AutoDense unchanged; onlynewfreshcompiledgatedkernels execute.
+- **Bench:** quick20warm20calls5groups1fresh; original numericalFAIL is retained, no certification.
+
+| M,N,K | dtype | route | mode | Dense µs | complete SW µs | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 5.920000 | 6.808000 | 0.869565 | FAIL |
+| 128,128,128 | fp16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 5.828800 | 6.982400 | 0.834785 | FAIL |
+| 256,256,256 | bf16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 5.998400 | 9.099200 | 0.659223 | FAIL |
+| 256,256,256 | fp16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 6.572800 | 9.203200 | 0.714186 | FAIL |
+| 512,512,512 | bf16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 6.476800 | 13.708800 | 0.472456 | FAIL |
+| 512,512,512 | fp16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 6.384000 | 13.832000 | 0.461538 | FAIL |
+| 1024,1024,1024 | bf16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 13.278399 | 23.391999 | 0.567647 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 10.214400 | 23.212799 | 0.440033 | FAIL |
+| 2048,2048,2048 | bf16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 31.972799 | 187.769604 | 0.170277 | FAIL |
+| 2048,2048,2048 | fp16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 33.287999 | 184.072006 | 0.180842 | FAIL |
+| 3072,3072,3072 | bf16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 87.055999 | 685.721588 | 0.126955 | FAIL |
+| 3072,3072,3072 | fp16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 89.558399 | 681.411219 | 0.131431 | FAIL |
+| 4096,4096,4096 | bf16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 195.553601 | 1797.873688 | 0.108769 | FAIL |
+| 4096,4096,4096 | fp16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 206.177592 | 1798.646355 | 0.114629 | FAIL |
+| 1024,512,1024 | bf16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 9.500800 | 23.337600 | 0.407103 | FAIL |
+| 1024,512,1024 | fp16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 9.632000 | 23.393600 | 0.411737 | FAIL |
+| 512,1024,1024 | bf16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 8.334400 | 23.310401 | 0.357540 | FAIL |
+| 512,1024,1024 | fp16 | megakernel_wgmma_psplit_rsa_64x32 v39 | launch | 8.681600 | 23.321600 | 0.372256 | FAIL |
+
+- **Analysis:** Own complete SW latency determines code benefit; same-row tuned Dense/SW reports the comparison. Numerical/structural/SAN evidence stays separate. Missing unsafe routes will have explicit compiled-safety exclusions rather than invented rows.
+- **Next:** Mandatoryfull1024 measured39 plus retainedbest36/sameBK64SS38/Lt1,100calls5groups3fresh; actual validation scope, independent implementation/data audits and source/raw/report/Git closure.
+- **Archive:** trajectory/20261014_045025_iter-36/

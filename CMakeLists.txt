@@ -22,7 +22,7 @@ add_library(megafmm STATIC solution/plan.cpp solution/pack_winograd.cu
   solution/small_mma_k128_specialized.cu
   solution/small_mma_cooperative.cu solution/megakernel_wgmma_pipeline.cu
   solution/megakernel_wgmma_tma_alias.cu solution/megakernel_wgmma_wait1.cu solution/megakernel_wgmma_wait1_three_stage.cu
-  solution/megakernel_wgmma_psplit.cu solution/megakernel_wgmma_psplit_asymmetric.cu solution/megakernel_wgmma_psplit_bk64.cu)
+  solution/megakernel_wgmma_psplit.cu solution/megakernel_wgmma_psplit_asymmetric.cu solution/megakernel_wgmma_psplit_bk64.cu solution/megakernel_wgmma_psplit_rsa.cu)
 target_include_directories(megafmm PUBLIC include PRIVATE solution "${CUTLASS_ROOT}/include" "${CUTLASS_ROOT}/tools/util/include")
 target_link_libraries(megafmm PUBLIC CUDA::cudart CUDA::cublasLt CUDA::cublas CUDA::cuda_driver)
 target_compile_options(megafmm PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_90a,code=sm_90a;--expt-relaxed-constexpr;--expt-extended-lambda;-lineinfo;-Xptxas=-v>)
@@ -47,3 +47,7 @@ set_source_files_properties(solution/megakernel_wgmma_psplit.cu solution/megaker
 # Archive the actual new BK64 PTX/cubin feeding ptxas; no separate PTX compile.
 set_source_files_properties(solution/megakernel_wgmma_psplit_bk64.cu
   PROPERTIES COMPILE_OPTIONS "--keep;--keep-dir=${CMAKE_CURRENT_SOURCE_DIR}/.scratch/psplit_bk64_nvcc_keep_iter35")
+
+# Preserve actual RS-A PTX and cubin feeding ptxas for fresh input-lifetime audit.
+set_source_files_properties(solution/megakernel_wgmma_psplit_rsa.cu
+  PROPERTIES COMPILE_OPTIONS "--keep;--keep-dir=${CMAKE_CURRENT_SOURCE_DIR}/.scratch/psplit_rsa_nvcc_keep_iter36")

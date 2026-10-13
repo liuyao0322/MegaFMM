@@ -71,6 +71,8 @@ struct Policy {
   // 36/37=P3+4 two-consumer WGs, both64x32; quotas64/96/96 or64/80/96.
   // Original two-bank transforms and full7P fixedU, one launch, no globalSTP.
   // 38=P3+4 BK64 two-bank,64x32; quotas64/96/96, parent K%128==0.
+  // 39=RS-A P3+4 BK64,64x32: raw A4 shared/final B7 shared, quotas64/192/192.
+  // Complete onecast A transform in registers, whole7P then fixedU, no globalSTP.
   int mega_variant=0;
 };
 class Plan {
