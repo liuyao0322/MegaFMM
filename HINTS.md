@@ -35,6 +35,14 @@
 - Keep BF16 and FP16 results separate, preserve the original FP64 reference and fixed numerical gates, and include fresh input-dependent transforms in every measured invocation. Numerical failures stay visible and do not stop execution-performance experiments, but a failing candidate cannot certify completion or enable Auto SW.
 - The earlier four-size request and its frozen evidence remain recorded. This active goal focuses the next implementation work on1024; it does not certify the earlier four-size objective as achieved.
 
+## Current experimental evidence (iteration30)
+
+- Native Mega28/29 use BM64 BN16/32 BK32,256threads split128producer/128consumer and two final7operand shared banks with PipelineAsync2. Input transforms stay inside every one-launch complete run; no globalS/T/P or native matrixworkspace. Original FP32RN DAG, finalonecast, complete7P/U and explicitalphaRNbetaFMA remain unchanged.
+- Frozen samebinary1024 full20warm100calls5groups3fresh shows Mega29 at25.1098/25.4029µs ordinary and24.8368/25.0938µs Graph BF16/FP16; compared with retainedMega27 ownlatency reduces19.219%/15.827% ordinary and18.925%/17.016% Graph. Same-rowDense/SW remains0.482655/0.387950 ordinary and0.456742/0.376342 Graph. All20rows60fresh originalnumericalgates FAIL/NF0; AutoDense and activegoal remain.
+- Mega28 has no improvement overMega27. Multi-launchLt1 remains the observedallSW control winner and must not substitute for trueMegakernel goal completion. Rank next single-launch candidates against ownMega29 latency and tuned same-rowDense, while preserving failedgates; do not infer improvement from Dense denominator variation.
+- Compiled native initialREG96/160 and perCTAownedpool24576/40960 safely support producer64/consumer96-or160; independentfullCFG/implicitwidth audits maxR58/89 or54/145 and linked/objectinstruction equality PASS. Dynamiclaunchshared71808/86144B and ELFstaticSHARED1024B are distinct. Resource-based possibleCTA residency is not measuredoccupancy.
+- Default2080CASE859PASS, newstrict60=36PASS24FAIL/NF0, six targetedCUDA12.8sanitizers zeroerrors. The rawU/finalD native29 reference uses matchingN32oldMega0 atalpha1beta0 followed by independenthostRNmul/floatFMA for specifiedactiveepilogue; oldactivebetaM1 contraction differs and is retained asdiagnostic. Do not replace the original FP64 numerical gate with these implementation-consistency tests.
+
 <!-- User-supplied behavior directives. The skill reads this at session start
      and respects any constraint named here. Examples:
      - Optimization constraints or focus areas (e.g., "Prefer Triton over raw CUDA")

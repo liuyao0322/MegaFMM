@@ -1388,3 +1388,22 @@ The next iteration must preserve single-launch ownership/full-K sevenP/fixedU/al
 - **Analysis:** Predeclared nine-shape two-dtype launch screen20warm20calls5groups1fresh completed18finite numerical-failing rows exit2 after defaultGPU2080CASE859PASS and selected29same-input18raw-U/host-epilogue groups PASS. Native source and binary identities were frozen before measurement. This diagnostic alone establishes no certification or own-latency envelope gain; mandatory same-binary control and20row1024 full comparison follow.
 - **Next:** Measure Mega29 same-binary quick control and both new pipelines, Mega0/Mega27/Lt1 in launch/Graph20warm100calls5groups3fresh; finish original strict60scope, sixCUDA12.8sanitizers, compiled resource and independent evidence audit, then report actual endpoint latency and numerical failure.
 - **Archive:** trajectory/20261014_005808_iter-30/
+
+#### Iter30 full1024 evidence closure
+
+Same frozen source checkpoint `4a655fc7ed4c30497d262c7dd2a82137b2833989`, seven source hashes and bench/test SHA `ccad7e48…`/`140a9518…` cover both native pipelines, retainedMega0/Mega27 and multi-launchLt1 in launch/Graph. Predeclared20warm100calls5groups3fresh completed20rows/60fresh/200TIME; all original numerical gates fail/NF0, each benchmark exits2. Full raw/statistics/contracts/resource/report binding is `results/small_pipeline_profile_iter30.json`, with expanded measurements in `results/small_pipeline_measurements_iter30.json` and `results/1024_MEGAKERNEL_PIPELINE_REPORT.md`.
+
+| Mode | dtype | RetainedMega27 own µs | NewMega29 own µs | Own latency decrease | Same-rowDense µs | Dense/SW | Gate |
+|---|---|---:|---:|---:|---:|---:|---|
+| launch | bf16 | 31.0838 | 25.1098 | 19.219% | 12.1194 | 0.482655 | FAIL finite |
+| launch | fp16 | 30.1795 | 25.4029 | 15.827% | 9.8550 | 0.387950 | FAIL finite |
+| graph | bf16 | 30.6342 | 24.8368 | 18.925% | 11.3440 | 0.456742 | FAIL finite |
+| graph | fp16 | 30.2394 | 25.0938 | 17.016% | 9.4438 | 0.376342 | FAIL finite |
+
+Mega29 improves the retained same-binary trueMegakernel comparison, but has not exceeded cuBLAS. Mega28 offers no improvement overMega27. All measuredSW route winner remains multi-launchLt1 at19.2739/19.6486µs ordinary and16.8362/17.1894µs Graph; it is a control and cannot replace the single-launch active goal. The historical source23 allSW envelope is19.6432/19.3498µs Lt1 at1024; the new pipeline does not improve that historical envelope. Ordinary/Graph and ownSW/Dense ratios remain separate; no floor or direction-exhaustion claim.
+
+Default2080CASE859PASS, selected29 24CASE38PASS, CPU3DAG+6stage PASS; independent tests audit preserves old2034CASE/803PASS domains and34old function bodies. New29 eighteen same-input raw-U/final-D fixtures pass against matchingN32oldMega0 rawU plus independenthostRNmultiply/floatstd::fma epilogue. An early activebeta comparison failed because oldMega0 contracts beta*C0 first; olddiagnostic and SASS proofs are retained. Device specifiedalphaRNbetaFMA and originalFP64gate were not changed. No direct seven-P exportedbitwise claim for this test or N16/N32bitwise claim. NewGraph12configurations36freshAB replay eachcaptureonekernelnode PASS.
+
+Newstrict60 scope retains original floors/patterns:36PASS24FAIL/NF0,48native12Dense-rangefallback; old1290gates and25oldCUDA TUs/source23–29 evidence remain bytepreserved, not a repeated1350suite. SixCUDA12.8sanitizers for28/29 eachmemcheck/racecheck/synccheck exit0 withzeroerrors/hazards/warnings/leaks. Static gate beforelaunch proves BN16REG96/pool24576≥role20480, producer64/consumer96 withmaxR58/89; BN32REG160/pool40960≥28672, quotas64/160 maxR54/145 includingimplicitwidths andwaitstubs. STACK/LOCAL/spill0; formal dynamicshared71808/86144B versusELFstaticSHARED1024B separately recorded. Four linkedinstructionstreams equal finalobject; resource conditions forBN16twoCTA are not measuredoccupancy. Ncu not retried.
+
+Original BF16/FP16 precision/numerical contracts and AutoDense remain unchanged. Continue optimizing the actual1024 single-launch kernel; no next implementation started in this lease before evidence closure.
