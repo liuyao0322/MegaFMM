@@ -1772,3 +1772,7 @@ Freshfourinstancecompiledgate independentlyPASS, completeobject/bench/test addre
 - **Analysis:** Own complete SW latency ranks code changes; Dense timing variation and machine/fixture/SAN PASS do not certify original FP64 numerical accuracy.
 - **Next:** Mandatory samebinaryfull20 for44/39/40/36/Lt1,100calls5groups3fresh irrespectivequick3%, originalstrict30 andserialSAN3, coverage/profile/report/twoindependentfinal audits.
 - **Archive:** trajectory/20261014_065139_iter-40/
+
+#### Iter40 full closure evidence
+
+Mandatory full20/200TIME/60CHECK completed;60 originalFAIL/NF0,10 innerexit2.44 ordinaryBF23.6076807976/FP23.2681608200us versus39 23.1145596504/23.1103992462us;Graph44 23.3548808098/23.1475210190 versus39 22.9222393036/22.9046392441us.44 failed to improve its samegeometryparent39; all20DenseCV<2% and allgroups kept. Default2690/2292 and selected56/135 exit0, strict30=18PASS12FAILNF0/exit2, SAN3zeroerror with leakonlymem0. RawU reference39/hostspecifiedepilogue/Graph/CPU abstractions are separate from originalFP64certification. No45/no precision relaxation/no promotion,AutoDense/goalactive. Single-A payload savings did not establish speedup or occupancy/stall cause. Exact current evidence is the microbatchreport/profile/measurement/coverage; future selectiveTMAA and role-clock prefixes are CPU-only and not current40 measurements.
