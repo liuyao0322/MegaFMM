@@ -1,0 +1,33 @@
+COMMAND ["bash", "scripts/on_gpu.sh", "./build/megafmm_bench", "--algorithm", "mega", "--mega-variant", "36", "--shapes", "1024,1024,1024", "--dtype", "both", "--trials", "100", "--warmup", "20", "--groups", "5", "--correct-trials", "3", "--rotate-inputs", "1", "--output", "results/small_psplit36_graph_iter38_full1024.csv", "--graph"]
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=dense config=dense:id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=10;bound_candidate=4/16;tuned_candidate=4;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.012918;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=none
+CHECK 1024,1024,1024 bf16 trial=0 dense_eF=8.51899e-07 solution_eF=0.00600975 gate=0.00100256 pass=0
+CHECK 1024,1024,1024 bf16 trial=1 dense_eF=8.52266e-07 solution_eF=0.0060152 gate=0.00100256 pass=0
+CHECK 1024,1024,1024 bf16 trial=2 dense_eF=8.50027e-07 solution_eF=0.00601153 gate=0.00100255 pass=0
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.0230179 wall_ms=0.0231099
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0112822 wall_ms=0.0113535
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.0112704 wall_ms=0.0113471
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.0230115 wall_ms=0.0230893
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.0230499 wall_ms=0.0231283
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.0112893 wall_ms=0.0113607
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.0230854 wall_ms=0.0231587
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.0113379 wall_ms=0.0114099
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.0113283 wall_ms=0.011411
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.0230477 wall_ms=0.0231205
+TUNE shape=1024,1024,1024 dtype=fp16 case=dense config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010416;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=none
+CHECK 1024,1024,1024 fp16 trial=0 dense_eF=1.24851e-06 solution_eF=0.000751819 gate=0.000103746 pass=0
+CHECK 1024,1024,1024 fp16 trial=1 dense_eF=1.25092e-06 solution_eF=0.000753235 gate=0.000103753 pass=0
+CHECK 1024,1024,1024 fp16 trial=2 dense_eF=1.24799e-06 solution_eF=0.000754626 gate=0.000103744 pass=0
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.0232822 wall_ms=0.0233633
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.00957408 wall_ms=0.00964587
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.00956448 wall_ms=0.00964028
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.0233014 wall_ms=0.0233726
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.0232928 wall_ms=0.0233676
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.00956096 wall_ms=0.00963217
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.0232138 wall_ms=0.0232899
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.0094448 wall_ms=0.00951783
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.00945728 wall_ms=0.00953195
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.0231677 wall_ms=0.0232402
+srun: error: g08: task 0: Exited with exit code 2

@@ -1,0 +1,33 @@
+{
+  "schema": "megafmm.iter38.hybrid-s-measured-identity.v1",
+  "base_checkpoint": "c7be7d18ddc25a264b0591782d4a733ff7b758d5",
+  "measurement_source_commit": "dec5e4b55f838f77fda3ec31a9869931cd9829f4",
+  "frozen_sources": {
+    "CMakeLists.txt": "bff645d92a844e6bce355b71dfdd1e5d37a25babca05af2aaa9f7d019ac1c8d3",
+    "bench/benchmark.cu": "f6c5716e610a74e68611a01b4d6813f6e374a4c3eee50b7e1194ab4fa77ddcbf",
+    "include/megafmm/gemm.h": "03344003fa3e7c324c170833e557806cdb3f62780077c6b1d9d0500f3322fb02",
+    "include/megafmm/kernels.h": "cad0a9d521951b0c52825f7ed23b8bcc7e2d40dbb9565abb2066f5d5cd49cf5d",
+    "solution/plan.cpp": "0db2b38640237f002b836f666bdf493dc1cefa439ad90e32f8b7207d0b5b034d",
+    "tests/test_correctness.cu": "62f376ab23d2b401eeafc16ad32ff995d7ba6a2bc441b36731311c43ad7ec6e2",
+    "solution/megakernel_wgmma_psplit_hybrid_s.cu": "db5ed2caf91fe7713830b16876c2e08c9d58fad6f75389d391afc77827a1f8be"
+  },
+  "frozen_binaries": {
+    "build/megafmm_bench": "6f81bf43e39d7d6bc089f4877cb8cdceb16c2e7f1dbdc47a47e4a6f02b0e97d8",
+    "build/test_correctness": "37706b3c9b881ce59153905a4dbe98db02cbcebf144243c73003e7c35be1ae45"
+  },
+  "predeclared_plan": {
+    "path": "results/psplit_hybrid_s1024_plan_iter38.json",
+    "sha256": "4c9b459de971f9385a0d81c75fd637b79967950f029ca68f348820c430bd2673"
+  },
+  "predeclared_plan_sha256": "4c9b459de971f9385a0d81c75fd637b79967950f029ca68f348820c430bd2673",
+  "quick_archive": "trajectory/20261014_054901_iter-38",
+  "independent_compiled_gate": {
+    "path": "results/psplit_hybrid_s_static_review_initial_iter38.json",
+    "sha256": "bdd8ae67d1206ecf870a5b17eb255fc8f5d76789fa996a61f650b0719dd86932",
+    "status": "PASS_COMPILED_CAN_LAUNCH_41_ONLY_37_REMAINS_BLOCKED"
+  },
+  "linked_identity_path": "results/psplit_hybrid_s_initial_link_identity_iter38.json",
+  "linked_identity_sha256": "722741479b60958894ca254c8f91ef85c69dfae58ff62fc170e7a22fc36db197",
+  "compiled_scope": "Independent fresh CAN_LAUNCH41 PASS for final corrected Plan0db2 and TUdb5/bench6f81/test37706. I168 owned64512>=57344; implicit FP16 41/124/164 BF16 39/124/164; zero STACK/LOCAL/spill/newC7512, complete-stage A24/32/P48/64 pending generic touches0. Actual86144dynamic+1024static/384; typed bank43008 with S2 planes, both-bank drain before cross-bank tailSTS. Original numerical certification separate.37 remains disabled. Initial infra build failure and bad dispatch source, then historical pregate pending snapshot preserved chronologically.",
+  "metadata_scope": "Measuredidentity created ONCE after AKO quicklogger/Git closure, before mandatoryfull timing. Plan/gate/quick/link/source7/bin2 complete initially; no hindsight metadata append."
+}
