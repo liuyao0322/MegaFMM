@@ -52,6 +52,8 @@ struct Policy {
   //    and 16x8/8x8 identity owners (each otherwise 16/15/14/12/7; no mutual fallback).
   // 24/25=original19 parent-K128 fixed four-stage no-unroll/full-unroll
   //    (otherwise original19 then16/15/14/12/7; no mutual fallback).
+  // 26/27=cooperative32x16/32x32 transformed operand tiles, complete seven P
+  //    then fixed U (otherwise packed7; common input binding guard uses Dense).
   int mega_variant=0;
 };
 class Plan {

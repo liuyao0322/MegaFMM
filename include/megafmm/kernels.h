@@ -150,4 +150,15 @@ void launch_mma8x8_k128_specialized(const Problem& p, const void* A,
     const void* B, const float* C0, float* D, cudaStream_t stream,
     K128OuterLoop control);
 
+// Cooperative complete-P M1:26 has32x16/64threads,27 has32x32/128threads.
+// Shared transformed A/B operands are produced once per CTA/K16 stage.
+// Native metadata/current AB16 guards fail to packed7; scalar D/C0 supported.
+bool cooperative_mma_can_implement(const Problem& p, int variant=26);
+bool cooperative_mma_full_tiles(const Problem& p, const void* A, const void* B,
+                                int variant=26);
+void prepare_cooperative_mma(const Problem& p, int variant=26);
+void launch_cooperative_mma(const Problem& p, const void* A, const void* B,
+                            const float* C0, float* D, cudaStream_t stream,
+                            int variant=26);
+
 }

@@ -81,6 +81,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 26 | Specialize original owner8 MMA at parent K128 | 0.3493 | 1.036923 | screened |
 
+| 27 | Share transformed operands across cooperative M1 output warps | 0.3916 | 0.337076 | diagnostic |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -1138,3 +1140,35 @@ Independent compiled audit passed. Original19 uses REG96 / 440 static instructio
 Reassessment of iterations24–26 is complete before27: direct native ABI, coalesced vector/permutation and fixed K128 loop controls each lack a primary own-SW screen improvement of at least3%. [CUDA12.4.1 pragma unroll](https://docs.nvidia.com/cuda/archive/12.4.1/cuda-c-programming-guide/index.html#pragma-unroll) and the [pinned CuTe config](https://github.com/NVIDIA/cutlass/blob/f7b19de32c5d1f3cedfc735c2849f12b537522ee/include/cute/config.hpp) support the intended no-unroll/full-unroll controls; actual SASS confirms backend realization. [PTX8.4 native MMA/cache operators](https://docs.nvidia.com/cuda/archive/12.4.1/parallel-thread-execution/index.html) and [pinned SM80 atoms](https://github.com/NVIDIA/cutlass/blob/f7b19de32c5d1f3cedfc735c2849f12b537522ee/include/cute/arch/mma_sm80.hpp) constrain operand ABI and typed accumulation. Cache hints do not establish measured DRAM traffic. The original `results/profile_baseline.txt` records `/tmp/nsight-compute-lock` failure, InterprocessLockFailed, exit9 and no profiled kernels; the session prohibits retry and none was attempted. Historical single-warmed Mega19 GPU durations3.200/3.232µs and Dense128 GPU durations3.072/3.008µs remain separate captures and cannot establish a launch floor by subtraction.
 
 The new profile and `results/small_reassessment_iter26.json` bind actual d5ea407 source, binaries, raw configurations, logs and exits, plus prior frozen artifacts. Source23/24/25 results remain unchanged; later documentation HEAD is not the measurement identity. A viable next axis for512/1024 is fused original-input transforms and batched Tensor Core products followed by the existing fixed-U combine: two launches instead of three, with no global packed A/B storage. Original final RN casts, full-P arithmetic, the numerical gate and caller-owned workspace remain requirements. Root-owned scratch needs a separate27 lease and is not part of26. Further geometry, reuse and stage-specific address propagation for128/256 remain viable. No hardware floor, exhaustion or goal completion is established; historical faster paths are retained and optimization continues.
+
+### Iter 27 — Share transformed operands across cooperative M1 output warps
+
+- **Hypothesis:** A cooperative CTA can reuse each transformed A/B tile across output warps and reduce repeated S/T work at512/1024 while preserving complete seven-P M1 arithmetic.
+- **Changes:** Add Mega26 cooperative32x16 and Mega27 cooperative32x32, strict native metadata and current AB16 guards, packed7/commonDense fallback, max27, fresh-input Graph/native-bitwise/alias/stride/rebind tests; preserve all22 old CUDA implementations, numerical gate, Lt tuner and51column schema.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.337076 ms; mean speedup=0.3916x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_cooperative_32x16 v26 | launch | 0.005627 | 0.005590 | 1.0066 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_cooperative_32x16 v26 | launch | 0.005501 | 0.005723 | 0.9611 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_cooperative_32x16 v26 | launch | 0.005621 | 0.008262 | 0.6803 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_cooperative_32x16 v26 | launch | 0.005642 | 0.008443 | 0.6682 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_cooperative_32x16 v26 | launch | 0.006326 | 0.013349 | 0.4739 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_cooperative_32x16 v26 | launch | 0.006368 | 0.013507 | 0.4715 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_cooperative_32x16 v26 | launch | 0.013195 | 0.039114 | 0.3374 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_cooperative_32x16 v26 | launch | 0.010318 | 0.038310 | 0.2693 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_cooperative_32x16 v26 | launch | 0.031979 | 0.239938 | 0.1333 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_cooperative_32x16 v26 | launch | 0.033104 | 0.242261 | 0.1366 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_cooperative_32x16 v26 | launch | 0.086795 | 0.804962 | 0.1078 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_cooperative_32x16 v26 | launch | 0.089411 | 0.813312 | 0.1099 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_cooperative_32x16 v26 | launch | 0.195350 | 1.862882 | 0.1049 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_cooperative_32x16 v26 | launch | 0.206323 | 1.863450 | 0.1107 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_cooperative_32x16 v26 | launch | 0.011352 | 0.026766 | 0.4241 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_cooperative_32x16 v26 | launch | 0.011515 | 0.027221 | 0.4230 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_cooperative_32x16 v26 | launch | 0.008374 | 0.027070 | 0.3094 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_cooperative_32x16 v26 | launch | 0.008736 | 0.027203 | 0.3211 | 0.00075151 | 0 |
+
+- **Analysis:** Predeclared nine-shape two-dtype Mega26 diagnostic20warm20calls5groups1fresh completed18finite numerical-failing rows exit2 after defaultGPU1902CASE667PASS with36newnativepairedbitwise and72Graph216freshABreplays. Core/test independentCPUauditPASS. Native complete-P stage sharing compiles REG126/128 with no spill; actual latency and own-primary signal will be evaluated from row medians after mandatory closure. Same-row Dense changes cannot establish code gain.
+- **Next:** Measure same-binary Mega27 control; validate strict1170 and six isolatedCUDA12.8 sanitizer runs; audit compiled CTA barriers/load roles/LDSM/fullP U/resources; expand new versus old-best same-binary full launch/Graph only if primary ownSWlatency improves at least3percent.
+- **Archive:** trajectory/20261013_193314_iter-27/

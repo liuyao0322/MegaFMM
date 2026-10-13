@@ -415,7 +415,11 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     return;
   }
   if (plan.algorithm == Algorithm::Megakernel) {
-    if (plan.policy.mega_variant == 24 || plan.policy.mega_variant == 25) {
+    if (plan.policy.mega_variant == 26 || plan.policy.mega_variant == 27) {
+      if (cooperative_mma_full_tiles(p, A, B, plan.policy.mega_variant))
+        launch_cooperative_mma(p, A, B, C0, D, stream, plan.policy.mega_variant);
+      else launch_packed_mma(p, A, B, C0, D, stream, 7);
+    } else if (plan.policy.mega_variant == 24 || plan.policy.mega_variant == 25) {
       if (mma8x8_k128_specialized_full_tiles(p, A, B, C0, D))
         launch_mma8x8_k128_specialized(p, A, B, C0, D, stream,
             plan.policy.mega_variant == 24 ? K128OuterLoop::FixedBoundNoUnroll
@@ -612,6 +616,12 @@ std::string Plan::algorithm_name() const {
       return impl_->small_batched ? (impl_->policy.hopper_variant >= 7
         ? "winograd_sm80_batched_k64" : "winograd_sm80_batched") : "winograd_hopper_v2";
     case Algorithm::Megakernel:
+      if (impl_->policy.mega_variant == 26 || impl_->policy.mega_variant == 27) {
+        if (cooperative_mma_can_implement(impl_->problem, impl_->policy.mega_variant))
+          return impl_->policy.mega_variant == 26
+            ? "megakernel_cooperative_32x16" : "megakernel_cooperative_32x32";
+        return "megakernel_warp_mma_packed";
+      }
       if (impl_->policy.mega_variant == 24 || impl_->policy.mega_variant == 25) {
         if (mma8x8_k128_specialized_can_implement(impl_->problem))
           return impl_->policy.mega_variant == 24
@@ -747,8 +757,8 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     throw std::invalid_argument("lt_variant must be 0 (views) or 1 (uniform batched operands)");
   if (policy.hopper_variant < 0 || policy.hopper_variant > 8)
     throw std::invalid_argument("hopper_variant must be between 0 and 8");
-  if (policy.mega_variant < 0 || policy.mega_variant > 25)
-    throw std::invalid_argument("mega_variant must be between 0 and 25");
+  if (policy.mega_variant < 0 || policy.mega_variant > 27)
+    throw std::invalid_argument("mega_variant must be between 0 and 27");
   if (policy.algorithm < Algorithm::Auto || policy.algorithm > Algorithm::Megakernel)
     throw std::invalid_argument("unsupported algorithm policy");
   auto impl = std::make_unique<Plan::Impl>();
@@ -761,7 +771,9 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   Algorithm desired = policy.algorithm;
   if (desired == Algorithm::Auto || policy.levels == 0 || !winograd_shape(p, policy)) desired = Algorithm::Dense;
   if (desired == Algorithm::Megakernel) {
-    const bool supported = (policy.mega_variant == 24 || policy.mega_variant == 25)
+    const bool supported = (policy.mega_variant == 26 || policy.mega_variant == 27)
+                             ? (cooperative_mma_can_implement(p, policy.mega_variant) || packed_mma_can_implement(p, 7))
+                           : (policy.mega_variant == 24 || policy.mega_variant == 25)
                              ? (mma8x8_k128_specialized_can_implement(p) ||
                                 mma8x8_prefetch_can_implement(p, 19) ||
                                 mma16x8_prefetch_can_implement(p, 16) ||
@@ -841,7 +853,10 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);
     impl->bytes = impl->dense->scratch_bytes();
   } else if (desired == Algorithm::Megakernel) {
-    if (policy.mega_variant == 24 || policy.mega_variant == 25) {
+    if (policy.mega_variant == 26 || policy.mega_variant == 27) {
+      if (cooperative_mma_can_implement(p, policy.mega_variant)) prepare_cooperative_mma(p, policy.mega_variant);
+      else prepare_packed_mma(p, 7);
+    } else if (policy.mega_variant == 24 || policy.mega_variant == 25) {
       if (mma8x8_k128_specialized_can_implement(p)) prepare_mma8x8_k128_specialized(p);
       else if (mma8x8_prefetch_can_implement(p, 19)) prepare_mma8x8_prefetch(p, 19);
       else if (mma16x8_prefetch_can_implement(p, 16)) prepare_mma16x8_prefetch(p, 16);

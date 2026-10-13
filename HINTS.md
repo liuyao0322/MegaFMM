@@ -11,6 +11,12 @@
 - User resumed from the final large-shape report: continue optimizing and focus on small-matrix speedup. Prioritize128/256/512/1024/2048/4096 squares and small rectangular controls; ordinary launch and CUDA Graph remain separate. Numerical failures must remain visible, but are not a reason to stop the requested execution-performance experiments.
 - From the user's explicit active goal: continuously optimize the SW operator until all four square sizes 128, 256, 512 and 1024 are faster than cuBLAS. Keep every size in scope and verify against the same-row independently tuned ordinary cuBLASLt baseline under the existing dtype/output, numerical and timing contracts. A near-unity noisy observation, Dense fallback or an improvement at only a subset of sizes does not complete this goal.
 
+## Current experimental direction (iteration27)
+
+- Cooperative complete-P M1 controls share one transformed A/B bank per CTA/K16 stage: Mega26 uses32x16 output tiles and Mega27 uses32x32. Preserve all older CUDA implementations and historical evidence.
+- Retain original FP32 S/T dependencies, one RN conversion for each final operand, seven complete-K FP32 P products, fixed U, and explicit alpha RN multiply followed by active-beta FMA. Public certification, overlap, current-pointer fallback and Auto Dense rules remain unchanged.
+- Keep128/256/512/1024 in each diagnostic comparison, with special attention to shared-transform reuse at512/1024. Rank implementation changes by their own SW latency against the historical envelope; slower Dense measurements cannot establish a code benefit.
+
 <!-- User-supplied behavior directives. The skill reads this at session start
      and respects any constraint named here. Examples:
      - Optimization constraints or focus areas (e.g., "Prefer Triton over raw CUDA")
