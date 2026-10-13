@@ -332,7 +332,7 @@ struct Plan::Impl {
   Problem problem;
   Policy policy;
   Algorithm algorithm = Algorithm::Dense;
-  bool empty = false, scale = false, small_batched = false;
+  bool empty = false, scale = false, small_batched = false, fused_input = false;
   size_t bytes = 0, s_offset = 0, t_offset = 0, p_offset = 0, scratch_offset = 0;
   cublasLtHandle_t handle = nullptr;
   std::unique_ptr<LtOp> dense;
@@ -348,9 +348,16 @@ struct Plan::Impl {
 };
 
 namespace {
-bool use_dense(const Plan::Impl& plan, const void* A, const void* B) {
-  return plan.algorithm == Algorithm::Dense || reinterpret_cast<uintptr_t>(A) % 16 ||
-      reinterpret_cast<uintptr_t>(B) % 16;
+bool use_dense(const Plan::Impl& plan, const void* A, const void* B, void* workspace) {
+  if (plan.algorithm == Algorithm::Dense || reinterpret_cast<uintptr_t>(A) % 16 ||
+      reinterpret_cast<uintptr_t>(B) % 16) return true;
+  if (plan.fused_input) {
+    const auto* products = reinterpret_cast<const float*>(
+        static_cast<const unsigned char*>(workspace) + plan.p_offset);
+    return !fused_leaf_full_tiles(plan.problem, A, B, products,
+                                 plan.policy.hopper_variant - 9);
+  }
+  return false;
 }
 void validate_binding(const Plan::Impl& plan, const void* A, const void* B,
                       const float* C0, float* D, void* workspace) {
@@ -409,7 +416,7 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     return;
   }
   void* scratch = plan.bytes ? static_cast<unsigned char*>(workspace) + plan.scratch_offset : nullptr;
-  if (use_dense(plan, A, B)) {
+  if (use_dense(plan, A, B, workspace)) {
     lt_check(execute_lt(plan.handle, *plan.dense, bound_candidate(*plan.dense, A, B, C0, D),
         A, B, C0, D, scratch, stream), "run dense GEMM");
     return;
@@ -533,6 +540,13 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
   }
   auto* base = static_cast<unsigned char*>(workspace);
   float* products = reinterpret_cast<float*>(base + plan.p_offset);
+  if (plan.fused_input) {
+    launch_fused_leaf(p, A, B, products, stream, plan.policy.hopper_variant - 9);
+    cuda_check(cudaPeekAtLastError(), "launch fused-input Winograd products");
+    detail::combine_winograd(p, products, C0, D, stream);
+    cuda_check(cudaPeekAtLastError(), "launch fused-input Winograd combine");
+    return;
+  }
   if (plan.batched || plan.small_batched) {
     const void* left = base + plan.s_offset;
     const void* right = base + plan.t_offset;
@@ -585,7 +599,7 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
   const auto& impl = *impl_;
   validate_binding(impl, A, B, C0, D, workspace);
   if (impl.empty || impl.scale) return "none";
-  if (use_dense(impl, A, B))
+  if (use_dense(impl, A, B, workspace))
     return "dense:" + describe_lt(*impl.dense, bound_candidate(*impl.dense, A, B, C0, D));
   if (impl.algorithm != Algorithm::WinogradLt) return "none";
   auto* base = static_cast<unsigned char*>(workspace);
@@ -613,6 +627,8 @@ std::string Plan::algorithm_name() const {
   switch (impl_->algorithm) {
     case Algorithm::WinogradLt: return impl_->batched ? "winograd_lt_batched" : "winograd_lt_v1";
     case Algorithm::WinogradHopper:
+      if (impl_->fused_input) return impl_->policy.hopper_variant == 9
+        ? "winograd_fused_input_32x32" : "winograd_fused_input_32x64";
       return impl_->small_batched ? (impl_->policy.hopper_variant >= 7
         ? "winograd_sm80_batched_k64" : "winograd_sm80_batched") : "winograd_hopper_v2";
     case Algorithm::Megakernel:
@@ -755,8 +771,8 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     throw std::invalid_argument("heuristic_candidates must be between 1 and 128");
   if (policy.lt_variant < 0 || policy.lt_variant > 1)
     throw std::invalid_argument("lt_variant must be 0 (views) or 1 (uniform batched operands)");
-  if (policy.hopper_variant < 0 || policy.hopper_variant > 8)
-    throw std::invalid_argument("hopper_variant must be between 0 and 8");
+  if (policy.hopper_variant < 0 || policy.hopper_variant > 10)
+    throw std::invalid_argument("hopper_variant must be between 0 and 10");
   if (policy.mega_variant < 0 || policy.mega_variant > 27)
     throw std::invalid_argument("mega_variant must be between 0 and 27");
   if (policy.algorithm < Algorithm::Auto || policy.algorithm > Algorithm::Megakernel)
@@ -818,7 +834,19 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
                                                      : megakernel_can_implement(p, policy.mega_variant);
     if (!supported) desired = Algorithm::Dense;
   }
-  if (desired != Algorithm::Dense && desired != Algorithm::Megakernel) {
+  if (desired == Algorithm::WinogradHopper && policy.hopper_variant >= 9) {
+    // P-only native allocation. Unsupported metadata uses ordinary GEMM; a
+    // later incompatible binding uses the zero-workspace Dense operator below.
+    if (!fused_leaf_can_implement(p, policy.hopper_variant - 9)) desired = Algorithm::Dense;
+    else {
+      const size_t product_bytes = fused_leaf_product_workspace_bytes(p, policy.hopper_variant - 9);
+      impl->p_offset = 0;
+      impl->scratch_offset = aligned(product_bytes);
+      if (impl->scratch_offset > policy.workspace_limit) desired = Algorithm::Dense;
+      else impl->fused_input = true;
+    }
+  }
+  if (desired != Algorithm::Dense && desired != Algorithm::Megakernel && !impl->fused_input) {
     const bool small_batched = desired == Algorithm::WinogradHopper && policy.hopper_variant >= 5;
     const bool batched = (desired == Algorithm::WinogradLt && policy.lt_variant == 1) || small_batched;
     const size_t input_slots = batched ? 7 : 4;
@@ -918,6 +946,12 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     impl->scratch_offset = 0;
     impl->dense = make_lt_op(impl->handle, p, 0, policy.heuristic_candidates);
     impl->bytes = 0;
+  } else if (impl->fused_input) {
+    prepare_fused_leaf(p, policy.hopper_variant - 9);
+    // Rebindings retain caller-owned P-only capacity. Dense fallback is
+    // deliberately limited to zero scratch; no transformed-buffer fallback.
+    impl->dense = make_lt_op(impl->handle, p, 0, policy.heuristic_candidates);
+    impl->bytes = impl->scratch_offset;
   } else {
     const size_t available = policy.workspace_limit - impl->scratch_offset;
     impl->dense = make_lt_op(impl->handle, p, available, policy.heuristic_candidates);
@@ -984,7 +1018,7 @@ void tune(Plan& plan, const void* A, const void* B, const float* C0,
   try {
     if (!impl.scale) {
       void* scratch = impl.bytes ? static_cast<unsigned char*>(workspace) + impl.scratch_offset : nullptr;
-      if (use_dense(impl, A, B))
+      if (use_dense(impl, A, B, workspace))
         tune_lt(impl.handle, *impl.dense, A, B, original_c, D, scratch, stream);
       else if (impl.algorithm == Algorithm::WinogradLt) {
         auto* base = static_cast<unsigned char*>(workspace);

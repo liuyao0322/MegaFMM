@@ -19,6 +19,16 @@ size_t small_batched_k64_workspace_bytes(const Problem& leaf, int variant=7);
 void launch_small_batched_k64(const Problem& leaf, const void* A7,
                              const void* B7, float* P, cudaStream_t stream,
                              int variant=7);
+// Original A/B transforms fused into uniform seven compact full-K P slots.
+// Internal config0/1 maps to Hopper9/10; existing combine is a second launch.
+// Plan reserves P only and uses ordinary GEMM for incompatible metadata/bindings.
+bool fused_leaf_can_implement(const Problem& p, int config=0);
+bool fused_leaf_full_tiles(const Problem& p, const void* A, const void* B,
+                           const float* P, int config=0);
+size_t fused_leaf_product_workspace_bytes(const Problem& p, int config=0);
+void prepare_fused_leaf(const Problem& p, int config=0);
+void launch_fused_leaf(const Problem& p, const void* A, const void* B, float* P,
+                       cudaStream_t stream, int config=0);
 bool megakernel_can_implement(const Problem& p, int variant=0);
 // One-time launch configuration; called during planning, never in steady-state run.
 void prepare_megakernel(const Problem& p, int variant=0);

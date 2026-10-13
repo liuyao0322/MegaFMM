@@ -83,6 +83,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 27 | Share transformed operands across cooperative M1 output warps | 0.3916 | 0.337076 | diagnostic |
 
+| 28 | Fuse original inputs into uniform seven-product leaves | 0.3811 | 0.364023 | diagnostic |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -1197,3 +1199,35 @@ Six separate CUDA12.8 Compute Sanitizer2025.1.0.0 processes run the unchanged CU
 Independent compiler audit passed for all four instances. Mega26 usesREG126, ptxas smem10752B, ELF SHARED11776B and984 static instructions; Mega27 usesREG128, ptxas14336B, ELF15360B and976 static instructions. STACK/LOCAL and ptxas stack/spill stores/spill loads are zero. No CUDA function attribute was queried, so shared fields remain separate. Variant26 has four128-bit A loads and four64-bit B loads per thread per stage;27 has mutually exclusive low64 A/high64 B producers with four128-bit loads per producer. All14 LDSM and14 HMMA per warp/K16 stage are unpredicated. Both CTA barriers are unpredicated and encompass all shared reads. The compiler places the second barrier before the final eight HMMA, after all operands have reached registers; this is safe, but it is not a compiled barrier after all MMA completion. Seven independent P chains retain ascending complete-K accumulation before fixed U. Both beta paths keep separate alpha FMUL; active beta uses alpha products as FFMA addends, with four C0 loads before four corresponding stores for each output group. Static60 FMUL /64 STG include duplicated beta paths; one actual thread path executes32 FMUL /32 STG, plus32 FFMA only for active beta. Static instructions, register counts, shared fields and source reuse do not establish dynamic issue, DRAM traffic, achieved occupancy or a measured bottleneck. ncu was not retried.
 
 `results/small_cooperative_profile_iter27.json` binds actual cad199f source, both binaries, all new raw logs/CSVs/exits, exact Lt configurations, compiled resources and older frozen evidence. The source23 complete performance envelope remains unchanged, including its sampling/selection limits and numerical failures. Source23/24/25/26 artifacts are byte frozen; later documentation HEAD is not the measurement identity. Cooperative sharing is a distinct tested mechanism after the24–26 reassessment, with no new primary own-latency win. Existing faster paths remain available. Root-owned fused original-input transform plus batched leaf with the existing complete-P/fixed-U combine remains a viable separate next mechanism, subject to a new formal lease. The user's four-size goal remains active and unmet; no hardware floor, exhaustion or optimization completion is established.
+
+### Iter 28 — Fuse original inputs into uniform seven-product leaves
+
+- **Hypothesis:** One full-P accumulator per CTA reduces register pressure while sharing each transformed operand across output warps.
+- **Changes:** Add Hopper9/10 BM32 BN32/64 BK32 fused original-input leaves, compact P-only workspace, current-binding zero-scratch Dense fallback, and required existing combine as the second launch. Preserve all older kernel TUs, numerical gates, Auto and Lt metadata.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.364023 ms; mean speedup=0.3811x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | winograd_fused_input_32x32 v9 | launch | 0.005968 | 0.007314 | 0.8160 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | winograd_fused_input_32x32 v9 | launch | 0.005910 | 0.007528 | 0.7851 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | winograd_fused_input_32x32 v9 | launch | 0.005989 | 0.008845 | 0.6771 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | winograd_fused_input_32x32 v9 | launch | 0.007662 | 0.009152 | 0.8372 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | winograd_fused_input_32x32 v9 | launch | 0.006502 | 0.013608 | 0.4778 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | winograd_fused_input_32x32 v9 | launch | 0.006362 | 0.013598 | 0.4678 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | winograd_fused_input_32x32 v9 | launch | 0.013422 | 0.043528 | 0.3084 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | winograd_fused_input_32x32 v9 | launch | 0.010245 | 0.043061 | 0.2379 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | winograd_fused_input_32x32 v9 | launch | 0.032155 | 0.268819 | 0.1196 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | winograd_fused_input_32x32 v9 | launch | 0.032546 | 0.272982 | 0.1192 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | winograd_fused_input_32x32 v9 | launch | 0.086990 | 0.861043 | 0.1010 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | winograd_fused_input_32x32 v9 | launch | 0.089555 | 0.850288 | 0.1053 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | winograd_fused_input_32x32 v9 | launch | 0.195718 | 2.001274 | 0.0978 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | winograd_fused_input_32x32 v9 | launch | 0.206733 | 2.050360 | 0.1008 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | winograd_fused_input_32x32 v9 | launch | 0.011802 | 0.025312 | 0.4662 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | winograd_fused_input_32x32 v9 | launch | 0.011677 | 0.025373 | 0.4602 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | winograd_fused_input_32x32 v9 | launch | 0.008405 | 0.025101 | 0.3348 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | winograd_fused_input_32x32 v9 | launch | 0.008781 | 0.025235 | 0.3480 | 0.00075151 | 0 |
+
+- **Analysis:** Nine-shape both-dtype end-to-end launch quick screen uses20warm/20calls/5groups/1fresh and same-row independently tuned Dense. Raw numerical failures remain visible. Default structural tests, four direct seven-P integer fixtures,36 random final-M1 pairs and fresh-A/B Graph tests passed before screening. Own-latency comparisons and compiled-resource interpretations follow in a separate evidence checkpoint; this quick screen does not certify performance or numerics.
+- **Next:** Measure Hopper10 control; complete mandatory same-binary1024 full Hopper9/Hopper10/Lt1/H7 in launch and Graph20warm100calls5groups3fresh even without quick gain, then original strict gate, six CUDA12.8 sanitizers and independent raw/compiler audit.
+- **Archive:** trajectory/20261013_203807_iter-28/

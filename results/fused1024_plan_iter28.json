@@ -1,0 +1,70 @@
+{
+  "schema": "megafmm.iter28.full1024-plan.v1",
+  "reason": "User explicitly requests actual full one-level1024 measurements for fused-input and packed-once routes; required even without the normal >=3percent own-latency screening signal.",
+  "declared_before_measurement": true,
+  "frozen_sources": {
+    "solution/gemm_fused_leaf.cu": "c26c7b70cc535c7bef4237c3a4edc2b75fc28753d2276c2208cf873c744e43bc",
+    "solution/plan.cpp": "957eace23f5ad9f6af5df6b64f66860b10475293465a02c2eeeb7000b30dfa40",
+    "include/megafmm/kernels.h": "25ec48b876dc2488bd899dd4e9271c96cb805cad486f1a147d588ce4ea9d888d",
+    "include/megafmm/gemm.h": "b8543c67750f43a9a469e3065f88134ce4a2d9087f1536055564b58ed3497f06",
+    "CMakeLists.txt": "64946e332e37c74a88c0c6ba6a020d3299b0df245f36d1eb5a9e1a2617250933",
+    "bench/benchmark.cu": "61a1f9203c8b0cda07b83706a6d3fb4e32915880a93478c7aaeea16e48830a16",
+    "tests/test_correctness.cu": "2e6473e46c10b55067f8890606d0b3ca52dcf00775fc2baaae32a659beb37552"
+  },
+  "shapes": [
+    [
+      1024,
+      1024,
+      1024
+    ]
+  ],
+  "dtypes": [
+    "bf16",
+    "fp16"
+  ],
+  "modes": [
+    "launch",
+    "graph"
+  ],
+  "warmup": 20,
+  "trials": 100,
+  "groups": 5,
+  "correct_trials": 3,
+  "rotate_inputs": 1,
+  "heuristic_candidates": 32,
+  "workspace_limit": 8589934592,
+  "routes": [
+    {
+      "label": "fused9",
+      "algorithm": "hopper",
+      "variant": 9
+    },
+    {
+      "label": "fused10",
+      "algorithm": "hopper",
+      "variant": 10
+    },
+    {
+      "label": "packed_lt1",
+      "algorithm": "lt",
+      "variant": 1
+    },
+    {
+      "label": "packed_h7",
+      "algorithm": "hopper",
+      "variant": 7
+    }
+  ],
+  "csv_paths": [
+    "results/small_fused9_launch_iter28_full1024.csv",
+    "results/small_fused9_graph_iter28_full1024.csv",
+    "results/small_fused10_launch_iter28_full1024.csv",
+    "results/small_fused10_graph_iter28_full1024.csv",
+    "results/small_packed_lt1_launch_iter28_full1024.csv",
+    "results/small_packed_lt1_graph_iter28_full1024.csv",
+    "results/small_packed_h7_launch_iter28_full1024.csv",
+    "results/small_packed_h7_graph_iter28_full1024.csv"
+  ],
+  "timing_contract": "Complete run: current original A/B transformations, product GEMM(s), complete FP32 P writes/reads, fixed U and alpha/beta. No input preprocessing cache; each Graph replays the full captured run with fixed addresses.",
+  "reference": "Same-row independently tuned ordinary cuBLASLt; numerical reference is original rounded A/B FP64 plain GEMM with frozen gate."
+}

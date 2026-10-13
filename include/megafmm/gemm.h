@@ -28,6 +28,8 @@ struct Policy {
   // 3=source-free 128x256, 4=source-free with B multicast,
   // 5/6=uniform seven-batch SM80 leaves with CTA64x64/CTA32x64,
   // 7/8=CTA32x64x64 with three-stage Multistage/two-stage Pipelined.
+  // 9/10=fused original-input 32x32/32x64 products + required combine (two launches).
+  // Native uses P-only workspace; incompatible metadata/input bindings use Dense.
   int hopper_variant=0;
   // Mega: 0/1=seven live P tiles, 2=three live P/U tiles,
   // 3=full-tile beta-zero two-stage pipeline (otherwise variant 2),

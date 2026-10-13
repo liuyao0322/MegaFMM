@@ -17,6 +17,12 @@
 - Retain original FP32 S/T dependencies, one RN conversion for each final operand, seven complete-K FP32 P products, fixed U, and explicit alpha RN multiply followed by active-beta FMA. Public certification, overlap, current-pointer fallback and Auto Dense rules remain unchanged.
 - Keep128/256/512/1024 in each diagnostic comparison, with special attention to shared-transform reuse at512/1024. Rank implementation changes by their own SW latency against the historical envelope; slower Dense measurements cannot establish a code benefit.
 
+## Current experimental direction (iteration28)
+
+- From the continuing one-level1024 optimization task: Hopper9/10 fuse original-input transforms into one uniform seven-product leaf launch, writing full-K FP32 P; the existing combine is the required second launch. Measure both together, preserving all older CUDA implementations and evidence.
+- Use native strict full tiles and current A/B/P16 guards with P-only caller workspace. Incompatible metadata/bindings use ordinary GEMM. Keep the original FP32 DAG/final RN cast, frozen FP64 gate, Lt metadata/tuner, Auto Dense and all four target sizes unchanged.
+- From the user's explicit1024 comparison request: irrespective of the usual >=3% quick-screen trigger, run same-source/binary full1024 end-to-end measurements for both fused controls and packed-once Lt1/H7, both dtypes and launch/Graph. Use20warm/100calls/5groups/3fresh, shared8GiB cap and32heuristic budget; report same-row Dense/SW, p10/p90/CV and unchanged numerical gates.
+
 <!-- User-supplied behavior directives. The skill reads this at session start
      and respects any constraint named here. Examples:
      - Optimization constraints or focus areas (e.g., "Prefer Triton over raw CUDA")
