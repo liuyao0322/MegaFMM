@@ -51,6 +51,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 11 | Parallelize seven complete products across warps and fix epilogue rounding | 0.2446 | 1.033407 | regression |
 
+| 12 | Remove complete-tile checks from parallel product warps | 0.3034 | 0.914679 | regression |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -447,3 +449,35 @@ experiments have not been silently marked complete in PLAN.
 - **Analysis:** Predeclared quick20/5/1 launch signal. Primary128..1024 geometric gain vs best single-warp fast8 iter10=0.715546x. bf16 128^3 5.942us Dense/SW=0.704x; fp16 128^3 6.107us Dense/SW=0.683x; bf16 256^3 8.578us Dense/SW=0.620x; fp16 256^3 8.669us Dense/SW=0.563x; bf16 512^3 18.938us Dense/SW=0.325x; fp16 512^3 18.922us Dense/SW=0.325x; bf16 1024^3 97.243us Dense/SW=0.135x; fp16 1024^3 96.216us Dense/SW=0.106x. Product warps have66registers/thread,14KiBshared,0spill; reduced live accumulators do not offset repeated selective loads, warp branching and CTA combination. All18numeric gatesfail,0nonfinite. Prior iter10 GPU smoke7/8 and six sanitizerchecks PASS, but fresh dyadic default bitwise test fails beta nonzero due to compiler alpha/beta FMA contraction; this iter makes old4..8 alpha __fmul_rn then beta fmaf explicit like9/combine; original bitwise test retained.
 - **Next:** Validate bitwise regression and product9; benchmark complete-tile product10, then narrower16x8owners.
 - **Archive:** trajectory/20261013_134640_iter-11/
+
+### Iter 12 — Remove complete-tile checks from parallel product warps
+
+- **Hypothesis:** Unchecked aligned vector loads and int K counter shorten selective operand construction for seven product warps.
+- **Changes:** Add Mega10 with complete32multiple tiles, all4ld8 guard, exact2Dgrid and generic9fallback; immutable9source; add10toexactbitwise/tail/rebindtests.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.914679 ms; mean speedup=0.3034x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_product_warps_fast v10 | launch | 0.004178 | 0.004642 | 0.9000 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_product_warps_fast v10 | launch | 0.004147 | 0.004782 | 0.8672 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_product_warps_fast v10 | launch | 0.005442 | 0.006390 | 0.8515 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_product_warps_fast v10 | launch | 0.004850 | 0.006406 | 0.7570 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_product_warps_fast v10 | launch | 0.006317 | 0.013835 | 0.4566 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_product_warps_fast v10 | launch | 0.006184 | 0.013856 | 0.4463 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_product_warps_fast v10 | launch | 0.013003 | 0.107262 | 0.1212 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_product_warps_fast v10 | launch | 0.010240 | 0.107382 | 0.0954 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_product_warps_fast v10 | launch | 0.031982 | 0.678390 | 0.0471 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_product_warps_fast v10 | launch | 0.032120 | 0.681822 | 0.0471 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_product_warps_fast v10 | launch | 0.086142 | 2.218050 | 0.0388 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_product_warps_fast v10 | launch | 0.088686 | 2.261314 | 0.0392 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_product_warps_fast v10 | launch | 0.194874 | 5.071085 | 0.0384 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_product_warps_fast v10 | launch | 0.206202 | 5.094073 | 0.0405 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_product_warps_fast v10 | launch | 0.009186 | 0.048459 | 0.1896 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_product_warps_fast v10 | launch | 0.009242 | 0.048763 | 0.1895 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_product_warps_fast v10 | launch | 0.008040 | 0.048819 | 0.1647 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_product_warps_fast v10 | launch | 0.008373 | 0.048890 | 0.1713 | 0.00075151 | 0 |
+
+- **Analysis:** Predeclared quick20/5/1 launch. Primary128..1024 geometric gain vs best fast8=0.863764x; vs product9=1.207139x. bf16 128^3 4.642us Dense/SW=0.900x; fp16 128^3 4.782us Dense/SW=0.867x; bf16 256^3 6.390us Dense/SW=0.852x; fp16 256^3 6.406us Dense/SW=0.757x; bf16 512^3 13.835us Dense/SW=0.457x; fp16 512^3 13.856us Dense/SW=0.446x; bf16 1024^3 107.262us Dense/SW=0.121x; fp16 1024^3 107.382us Dense/SW=0.095x. FullTile productfast does not overcome repeated operand loading and product-warp branch cost; retain additive comparison. All18numerical gatesfail finite. Iter11 full GPU structural/bitwise4/7/8/9 PASS; three9sanitizers0errors0warnings. Rounding fix verified without weakening tests.
+- **Next:** Validate10 and integrate native16x8owners11; if third no-improvement iteration occurs, reassess profiler/compiler and primary literature before next edit.
+- **Archive:** trajectory/20261013_135104_iter-12/

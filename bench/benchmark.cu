@@ -191,7 +191,7 @@ Options options(int argc, char** argv) {
     auto next = [&]() { if (!value.empty()) return value; if (++i == argc) throw std::runtime_error("missing value for " + arg); return std::string(argv[i]); };
     if (arg == "--help") {
       std::cout << "megafmm_bench --shapes 'M,N,K;...' --dtype bf16|fp16|both "
-        "--algorithm lt|hopper|mega --lt-variant 0|1 --mega-variant 0..9 --hopper-variant 0..6 "
+        "--algorithm lt|hopper|mega --lt-variant 0|1 --mega-variant 0..10 --hopper-variant 0..6 "
         "--trials N --warmup N --groups N --correct-trials N --rotate-inputs N --graph --output CSV --profile\n";
       std::exit(0);
     } else if (arg == "--shapes") o.shapes = parse_shapes(next());
@@ -214,7 +214,7 @@ Options options(int argc, char** argv) {
   if (o.algorithm != "lt" && o.algorithm != "hopper" && o.algorithm != "mega") throw std::runtime_error("invalid algorithm");
   if (o.lt_variant < 0 || o.lt_variant > 1) throw std::runtime_error("lt-variant must be 0 or 1");
   if (o.hopper_variant < 0 || o.hopper_variant > 6) throw std::runtime_error("hopper-variant must be between 0 and 6");
-  if (o.mega_variant < 0 || o.mega_variant > 9) throw std::runtime_error("mega-variant must be between 0 and 9");
+  if (o.mega_variant < 0 || o.mega_variant > 10) throw std::runtime_error("mega-variant must be between 0 and 10");
   if (o.trials <= 0 || o.groups <= 0 || o.warmup < 0 || o.correct_trials < 0 || o.rotate_inputs <= 0) throw std::runtime_error("invalid trial count");
   return o;
 }

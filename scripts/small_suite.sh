@@ -12,10 +12,11 @@ all_labels=(
   warp4_launch warp4_graph packed7_launch packed7_graph
   fast8_launch fast8_graph product9_launch product9_graph
   product10_launch product10_graph narrow11_launch narrow11_graph
+  narrow12_launch narrow12_graph
 )
 if [[ "${1:-}" == --help || "${1:-}" == -h ]]; then
   printf 'Usage: bash scripts/small_suite.sh [LABEL ...]\n'
-  printf 'No labels runs all 20 cases; selected labels use the same full protocol.\n'
+  printf 'No labels runs all 22 cases; selected labels use the same full protocol.\n'
   printf 'Labels: %s\n' "${all_labels[*]}"
   printf 'Build first. Uses the current MEGAFMM_JOB_ID / existing allocation.\n'
   exit 0
@@ -76,7 +77,7 @@ binary = sys.argv[2]
 selected = set(sys.argv[3:])
 fields = ['label', 'source_commit', 'binary_sha256', 'exit_code']
 retained = []
-if len(selected) < 20 and path.is_file() and path.stat().st_size:
+if len(selected) < 22 and path.is_file() and path.stat().st_size:
     with path.open(newline='', encoding='utf-8') as stream:
         reader = csv.DictReader(stream)
         if reader.fieldnames != fields:
@@ -169,4 +170,6 @@ run_case product10_launch --algorithm mega --mega-variant 10
 run_case product10_graph --algorithm mega --mega-variant 10 --graph
 run_case narrow11_launch --algorithm mega --mega-variant 11
 run_case narrow11_graph --algorithm mega --mega-variant 11 --graph
+run_case narrow12_launch --algorithm mega --mega-variant 12
+run_case narrow12_graph --algorithm mega --mega-variant 12 --graph
 exit "$numeric_failure"

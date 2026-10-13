@@ -37,4 +37,10 @@ void prepare_small_product(const Problem& p, int variant=9);
 void launch_small_product(const Problem& p, const void* A, const void* B,
                           const float* C0, float* D, cudaStream_t stream,
                           int variant=9);
+// Complete-tile product warps, with variant 9 as the generic tail fallback.
+bool small_product_fast_can_implement(const Problem& p, int variant=10);
+void prepare_small_product_fast(const Problem& p, int variant=10);
+void launch_small_product_fast(const Problem& p, const void* A, const void* B,
+                               const float* C0, float* D, cudaStream_t stream,
+                               int variant=10);
 }
