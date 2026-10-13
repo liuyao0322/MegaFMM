@@ -353,7 +353,10 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     return;
   }
   if (plan.algorithm == Algorithm::Megakernel) {
-    launch_megakernel(p, A, B, C0, D, stream, plan.policy.mega_variant);
+    if (plan.policy.mega_variant >= 4)
+      launch_small_mma(p, A, B, C0, D, stream, plan.policy.mega_variant);
+    else
+      launch_megakernel(p, A, B, C0, D, stream, plan.policy.mega_variant);
     cuda_check(cudaPeekAtLastError(), "launch Winograd megakernel");
     return;
   }
@@ -409,6 +412,7 @@ std::string Plan::algorithm_name() const {
     case Algorithm::WinogradLt: return impl_->batched ? "winograd_lt_batched" : "winograd_lt_v1";
     case Algorithm::WinogradHopper: return impl_->small_batched ? "winograd_sm80_batched" : "winograd_hopper_v2";
     case Algorithm::Megakernel:
+      if (impl_->policy.mega_variant >= 4) return "megakernel_warp_mma";
       if (impl_->policy.mega_variant == 3) {
         const auto& p = impl_->problem;
         return p.m % 128 == 0 && p.n % 256 == 0 && p.k % 64 == 0 && p.beta == 0.0f
@@ -430,6 +434,8 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     throw std::invalid_argument("lt_variant must be 0 (views) or 1 (uniform batched operands)");
   if (policy.hopper_variant < 0 || policy.hopper_variant > 6)
     throw std::invalid_argument("hopper_variant must be between 0 and 6");
+  if (policy.mega_variant < 0 || policy.mega_variant > 6)
+    throw std::invalid_argument("mega_variant must be between 0 and 6");
   if (policy.algorithm < Algorithm::Auto || policy.algorithm > Algorithm::Megakernel)
     throw std::invalid_argument("unsupported algorithm policy");
   auto impl = std::make_unique<Plan::Impl>();
@@ -441,7 +447,11 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   // Auto stays on the tuned baseline until an independently validated policy table exists.
   Algorithm desired = policy.algorithm;
   if (desired == Algorithm::Auto || policy.levels == 0 || !winograd_shape(p, policy)) desired = Algorithm::Dense;
-  if (desired == Algorithm::Megakernel && !megakernel_can_implement(p, policy.mega_variant)) desired = Algorithm::Dense;
+  if (desired == Algorithm::Megakernel) {
+    const bool supported = policy.mega_variant >= 4 ? small_mma_can_implement(p, policy.mega_variant)
+                                                   : megakernel_can_implement(p, policy.mega_variant);
+    if (!supported) desired = Algorithm::Dense;
+  }
   if (desired != Algorithm::Dense && desired != Algorithm::Megakernel) {
     const bool small_batched = desired == Algorithm::WinogradHopper && policy.hopper_variant >= 5;
     const bool batched = (desired == Algorithm::WinogradLt && policy.lt_variant == 1) || small_batched;
@@ -476,7 +486,8 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);
     impl->bytes = impl->dense->scratch_bytes();
   } else if (desired == Algorithm::Megakernel) {
-    prepare_megakernel(p, policy.mega_variant);
+    if (policy.mega_variant >= 4) prepare_small_mma(p, policy.mega_variant);
+    else prepare_megakernel(p, policy.mega_variant);
     // Keep the fused route free of matrix workspace, including its unaligned-view fallback.
     impl->scratch_offset = 0;
     impl->dense = make_lt_op(impl->handle, p, 0, policy.heuristic_candidates);

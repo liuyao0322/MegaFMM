@@ -1,0 +1,15 @@
+========= COMPUTE-SANITIZER
+BEGIN_CANDIDATE dtype=bf16 algorithm=hopper variant=5 shape=256,256,256 alpha=1 beta=0 alias=0
+CASE hopper variant=5 actual=winograd_sm80_batched bf16 integers 256,256,256 maxabs=0 eF=0 scaled=0 normalized=0 nonfinite=0
+BEGIN_CANDIDATE dtype=bf16 algorithm=hopper variant=5 shape=256,256,256 alpha=0.5 beta=-0.25 alias=1
+CASE hopper variant=5 actual=winograd_sm80_batched bf16 integers 256,256,256 maxabs=0 eF=0 scaled=0 normalized=0 nonfinite=0
+BEGIN_CANDIDATE dtype=bf16 algorithm=hopper variant=5 shape=128,64,256 alpha=1 beta=0 alias=0
+CASE hopper variant=5 actual=winograd_sm80_batched bf16 integers 128,64,256 maxabs=0 eF=0 scaled=0 normalized=0 nonfinite=0
+BEGIN_CANDIDATE dtype=fp16 algorithm=hopper variant=5 shape=256,256,256 alpha=1 beta=0 alias=0
+CASE hopper variant=5 actual=winograd_sm80_batched fp16 integers 256,256,256 maxabs=0 eF=0 scaled=0 normalized=0 nonfinite=0
+BEGIN_CANDIDATE dtype=fp16 algorithm=hopper variant=5 shape=256,256,256 alpha=0.5 beta=-0.25 alias=1
+CASE hopper variant=5 actual=winograd_sm80_batched fp16 integers 256,256,256 maxabs=0 eF=0 scaled=0 normalized=0 nonfinite=0
+BEGIN_CANDIDATE dtype=fp16 algorithm=hopper variant=5 shape=128,64,256 alpha=1 beta=0 alias=0
+CASE hopper variant=5 actual=winograd_sm80_batched fp16 integers 128,64,256 maxabs=0 eF=0 scaled=0 normalized=0 nonfinite=0
+PASS selected candidate kernel paths, beta0, alpha/beta alias and rectangular fallback
+========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)

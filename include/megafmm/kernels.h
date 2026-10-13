@@ -18,4 +18,10 @@ void prepare_megakernel(const Problem& p, int variant=0);
 void launch_megakernel(const Problem& p, const void* A, const void* B,
                       const float* C0, float* D, cudaStream_t stream,
                       int variant=0);
+// Fused warp mma.sync path: variants 4/5/6 use one/two/four owner warps per CTA.
+bool small_mma_can_implement(const Problem& p, int variant=4);
+void prepare_small_mma(const Problem& p, int variant=4);
+void launch_small_mma(const Problem& p, const void* A, const void* B,
+                      const float* C0, float* D, cudaStream_t stream,
+                      int variant=4);
 }

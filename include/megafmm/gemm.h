@@ -29,7 +29,8 @@ struct Policy {
   // 5/6=uniform seven-batch SM80 leaves with CTA64x64/CTA32x64.
   int hopper_variant=0;
   // Mega: 0/1=seven live P tiles, 2=three live P/U tiles,
-  // 3=full-tile beta-zero two-stage pipeline (otherwise variant 2).
+  // 3=full-tile beta-zero two-stage pipeline (otherwise variant 2),
+  // 4/5/6=warp mma.sync with one/two/four owners per 32/64/128-thread CTA.
   int mega_variant=0;
 };
 class Plan {

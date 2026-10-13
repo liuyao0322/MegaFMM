@@ -45,6 +45,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 8 | Use small-tile cp.async Tensor Core batched leaves | 0.4420 | 0.121435 | regression |
 
+| 9 | Fuse Winograd into independent warp-level mma.sync owners | 0.2690 | 0.403353 | regression |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -345,3 +347,35 @@ experiments have not been silently marked complete in PLAN.
 - **Analysis:** Matched Ltbatch iter7 geometric latency gain=0.8810x over18 rows. 128 bf16=9.77us (Dense/SW 0.403x); 128 fp16=10.08us (Dense/SW 0.388x); 256 bf16=10.99us (Dense/SW 0.474x); 256 fp16=11.01us (Dense/SW 0.417x); 512 bf16=11.87us (Dense/SW 0.495x); 512 fp16=11.80us (Dense/SW 0.498x); 1024 bf16=21.25us (Dense/SW 0.586x); 1024 fp16=21.15us (Dense/SW 0.471x). Variant5 has no leaf scratch or TMA descriptors; full18rows have finite outputs but fail frozen numerical gates. Relative gain at256 partly reflects earlier noisy Lt row; repeat final before interpreting.
 - **Next:** Validate both batched tiles and integrate per-warp fused mma.sync to remove all intermediate global buffers
 - **Archive:** trajectory/20261013_132150_iter-8/
+
+### Iter 9 — Fuse Winograd into independent warp-level mma.sync owners
+
+- **Hypothesis:** Small independent output owners remove all global matrix intermediates and increase CTA coverage on tiny matrices
+- **Changes:** Add Mega4/5/6 with1/2/4ownerwarps of16x16x16,7FP32P fragments,7/14/28KiBprivate shared andzero matrixworkspace; benchmark4 with predeclared quick20calls/5groups/1freshcheck
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.403353 ms; mean speedup=0.2690x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_warp_mma v4 | launch | 0.004166 | 0.006862 | 0.6071 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_warp_mma v4 | launch | 0.004128 | 0.007091 | 0.5821 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_warp_mma v4 | launch | 0.005250 | 0.011155 | 0.4706 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_warp_mma v4 | launch | 0.004835 | 0.011282 | 0.4286 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_warp_mma v4 | launch | 0.006130 | 0.018506 | 0.3312 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_warp_mma v4 | launch | 0.006104 | 0.018790 | 0.3248 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_warp_mma v4 | launch | 0.012864 | 0.045853 | 0.2805 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_warp_mma v4 | launch | 0.010270 | 0.044784 | 0.2293 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_warp_mma v4 | launch | 0.032122 | 0.288206 | 0.1115 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_warp_mma v4 | launch | 0.032138 | 0.285638 | 0.1125 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_warp_mma v4 | launch | 0.086026 | 0.973683 | 0.0884 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_warp_mma v4 | launch | 0.089285 | 0.969744 | 0.0921 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_warp_mma v4 | launch | 0.195018 | 2.217618 | 0.0879 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_warp_mma v4 | launch | 0.206362 | 2.218437 | 0.0930 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_warp_mma v4 | launch | 0.009414 | 0.035232 | 0.2672 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_warp_mma v4 | launch | 0.009493 | 0.036061 | 0.2632 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_warp_mma v4 | launch | 0.008248 | 0.035470 | 0.2325 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_warp_mma v4 | launch | 0.008613 | 0.035944 | 0.2396 | 0.00075151 | 0 |
+
+- **Analysis:** Quick signal only, not final acceptance; protocol differs from iter7full100/5/3. Matched Ltbatch approximate geometric latency gain=0.4538x. 128 bf16=6.86us (Dense/SW 0.607x); 128 fp16=7.09us (Dense/SW 0.582x); 256 bf16=11.16us (Dense/SW 0.471x); 256 fp16=11.28us (Dense/SW 0.429x); 512 bf16=18.51us (Dense/SW 0.331x); 512 fp16=18.79us (Dense/SW 0.325x); 1024 bf16=45.85us (Dense/SW 0.281x); 1024 fp16=44.78us (Dense/SW 0.229x). Tiny128 improves absolute latency relative to batch, while larger tiles regress as repeated DAG conversion and smallK steps dominate. All18freshchecks fail frozen numeric gate with finite outputs; AutoDense.
+- **Next:** GPU structural/sanitizer and Graph tests; profile SIMT cast work, compare warp grouping, then paired finalcasts
+- **Archive:** trajectory/20261013_132604_iter-9/
