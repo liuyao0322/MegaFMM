@@ -3,6 +3,7 @@
 # Usage: bash scripts/bench.sh [label]
 set -eo pipefail
 cd "$(dirname "$0")/.."
+mkdir -p results
 
 MODE_ARGS=()
 [[ "${MEGAFMM_GRAPH:-0}" == 1 ]] && MODE_ARGS+=(--graph)

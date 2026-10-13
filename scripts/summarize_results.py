@@ -11,8 +11,10 @@ import argparse
 import csv
 import datetime as dt
 import hashlib
+import json
 import math
 import os
+import re
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -169,7 +171,7 @@ def discover(results: Path, trajectories: Path) -> list[Path]:
 
 def shape_label(shape: tuple[int, int, int]) -> str:
     m, n, k = shape
-    return f"{m}³" if m == n == k else f"{m}×{n}×{k}"
+    return f"{m:,}\n(square)" if m == n == k else f"{m:,}×{n:,}\nK={k:,}"
 
 
 def relative_link(path: Path, report: Path, title: str | None = None) -> str:
@@ -187,6 +189,11 @@ def export_figures(records: list[Record], directory: Path) -> list[Path]:
     for r in records:
         by_panel[r.panel].append(r)
     panels = sorted(by_panel, key=lambda p: (p[4], p[1], p[2], p[3], p[0]))
+    all_series = sorted({r.series for r in records})
+    palette = plt.get_cmap("tab10")
+    series_colors = {series: palette(index % 10) for index,series in enumerate(all_series)}
+    markers = ("o", "s", "^", "D", "v", "P", "X", "<", ">", "h")
+    series_markers = {series: markers[index % len(markers)] for index,series in enumerate(all_series)}
     plt.rcParams.update({"font.size": 10, "axes.spines.top": False,
                          "axes.spines.right": False, "svg.fonttype": "none"})
     output = []
@@ -211,7 +218,10 @@ def export_figures(records: list[Record], directory: Path) -> list[Path]:
                     continue
                 xs = [positions[r.shape] for r in samples]
                 label, algorithm, variant = series
-                legend = f"{label}: {algorithm}, v{variant}"
+                # Source labels remain identifiable while modes/backends are given by the panel.
+                legend = f"{label.removeprefix('final_')} (v{variant})"
+                color = series_colors[series]
+                marker = series_markers[series]
                 if kind == "performance":
                     ys = [r.speedup for r in samples]
                     low, high = [], []
@@ -219,23 +229,25 @@ def export_figures(records: list[Record], directory: Path) -> list[Path]:
                         lower = r.number("dense_p10_ms", r.number("dense_event_ms")) / r.number("solution_p90_ms", r.number("solution_event_ms"))
                         upper = r.number("dense_p90_ms", r.number("dense_event_ms")) / r.number("solution_p10_ms", r.number("solution_event_ms"))
                         low.append(max(0, y-lower)); high.append(max(0, upper-y))
-                    ax.errorbar(xs, ys, yerr=(low,high), marker="o", markersize=4,
-                                linewidth=1.4, capsize=3, label=legend)
+                    ax.errorbar(xs, ys, yerr=(low,high), marker=marker, markersize=4.5,
+                                color=color,linewidth=1.4, capsize=3, label=legend)
                 else:
                     # Exact-zero cases appear at a documented display floor on the logarithmic axis.
                     display_floor = 1e-12
                     ys = [max(display_floor, r.number("solution_ef")) for r in samples]
-                    ax.plot(xs, ys, marker="o", markersize=4, linewidth=1.4, label=legend)
+                    ax.plot(xs, ys, marker=marker, markersize=4.5,color=color,linewidth=1.4, label=legend)
             dtype, mode, cache, rotations, category = panel
-            ax.set_title(f"{dtype.upper()} · {mode} · {cache} · pairs={rotations}\nBackend/evidence: {category}")
-            ax.set_xticks(range(len(shapes)), [shape_label(s) for s in shapes], rotation=20, ha="right")
-            ax.set_xlabel("Shape M × N × K (each point has its own tuned dense baseline)")
+            category_title = {"sw":"SW experiments", "dense_fallback":"Dense fallback; no SW acceptance",
+                              "dense":"Ordinary dense backend", "other":"Other backend"}.get(category,category)
+            ax.set_title(f"{dtype.upper()} · {mode} · {cache} · pairs={rotations}\n{category_title}",fontsize=11)
+            ax.set_xticks(range(len(shapes)), [shape_label(s) for s in shapes], rotation=35, ha="right",fontsize=8)
+            ax.set_xlabel("Shape M × N × K",fontsize=9)
             ax.grid(axis="y", alpha=.22)
             if kind == "performance":
-                ax.axhline(1.0, color="#111827", linewidth=1.2, linestyle="--", label="Dense baseline = 1×")
+                ax.axhline(1.0, color="#111827", linewidth=1.2, linestyle="--", label="Same-row dense = 1×")
                 if category == "sw":
-                    ax.axhline(1.05, color="#64748b", linewidth=.9, linestyle=":", label="SW candidate target 1.05×; accuracy also required")
-                ax.set_ylabel("Same-row dense / executed-backend event median")
+                    ax.axhline(1.05, color="#64748b", linewidth=.9, linestyle=":", label="SW target 1.05×; accuracy required")
+                ax.set_ylabel("Same-row event-median ratio\n(dense / executed backend)",fontsize=9)
                 ax.set_ylim(bottom=0)
             else:
                 floor = {"bf16": 1e-3, "fp16": 1e-4}.get(dtype)
@@ -250,13 +262,15 @@ def export_figures(records: list[Record], directory: Path) -> list[Path]:
                                 [max(1e-12,r.number("gate_limit")) for r in checked],
                                 color="#94a3b8", alpha=.45, linestyle=":", linewidth=1)
                 ax.set_yscale("log")
-                ax.set_ylabel("Worst trial Frobenius relative error eF")
+                ax.set_ylabel("Worst trial Frobenius\nrelative error eF",fontsize=9)
                 if category.startswith("unchecked:"):
                     ax.text(.5,.5,"Correctness not checked; no SW certification evidence",
                             transform=ax.transAxes,ha="center",va="center",fontsize=9)
             handles, labels = ax.get_legend_handles_labels()
             if handles:
-                ax.legend(handles, labels, fontsize=7, loc="best", framealpha=.85)
+                # Outside legends keep low-throughput experimental curves visible.
+                ax.legend(handles, labels, fontsize=8, loc="upper left",bbox_to_anchor=(0,-.34),
+                          ncol=2,frameon=False,handlelength=2,columnspacing=1)
         for index in range(len(panels), rows*cols):
             axes.flat[index].set_visible(False)
         title = ("SW experiments and dense fallback shown separately; unchecked rows are ineligible" if kind == "performance"
@@ -265,6 +279,9 @@ def export_figures(records: list[Record], directory: Path) -> list[Path]:
         for extension in ("svg", "png"):
             path = directory / f"{kind}.{extension}"
             fig.savefig(path, dpi=180)
+            if extension == "svg":
+                # Matplotlib emits trailing spaces in multiline path attributes.
+                path.write_text("\n".join(line.rstrip() for line in path.read_text(encoding="utf-8").splitlines())+"\n", encoding="utf-8")
             output.append(path)
         plt.close(fig)
     return output
@@ -296,6 +313,30 @@ def stage_profile(path: Path) -> tuple[dict[str, tuple[float,int,int]], str | No
         stats[category][1] += nanoseconds
         stats[category][2] += instances
     return dict(stats), shape
+
+
+def log_fields(path: Path, prefix: str) -> list[dict[str,str]]:
+    if not path.exists():
+        return []
+    rows=[]
+    for line in path.read_text(encoding="utf-8",errors="replace").splitlines():
+        if line.startswith(prefix+" "):
+            rows.append(dict(token.split("=",1) for token in line.split()[1:] if "=" in token))
+    return rows
+
+
+def sanitizer_summary(path: Path, tool: str) -> str:
+    text=path.read_text(encoding="utf-8",errors="replace")
+    if tool=="racecheck":
+        matches=re.findall(r"RACECHECK SUMMARY:\s*(\d+) hazards displayed \((\d+) errors, (\d+) warnings\)",text)
+        if matches:
+            hazards,errors,warnings=map(int,matches[-1])
+            return f"racecheck 实际报告 {hazards} hazards、{errors} errors、{warnings} warnings"
+    else:
+        matches=re.findall(r"ERROR SUMMARY:\s*(\d+) errors",text)
+        if matches:
+            return f"{tool} 实际报告 {int(matches[-1])} errors"
+    return f"{tool} 未找到完整 summary；需要检查日志"
 
 
 def report(records: list[Record], warnings: list[str], artifacts: list[Path],
@@ -368,16 +409,73 @@ def report(records: list[Record], warnings: list[str], artifacts: list[Path],
               "warm_cache 重复使用同一对地址，仍每次重算变换。rotating_inputs 轮换多个不同的 A/B 地址对，记录实际输入工作集；应根据工作集与 L2 的大小判断缓存影响，不能仅凭轮换标签断言完全冷缓存。轮换数据不与 warm-cache 合并。", "",
               "原始 CSV 还保留 maxabs、Frobenius eF、`|error|/(atol+rtol*|reference|)` 最大值、`||A||F||B||F` 归一化误差、近零参考的绝对误差、nonfinite 数量、主机 wall time、实际 workspace 与初始化/调优成本。等效 TFLOP/s 使用 `2MNK/T`，不能等同七叶的实际 Tensor Core 算术吞吐。", "",
               "## 工具与独立证据", ""]
-    memcheck=results/"memcheck_iter1.txt"
-    correctness=results/"correctness_initial.txt"
+    correctness=results/"final_correctness.txt"
+    if not correctness.exists():
+        correctness=results/"correctness_initial.txt"
     if correctness.exists():
         text=correctness.read_text(encoding="utf-8",errors="replace")
-        verdict="结构和接口测试通过" if "PASS structural DAG" in text else "需检查日志状态"
+        verdict="结构和接口测试通过" if "PASS structural DAG" in text and "FAIL " not in text else "需检查日志状态"
         lines += [f"{verdict}：{relative_link(correctness,target)}。结构正确性与混合精度数值认证是不同关口。", ""]
-    if memcheck.exists():
-        text=memcheck.read_text(encoding="utf-8",errors="replace")
-        verdict="compute-sanitizer memcheck 报告 0 errors" if "ERROR SUMMARY: 0 errors" in text else "compute-sanitizer 日志需检查状态"
-        lines += [f"{verdict}：{relative_link(memcheck,target)}。该结果覆盖已运行的功能测试，不替代异步同步协议审查。", ""]
+    dag=results/"final_dag.txt"
+    if dag.exists():
+        text=dag.read_text(encoding="utf-8",errors="replace")
+        verdict="精确 DAG 测试通过" if "\nOK" in text else "DAG 日志需检查状态"
+        lines += [f"{verdict}：{relative_link(dag,target)}。", ""]
+    for tool in ("memcheck","racecheck","synccheck"):
+        log=results/f"final_{tool}.txt"
+        if tool=="memcheck" and not log.exists():
+            log=results/"memcheck_iter1.txt"
+        if not log.exists():
+            continue
+        verdict=sanitizer_summary(log,tool)
+        candidates=log_fields(log,"BEGIN_CANDIDATE")
+        coverage=""
+        if candidates:
+            combinations={(r.get("dtype"),r.get("algorithm"),r.get("variant")) for r in candidates}
+            coverage=f"日志包含 {len(combinations)} 个 dtype/algorithm/variant 组合、{len(candidates)} 个候选路径用例，覆盖 beta-zero、alpha/beta 原位 alias 和矩形 fallback。"
+        lines += [f"{verdict}：{relative_link(log,target)}。{coverage}结果只覆盖实际运行的用例，不替代异步协议审查，也不认证所有可能输入。", ""]
+    strict=results/"final_strict_numerics.txt"
+    if strict.exists():
+        gates=log_fields(strict,"NUMERICAL_GATE")
+        passes=sum(r.get("pass")=="1" for r in gates)
+        failures=sum(r.get("pass")=="0" for r in gates)
+        nonfinite=sum(int(r.get("nonfinite","0")) for r in gates)
+        unknown=sum(r.get("certified_range")=="0" for r in gates)
+        unknown_passes=sum(r.get("certified_range")=="0" and r.get("pass")=="1" for r in gates)
+        strict_exit=results/"final_strict_numerics.exit"
+        exit_text=strict_exit.read_text(encoding="utf-8",errors="replace").strip() if strict_exit.exists() else "未单独记录"
+        exit_link=relative_link(strict_exit,target) if strict_exit.exists() else "exit 状态无独立文件"
+        lines += [f"最终全候选严格数值压力组：{relative_link(strict,target)}；退出状态 `{exit_text}`：{exit_link}。从实际 `NUMERICAL_GATE` 行解析得到 {len(gates)} 个试验、{passes} 个门槛通过、{failures} 个失败，nonfinite 元素合计 {nonfinite}。其中 {unknown} 个试验声明范围未知，{unknown_passes} 个通过由普通 GEMM fallback 获得，不是 SW 认证。压力组中的精确 cancellation 通过也不能消除普通随机/动态范围样本的失败。", "",
+                  table_line(["pattern", "试验", "通过", "失败", "nonfinite", "范围未知/fallback"]),
+                  table_line(["---", "---:", "---:", "---:", "---:", "---:"])]
+        patterns=defaultdict(list)
+        for gate in gates:
+            patterns[gate.get("pattern","unknown")].append(gate)
+        for pattern,group in sorted(patterns.items()):
+            lines.append(table_line([pattern,len(group),sum(r.get("pass")=="1" for r in group),
+                                     sum(r.get("pass")=="0" for r in group),
+                                     sum(int(r.get("nonfinite","0")) for r in group),
+                                     sum(r.get("certified_range")=="0" for r in group)]))
+        lines.append("")
+    runs=results/"final_runs.csv"
+    if runs.exists():
+        with runs.open(newline="",encoding="utf-8") as stream:
+            run_rows=list(csv.DictReader(stream))
+        commits=sorted({r.get("source_commit","") for r in run_rows if r.get("source_commit")})
+        statuses=sorted({r.get("exit_code","") for r in run_rows if r.get("exit_code")})
+        lines += [f"最终测量来源与退出状态：{relative_link(runs,target)}。目前记录 {len(run_rows)} 次调用、source commit `{', '.join(commits)}`、exit code `{', '.join(statuses)}`。benchmark 的 exit 2 表示数值门槛失败，不能忽略该状态而仅保留性能表。", ""]
+    telemetry=sorted(results.glob("final_*_telemetry_*.csv"))
+    if telemetry:
+        by_label=defaultdict(dict)
+        for path in telemetry:
+            prefix,phase=path.stem.rsplit("_telemetry_",1)
+            by_label[prefix.removeprefix("final_")][phase]=path
+        lines += ["最终测量前后 GPU telemetry 证据：", "",
+                  table_line(["调用标签", "before", "after"]),table_line(["---", "---", "---"])]
+        for label,pair in sorted(by_label.items()):
+            lines.append(table_line([label,relative_link(pair["before"],target) if "before" in pair else "未记录",
+                                     relative_link(pair["after"],target) if "after" in pair else "未记录"]))
+        lines += ["", "这些文件是每次测量前后的 UUID、时钟、功耗、温度和利用率快照，不是连续采样，不能据此声称受测 kernel 期间频率固定或完全没有共享干扰。", ""]
     witness=results/"mixed_precision_witness.json"
     if witness.exists():
         lines += [f"独立精确叶乘法量化反例：{relative_link(witness,target)}。即使叶乘法无额外累加误差，最终 S/T 量化也可能超过固定 floor。", ""]
@@ -398,7 +496,19 @@ def report(records: list[Record], warnings: list[str], artifacts: list[Path],
         lines += ["", "阶段比例约为叶乘法 75%、两侧 packing 12%、combine 13%，对应一次被 profiler 捕获的 BF16 8192 调用。比例分母为 kernel 执行时间，不包含所有主机调度间隙；不能将 profiler replay/采样延迟作为 steady-state 性能成绩，也不能将该比例推广至全部尺寸或 FP16。", ""]
     release=results/"hopper_release_resources.txt"
     if release.exists():
-        lines += [f"Release 构建资源核验：{relative_link(release,target)}。六个普通 Hopper leaf 核均为 REG 168、STACK/LOCAL 0，SASS LDL/STL 计数均为 0；warpgroup 存在 232/40 的寄存器重新分配。早期 probe 编译日志的 spill 数不代表实际 Release 对象。静态 SHARED=1024 之外还有动态 shared storage，零 spill 本身不证明性能瓶颈已经消除。", ""]
+        lines += [f"历史初始 Release probe 资源核验：{relative_link(release,target)}。该文件覆盖当时 Hopper variants 0/1/2 的 BF16/FP16 六个普通 leaf 核：REG 168、STACK/LOCAL 0，SASS LDL/STL 计数均为 0；warpgroup 存在 232/40 的寄存器重新分配。它不代表当前全部候选，尤其不覆盖后加的 Hopper variants 3/4。早期 probe 编译日志的 spill 数不代表当时实际 Release 对象；静态 SHARED=1024 之外还有动态 shared storage。", ""]
+    pipeline=results/"mega_pipeline_resources.txt"
+    if pipeline.exists():
+        lines += [f"Megakernel pipeline 的编译与 SASS 证据：{relative_link(pipeline,target)}。记录 iter 4 对象 v2 的 248 registers/thread、12 KiB 动态 shared，v3 的 233 registers/thread、24 KiB 动态 shared；两种 dtype 均无 stack/spill 和 LDL/STL。该记录检查了七个产品的下一 stage load/transform/store/publish 在对应 wait 前发出，以及未过早访问未完成的 accumulator。它证明的是静态编译指令顺序与所列用例的 sanitizer 状态，不提供实际重叠时长、动态指令数、stall 或 Tensor Core 利用率；非 v3 全 tile/对齐/beta-zero 范围使用 v2。", ""]
+    subcuber=results/"subcuber_compatibility.json"
+    if subcuber.exists():
+        audit=json.loads(subcuber.read_text(encoding="utf-8"))
+        status=audit.get("replication_status","unknown")
+        commit=audit.get("source_identity",{}).get("author_commit","unknown")
+        lines += [f"SubCuber 主源码兼容性审计：{relative_link(subcuber,target)}。固定作者 commit `{commit}`，状态 `{status}`，没有 H100 编译/运行、性能测量或加速声明。未改动的作者 runner 没有 BF16 入口，所审查 FP16 kernel/runner 输出和部分中间 postsum 为 FP16；选定 global-presum presets 在 warmup 后复用 B 变换，不能直接比较本项目 FP32 输出、动态 A/B 的完整调用。该缓存问题不覆盖所有 L1 presets。公平对照需要独立 BF16/FP16 输入及 FP32 输出适配、每次动态变换计时、资源重新核算和本项目原始输入 FP64 参考认证；审计中的 deferred commands 未执行。", ""]
+    manifest=results/"final_manifest.json"
+    if manifest.exists():
+        lines += [f"本次最终结果校验和与复测协议：{relative_link(manifest,target)}。记录测量源码 commit、solution tree、源文件/二进制/CSV SHA256、设备 UUID、固定门限与完整采样配置；该证据文件描述这次复测，后续重新运行需重新核对来源。", ""]
     for path in (results/"environment.txt",results/"dependency.txt"):
         if path.exists():
             lines += [f"环境/依赖记录：{relative_link(path,target)}。", ""]

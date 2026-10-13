@@ -1,6 +1,15 @@
 # MegaFMM：面向 H100 的高性能 Strassen–Winograd 实现计划
 
-日期：2026-10-13。状态：资料检索、实现方向与验收方案已形成；CUDA 实现和 GPU 性能测量属于后续开发阶段。
+日期：2026-10-13。下文保留实施前的设计与验收合同；实际执行状态见本段及最终证据。
+
+执行更新：已建立 CUDA/C++ 工程，实现完整单层 V1、Hopper V2 与 M1/M3
+megakernel，完成 AKO4ALL 的5轮修改、测量、记录和提交。最终结构/API 测试及
+memcheck/racecheck/synccheck 均通过；原始输入 FP64 参考下的固定数值门限
+仍失败，完整性能复测也未达到相邻大形状至少1.05×的加速关口。因此自动
+dispatcher 保持 Dense，强制 SW 保留为实验接口。双层、M2、较广的 V3/V4、
+batch/scheduler、tail peeling 和同合同 SubCuber 性能复现尚未完成；本次
+没有把 P0–P5 的全部验收标为通过。详见 [README.md](README.md)、
+[ITERATIONS.md](ITERATIONS.md) 与 [results/REPORT.md](results/REPORT.md)。
 
 ## 1. 实现方向与目标合同
 
@@ -365,4 +374,4 @@ nvidia-smi
 
 若采用 SSH，g08 使用端口 2222，并核验 allocation 对应的 GPU；不能假定任意 SSH 会话继承 Slurm 设备绑定。现有分配失效时先查 `scontrol show partition h100`，按集群默认使用长驻 `salloc`，允许时请求 UNLIMITED，并保持 allocation shell。下载依赖在登录节点完成，计算节点承担构建、测试与 profiling。
 
-本阶段已经完成：仓库/现场只读检查、官方文档与原始研究检索、最新 SubCuber 源码边界核验、算法双线性恒等检查，以及成本与 workspace 推导。尚未完成：CUDA 实现、H100 正确性运行、性能测量、交叉规模和最终最优策略；这些由 P0–P5 的实际数据确定。
+实施前阶段已经完成：仓库/现场只读检查、官方文档与原始研究检索、最新 SubCuber 源码边界核验、算法双线性恒等检查，以及成本与 workspace 推导。该阶段尚未进行 CUDA 实现和 H100 测量；后续执行结果见开头的执行更新，验收合同仍由上述 P0–P5 定义。

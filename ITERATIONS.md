@@ -34,6 +34,11 @@ Status values: improved / no-change / regression / failed.
 
 | 5 | Replace the unresolved Pingpong control with ordinary warp specialization | 0.5183 | 9.565941 | no-change |
 
+Each row pools only that iteration's selected experimental family and shapes.
+These arithmetic means are not comparable across iterations with different
+families or scopes; use matched shape/dtype/mode rows for decisions. The final
+retained tree includes the fast implementations from earlier iterations.
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -53,7 +58,7 @@ Status values: improved / no-change / regression / failed.
 | 16384 | bf16 | 12.661223 | 13.059917 | 0.9695 | 0.00602276 | 0.00105372 |
 | 16384 | fp16 | 13.259946 | 13.621885 | 0.9734 | 0.000753079 | 0.000157995 |
 
-- Resource probe: megakernel64x32 M1=150 registers,42KiB SMEM,0 spill;64x64 M1=254 registers,56KiB,0 spill. Stock Hopper variants=168 static registers with512/1024-byte compiler spill stores/loads.
+- Resource probe: megakernel64x32 M1=150 registers,42KiB SMEM,0 spill;64x64 M1=254 registers,56KiB,0 spill. Stock Hopper variants use168 static registers. An early non-NDEBUG probe emitted512/1024-byte spill stores/loads; the measured Release objects have zero stack/spills and no LDL/STL, as verified in hopper_release_resources.txt. The probe is not evidence of spills in benchmark binaries.
 - Raw baseline snapshot: trajectory/20261013_114800_baseline/. Next: ncu baseline once, then optimize dominant full-call cost.
 
 ### Iter 1 — Vectorize shared DAG packing and FP32 combine
@@ -151,3 +156,90 @@ Status values: improved / no-change / regression / failed.
 - **Analysis:** Compiles with zero spills. Full-call control latency is0.422/0.427ms at4096,2.666/2.763ms at8192,25.227/25.890ms at16384 BF16/FP16. This is a validation repair/control rather than a speed winner; keep vector V1 and Hopper3/4 as fast experimental routes. Frozen numerical gates still fail with finite outputs; independent sanitizer confirmation follows this commit.
 - **Next:** Run complete structural and sanitizer checks, then full final timing with100calls5groups3fresh references, Graph and rotating inputs
 - **Archive:** trajectory/20261013_121327_iter-5/
+
+## Final reassessment and retained implementation (2026-10-13)
+
+The fixed one-cast Winograd policy is not certified. This is a numerical
+feasibility barrier for the current policy, rather than evidence of a minimum
+possible GPU latency. The independent `tests/mixed_precision_floor.py` witness
+uses original already-rounded inputs and exact leaf products: BF16 eF is
+0.004871312 versus floor0.001, and FP16 eF is0.000803082 versus floor0.0001.
+The FP32 product/U diagnostic also fails, with Dense eF0 and8.92e-9 respectively.
+Tensoring these2x2 coefficient matrices with an identity preserves relative
+error and constructs aligned sizes; this is a mathematical lifting argument,
+not a claimed GPU run of the lifted witness. Independent GPU uniform/range
+stress checks demonstrate the same limitation in actual candidates.
+
+Changing transport, tiles, stages, occupancy or product lifetime cannot restore
+information removed by that prescribed cast. The current optimization cycle
+therefore closes with no automatically accepted SW shape. Compensation,
+scaling, restricted input contracts or different operand precision require a
+separate numerical policy and independently timed/validated implementation.
+No tolerance was relaxed, no random-pattern detector was introduced, and
+finite output alone was never counted as numerical certification.
+
+The reassessment reviewed per-shape logs and the once-only Nsight Systems
+capture because the session's one ncu probe failed. Four distinct execution
+rewrites were measured and committed: iter1 vectorized S/T and U transport;
+iter2 three-accumulator M3 full-product scheduling; iter3 source-free Hopper
+epilogue and cluster B multicast; iter4 full-tile shared vector stores and
+asynchronous two-stage transform/WGMMA pipeline. Iter5 repaired the diagnostic
+control. The [Hopper tuning guide](https://docs.nvidia.com/cuda/archive/12.4.1/hopper-tuning-guide/index.html)
+and [pinned CUTLASS producer/consumer mainloop](https://github.com/NVIDIA/cutlass/blob/v3.5.1/include/cutlass/gemm/collective/sm90_mma_tma_gmma_ss_warpspecialized.hpp)
+support the data-transfer/compute overlap direction; source inspection and
+compiled instruction order were used alongside full-call timing, rather than
+assuming that a stage-count change alone produces a gain. The source-free
+epilogue comparison also changes delayed-store behavior and mainloop stages;
+it is not an isolated epilogue-arithmetic experiment.
+
+The final retained source is d3cff91's solution tree. It already includes the
+unchanged iter1 vector V1, iter3 Hopper3/4 alternatives, iter4's fastest measured
+M3 variant3, and iter5's validated ordinary warp-specialized control. No later
+iteration overwrote those fast candidates, so there is no source restoration.
+The default Auto route remains tuned Dense because the accepted SW set is
+empty. Per-family retention is intentional: V1 has the lower measured large
+shape latency, while Hopper4 is competitive at smaller shapes. Summary means
+over different families are not a ranking of complete implementations.
+
+Final validation passed3 independent DAG tests, the full structural/API suite,
+full-suite memcheck, and all-candidate racecheck/synccheck. The strict matrix
+contains300 candidate/pattern/trial/dtype checks:120 frozen-gate failures,
+zero nonfinite outputs. Each dtype has150 checks and60 failures. Failures are
+uniform and in-range amplitude stress; the high FP16 range cases deliberately
+use Dense fallback and cannot certify SW. Logs are `results/final_*.txt`.
+
+Final ordinary launch examples,20warmups/100calls/5groups/3fresh FP64 references:
+
+| M=N=K | dtype | tuned Dense median ms | vector V1 median ms | Dense / V1 | SW eF | maximum trial gate |
+|---:|---|---:|---:|---:|---:|---:|
+|8192|BF16|1.717472|1.935383|0.887407|0.006023394|0.001025652|
+|8192|FP16|1.771971|1.984888|0.892731|0.000753411|0.000129068|
+|16384|BF16|12.842401|12.944546|0.992109|0.006022762|0.001053692|
+|16384|FP16|13.302281|13.472572|0.987360|0.000753079|0.000157995|
+
+The short iter1 16384 FP16 ratio1.051 did not persist at the full gate.
+Neither neighboring large shape performance nor fixed numerical acceptance
+was achieved. Graph and4-address-pair rotation are reported separately in
+`results/REPORT.md`; every invocation includes fresh dependent transforms.
+The M3 pipeline retest gives8192 BF16/FP16 21.670815/21.808022ms, approximately
+12% below iter2's24.564484/24.810445ms, but far slower than tuned Dense. Static
+SASS sites fall8152→3928 and registers248→233, with zero spills; this evidence
+does not measure dynamic utilization or overlap duration. See
+`results/mega_pipeline_resources.txt`.
+
+All timing uses unlocked GPU clocks. Group p10/p90 and CV describe five group
+means, not invocation tails or confidence intervals; before/after telemetry
+does not establish within-group clock stability. Final source commits and
+exit codes are in `results/final_runs.csv`. There are94 final rows:88 actual SW
+rows all fail the frozen gate,6 Dense fallback rows pass, and no unchecked or
+nonfinite rows. `results/final_manifest.json` records source/binary/CSV hashes,
+device identity, protocol and independent evidence counts. Exit2 preserves the numerical
+failure; it is not a runtime failure or a passing score.
+
+This closure does not claim that every performance research direction is
+exhausted. M2, broader V3/V4, product-aware batch/scheduler, tail peeling and
+two levels remain unimplemented. The primary-source SubCuber audit in
+`results/subcuber_compatibility.json` establishes that an unmodified author
+runner is not the same BF16/FP16-input FP32-output dynamic-input comparator;
+no author build, H100 run or performance speedup is reported. These open
+experiments have not been silently marked complete in PLAN.

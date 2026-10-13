@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
+mkdir -p results
 # Probe ncu once after baseline. Profiler replay times are never benchmark scores.
 bash scripts/on_gpu.sh ncu --target-processes all --set basic \
   --kernel-name 'regex:pack_|combine_' --launch-count 3 \

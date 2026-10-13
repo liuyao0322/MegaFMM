@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-13",
+  "audit_kind": "primary_source_read_only_comparator_audit",
+  "replication_status": "not_built_or_run",
+  "performance_measurements": null,
+  "speedup_claim": null,
+  "conclusion": {
+    "author_hopper_fp16_build_with_cuda_12_4_driver_575": "plausible_from_documented_requirements_but_unbuilt",
+    "ready_fair_bf16_fp16_input_fp32_output_comparator": false,
+    "deferred_reason": "The unmodified author runner has no BF16 entry and its FP16 kernels and runner store D as FP16. Selected global-presum presets reuse precomputed B transforms after warmup. A fair adapter and independent numerical validation are required before reporting timings against this project's FP32-output dynamic-input contract.",
+    "h100_status": "SM90a is the appropriate author build target for Hopper/H100; no author binary was compiled or launched on H100 in this audit. The paper reports A100/H200, not an H100 replication."
+  },
+  "source_identity": {
+    "official_repository": "https://github.com/microsoft/subcuber",
+    "author_commit": "c7b6fd8c72db4fc83982b26ea6e80e47567d674f",
+    "cutlass_gitlink": "a49a78ffefc86a87160dfe0ccc3a3a2d1622c918",
+    "cutlass_version_h": "4.1.0",
+    "cutlass_readme_version_label": "4.2.0",
+    "version_note": "The same pinned CUTLASS commit's README label differs from version.h. Record the exact gitlink and version.h values; PLAN's 4.1.0 header version is correct.",
+    "author_cutlass_patch_sha256": "8c5d41bdecf89a5a719c169cb24ff01c47e375a10371bd66ca57881eacb0b378",
+    "author_cutlass_patch_bytes": 4434,
+    "paper_title": "Compiling Strassen-like Matrix Multiplication Algorithms to Fast CUDA Kernels",
+    "paper_venue_date": "PLDI, June 2026",
+    "paper_official_page": "https://www.microsoft.com/en-us/research/publication/compiling-strassen-like-matrix-multiplication-algorithms-to-fast-cuda-kernels/",
+    "paper_publication_url": "https://dl.acm.org/doi/10.1145/3808267",
+    "paper_full_text_status": "ACM page returned HTTP 403; official Microsoft abstract and author source were inspected, not full paper text.",
+    "dependency_isolation": "Keep the author's patched CUTLASS checkout separate from MegaFMM's pinned stock CUTLASS 3.5.1."
+  },
+  "findings": [
+    {
+      "id": "dtype_output",
+      "claim": "Hopper FP16 L1 and L2 presets use half A/B and half D, with float accumulators and row-major layouts. FP32 accumulation does not make their stored output FP32.",
+      "evidence": ["l1_types", "l2_types"],
+      "impact": "The unmodified FP16 result is a different output contract from MegaFMM."
+    },
+    {
+      "id": "bf16_runner_absent",
+      "claim": "The benchmark runner validates dtype against f32/f16/f64 and instantiates one selected Element for A, B and D. No BF16 runner entry or FP16-input/FP32-output allocation is provided.",
+      "evidence": ["runner_dtype"],
+      "impact": "Neither --dtype=bf16 nor changing only a kernel typedef supplies the requested comparator. This is a claim about the inspected author runner and registered Hopper presets, not every possible template instantiation."
+    },
+    {
+      "id": "fp32_presums_already_present",
+      "claim": "The Hopper collective's PresumComputeType is ElementAccumulator, float in the FP16 presets. Its fixed expression chain converts raw operands to this compute type and converts transformed values back to the operand type for storage. The global presum kernel uses the same conversion pattern.",
+      "evidence": ["presum_collective", "global_presum"],
+      "impact": "Do not characterize all author presums as FP16 arithmetic. A fair adaptation must preserve FP32 arithmetic, expression ordering and conversion points, and must separately address FP16 output/interim postsums."
+    },
+    {
+      "id": "interim_postsum_precision",
+      "claim": "The Hopper epilogue uses ElementD for shared postsum and secondary D buffers; the selected presets define ElementD as half.",
+      "evidence": ["epilogue_storage", "l1_types", "l2_types"],
+      "impact": "Audit intermediate materialization as well as final output when adapting to fixed FP32 postsums. Re-measure shared-memory resources and stage counts after widening these buffers."
+    },
+    {
+      "id": "cached_global_presum_timing",
+      "claim": "The selected L2 cooperative/pingpong TMA-reduce preset computes the four A presums in its producer and selects PresumGlobalKernel for the four B presums. Its adapter runs global presums only while paramsM0_.run <= 1, synchronizes, and increments that counter. The runner reuses one initialized operator for warmup and measured iterations; warmup=2 excludes later B transformation work from the measured loop.",
+      "evidence": ["l2_types", "adapter_presum_cache", "runner_timing"],
+      "impact": "For dynamic B, recompute B presums inside every timed invocation or report a distinct fixed-weight scenario. Setting warmup=0 alone is insufficient because only the first one or two timed calls include the work.",
+      "scope_note": "This exclusion applies to presets that select PresumGlobalKernel. The inspected L1 pingpong preset selects PresumCompute for all A/B presums; its presums are part of each invocation, so the cached-global-presum claim does not apply to that preset."
+    },
+    {
+      "id": "shape_limits",
+      "claim": "The selected L2 preset checks M modulo 512, N modulo 1024, and K modulo 256. MegaFMM's square 4096/8192/16384 shapes meet these divisibility checks; arbitrary shape support cannot be assumed.",
+      "evidence": ["l2_types"]
+    },
+    {
+      "id": "author_validation_differs",
+      "claim": "The README states that the runner does not check output. The separate tests compare with ReferenceStrassenWinogradGemm, and their FP16 L2 threshold accepts absolute error <=14 OR relative error <=0.11.",
+      "evidence": ["author_readme", "author_tests"],
+      "impact": "These tests are useful source checks but do not replace MegaFMM's original-input high-precision GEMM reference and frozen numerical gates."
+    },
+    {
+      "id": "author_lt_baseline",
+      "claim": "The author's cuBLASLt runner requests one heuristic candidate.",
+      "evidence": ["author_lt"],
+      "impact": "Use MegaFMM's independently tuned dense baseline for any fair comparison; do not transfer the author's baseline speedup to H100."
+    }
+  ],
+  "build_runtime_assessment": {
+    "required_host_dialect": "C++20",
+    "author_hopper_gencode": "--generate-code=arch=compute_90a,code=[compute_90a,sm_90a] -DGENCODE_ARCH=900",
+    "cutlass_hopper_cuda_threshold": "CUDA >=12.0 for SM90a; modifiable TMA guards require >=12.3",
+    "cuda_12_4_evidence": "The author README explicitly gives a CUDA_HOME=/usr/local/cuda-12.4 build example. Pinned CUTLASS README includes all CUDA12.x in its compatibility range. These source statements support an attempted Hopper-only build, not proof that every patched specialization compiles.",
+    "host_compiler_requirement": "CUDA12.4 C++20 requires GCC>=10; documented x86 GCC support reaches13.2.",
+    "existing_compiler_observation": "/usr/bin/c++ --version reports Debian GCC12.2.0-14; current MegaFMM CMakeCache points to /usr/bin/c++ and /share/app/cuda/cuda-12.4/bin/nvcc.",
+    "driver_575_assessment": "Driver575 exceeds CUDA12.4's550.54.14 GA/550.54.15 Update1 driver baselines. Native CUDA12.4 binaries are a supported direction under NVIDIA backward compatibility; no runtime test of SubCuber was performed.",
+    "default_target_caveat": "Use kernel_runner_hopper. The default make source list includes Blackwell sm100a targets requiring newer CUDA support and is not the appropriate CUDA12.4 Hopper build.",
+    "author_container_caveat": "Author Dockerfile uses NVIDIA PyTorch26.02-py3 with CUDA13.1.1. Plain CUDA13.x requires driver>=580; an unchanged author container on575 would need a separately validated compatibility setup. Native CUDA12.4 avoids that unrelated environment change.",
+    "evidence": ["author_readme", "author_makefile", "cutlass_readme", "cutlass_arch", "cutlass_cmake", "cuda_host_compiler", "cuda_driver", "cuda_minor_compatibility", "hopper_guide", "author_dockerfile", "pytorch_container"]
+  },
+  "required_fair_adapter_changes": [
+    "Add explicit BF16 and FP16 input specializations and runner allocation independent of FP32 D storage; keep float accumulation.",
+    "Use FP32 final D and required interim postsum storage. Audit all epilogue layouts, conversion points, TMA reduce/store operators, shared memory and stage counts; validate compilation and resources after widening.",
+    "Preserve the project's FP32 pre/post-transform expression ordering and quantize transformed tensor-core operands only at the agreed boundary. Audit the extra materialization and rounding in any level2 preset.",
+    "For dynamic A/B, include every required transform in each timed call. Remove or reset cached global B presum behavior through an explicit adapter contract; retain a separately labeled fixed-weight scenario if evaluated.",
+    "Feed the same original quantized inputs, shapes, recursion level, layout/stride and alpha/beta cases to author and project kernels. Validate against the same high-precision original-input GEMM reference and frozen numerical gate.",
+    "Use the project's tuned dense baseline and common event/capture/stream protocol, warmup, measured iterations, clocks, workspace accounting and repeated distribution reporting. Include transforms and combination work required by the selected scenario."
+  ],
+  "deferred_commands": {
+    "executed": false,
+    "scope": "Future commands only, in a fresh separate author checkout; runtime commands require an allocated H100 GPU. The commands below exercise the unmodified FP16-output implementation, not the fair adapted comparator.",
+    "prepare": [
+      "git clone https://github.com/microsoft/subcuber.git /share/home/liuyao/workspace/subcuber-author-audit",
+      "git -C /share/home/liuyao/workspace/subcuber-author-audit checkout --detach c7b6fd8c72db4fc83982b26ea6e80e47567d674f",
+      "git -C /share/home/liuyao/workspace/subcuber-author-audit submodule update --init --recursive",
+      "git -C /share/home/liuyao/workspace/subcuber-author-audit/cutlass rev-parse HEAD",
+      "git -C /share/home/liuyao/workspace/subcuber-author-audit apply --check --directory=cutlass cutlass.patch",
+      "git -C /share/home/liuyao/workspace/subcuber-author-audit apply --directory=cutlass cutlass.patch"
+    ],
+    "build": "make -C /share/home/liuyao/workspace/subcuber-author-audit -j2 kernel_runner_hopper CUDA_HOME=/share/app/cuda/cuda-12.4 NVCC='/share/app/cuda/cuda-12.4/bin/nvcc -ccbin /usr/bin/c++' CXX=/usr/bin/c++ SPLIT_COMPILE=1 PRESUM_LEVEL_2_SPLIT_COMPILE=1",
+    "author_l1_all_presum_compute_control": "/share/home/liuyao/workspace/subcuber-author-audit/build/kernel_runner_hopper --m=8192 --n=8192 --k=8192 --dtype=f16 --gpu_arch=hopper --strassen_level=1 --iterations=10 --warmup=2 --streams=1 --kernel_regex='^hopper_f16_sw_interleaved_presum_pingpong_max_fusion_2x128_2x128_opt_no$'",
+    "author_l2_example": "/share/home/liuyao/workspace/subcuber-author-audit/build/kernel_runner_hopper --m=16384 --n=16384 --k=16384 --dtype=f16 --gpu_arch=hopper --strassen_level=2 --iterations=10 --warmup=2 --streams=1 --kernel_regex='level_2_cooperative_pingpong_max_fusion_tma_reduce'",
+    "author_test_build": "make -C /share/home/liuyao/workspace/subcuber-author-audit/tests test_hopper_f16_tensorop_strassen_winograd_level_2_cooperative_pingpong_tma_reduce NVCC='/share/app/cuda/cuda-12.4/bin/nvcc -ccbin /usr/bin/c++' CXX=/usr/bin/c++ SPLIT_COMPILE=1",
+    "author_test_run": "/share/home/liuyao/workspace/subcuber-author-audit/tests/test_hopper_f16_tensorop_strassen_winograd_level_2_cooperative_pingpong_tma_reduce",
+    "fair_benchmark_command": null,
+    "fair_benchmark_command_reason": "A fair BF16/FP16-input FP32-output adapter has not been implemented or validated, so no ready fair-comparator command is claimed."
+  },
+  "primary_sources": {
+    "paper": {"url": "https://www.microsoft.com/en-us/research/publication/compiling-strassen-like-matrix-multiplication-algorithms-to-fast-cuda-kernels/", "location": "Title, venue/date and evaluation abstract"},
+    "gitlink": {"url": "https://api.github.com/repos/microsoft/subcuber/git/trees/c7b6fd8c72db4fc83982b26ea6e80e47567d674f", "location": "cutlass tree entry: mode160000, typecommit, shaa49a78ffefc86a87160dfe0ccc3a3a2d1622c918"},
+    "version_h": {"url": "https://github.com/NVIDIA/cutlass/blob/a49a78ffefc86a87160dfe0ccc3a3a2d1622c918/include/cutlass/version.h#L37", "lines": [37, 39]},
+    "cutlass_readme": {"url": "https://github.com/NVIDIA/cutlass/blob/a49a78ffefc86a87160dfe0ccc3a3a2d1622c918/README.md#L142", "lines": [142, 150], "other_location": "Version label at lines4-6"},
+    "author_patch": {"url": "https://raw.githubusercontent.com/microsoft/subcuber/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/cutlass.patch", "location": "Whole4434-byte patch fetched in memory to compute SHA256"},
+    "author_readme": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/README.md#L8", "locations": [[8, 32], [59, 77], [115, 134]]},
+    "author_makefile": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/Makefile#L25", "locations": [[25, 39], [172, 177]]},
+    "l1_types": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/src/cuda/kernels/hopper/strassen_winograd/hopper_f16_sw_interleaved_presum_pingpong_max_fusion.cuh#L20", "locations": [[20, 59]]},
+    "l2_types": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/src/cuda/kernels/hopper/strassen_winograd/hopper_f16_sw_interleaved_presum_level_2_cooperative_pingpong_max_fusion_tma_reduce.cuh#L22", "locations": [[22, 47], [131, 137]]},
+    "runner_dtype": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/src/cuda/kernel_runner.cpp#L314", "locations": [[314, 319], [367, 367], [400, 402], [635, 637], [663, 672]]},
+    "presum_collective": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/include/cutlass/gemm/collective/sm90_strassen_mma_tma_gmma_ss_warpspecialized.hpp#L163", "locations": [[163, 167], [1362, 1365], [1513, 1516]]},
+    "global_presum": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/include/cutlass/strassen_presum_global_kernel.h#L27", "locations": [[27, 29], [135, 153], [190, 209]]},
+    "epilogue_storage": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/include/cutlass/epilogue/collective/sm90_strassen_epilogue_tma_warpspecialized.hpp#L150", "locations": [[150, 158], [226, 272]]},
+    "adapter_presum_cache": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/include/cutlass/gemm/device/strassen_gemm_universal_adapter.h#L1460", "locations": [[1460, 1474], [2086, 2086], [2242, 2242], [2266, 2333]]},
+    "runner_timing": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/src/cuda/kernel_runner_support.cuh#L355", "locations": [[355, 379], [396, 404], [439, 439]]},
+    "author_tests": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/tests/base_test.cuh#L85", "locations": [[85, 106], [297, 305]]},
+    "author_lt": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/src/cuda/cublaslt_runner.cpp#L168", "lines": [168, 172]},
+    "cutlass_arch": {"url": "https://github.com/NVIDIA/cutlass/blob/a49a78ffefc86a87160dfe0ccc3a3a2d1622c918/include/cutlass/arch/config.h#L42", "locations": [[42, 50], [60, 68]]},
+    "cutlass_cmake": {"url": "https://github.com/NVIDIA/cutlass/blob/a49a78ffefc86a87160dfe0ccc3a3a2d1622c918/CMakeLists.txt#L173", "lines": [173, 178]},
+    "cuda_host_compiler": {"url": "https://docs.nvidia.com/cuda/archive/12.4.1/cuda-installation-guide-linux/index.html#host-compiler-support-policy", "location": "Tables2 and supported C++ dialects, section1.3/1.3.1"},
+    "cuda_driver": {"url": "https://docs.nvidia.com/cuda/archive/12.4.1/cuda-toolkit-release-notes/index.html#cuda-driver", "location": "CUDA Driver tables and backward compatibility explanation"},
+    "cuda_minor_compatibility": {"url": "https://docs.nvidia.com/deploy/cuda-compatibility/minor-version-compatibility.html", "location": "CUDA toolkit/driver compatibility ranges table"},
+    "hopper_guide": {"url": "https://docs.nvidia.com/cuda/archive/12.4.1/hopper-compatibility-guide/index.html", "location": "Section1.4: sm90a/compute90a architecture-conditional code targets compute capability9.0"},
+    "author_dockerfile": {"url": "https://github.com/microsoft/subcuber/blob/c7b6fd8c72db4fc83982b26ea6e80e47567d674f/Dockerfile#L1", "lines": [1, 1]},
+    "pytorch_container": {"url": "https://docs.nvidia.com/deeplearning/frameworks/pytorch-release-notes/rel-26-02.html", "location": "Container contents: CUDA13.1.1"}
+  },
+  "actions_performed": {
+    "official_web_and_raw_source_reads": true,
+    "metadata_source_fetched_to_memory_only": true,
+    "existing_local_compiler_version_read": true,
+    "gpu_access": false,
+    "build_or_benchmark": false,
+    "git_command": false,
+    "environment_change": false,
+    "solution_or_dependency_edit": false,
+    "only_persisted_artifact": "results/subcuber_compatibility.json"
+  }
+}

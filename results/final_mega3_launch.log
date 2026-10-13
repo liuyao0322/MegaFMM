@@ -1,0 +1,54 @@
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+CHECK 4096,4096,4096 bf16 trial=0 dense_eF=4.02334e-06 solution_eF=0.00602272 gate=0.00101207 pass=0
+CHECK 4096,4096,4096 bf16 trial=1 dense_eF=4.02328e-06 solution_eF=0.00602569 gate=0.00101207 pass=0
+CHECK 4096,4096,4096 bf16 trial=2 dense_eF=4.02375e-06 solution_eF=0.0060269 gate=0.00101207 pass=0
+TIME shape=4096,4096,4096 dtype=bf16 group=0 case=dense event_ms=0.196621 wall_ms=0.196737
+TIME shape=4096,4096,4096 dtype=bf16 group=0 case=solution event_ms=2.66631 wall_ms=2.66645
+TIME shape=4096,4096,4096 dtype=bf16 group=1 case=solution event_ms=2.64588 wall_ms=2.64602
+TIME shape=4096,4096,4096 dtype=bf16 group=1 case=dense event_ms=0.19726 wall_ms=0.197373
+TIME shape=4096,4096,4096 dtype=bf16 group=2 case=solution event_ms=2.70457 wall_ms=2.70467
+TIME shape=4096,4096,4096 dtype=bf16 group=2 case=dense event_ms=0.196602 wall_ms=0.196699
+TIME shape=4096,4096,4096 dtype=bf16 group=3 case=dense event_ms=0.197002 wall_ms=0.197088
+TIME shape=4096,4096,4096 dtype=bf16 group=3 case=solution event_ms=2.71314 wall_ms=2.71327
+TIME shape=4096,4096,4096 dtype=bf16 group=4 case=solution event_ms=2.64634 wall_ms=2.64645
+TIME shape=4096,4096,4096 dtype=bf16 group=4 case=dense event_ms=0.19702 wall_ms=0.197153
+CHECK 4096,4096,4096 fp16 trial=0 dense_eF=4.87534e-06 solution_eF=0.000753133 gate=0.000114626 pass=0
+CHECK 4096,4096,4096 fp16 trial=1 dense_eF=4.87603e-06 solution_eF=0.000752695 gate=0.000114628 pass=0
+CHECK 4096,4096,4096 fp16 trial=2 dense_eF=4.87674e-06 solution_eF=0.000753062 gate=0.00011463 pass=0
+TIME shape=4096,4096,4096 dtype=fp16 group=0 case=dense event_ms=0.208645 wall_ms=0.208744
+TIME shape=4096,4096,4096 dtype=fp16 group=0 case=solution event_ms=2.70216 wall_ms=2.70227
+TIME shape=4096,4096,4096 dtype=fp16 group=1 case=solution event_ms=2.66204 wall_ms=2.66214
+TIME shape=4096,4096,4096 dtype=fp16 group=1 case=dense event_ms=0.208144 wall_ms=0.208237
+TIME shape=4096,4096,4096 dtype=fp16 group=2 case=solution event_ms=2.72525 wall_ms=2.72534
+TIME shape=4096,4096,4096 dtype=fp16 group=2 case=dense event_ms=0.207515 wall_ms=0.2076
+TIME shape=4096,4096,4096 dtype=fp16 group=3 case=dense event_ms=0.208991 wall_ms=0.209076
+TIME shape=4096,4096,4096 dtype=fp16 group=3 case=solution event_ms=2.7449 wall_ms=2.745
+TIME shape=4096,4096,4096 dtype=fp16 group=4 case=solution event_ms=2.6623 wall_ms=2.66245
+TIME shape=4096,4096,4096 dtype=fp16 group=4 case=dense event_ms=0.208152 wall_ms=0.208254
+CHECK 8192,8192,8192 bf16 trial=0 dense_eF=8.54807e-06 solution_eF=0.00602247 gate=0.00102564 pass=0
+CHECK 8192,8192,8192 bf16 trial=1 dense_eF=8.54797e-06 solution_eF=0.00602145 gate=0.00102564 pass=0
+CHECK 8192,8192,8192 bf16 trial=2 dense_eF=8.55055e-06 solution_eF=0.00602339 gate=0.00102565 pass=0
+TIME shape=8192,8192,8192 dtype=bf16 group=0 case=solution event_ms=21.6169 wall_ms=21.6172
+TIME shape=8192,8192,8192 dtype=bf16 group=0 case=dense event_ms=1.57028 wall_ms=1.57047
+TIME shape=8192,8192,8192 dtype=bf16 group=1 case=solution event_ms=21.6856 wall_ms=21.6859
+TIME shape=8192,8192,8192 dtype=bf16 group=1 case=dense event_ms=1.59443 wall_ms=1.59462
+TIME shape=8192,8192,8192 dtype=bf16 group=2 case=dense event_ms=1.5897 wall_ms=1.58981
+TIME shape=8192,8192,8192 dtype=bf16 group=2 case=solution event_ms=21.6708 wall_ms=21.6711
+TIME shape=8192,8192,8192 dtype=bf16 group=3 case=solution event_ms=21.6197 wall_ms=21.62
+TIME shape=8192,8192,8192 dtype=bf16 group=3 case=dense event_ms=1.54011 wall_ms=1.54029
+TIME shape=8192,8192,8192 dtype=bf16 group=4 case=solution event_ms=21.708 wall_ms=21.7082
+TIME shape=8192,8192,8192 dtype=bf16 group=4 case=dense event_ms=1.59626 wall_ms=1.5964
+CHECK 8192,8192,8192 fp16 trial=0 dense_eF=9.68663e-06 solution_eF=0.000753411 gate=0.00012906 pass=0
+CHECK 8192,8192,8192 fp16 trial=1 dense_eF=9.6864e-06 solution_eF=0.000752908 gate=0.000129059 pass=0
+CHECK 8192,8192,8192 fp16 trial=2 dense_eF=9.68937e-06 solution_eF=0.000752953 gate=0.000129068 pass=0
+TIME shape=8192,8192,8192 dtype=fp16 group=0 case=solution event_ms=21.7545 wall_ms=21.7548
+TIME shape=8192,8192,8192 dtype=fp16 group=0 case=dense event_ms=1.67424 wall_ms=1.67439
+TIME shape=8192,8192,8192 dtype=fp16 group=1 case=solution event_ms=21.8594 wall_ms=21.8596
+TIME shape=8192,8192,8192 dtype=fp16 group=1 case=dense event_ms=1.63814 wall_ms=1.63826
+TIME shape=8192,8192,8192 dtype=fp16 group=2 case=dense event_ms=1.68107 wall_ms=1.68117
+TIME shape=8192,8192,8192 dtype=fp16 group=2 case=solution event_ms=21.8174 wall_ms=21.8176
+TIME shape=8192,8192,8192 dtype=fp16 group=3 case=solution event_ms=21.7317 wall_ms=21.732
+TIME shape=8192,8192,8192 dtype=fp16 group=3 case=dense event_ms=1.597 wall_ms=1.59716
+TIME shape=8192,8192,8192 dtype=fp16 group=4 case=solution event_ms=21.808 wall_ms=21.8082
+TIME shape=8192,8192,8192 dtype=fp16 group=4 case=dense event_ms=1.65409 wall_ms=1.65424
+srun: error: g08: task 0: Exited with exit code 2
