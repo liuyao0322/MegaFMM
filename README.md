@@ -312,3 +312,39 @@ SubCuber比较边界见 [subcuber_compatibility.json](results/subcuber_compatibi
 作者half输出、缺BF16和部分预热后复用B变换的preset须先适配，不引用其速度为本工程成绩。
 AKO4ALL持续保留假设、资源、正确性、完整时间与提交记录；直接寄存器operand等
 可行新方向仍需独立接入与同合同复验，当前快照没有将P0–P5全部关口标为通过。
+
+
+## Iteration28: fused-input leaf versus packed-once1024
+
+Measured source `68035fa6b35bebdbef660741cba513ed3e183fd1` adds Hopper9/10: one CTA-uniform seven-product fused-input leaf launch writes full-K FP32 P, followed by the required existing combine launch. Every run recomputes its original-input transforms. Native plans reserve P only and use zero-scratch Dense for incompatible rebindings; unsupported metadata/range/budget selects ordinary GEMM. All23 older CUDA TUs and frozen source23–27 evidence remain unchanged.
+
+The nine-shape both-dtype quick screens retain20warm/20calls/5groups/1fresh. Neither new configuration improves a primary own-SW latency by at least3% against the retained historical envelope. The user explicitly requested actual1024 comparison of both routes, so same-binary full1024 was required despite that screening result: Hopper9/Hopper10/Lt1/H7, both dtypes and launch/Graph,20warm/100calls/5groups/3fresh,32heuristic candidates and the same8GiB cap. All input transforms/packing, leaf products, P writes/reads, fixed U and alpha/beta are included; no input-dependent preprocessing is cached.
+
+| Mode | dtype | route | Dense us | SW us | Dense/SW | SW p10/p90 us | SW CV | gate |
+|---|---|---|---:|---:|---:|---|---:|---|
+| launch | bf16 | winograd_fused_input_32x32 v9 | 12.3837 | 43.1270 | 0.2871 | 43.0868/43.1683 | 0.000859 | FAIL |
+| launch | fp16 | winograd_fused_input_32x32 v9 | 9.9226 | 42.9302 | 0.2311 | 42.9039/43.0237 | 0.001266 | FAIL |
+| graph | bf16 | winograd_fused_input_32x32 v9 | 11.2976 | 40.9485 | 0.2759 | 40.9297/40.9761 | 0.000563 | FAIL |
+| graph | fp16 | winograd_fused_input_32x32 v9 | 9.3990 | 41.1693 | 0.2283 | 41.1480/41.2093 | 0.000759 | FAIL |
+| launch | bf16 | winograd_fused_input_32x64 v10 | 12.3357 | 38.1146 | 0.3236 | 38.0742/38.1633 | 0.001036 | FAIL |
+| launch | fp16 | winograd_fused_input_32x64 v10 | 9.9872 | 38.4778 | 0.2596 | 38.4567/38.5236 | 0.000795 | FAIL |
+| graph | bf16 | winograd_fused_input_32x64 v10 | 11.2298 | 36.2998 | 0.3094 | 36.2724/36.3217 | 0.000623 | FAIL |
+| graph | fp16 | winograd_fused_input_32x64 v10 | 9.4278 | 36.7155 | 0.2568 | 36.6911/36.7302 | 0.000481 | FAIL |
+| launch | bf16 | winograd_lt_batched v1 | 12.2349 | 19.2918 | 0.6342 | 19.2653/19.2972 | 0.000761 | FAIL |
+| launch | fp16 | winograd_lt_batched v1 | 9.9318 | 19.6413 | 0.5057 | 19.6324/19.6522 | 0.000471 | FAIL |
+| graph | bf16 | winograd_lt_batched v1 | 11.3667 | 16.9962 | 0.6688 | 16.9948/17.0018 | 0.000192 | FAIL |
+| graph | fp16 | winograd_lt_batched v1 | 9.3722 | 17.3923 | 0.5389 | 17.3836/17.4536 | 0.002366 | FAIL |
+| launch | bf16 | winograd_sm80_batched_k64 v7 | 12.2912 | 21.8685 | 0.5621 | 21.8548/21.9129 | 0.001364 | FAIL |
+| launch | fp16 | winograd_sm80_batched_k64 v7 | 9.9328 | 22.3366 | 0.4447 | 22.2934/22.3381 | 0.000965 | FAIL |
+| graph | bf16 | winograd_sm80_batched_k64 v7 | 11.2925 | 19.1539 | 0.5896 | 19.1300/19.1677 | 0.000879 | FAIL |
+| graph | fp16 | winograd_sm80_batched_k64 v7 | 9.4995 | 19.7997 | 0.4798 | 19.7795/19.8452 | 0.001476 | FAIL |
+
+All16 full rows and all48 original-input FP64 fresh gates fail the unchanged numerical threshold; nonfinite outputs are zero and Auto stays Dense. Packed-once Lt1 is the observed own-SW minimum among these four controls for each mode/dtype. Its same-row Dense/SW ratios remain below1. This result compares current backend/config choices; it is not a matched leaf experiment isolating only the placement of S/T. Row ordering and unlocked clocks limit causal attribution; p10/p90/CV describe five group means, not individual-call tails or confidence intervals.
+
+At1024, fused native P payload and caller-reserved workspace are7MiB. Packed Lt1/H7 have7MiB transformed lowp inputs plus7MiB P (14MiB payload), while their actual caller-reserved workspace is46MiB, including32MiB reserved for Dense-fallback candidates. The tuned Lt1 batch used bound_workspace0 and H7 leaf has zero backend scratch. The table reports complete end-to-end time, not leaf-only time.
+
+Default structural validation exits0 with1956CASE/731PASS, four direct seven-P integer fixtures,36 random final-D bitwise pairs against Mega7, and80Graph checks/240fresh-A/B replays. Strict validation exits2 with1230gates=738PASS+492FAIL,410distributions and NF0; its groups are1050old+60K128+60cooperative+60fused. New fused60 splits48native and12required HighHalf Dense. Final six CUDA12.8 compute-sanitizer2025.1.0.0 checks all exit0 with zero leaks/errors/hazards/warnings; each H9 check has32CASE/33PASS and H10 has34CASE/33PASS, two direct-P fixtures,18 final-D pairs and fourGraph checks/12freshAB replays. The initial H9 memcheck briefly overlapped the still-pending strict process, was retained separately as diagnostic_initial, and is excluded from the final six; its replacement ran independently after the other five. All timing completed before this diagnostic overlap.
+
+Compiled BN32/64 instances use56/64 registers with no stack/local/spill. ptxas reports4096/6144B shared; ELF reports5120/7168B separately, and runtime function attributes were not queried. Static1744/1816 instruction totals include all seven product branches and padding. A CTA selects one product, so static28HMMA/14BAR totals are not its dynamic stage counts. No ncu retry, occupancy claim, physical-floor conclusion or four-size completion follows. Fused-specific tests do not add transpose, isolated ldb misalignment or32768 GPU boundaries; common overlap/overflow negative tests remain the earlier forced-Lt coverage.
+
+Binary SHA256: benchmark `5fc2afccc67ee63afb0e7bfc68435e855909f4447f00a9739fa36a15e643193f`; tests `e34035a28da7bfb0fefb055f1b632b4089aa8e50e0807e302ef2b87c84640a54`. Source/binary/raw/config bindings and all16 full rows are in [results/small_fused_profile_iter28.json](results/small_fused_profile_iter28.json); the original nine-shape screen is archived under `trajectory/20261013_203807_iter-28/`. The active128/256/512/1024 goal remains unmet. Later evidence-only HEADs do not redefine the measured source commit.
