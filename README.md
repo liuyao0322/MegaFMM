@@ -15,7 +15,8 @@ WGMMA/Sm80 batched leaves，以及 M1/M2/M3、warp/product/cluster megakernel。
 用户已要求持续优化，并优先处理小矩阵。本快照记录 iteration23 的完整复测，
 不表示优化停止、达到物理延迟下限或整份 PLAN 已完成。直接寄存器传递 operand
 已在 iteration24 作为 Mega20/21 加入并完成诊断验证，未更新本快照的最优包络。
-后续连续向量加载与寄存器重排方向仍在推进。
+iteration25 的连续向量加载与寄存器重排控制已完成诊断和验证，仍未更新最优包络。
+持续优化目标为128/256/512/1024四尺寸都快于同行调优cuBLASLt；当前证据尚未满足。
 
 证据在 [小矩阵报告](results/SMALL_REPORT.md)、[small manifest](results/small_manifest.json)
 和 [ITERATIONS.md](ITERATIONS.md)；历史 profile 中的 Graph 覆盖描述以
@@ -104,6 +105,28 @@ variant 分别通过 standalone CUDA12.8 memcheck/racecheck/synccheck 定向检�
 原始24轮证据与覆盖限制另存，不改写源23的完整报告、manifest或profile。
 详见 [第24轮独立审计](results/small_direct_profile_iter24.json) 和
 [Mega21原始诊断数据](results/small_direct21_launch_iter24.csv)。
+
+Iteration25 的 Mega22/23 以向量64bit输入和全warp寄存器重排传递原生 MMA
+operand，同一冻结二进制的诊断 BF16/FP16 128 launch分别为4.6528/4.8272µs
+与4.1680/4.3392µs。自身延迟均慢于源23最优观测，因此没有触发≥3%改善后的
+完整扩测。该轮128同行Dense为5.3872–5.8736µs，比历史同行基线更慢；
+即使当轮Dense/SW>1，也不能把它计为代码收益或四尺寸目标已完成。BF128实际
+Lt算法字段相同，FP128所选stage从19变为13；原始TUNE配置保留，时钟未锁定，
+快筛和历史完整采样规模也不同。
+
+新M16/M8 kernel寄存器分别96/72，SHARED/LOCAL/STACK均零；每个K16 stage
+静态发出12/8条LDG.E.64、20/16条SHFL.BFLY与8条PRMT，保留完整7P后固定U。
+静态指令数不代表动态issue、DRAM流量或实际瓶颈。默认结构/API测试exit0，
+新增144次随机原生逐位比较通过；48项Graph检查/144次replay在每次重放前于
+同stream、固定captured pointers刷新A/B，并重算原输入FP64参考，M2另重算stage
+参考。这是源25新覆盖，不追认源23/24。22/23分别通过独立CUDA12.8三工具定向
+检查，零错误/危害/警告。strict35配置共1050检查，630通过、420失败、nonfinite零；
+两个控制的36诊断行全部固定数值失败，Auto仍为Dense。
+[第25轮独立审计](results/small_coalesced_profile_iter25.json)将源码commit
+`9c9c188f566ed05c17fb30429308b65586879bcc`、二进制与原始日志绑定；
+[Mega23控制数据](results/small_coalesced23_launch_iter25.csv)另存，旧快照保持冻结。
+下一轮检验K128固定循环边界/展开，原有最优路径保留；本checkpoint不是延迟下限
+或可行方向耗尽的判断。
 
 ## 构建、验证与复现
 
