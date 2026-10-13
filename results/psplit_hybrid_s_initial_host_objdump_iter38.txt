@@ -1,0 +1,512 @@
+000000000000ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>:
+    ab7a:	bf 10 00 00 00       	mov    $0x10,%edi
+    ab7f:	e8 3c a6 ff ff       	call   51c0 <__cxa_allocate_exception@plt>
+    ab84:	48 8d 35 dd 59 06 00 	lea    0x659dd(%rip),%rsi        # 70568 <cute::_+0x7>
+    ab8b:	48 89 c7             	mov    %rax,%rdi
+    ab8e:	48 89 c3             	mov    %rax,%rbx
+    ab91:	e8 8a ac ff ff       	call   5820 <std::invalid_argument::invalid_argument(char const*)@plt>
+    ab96:	48 8b 15 23 64 e2 00 	mov    0xe26423(%rip),%rdx        # e30fc0 <std::invalid_argument::~invalid_argument()@GLIBCXX_3.4>
+    ab9d:	48 8d 35 cc 60 e2 00 	lea    0xe260cc(%rip),%rsi        # e30c70 <typeinfo for std::invalid_argument@GLIBCXX_3.4>
+    aba4:	48 89 df             	mov    %rbx,%rdi
+    aba7:	e8 d4 ab ff ff       	call   5780 <__cxa_throw@plt>
+    abac:	bf 10 00 00 00       	mov    $0x10,%edi
+    abb1:	e8 0a a6 ff ff       	call   51c0 <__cxa_allocate_exception@plt>
+    abb6:	48 8d 35 e3 59 06 00 	lea    0x659e3(%rip),%rsi        # 705a0 <cute::_+0x3f>
+    abbd:	48 89 c7             	mov    %rax,%rdi
+    abc0:	48 89 c3             	mov    %rax,%rbx
+    abc3:	e8 58 ac ff ff       	call   5820 <std::invalid_argument::invalid_argument(char const*)@plt>
+    abc8:	48 8b 15 f1 63 e2 00 	mov    0xe263f1(%rip),%rdx        # e30fc0 <std::invalid_argument::~invalid_argument()@GLIBCXX_3.4>
+    abcf:	48 8d 35 9a 60 e2 00 	lea    0xe2609a(%rip),%rsi        # e30c70 <typeinfo for std::invalid_argument@GLIBCXX_3.4>
+    abd6:	48 89 df             	mov    %rbx,%rdi
+    abd9:	e8 a2 ab ff ff       	call   5780 <__cxa_throw@plt>
+    abde:	48 89 c5             	mov    %rax,%rbp
+    abe1:	48 89 df             	mov    %rbx,%rdi
+    abe4:	e8 c7 a6 ff ff       	call   52b0 <__cxa_free_exception@plt>
+    abe9:	48 89 ef             	mov    %rbp,%rdi
+    abec:	e8 cf ab ff ff       	call   57c0 <_Unwind_Resume@plt>
+    abf1:	48 89 c5             	mov    %rax,%rbp
+    abf4:	48 89 df             	mov    %rbx,%rdi
+    abf7:	e8 b4 a6 ff ff       	call   52b0 <__cxa_free_exception@plt>
+    abfc:	48 89 ef             	mov    %rbp,%rdi
+    abff:	e8 bc ab ff ff       	call   57c0 <_Unwind_Resume@plt>
+
+000000000000ac04 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]>:
+    ac04:	bf 10 00 00 00       	mov    $0x10,%edi
+    ac09:	e8 b2 a5 ff ff       	call   51c0 <__cxa_allocate_exception@plt>
+    ac0e:	48 8d 35 7b 5b 06 00 	lea    0x65b7b(%rip),%rsi        # 70790 <cute::_+0x22f>
+    ac15:	48 89 c7             	mov    %rax,%rdi
+    ac18:	48 89 c3             	mov    %rax,%rbx
+    ac1b:	e8 00 ac ff ff       	call   5820 <std::invalid_argument::invalid_argument(char const*)@plt>
+    ac20:	48 8b 15 99 63 e2 00 	mov    0xe26399(%rip),%rdx        # e30fc0 <std::invalid_argument::~invalid_argument()@GLIBCXX_3.4>
+    ac27:	48 8d 35 42 60 e2 00 	lea    0xe26042(%rip),%rsi        # e30c70 <typeinfo for std::invalid_argument@GLIBCXX_3.4>
+    ac2e:	48 89 df             	mov    %rbx,%rdi
+    ac31:	e8 4a ab ff ff       	call   5780 <__cxa_throw@plt>
+    ac36:	bf 10 00 00 00       	mov    $0x10,%edi
+    ac3b:	e8 80 a5 ff ff       	call   51c0 <__cxa_allocate_exception@plt>
+    ac40:	89 df                	mov    %ebx,%edi
+    ac42:	48 89 c5             	mov    %rax,%rbp
+    ac45:	e8 76 aa ff ff       	call   56c0 <cudaGetErrorString@plt>
+    ac4a:	4c 8d 64 24 10       	lea    0x10(%rsp),%r12
+    ac4f:	48 8d 54 24 0f       	lea    0xf(%rsp),%rdx
+    ac54:	48 89 c3             	mov    %rax,%rbx
+    ac57:	48 8d 35 5c 5b 06 00 	lea    0x65b5c(%rip),%rsi        # 707ba <cute::_+0x259>
+    ac5e:	4c 89 e7             	mov    %r12,%rdi
+    ac61:	e8 9a 30 03 00       	call   3dd00 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)>
+    ac66:	48 89 de             	mov    %rbx,%rsi
+    ac69:	4c 89 e7             	mov    %r12,%rdi
+    ac6c:	e8 bf ab ff ff       	call   5830 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*)@plt>
+    ac71:	48 8d 5c 24 30       	lea    0x30(%rsp),%rbx
+    ac76:	48 89 c6             	mov    %rax,%rsi
+    ac79:	48 89 df             	mov    %rbx,%rdi
+    ac7c:	e8 9f a5 ff ff       	call   5220 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)@plt>
+    ac81:	48 89 de             	mov    %rbx,%rsi
+    ac84:	48 89 ef             	mov    %rbp,%rdi
+    ac87:	e8 64 aa ff ff       	call   56f0 <std::runtime_error::runtime_error(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@plt>
+    ac8c:	48 8b 7c 24 30       	mov    0x30(%rsp),%rdi
+    ac91:	48 8d 44 24 40       	lea    0x40(%rsp),%rax
+    ac96:	48 39 c7             	cmp    %rax,%rdi
+    ac99:	74 0e                	je     aca9 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]+0xa5>
+    ac9b:	48 8b 44 24 40       	mov    0x40(%rsp),%rax
+    aca0:	48 8d 70 01          	lea    0x1(%rax),%rsi
+    aca4:	e8 27 a7 ff ff       	call   53d0 <operator delete(void*, unsigned long)@plt>
+    aca9:	48 8b 7c 24 10       	mov    0x10(%rsp),%rdi
+    acae:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+    acb3:	48 39 c7             	cmp    %rax,%rdi
+    acb6:	74 0e                	je     acc6 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]+0xc2>
+    acb8:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+    acbd:	48 8d 70 01          	lea    0x1(%rax),%rsi
+    acc1:	e8 0a a7 ff ff       	call   53d0 <operator delete(void*, unsigned long)@plt>
+    acc6:	48 8b 15 e3 62 e2 00 	mov    0xe262e3(%rip),%rdx        # e30fb0 <std::runtime_error::~runtime_error()@GLIBCXX_3.4>
+    accd:	48 8d 35 cc 5f e2 00 	lea    0xe25fcc(%rip),%rsi        # e30ca0 <typeinfo for std::runtime_error@GLIBCXX_3.4>
+    acd4:	48 89 ef             	mov    %rbp,%rdi
+    acd7:	e8 a4 aa ff ff       	call   5780 <__cxa_throw@plt>
+    acdc:	48 89 c5             	mov    %rax,%rbp
+    acdf:	48 89 df             	mov    %rbx,%rdi
+    ace2:	e8 c9 a5 ff ff       	call   52b0 <__cxa_free_exception@plt>
+    ace7:	48 89 ef             	mov    %rbp,%rdi
+    acea:	e8 d1 aa ff ff       	call   57c0 <_Unwind_Resume@plt>
+    acef:	48 8b 7c 24 30       	mov    0x30(%rsp),%rdi
+    acf4:	48 89 c3             	mov    %rax,%rbx
+    acf7:	48 8d 44 24 40       	lea    0x40(%rsp),%rax
+    acfc:	48 39 c7             	cmp    %rax,%rdi
+    acff:	74 0e                	je     ad0f <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]+0x10b>
+    ad01:	48 8b 44 24 40       	mov    0x40(%rsp),%rax
+    ad06:	48 8d 70 01          	lea    0x1(%rax),%rsi
+    ad0a:	e8 c1 a6 ff ff       	call   53d0 <operator delete(void*, unsigned long)@plt>
+    ad0f:	48 8b 7c 24 10       	mov    0x10(%rsp),%rdi
+    ad14:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+    ad19:	48 39 c7             	cmp    %rax,%rdi
+    ad1c:	74 0e                	je     ad2c <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]+0x128>
+    ad1e:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+    ad23:	48 8d 70 01          	lea    0x1(%rax),%rsi
+    ad27:	e8 a4 a6 ff ff       	call   53d0 <operator delete(void*, unsigned long)@plt>
+    ad2c:	48 89 ef             	mov    %rbp,%rdi
+    ad2f:	e8 7c a5 ff ff       	call   52b0 <__cxa_free_exception@plt>
+    ad34:	48 89 df             	mov    %rbx,%rdi
+    ad37:	e8 84 aa ff ff       	call   57c0 <_Unwind_Resume@plt>
+    ad3c:	48 89 c3             	mov    %rax,%rbx
+    ad3f:	eb ce                	jmp    ad0f <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]+0x10b>
+    ad41:	48 89 c3             	mov    %rax,%rbx
+    ad44:	eb e6                	jmp    ad2c <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]+0x128>
+    ad46:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
+    ad4d:	00 00 00 
+
+0000000000062250 <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)>:
+   62250:	41 57                	push   %r15
+   62252:	41 56                	push   %r14
+   62254:	41 55                	push   %r13
+   62256:	41 54                	push   %r12
+   62258:	55                   	push   %rbp
+   62259:	53                   	push   %rbx
+   6225a:	48 81 ec 18 01 00 00 	sub    $0x118,%rsp
+   62261:	44 8b 94 24 50 01 00 	mov    0x150(%rsp),%r10d
+   62268:	00 
+   62269:	45 85 d2             	test   %r10d,%r10d
+   6226c:	0f 85 08 89 fa ff    	jne    ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   62272:	49 89 f4             	mov    %rsi,%r12
+   62275:	31 f6                	xor    %esi,%esi
+   62277:	48 89 fb             	mov    %rdi,%rbx
+   6227a:	49 89 d5             	mov    %rdx,%r13
+   6227d:	49 89 ce             	mov    %rcx,%r14
+   62280:	4c 89 c5             	mov    %r8,%rbp
+   62283:	4d 89 cf             	mov    %r9,%r15
+   62286:	e8 b5 9b fe ff       	call   4be40 <megafmm::megakernel_can_implement(megafmm::Problem const&, int)>
+   6228b:	84 c0                	test   %al,%al
+   6228d:	0f 84 e7 88 fa ff    	je     ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   62293:	f6 03 7f             	testb  $0x7f,(%rbx)
+   62296:	0f 85 de 88 fa ff    	jne    ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   6229c:	f6 43 08 3f          	testb  $0x3f,0x8(%rbx)
+   622a0:	0f 85 d4 88 fa ff    	jne    ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   622a6:	f6 43 10 3f          	testb  $0x3f,0x10(%rbx)
+   622aa:	0f 85 ca 88 fa ff    	jne    ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   622b0:	f6 43 18 07          	testb  $0x7,0x18(%rbx)
+   622b4:	0f 85 c0 88 fa ff    	jne    ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   622ba:	f6 43 20 07          	testb  $0x7,0x20(%rbx)
+   622be:	0f 85 b6 88 fa ff    	jne    ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   622c4:	31 f6                	xor    %esi,%esi
+   622c6:	48 89 df             	mov    %rbx,%rdi
+   622c9:	e8 72 9b fe ff       	call   4be40 <megafmm::megakernel_can_implement(megafmm::Problem const&, int)>
+   622ce:	84 c0                	test   %al,%al
+   622d0:	0f 84 a4 88 fa ff    	je     ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   622d6:	48 8b 0b             	mov    (%rbx),%rcx
+   622d9:	f6 c1 7f             	test   $0x7f,%cl
+   622dc:	0f 85 98 88 fa ff    	jne    ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   622e2:	48 8b 73 08          	mov    0x8(%rbx),%rsi
+   622e6:	40 f6 c6 3f          	test   $0x3f,%sil
+   622ea:	0f 85 8a 88 fa ff    	jne    ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   622f0:	f6 43 10 3f          	testb  $0x3f,0x10(%rbx)
+   622f4:	0f 85 80 88 fa ff    	jne    ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   622fa:	f6 43 18 07          	testb  $0x7,0x18(%rbx)
+   622fe:	0f 85 76 88 fa ff    	jne    ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   62304:	48 8b 43 20          	mov    0x20(%rbx),%rax
+   62308:	4d 85 e4             	test   %r12,%r12
+   6230b:	0f 84 69 88 fa ff    	je     ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   62311:	4d 85 ed             	test   %r13,%r13
+   62314:	0f 84 60 88 fa ff    	je     ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   6231a:	4c 89 e2             	mov    %r12,%rdx
+   6231d:	83 e0 07             	and    $0x7,%eax
+   62320:	4c 09 ea             	or     %r13,%rdx
+   62323:	83 e2 0f             	and    $0xf,%edx
+   62326:	48 09 c2             	or     %rax,%rdx
+   62329:	0f 85 4b 88 fa ff    	jne    ab7a <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]>
+   6232f:	48 85 ed             	test   %rbp,%rbp
+   62332:	0f 84 7f 03 00 00    	je     626b7 <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x467>
+   62338:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   6233c:	0f 2e 43 44          	ucomiss 0x44(%rbx),%xmm0
+   62340:	ba 01 00 00 00       	mov    $0x1,%edx
+   62345:	0f 9a c0             	setp   %al
+   62348:	0f 45 c2             	cmovne %edx,%eax
+   6234b:	84 c0                	test   %al,%al
+   6234d:	74 09                	je     62358 <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x108>
+   6234f:	4d 85 f6             	test   %r14,%r14
+   62352:	0f 84 54 88 fa ff    	je     abac <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x32>
+   62358:	48 85 f6             	test   %rsi,%rsi
+   6235b:	48 8d 56 3f          	lea    0x3f(%rsi),%rdx
+   6235f:	48 8d 41 7f          	lea    0x7f(%rcx),%rax
+   62363:	8b 7b 3c             	mov    0x3c(%rbx),%edi
+   62366:	48 0f 49 d6          	cmovns %rsi,%rdx
+   6236a:	48 c1 fa 06          	sar    $0x6,%rdx
+   6236e:	48 85 c9             	test   %rcx,%rcx
+   62371:	48 0f 49 c1          	cmovns %rcx,%rax
+   62375:	48 c1 f8 07          	sar    $0x7,%rax
+   62379:	85 ff                	test   %edi,%edi
+   6237b:	75 73                	jne    623f0 <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x1a0>
+   6237d:	66 0f 6e c0          	movd   %eax,%xmm0
+   62381:	66 0f 6e ca          	movd   %edx,%xmm1
+   62385:	4d 89 f9             	mov    %r15,%r9
+   62388:	b9 01 00 00 00       	mov    $0x1,%ecx
+   6238d:	66 0f 62 c1          	punpckldq %xmm1,%xmm0
+   62391:	41 b8 80 50 01 00    	mov    $0x15080,%r8d
+   62397:	48 8b 05 fa 67 00 00 	mov    0x67fa(%rip),%rax        # 68b98 <cute::_+0x93>
+   6239e:	48 ba 80 01 00 00 01 	movabs $0x100000180,%rdx
+   623a5:	00 00 00 
+   623a8:	66 48 0f 7e c7       	movq   %xmm0,%rdi
+   623ad:	be 01 00 00 00       	mov    $0x1,%esi
+   623b2:	c7 44 24 40 01 00 00 	movl   $0x1,0x40(%rsp)
+   623b9:	00 
+   623ba:	48 89 44 24 48       	mov    %rax,0x48(%rsp)
+   623bf:	c7 44 24 50 01 00 00 	movl   $0x1,0x50(%rsp)
+   623c6:	00 
+   623c7:	66 0f d6 44 24 38    	movq   %xmm0,0x38(%rsp)
+   623cd:	e8 0e 34 fa ff       	call   57e0 <__cudaPushCallConfiguration@plt>
+   623d2:	85 c0                	test   %eax,%eax
+   623d4:	0f 84 a6 01 00 00    	je     62580 <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x330>
+   623da:	48 81 c4 18 01 00 00 	add    $0x118,%rsp
+   623e1:	5b                   	pop    %rbx
+   623e2:	5d                   	pop    %rbp
+   623e3:	41 5c                	pop    %r12
+   623e5:	41 5d                	pop    %r13
+   623e7:	41 5e                	pop    %r14
+   623e9:	41 5f                	pop    %r15
+   623eb:	c3                   	ret
+   623ec:	0f 1f 40 00          	nopl   0x0(%rax)
+   623f0:	89 44 24 68          	mov    %eax,0x68(%rsp)
+   623f4:	48 8b 05 9d 67 00 00 	mov    0x679d(%rip),%rax        # 68b98 <cute::_+0x93>
+   623fb:	4d 89 f9             	mov    %r15,%r9
+   623fe:	41 b8 80 50 01 00    	mov    $0x15080,%r8d
+   62404:	89 54 24 6c          	mov    %edx,0x6c(%rsp)
+   62408:	48 8b 7c 24 68       	mov    0x68(%rsp),%rdi
+   6240d:	48 ba 80 01 00 00 01 	movabs $0x100000180,%rdx
+   62414:	00 00 00 
+   62417:	b9 01 00 00 00       	mov    $0x1,%ecx
+   6241c:	be 01 00 00 00       	mov    $0x1,%esi
+   62421:	c7 44 24 70 01 00 00 	movl   $0x1,0x70(%rsp)
+   62428:	00 
+   62429:	48 89 44 24 38       	mov    %rax,0x38(%rsp)
+   6242e:	c7 44 24 40 01 00 00 	movl   $0x1,0x40(%rsp)
+   62435:	00 
+   62436:	e8 a5 33 fa ff       	call   57e0 <__cudaPushCallConfiguration@plt>
+   6243b:	85 c0                	test   %eax,%eax
+   6243d:	75 9b                	jne    623da <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x18a>
+   6243f:	48 8b 43 40          	mov    0x40(%rbx),%rax
+   62443:	f3 0f 6f 13          	movdqu (%rbx),%xmm2
+   62447:	48 8d 4c 24 30       	lea    0x30(%rsp),%rcx
+   6244c:	48 8d 54 24 28       	lea    0x28(%rsp),%rdx
+   62451:	f3 0f 6f 5b 10       	movdqu 0x10(%rbx),%xmm3
+   62456:	f3 0f 6f 63 20       	movdqu 0x20(%rbx),%xmm4
+   6245b:	48 8d 74 24 58       	lea    0x58(%rsp),%rsi
+   62460:	48 8d 7c 24 48       	lea    0x48(%rsp),%rdi
+   62465:	48 89 84 24 00 01 00 	mov    %rax,0x100(%rsp)
+   6246c:	00 
+   6246d:	48 8d 84 24 c0 00 00 	lea    0xc0(%rsp),%rax
+   62474:	00 
+   62475:	f3 0f 6f 6b 30       	movdqu 0x30(%rbx),%xmm5
+   6247a:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   6247f:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+   62484:	4c 89 74 24 08       	mov    %r14,0x8(%rsp)
+   62489:	66 48 0f 6e f0       	movq   %rax,%xmm6
+   6248e:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+   62493:	48 89 6c 24 10       	mov    %rbp,0x10(%rsp)
+   62498:	66 0f 6c c6          	punpcklqdq %xmm6,%xmm0
+   6249c:	4c 89 64 24 18       	mov    %r12,0x18(%rsp)
+   624a1:	0f 29 84 24 90 00 00 	movaps %xmm0,0x90(%rsp)
+   624a8:	00 
+   624a9:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   624ae:	48 8d 44 24 08       	lea    0x8(%rsp),%rax
+   624b3:	66 48 0f 6e f8       	movq   %rax,%xmm7
+   624b8:	48 8d 44 24 10       	lea    0x10(%rsp),%rax
+   624bd:	4c 89 6c 24 20       	mov    %r13,0x20(%rsp)
+   624c2:	48 89 84 24 b0 00 00 	mov    %rax,0xb0(%rsp)
+   624c9:	00 
+   624ca:	48 8b 05 1f 16 00 00 	mov    0x161f(%rip),%rax        # 63af0 <std::__detail::__to_chars_10_impl<unsigned int>(char*, unsigned int, unsigned int)::__digits+0xd0>
+   624d1:	66 0f 6c c7          	punpcklqdq %xmm7,%xmm0
+   624d5:	c7 44 24 50 01 00 00 	movl   $0x1,0x50(%rsp)
+   624dc:	00 
+   624dd:	48 89 44 24 48       	mov    %rax,0x48(%rsp)
+   624e2:	48 89 44 24 58       	mov    %rax,0x58(%rsp)
+   624e7:	c7 44 24 60 01 00 00 	movl   $0x1,0x60(%rsp)
+   624ee:	00 
+   624ef:	0f 29 94 24 c0 00 00 	movaps %xmm2,0xc0(%rsp)
+   624f6:	00 
+   624f7:	0f 29 9c 24 d0 00 00 	movaps %xmm3,0xd0(%rsp)
+   624fe:	00 
+   624ff:	0f 29 a4 24 e0 00 00 	movaps %xmm4,0xe0(%rsp)
+   62506:	00 
+   62507:	0f 29 ac 24 f0 00 00 	movaps %xmm5,0xf0(%rsp)
+   6250e:	00 
+   6250f:	0f 29 84 24 a0 00 00 	movaps %xmm0,0xa0(%rsp)
+   62516:	00 
+   62517:	e8 34 32 fa ff       	call   5750 <__cudaPopCallConfiguration@plt>
+   6251c:	85 c0                	test   %eax,%eax
+   6251e:	0f 85 b6 fe ff ff    	jne    623da <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x18a>
+   62524:	48 8b 74 24 48       	mov    0x48(%rsp),%rsi
+   62529:	8b 54 24 50          	mov    0x50(%rsp),%edx
+   6252d:	48 8d 3d 0c 03 00 00 	lea    0x30c(%rip),%rdi        # 62840 <void megafmm::(anonymous namespace)::winograd_wgmma_psplit_hybrid_s<cutlass::half_t, 32>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)>
+   62534:	48 8b 4c 24 58       	mov    0x58(%rsp),%rcx
+   62539:	44 8b 44 24 60       	mov    0x60(%rsp),%r8d
+   6253e:	48 89 b4 24 84 00 00 	mov    %rsi,0x84(%rsp)
+   62545:	00 
+   62546:	89 94 24 8c 00 00 00 	mov    %edx,0x8c(%rsp)
+   6254d:	48 89 4c 24 78       	mov    %rcx,0x78(%rsp)
+   62552:	44 89 84 24 80 00 00 	mov    %r8d,0x80(%rsp)
+   62559:	00 
+   6255a:	ff 74 24 30          	push   0x30(%rsp)
+   6255e:	ff 74 24 30          	push   0x30(%rsp)
+   62562:	4c 8d 8c 24 a0 00 00 	lea    0xa0(%rsp),%r9
+   62569:	00 
+   6256a:	e8 21 2b fa ff       	call   5090 <cudaLaunchKernel@plt>
+   6256f:	58                   	pop    %rax
+   62570:	5a                   	pop    %rdx
+   62571:	e9 64 fe ff ff       	jmp    623da <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x18a>
+   62576:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
+   6257d:	00 00 00 
+   62580:	48 8b 43 40          	mov    0x40(%rbx),%rax
+   62584:	f3 0f 6f 13          	movdqu (%rbx),%xmm2
+   62588:	48 8d 4c 24 30       	lea    0x30(%rsp),%rcx
+   6258d:	48 8d 54 24 28       	lea    0x28(%rsp),%rdx
+   62592:	f3 0f 6f 5b 10       	movdqu 0x10(%rbx),%xmm3
+   62597:	f3 0f 6f 63 20       	movdqu 0x20(%rbx),%xmm4
+   6259c:	48 8d 74 24 68       	lea    0x68(%rsp),%rsi
+   625a1:	48 8d 7c 24 58       	lea    0x58(%rsp),%rdi
+   625a6:	48 89 84 24 00 01 00 	mov    %rax,0x100(%rsp)
+   625ad:	00 
+   625ae:	48 8d 84 24 c0 00 00 	lea    0xc0(%rsp),%rax
+   625b5:	00 
+   625b6:	f3 0f 6f 6b 30       	movdqu 0x30(%rbx),%xmm5
+   625bb:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   625c0:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+   625c5:	4c 89 74 24 08       	mov    %r14,0x8(%rsp)
+   625ca:	66 48 0f 6e f0       	movq   %rax,%xmm6
+   625cf:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+   625d4:	48 89 6c 24 10       	mov    %rbp,0x10(%rsp)
+   625d9:	66 0f 6c c6          	punpcklqdq %xmm6,%xmm0
+   625dd:	4c 89 64 24 18       	mov    %r12,0x18(%rsp)
+   625e2:	0f 29 84 24 90 00 00 	movaps %xmm0,0x90(%rsp)
+   625e9:	00 
+   625ea:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   625ef:	48 8d 44 24 08       	lea    0x8(%rsp),%rax
+   625f4:	66 48 0f 6e f8       	movq   %rax,%xmm7
+   625f9:	48 8d 44 24 10       	lea    0x10(%rsp),%rax
+   625fe:	4c 89 6c 24 20       	mov    %r13,0x20(%rsp)
+   62603:	48 89 84 24 b0 00 00 	mov    %rax,0xb0(%rsp)
+   6260a:	00 
+   6260b:	48 8b 05 de 14 00 00 	mov    0x14de(%rip),%rax        # 63af0 <std::__detail::__to_chars_10_impl<unsigned int>(char*, unsigned int, unsigned int)::__digits+0xd0>
+   62612:	66 0f 6c c7          	punpcklqdq %xmm7,%xmm0
+   62616:	c7 44 24 60 01 00 00 	movl   $0x1,0x60(%rsp)
+   6261d:	00 
+   6261e:	48 89 44 24 58       	mov    %rax,0x58(%rsp)
+   62623:	48 89 44 24 68       	mov    %rax,0x68(%rsp)
+   62628:	c7 44 24 70 01 00 00 	movl   $0x1,0x70(%rsp)
+   6262f:	00 
+   62630:	0f 29 94 24 c0 00 00 	movaps %xmm2,0xc0(%rsp)
+   62637:	00 
+   62638:	0f 29 9c 24 d0 00 00 	movaps %xmm3,0xd0(%rsp)
+   6263f:	00 
+   62640:	0f 29 a4 24 e0 00 00 	movaps %xmm4,0xe0(%rsp)
+   62647:	00 
+   62648:	0f 29 ac 24 f0 00 00 	movaps %xmm5,0xf0(%rsp)
+   6264f:	00 
+   62650:	0f 29 84 24 a0 00 00 	movaps %xmm0,0xa0(%rsp)
+   62657:	00 
+   62658:	e8 f3 30 fa ff       	call   5750 <__cudaPopCallConfiguration@plt>
+   6265d:	85 c0                	test   %eax,%eax
+   6265f:	0f 85 75 fd ff ff    	jne    623da <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x18a>
+   62665:	48 8b 74 24 58       	mov    0x58(%rsp),%rsi
+   6266a:	8b 54 24 60          	mov    0x60(%rsp),%edx
+   6266e:	48 8d 3d eb 00 00 00 	lea    0xeb(%rip),%rdi        # 62760 <void megafmm::(anonymous namespace)::winograd_wgmma_psplit_hybrid_s<cutlass::bfloat16_t, 32>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)>
+   62675:	48 8b 4c 24 68       	mov    0x68(%rsp),%rcx
+   6267a:	44 8b 44 24 70       	mov    0x70(%rsp),%r8d
+   6267f:	48 89 b4 24 84 00 00 	mov    %rsi,0x84(%rsp)
+   62686:	00 
+   62687:	89 94 24 8c 00 00 00 	mov    %edx,0x8c(%rsp)
+   6268e:	48 89 4c 24 78       	mov    %rcx,0x78(%rsp)
+   62693:	44 89 84 24 80 00 00 	mov    %r8d,0x80(%rsp)
+   6269a:	00 
+   6269b:	ff 74 24 30          	push   0x30(%rsp)
+   6269f:	ff 74 24 30          	push   0x30(%rsp)
+   626a3:	4c 8d 8c 24 a0 00 00 	lea    0xa0(%rsp),%r9
+   626aa:	00 
+   626ab:	e8 e0 29 fa ff       	call   5090 <cudaLaunchKernel@plt>
+   626b0:	59                   	pop    %rcx
+   626b1:	5e                   	pop    %rsi
+   626b2:	e9 23 fd ff ff       	jmp    623da <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int)+0x18a>
+   626b7:	e9 f0 84 fa ff       	jmp    abac <megafmm::launch_wgmma_psplit_hybrid_s(megafmm::Problem const&, void const*, void const*, float const*, float*, CUstream_st*, int) [clone .cold]+0x32>
+   626bc:	0f 1f 40 00          	nopl   0x0(%rax)
+
+00000000000626c0 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int)>:
+   626c0:	41 54                	push   %r12
+   626c2:	55                   	push   %rbp
+   626c3:	53                   	push   %rbx
+   626c4:	48 83 ec 50          	sub    $0x50,%rsp
+   626c8:	85 f6                	test   %esi,%esi
+   626ca:	0f 85 34 85 fa ff    	jne    ac04 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]>
+   626d0:	48 89 fb             	mov    %rdi,%rbx
+   626d3:	e8 68 97 fe ff       	call   4be40 <megafmm::megakernel_can_implement(megafmm::Problem const&, int)>
+   626d8:	84 c0                	test   %al,%al
+   626da:	0f 84 24 85 fa ff    	je     ac04 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]>
+   626e0:	f6 03 7f             	testb  $0x7f,(%rbx)
+   626e3:	0f 85 1b 85 fa ff    	jne    ac04 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]>
+   626e9:	f6 43 08 3f          	testb  $0x3f,0x8(%rbx)
+   626ed:	0f 85 11 85 fa ff    	jne    ac04 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]>
+   626f3:	f6 43 10 3f          	testb  $0x3f,0x10(%rbx)
+   626f7:	0f 85 07 85 fa ff    	jne    ac04 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]>
+   626fd:	f6 43 18 07          	testb  $0x7,0x18(%rbx)
+   62701:	0f 85 fd 84 fa ff    	jne    ac04 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]>
+   62707:	f6 43 20 07          	testb  $0x7,0x20(%rbx)
+   6270b:	0f 85 f3 84 fa ff    	jne    ac04 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]>
+   62711:	8b 43 3c             	mov    0x3c(%rbx),%eax
+   62714:	85 c0                	test   %eax,%eax
+   62716:	75 30                	jne    62748 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int)+0x88>
+   62718:	ba 80 50 01 00       	mov    $0x15080,%edx
+   6271d:	be 08 00 00 00       	mov    $0x8,%esi
+   62722:	48 8d 3d 37 00 00 00 	lea    0x37(%rip),%rdi        # 62760 <void megafmm::(anonymous namespace)::winograd_wgmma_psplit_hybrid_s<cutlass::bfloat16_t, 32>(megafmm::Problem, cutlass::bfloat16_t const*, cutlass::bfloat16_t const*, float const*, float*)>
+   62729:	e8 c2 2e fa ff       	call   55f0 <cudaFuncSetAttribute@plt>
+   6272e:	89 c3                	mov    %eax,%ebx
+   62730:	85 c0                	test   %eax,%eax
+   62732:	0f 85 fe 84 fa ff    	jne    ac36 <megafmm::prepare_wgmma_psplit_hybrid_s(megafmm::Problem const&, int) [clone .cold]+0x32>
+   62738:	48 83 c4 50          	add    $0x50,%rsp
+   6273c:	5b                   	pop    %rbx
+   6273d:	5d                   	pop    %rbp
+   6273e:	41 5c                	pop    %r12
+   62740:	c3                   	ret
+   62741:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+   62748:	48 83 c4 50          	add    $0x50,%rsp
+   6274c:	5b                   	pop    %rbx
+   6274d:	5d                   	pop    %rbp
+   6274e:	41 5c                	pop    %r12
+   62750:	e9 cb 01 00 00       	jmp    62920 <void megafmm::(anonymous namespace)::prepare_wgmma_psplit_hybrid_s_typed<cutlass::half_t>()>
+   62755:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
+   6275c:	00 00 00 
+   6275f:	90                   	nop
+
+0000000000062920 <void megafmm::(anonymous namespace)::prepare_wgmma_psplit_hybrid_s_typed<cutlass::half_t>()>:
+   62920:	41 54                	push   %r12
+   62922:	ba 80 50 01 00       	mov    $0x15080,%edx
+   62927:	be 08 00 00 00       	mov    $0x8,%esi
+   6292c:	48 8d 3d 0d ff ff ff 	lea    -0xf3(%rip),%rdi        # 62840 <void megafmm::(anonymous namespace)::winograd_wgmma_psplit_hybrid_s<cutlass::half_t, 32>(megafmm::Problem, cutlass::half_t const*, cutlass::half_t const*, float const*, float*)>
+   62933:	55                   	push   %rbp
+   62934:	53                   	push   %rbx
+   62935:	48 83 ec 50          	sub    $0x50,%rsp
+   62939:	e8 b2 2c fa ff       	call   55f0 <cudaFuncSetAttribute@plt>
+   6293e:	85 c0                	test   %eax,%eax
+   62940:	75 09                	jne    6294b <void megafmm::(anonymous namespace)::prepare_wgmma_psplit_hybrid_s_typed<cutlass::half_t>()+0x2b>
+   62942:	48 83 c4 50          	add    $0x50,%rsp
+   62946:	5b                   	pop    %rbx
+   62947:	5d                   	pop    %rbp
+   62948:	41 5c                	pop    %r12
+   6294a:	c3                   	ret
+   6294b:	89 c3                	mov    %eax,%ebx
+   6294d:	bf 10 00 00 00       	mov    $0x10,%edi
+   62952:	e8 69 28 fa ff       	call   51c0 <__cxa_allocate_exception@plt>
+   62957:	89 df                	mov    %ebx,%edi
+   62959:	48 89 c5             	mov    %rax,%rbp
+   6295c:	e8 5f 2d fa ff       	call   56c0 <cudaGetErrorString@plt>
+   62961:	4c 8d 64 24 10       	lea    0x10(%rsp),%r12
+   62966:	48 8d 54 24 0f       	lea    0xf(%rsp),%rdx
+   6296b:	48 89 c3             	mov    %rax,%rbx
+   6296e:	48 8d 35 45 de 00 00 	lea    0xde45(%rip),%rsi        # 707ba <cute::_+0x259>
+   62975:	4c 89 e7             	mov    %r12,%rdi
+   62978:	e8 83 b3 fd ff       	call   3dd00 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)>
+   6297d:	48 89 de             	mov    %rbx,%rsi
+   62980:	4c 89 e7             	mov    %r12,%rdi
+   62983:	e8 a8 2e fa ff       	call   5830 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*)@plt>
+   62988:	48 8d 5c 24 30       	lea    0x30(%rsp),%rbx
+   6298d:	48 89 c6             	mov    %rax,%rsi
+   62990:	48 89 df             	mov    %rbx,%rdi
+   62993:	e8 88 28 fa ff       	call   5220 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)@plt>
+   62998:	48 89 de             	mov    %rbx,%rsi
+   6299b:	48 89 ef             	mov    %rbp,%rdi
+   6299e:	e8 4d 2d fa ff       	call   56f0 <std::runtime_error::runtime_error(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@plt>
+   629a3:	48 8b 7c 24 30       	mov    0x30(%rsp),%rdi
+   629a8:	48 8d 44 24 40       	lea    0x40(%rsp),%rax
+   629ad:	48 39 c7             	cmp    %rax,%rdi
+   629b0:	74 0e                	je     629c0 <void megafmm::(anonymous namespace)::prepare_wgmma_psplit_hybrid_s_typed<cutlass::half_t>()+0xa0>
+   629b2:	48 8b 44 24 40       	mov    0x40(%rsp),%rax
+   629b7:	48 8d 70 01          	lea    0x1(%rax),%rsi
+   629bb:	e8 10 2a fa ff       	call   53d0 <operator delete(void*, unsigned long)@plt>
+   629c0:	48 8b 7c 24 10       	mov    0x10(%rsp),%rdi
+   629c5:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+   629ca:	48 39 c7             	cmp    %rax,%rdi
+   629cd:	74 0e                	je     629dd <void megafmm::(anonymous namespace)::prepare_wgmma_psplit_hybrid_s_typed<cutlass::half_t>()+0xbd>
+   629cf:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+   629d4:	48 8d 70 01          	lea    0x1(%rax),%rsi
+   629d8:	e8 f3 29 fa ff       	call   53d0 <operator delete(void*, unsigned long)@plt>
+   629dd:	48 8b 15 cc e5 dc 00 	mov    0xdce5cc(%rip),%rdx        # e30fb0 <std::runtime_error::~runtime_error()@GLIBCXX_3.4>
+   629e4:	48 8d 35 b5 e2 dc 00 	lea    0xdce2b5(%rip),%rsi        # e30ca0 <typeinfo for std::runtime_error@GLIBCXX_3.4>
+   629eb:	48 89 ef             	mov    %rbp,%rdi
+   629ee:	e8 8d 2d fa ff       	call   5780 <__cxa_throw@plt>
+   629f3:	48 89 c3             	mov    %rax,%rbx
+   629f6:	eb 44                	jmp    62a3c <void megafmm::(anonymous namespace)::prepare_wgmma_psplit_hybrid_s_typed<cutlass::half_t>()+0x11c>
+   629f8:	48 89 c3             	mov    %rax,%rbx
+   629fb:	eb 05                	jmp    62a02 <void megafmm::(anonymous namespace)::prepare_wgmma_psplit_hybrid_s_typed<cutlass::half_t>()+0xe2>
+   629fd:	48 89 c3             	mov    %rax,%rbx
+   62a00:	eb 1d                	jmp    62a1f <void megafmm::(anonymous namespace)::prepare_wgmma_psplit_hybrid_s_typed<cutlass::half_t>()+0xff>
+   62a02:	48 8b 7c 24 30       	mov    0x30(%rsp),%rdi
+   62a07:	48 8d 44 24 40       	lea    0x40(%rsp),%rax
+   62a0c:	48 39 c7             	cmp    %rax,%rdi
+   62a0f:	74 0e                	je     62a1f <void megafmm::(anonymous namespace)::prepare_wgmma_psplit_hybrid_s_typed<cutlass::half_t>()+0xff>
+   62a11:	48 8b 44 24 40       	mov    0x40(%rsp),%rax
+   62a16:	48 8d 70 01          	lea    0x1(%rax),%rsi
+   62a1a:	e8 b1 29 fa ff       	call   53d0 <operator delete(void*, unsigned long)@plt>
+   62a1f:	48 8b 7c 24 10       	mov    0x10(%rsp),%rdi
+   62a24:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
+   62a29:	48 39 c7             	cmp    %rax,%rdi
+   62a2c:	74 0e                	je     62a3c <void megafmm::(anonymous namespace)::prepare_wgmma_psplit_hybrid_s_typed<cutlass::half_t>()+0x11c>
+   62a2e:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+   62a33:	48 8d 70 01          	lea    0x1(%rax),%rsi
+   62a37:	e8 94 29 fa ff       	call   53d0 <operator delete(void*, unsigned long)@plt>
+   62a3c:	48 89 ef             	mov    %rbp,%rdi
+   62a3f:	e8 6c 28 fa ff       	call   52b0 <__cxa_free_exception@plt>
+   62a44:	48 89 df             	mov    %rbx,%rdi
+   62a47:	e8 74 2d fa ff       	call   57c0 <_Unwind_Resume@plt>
+   62a4c:	0f 1f 40 00          	nopl   0x0(%rax)

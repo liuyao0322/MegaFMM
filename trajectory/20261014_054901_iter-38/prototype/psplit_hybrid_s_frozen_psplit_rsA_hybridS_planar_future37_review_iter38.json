@@ -1,0 +1,1011 @@
+{
+  "schema": "megafmm.future37.hybrid-S-planar.cpu-geometry.v1",
+  "status": "PASS_CPU_ONLY_LITERAL_PLANAR_GEOMETRY",
+  "model_sha256": "a3ea1c358db0c8e0ee3328ba77df1d714c786ff518b9fc5a8eb445de186b41c9",
+  "source_layout_sha256": {
+    "solution/megakernel_wgmma_psplit_rsa_bk32.cu": "548f27dc7a284a150423bd0162fa751b9dcf945baeccd4e7d571f044e0a6c0d3",
+    "third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp": "9673bc77196f52edcf0b9b824cec5d305c0738251e9b3beb39ddc308e5b37e9f",
+    "third_party/cutlass/include/cute/layout.hpp": "f82ea2a9cb3a64f77f49c67d76801a8707456950ace68b5165fd536acb67b2e8",
+    "third_party/cutlass/include/cute/layout_composed.hpp": "c149170ddd4f42e6d5b4ba54b7f2150ef1a380a9915e562978a9355cdcf1c79d",
+    "third_party/cutlass/include/cute/pointer_flagged.hpp": "0f3a985cc413e7b0b51b38f8260160e17cbe9e30bc9f7559d46d76f98e2193fe",
+    "third_party/cutlass/include/cute/pointer_swizzle.hpp": "115e3d4ffa3e98bc757d930af1d63c7377d56ff2f7f96af05b83ba3f20b6aa1a",
+    "third_party/cutlass/include/cute/swizzle.hpp": "73904577d2bb8986dd4e18d1266c020b7ee7a75176f5ccb068c6292bcf10c459"
+  },
+  "source_layout_verified_unchanged": true,
+  "frozen_HybridS_four_files_sha256": {
+    ".scratch/psplit_rsA_hybridS_future37_model.py": "5bc9d8a360177fdbc84a3fefb7f0e295f985ff17240a952cbb9ed9058a299dba",
+    ".scratch/psplit_rsA_hybridS_future37_review.json": "9fa53047988c1a046a5ab0882b6fe5a7c5ca2f29380b444567bfc7541c506932",
+    ".scratch/psplit_rsA_hybridS_future37_cpu.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    ".scratch/psplit_rsA_hybridS_future37_protocol.md": "2fe2174852c6f1b0e271ac58a0615baf67aa96467aa9581fa3cabbefa2a65ab6"
+  },
+  "frozen_HybridS_four_files_verified_unchanged": true,
+  "local_definition_assertions": {
+    "third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp": [
+      {
+        "line": 77,
+        "snippet": "using Layout_K_SW32_Atom_Bits   = ComposedLayout<Swizzle<1,4,3>, smem_ptr_flag, Layout<Shape<_8, _256>,Stride< _256,_1>>>;"
+      },
+      {
+        "line": 95,
+        "snippet": "using Layout_K_SW32_Atom  = decltype(upcast<sizeof_bits<Type>::value>(Layout_K_SW32_Atom_Bits{}));"
+      },
+      {
+        "line": 389,
+        "snippet": "using CLayout_64x16  = Layout<Shape <Shape <  _4,_8, _4>,Shape < _2,_2,  _2>>,"
+      },
+      {
+        "line": 390,
+        "snippet": "Stride<Stride<_128,_1,_16>,Stride<_64,_8,_512>>>;"
+      },
+      {
+        "line": 442,
+        "snippet": "using ALayout_64x16 = CLayout_64x16;"
+      }
+    ],
+    "third_party/cutlass/include/cute/layout.hpp": [
+      {
+        "line": 1705,
+        "snippet": "Defaults to GenColMajor"
+      },
+      {
+        "line": 1735,
+        "snippet": "return coalesce(blocked_product(padded_block, make_ordered_layout(product_shape, ord_shape)), product_shape);"
+      }
+    ],
+    "third_party/cutlass/include/cute/layout_composed.hpp": [
+      {
+        "line": 545,
+        "snippet": "class Shape, class ModeOrder = GenColMajor>"
+      },
+      {
+        "line": 552,
+        "snippet": "return composition(layout.layout_a(), layout.offset(), tile_to_shape(layout.layout_b(), trg_shape, ord_shape));"
+      }
+    ],
+    "third_party/cutlass/include/cute/pointer_flagged.hpp": [
+      {
+        "line": 67,
+        "snippet": "return make_tensor(make_smem_ptr(ptr.get(), layout.layout_a()),"
+      },
+      {
+        "line": 77,
+        "snippet": "return composition(layout.layout_a(), smem_ptr_flag_bits<B*N>{}, upcast<N>(layout.layout_b()));"
+      }
+    ],
+    "third_party/cutlass/include/cute/pointer_swizzle.hpp": [
+      {
+        "line": 89,
+        "snippet": "return reinterpret_cast<T*>(SwizzleFn::apply(reinterpret_cast<uintptr_t>(ptr)));"
+      },
+      {
+        "line": 106,
+        "snippet": "return *apply_swizzle(this->get() + i);"
+      }
+    ],
+    "third_party/cutlass/include/cute/swizzle.hpp": [
+      {
+        "line": 80,
+        "snippet": "return offset ^ shiftr(offset & yyy_msk{}, msk_sft{});"
+      },
+      {
+        "line": 69,
+        "snippet": "bit_msk{} << (num_base + max(0,num_shft))"
+      }
+    ],
+    "solution/megakernel_wgmma_psplit_rsa_bk32.cu": [
+      {
+        "line": 153,
+        "snippet": "const int row=task/(BK/8),k=(task%(BK/8))*8;"
+      },
+      {
+        "line": 317,
+        "snippet": "for (int task = tid; task < T::BM*T::BK/8; task += T::ProducerThreads)"
+      },
+      {
+        "line": 183,
+        "snippet": "thr_mma.partition_A(make_identity_tensor(make_shape(Int<64>{},Int<BK>{})))"
+      },
+      {
+        "line": 193,
+        "snippet": "const auto c=coords(2*pair,0,atom);"
+      },
+      {
+        "line": 167,
+        "snippet": "asm volatile(\"ld.shared.u32 %0, [%1];\""
+      },
+      {
+        "line": 64,
+        "snippet": "GMMA::Layout_K_SW32_Atom<Element>{}"
+      }
+    ]
+  },
+  "literal_derivation": {
+    "SW32_pointer_byte_function": "address XOR ((address AND 128) >> 3)",
+    "FP32_SW32_atom": "Shape(8,8), Stride(8,1); pointer SW32 retained by flagged upcast<32>",
+    "tiled_FP32_unswizzled_byte_address": "base +4*[64*(plane*8*(cols/8)+8*floor(col/8)+floor(row/8))+8*(row%8)+(col%8)]",
+    "flat": "cols=BK, plane=0, col=k",
+    "planar": "cols=BK/2, plane=k%2, col=floor(k/2)",
+    "plane0_equals_existing_16bit_packed_u32_address": true,
+    "plane1_equals_plane0_plus_bytes": "128*BK",
+    "tensor_scope": "Literal interpretation of local CuTe atom, GenColMajor tiled product, actual pointer byte swizzle and original RS coordinates. No C++/CUDA instantiation or physical execution."
+  },
+  "geometry_BK32_BK64": [
+    {
+      "BK": 32,
+      "row_count": 64,
+      "plane_shape": [
+        64,
+        16
+      ],
+      "plane_count": 2,
+      "FP32_payload_bytes": 8192,
+      "plane_payload_bytes": 4096,
+      "origins_bytes_tested": [
+        0,
+        128,
+        256,
+        384,
+        20480,
+        63488
+      ],
+      "base_alignment_bytes": 128,
+      "per_origin_address_bijection_words": 2048,
+      "producer_vector8_tasks_checked": 1536,
+      "producer_split_even_odd_v4_16B_stores_checked": 3072,
+      "flat_two_contiguous_v4_16B_stores_checked": 3072,
+      "consumer_original_RS_pair_coordinates_checked": 6144,
+      "consumer_S2_scalar_u32_reads_checked": 12288,
+      "planar_vs_original_packed_mapping_equalities": 12288,
+      "scalar_comparison_warp_batches_per_route": 192,
+      "per_warp_max_distinct_words_per_bank_histograms": {
+        "original_packed_u32": {
+          "1": 192
+        },
+        "flat_even_u32": {
+          "2": 192
+        },
+        "flat_odd_u32": {
+          "2": 192
+        },
+        "planar_even_u32": {
+          "1": 192
+        },
+        "planar_odd_u32": {
+          "1": 192
+        }
+      },
+      "per_warp_distinct_word_histograms": {
+        "original_packed_u32": {
+          "32": 192
+        },
+        "flat_even_u32": {
+          "32": 192
+        },
+        "flat_odd_u32": {
+          "32": 192
+        },
+        "planar_even_u32": {
+          "32": 192
+        },
+        "planar_odd_u32": {
+          "32": 192
+        }
+      },
+      "per_warp_used_bank_histograms": {
+        "original_packed_u32": {
+          "32": 192
+        },
+        "flat_even_u32": {
+          "16": 192
+        },
+        "flat_odd_u32": {
+          "16": 192
+        },
+        "planar_even_u32": {
+          "32": 192
+        },
+        "planar_odd_u32": {
+          "32": 192
+        }
+      },
+      "example_first_warp_atom_pair_base0": {
+        "original_packed_u32": {
+          "addresses_bytes_lane0_to31": [
+            0,
+            4,
+            8,
+            12,
+            32,
+            36,
+            40,
+            44,
+            64,
+            68,
+            72,
+            76,
+            96,
+            100,
+            104,
+            108,
+            144,
+            148,
+            152,
+            156,
+            176,
+            180,
+            184,
+            188,
+            208,
+            212,
+            216,
+            220,
+            240,
+            244,
+            248,
+            252
+          ],
+          "banks_lane0_to31": [
+            0,
+            1,
+            2,
+            3,
+            8,
+            9,
+            10,
+            11,
+            16,
+            17,
+            18,
+            19,
+            24,
+            25,
+            26,
+            27,
+            4,
+            5,
+            6,
+            7,
+            12,
+            13,
+            14,
+            15,
+            20,
+            21,
+            22,
+            23,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        "flat_even_u32": {
+          "addresses_bytes_lane0_to31": [
+            0,
+            8,
+            16,
+            24,
+            32,
+            40,
+            48,
+            56,
+            64,
+            72,
+            80,
+            88,
+            96,
+            104,
+            112,
+            120,
+            144,
+            152,
+            128,
+            136,
+            176,
+            184,
+            160,
+            168,
+            208,
+            216,
+            192,
+            200,
+            240,
+            248,
+            224,
+            232
+          ],
+          "banks_lane0_to31": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            14,
+            16,
+            18,
+            20,
+            22,
+            24,
+            26,
+            28,
+            30,
+            4,
+            6,
+            0,
+            2,
+            12,
+            14,
+            8,
+            10,
+            20,
+            22,
+            16,
+            18,
+            28,
+            30,
+            24,
+            26
+          ]
+        },
+        "flat_odd_u32": {
+          "addresses_bytes_lane0_to31": [
+            4,
+            12,
+            20,
+            28,
+            36,
+            44,
+            52,
+            60,
+            68,
+            76,
+            84,
+            92,
+            100,
+            108,
+            116,
+            124,
+            148,
+            156,
+            132,
+            140,
+            180,
+            188,
+            164,
+            172,
+            212,
+            220,
+            196,
+            204,
+            244,
+            252,
+            228,
+            236
+          ],
+          "banks_lane0_to31": [
+            1,
+            3,
+            5,
+            7,
+            9,
+            11,
+            13,
+            15,
+            17,
+            19,
+            21,
+            23,
+            25,
+            27,
+            29,
+            31,
+            5,
+            7,
+            1,
+            3,
+            13,
+            15,
+            9,
+            11,
+            21,
+            23,
+            17,
+            19,
+            29,
+            31,
+            25,
+            27
+          ]
+        },
+        "planar_even_u32": {
+          "addresses_bytes_lane0_to31": [
+            0,
+            4,
+            8,
+            12,
+            32,
+            36,
+            40,
+            44,
+            64,
+            68,
+            72,
+            76,
+            96,
+            100,
+            104,
+            108,
+            144,
+            148,
+            152,
+            156,
+            176,
+            180,
+            184,
+            188,
+            208,
+            212,
+            216,
+            220,
+            240,
+            244,
+            248,
+            252
+          ],
+          "banks_lane0_to31": [
+            0,
+            1,
+            2,
+            3,
+            8,
+            9,
+            10,
+            11,
+            16,
+            17,
+            18,
+            19,
+            24,
+            25,
+            26,
+            27,
+            4,
+            5,
+            6,
+            7,
+            12,
+            13,
+            14,
+            15,
+            20,
+            21,
+            22,
+            23,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        "planar_odd_u32": {
+          "addresses_bytes_lane0_to31": [
+            4096,
+            4100,
+            4104,
+            4108,
+            4128,
+            4132,
+            4136,
+            4140,
+            4160,
+            4164,
+            4168,
+            4172,
+            4192,
+            4196,
+            4200,
+            4204,
+            4240,
+            4244,
+            4248,
+            4252,
+            4272,
+            4276,
+            4280,
+            4284,
+            4304,
+            4308,
+            4312,
+            4316,
+            4336,
+            4340,
+            4344,
+            4348
+          ],
+          "banks_lane0_to31": [
+            0,
+            1,
+            2,
+            3,
+            8,
+            9,
+            10,
+            11,
+            16,
+            17,
+            18,
+            19,
+            24,
+            25,
+            26,
+            27,
+            4,
+            5,
+            6,
+            7,
+            12,
+            13,
+            14,
+            15,
+            20,
+            21,
+            22,
+            23,
+            28,
+            29,
+            30,
+            31
+          ]
+        }
+      },
+      "producer_mapping_scope": "Existing source task=tid+j*128, row=task/(BK/8), k=(task%(BK/8))*8. Hypothetical planar S2 splits four even and four odd FP32 values into two aligned16B stores; actual CUDA shuffle/register packing is unimplemented.",
+      "bank_scope": "Literal scalar-u32 coordinate comparator: bank=(byte_address//4)%32; count distinct words per bank within one assumed warp scalar instruction. No physical transaction, compiler grouping, conflict-cycle, WGMMA bank, throughput or performance proof."
+    },
+    {
+      "BK": 64,
+      "row_count": 64,
+      "plane_shape": [
+        64,
+        32
+      ],
+      "plane_count": 2,
+      "FP32_payload_bytes": 16384,
+      "plane_payload_bytes": 8192,
+      "origins_bytes_tested": [
+        0,
+        128,
+        256,
+        384,
+        40960,
+        126976
+      ],
+      "base_alignment_bytes": 128,
+      "per_origin_address_bijection_words": 4096,
+      "producer_vector8_tasks_checked": 3072,
+      "producer_split_even_odd_v4_16B_stores_checked": 6144,
+      "flat_two_contiguous_v4_16B_stores_checked": 6144,
+      "consumer_original_RS_pair_coordinates_checked": 12288,
+      "consumer_S2_scalar_u32_reads_checked": 24576,
+      "planar_vs_original_packed_mapping_equalities": 24576,
+      "scalar_comparison_warp_batches_per_route": 384,
+      "per_warp_max_distinct_words_per_bank_histograms": {
+        "original_packed_u32": {
+          "1": 384
+        },
+        "flat_even_u32": {
+          "2": 384
+        },
+        "flat_odd_u32": {
+          "2": 384
+        },
+        "planar_even_u32": {
+          "1": 384
+        },
+        "planar_odd_u32": {
+          "1": 384
+        }
+      },
+      "per_warp_distinct_word_histograms": {
+        "original_packed_u32": {
+          "32": 384
+        },
+        "flat_even_u32": {
+          "32": 384
+        },
+        "flat_odd_u32": {
+          "32": 384
+        },
+        "planar_even_u32": {
+          "32": 384
+        },
+        "planar_odd_u32": {
+          "32": 384
+        }
+      },
+      "per_warp_used_bank_histograms": {
+        "original_packed_u32": {
+          "32": 384
+        },
+        "flat_even_u32": {
+          "16": 384
+        },
+        "flat_odd_u32": {
+          "16": 384
+        },
+        "planar_even_u32": {
+          "32": 384
+        },
+        "planar_odd_u32": {
+          "32": 384
+        }
+      },
+      "example_first_warp_atom_pair_base0": {
+        "original_packed_u32": {
+          "addresses_bytes_lane0_to31": [
+            0,
+            4,
+            8,
+            12,
+            32,
+            36,
+            40,
+            44,
+            64,
+            68,
+            72,
+            76,
+            96,
+            100,
+            104,
+            108,
+            144,
+            148,
+            152,
+            156,
+            176,
+            180,
+            184,
+            188,
+            208,
+            212,
+            216,
+            220,
+            240,
+            244,
+            248,
+            252
+          ],
+          "banks_lane0_to31": [
+            0,
+            1,
+            2,
+            3,
+            8,
+            9,
+            10,
+            11,
+            16,
+            17,
+            18,
+            19,
+            24,
+            25,
+            26,
+            27,
+            4,
+            5,
+            6,
+            7,
+            12,
+            13,
+            14,
+            15,
+            20,
+            21,
+            22,
+            23,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        "flat_even_u32": {
+          "addresses_bytes_lane0_to31": [
+            0,
+            8,
+            16,
+            24,
+            32,
+            40,
+            48,
+            56,
+            64,
+            72,
+            80,
+            88,
+            96,
+            104,
+            112,
+            120,
+            144,
+            152,
+            128,
+            136,
+            176,
+            184,
+            160,
+            168,
+            208,
+            216,
+            192,
+            200,
+            240,
+            248,
+            224,
+            232
+          ],
+          "banks_lane0_to31": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            14,
+            16,
+            18,
+            20,
+            22,
+            24,
+            26,
+            28,
+            30,
+            4,
+            6,
+            0,
+            2,
+            12,
+            14,
+            8,
+            10,
+            20,
+            22,
+            16,
+            18,
+            28,
+            30,
+            24,
+            26
+          ]
+        },
+        "flat_odd_u32": {
+          "addresses_bytes_lane0_to31": [
+            4,
+            12,
+            20,
+            28,
+            36,
+            44,
+            52,
+            60,
+            68,
+            76,
+            84,
+            92,
+            100,
+            108,
+            116,
+            124,
+            148,
+            156,
+            132,
+            140,
+            180,
+            188,
+            164,
+            172,
+            212,
+            220,
+            196,
+            204,
+            244,
+            252,
+            228,
+            236
+          ],
+          "banks_lane0_to31": [
+            1,
+            3,
+            5,
+            7,
+            9,
+            11,
+            13,
+            15,
+            17,
+            19,
+            21,
+            23,
+            25,
+            27,
+            29,
+            31,
+            5,
+            7,
+            1,
+            3,
+            13,
+            15,
+            9,
+            11,
+            21,
+            23,
+            17,
+            19,
+            29,
+            31,
+            25,
+            27
+          ]
+        },
+        "planar_even_u32": {
+          "addresses_bytes_lane0_to31": [
+            0,
+            4,
+            8,
+            12,
+            32,
+            36,
+            40,
+            44,
+            64,
+            68,
+            72,
+            76,
+            96,
+            100,
+            104,
+            108,
+            144,
+            148,
+            152,
+            156,
+            176,
+            180,
+            184,
+            188,
+            208,
+            212,
+            216,
+            220,
+            240,
+            244,
+            248,
+            252
+          ],
+          "banks_lane0_to31": [
+            0,
+            1,
+            2,
+            3,
+            8,
+            9,
+            10,
+            11,
+            16,
+            17,
+            18,
+            19,
+            24,
+            25,
+            26,
+            27,
+            4,
+            5,
+            6,
+            7,
+            12,
+            13,
+            14,
+            15,
+            20,
+            21,
+            22,
+            23,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        "planar_odd_u32": {
+          "addresses_bytes_lane0_to31": [
+            8192,
+            8196,
+            8200,
+            8204,
+            8224,
+            8228,
+            8232,
+            8236,
+            8256,
+            8260,
+            8264,
+            8268,
+            8288,
+            8292,
+            8296,
+            8300,
+            8336,
+            8340,
+            8344,
+            8348,
+            8368,
+            8372,
+            8376,
+            8380,
+            8400,
+            8404,
+            8408,
+            8412,
+            8432,
+            8436,
+            8440,
+            8444
+          ],
+          "banks_lane0_to31": [
+            0,
+            1,
+            2,
+            3,
+            8,
+            9,
+            10,
+            11,
+            16,
+            17,
+            18,
+            19,
+            24,
+            25,
+            26,
+            27,
+            4,
+            5,
+            6,
+            7,
+            12,
+            13,
+            14,
+            15,
+            20,
+            21,
+            22,
+            23,
+            28,
+            29,
+            30,
+            31
+          ]
+        }
+      },
+      "producer_mapping_scope": "Existing source task=tid+j*128, row=task/(BK/8), k=(task%(BK/8))*8. Hypothetical planar S2 splits four even and four odd FP32 values into two aligned16B stores; actual CUDA shuffle/register packing is unimplemented.",
+      "bank_scope": "Literal scalar-u32 coordinate comparator: bank=(byte_address//4)%32; count distinct words per bank within one assumed warp scalar instruction. No physical transaction, compiler grouping, conflict-cycle, WGMMA bank, throughput or performance proof."
+    }
+  ],
+  "old_model_imported_or_old_main_called": false,
+  "write_open_policy": "All file write opens rejected during execution; stdout only.",
+  "not_proved": [
+    "Candidate CUDA instantiation/layout ABI",
+    "Producer even/odd shuffle or register packing implementation",
+    "compiled shared/register fit or occupancy",
+    "physical shared instruction grouping, transactions or conflict cycles",
+    "async synchronization and RS fragment lifetime",
+    "precision/FP64 full-GEMM gates",
+    "GPU performance or cuBLAS speedup"
+  ]
+}

@@ -22,7 +22,7 @@ add_library(megafmm STATIC solution/plan.cpp solution/pack_winograd.cu
   solution/small_mma_k128_specialized.cu
   solution/small_mma_cooperative.cu solution/megakernel_wgmma_pipeline.cu
   solution/megakernel_wgmma_tma_alias.cu solution/megakernel_wgmma_wait1.cu solution/megakernel_wgmma_wait1_three_stage.cu
-  solution/megakernel_wgmma_psplit.cu solution/megakernel_wgmma_psplit_asymmetric.cu solution/megakernel_wgmma_psplit_bk64.cu solution/megakernel_wgmma_psplit_rsa.cu solution/megakernel_wgmma_psplit_rsa_bk32.cu)
+  solution/megakernel_wgmma_psplit.cu solution/megakernel_wgmma_psplit_asymmetric.cu solution/megakernel_wgmma_psplit_bk64.cu solution/megakernel_wgmma_psplit_rsa.cu solution/megakernel_wgmma_psplit_rsa_bk32.cu solution/megakernel_wgmma_psplit_hybrid_s.cu)
 target_include_directories(megafmm PUBLIC include PRIVATE solution "${CUTLASS_ROOT}/include" "${CUTLASS_ROOT}/tools/util/include")
 target_link_libraries(megafmm PUBLIC CUDA::cudart CUDA::cublasLt CUDA::cublas CUDA::cuda_driver)
 target_compile_options(megafmm PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_90a,code=sm_90a;--expt-relaxed-constexpr;--expt-extended-lambda;-lineinfo;-Xptxas=-v>)
@@ -55,3 +55,6 @@ set_source_files_properties(solution/megakernel_wgmma_psplit_rsa.cu
 # Preserve actual new BK32 RS-A feeding PTX/cubin for independent initial/register lifetime gate.
 set_source_files_properties(solution/megakernel_wgmma_psplit_rsa_bk32.cu
   PROPERTIES COMPILE_OPTIONS "--keep;--keep-dir=${CMAKE_CURRENT_SOURCE_DIR}/.scratch/psplit_rsa_bk32_nvcc_keep_iter37")
+
+set_source_files_properties(solution/megakernel_wgmma_psplit_hybrid_s.cu
+  PROPERTIES COMPILE_OPTIONS "--keep;--keep-dir=${CMAKE_CURRENT_SOURCE_DIR}/.scratch/psplit_hybrid_s_nvcc_keep_iter38")

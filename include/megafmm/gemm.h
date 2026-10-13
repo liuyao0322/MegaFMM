@@ -74,6 +74,7 @@ struct Policy {
   // 39=RS-A P3+4 BK64,64x32: raw A4 shared/final B7 shared, quotas64/192/192.
   // Complete onecast A transform in registers, whole7P then fixedU, no globalSTP.
   // 40=RS-A P3+4 BK32,64x32; rawA4/finalB7 shared, quotas64/192/192, parentK%64.
+  // 41=hybrid S RS-A P3+4 BK32,64x32; shared finalS1/FP32S2 planes, rawA4/finalB7.
   int mega_variant=0;
 };
 class Plan {

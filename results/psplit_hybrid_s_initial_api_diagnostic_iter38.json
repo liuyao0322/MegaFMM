@@ -1,0 +1,15 @@
+{
+  "schema": "megafmm.iter38.independent-api-source-diagnostic.v1",
+  "status": "FAIL_API_RUN41_FALLTHROUGH_PENDING_OWNER_FIX",
+  "source_path": "solution/plan.cpp",
+  "source_sha256": "8a6a4251c541064eadb2ac9edd375121eb608938051ba973075f6710800815fd",
+  "source_lines_first": 432,
+  "actual_excerpt": "    if (plan.policy.mega_variant == 41) {\n      if (wgmma_psplit_hybrid_s_full_tiles(p, A, B, 0))\n        launch_wgmma_psplit_hybrid_s(p, A, B, C0, D, stream, 0);\n      else launch_packed_mma(p, A, B, C0, D, stream, 7);\n    } \n    if (plan.policy.mega_variant == 40) {\n      if (wgmma_psplit_rsa_bk32_full_tiles(p, A, B, 0))\n        launch_wgmma_psplit_rsa_bk32(p, A, B, C0, D, stream, 0);\n      else launch_packed_mma(p, A, B, C0, D, stream, 7);\n    } else if (plan.policy.mega_variant == 39) {",
+  "new_TU_sha256": "db5ed2caf91fe7713830b16876c2e08c9d58fad6f75389d391afc77827a1f8be",
+  "blocker": "run41 branch followed by independent if40,so variant41 falls into old elif/default dispatch after its new native/P7 launch; violates complete-one-kernel contract and may dispatch invalid old variant.",
+  "required_routine_fix": "Connect following40 condition as else if; preserve original source/build snapshot then fresh final source7/bin2 linked identity and actual launch gate.",
+  "owner_confirmation": "core32 confirmed bug and waits initial build terminal before editing, to avoid mixed build identity.",
+  "no_new41_native_launch_authorized": true,
+  "compiled_resource_gate_status": "Pending actual current41 feeding/object/benchmark/test artifacts; no inherited40/39/future CPU proof.",
+  "scope": "CPU source diagnostic only; no build/GPU/Git/extraction or formal write by reviewer."
+}

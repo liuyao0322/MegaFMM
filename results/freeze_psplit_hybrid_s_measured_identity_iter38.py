@@ -1,0 +1,11 @@
+from pathlib import Path
+import subprocess,json,hashlib
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+p=Path('results/psplit_hybrid_s1024_plan_iter38.json');plan=json.loads(p.read_text())
+init=json.loads(Path('results/psplit_hybrid_s_initial_frozen_identity_iter38.json').read_text());gate=plan['route_configurations']['41']['compiled_gate']
+for f,h in {**init['frozen_sources'],**init['frozen_binaries']}.items():assert sha(f)==h,f
+head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+for f,h in init['frozen_sources'].items():assert hashlib.sha256(subprocess.check_output(['git','show',head+':'+f])).hexdigest()==h,f
+assert sha(gate['path'])==gate['sha256'];archive=Path('.scratch/psplit_hybrid_s_quick_archive_iter38.txt').read_text().strip();assert Path(archive,'results.csv').exists()
+obj={'schema':'megafmm.iter38.hybrid-s-measured-identity.v1','base_checkpoint':init['base_checkpoint'],'measurement_source_commit':head,'frozen_sources':init['frozen_sources'],'frozen_binaries':init['frozen_binaries'],'predeclared_plan':{'path':str(p),'sha256':sha(p)},'predeclared_plan_sha256':sha(p),'quick_archive':archive,'independent_compiled_gate':gate,'linked_identity_path':init['linked_identity_path'],'linked_identity_sha256':init['linked_identity_sha256'],'compiled_scope':'Independent fresh CAN_LAUNCH41 PASS for final corrected Plan0db2 and TUdb5/bench6f81/test37706. I168 owned64512>=57344; implicit FP16 41/124/164 BF16 39/124/164; zero STACK/LOCAL/spill/newC7512, complete-stage A24/32/P48/64 pending generic touches0. Actual86144dynamic+1024static/384; typed bank43008 with S2 planes, both-bank drain before cross-bank tailSTS. Original numerical certification separate.37 remains disabled. Initial infra build failure and bad dispatch source, then historical pregate pending snapshot preserved chronologically.','metadata_scope':'Measuredidentity created ONCE after AKO quicklogger/Git closure, before mandatoryfull timing. Plan/gate/quick/link/source7/bin2 complete initially; no hindsight metadata append.'}
+out=Path('results/psplit_hybrid_s_measured_identity_iter38.json');assert not out.exists();out.write_text(json.dumps(obj,indent=2)+'\n');print('MEASURED_SOURCE',head,'IDENTITY_SHA',sha(out),'PLAN_SHA',sha(p))

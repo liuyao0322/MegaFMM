@@ -1678,3 +1678,34 @@ Freshfourinstancecompiledgate independentlyPASS, completeobject/bench/test addre
 - **Analysis:** Own complete SW latency determines code benefit; same-row tuned Dense/SW reports the comparison. Numerical/structural/SAN evidence stays separate. Missing unsafe routes will have explicit compiled-safety exclusions rather than invented rows.
 - **Next:** Mandatoryfull1024 measured40 plus retainedRSBK64best39/matchedBK32SS36/Lt1,100calls5groups3fresh; actual validation scope, independent implementation/data audits and source/raw/report/Git closure.
 - **Archive:** trajectory/20261014_052434_iter-37/
+
+### Iter 38 — Hybrid S1/S2 producer and complete-stage register A
+
+- **Hypothesis:** Use hybrid S1/S2 producer construction with original RN onecast and BK32 RS-A while preserving whole-K seven P and fixed U; each stage builds distinct packed A words before issue and retains every A operand until wait0.
+- **Changes:** New41 uses BM64 BN32 BK32,384threads/producer64/WG192/WG192,full128/empty256/two banks; producer rawA4, final roundedS1/FP32S2 planes and finalB7, consumer complete-stage packed A24/32 plus P48/64 words. Actual initial quota/resource/full pendingA+P gate precedes any GPU launch. Original onecast/fixedU/alphaRNbetaFMA/nonaligned drain6/zeroGWS unchanged. ParentK%64 and truthful fallback. Old34CUDA preserved, registered37 disabled. Originalnumericalgate/AutoDense unchanged; onlynewfreshcompiledgatedkernels execute.
+- **Bench:** quick20warm20calls5groups1fresh; original numericalFAIL is retained, no certification.
+
+| M,N,K | dtype | route | mode | Dense µs | complete SW µs | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 5.646400 | 7.137600 | 0.791078 | FAIL |
+| 128,128,128 | fp16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 5.614400 | 7.300800 | 0.769012 | FAIL |
+| 256,256,256 | bf16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 5.694400 | 10.408000 | 0.547118 | FAIL |
+| 256,256,256 | fp16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 5.766400 | 10.478400 | 0.550313 | FAIL |
+| 512,512,512 | bf16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 6.334400 | 16.816001 | 0.376689 | FAIL |
+| 512,512,512 | fp16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 6.372800 | 16.931200 | 0.376394 | FAIL |
+| 1024,1024,1024 | bf16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 13.211200 | 29.441601 | 0.448726 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 10.214400 | 29.244801 | 0.349272 | FAIL |
+| 2048,2048,2048 | bf16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 31.990400 | 238.459206 | 0.134155 | FAIL |
+| 2048,2048,2048 | fp16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 32.734400 | 241.902399 | 0.135321 | FAIL |
+| 3072,3072,3072 | bf16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 87.208003 | 884.284782 | 0.098620 | FAIL |
+| 3072,3072,3072 | fp16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 89.279997 | 867.504025 | 0.102916 | FAIL |
+| 4096,4096,4096 | bf16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 195.660806 | 2175.673676 | 0.089931 | FAIL |
+| 4096,4096,4096 | fp16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 206.839991 | 2206.334305 | 0.093748 | FAIL |
+| 1024,512,1024 | bf16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 11.502400 | 29.921600 | 0.384418 | FAIL |
+| 1024,512,1024 | fp16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 11.649600 | 30.062401 | 0.387514 | FAIL |
+| 512,1024,1024 | bf16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 8.430400 | 29.912001 | 0.281840 | FAIL |
+| 512,1024,1024 | fp16 | megakernel_wgmma_psplit_hybrid_s_64x32 v41 | launch | 8.497600 | 28.716800 | 0.295910 | FAIL |
+
+- **Analysis:** Own complete SW latency determines code benefit; same-row tuned Dense/SW reports the comparison. Numerical/structural/SAN evidence stays separate. Missing unsafe routes will have explicit compiled-safety exclusions rather than invented rows.
+- **Next:** Mandatoryfull1024 measured41 plus retainedRSBK64best39/matchedrawBK32RS40/SS36/Lt1,100calls5groups3fresh; actual validation scope, independent implementation/data audits and source/raw/report/Git closure.
+- **Archive:** trajectory/20261014_054901_iter-38/
