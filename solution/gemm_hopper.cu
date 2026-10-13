@@ -34,8 +34,9 @@ void check_cutlass(cutlass::Status status, const char* operation) {
 }
 
 bool supported_shape(const Problem& p, int variant) {
-  if (variant < 0 || variant > 2 || p.trans_a || p.trans_b) return false;
+  if (variant < 0 || variant > 4 || p.trans_a || p.trans_b) return false;
   if (p.dtype != DType::BF16 && p.dtype != DType::FP16) return false;
+  if (variant >= 3 && p.beta != 0.f) return false;
   if (p.m <= 0 || p.n <= 0 || p.k <= 0 ||
       p.m > INT_MAX || p.n > INT_MAX || p.k > INT_MAX) return false;
   if (p.lda < p.k || p.ldb < p.n || p.ldd < p.n ||
@@ -77,16 +78,21 @@ cutlass::KernelHardwareInfo hardware_info() {
   return result;
 }
 
-template <class Input, int BM, int BN, class MainloopSchedule, class EpilogueSchedule>
+template <class Input, int BM, int BN, class MainloopSchedule, class EpilogueSchedule,
+          bool NoSource = false, int ClusterM = 1, int ClusterN = 1>
 struct HopperGemm {
   using Tile = cute::Shape<cute::Int<BM>, cute::Int<BN>, cute::_64>;
-  using Cluster = cute::Shape<cute::_1, cute::_1, cute::_1>;
+  using Cluster = cute::Shape<cute::Int<ClusterM>, cute::Int<ClusterN>, cute::_1>;
+  using Source = cute::conditional_t<NoSource, void, float>;
+  using Fusion = cute::conditional_t<NoSource,
+      cutlass::epilogue::fusion::ScaledAcc<float, float>,
+      cutlass::epilogue::fusion::LinearCombination<float, float, float>>;
   using RowMajor = cutlass::layout::RowMajor;
   using Epilogue = typename cutlass::epilogue::collective::CollectiveBuilder<
       cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,
       Tile, Cluster, cutlass::epilogue::collective::EpilogueTileAuto,
-      float, float, float, RowMajor, 4, float, RowMajor, 4,
-      EpilogueSchedule>::CollectiveOp;
+      float, float, Source, RowMajor, 4, float, RowMajor, 4,
+      EpilogueSchedule, Fusion>::CollectiveOp;
   using Mainloop = typename cutlass::gemm::collective::CollectiveBuilder<
       cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,
       Input, RowMajor, 8, Input, RowMajor, 8, float, Tile, Cluster,
@@ -108,16 +114,17 @@ struct HopperGemm {
     typename Kernel::StrideC sc = cute::make_stride(
         p.beta == 0.f ? p.ldd : p.ldc, cute::_1{}, int64_t(0));
     typename Kernel::StrideD sd = cute::make_stride(p.ldd, cute::_1{}, int64_t(0));
-    // A beta=0 call may omit C0.  Give tensor-map construction a valid source
-    // descriptor, while the epilogue's beta=0 predicate suppresses all C loads.
-    const float* source = p.beta == 0.f ? D : C0;
+    // A general beta=0 kernel may omit C0.  Give its tensor-map construction
+    // a valid source descriptor, while the beta=0 predicate suppresses C loads.
+    // A compile-time sourceless epilogue does not construct a C descriptor.
+    const float* source = NoSource ? nullptr : (p.beta == 0.f ? D : C0);
     typename Gemm::Arguments args{
         cutlass::gemm::GemmUniversalMode::kGemm,
         {static_cast<int>(p.m), static_cast<int>(p.n), static_cast<int>(p.k), 1},
         {static_cast<const Input*>(A), sa, static_cast<const Input*>(B), sb},
         {{}, source, sc, D, sd}, hw};
     args.epilogue.thread.alpha = p.alpha;
-    args.epilogue.thread.beta = p.beta;
+    if constexpr (!NoSource) args.epilogue.thread.beta = p.beta;
     return args;
   }
 
@@ -168,6 +175,19 @@ size_t dispatch_variant(const Problem& p, int variant, Operation operation,
       return HopperGemm<Input, 64, 128,
           cutlass::gemm::KernelTmaWarpSpecializedPingpong,
           cutlass::epilogue::TmaWarpSpecialized>::execute(
+              p, operation, A, B, C0, D, workspace, stream);
+    case 3:
+      // Winograd leaves always have beta=0.  Compiling out the C path
+      // halves epilogue data storage and enables delayed TMA stores.
+      return HopperGemm<Input, 128, 256,
+          cutlass::gemm::KernelTmaWarpSpecializedCooperative,
+          cutlass::epilogue::TmaWarpSpecializedCooperative, true>::execute(
+              p, operation, A, B, C0, D, workspace, stream);
+    case 4:
+      // A 2x1 cluster reuses each B tile across two M tiles by TMA multicast.
+      return HopperGemm<Input, 128, 256,
+          cutlass::gemm::KernelTmaWarpSpecializedCooperative,
+          cutlass::epilogue::TmaWarpSpecializedCooperative, true, 2, 1>::execute(
               p, operation, A, B, C0, D, workspace, stream);
     default: throw std::invalid_argument("unknown Hopper GEMM variant");
   }

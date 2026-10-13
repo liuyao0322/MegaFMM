@@ -298,10 +298,39 @@ template<class T> bool strict_numerics(megafmm::DType dtype) {
 } // namespace
 int main(int argc,char** argv) {
   try {
-    bool numeric=false;
+    bool numeric=false, candidates_only=false;
     for(int i=1;i<argc;++i) {
       if(std::string(argv[i])=="--strict-numerics")numeric=true;
-      else throw std::runtime_error("usage: test_correctness [--strict-numerics]");
+      else if(std::string(argv[i])=="--smoke-candidates")candidates_only=true;
+      else throw std::runtime_error("usage: test_correctness [--strict-numerics] [--smoke-candidates]");
+    }
+    if(candidates_only) {
+      auto check_candidates=[](auto input_tag,megafmm::DType dtype) {
+        using T=decltype(input_tag);
+        for(auto candidate:{std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,0},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,1},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,2},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,0},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,1},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,2},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,3},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,4}}) {
+          auto p=problem(256,256,256,dtype);
+          p.alpha=.5f;p.beta=-.25f;
+          megafmm::Policy policy;
+          policy.algorithm=candidate.first;policy.certified_range=true;
+          policy.mega_variant=policy.hopper_variant=candidate.second;
+          auto planned=megafmm::create_plan(p,policy);
+          require(planned->algorithm_name().find("dense")==std::string::npos,
+                  "supported candidate unexpectedly fell back to Dense");
+          auto e=run_case<T>(p,candidate.first,Pattern::Integers,true,true,1234567,candidate.second);
+          require(e.nonfinite==0 && e.maxabs==0,"candidate alpha/beta alias smoke failed");
+        }
+      };
+      check_candidates(__nv_bfloat16{},megafmm::DType::BF16);
+      check_candidates(__half{},megafmm::DType::FP16);
+      std::cout << "PASS all candidate kernel paths, integer outputs and alpha/beta alias\n";
+      return 0;
     }
     structural_suite<__nv_bfloat16>(megafmm::DType::BF16);
     structural_suite<__half>(megafmm::DType::FP16);
