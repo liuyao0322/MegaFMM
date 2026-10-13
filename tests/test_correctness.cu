@@ -76,6 +76,8 @@ const char* batched_name(megafmm::Algorithm algorithm,int variant) {
   if(algorithm==megafmm::Algorithm::WinogradLt)return "winograd_lt_batched";
   if(variant==9)return "winograd_fused_input_32x32";
   if(variant==10)return "winograd_fused_input_32x64";
+  if(variant==11)return "winograd_packed_input_32x32";
+  if(variant==12)return "winograd_packed_input_32x64";
   return variant>=7 ? "winograd_sm80_batched_k64":"winograd_sm80_batched";
 }
 bool fused_input_supported(const megafmm::Problem& p,int variant) {
@@ -89,6 +91,42 @@ size_t fused_product_bytes(const megafmm::Problem& p) {
 }
 size_t fused_reserved_bytes(const megafmm::Problem& p) {
   return (fused_product_bytes(p)+255)/256*256;
+}
+bool packed_input_supported(const megafmm::Problem& p,int variant) {
+  return (variant==11 || variant==12) && !p.trans_a && !p.trans_b &&
+         p.m>0 && p.n>0 && p.k>0 && p.m<=32768 && p.n<=32768 && p.k<=32768 &&
+         p.m%64==0 && p.n%(variant==11 ? 64:128)==0 && p.k%64==0 &&
+         p.lda%8==0 && p.ldb%8==0;
+}
+size_t packed_align256(size_t bytes) {return (bytes+255)/256*256;}
+struct PackedTestLayout {size_t a_bytes,b_bytes,p_bytes,b_offset,p_offset,payload;};
+PackedTestLayout packed_test_layout(const megafmm::Problem& p) {
+  const size_t mh=size_t(p.m/2),nh=size_t(p.n/2),kh=size_t(p.k/2);
+  const size_t a=7*mh*kh*2,b=7*kh*nh*2,c=7*mh*nh*sizeof(float);
+  const size_t bo=packed_align256(a),po=packed_align256(bo+b);
+  return {a,b,c,bo,po,packed_align256(po+c)};
+}
+void check_packed_workspace(const megafmm::Plan& plan,const megafmm::Problem& p,
+                            size_t limit=size_t(8)<<30) {
+  const auto layout=packed_test_layout(p);
+  require(plan.workspace_bytes()>=layout.payload && plan.workspace_bytes()<=limit,
+          "packed input reserved workspace must cover aligned A7+B7+P and obey cap");
+}
+void check_packed_metadata(const megafmm::Problem& p,int variant) {
+  require(megafmm::packed_leaf_can_implement(p,variant-11)==packed_input_supported(p,variant),
+          "packed input metadata guard disagrees with independent shape/stride reference");
+  if(!packed_input_supported(p,variant))return;
+  const auto meta=megafmm::packed_leaf_metadata(p,variant-11);
+  const auto layout=packed_test_layout(p);
+  const int64_t mh=p.m/2,nh=p.n/2,kh=p.k/2;
+  require(meta.mh==mh && meta.nh==nh && meta.kh==kh &&
+          meta.a_row_stride==kh && meta.b_row_stride==nh && meta.p_row_stride==nh &&
+          meta.a_product_stride==mh*kh && meta.b_product_stride==kh*nh &&
+          meta.p_product_stride==mh*nh && meta.a_bytes==layout.a_bytes &&
+          meta.b_bytes==layout.b_bytes && meta.p_bytes==layout.p_bytes &&
+          meta.compact_workspace_bytes==layout.payload &&
+          megafmm::packed_leaf_workspace_bytes(p,variant-11)==layout.payload,
+          "packed input metadata is not seven compact row-major A/B/P slots");
 }
 const char* warp_mma_name(int variant,const megafmm::Problem& p) {
   if(variant==26 || variant==27)
@@ -317,6 +355,8 @@ template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorit
                            std::string("unexpected route: expected ")+expected_route+", got "+plan->algorithm_name());
   if(expected_route && std::string(expected_route).find("winograd_fused_input")==0)
     require(plan->workspace_bytes()==fused_reserved_bytes(p),"fused input plan must reserve only seven P slots");
+  if(expected_route && std::string(expected_route).find("winograd_packed_input")==0)
+    check_packed_workspace(*plan,p,workspace_limit);
   if(expected_route && (std::string(expected_route).find("megakernel_warp_mma")==0 ||
                         std::string(expected_route).find("megakernel_cooperative")==0 ||
                         std::string(expected_route).find("megakernel_product_warps")==0 ||
@@ -1138,6 +1178,419 @@ template<class T> void fused_input_graph_suite(megafmm::DType dtype,int variant)
               << " alias=" << active_beta << " null_c0=" << !active_beta << " refresh_ab=1 replays=3\n";
   }
 }
+template<class T> void packed_input_product_slots(megafmm::DType dtype,int variant) {
+  auto p=problem(64,variant==11 ? 64:128,64,dtype);
+  p.lda+=8;p.ldb+=8;
+  std::vector<T> a(size_t(p.m)*p.lda,round_value<T>(0)),
+                 b(size_t(p.k)*p.ldb,round_value<T>(0));
+  std::mt19937 rng(928374u+unsigned(variant));
+  for(int i=0;i<p.m;++i)for(int k=0;k<p.k;++k)
+    a[size_t(i)*p.lda+k]=round_value<T>(float(int(rng()%7)-3));
+  for(int k=0;k<p.k;++k)for(int j=0;j<p.n;++j)
+    b[size_t(k)*p.ldb+j]=round_value<T>(float(int(rng()%7)-3));
+  megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::WinogradHopper;
+  policy.certified_range=true;policy.hopper_variant=variant;
+  auto plan=megafmm::create_plan(p,policy);
+  require(plan->algorithm_name()==batched_name(policy.algorithm,variant),"P-slot fixture is not native");
+  check_packed_workspace(*plan,p);
+  Buffer da(a.size()*sizeof(T)),db(b.size()*sizeof(T)),dd(size_t(p.m)*p.n*sizeof(float)),
+         workspace(plan->workspace_bytes());
+  check(cudaMemcpy(da.data,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice));
+  check(cudaMemcpy(db.data,b.data(),b.size()*sizeof(T),cudaMemcpyHostToDevice));
+  megafmm::run(*plan,da.data,db.data,nullptr,dd.as<float>(),workspace.data);
+  check(cudaDeviceSynchronize());
+  const int mh=int(p.m/2),nh=int(p.n/2),kh=int(p.k/2);
+  std::vector<float> actual(size_t(7)*mh*nh);
+  const auto layout=packed_test_layout(p);
+  check(cudaMemcpy(actual.data(),workspace.as<char>()+layout.p_offset,actual.size()*sizeof(float),cudaMemcpyDeviceToHost));
+  std::vector<T> actual_a(layout.a_bytes/sizeof(T)),actual_b(layout.b_bytes/sizeof(T));
+  check(cudaMemcpy(actual_a.data(),workspace.data,layout.a_bytes,cudaMemcpyDeviceToHost));
+  check(cudaMemcpy(actual_b.data(),workspace.as<char>()+layout.b_offset,layout.b_bytes,cudaMemcpyDeviceToHost));
+  for(int row=0;row<mh;++row)for(int k=0;k<kh;++k) {
+    const double a11=double_value(a[size_t(row)*p.lda+k]);
+    const double a12=double_value(a[size_t(row)*p.lda+k+kh]);
+    const double a21=double_value(a[size_t(row+mh)*p.lda+k]);
+    const double a22=double_value(a[size_t(row+mh)*p.lda+k+kh]);
+    const double s1=a21+a22,s2=s1-a11,s3=a11-a21,s4=a12-s2;
+    const double expected[7]={a11,a12,s4,a22,s1,s2,s3};
+    for(int product=0;product<7;++product)
+      require(double_value(actual_a[size_t(product)*mh*kh+size_t(row)*kh+k])==expected[product],
+              "packed A7 slot differs from independent original-quadrant integer transform");
+  }
+  for(int k=0;k<kh;++k)for(int col=0;col<nh;++col) {
+    const double b11=double_value(b[size_t(k)*p.ldb+col]);
+    const double b12=double_value(b[size_t(k)*p.ldb+col+nh]);
+    const double b21=double_value(b[size_t(k+kh)*p.ldb+col]);
+    const double b22=double_value(b[size_t(k+kh)*p.ldb+col+nh]);
+    const double t1=b12-b11,t2=b22-t1,t3=b22-b12,t4=t2-b21;
+    const double expected[7]={b11,b21,b22,t4,t1,t2,t3};
+    for(int product=0;product<7;++product)
+      require(double_value(actual_b[size_t(product)*kh*nh+size_t(k)*nh+col])==expected[product],
+              "packed B7 slot differs from independent original-quadrant integer transform");
+  }
+  // These integer transforms are exactly representable in either input dtype.
+  // Independent original-quadrant FP64 dots check every compact P slot directly.
+  for(int row=0;row<mh;++row)for(int col=0;col<nh;++col) {
+    double reference[7]={};
+    for(int k=0;k<kh;++k) {
+      const double a11=double_value(a[size_t(row)*p.lda+k]);
+      const double a12=double_value(a[size_t(row)*p.lda+k+kh]);
+      const double a21=double_value(a[size_t(row+mh)*p.lda+k]);
+      const double a22=double_value(a[size_t(row+mh)*p.lda+k+kh]);
+      const double b11=double_value(b[size_t(k)*p.ldb+col]);
+      const double b12=double_value(b[size_t(k)*p.ldb+col+nh]);
+      const double b21=double_value(b[size_t(k+kh)*p.ldb+col]);
+      const double b22=double_value(b[size_t(k+kh)*p.ldb+col+nh]);
+      const double s1=a21+a22,s2=s1-a11,s3=a11-a21,s4=a12-s2;
+      const double t1=b12-b11,t2=b22-t1,t3=b22-b12,t4=t2-b21;
+      const double left[7]={a11,a12,s4,a22,s1,s2,s3};
+      const double right[7]={b11,b21,b22,t4,t1,t2,t3};
+      for(int product=0;product<7;++product)reference[product]+=left[product]*right[product];
+    }
+    for(int product=0;product<7;++product)
+      require(double(actual[size_t(product)*mh*nh+size_t(row)*nh+col])==reference[product],
+              "packed input compact product slot differs from independent FP64 integer dot");
+  }
+  std::cout << "PASS_PACKED_INPUT_PRODUCTS dtype=" << megafmm::dtype_name(dtype)
+            << " variant=" << variant << " slots=7 elements=" << actual.size()
+            << " native=1 input_slots_verified=14 reference=original_quadrant_fp64_integer_dot\n";
+}
+template<class T> void packed_input_suite(megafmm::DType dtype,int variant) {
+  require(variant==11 || variant==12,"packed input suite needs Hopper11/12");
+  packed_input_product_slots<T>(dtype,variant);
+  auto exact=[dtype,variant](megafmm::Problem p,bool alias=false,bool certified=true,
+                            size_t limit=size_t(8)<<30,bool tune=false) {
+    const bool native=certified && packed_input_supported(p,variant) && packed_test_layout(p).payload<=limit;
+    const char* route=native ? batched_name(megafmm::Algorithm::WinogradHopper,variant):"dense_cublaslt";
+    std::cout << "BEGIN_PACKED_INPUT dtype=" << megafmm::dtype_name(dtype)
+              << " variant=" << variant << " shape=" << p.m << ',' << p.n << ',' << p.k
+              << " alpha=" << p.alpha << " beta=" << p.beta << " alias=" << alias
+              << " null_c0=" << (p.beta==0.0f) << " expected=" << route << std::endl;
+    check_packed_metadata(p,variant);
+    auto e=run_case<T>(p,megafmm::Algorithm::WinogradHopper,Pattern::Integers,alias,certified,
+                       1234567,variant,tune,limit,route);
+    require(e.nonfinite==0 && e.maxabs==0,"packed input native/Dense fallback integer output incorrect");
+  };
+  const int n=variant==11 ? 64:128;
+  // Leaf K32/64/96 corresponds to parent K64/128/192. Parent K32/96 is unsupported.
+  for(int k:{64,128,192})exact(problem(64,n,k,dtype));
+  exact(problem(512,1024,64,dtype));
+  auto padded=problem(128,256,128,dtype);padded.lda+=8;padded.ldb+=8;
+  padded.ldc+=1;padded.ldd+=1;padded.alpha=.5f;padded.beta=-.25f;
+  exact(padded,true,true,size_t(8)<<30,true);
+  auto null_c0=problem(128,128,64,dtype);null_c0.beta=-0.0f;null_c0.ldc+=1;null_c0.ldd+=1;
+  exact(null_c0);
+  for(int k:{32,96})exact(problem(64,n,k,dtype));
+  exact(problem(80,112,48,dtype));
+  if(variant==12)exact(problem(64,64,64,dtype));
+  auto p=problem(128,128,128,dtype);
+  exact(p,false,false);
+  exact(p,false,true,0);
+  exact(p,false,true,packed_test_layout(p).payload-1);
+  exact(p,false,true,packed_test_layout(p).payload,true);
+  auto odd_b=p;odd_b.ldb+=1;exact(odd_b);
+  for(bool ta:{false,true})for(bool tb:{false,true}) {
+    if(!ta && !tb)continue;
+    auto transposed=p;transposed.trans_a=ta;transposed.trans_b=tb;exact(transposed);
+  }
+  p.lda+=1;exact(p);
+  const auto large=problem(1024,1024,1024,dtype);
+  check_packed_metadata(large,variant);
+  require(packed_test_layout(large).payload==size_t(14)*1024*1024,
+          "1024 packed payload must be exactly 14 MiB before Dense scratch");
+  megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::WinogradHopper;
+  policy.certified_range=true;policy.hopper_variant=variant;
+  auto plan=megafmm::create_plan(large,policy);
+  require(plan->algorithm_name()==batched_name(policy.algorithm,variant),"1024 packed metadata selected Dense");
+  check_packed_workspace(*plan,large,policy.workspace_limit);
+  std::cout << "PASS_PACKED_INPUT_WORKSPACE dtype=" << megafmm::dtype_name(dtype)
+            << " variant=" << variant << " shape=1024,1024,1024 payload_bytes="
+            << packed_test_layout(large).payload << " reserved_bytes=" << plan->workspace_bytes()
+            << " cap_bytes=" << policy.workspace_limit << " payload_alignment=256\n";
+}
+template<class T> void packed_input_native_bitwise_suite(megafmm::DType dtype,int variant) {
+  require(variant==11 || variant==12,"packed native bits needs Hopper11/12");
+  for(auto mn:{std::pair<int,int>{64,variant==11 ? 64:128},std::pair<int,int>{128,256},
+               std::pair<int,int>{512,1024}})
+  for(int k:{64,128,192}) {
+    auto p=problem(mn.first,mn.second,k,dtype);
+    const int input_shift=k==192 ? 8:0,output_shift=k==192 ? 1:0;
+    if(k!=64) {p.lda+=8;p.ldb+=8;p.ldc+=1;p.ldd+=1;}
+    if(k==128)p.beta=-0.0f;
+    require(packed_input_supported(p,variant),"packed random fixture is not native");
+    uint32_t seed=553311u+uint32_t(p.m*31+p.n*17+p.k*7+variant*137)+
+                  (dtype==megafmm::DType::BF16 ? 0u:918273u);
+    std::mt19937 rng(seed);
+    std::vector<T> a(size_t(p.m)*p.lda,round_value<T>(3.25f)),
+                   b(size_t(p.k)*p.ldb,round_value<T>(-2.75f));
+    auto random_input=[&]() {return round_value<T>(2.0f*(float(rng()>>8)/16777216.0f)-1.0f);};
+    for(int i=0;i<p.m;++i) for(int l=0;l<p.k;++l)a[size_t(i)*p.lda+l]=random_input();
+    for(int l=0;l<p.k;++l) for(int j=0;j<p.n;++j)b[size_t(l)*p.ldb+j]=random_input();
+    std::vector<T> a_storage(a.size()+8,round_value<T>(5.5f)),
+                   b_storage(b.size()+8,round_value<T>(-6.5f));
+    std::copy(a.begin(),a.end(),a_storage.begin()+input_shift);
+    std::copy(b.begin(),b.end(),b_storage.begin()+input_shift);
+    const size_t output_count=size_t(p.m)*p.ldd;
+    std::vector<float> initial(output_count+2),actual(initial.size()),baseline(initial.size()),fused_output(initial.size());
+    std::vector<float> fused_products(size_t(7)*(p.m/2)*(p.n/2)),packed_products(fused_products.size());
+    for(size_t at=0;at<initial.size();++at)initial[at]=float(int((at+seed)%1024)-512)/8.0f;
+    for(int i=0;i<p.m;++i) for(int j=0;j<p.n;++j)
+      initial[size_t(i)*p.ldd+j]=std::numeric_limits<float>::quiet_NaN();
+    Buffer da(a_storage.size()*sizeof(T)),db(b_storage.size()*sizeof(T)),
+           dd((initial.size()+1)*sizeof(float));
+    const T* left=da.as<T>()+input_shift,*right=db.as<T>()+input_shift;
+    float* output=dd.as<float>()+output_shift;
+    std::cout << "BEGIN_PACKED_INPUT_NATIVE_BITWISE dtype=" << megafmm::dtype_name(dtype)
+              << " variant=" << variant << " reference_variant=7 paired_fused_variant=" << variant-2 << " shape=" << p.m << ',' << p.n << ',' << p.k
+              << " input_shift_bytes=" << input_shift*sizeof(T) << " output_shift_bytes=" << output_shift*sizeof(float)
+              << " beta_signbit=" << std::signbit(p.beta) << " null_c0=1 seed=" << seed << std::endl;
+    for(int route:{0,1,2}) {
+      const bool native_leaf=route!=0,paired_fused=route==1,packed=route==2;
+      megafmm::Policy policy;policy.certified_range=true;
+      policy.algorithm=native_leaf ? megafmm::Algorithm::WinogradHopper:megafmm::Algorithm::Megakernel;
+      policy.hopper_variant=paired_fused ? variant-2:variant;policy.mega_variant=7;
+      auto plan=megafmm::create_plan(p,policy);Buffer workspace(plan->workspace_bytes());
+      require(plan->algorithm_name()==(native_leaf ? batched_name(policy.algorithm,policy.hopper_variant):"megakernel_warp_mma_packed"),
+              "packed random bitwise fixture selected another route");
+      if(packed)check_packed_workspace(*plan,p);
+      else if(paired_fused)require(plan->workspace_bytes()==fused_reserved_bytes(p),"paired fused fixture is not P-only");
+      else require(plan->workspace_bytes()==0,"packed random Mega7 reference unexpectedly requires workspace");
+      check(cudaMemcpy(da.data,a_storage.data(),a_storage.size()*sizeof(T),cudaMemcpyHostToDevice));
+      check(cudaMemcpy(db.data,b_storage.data(),b_storage.size()*sizeof(T),cudaMemcpyHostToDevice));
+      check(cudaMemcpy(output,initial.data(),initial.size()*sizeof(float),cudaMemcpyHostToDevice));
+      require(plan->lt_algorithm_config(left,right,nullptr,output,workspace.data)=="none",
+              "packed random bitwise metadata not none");
+      megafmm::run(*plan,left,right,nullptr,output,workspace.data);
+      check(cudaDeviceSynchronize());
+      check(cudaMemcpy(actual.data(),output,actual.size()*sizeof(float),cudaMemcpyDeviceToHost));
+      for(int i=0;i<p.m;++i) {
+        for(int j=0;j<p.n;++j)
+          require(std::isfinite(actual[size_t(i)*p.ldd+j]),"packed random bits returned nonfinite/unwritten output");
+        for(int j=int(p.n);j<p.ldd;++j)
+          require(actual[size_t(i)*p.ldd+j]==initial[size_t(i)*p.ldd+j],"packed random bits overwrote D padding");
+      }
+      for(size_t at=output_count;at<actual.size();++at)
+        require(actual[at]==initial[at],"packed random bits overwrote trailing D guard");
+      if(route==0)baseline=actual;
+      else for(int i=0;i<p.m;++i)
+        require(std::memcmp(baseline.data()+size_t(i)*p.ldd,actual.data()+size_t(i)*p.ldd,
+                            size_t(p.n)*sizeof(float))==0,"matched-control final M1 output bits differ from Mega7");
+      if(paired_fused) {
+        fused_output=actual;
+        check(cudaMemcpy(fused_products.data(),workspace.data,fused_products.size()*sizeof(float),cudaMemcpyDeviceToHost));
+      } else if(packed) {
+        const auto layout=packed_test_layout(p);
+        check(cudaMemcpy(packed_products.data(),workspace.as<char>()+layout.p_offset,
+                         packed_products.size()*sizeof(float),cudaMemcpyDeviceToHost));
+        require(std::memcmp(fused_products.data(),packed_products.data(),
+                            packed_products.size()*sizeof(float))==0,
+                "matched packed/fused complete seven P slots differ on the same rounded random inputs");
+        for(int i=0;i<p.m;++i)
+          require(std::memcmp(fused_output.data()+size_t(i)*p.ldd,actual.data()+size_t(i)*p.ldd,
+                              size_t(p.n)*sizeof(float))==0,
+                  "matched packed/fused final D bits differ on the same rounded random inputs");
+      }
+    }
+    std::cout << "PASS_PACKED_INPUT_NATIVE_BITWISE dtype=" << megafmm::dtype_name(dtype)
+              << " variant=" << variant << " reference_variant=7 paired_fused_variant=" << variant-2 << " shape=" << p.m << ',' << p.n << ',' << p.k
+              << " input_shift_bytes=" << input_shift*sizeof(T) << " output_shift_bytes=" << output_shift*sizeof(float)
+              << " beta_signbit=" << std::signbit(p.beta) << " null_c0=1 padding_guard=1 paired_p_slots=7 paired_final_d=1\n";
+  }
+}
+template<class T> void packed_input_output_rebind_suite(megafmm::DType dtype,int variant) {
+  auto p=problem(128,128,128,dtype);p.alpha=.5f;p.beta=-.25f;
+  std::mt19937 rng(776655u);
+  std::vector<T> a(size_t(p.m)*p.lda),b(size_t(p.k)*p.ldb);
+  std::vector<float> c(size_t(p.m)*p.ldc),actual(c.size());
+  for(auto& value:a)value=round_value<T>(float(int(rng()%5)-2));
+  for(auto& value:b)value=round_value<T>(float(int(rng()%5)-2));
+  for(auto& value:c)value=float(int(rng()%9)-4)/4.0f;
+  std::vector<double> reference(size_t(p.m)*p.n);
+  for(int i=0;i<p.m;++i) for(int j=0;j<p.n;++j) {
+    double sum=0;
+    for(int l=0;l<p.k;++l)sum+=double_value(a[size_t(i)*p.lda+l])*double_value(b[size_t(l)*p.ldb+j]);
+    reference[size_t(i)*p.n+j]=double(p.alpha)*sum+double(p.beta)*c[size_t(i)*p.ldc+j];
+  }
+  Buffer da(a.size()*sizeof(T)),db(b.size()*sizeof(T)),dc((c.size()+1)*sizeof(float)),
+         dd((actual.size()+1)*sizeof(float));
+  check(cudaMemcpy(da.data,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice));
+  check(cudaMemcpy(db.data,b.data(),b.size()*sizeof(T),cudaMemcpyHostToDevice));
+  megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::WinogradHopper;
+  policy.certified_range=true;policy.hopper_variant=variant;
+  auto plan=megafmm::create_plan(p,policy);Buffer workspace(plan->workspace_bytes()+256);
+  require(plan->algorithm_name()==batched_name(policy.algorithm,variant),"packed output rebind selected another route");
+  check_packed_workspace(*plan,p);
+  const auto layout=packed_test_layout(p);
+  const void* a7=workspace.data;
+  const void* b7=workspace.as<char>()+layout.b_offset;
+  const float* products=reinterpret_cast<float*>(workspace.as<char>()+layout.p_offset);
+  require(megafmm::packed_leaf_original_input_guard(p,da.data,db.data,variant-11),
+          "packed original aligned A/B rejected");
+  require(!megafmm::packed_leaf_original_input_guard(p,da.as<T>()+1,db.data,variant-11) &&
+          !megafmm::packed_leaf_original_input_guard(p,da.data,db.as<T>()+1,variant-11),
+          "packed original A+2/B+2 accepted");
+  require(megafmm::packed_leaf_full_tiles(p,a7,b7,products,variant-11),
+          "packed low-level aligned binding rejected");
+  require(!megafmm::packed_leaf_full_tiles(p,workspace.as<char>()+2,b7,products,variant-11) &&
+          !megafmm::packed_leaf_full_tiles(p,a7,static_cast<const char*>(b7)+2,products,variant-11) &&
+          !megafmm::packed_leaf_full_tiles(p,a7,b7,products+1,variant-11),
+          "packed low-level A7+2/B7+2/P+4 binding accepted");
+  require(!megafmm::packed_leaf_full_tiles(p,nullptr,b7,products,variant-11) &&
+          !megafmm::packed_leaf_full_tiles(p,a7,nullptr,products,variant-11) &&
+          !megafmm::packed_leaf_full_tiles(p,a7,b7,nullptr,variant-11),
+          "packed low-level null compact binding accepted");
+  const void* overflowing=reinterpret_cast<const void*>(std::numeric_limits<uintptr_t>::max()-15);
+  require(!megafmm::packed_leaf_full_tiles(p,overflowing,b7,products,variant-11) &&
+          !megafmm::packed_leaf_full_tiles(p,a7,overflowing,products,variant-11) &&
+          !megafmm::packed_leaf_full_tiles(p,a7,b7,static_cast<const float*>(overflowing),variant-11),
+          "packed low-level compact pointer range overflow accepted");
+  bool rejected=false;
+  try {megafmm::run(*plan,da.data,db.data,dc.as<float>(),dd.as<float>(),workspace.as<float>()+1);}
+  catch(const std::exception&) {rejected=true;}
+  require(rejected,"packed Plan accepted workspace without required 256-byte alignment");
+  for(int mode=0;mode<3;++mode) {
+    for(int shift:{0,1,0}) {
+      float* source=dc.as<float>()+(mode==0 ? 0:shift);
+      float* output=mode==2 ? source:dd.as<float>()+(mode==0 ? shift:0);
+      check(cudaMemset(dc.data,0xff,(c.size()+1)*sizeof(float)));
+      check(cudaMemset(dd.data,0xff,(actual.size()+1)*sizeof(float)));
+      check(cudaMemcpy(source,c.data(),c.size()*sizeof(float),cudaMemcpyHostToDevice));
+      require(plan->lt_algorithm_config(da.data,db.data,source,output,workspace.data)=="none",
+              "packed scalar output rebind unexpectedly chose Dense");
+      megafmm::run(*plan,da.data,db.data,source,output,workspace.data);
+      check(cudaDeviceSynchronize());
+      check(cudaMemcpy(actual.data(),output,actual.size()*sizeof(float),cudaMemcpyDeviceToHost));
+      for(size_t i=0;i<actual.size();++i)
+        require(double(actual[i])==reference[i],"packed same-plan D/C0+4 rebind returned incorrect output");
+    }
+    std::cout << "PASS_PACKED_INPUT_OUTPUT_REBIND dtype=" << megafmm::dtype_name(dtype)
+              << " variant=" << variant << " mode=" << mode << " alias=" << (mode==2)
+              << " aligned_then_float_aligned_then_aligned=1 workspace_alignment_rejection=1\n";
+  }
+}
+template<class T> void packed_input_graph_suite(megafmm::DType dtype,int variant) {
+  for(bool active_beta:{false,true}) {
+    auto p=active_beta ? problem(128,256,128,dtype):problem(64,variant==11 ? 64:128,64,dtype);
+    p.lda+=8;p.ldb+=8;p.ldc+=1;p.ldd+=1;
+    if(active_beta) {p.alpha=.5f;p.beta=-.25f;} else p.beta=-0.0f;
+    std::mt19937 rng(998877u+uint32_t(p.m*31+p.n*17+p.k*7));
+    std::vector<T> a(size_t(p.m)*p.lda),b(size_t(p.k)*p.ldb);
+    std::vector<float> c(size_t(p.m)*p.ldc,-777.0f),actual(c.size());
+    std::vector<double> reference_ab(size_t(p.m)*p.n);
+    Buffer da(a.size()*sizeof(T)),db(b.size()*sizeof(T)),dc(c.size()*sizeof(float));
+    megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::WinogradHopper;
+    policy.certified_range=true;policy.hopper_variant=variant;
+    auto plan=megafmm::create_plan(p,policy);Buffer workspace(plan->workspace_bytes());
+    require(plan->algorithm_name()==batched_name(policy.algorithm,variant),"packed graph selected another route");
+    check_packed_workspace(*plan,p);
+    std::cout << "BEGIN_PACKED_INPUT_GRAPH dtype=" << megafmm::dtype_name(dtype)
+              << " variant=" << variant << " shape=" << p.m << ',' << p.n << ',' << p.k
+              << " alpha=" << p.alpha << " beta=" << p.beta << " alias=" << active_beta
+              << " null_c0=" << !active_beta << " refresh_ab=1" << std::endl;
+    Stream stream;Graph graph;
+    check(cudaStreamSynchronize(stream.value));
+    check(cudaStreamBeginCapture(stream.value,cudaStreamCaptureModeThreadLocal));
+    megafmm::run(*plan,da.data,db.data,active_beta ? dc.as<float>():nullptr,dc.as<float>(),workspace.data,stream.value);
+    check(cudaStreamEndCapture(stream.value,&graph.value));
+    check(cudaGraphInstantiate(&graph.executable,graph.value,0));
+    for(int replay=0;replay<3;++replay) {
+      for(int i=0;i<p.m;++i) for(int l=0;l<p.k;++l)
+        a[size_t(i)*p.lda+l]=round_value<T>(float(int(rng()%5)-2));
+      for(int l=0;l<p.k;++l) for(int j=0;j<p.n;++j)
+        b[size_t(l)*p.ldb+j]=round_value<T>(float(int(rng()%5)-2));
+      std::fill(reference_ab.begin(),reference_ab.end(),0.0);
+      for(int i=0;i<p.m;++i) for(int j=0;j<p.n;++j)
+        for(int l=0;l<p.k;++l)
+          reference_ab[size_t(i)*p.n+j]+=double_value(a[size_t(i)*p.lda+l])*double_value(b[size_t(l)*p.ldb+j]);
+      for(int i=0;i<p.m;++i) for(int j=0;j<p.n;++j)
+        c[size_t(i)*p.ldc+j]=float((i+j+3*replay)%9-4)/4.0f;
+      // Captured pointers stay fixed. Refresh original rounded A/B and restore
+      // the immutable host C0 snapshot on the replay stream before each launch.
+      check(cudaMemcpyAsync(da.data,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice,stream.value));
+      check(cudaMemcpyAsync(db.data,b.data(),b.size()*sizeof(T),cudaMemcpyHostToDevice,stream.value));
+      check(cudaMemcpyAsync(dc.data,c.data(),c.size()*sizeof(float),cudaMemcpyHostToDevice,stream.value));
+      check(cudaGraphLaunch(graph.executable,stream.value));
+      check(cudaStreamSynchronize(stream.value));
+      check(cudaMemcpy(actual.data(),dc.data,actual.size()*sizeof(float),cudaMemcpyDeviceToHost));
+      for(int i=0;i<p.m;++i) for(int j=0;j<p.n;++j)
+        require(double(actual[size_t(i)*p.ldd+j])==double(p.alpha)*reference_ab[size_t(i)*p.n+j]+double(p.beta)*c[size_t(i)*p.ldc+j],
+                "packed graph replay disagrees with fresh original-input FP64 AB");
+      for(int i=0;i<p.m;++i) for(int j=p.n;j<p.ldd;++j)
+        require(actual[size_t(i)*p.ldd+j]==-777.0f,"packed graph replay overwrote D padding");
+    }
+    std::cout << "PASS_PACKED_INPUT_GRAPH dtype=" << megafmm::dtype_name(dtype)
+              << " variant=" << variant << " shape=" << p.m << ',' << p.n << ',' << p.k
+              << " alias=" << active_beta << " null_c0=" << !active_beta << " refresh_ab=1 replays=3\n";
+  }
+}
+template<class T> void packed_input_policy_suite(megafmm::DType dtype,int variant) {
+  megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::WinogradHopper;
+  policy.certified_range=true;policy.hopper_variant=variant;
+  auto p=problem(128,128,128,dtype);p.beta=.5f;
+  auto plan=megafmm::create_plan(p,policy);
+  check_packed_workspace(*plan,p,policy.workspace_limit);
+  const size_t ab=size_t(p.m)*p.lda*sizeof(T),bb=size_t(p.k)*p.ldb*sizeof(T),
+               cb=size_t(p.m)*p.ldc*sizeof(float);
+  Buffer da(ab),db(bb),dc(cb+sizeof(float)),dd(cb+sizeof(float)),workspace(plan->workspace_bytes()+256);
+  auto reject=[&](const megafmm::Plan& current,const void* a,const void* b,const float* c,
+                  float* d,void* work,const char* reason) {
+    bool runtime=false,metadata=false;
+    try {megafmm::run(current,a,b,c,d,work);}catch(const std::exception&) {runtime=true;}
+    try {(void)current.lt_algorithm_config(a,b,c,d,work);}catch(const std::exception&) {metadata=true;}
+    require(runtime && metadata,std::string("packed run/metadata accepted ")+reason);
+  };
+  reject(*plan,nullptr,db.data,dc.as<float>(),dd.as<float>(),workspace.data,"null A");
+  reject(*plan,da.data,nullptr,dc.as<float>(),dd.as<float>(),workspace.data,"null B");
+  reject(*plan,da.data,db.data,nullptr,dd.as<float>(),workspace.data,"missing active C0");
+  reject(*plan,da.data,db.data,dc.as<float>(),dd.as<float>(),nullptr,"null workspace");
+  reject(*plan,da.data,db.data,dc.as<float>(),dd.as<float>(),workspace.as<char>()+4,"workspace+4");
+  reject(*plan,da.data,db.data,dc.as<float>(),da.as<float>(),workspace.data,"A/D overlap");
+  reject(*plan,da.data,db.data,dc.as<float>(),db.as<float>(),workspace.data,"B/D overlap");
+  reject(*plan,workspace.data,db.data,dc.as<float>(),dd.as<float>(),workspace.data,"A/workspace overlap");
+  reject(*plan,da.data,workspace.data,dc.as<float>(),dd.as<float>(),workspace.data,"B/workspace overlap");
+  reject(*plan,da.data,db.data,workspace.as<float>(),dd.as<float>(),workspace.data,"C0/workspace overlap");
+  reject(*plan,da.data,db.data,dc.as<float>(),workspace.as<float>(),workspace.data,"D/workspace overlap");
+  reject(*plan,da.data,db.data,dc.as<float>(),dc.as<float>()+1,workspace.data,"partial C0/D overlap");
+  const void* overflowing=reinterpret_cast<const void*>(std::numeric_limits<uintptr_t>::max()-15);
+  reject(*plan,overflowing,db.data,dc.as<float>(),dd.as<float>(),workspace.data,"A pointer range overflow");
+  reject(*plan,da.data,overflowing,dc.as<float>(),dd.as<float>(),workspace.data,"B pointer range overflow");
+  auto unequal=p;unequal.ldc+=1;
+  auto unequal_plan=megafmm::create_plan(unequal,policy);Buffer unequal_workspace(unequal_plan->workspace_bytes());
+  reject(*unequal_plan,da.data,db.data,dc.as<float>(),dc.as<float>(),unequal_workspace.data,
+         "equal C0/D pointers with unequal strides");
+  for(int zero_dim:{0,1}) {
+    auto empty=problem(zero_dim==0 ? 0:9,zero_dim==1 ? 0:11,17,dtype);
+    auto current=megafmm::create_plan(empty,policy);
+    require(current->workspace_bytes()==0 && current->lt_algorithm_config(nullptr,nullptr,nullptr,nullptr,nullptr)=="none",
+            "packed empty plan requires data/workspace");
+    megafmm::run(*current,nullptr,nullptr,nullptr,nullptr,nullptr);
+  }
+  for(bool alpha_zero:{false,true})for(float beta:{0.0f,-0.0f,.5f,-1.0f}) {
+    auto scale=problem(7,11,alpha_zero ? 13:0,dtype);scale.alpha=alpha_zero ? 0:1;scale.beta=beta;
+    std::vector<float> c(size_t(scale.m)*scale.n),actual(c.size());
+    for(size_t i=0;i<c.size();++i)c[i]=float(int(i%9)-4)/4;
+    Buffer source(c.size()*sizeof(float)),output(c.size()*sizeof(float));
+    check(cudaMemcpy(source.data,c.data(),c.size()*sizeof(float),cudaMemcpyHostToDevice));
+    check(cudaMemset(output.data,0xff,actual.size()*sizeof(float)));
+    auto current=megafmm::create_plan(scale,policy);
+    require(current->workspace_bytes()==0 &&
+            current->lt_algorithm_config(nullptr,nullptr,beta==0 ? nullptr:source.as<float>(),output.as<float>(),nullptr)=="none",
+            "packed scale plan unexpectedly uses packed operands/workspace");
+    megafmm::run(*current,nullptr,nullptr,beta==0 ? nullptr:source.as<float>(),output.as<float>(),nullptr);
+    check(cudaDeviceSynchronize());
+    check(cudaMemcpy(actual.data(),output.data,actual.size()*sizeof(float),cudaMemcpyDeviceToHost));
+    for(size_t i=0;i<c.size();++i)require(actual[i]==beta*c[i],"packed degenerate beta*C0 incorrect");
+  }
+  megafmm::Policy automatic=policy;automatic.algorithm=megafmm::Algorithm::Auto;
+  auto automatic_plan=megafmm::create_plan(p,automatic);
+  require(automatic_plan->algorithm_name()=="dense_cublaslt","packed candidate caused Auto to select uncertified SW");
+  auto e=run_case<T>(p,megafmm::Algorithm::Auto,Pattern::Integers,false,true,1234567,variant,
+                     false,size_t(8)<<30,"dense_cublaslt");
+  require(e.nonfinite==0 && e.maxabs==0,"packed candidate changed Auto Dense result");
+  std::cout << "PASS_PACKED_INPUT_POLICY dtype=" << megafmm::dtype_name(dtype)
+            << " variant=" << variant << " overlap_null_overflow_checks=15 metadata_and_run=1"
+            << " empty_cases=2 scale_cases=8 auto_dense=1\n";
+}
 template<class T> void warp_mma_bitwise_suite(megafmm::DType dtype) {
   // M1 requires complete-P accumulation followed by the fixed U DAG. Mega18
   // uses separately rounded stage contributions and is intentionally excluded.
@@ -1339,6 +1792,8 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,8},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,9},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,10},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,11},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,12},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,3},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,4},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,5},
@@ -1376,8 +1831,10 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
     if(algo==megafmm::Algorithm::Megakernel)policy.mega_variant=variant;
     auto plan=megafmm::create_plan(p,policy);Buffer workspace(plan->workspace_bytes());
     if(is_batched)require(plan->algorithm_name()==batched_name(algo,variant),"batched rebind test selected Dense");
-    if(algo==megafmm::Algorithm::WinogradHopper && variant>=9)
+    if(algo==megafmm::Algorithm::WinogradHopper && (variant==9 || variant==10))
       require(plan->workspace_bytes()==fused_reserved_bytes(p),"fused input rebind is not P-only");
+    if(algo==megafmm::Algorithm::WinogradHopper && (variant==11 || variant==12))
+      check_packed_workspace(*plan,p,policy.workspace_limit);
     if(algo==megafmm::Algorithm::Megakernel && variant>=4) {
       require(plan->algorithm_name()==warp_mma_name(variant,p),"warp MMA rebind test selected another route");
       require(plan->workspace_bytes()==0,"warp MMA rebind unexpectedly requires workspace");
@@ -1411,7 +1868,7 @@ void batched_policy_rejection_suite(bool lt_only=false) {
   for(auto algorithm:{megafmm::Algorithm::Auto,megafmm::Algorithm::Dense,megafmm::Algorithm::WinogradLt,
                       megafmm::Algorithm::WinogradHopper,megafmm::Algorithm::Megakernel})
   for(int scenario=0;scenario<4;++scenario) for(int family=0;family<3;++family)
-  for(int variant:{-1,family==0 ? 2:family==1 ? 11:28}) {
+  for(int variant:{-1,family==0 ? 2:family==1 ? 13:28}) {
     if(lt_only && family!=0)continue;
     megafmm::Policy policy;policy.algorithm=algorithm;policy.certified_range=true;
     if(family==0)policy.lt_variant=variant;
@@ -1530,6 +1987,8 @@ template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false
   for(int variant=0;variant<=23;++variant)candidates.push_back({megafmm::Algorithm::Megakernel,variant});
   candidates.push_back({megafmm::Algorithm::Megakernel,26});
   candidates.push_back({megafmm::Algorithm::Megakernel,27});
+  candidates.push_back({megafmm::Algorithm::WinogradHopper,11});
+  candidates.push_back({megafmm::Algorithm::WinogradHopper,12});
   if(k128_only)candidates={{megafmm::Algorithm::Megakernel,24},{megafmm::Algorithm::Megakernel,25}};
   for(auto pat:{Pattern::Uniform,Pattern::Positive,Pattern::Range,Pattern::Cancellation,Pattern::HighHalf}) {
     std::vector<std::vector<double>> ef(candidates.size());
@@ -1591,7 +2050,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false
 int main(int argc,char** argv) {
   try {
     std::cout << std::unitbuf;std::cerr << std::unitbuf;
-    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-batched | --smoke-candidates [--mega-only] [--mega-variant 0..27 | --hopper-variant 0..10]]";
+    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-batched | --smoke-candidates [--mega-only] [--mega-variant 0..27 | --hopper-variant 0..12]]";
     bool numeric=false, candidates_only=false,mega_only=false,batched_only=false;
     int hopper_filter=-1,mega_filter=-1;
     for(int i=1;i<argc;++i) {
@@ -1609,7 +2068,7 @@ int main(int argc,char** argv) {
         require(i+1<argc,usage);
         std::string value=argv[++i];size_t consumed=0;
         hopper_filter=std::stoi(value,&consumed);
-        require(consumed==value.size() && hopper_filter>=0 && hopper_filter<=10,usage);
+        require(consumed==value.size() && hopper_filter>=0 && hopper_filter<=12,usage);
       } else throw std::runtime_error(usage);
     }
     require((!mega_only && hopper_filter<0 && mega_filter<0) || candidates_only,
@@ -1667,7 +2126,9 @@ int main(int argc,char** argv) {
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,7},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,8},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,9},
-                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,10}}) {
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,10},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,11},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,12}}) {
           if(mega_only && candidate.first!=megafmm::Algorithm::Megakernel)continue;
           if(hopper_filter>=0 && (candidate.first!=megafmm::Algorithm::WinogradHopper ||
                                   candidate.second!=hopper_filter))continue;
@@ -1708,7 +2169,8 @@ int main(int argc,char** argv) {
             if(candidate.first==megafmm::Algorithm::WinogradHopper)policy.hopper_variant=candidate.second;
             auto planned=megafmm::create_plan(p,policy);
             const bool fused=candidate.first==megafmm::Algorithm::WinogradHopper && candidate.second>=9;
-            const bool fused_fallback=fused && !fused_input_supported(p,candidate.second);
+            const bool fused_fallback=fused && !(candidate.second<=10 ?
+                fused_input_supported(p,candidate.second):packed_input_supported(p,candidate.second));
             require(fused_fallback || planned->algorithm_name().find("dense")==std::string::npos,
                     "supported candidate unexpectedly fell back to Dense");
             const char* route=fused_fallback ? "dense_cublaslt":
@@ -1797,6 +2259,20 @@ int main(int argc,char** argv) {
         rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,false,hopper_filter);
         rebind_suite<__half>(megafmm::DType::FP16,false,hopper_filter);
       }
+      if(hopper_filter==11 || hopper_filter==12) {
+        packed_input_suite<__nv_bfloat16>(megafmm::DType::BF16,hopper_filter);
+        packed_input_suite<__half>(megafmm::DType::FP16,hopper_filter);
+        packed_input_native_bitwise_suite<__nv_bfloat16>(megafmm::DType::BF16,hopper_filter);
+        packed_input_native_bitwise_suite<__half>(megafmm::DType::FP16,hopper_filter);
+        packed_input_output_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,hopper_filter);
+        packed_input_output_rebind_suite<__half>(megafmm::DType::FP16,hopper_filter);
+        packed_input_graph_suite<__nv_bfloat16>(megafmm::DType::BF16,hopper_filter);
+        packed_input_graph_suite<__half>(megafmm::DType::FP16,hopper_filter);
+        packed_input_policy_suite<__nv_bfloat16>(megafmm::DType::BF16,hopper_filter);
+        packed_input_policy_suite<__half>(megafmm::DType::FP16,hopper_filter);
+        rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,false,hopper_filter);
+        rebind_suite<__half>(megafmm::DType::FP16,false,hopper_filter);
+      }
       std::cout << "PASS selected candidate kernel paths, beta0, alpha/beta alias and rectangular fallback\n";
       return 0;
     }
@@ -1817,6 +2293,18 @@ int main(int argc,char** argv) {
       fused_input_output_rebind_suite<__half>(megafmm::DType::FP16,variant);
       fused_input_graph_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
       fused_input_graph_suite<__half>(megafmm::DType::FP16,variant);
+    }
+    for(int variant:{11,12}) {
+      packed_input_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      packed_input_suite<__half>(megafmm::DType::FP16,variant);
+      packed_input_native_bitwise_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      packed_input_native_bitwise_suite<__half>(megafmm::DType::FP16,variant);
+      packed_input_output_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      packed_input_output_rebind_suite<__half>(megafmm::DType::FP16,variant);
+      packed_input_graph_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      packed_input_graph_suite<__half>(megafmm::DType::FP16,variant);
+      packed_input_policy_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      packed_input_policy_suite<__half>(megafmm::DType::FP16,variant);
     }
     warp_mma_suite<__nv_bfloat16>(megafmm::DType::BF16);
     warp_mma_suite<__half>(megafmm::DType::FP16);

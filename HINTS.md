@@ -23,6 +23,12 @@
 - Use native strict full tiles and current A/B/P16 guards with P-only caller workspace. Incompatible metadata/bindings use ordinary GEMM. Keep the original FP32 DAG/final RN cast, frozen FP64 gate, Lt metadata/tuner, Auto Dense and all four target sizes unchanged.
 - From the user's explicit1024 comparison request: irrespective of the usual >=3% quick-screen trigger, run same-source/binary full1024 end-to-end measurements for both fused controls and packed-once Lt1/H7, both dtypes and launch/Graph. Use20warm/100calls/5groups/3fresh, shared8GiB cap and32heuristic budget; report same-row Dense/SW, p10/p90/CV and unchanged numerical gates.
 
+## Current experimental direction (iteration29)
+
+- From the user's request to compare both one-level1024 input-placement routes: add Hopper11/12 matched compact-input leaves using the same32x32/32x64 BK32 MMA/shared layout and consumer order as fused Hopper9/10. Every complete run freshly packs original rounded A/B, executes the leaf, then combines P (three launches). Preserve all older implementations and frozen evidence.
+- Keep the original FP32 S/T DAG and one final RN conversion, complete seven FP32 P products, original FP64 numerical gate, caller-owned workspace, current binding guards, tuned Lt protocol/metadata and Auto Dense unchanged. Rank changes by their own SW latency, rather than a slower Dense denominator.
+- Full1024 is required irrespective of the usual >=3% quick-screen trigger: same source/binary Hopper9/10/11/12 and packed-once Lt1/H7, both dtypes, launch/Graph,20warm/100calls/5groups/3fresh,8GiB cap and32 Lt candidates. Report all24 same-row Dense/SW results, p10/p90/CV, workspace and failed numerical gates. This is a matched leaf control for input placement; it is not a dispatcher certification or completion of the four-size goal.
+
 <!-- User-supplied behavior directives. The skill reads this at session start
      and respects any constraint named here. Examples:
      - Optimization constraints or focus areas (e.g., "Prefer Triton over raw CUDA")

@@ -30,6 +30,7 @@ struct Policy {
   // 7/8=CTA32x64x64 with three-stage Multistage/two-stage Pipelined.
   // 9/10=fused original-input 32x32/32x64 products + required combine (two launches).
   // Native uses P-only workspace; incompatible metadata/input bindings use Dense.
+  // 11/12=matched compact-input 32x32/32x64: fresh uniform pack + leaf + combine.
   int hopper_variant=0;
   // Mega: 0/1=seven live P tiles, 2=three live P/U tiles,
   // 3=full-tile beta-zero two-stage pipeline (otherwise variant 2),

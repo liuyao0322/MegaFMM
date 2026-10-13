@@ -29,6 +29,23 @@ size_t fused_leaf_product_workspace_bytes(const Problem& p, int config=0);
 void prepare_fused_leaf(const Problem& p, int config=0);
 void launch_fused_leaf(const Problem& p, const void* A, const void* B, float* P,
                        cudaStream_t stream, int config=0);
+// Fresh uniform A7/B7 input slots, one matched complete-P leaf, then combine.
+// Internal configs0/1 map to Hopper11/12; complete run uses three launches.
+struct PackedLeafMetadata {
+  int64_t mh, nh, kh;
+  int64_t a_row_stride, b_row_stride, p_row_stride;
+  int64_t a_product_stride, b_product_stride, p_product_stride;
+  size_t a_bytes, b_bytes, p_bytes, compact_workspace_bytes;
+};
+bool packed_leaf_can_implement(const Problem& p, int config=0);
+PackedLeafMetadata packed_leaf_metadata(const Problem& p, int config=0);
+bool packed_leaf_original_input_guard(const Problem& p, const void* A, const void* B, int config=0);
+bool packed_leaf_full_tiles(const Problem& p, const void* A7, const void* B7,
+                            const float* P, int config=0);
+size_t packed_leaf_workspace_bytes(const Problem& p, int config=0);
+void prepare_packed_leaf(const Problem& p, int config=0);
+void launch_packed_leaf(const Problem& p, const void* A7, const void* B7, float* P,
+                        cudaStream_t stream, int config=0);
 bool megakernel_can_implement(const Problem& p, int variant=0);
 // One-time launch configuration; called during planning, never in steady-state run.
 void prepare_megakernel(const Problem& p, int variant=0);

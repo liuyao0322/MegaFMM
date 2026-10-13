@@ -85,6 +85,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 28 | Fuse original inputs into uniform seven-product leaves | 0.3811 | 0.364023 | diagnostic |
 
+| 29 | Matched packed-input seven-product leaves | 0.3329 | 0.288007 | measured-not-certified |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -1267,3 +1269,35 @@ Default structural validation exits0 with1956CASE/731PASS, four direct seven-P i
 Compiled BN32/64 instances use56/64 registers with no stack/local/spill. ptxas reports4096/6144B shared; ELF reports5120/7168B separately, and runtime function attributes were not queried. Static1744/1816 instruction totals include all seven product branches and padding. A CTA selects one product, so static28HMMA/14BAR totals are not its dynamic stage counts. No ncu retry, occupancy claim, physical-floor conclusion or four-size completion follows. Fused-specific tests do not add transpose, isolated ldb misalignment or32768 GPU boundaries; common overlap/overflow negative tests remain the earlier forced-Lt coverage.
 
 Binary SHA256: benchmark `5fc2afccc67ee63afb0e7bfc68435e855909f4447f00a9739fa36a15e643193f`; tests `e34035a28da7bfb0fefb055f1b632b4089aa8e50e0807e302ef2b87c84640a54`. Source/binary/raw/config bindings and all16 full rows are in [results/small_fused_profile_iter28.json](results/small_fused_profile_iter28.json); the original nine-shape screen is archived under `trajectory/20261013_203807_iter-28/`. The active128/256/512/1024 goal remains unmet. Later evidence-only HEADs do not redefine the measured source commit.
+
+### Iter 29 — Matched packed-input seven-product leaves
+
+- **Hypothesis:** Construct S/T once in a fresh uniform pack and reuse the fused controls tile, K32 consumer and complete-P order; compare end-to-end input placement at1024.
+- **Changes:** Add Hopper11/12 compact-input32x32/32x64 leaves and current-binding guarded three-launch pack/leaf/combine Plan routes; retain all24 old CUDA TUs, frozen numerical/Auto/Lt contracts, seven-P matched bitwise tests and mandatory24-row full1024 declaration.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.288007 ms; mean speedup=0.3329x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | winograd_packed_input_32x32 v11 | launch | 0.005677 | 0.010038 | 0.5655 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | winograd_packed_input_32x32 v11 | launch | 0.005590 | 0.010344 | 0.5404 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | winograd_packed_input_32x32 v11 | launch | 0.005611 | 0.011266 | 0.4981 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | winograd_packed_input_32x32 v11 | launch | 0.005602 | 0.011349 | 0.4936 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | winograd_packed_input_32x32 v11 | launch | 0.006328 | 0.014720 | 0.4299 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | winograd_packed_input_32x32 v11 | launch | 0.006314 | 0.014691 | 0.4298 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | winograd_packed_input_32x32 v11 | launch | 0.013384 | 0.040662 | 0.3291 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | winograd_packed_input_32x32 v11 | launch | 0.010358 | 0.040525 | 0.2556 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | winograd_packed_input_32x32 v11 | launch | 0.031800 | 0.222539 | 0.1429 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | winograd_packed_input_32x32 v11 | launch | 0.033211 | 0.225966 | 0.1470 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | winograd_packed_input_32x32 v11 | launch | 0.086600 | 0.684434 | 0.1265 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | winograd_packed_input_32x32 v11 | launch | 0.089246 | 0.677424 | 0.1317 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | winograd_packed_input_32x32 v11 | launch | 0.195766 | 1.561149 | 0.1254 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | winograd_packed_input_32x32 v11 | launch | 0.206790 | 1.561870 | 0.1324 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | winograd_packed_input_32x32 v11 | launch | 0.011376 | 0.024158 | 0.4709 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | winograd_packed_input_32x32 v11 | launch | 0.011426 | 0.024494 | 0.4665 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | winograd_packed_input_32x32 v11 | launch | 0.008403 | 0.024208 | 0.3471 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | winograd_packed_input_32x32 v11 | launch | 0.008752 | 0.024293 | 0.3603 | 0.00075151 | 0 |
+
+- **Analysis:** Quick nine-shape two-dtype launch screen uses20warm/20calls/5groups/1fresh,32Lt candidates and8GiB shared cap. Results and original numerical failures are recorded exactly; this diagnostic does not establish certification. Same-binary second control, mandatory user full1024 six routes in both modes/dtypes, strict numerics, six CUDA12.8 sanitizers and resource audit follow before evidence checkpoint. Judge gains from own SW latency, not Dense denominator changes.
+- **Next:** Measure Hopper12 control and full1024 H9/H10/H11/H12/Lt1/H7 launch/Graph BF16/FP16 at20warm100calls5groups3fresh, then close strict/sanitizer/compiler evidence without changing frozen source.
+- **Archive:** trajectory/20261013_211356_iter-29/

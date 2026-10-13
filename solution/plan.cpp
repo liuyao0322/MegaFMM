@@ -332,7 +332,7 @@ struct Plan::Impl {
   Problem problem;
   Policy policy;
   Algorithm algorithm = Algorithm::Dense;
-  bool empty = false, scale = false, small_batched = false, fused_input = false;
+  bool empty = false, scale = false, small_batched = false, fused_input = false, packed_input = false;
   size_t bytes = 0, s_offset = 0, t_offset = 0, p_offset = 0, scratch_offset = 0;
   cublasLtHandle_t handle = nullptr;
   std::unique_ptr<LtOp> dense;
@@ -351,6 +351,13 @@ namespace {
 bool use_dense(const Plan::Impl& plan, const void* A, const void* B, void* workspace) {
   if (plan.algorithm == Algorithm::Dense || reinterpret_cast<uintptr_t>(A) % 16 ||
       reinterpret_cast<uintptr_t>(B) % 16) return true;
+  if (plan.packed_input) {
+    const auto* base = static_cast<const unsigned char*>(workspace);
+    const auto* products = reinterpret_cast<const float*>(base + plan.p_offset);
+    return !packed_leaf_original_input_guard(plan.problem, A, B, plan.policy.hopper_variant - 11) ||
+        !packed_leaf_full_tiles(plan.problem, base + plan.s_offset, base + plan.t_offset,
+                               products, plan.policy.hopper_variant - 11);
+  }
   if (plan.fused_input) {
     const auto* products = reinterpret_cast<const float*>(
         static_cast<const unsigned char*>(workspace) + plan.p_offset);
@@ -540,6 +547,17 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
   }
   auto* base = static_cast<unsigned char*>(workspace);
   float* products = reinterpret_cast<float*>(base + plan.p_offset);
+  if (plan.packed_input) {
+    detail::pack_winograd_batched_inputs(p, A, B, base + plan.s_offset,
+                                       base + plan.t_offset, stream);
+    cuda_check(cudaPeekAtLastError(), "launch matched Winograd operand packing");
+    launch_packed_leaf(p, base + plan.s_offset, base + plan.t_offset, products,
+                       stream, plan.policy.hopper_variant - 11);
+    cuda_check(cudaPeekAtLastError(), "launch matched packed-input Winograd products");
+    detail::combine_winograd(p, products, C0, D, stream);
+    cuda_check(cudaPeekAtLastError(), "launch matched packed-input Winograd combine");
+    return;
+  }
   if (plan.fused_input) {
     launch_fused_leaf(p, A, B, products, stream, plan.policy.hopper_variant - 9);
     cuda_check(cudaPeekAtLastError(), "launch fused-input Winograd products");
@@ -627,6 +645,8 @@ std::string Plan::algorithm_name() const {
   switch (impl_->algorithm) {
     case Algorithm::WinogradLt: return impl_->batched ? "winograd_lt_batched" : "winograd_lt_v1";
     case Algorithm::WinogradHopper:
+      if (impl_->packed_input) return impl_->policy.hopper_variant == 11
+        ? "winograd_packed_input_32x32" : "winograd_packed_input_32x64";
       if (impl_->fused_input) return impl_->policy.hopper_variant == 9
         ? "winograd_fused_input_32x32" : "winograd_fused_input_32x64";
       return impl_->small_batched ? (impl_->policy.hopper_variant >= 7
@@ -771,8 +791,8 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     throw std::invalid_argument("heuristic_candidates must be between 1 and 128");
   if (policy.lt_variant < 0 || policy.lt_variant > 1)
     throw std::invalid_argument("lt_variant must be 0 (views) or 1 (uniform batched operands)");
-  if (policy.hopper_variant < 0 || policy.hopper_variant > 10)
-    throw std::invalid_argument("hopper_variant must be between 0 and 10");
+  if (policy.hopper_variant < 0 || policy.hopper_variant > 12)
+    throw std::invalid_argument("hopper_variant must be between 0 and 12");
   if (policy.mega_variant < 0 || policy.mega_variant > 27)
     throw std::invalid_argument("mega_variant must be between 0 and 27");
   if (policy.algorithm < Algorithm::Auto || policy.algorithm > Algorithm::Megakernel)
@@ -834,7 +854,22 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
                                                      : megakernel_can_implement(p, policy.mega_variant);
     if (!supported) desired = Algorithm::Dense;
   }
-  if (desired == Algorithm::WinogradHopper && policy.hopper_variant >= 9) {
+  if (desired == Algorithm::WinogradHopper && policy.hopper_variant >= 11) {
+    // Compact A7/B7/P capacity is independent of the older P-only route.
+    // Metadata or budget failures use ordinary GEMM; current pointer guards are
+    // rechecked for every run before original inputs are freshly packed.
+    if (!packed_leaf_can_implement(p, policy.hopper_variant - 11)) desired = Algorithm::Dense;
+    else {
+      const auto meta = packed_leaf_metadata(p, policy.hopper_variant - 11);
+      impl->s_offset = 0;
+      impl->t_offset = aligned(meta.a_bytes);
+      impl->p_offset = aligned(checked_add(impl->t_offset, meta.b_bytes));
+      impl->scratch_offset = aligned(checked_add(impl->p_offset, meta.p_bytes));
+      if (impl->scratch_offset > policy.workspace_limit) desired = Algorithm::Dense;
+      else impl->packed_input = true;
+    }
+  }
+  if (desired == Algorithm::WinogradHopper && policy.hopper_variant >= 9 && policy.hopper_variant <= 10) {
     // P-only native allocation. Unsupported metadata uses ordinary GEMM; a
     // later incompatible binding uses the zero-workspace Dense operator below.
     if (!fused_leaf_can_implement(p, policy.hopper_variant - 9)) desired = Algorithm::Dense;
@@ -846,7 +881,7 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
       else impl->fused_input = true;
     }
   }
-  if (desired != Algorithm::Dense && desired != Algorithm::Megakernel && !impl->fused_input) {
+  if (desired != Algorithm::Dense && desired != Algorithm::Megakernel && !impl->fused_input && !impl->packed_input) {
     const bool small_batched = desired == Algorithm::WinogradHopper && policy.hopper_variant >= 5;
     const bool batched = (desired == Algorithm::WinogradLt && policy.lt_variant == 1) || small_batched;
     const size_t input_slots = batched ? 7 : 4;
@@ -946,6 +981,13 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     impl->scratch_offset = 0;
     impl->dense = make_lt_op(impl->handle, p, 0, policy.heuristic_candidates);
     impl->bytes = 0;
+  } else if (impl->packed_input) {
+    prepare_packed_leaf(p, policy.hopper_variant - 11);
+    // Reserve the complete compact operands/products plus the Dense fallback
+    // candidate pool. The custom leaf itself requires no backend scratch.
+    const size_t available = policy.workspace_limit - impl->scratch_offset;
+    impl->dense = make_lt_op(impl->handle, p, available, policy.heuristic_candidates);
+    impl->bytes = checked_add(impl->scratch_offset, impl->dense->scratch_bytes());
   } else if (impl->fused_input) {
     prepare_fused_leaf(p, policy.hopper_variant - 9);
     // Rebindings retain caller-owned P-only capacity. Dense fallback is
