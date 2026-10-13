@@ -1,6 +1,6 @@
 # 1024 单launch P3+4 BK64 实测（iteration35）
 
-新Mega38未超过同binary当前native最佳Mega36；普通launch下BF16耗时变化+0.862%、FP16耗时变化+2.301%；Graph下BF16耗时变化+1.697%、FP16耗时变化+3.022%。
+新Mega38未超过同binary本轮已测29/36/38中最快native Mega36；普通launch下BF16耗时变化+0.862%、FP16耗时变化+2.301%；Graph下BF16耗时变化+1.697%、FP16耗时变化+3.022%。
 
 BF16新Mega38完整调用23.765121µs，同行cuBLASLt 12.318720µs，Dense/SW 0.518353×；相对同binary Mega29自身耗时变化-6.068%。FP16新Mega38完整调用24.090879µs，同行cuBLASLt 10.020159µs，Dense/SW 0.415932×；相对同binary Mega29自身耗时变化-5.341%。
 
@@ -16,7 +16,7 @@ BF16新Mega38完整调用23.765121µs，同行cuBLASLt 12.318720µs，Dense/SW 0
 
 完整目标为新38/retained36/29/Lt1 × BF16/FP16 × ordinary/Graph。每行20warmup、100calls/group、5groups、3fresh检查、rotate_inputs=1；32 heuristic candidates和共同8GiB workspace cap。BF16/FP16输入、FP32输出。median与线性p10/p90来自五个组均值，CV使用总体标准差/均值。每行cuBLASLt独立调优，调优发生在capture前，没有Graph专用调优；Dense和SW按同行相同模式计时。Dense/SW使用同行Dense event median / 完整SW event median。quick仅作筛选：20warmup、20calls/group、5groups、1fresh，不能替代这里的mandatory full测量。
 
-新38采用BM64/BN32/BK64、两bank、384线程，将P3+4分给两个独立consumer WG。每WG完成升序whole-K，每BK64包含四个升序K16步骤，wait0/release；drain结束后复用typed shared union，发布全部七P后计算固定U与原alpha/beta epilogue。没有将K拆成浮点分段归约。最终名称、producer/consumer配额及launch bounds按冻结plan填写；本轮初始与最终均64/96/96，仅BK几何、符号名称和注释发生变化，均通过本轮新编译门限。
+新38采用BM64/BN32/BK64、两bank、384线程，将P3+4分给两个独立consumer WG。每WG完成升序whole-K，每BK64包含四个升序K16步骤，wait0/release；drain结束后复用typed shared union，发布全部七P后计算固定U与原alpha/beta epilogue。没有将K拆成浮点分段归约。最终名称、producer/consumer配额及launch bounds按冻结plan填写；本轮初始与最终配额均64/96/96；归一化相对保留36仅BK几何、符号名称与注释发生变化。正式fresh compiled gate绑定最终d25源码和最终两个binary；初始e3构建当时尚未完成test绑定，不单独称其通过最终门限。
 
 新38最终配置：actual=`megakernel_wgmma_psplit_bk64_64x32`、quota=64/96/96、min_ctas=1。BK64 native要求父矩阵K能被128整除；partial K64/192/320走回退，不能把这些fallback的PASS解释为native认证。sameatom检查的新38参考是36的N32 raw U与独立host RNalpha/betaFMA，不采用N16 oracle。
 
