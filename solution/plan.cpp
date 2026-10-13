@@ -322,8 +322,8 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     return;
   }
   auto* base = static_cast<unsigned char*>(workspace);
-  detail::pack_winograd_a(p, A, base + plan.s_offset, stream);
-  detail::pack_winograd_b(p, B, base + plan.t_offset, stream);
+  detail::pack_winograd_inputs(p, A, B, base + plan.s_offset,
+                             base + plan.t_offset, stream);
   cuda_check(cudaPeekAtLastError(), "launch Winograd packing kernels");
   std::array<const void*, 7> left, right;
   operands(plan, A, B, workspace, left, right);
@@ -467,8 +467,8 @@ void tune(Plan& plan, const void* A, const void* B, const float* C0,
         tune_lt(impl.handle, *impl.dense, A, B, original_c, D, scratch, stream);
       else if (impl.algorithm == Algorithm::WinogradLt) {
         auto* base = static_cast<unsigned char*>(workspace);
-        detail::pack_winograd_a(impl.problem, A, base + impl.s_offset, stream);
-        detail::pack_winograd_b(impl.problem, B, base + impl.t_offset, stream);
+        detail::pack_winograd_inputs(impl.problem, A, B, base + impl.s_offset,
+                                   base + impl.t_offset, stream);
         cuda_check(cudaPeekAtLastError(), "launch tuning transforms");
         std::array<const void*, 7> left, right;
         operands(impl, A, B, workspace, left, right);

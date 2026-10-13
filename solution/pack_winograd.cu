@@ -14,12 +14,12 @@ template<> __device__ inline __half from_float(float x) { return __float2half_rn
 template<> __device__ inline __nv_bfloat16 from_float(float x) { return __float2bfloat16_rn(x); }
 
 template<class T, bool IsA>
-__global__ void pack_vector_kernel(const T* __restrict__ input, T* __restrict__ packed,
-                                  int64_t rows, int64_t cols, int64_t ld) {
+__device__ __forceinline__ void pack_vectors(const T* __restrict__ input, T* __restrict__ packed,
+                                  int64_t rows, int64_t cols, int64_t ld,
+                                  uint64_t first, uint64_t step) {
   const uint64_t vectors = uint64_t(rows) * (cols / 8);
   const uint64_t count = uint64_t(rows) * cols;
-  for (uint64_t v = uint64_t(blockIdx.x) * blockDim.x + threadIdx.x;
-       v < vectors; v += uint64_t(blockDim.x) * gridDim.x) {
+  for (uint64_t v = first; v < vectors; v += step) {
     const uint64_t row = v / (cols / 8), col = (v % (cols / 8)) * 8;
     const uint4 q11 = *reinterpret_cast<const uint4*>(input + row * ld + col);
     const uint4 q12 = *reinterpret_cast<const uint4*>(input + row * ld + col + cols);
@@ -50,6 +50,31 @@ __global__ void pack_vector_kernel(const T* __restrict__ input, T* __restrict__ 
     *reinterpret_cast<uint4*>(packed + count + i) = z2;
     *reinterpret_cast<uint4*>(packed + 2 * count + i) = z3;
     *reinterpret_cast<uint4*>(packed + 3 * count + i) = z4;
+  }
+}
+
+template<class T, bool IsA>
+__global__ void pack_vector_kernel(const T* __restrict__ input, T* __restrict__ packed,
+                                  int64_t rows, int64_t cols, int64_t ld) {
+  pack_vectors<T, IsA>(input, packed, rows, cols, ld,
+      uint64_t(blockIdx.x) * blockDim.x + threadIdx.x,
+      uint64_t(blockDim.x) * gridDim.x);
+}
+
+// Each CTA belongs to exactly one input. Both independent DAGs share one
+// launch without requiring any cross-CTA communication or extra storage.
+template<class T>
+__global__ void pack_inputs_kernel(Problem p, const T* __restrict__ A,
+    const T* __restrict__ B, T* __restrict__ S, T* __restrict__ Tpacked,
+    unsigned a_blocks, unsigned b_blocks) {
+  if (blockIdx.x < a_blocks) {
+    pack_vectors<T, true>(A, S, p.m / 2, p.k / 2, p.lda,
+        uint64_t(blockIdx.x) * blockDim.x + threadIdx.x,
+        uint64_t(blockDim.x) * a_blocks);
+  } else {
+    pack_vectors<T, false>(B, Tpacked, p.k / 2, p.n / 2, p.ldb,
+        uint64_t(blockIdx.x - a_blocks) * blockDim.x + threadIdx.x,
+        uint64_t(blockDim.x) * b_blocks);
   }
 }
 
@@ -104,5 +129,27 @@ void pack_winograd_a(const Problem& p, const void* A, void* S, cudaStream_t stre
 }
 void pack_winograd_b(const Problem& p, const void* B, void* T, cudaStream_t stream) {
   launch<false>(p, B, T, stream);
+}
+void pack_winograd_inputs(const Problem& p, const void* A, const void* B,
+                          void* S, void* T, cudaStream_t stream) {
+  // Retain the measured large-shape path; a saved launch matters most where
+  // the transforms' own work is short. The branch is solely shape-based.
+  if (p.m > 4096 || p.n > 4096 || p.k > 4096) {
+    launch<true>(p, A, S, stream);
+    launch<false>(p, B, T, stream);
+    return;
+  }
+  const uint64_t av = uint64_t(p.m / 2) * uint64_t(p.k / 16);
+  const uint64_t bv = uint64_t(p.k / 2) * uint64_t(p.n / 16);
+  const unsigned ab = static_cast<unsigned>((av + 255) / 256);
+  const unsigned bb = static_cast<unsigned>((bv + 255) / 256);
+  if (p.dtype == DType::BF16)
+    pack_inputs_kernel<__nv_bfloat16><<<ab + bb, 256, 0, stream>>>(p,
+        static_cast<const __nv_bfloat16*>(A), static_cast<const __nv_bfloat16*>(B),
+        static_cast<__nv_bfloat16*>(S), static_cast<__nv_bfloat16*>(T), ab, bb);
+  else
+    pack_inputs_kernel<__half><<<ab + bb, 256, 0, stream>>>(p,
+        static_cast<const __half*>(A), static_cast<const __half*>(B),
+        static_cast<__half*>(S), static_cast<__half*>(T), ab, bb);
 }
 }  // namespace megafmm::detail

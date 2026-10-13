@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "purpose": "Predeclared small-matrix suite for the resumed optimization campaign",
+  "tuple_order": ["M", "N", "K"],
+  "dtypes": ["bf16", "fp16"],
+  "output_dtype": "fp32",
+  "layout": "row_major_nontransposed",
+  "alpha": 1.0,
+  "beta": 0.0,
+  "squares": [
+    [128,128,128],
+    [256,256,256],
+    [512,512,512],
+    [1024,1024,1024],
+    [2048,2048,2048],
+    [3072,3072,3072],
+    [4096,4096,4096]
+  ],
+  "rectangles": [[1024,512,1024],[512,1024,1024]],
+  "shape_count": 9,
+  "cli_shapes": "128,128,128;256,256,256;512,512,512;1024,1024,1024;2048,2048,2048;3072,3072,3072;4096,4096,4096;1024,512,1024;512,1024,1024",
+  "execution_modes": {
+    "launch": {"graph": false},
+    "graph": {"graph": true},
+    "reporting": "Keep launch and Graph results separate; compare each candidate against the tuned dense baseline in the same mode and CSV row"
+  },
+  "input_scenario": {
+    "cache": "warm_cache",
+    "rotate_inputs": 1,
+    "transforms": "Recompute every input-dependent transform in every timed invocation, including each captured Graph launch"
+  },
+  "full": {
+    "purpose": "Final measurements and acceptance evidence",
+    "warmup": 20,
+    "trials": 100,
+    "groups": 5,
+    "correctness_trials": 3,
+    "cli": "--warmup 20 --trials 100 --groups 5 --correct-trials 3"
+  },
+  "quick": {
+    "purpose": "Diagnostic optimization screening; cannot establish final acceptance",
+    "warmup": 20,
+    "trials": 20,
+    "groups": 5,
+    "correctness_trials": 1,
+    "cli": "--warmup 20 --trials 20 --groups 5 --correct-trials 1"
+  },
+  "baseline": {
+    "backend": "independently_tuned_cublaslt",
+    "heuristic_candidates": 32,
+    "workspace_limit_bytes": 8589934592,
+    "same_contract": "Original BF16/FP16 inputs, FP32 output, same shape/layout/alpha/beta and timing mode"
+  },
+  "numeric_gate": {
+    "reference": "FP64 plain GEMM from original rounded BF16/FP16 inputs; no S/T transformations",
+    "expression": "eF_solution <= 3*eF_dense + floor for every fresh correctness trial",
+    "bf16_floor": 0.001,
+    "fp16_floor": 0.0001,
+    "nonfinite_allowed": false,
+    "frozen": true
+  },
+  "acceptance": {
+    "candidate_speedup": 1.05,
+    "neighboring_square_sizes": [128,256,512,1024,2048,3072,4096],
+    "scope": "Assess BF16 and FP16 independently, using the full configuration and at least two neighboring predeclared square sizes within the same algorithm version, variant and execution mode",
+    "noise": "Median speedup must exceed measurement noise; retain group-mean timings, p10/p90/CV and logs. These distributions are not confidence intervals",
+    "backend": "A passing dense fallback validates ordinary GEMM routing and does not certify SW or establish SW speedup",
+    "uncertified": "Numerically failing or unchecked SW results remain experimental and cannot enable Auto"
+  }
+}
