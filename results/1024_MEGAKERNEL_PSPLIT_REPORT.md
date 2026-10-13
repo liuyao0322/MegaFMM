@@ -1,6 +1,6 @@
 # 1024 单launch P3+4 双consumer 实测（iteration34）
 
-BF16实际可用最佳新Mega36 23.426239µs，同行cuBLASLt 12.356800µs，Dense/SW 0.527477×；相对Mega29自身耗时变化-7.394%。FP16实际可用最佳新Mega36 23.645761µs，同行cuBLASLt 9.916160µs，Dense/SW 0.419363×；相对Mega29自身耗时变化-7.039%。
+BF16已测最快新Mega36 23.426239µs，同行cuBLASLt 12.356800µs，Dense/SW 0.527477×；相对Mega29自身耗时变化-7.394%。FP16已测最快新Mega36 23.645761µs，同行cuBLASLt 9.916160µs，Dense/SW 0.419363×；相对Mega29自身耗时变化-7.039%。
 
 预声明20行，实际16行、160条TIME、48个fresh CHECK；完整矩阵=否。原门限0 PASS /48 FAIL，nonfinite=0，实际记录行0/16通过。
 
