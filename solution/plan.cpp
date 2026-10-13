@@ -355,7 +355,13 @@ std::string Plan::algorithm_name() const {
   switch (impl_->algorithm) {
     case Algorithm::WinogradLt: return "winograd_lt_v1";
     case Algorithm::WinogradHopper: return "winograd_hopper_v2";
-    case Algorithm::Megakernel: return impl_->policy.mega_variant == 2 ? "megakernel_m3" : "megakernel_m1";
+    case Algorithm::Megakernel:
+      if (impl_->policy.mega_variant == 3) {
+        const auto& p = impl_->problem;
+        return p.m % 128 == 0 && p.n % 256 == 0 && p.k % 64 == 0 && p.beta == 0.0f
+          ? "megakernel_m3_pipeline" : "megakernel_m3";
+      }
+      return impl_->policy.mega_variant == 2 ? "megakernel_m3" : "megakernel_m1";
     default: return "dense_cublaslt";
   }
 }

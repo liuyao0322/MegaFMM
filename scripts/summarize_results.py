@@ -43,9 +43,19 @@ class Record:
         return self.integer("m"), self.integer("n"), self.integer("k")
 
     @property
-    def panel(self) -> tuple[str, str, str, int]:
+    def backend(self) -> str:
+        actual = self.values["actual"].lower()
+        if actual.startswith(("winograd_", "megakernel_")):
+            return "sw"
+        if actual.startswith("dense"):
+            return "dense" if self.values.get("requested") == "dense" else "dense_fallback"
+        return "other"
+
+    @property
+    def panel(self) -> tuple[str, str, str, int, str]:
+        category = self.backend if self.checked else f"unchecked:{self.backend}"
         return (self.values["dtype"], self.values["mode"], self.values["cache"],
-                self.integer("rotate_inputs", 1))
+                self.integer("rotate_inputs", 1), category)
 
     @property
     def series(self) -> tuple[str, str, int]:
@@ -57,7 +67,35 @@ class Record:
 
     @property
     def passed(self) -> bool:
-        return self.checked and self.values["numerical_pass"] == "1" and self.integer("nonfinite") == 0
+        return (self.checked and self.values["numerical_pass"] == "1" and self.integer("nonfinite") == 0
+                and math.isfinite(self.number("solution_ef"))
+                and self.number("solution_ef") <= self.number("gate_limit"))
+
+    @property
+    def frozen_gate(self) -> bool:
+        floor = {"bf16": 1e-3, "fp16": 1e-4}.get(self.values["dtype"])
+        return floor is not None and math.isclose(self.number("gate_floor"), floor, rel_tol=0, abs_tol=1e-12)
+
+    @property
+    def certified_sw(self) -> bool:
+        return self.backend == "sw" and self.passed and self.frozen_gate
+
+    @property
+    def sw_performance_candidate(self) -> bool:
+        # This marks an eligible individual observation, not neighboring-shape acceptance.
+        return self.certified_sw and self.full_config and self.speedup >= 1.05
+
+    @property
+    def verdict(self) -> str:
+        if not self.checked:
+            return "unchecked；不参与 SW 验收"
+        if self.backend == "sw":
+            if self.certified_sw:
+                return "SW 固定数值门槛通过"
+            return "SW 数值失败" if not self.passed else "SW floor 合同不一致"
+        if self.backend == "dense_fallback":
+            return "Dense fallback 通过；非 SW 认证" if self.passed else "Dense fallback 失败"
+        return "普通/其他后端通过；非 SW 认证" if self.passed else "普通/其他后端失败"
 
     @property
     def full_config(self) -> bool:
@@ -115,7 +153,7 @@ def read_records(paths: list[Path]) -> tuple[list[Record], list[str]]:
                     frozen = {"bf16": 1e-3, "fp16": 1e-4}.get(r.values["dtype"])
                     if frozen is not None and not math.isclose(r.number("gate_floor"), frozen, rel_tol=0, abs_tol=1e-12):
                         warnings.append(f"{path}:{line}: gate floor differs from fixed contract")
-                    if r.passed and r.number("solution_ef") > r.number("gate_limit"):
+                    if r.values["numerical_pass"] == "1" and r.number("solution_ef") > r.number("gate_limit"):
                         warnings.append(f"{path}:{line}: recorded pass contradicts error/limit; manual review required")
                 records.append(r)
     return records, warnings
@@ -148,7 +186,7 @@ def export_figures(records: list[Record], directory: Path) -> list[Path]:
     by_panel = defaultdict(list)
     for r in records:
         by_panel[r.panel].append(r)
-    panels = sorted(by_panel, key=lambda p: (p[1], p[2], p[3], p[0]))
+    panels = sorted(by_panel, key=lambda p: (p[4], p[1], p[2], p[3], p[0]))
     plt.rcParams.update({"font.size": 10, "axes.spines.top": False,
                          "axes.spines.right": False, "svg.fonttype": "none"})
     output = []
@@ -188,15 +226,16 @@ def export_figures(records: list[Record], directory: Path) -> list[Path]:
                     display_floor = 1e-12
                     ys = [max(display_floor, r.number("solution_ef")) for r in samples]
                     ax.plot(xs, ys, marker="o", markersize=4, linewidth=1.4, label=legend)
-            dtype, mode, cache, rotations = panel
-            ax.set_title(f"{dtype.upper()} · {mode} · {cache} · input pairs={rotations}")
+            dtype, mode, cache, rotations, category = panel
+            ax.set_title(f"{dtype.upper()} · {mode} · {cache} · pairs={rotations}\nBackend/evidence: {category}")
             ax.set_xticks(range(len(shapes)), [shape_label(s) for s in shapes], rotation=20, ha="right")
             ax.set_xlabel("Shape M × N × K (each point has its own tuned dense baseline)")
             ax.grid(axis="y", alpha=.22)
             if kind == "performance":
                 ax.axhline(1.0, color="#111827", linewidth=1.2, linestyle="--", label="Dense baseline = 1×")
-                ax.axhline(1.05, color="#64748b", linewidth=.9, linestyle=":", label="Candidate performance target 1.05×")
-                ax.set_ylabel("Same-row dense / solution event median")
+                if category == "sw":
+                    ax.axhline(1.05, color="#64748b", linewidth=.9, linestyle=":", label="SW candidate target 1.05×; accuracy also required")
+                ax.set_ylabel("Same-row dense / executed-backend event median")
                 ax.set_ylim(bottom=0)
             else:
                 floor = {"bf16": 1e-3, "fp16": 1e-4}.get(dtype)
@@ -212,12 +251,15 @@ def export_figures(records: list[Record], directory: Path) -> list[Path]:
                                 color="#94a3b8", alpha=.45, linestyle=":", linewidth=1)
                 ax.set_yscale("log")
                 ax.set_ylabel("Worst trial Frobenius relative error eF")
+                if category.startswith("unchecked:"):
+                    ax.text(.5,.5,"Correctness not checked; no SW certification evidence",
+                            transform=ax.transAxes,ha="center",va="center",fontsize=9)
             handles, labels = ax.get_legend_handles_labels()
             if handles:
                 ax.legend(handles, labels, fontsize=7, loc="best", framealpha=.85)
         for index in range(len(panels), rows*cols):
             axes.flat[index].set_visible(False)
-        title = ("Forced SW experiments: performance and numerical acceptance are separate" if kind == "performance"
+        title = ("SW experiments and dense fallback shown separately; unchecked rows are ineligible" if kind == "performance"
                  else "Original rounded inputs → FP64 plain GEMM reference; fixed precision gates")
         fig.suptitle(title, fontsize=14)
         for extension in ("svg", "png"):
@@ -261,14 +303,19 @@ def report(records: list[Record], warnings: list[str], artifacts: list[Path],
     lines = ["# MegaFMM 实验与验收记录", "",
              f"本文件由 `scripts/summarize_results.py` 生成，时间 {dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds')}。", "",
              "**未获得数值认证的强制 SW 路径只能作为研究候选，不能进入 Auto。Auto 保持调优普通 GEMM；性能结果不能替代数值验收。未经正确性检查的 `unchecked` 行也不能作为启用快速路径的依据。**", "",
-             "每个 speedup 都由同一 CSV 行的调优普通 GEMM 与完整 SW 调用计算，精度、形状、launch/Graph 模式、warm-cache/轮换输入模式相同。不同 dtype 和执行模式分别展示，未跨模式汇总或计算总体平均加速比。", ""]
+             "每个 speedup 都由同一 CSV 行的调优普通 GEMM 与实际执行后端的完整调用计算，精度、形状、launch/Graph 模式、warm-cache/轮换输入模式相同。不同 dtype、执行模式和 SW/dense fallback 后端分别展示，未跨模式汇总或计算总体平均加速比。", ""]
     final = [r for r in records if r.source.name.startswith("final")]
     if final:
         lines += [f"已发现最终命名数据集 {len({r.source for r in final})} 个、{len(final)} 行；这些命名表示复测来源，不自动表示性能或精度验收通过。", ""]
     else:
         lines += ["尚无最终命名数据集；当前表格包含初始基线和探索性轨迹。16384 方阵短测中的约 1.04–1.05× 结果是待完整复测的候选观察，时钟和重复组离散度可能影响结论，不能据此宣称已经确认最佳实现。", ""]
     checked = [r for r in records if r.checked]
-    lines += [f"已检查 {len(checked)} 行：{sum(r.passed for r in checked)} 行数值门槛通过，{sum(not r.passed for r in checked)} 行失败；另有 {sum(not r.checked for r in records)} 行未检查。原始输入先舍入至 BF16/FP16，再直接转 FP64 计算普通 GEMM 参考，参考输入不经过 S/T 变换。", "",
+    sw_checked = [r for r in checked if r.backend == "sw"]
+    fallback_checked = [r for r in checked if r.backend == "dense_fallback"]
+    other_checked = [r for r in checked if r.backend not in ("sw", "dense_fallback")]
+    lines += [f"SW 已检查 {len(sw_checked)} 行：{sum(r.certified_sw for r in sw_checked)} 行固定数值门槛通过，{sum(not r.certified_sw for r in sw_checked)} 行未通过。Dense fallback 已检查 {len(fallback_checked)} 行：{sum(r.passed for r in fallback_checked)} 行 fallback 通过，{sum(not r.passed for r in fallback_checked)} 行失败；这些通过均不是 SW 认证。普通/其他后端已检查 {len(other_checked)} 行；另有 {sum(not r.checked for r in records)} 行 unchecked，不参与 SW 验收。", "",
+              f"满足固定 SW 数值门槛、完整 `100/5/3` 或更充分计时配置且单行 speedup ≥ 1.05 的候选观察为 {sum(r.sw_performance_candidate for r in records)} 行。单行候选还需要预先指定的相邻大尺寸和超出噪声的重复证据，不能直接视为性能验收通过。", "",
+              "原始输入先舍入至 BF16/FP16，再直接转 FP64 计算普通 GEMM 参考，参考输入不经过 S/T 变换。`actual` 字段决定后端分类；请求 SW 后实际执行 `dense_cublaslt` 的边界、未知范围或资源 fallback 结果只验证普通 GEMM 路由。", "",
               "固定门槛为每次独立试验 `eF_SW ≤ 3*eF_dense + floor`，BF16 floor 为 `1e-3`，FP16 为 `1e-4`。门槛未为某个候选实现放宽；CSV 的误差和 gate_limit 是跨正确性试验的最大值，`numerical_pass` 是逐试验验收的合取。最大误差试验与最大门槛试验可能不同，不能仅用两个最大值替代逐试验验收。", "",
               "## 原始数据与计时配置", "",
               table_line(["来源", "行数", "配置 trials/groups/correct", "模式", "结果状态"]),
@@ -280,31 +327,35 @@ def report(records: list[Record], warnings: list[str], artifacts: list[Path],
         configs = sorted({f"{r.integer('trials')}/{r.integer('groups')}/{r.integer('correct_trials')}" for r in group})
         modes = sorted({f"{r.values['mode']}/{r.values['cache']}/pairs={r.integer('rotate_inputs',1)}" for r in group})
         state = "完整计时配置" if all(r.full_config for r in group) else "探索性配置，需复测"
-        if any(r.checked and not r.passed for r in group):
-            state += "；数值失败"
+        if any(r.checked and r.backend == "sw" and not r.certified_sw for r in group):
+            state += "；SW 数值失败"
+        if any(r.checked and r.backend == "dense_fallback" for r in group):
+            state += f"；fallback 通过 {sum(r.backend=='dense_fallback' and r.passed for r in group)} 行（非 SW 认证）"
+        if any(r.checked and r.backend != "sw" and not r.passed for r in group):
+            state += "；普通/fallback 数值失败"
         if any(not r.checked for r in group):
             state += "；包含未检查行"
         lines.append(table_line([relative_link(source,target,source_label(source)), len(group),
                                  "; ".join(configs), "; ".join(modes), state]))
-    lines += ["", "`current.csv` 是可变文件，与轨迹快照重复，因此自动发现时不纳入。轨迹目录保存各自源码快照和输出；跨来源时钟/共享干扰可能不同，同形状跨来源的绝对时间不能作为受控配对实验。", "",
+    lines += ["", "`current.csv` 是可变文件，与轨迹快照重复，因此自动发现时不纳入。默认自动发现包括全部实验轨迹，不代表最终候选选择；发布最终验收表时使用 `--files` 明确列出已经完成的最终 CSV。轨迹目录保存各自源码快照和输出；跨来源时钟/共享干扰可能不同，同形状跨来源的绝对时间不能作为受控配对实验。", "",
               "## 完整调用的逐行性能与精度", ""]
     by_panel = defaultdict(list)
     for r in records:
         by_panel[r.panel].append(r)
-    for panel, group in sorted(by_panel.items(),key=lambda item:(item[0][1],item[0][2],item[0][3],item[0][0])):
-        dtype,mode,cache,rotations = panel
-        lines += [f"### {dtype.upper()} / {mode} / {cache} / input pairs={rotations}", "",
-                  table_line(["来源 / 实际算法", "M,N,K", "Dense median [p10,p90] ms", "SW median [p10,p90] ms", "加速比", "CV dense/SW", "eF dense/SW", "fixed floor / max gate", "验收", "workspace dense/SW GiB"]),
+    for panel, group in sorted(by_panel.items(),key=lambda item:(item[0][4],item[0][1],item[0][2],item[0][3],item[0][0])):
+        dtype,mode,cache,rotations,category = panel
+        solution_label="SW" if category=="sw" else "实际后端"
+        lines += [f"### {dtype.upper()} / {mode} / {cache} / input pairs={rotations} / {category}", "",
+                  table_line(["来源 / 实际算法", "M,N,K", "Dense median [p10,p90] ms", f"{solution_label} median [p10,p90] ms", "同一行时间比", f"CV dense/{solution_label}", f"eF dense/{solution_label}", "fixed floor / max gate", "分类与数值状态", f"workspace dense/{solution_label} GiB"]),
                   table_line(["---", "---", "---", "---", "---:", "---", "---", "---", "---", "---"])]
         for r in sorted(group,key=lambda x:(math.prod(x.shape),x.shape,x.label,x.line)):
             v=r.values
             timing=lambda prefix:f"{r.number(prefix+'_event_ms'):.4f} [{r.number(prefix+'_p10_ms'):.4f},{r.number(prefix+'_p90_ms'):.4f}]"
-            verdict="通过" if r.passed else "失败" if r.checked else "unchecked"
             lines.append(table_line([f"{r.label} / {v['actual']} v{r.integer('variant')}",
                                      ",".join(map(str,r.shape)),timing("dense"),timing("solution"),f"{r.speedup:.4f}×",
                                      f"{100*r.number('dense_cv'):.2f}% / {100*r.number('solution_cv'):.2f}%",
                                      f"{r.number('dense_ef'):.3e} / {r.number('solution_ef'):.3e}",
-                                     f"{r.number('gate_floor'):.2e} / {r.number('gate_limit'):.3e}",verdict,
+                                     f"{r.number('gate_floor'):.2e} / {r.number('gate_limit'):.3e}",r.verdict,
                                      f"{r.number('dense_workspace')/2**30:.3f} / {r.number('solution_workspace')/2**30:.3f}"]))
         lines.append("")
     lines += ["## 静态导出图", ""]
@@ -312,7 +363,7 @@ def report(records: list[Record], warnings: list[str], artifacts: list[Path],
         lines.append(relative_link(artifact,target))
     lines += ["", "性能图使用逐行加速比，误差条端点为 `dense_p10 / solution_p90` 与 `dense_p90 / solution_p10`，用于表示组计时离散度，不能解释为置信区间。数值图实线为每来源最差正确性试验 eF，黑虚线为固定 floor，灰点线为各来源最大试验 gate_limit；精确零误差仅为对数显示而绘制于 `1e-12`。", "",
               "## 计时和误差解释", "",
-              "计时采用预分配、预调优的完整调用，每次重新执行依赖 A/B 的变换、全部七个叶乘法和 FP32 重组。库调优、FP64 参考、输入更新在计时区间之外。Graph 捕获包含完整调用；Graph 与普通 launch 的结果分别报告。beta 非零时 C0 语义在功能测试中独立覆盖。", "",
+              "计时采用预分配、预调优的完整调用；实际执行 SW 的行每次重新执行依赖 A/B 的变换、全部七个叶乘法和 FP32 重组，fallback 行完整执行普通 GEMM。库调优、FP64 参考、输入更新在计时区间之外。Graph 捕获包含实际后端的完整调用；Graph 与普通 launch 的结果分别报告。beta 非零时 C0 语义在功能测试中独立覆盖。", "",
               "CSV 的 median、p10、p90 和 CV 来自独立重复组的每调用平均时间（`quantile_unit=group_mean`），而非单次 invocation 的延迟分布。speedup 是两组 median 的比值。只有五组时尾分位数和 CV 的估计有限；接近 1.05× 的收益必须结合配对重复结果、时钟和噪声验证。", "",
               "warm_cache 重复使用同一对地址，仍每次重算变换。rotating_inputs 轮换多个不同的 A/B 地址对，记录实际输入工作集；应根据工作集与 L2 的大小判断缓存影响，不能仅凭轮换标签断言完全冷缓存。轮换数据不与 warm-cache 合并。", "",
               "原始 CSV 还保留 maxabs、Frobenius eF、`|error|/(atol+rtol*|reference|)` 最大值、`||A||F||B||F` 归一化误差、近零参考的绝对误差、nonfinite 数量、主机 wall time、实际 workspace 与初始化/调优成本。等效 TFLOP/s 使用 `2MNK/T`，不能等同七叶的实际 Tensor Core 算术吞吐。", "",
@@ -356,7 +407,9 @@ def report(records: list[Record], warnings: list[str], artifacts: list[Path],
         lines += [f"- {warning}" for warning in warnings]
         lines.append("")
     lines += ["## 后续验收", "",
-              "需要同时满足固定数值门槛、完整调用性能和独立功能/内存检查，才能为特定 dtype 与 shape 启用快速路径。当前数据中的数值失败行没有自动启用资格。性能目标至少需要预先固定的相邻大尺寸区间达到超出噪声的收益；单行或短测结果不足以完成该验收。后续可独立评估保持原输入 FP32 信息的叶策略、计入时间的补偿/缩放与不同量化合同，任何合同变更必须明确记录并重新建立同精度基线。", ""]
+              "需要同时满足固定数值门槛、完整调用性能和独立功能/内存检查，才能为特定 dtype 与 shape 启用快速路径。SW 的数值失败行、所有 unchecked 行、所有 dense fallback 行均不能用于 SW 性能验收或 SW 认证。fallback 通过只说明普通 GEMM 路由正常。", "",
+              "性能目标需要预先指定的至少两个相邻大尺寸，在同一 dtype、执行模式、缓存/轮换合同、算法版本和 variant 下，各自 median speedup ≥ 1.05，并由完整 trials≥100、groups≥5、correct_trials≥3 配置与超出噪声的重复数据支持。各尺寸也须通过冻结的逐试验精度门槛。单行、短测或跨精度/Graph 模式拼接的结果不足以完成验收。若约 5% 的收益与 CV/组分布变化相近，保留原始分组日志并增加独立重复确认；这里不从五组数据声称置信区间，也不自动宣布胜者。", "",
+              "最终报告通过 `--files` 选择完整最终数据集；默认含全部轨迹的报告用于实验回顾。后续可独立评估保持原输入 FP32 信息的叶策略、计入时间的补偿/缩放与不同量化合同，任何合同变更必须明确记录并重新建立同精度基线。", ""]
     target.parent.mkdir(parents=True,exist_ok=True)
     target.write_text("\n".join(lines),encoding="utf-8")
 

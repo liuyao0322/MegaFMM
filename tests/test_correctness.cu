@@ -60,7 +60,8 @@ std::string algorithm_name(megafmm::Algorithm algorithm) {
   } return "unknown";
 }
 template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorithm,
-                                  Pattern pattern,bool alias,bool certified,uint32_t seed=1234567,int variant=0) {
+                                  Pattern pattern,bool alias,bool certified,uint32_t seed=1234567,int variant=0,
+                                  bool do_tune=true) {
   int ar=p.trans_a ? p.k:p.m, ac=p.trans_a ? p.m:p.k;
   int br=p.trans_b ? p.n:p.k, bc=p.trans_b ? p.k:p.n;
   std::vector<T> a(size_t(ar)*p.lda),b(size_t(br)*p.ldb);
@@ -116,7 +117,7 @@ template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorit
   Buffer workspace(plan->workspace_bytes());
   float* output=alias ? dc.as<float>():dd.as<float>();
   require(!alias || p.ldc==p.ldd,"test alias needs equal C/D strides");
-  megafmm::tune(*plan,da.data,db.data,p.beta==0 ? nullptr:dc.as<float>(),output,workspace.data);
+  if(do_tune) megafmm::tune(*plan,da.data,db.data,p.beta==0 ? nullptr:dc.as<float>(),output,workspace.data);
   // Restore C0 after tuning when C0 and D share storage.
   if(alias) check(cudaMemcpy(dc.data,c.data(),c.size()*sizeof(float),cudaMemcpyHostToDevice));
   for(int repeat=0;repeat<2;++repeat) {
@@ -127,7 +128,8 @@ template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorit
   }
   double floor=p.dtype==megafmm::DType::BF16 ? 1e-3:1e-4,rtol=p.dtype==megafmm::DType::BF16 ? 1e-2:1e-3;
   Metrics e=metrics(result,reference,p.m,p.n,p.ldd,floor,rtol,std::sqrt(anorm*bnorm));
-  std::cout << "CASE " << algorithm_name(algorithm) << " actual=" << plan->algorithm_name() << ' '
+  std::cout << "CASE " << algorithm_name(algorithm) << " variant=" << variant
+            << " actual=" << plan->algorithm_name() << ' '
             << megafmm::dtype_name(p.dtype) << ' ' << pattern_name(pattern) << ' '
             << p.m << ',' << p.n << ',' << p.k << " maxabs=" << e.maxabs << " eF=" << e.ef
             << " scaled=" << e.scaled << " normalized=" << e.normalized << " nonfinite=" << e.nonfinite << '\n';
@@ -184,16 +186,52 @@ template<class T> void structural_suite(megafmm::DType dtype) {
   }
   for(auto candidate:{std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,1},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,2},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,3},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,1},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,2}}) {
     auto e=run_case<T>(problem(256,256,256,dtype),candidate.first,Pattern::Integers,false,true,1234567,candidate.second);
     require(e.nonfinite==0 && e.maxabs==0,"candidate variant structural test failed");
   }
-  {
+  for(int variant:{2,3}) {
     auto p=problem(256,256,256,dtype);
     p.alpha=.5f;p.beta=-.25f;
-    auto e=run_case<T>(p,megafmm::Algorithm::Megakernel,Pattern::Integers,true,true,1234567,2);
+    auto e=run_case<T>(p,megafmm::Algorithm::Megakernel,Pattern::Integers,true,true,1234567,variant);
     require(e.nonfinite==0 && e.maxabs==0,"streaming megakernel alpha/beta alias test failed");
+  }
+}
+template<class T> void rebind_suite(megafmm::DType dtype) {
+  // Reuse a tuned plan with changed addresses: an aligned preferred SW route must
+  // safely choose Dense when the new input views have only element alignment.
+  auto p=problem(256,256,256,dtype);
+  std::vector<T> a(size_t(p.m)*p.k),b(size_t(p.k)*p.n);
+  for(int i=0;i<p.m;++i) for(int l=0;l<p.k;++l)
+    a[size_t(i)*p.k+l]=round_value<T>(float(i%5-2));
+  for(int l=0;l<p.k;++l) for(int j=0;j<p.n;++j)
+    b[size_t(l)*p.n+j]=round_value<T>(float(j%7-3));
+  Buffer da((a.size()+1)*sizeof(T)),db((b.size()+1)*sizeof(T)),dd(size_t(p.m)*p.n*sizeof(float));
+  std::vector<float> actual(size_t(p.m)*p.n);
+  for(auto algo:{megafmm::Algorithm::Dense,megafmm::Algorithm::WinogradLt,
+                 megafmm::Algorithm::WinogradHopper,megafmm::Algorithm::Megakernel}) {
+    megafmm::Policy policy;policy.algorithm=algo;policy.certified_range=true;policy.mega_variant=3;
+    auto plan=megafmm::create_plan(p,policy);Buffer workspace(plan->workspace_bytes());
+    check(cudaMemcpy(da.data,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice));
+    check(cudaMemcpy(db.data,b.data(),b.size()*sizeof(T),cudaMemcpyHostToDevice));
+    megafmm::tune(*plan,da.data,db.data,nullptr,dd.as<float>(),workspace.data);
+    for(bool shifted:{false,true}) {
+      T* left=da.as<T>()+int(shifted),*right=db.as<T>()+int(shifted);
+      if(shifted) {
+        check(cudaMemcpy(left,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice));
+        check(cudaMemcpy(right,b.data(),b.size()*sizeof(T),cudaMemcpyHostToDevice));
+      }
+      megafmm::run(*plan,left,right,nullptr,dd.as<float>(),workspace.data);
+      check(cudaDeviceSynchronize());
+      check(cudaMemcpy(actual.data(),dd.data,actual.size()*sizeof(float),cudaMemcpyDeviceToHost));
+      for(int i=0;i<p.m;++i) for(int j=0;j<p.n;++j)
+        require(actual[size_t(i)*p.n+j]==float(p.k*(i%5-2)*(j%7-3)),
+                "same-plan pointer alignment rebind returned an incorrect product");
+    }
+    std::cout << "PASS_POINTER_REBIND dtype=" << megafmm::dtype_name(dtype)
+              << " algorithm=" << algorithm_name(algo) << " aligned_then_element_aligned=1\n";
   }
 }
 void degenerate_suite() {
@@ -258,25 +296,54 @@ void rejection_suite() {
                      memory.as<float>()+2048,unequal_stride_workspace.data); }
   catch(const std::exception&) { overlap_rejected=true; }
   require(overlap_rejected,"exact C0/D alias with unequal strides accepted");
+  p.ldc=p.ldd;plan=megafmm::create_plan(p,policy);
+  Buffer c_overlap_workspace(plan->workspace_bytes());
+  if(plan->workspace_bytes()) {
+    overlap_rejected=false;
+    try { megafmm::run(*plan,memory.data,memory.as<char>()+4096,c_overlap_workspace.as<float>(),
+                       memory.as<float>()+2048,c_overlap_workspace.data); }
+    catch(const std::exception&) { overlap_rejected=true; }
+    require(overlap_rejected,"C0/workspace overlap accepted");
+  }
+  overlap_rejected=false;
+  try {
+    const void* overflowing_a=reinterpret_cast<const void*>(std::numeric_limits<uintptr_t>::max()-1);
+    megafmm::run(*plan,overflowing_a,memory.as<char>()+4096,memory.as<float>()+1024,
+                 memory.as<float>()+2048,c_overlap_workspace.data);
+  } catch(const std::exception&) { overlap_rejected=true; }
+  require(overlap_rejected,"runtime pointer range overflow accepted");
 }
 template<class T> bool strict_numerics(megafmm::DType dtype) {
   bool pass=true;double floor=dtype==megafmm::DType::BF16 ? 1e-3:1e-4;
-  for(auto algo:{megafmm::Algorithm::WinogradLt,megafmm::Algorithm::WinogradHopper,megafmm::Algorithm::Megakernel}) {
-    for(auto pat:{Pattern::Uniform,Pattern::Positive,Pattern::Range,Pattern::Cancellation,Pattern::HighHalf}) {
-      std::vector<double> ef,dense_ef;
-      size_t failures=0,nonfinite=0;
-      // Near the FP16 limit is outside the certified fast-path range and must use fallback.
-      bool certified=pat!=Pattern::HighHalf;
-      for(int trial=0;trial<3;++trial) {
-        auto p=problem(128,128,128,dtype);uint32_t seed=1234567+trial*918273;
-        auto dense=run_case<T>(p,megafmm::Algorithm::Dense,pat,false,certified,seed);
-        auto sw=run_case<T>(p,algo,pat,false,certified,seed);
+  struct Candidate { megafmm::Algorithm algorithm;int variant; };
+  std::vector<Candidate> candidates={{megafmm::Algorithm::WinogradLt,0}};
+  for(int variant=0;variant<=4;++variant)candidates.push_back({megafmm::Algorithm::WinogradHopper,variant});
+  for(int variant=0;variant<=3;++variant)candidates.push_back({megafmm::Algorithm::Megakernel,variant});
+  for(auto pat:{Pattern::Uniform,Pattern::Positive,Pattern::Range,Pattern::Cancellation,Pattern::HighHalf}) {
+    std::vector<std::vector<double>> ef(candidates.size());
+    std::vector<double> dense_ef;
+    std::vector<size_t> failures(candidates.size(),0),nonfinite(candidates.size(),0);
+    // Near the FP16 limit is outside the certified fast-path range and must use fallback.
+    bool certified=pat!=Pattern::HighHalf;
+    for(int trial=0;trial<3;++trial) {
+      // 256 cubed gives variant 3 complete output tiles and therefore exercises
+      // its new beta=0 fast kernel rather than only its general fallback.
+      auto p=problem(256,256,256,dtype);uint32_t seed=1234567+trial*918273;
+      auto dense=run_case<T>(p,megafmm::Algorithm::Dense,pat,false,certified,seed);
+      dense_ef.push_back(dense.ef);
+      for(size_t candidate=0;candidate<candidates.size();++candidate) {
+        const auto algo=candidates[candidate].algorithm;
+        const int variant=candidates[candidate].variant;
+        // Kernel numerical coverage does not require retuning seven leaves for
+        // every input pattern. Dense is still tuned once per shared reference.
+        auto sw=run_case<T>(p,algo,pat,false,certified,seed,variant,false);
         bool finite=dense.nonfinite==0 && sw.nonfinite==0;
         bool gate=finite && sw.ef<=3*dense.ef+floor;
-        pass=gate && pass;failures+=!gate;nonfinite+=dense.nonfinite+sw.nonfinite;
-        ef.push_back(sw.ef);dense_ef.push_back(dense.ef);
+        pass=gate && pass;failures[candidate]+=!gate;nonfinite[candidate]+=dense.nonfinite+sw.nonfinite;
+        ef[candidate].push_back(sw.ef);
         std::cout << "NUMERICAL_GATE dtype=" << megafmm::dtype_name(dtype)
-                  << " algorithm=" << algorithm_name(algo) << " pattern=" << pattern_name(pat)
+                  << " algorithm=" << algorithm_name(algo) << " variant=" << variant
+                  << " pattern=" << pattern_name(pat)
                   << " trial=" << trial << " certified_range=" << certified << " pass=" << gate
                   << " finite=" << finite << " nonfinite=" << dense.nonfinite+sw.nonfinite
                   << " dense_ef=" << dense.ef << " solution_ef=" << sw.ef
@@ -284,12 +351,17 @@ template<class T> bool strict_numerics(megafmm::DType dtype) {
                   << " normalized=" << sw.normalized << " nearzero_abs=" << sw.nearzero
                   << " floor=" << floor << " limit=" << 3*dense.ef+floor << '\n';
       }
-      std::sort(ef.begin(),ef.end());std::sort(dense_ef.begin(),dense_ef.end());
+    }
+    std::sort(dense_ef.begin(),dense_ef.end());
+    for(size_t candidate=0;candidate<candidates.size();++candidate) {
+      auto& errors=ef[candidate];std::sort(errors.begin(),errors.end());
       std::cout << "NUMERICAL_DISTRIBUTION dtype=" << megafmm::dtype_name(dtype)
-                << " algorithm=" << algorithm_name(algo) << " pattern=" << pattern_name(pat)
-                << " trials=" << ef.size() << " failures=" << failures << " nonfinite=" << nonfinite
-                << " ef_min=" << ef.front() << " ef_median=" << ef[ef.size()/2]
-                << " ef_max=" << ef.back() << " dense_ef_median=" << dense_ef[dense_ef.size()/2]
+                << " algorithm=" << algorithm_name(candidates[candidate].algorithm)
+                << " variant=" << candidates[candidate].variant << " pattern=" << pattern_name(pat)
+                << " trials=" << errors.size() << " failures=" << failures[candidate]
+                << " nonfinite=" << nonfinite[candidate]
+                << " ef_min=" << errors.front() << " ef_median=" << errors[errors.size()/2]
+                << " ef_max=" << errors.back() << " dense_ef_median=" << dense_ef[dense_ef.size()/2]
                 << " gate_floor=" << floor << '\n';
     }
   }
@@ -298,42 +370,68 @@ template<class T> bool strict_numerics(megafmm::DType dtype) {
 } // namespace
 int main(int argc,char** argv) {
   try {
-    bool numeric=false, candidates_only=false;
+    std::cout << std::unitbuf;std::cerr << std::unitbuf;
+    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-candidates [--mega-only | --hopper-variant 0..4]]";
+    bool numeric=false, candidates_only=false,mega_only=false;
+    int hopper_filter=-1;
     for(int i=1;i<argc;++i) {
       if(std::string(argv[i])=="--strict-numerics")numeric=true;
       else if(std::string(argv[i])=="--smoke-candidates")candidates_only=true;
-      else throw std::runtime_error("usage: test_correctness [--strict-numerics] [--smoke-candidates]");
+      else if(std::string(argv[i])=="--mega-only")mega_only=true;
+      else if(std::string(argv[i])=="--hopper-variant") {
+        require(i+1<argc,usage);
+        std::string value=argv[++i];size_t consumed=0;
+        hopper_filter=std::stoi(value,&consumed);
+        require(consumed==value.size() && hopper_filter>=0 && hopper_filter<=4,usage);
+      } else throw std::runtime_error(usage);
     }
+    require((!mega_only && hopper_filter<0) || candidates_only,
+            "candidate filters require --smoke-candidates; "+usage);
+    require(!mega_only || hopper_filter<0,"--mega-only and --hopper-variant cannot be combined; "+usage);
     if(candidates_only) {
-      auto check_candidates=[](auto input_tag,megafmm::DType dtype) {
+      auto check_candidates=[mega_only,hopper_filter](auto input_tag,megafmm::DType dtype) {
         using T=decltype(input_tag);
         for(auto candidate:{std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,0},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,1},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,2},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,3},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,0},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,1},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,2},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,3},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,4}}) {
-          auto p=problem(256,256,256,dtype);
-          p.alpha=.5f;p.beta=-.25f;
-          megafmm::Policy policy;
-          policy.algorithm=candidate.first;policy.certified_range=true;
-          policy.mega_variant=policy.hopper_variant=candidate.second;
-          auto planned=megafmm::create_plan(p,policy);
-          require(planned->algorithm_name().find("dense")==std::string::npos,
-                  "supported candidate unexpectedly fell back to Dense");
-          auto e=run_case<T>(p,candidate.first,Pattern::Integers,true,true,1234567,candidate.second);
-          require(e.nonfinite==0 && e.maxabs==0,"candidate alpha/beta alias smoke failed");
+          if(mega_only && candidate.first!=megafmm::Algorithm::Megakernel)continue;
+          if(hopper_filter>=0 && (candidate.first!=megafmm::Algorithm::WinogradHopper ||
+                                  candidate.second!=hopper_filter))continue;
+          for(int scenario=0;scenario<3;++scenario) {
+            if(scenario==2 && candidate.first!=megafmm::Algorithm::Megakernel)continue;
+            auto p=scenario==2 ? problem(128,64,256,dtype):problem(256,256,256,dtype);
+            bool alias=scenario==1;
+            if(alias) {p.alpha=.5f;p.beta=-.25f;}
+            std::cout << "BEGIN_CANDIDATE dtype=" << megafmm::dtype_name(dtype)
+                      << " algorithm=" << algorithm_name(candidate.first) << " variant=" << candidate.second
+                      << " shape=" << p.m << ',' << p.n << ',' << p.k
+                      << " alpha=" << p.alpha << " beta=" << p.beta << " alias=" << alias << std::endl;
+            megafmm::Policy policy;
+            policy.algorithm=candidate.first;policy.certified_range=true;
+            policy.mega_variant=policy.hopper_variant=candidate.second;
+            auto planned=megafmm::create_plan(p,policy);
+            require(planned->algorithm_name().find("dense")==std::string::npos,
+                    "supported candidate unexpectedly fell back to Dense");
+            auto e=run_case<T>(p,candidate.first,Pattern::Integers,alias,true,1234567,candidate.second);
+            require(e.nonfinite==0 && e.maxabs==0,"candidate beta0/alias/rectangular smoke failed");
+          }
         }
       };
       check_candidates(__nv_bfloat16{},megafmm::DType::BF16);
       check_candidates(__half{},megafmm::DType::FP16);
-      std::cout << "PASS all candidate kernel paths, integer outputs and alpha/beta alias\n";
+      std::cout << "PASS selected candidate kernel paths, beta0, alpha/beta alias and rectangular fallback\n";
       return 0;
     }
     structural_suite<__nv_bfloat16>(megafmm::DType::BF16);
     structural_suite<__half>(megafmm::DType::FP16);
+    rebind_suite<__nv_bfloat16>(megafmm::DType::BF16);
+    rebind_suite<__half>(megafmm::DType::FP16);
     degenerate_suite();rejection_suite();
     std::cout << "PASS structural DAG, fallback numerics, strides/transposes, alias, degenerate and rejection tests\n";
     bool pass=true;

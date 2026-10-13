@@ -531,10 +531,284 @@ void launch_m3(const Problem& p, const void* A, const void* B,
       p, static_cast<const Element*>(A), static_cast<const Element*>(B), C0, D);
 }
 
+// Variant 3 keeps M3's full-product/U schedule, but has a full-tile beta-zero
+// path and overlaps each current WGMMA batch with SIMT filling the next stage.
+// The original M3 above remains the control and the general-condition fallback.
+template <class Element>
+struct MegaM4Traits {
+  using Base = MegaM3Traits<Element>;
+  static constexpr int BM = Base::BM;
+  static constexpr int BN = Base::BN;
+  static constexpr int BK = Base::BK;
+  using LayoutA = decltype(tile_to_shape(
+      GMMA::Layout_K_SW32_Atom<Element>{},
+      make_shape(Int<BM>{}, Int<BK>{}, Int<2>{})));
+  using LayoutB = decltype(tile_to_shape(
+      GMMA::Layout_MN_SW32_Atom<Element>{},
+      make_shape(Int<BN>{}, Int<BK>{}, Int<2>{})));
+  // GMMA layouts carry a byte-address swizzle flag. Convert the tile layout
+  // to physical element offsets for the contiguous-vector proof.
+  using PhysicalTileA = decltype(as_position_independent_swizzle_layout(
+      typename Base::LayoutA{}));
+  using PhysicalTileB = decltype(as_position_independent_swizzle_layout(
+      typename Base::LayoutB{}));
+  using Mma = typename Base::Mma;
+  static constexpr int ElementsA = cosize_v<LayoutA>;
+  static constexpr int ElementsB = cosize_v<LayoutB>;
+  static constexpr size_t SharedBytes =
+      size_t(ElementsA + ElementsB) * sizeof(Element);
+};
+
+template <class Element>
+CUTE_DEVICE PackedEight read_aligned_eight(const Element* ptr) {
+  return PackedEight{*reinterpret_cast<const uint4*>(ptr)};
+}
+
+// Only the full-tile dispatch uses these selective loads. All quadrant bases
+// and all eight lanes are known aligned and in bounds before kernel launch.
+template <int Product, class Element>
+CUTE_DEVICE PackedEight load_m4_a(const Problem& p, const Element* A,
+                                  int64_t row, int64_t k) {
+  const int64_t mh = p.m / 2;
+  const int64_t kh = p.k / 2;
+  PackedEight a11, a12, a21, a22;
+  if constexpr (Product == 0 || Product == 2 || Product == 5 || Product == 6)
+    a11 = read_aligned_eight(A + row * p.lda + k);
+  if constexpr (Product == 1 || Product == 2)
+    a12 = read_aligned_eight(A + row * p.lda + k + kh);
+  if constexpr (Product == 2 || Product == 4 || Product == 5 || Product == 6)
+    a21 = read_aligned_eight(A + (row + mh) * p.lda + k);
+  if constexpr (Product == 2 || Product == 3 || Product == 4 || Product == 5)
+    a22 = read_aligned_eight(A + (row + mh) * p.lda + k + kh);
+  if constexpr (Product == 0) return a11;
+  else if constexpr (Product == 1) return a12;
+  else if constexpr (Product == 3) return a22;
+  else {
+    PackedEight result{make_uint4(0, 0, 0, 0)};
+    CUTE_UNROLL
+    for (int lane = 0; lane < 8; ++lane) {
+      float value;
+      if constexpr (Product == 2) {
+        const float s1 = unpack<Element>(a21, lane) + unpack<Element>(a22, lane);
+        const float s2 = s1 - unpack<Element>(a11, lane);
+        value = unpack<Element>(a12, lane) - s2;
+      } else if constexpr (Product == 4) {
+        value = unpack<Element>(a21, lane) + unpack<Element>(a22, lane);
+      } else if constexpr (Product == 5) {
+        const float s1 = unpack<Element>(a21, lane) + unpack<Element>(a22, lane);
+        value = s1 - unpack<Element>(a11, lane);
+      } else {
+        value = unpack<Element>(a11, lane) - unpack<Element>(a21, lane);
+      }
+      result.insert(lane, Element(value).raw());
+    }
+    return result;
+  }
+}
+
+template <int Product, class Element>
+CUTE_DEVICE PackedEight load_m4_b(const Problem& p, const Element* B,
+                                  int64_t k, int64_t col) {
+  const int64_t kh = p.k / 2;
+  const int64_t nh = p.n / 2;
+  PackedEight b11, b12, b21, b22;
+  if constexpr (Product == 0 || Product == 3 || Product == 4 || Product == 5)
+    b11 = read_aligned_eight(B + k * p.ldb + col);
+  if constexpr (Product == 3 || Product == 4 || Product == 5 || Product == 6)
+    b12 = read_aligned_eight(B + k * p.ldb + col + nh);
+  if constexpr (Product == 1 || Product == 3)
+    b21 = read_aligned_eight(B + (k + kh) * p.ldb + col);
+  if constexpr (Product == 2 || Product == 3 || Product == 5 || Product == 6)
+    b22 = read_aligned_eight(B + (k + kh) * p.ldb + col + nh);
+  if constexpr (Product == 0) return b11;
+  else if constexpr (Product == 1) return b21;
+  else if constexpr (Product == 2) return b22;
+  else {
+    PackedEight result{make_uint4(0, 0, 0, 0)};
+    CUTE_UNROLL
+    for (int lane = 0; lane < 8; ++lane) {
+      float value;
+      if constexpr (Product == 3) {
+        const float t1 = unpack<Element>(b12, lane) - unpack<Element>(b11, lane);
+        const float t2 = unpack<Element>(b22, lane) - t1;
+        value = t2 - unpack<Element>(b21, lane);
+      } else if constexpr (Product == 4) {
+        value = unpack<Element>(b12, lane) - unpack<Element>(b11, lane);
+      } else if constexpr (Product == 5) {
+        const float t1 = unpack<Element>(b12, lane) - unpack<Element>(b11, lane);
+        value = unpack<Element>(b22, lane) - t1;
+      } else {
+        value = unpack<Element>(b22, lane) - unpack<Element>(b12, lane);
+      }
+      result.insert(lane, Element(value).raw());
+    }
+    return result;
+  }
+}
+
+CUTE_DEVICE void store_shared_eight(void* ptr, const PackedEight& value) {
+  const uint32_t address = uint32_t(__cvta_generic_to_shared(ptr));
+  asm volatile("st.shared.v4.b32 [%0], {%1, %2, %3, %4};"
+      :: "r"(address), "r"(value.bits.x), "r"(value.bits.y),
+         "r"(value.bits.z), "r"(value.bits.w) : "memory");
+}
+
+template <int Product, class Element, class SmemA, class SmemB>
+CUTE_DEVICE void fill_m4_stage(const Problem& p, const Element* A,
+                               const Element* B, int64_t row_base,
+                               int64_t col_base, int64_t k_base, int stage,
+                               SmemA sA, SmemB sB) {
+  using T = MegaM4Traits<Element>;
+  CUTE_NO_UNROLL
+  for (int index = threadIdx.x * 8; index < T::BM * T::BK; index += 128 * 8) {
+    const int row = index / T::BK;
+    const int k = index % T::BK;
+    const PackedEight operand = load_m4_a<Product>(p, A, row_base + row, k_base + k);
+    store_shared_eight(&sA(row, k, stage), operand);
+  }
+  CUTE_NO_UNROLL
+  for (int index = threadIdx.x * 8; index < T::BK * T::BN; index += 128 * 8) {
+    const int k = index / T::BN;
+    const int col = index % T::BN;
+    const PackedEight operand = load_m4_b<Product>(p, B, k_base + k, col_base + col);
+    store_shared_eight(&sB(col, k, stage), operand);
+  }
+}
+
+template <int Product, class Element, class SmemA, class SmemB,
+          class DescriptorA, class DescriptorB, class Mma, class Accumulator>
+CUTE_DEVICE void full_m4_product(const Problem& p, const Element* A,
+                                 const Element* B, int64_t row_base,
+                                 int64_t col_base, SmemA sA, SmemB sB,
+                                 DescriptorA tCrA, DescriptorB tCrB,
+                                 Mma mma, Accumulator& accumulator) {
+  using T = MegaM4Traits<Element>;
+  clear(accumulator);
+  fill_m4_stage<Product>(p,A,B,row_base,col_base,0,0,sA,sB);
+  asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
+  __syncthreads();
+  int current_stage = 0;
+  CUTE_NO_UNROLL
+  for (int64_t k_base = 0; k_base < p.k / 2; k_base += T::BK) {
+    warpgroup_fence_operand(accumulator);
+    warpgroup_arrive();
+    gemm(mma, tCrA(_,_,_,current_stage), tCrB(_,_,_,current_stage), accumulator);
+    warpgroup_commit_batch();
+
+    // Only ordinary transform temporaries are touched here. The targeted
+    // accumulator stays live and untouched until wait<0> completes. Filling
+    // the other stage cannot overwrite current WGMMA operands.
+    const int next_stage = current_stage ^ 1;
+    if (k_base + T::BK < p.k / 2) {
+      fill_m4_stage<Product>(p,A,B,row_base,col_base,k_base + T::BK,next_stage,sA,sB);
+      asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
+      __syncthreads();
+    }
+    warpgroup_wait<0>();
+    warpgroup_fence_operand(accumulator);
+    // All threads finish consumption before the older stage can be reused.
+    // This also drains the last stage before U math or the next product.
+    __syncthreads();
+    current_stage = next_stage;
+  }
+}
+
+template <int QuadrantRow, int QuadrantCol, bool Sum, class Accumulator,
+          class Coordinates>
+CUTE_DEVICE void store_m4_quadrant(const Problem& p, float* D,
+                                   int64_t row_base, int64_t col_base,
+                                   const Accumulator& x, const Accumulator& y,
+                                   const Coordinates& coords) {
+  CUTE_UNROLL
+  for (int index = 0; index < size(x); ++index) {
+    const auto coord = coords(index);
+    const int64_t row = row_base + get<0>(coord) + QuadrantRow * (p.m / 2);
+    const int64_t col = col_base + get<1>(coord) + QuadrantCol * (p.n / 2);
+    const float value = Sum ? x(index) + y(index) : x(index);
+    D[row * p.ldd + col] = p.alpha * value;
+  }
+}
+
+template <class Element>
+__global__ __launch_bounds__(128, 1)
+void winograd_m4(Problem problem, const Element* __restrict__ A,
+                 const Element* __restrict__ B, float* D) {
+  using T = MegaM4Traits<Element>;
+  static_assert(has_contiguous_eight<typename T::PhysicalTileA, 1>(),
+                "physical A layout must preserve each eight-element vector");
+  static_assert(has_contiguous_eight<typename T::PhysicalTileB, 0>(),
+                "physical B layout must preserve each eight-element vector");
+  static_assert(T::ElementsA == 2 * MegaM3Traits<Element>::ElementsA &&
+                T::ElementsB == 2 * MegaM3Traits<Element>::ElementsB,
+                "two operand stages must have independent storage");
+  const int64_t row_base = int64_t(blockIdx.x) * T::BM;
+  const int64_t col_base = int64_t(blockIdx.y) * T::BN;
+  extern __shared__ __align__(128) unsigned char storage[];
+  auto sA = make_tensor(make_smem_ptr(reinterpret_cast<Element*>(storage)),
+                        typename T::LayoutA{});
+  auto sB = make_tensor(
+      make_smem_ptr(reinterpret_cast<Element*>(storage) + T::ElementsA),
+      typename T::LayoutB{});
+  typename T::Mma mma;
+  auto thr_mma = mma.get_thread_slice(threadIdx.x);
+  auto tCrA = thr_mma.make_fragment_A(thr_mma.partition_A(sA));
+  auto tCrB = thr_mma.make_fragment_B(thr_mma.partition_B(sB));
+  auto coords = thr_mma.partition_C(
+      make_identity_tensor(make_shape(Int<T::BM>{}, Int<T::BN>{})));
+  auto x = thr_mma.make_fragment_C(coords);
+  auto y = thr_mma.make_fragment_C(coords);
+  auto z = thr_mma.make_fragment_C(coords);
+
+  full_m4_product<0>(problem,A,B,row_base,col_base,sA,sB,tCrA,tCrB,mma,x); // P1
+  full_m4_product<1>(problem,A,B,row_base,col_base,sA,sB,tCrA,tCrB,mma,y); // P2
+  store_m4_quadrant<0,0,true>(problem,D,row_base,col_base,x,y,coords); // U1
+  full_m4_product<5>(problem,A,B,row_base,col_base,sA,sB,tCrA,tCrB,mma,y); // P6
+  CUTE_UNROLL
+  for (int index = 0; index < size(x); ++index) x(index) = x(index) + y(index); // U2
+  full_m4_product<6>(problem,A,B,row_base,col_base,sA,sB,tCrA,tCrB,mma,y); // P7
+  CUTE_UNROLL
+  for (int index = 0; index < size(x); ++index) y(index) = x(index) + y(index); // U3
+  full_m4_product<4>(problem,A,B,row_base,col_base,sA,sB,tCrA,tCrB,mma,z); // P5
+  CUTE_UNROLL
+  for (int index = 0; index < size(x); ++index) {
+    x(index) = x(index) + z(index); // U4
+    z(index) = y(index) + z(index); // U7
+  }
+  store_m4_quadrant<1,1,false>(problem,D,row_base,col_base,z,z,coords);
+  full_m4_product<2>(problem,A,B,row_base,col_base,sA,sB,tCrA,tCrB,mma,z); // P3
+  CUTE_UNROLL
+  for (int index = 0; index < size(x); ++index) x(index) = x(index) + z(index); // U5
+  store_m4_quadrant<0,1,false>(problem,D,row_base,col_base,x,x,coords);
+  full_m4_product<3>(problem,A,B,row_base,col_base,sA,sB,tCrA,tCrB,mma,x); // P4
+  CUTE_UNROLL
+  for (int index = 0; index < size(y); ++index) y(index) = y(index) - x(index); // U6
+  store_m4_quadrant<1,0,false>(problem,D,row_base,col_base,y,y,coords);
+}
+
+bool m4_fast_condition(const Problem& p, const void* A, const void* B) {
+  return p.beta == 0.0f && p.m % 128 == 0 && p.n % 256 == 0 && p.k % 64 == 0 &&
+         p.lda % 8 == 0 && p.ldb % 8 == 0 &&
+         (reinterpret_cast<uintptr_t>(A) & 15) == 0 &&
+         (reinterpret_cast<uintptr_t>(B) & 15) == 0;
+}
+
+template <class Element>
+void launch_m4(const Problem& p, const void* A, const void* B,
+               const float* C0, float* D, cudaStream_t stream) {
+  if (!m4_fast_condition(p, A, B)) {
+    launch_m3<Element>(p,A,B,C0,D,stream);
+    return;
+  }
+  using T = MegaM4Traits<Element>;
+  const dim3 grid(unsigned(p.m / (2 * T::BM)), unsigned(p.n / (2 * T::BN)));
+  winograd_m4<Element><<<grid, 128, T::SharedBytes, stream>>>(
+      p, static_cast<const Element*>(A), static_cast<const Element*>(B), D);
+}
+
 } // namespace
 
 bool megakernel_can_implement(const Problem& p, int variant) {
-  if (variant < 0 || variant > 2 || p.trans_a || p.trans_b) return false;
+  if (variant < 0 || variant > 3 || p.trans_a || p.trans_b) return false;
   if (p.dtype != DType::BF16 && p.dtype != DType::FP16) return false;
   if (p.m <= 0 || p.n <= 0 || p.k <= 0 || p.m > 32768 ||
       p.n > 32768 || p.k > 32768) return false;
@@ -553,7 +827,7 @@ bool megakernel_can_implement(const Problem& p, int variant) {
 void prepare_megakernel(const Problem& p, int variant) {
   if (!megakernel_can_implement(p, variant))
     throw std::invalid_argument("unsupported megakernel problem or variant");
-  if (variant == 2) return; // M3's 12 KiB shared tile needs no dynamic opt-in.
+  if (variant == 2 || variant == 3) return; // M3/M4 need no dynamic opt-in.
   if (p.dtype == DType::BF16) {
     if (variant == 0) prepare_m1<cutlass::bfloat16_t, 32>();
     else prepare_m1<cutlass::bfloat16_t, 64>();
@@ -573,11 +847,13 @@ void launch_megakernel(const Problem& p, const void* A, const void* B,
   if (p.dtype == DType::BF16) {
     if (variant == 0) launch_m1<cutlass::bfloat16_t, 32>(p,A,B,C0,D,stream);
     else if (variant == 1) launch_m1<cutlass::bfloat16_t, 64>(p,A,B,C0,D,stream);
-    else launch_m3<cutlass::bfloat16_t>(p,A,B,C0,D,stream);
+    else if (variant == 2) launch_m3<cutlass::bfloat16_t>(p,A,B,C0,D,stream);
+    else launch_m4<cutlass::bfloat16_t>(p,A,B,C0,D,stream);
   } else {
     if (variant == 0) launch_m1<cutlass::half_t, 32>(p,A,B,C0,D,stream);
     else if (variant == 1) launch_m1<cutlass::half_t, 64>(p,A,B,C0,D,stream);
-    else launch_m3<cutlass::half_t>(p,A,B,C0,D,stream);
+    else if (variant == 2) launch_m3<cutlass::half_t>(p,A,B,C0,D,stream);
+    else launch_m4<cutlass::half_t>(p,A,B,C0,D,stream);
   }
 }
 
