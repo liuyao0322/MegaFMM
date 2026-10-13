@@ -1,0 +1,29 @@
+--- .scratch/psplit_bk64_scope34_baseline.cu
++++ .scratch/psplit_bk64_scope34_candidate.cu
+@@ -51,7 +51,7 @@
+   static_assert(Cols == 32,"this prototype uses BN32 only");
+   static constexpr int BM = 64;
+   static constexpr int BN = Cols;
+-  static constexpr int BK = 32;
++  static constexpr int BK = 64;
+   static constexpr int Threads = 384;
+   static constexpr int ProducerThreads = 128;
+   static constexpr int ConsumerThreads = 128; // each independent WG
+@@ -151,7 +151,7 @@
+ CUTE_DEVICE void psplit_fill_a(const Problem& p,const Element* A,
+     int64_t row_base,int64_t k_base,int task,SmemA sA) {
+   const int64_t mh = p.m/2, kh = p.k/2;
+-  const int row = task/4, k = (task&3)*8;
++  const int row = task/8, k = (task&7)*8;
+   const int64_t gr = row_base+row, gk = k_base+k;
+   const auto a11 = psplit_read_eight(A + gr*p.lda + gk);
+   const auto a12 = psplit_read_eight(A + gr*p.lda + gk + kh);
+@@ -453,7 +453,7 @@
+ 
+ bool wgmma_psplit_can_implement(const Problem& p,int configuration) {
+   return configuration == 0 && megakernel_can_implement(p,0) &&
+-      p.m%128 == 0 && p.n%64 == 0 && p.k%64 == 0 && p.lda%8 == 0 && p.ldb%8 == 0;
++      p.m%128 == 0 && p.n%64 == 0 && p.k%128 == 0 && p.lda%8 == 0 && p.ldb%8 == 0;
+ }
+ bool wgmma_psplit_full_tiles(const Problem& p,const void* A,const void* B,int configuration) {
+   return wgmma_psplit_can_implement(p,configuration) && A && B &&

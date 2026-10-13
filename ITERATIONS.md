@@ -1585,3 +1585,34 @@ Freshfourinstancecompiledgate independentlyPASS, completeobject/bench/test addre
 - **Analysis:** Own complete SW latency determines code benefit; same-row tuned Dense/SW reports the comparison. Numerical/structural/SAN evidence stays separate. Missing unsafe routes will have explicit compiled-safety exclusions rather than invented rows.
 - **Next:** Mandatory full1024 measured safe routes plus retained29/35/Lt1,100calls5groups3fresh; actual validation scope, independent implementation/data audits and source/raw/report/Git closure.
 - **Archive:** trajectory/20261014_032834_iter-34/
+
+### Iter 35 — BK64 P3+4 geometry with fresh compiled safety gate
+
+- **Hypothesis:** Increase BK32 to64 while preserving the successful36 P3+4 dual-consumer scope; halve K-stage count at1024, with four ascendingK16 steps perP perstage, alloriginaltransforms and epilogue insideeach completekernel.
+- **Changes:** New38 uses BM64 BN32 BK64,384threads/producer64/WG96/WG96,full128/empty256/two banks. OnlyBK/A-vectorindex/parentKguardgeometry changes plus distinctrename; whole7P/fixedU/alphaRNbetaFMA/consumer-onlyq/nonaligneddrain6/zeroGWS unchanged. NativeparentK%128; partialKfallback truthful. Old31CUDA preserved, registered37 disabled. Originalnumericalgate/AutoDense unchanged; onlynewfreshcompiledgatedkernels execute.
+- **Bench:** quick20warm20calls5groups1fresh; original numericalFAIL is retained, no certification.
+
+| M,N,K | dtype | route | mode | Dense µs | complete SW µs | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 5.572800 | 6.244800 | 0.892390 | FAIL |
+| 128,128,128 | fp16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 5.636800 | 6.406400 | 0.879870 | FAIL |
+| 256,256,256 | bf16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 5.686400 | 8.860800 | 0.641748 | FAIL |
+| 256,256,256 | fp16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 5.684800 | 8.926400 | 0.636853 | FAIL |
+| 512,512,512 | bf16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 6.296000 | 13.880000 | 0.453602 | FAIL |
+| 512,512,512 | fp16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 6.315200 | 13.944000 | 0.452897 | FAIL |
+| 1024,1024,1024 | bf16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 13.424000 | 24.048001 | 0.558217 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 10.320000 | 24.291199 | 0.424845 | FAIL |
+| 2048,2048,2048 | bf16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 31.654400 | 196.660805 | 0.160959 | FAIL |
+| 2048,2048,2048 | fp16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 32.644799 | 202.663994 | 0.161078 | FAIL |
+| 3072,3072,3072 | bf16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 86.609602 | 719.028807 | 0.120454 | FAIL |
+| 3072,3072,3072 | fp16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 89.007998 | 714.793587 | 0.124523 | FAIL |
+| 4096,4096,4096 | bf16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 194.755197 | 1864.990425 | 0.104427 | FAIL |
+| 4096,4096,4096 | fp16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 205.999994 | 1908.491135 | 0.107939 | FAIL |
+| 1024,512,1024 | bf16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 11.585600 | 24.040000 | 0.481930 | FAIL |
+| 1024,512,1024 | fp16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 11.489600 | 24.320000 | 0.472434 | FAIL |
+| 512,1024,1024 | bf16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 8.188800 | 23.176000 | 0.353331 | FAIL |
+| 512,1024,1024 | fp16 | megakernel_wgmma_psplit_bk64_64x32 v38 | launch | 8.512000 | 23.424000 | 0.363388 | FAIL |
+
+- **Analysis:** Own complete SW latency determines code benefit; same-row tuned Dense/SW reports the comparison. Numerical/structural/SAN evidence stays separate. Missing unsafe routes will have explicit compiled-safety exclusions rather than invented rows.
+- **Next:** Mandatoryfull1024 measured38 plus retainedbest36/29/Lt1,100calls5groups3fresh; actual validation scope, independent implementation/data audits and source/raw/report/Git closure.
+- **Archive:** trajectory/20261014_040812_iter-35/

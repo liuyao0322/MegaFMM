@@ -70,6 +70,7 @@ struct Policy {
   // and tail wait0 remain, original precision and packed7/Dense guards.
   // 36/37=P3+4 two-consumer WGs, both64x32; quotas64/96/96 or64/80/96.
   // Original two-bank transforms and full7P fixedU, one launch, no globalSTP.
+  // 38=P3+4 BK64 two-bank,64x32; quotas64/96/96, parent K%128==0.
   int mega_variant=0;
 };
 class Plan {

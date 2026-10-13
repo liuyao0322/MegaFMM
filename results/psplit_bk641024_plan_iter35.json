@@ -1,0 +1,113 @@
+{
+  "schema": "megafmm.iter35.full1024-plan.v1",
+  "declared_before_measurement": true,
+  "reason": "True singlelaunch1024 active goal; isolate new38 BK64 vs currentbest36 BK32/control29, Lt1multilaunchcontrol. Fullmandatoryregardlessquick3percent.",
+  "shapes": [
+    [
+      1024,
+      1024,
+      1024
+    ]
+  ],
+  "dtypes": [
+    "bf16",
+    "fp16"
+  ],
+  "modes": [
+    "launch",
+    "graph"
+  ],
+  "warmup": 20,
+  "trials": 100,
+  "groups": 5,
+  "correct_trials": 3,
+  "rotate_inputs": 1,
+  "heuristic_candidates": 32,
+  "workspace_limit": 8589934592,
+  "routes": [
+    {
+      "label": "psplit_bk6438",
+      "algorithm": "mega",
+      "variant": 38
+    },
+    {
+      "label": "psplit36",
+      "algorithm": "mega",
+      "variant": 36
+    },
+    {
+      "label": "pipeline29",
+      "algorithm": "mega",
+      "variant": 29
+    },
+    {
+      "label": "packed_lt1",
+      "algorithm": "lt",
+      "variant": 1
+    }
+  ],
+  "timing_contract": "New38 onlyBK32to64/A8vectorindex/parentK%128 plusnames/comments; originalBM64BN32/384/prod64WG96WG96/two-bankfull128empty256/consumer-onlyq/ascendingwholeP-K16/FP32STonecast/fixedU/RNalphaFMA unchanged. Actual4K16/P/stage and1024stage8; allnewMegakernelcallsfreshcurrentAB\u2192ST/P/U insideonekernel,zero nativeglobalSTPworkspace/nohostencode. Tail57344allbank0 stillrequiresbothbankdrain nonaligned6/384 beforetailSTS thenpublication0 beforeU. Graphfixedcapturedaddressesfreshcontents; eventcompleteGPUwork andmedianhostwallof100callsincludingbatchsync/100. Setup/tune/capture excluded; originalnumericalgateFAILvisible.",
+  "reference": "Independently tuned same-rowcuBLASLt beforecapture,32heuristicCandidates/8GiB; Dense/SWtimedinsameordinary/Graphmode. OriginalroundedAB FP64gate unchanged, noGraph-specifictuner.",
+  "frozen_sources": {
+    "CMakeLists.txt": "49db31ede494c7fe6a1c38a59c579a2896a0091a850c89bdbd86efb9c6c4c6a9",
+    "bench/benchmark.cu": "364e92ac4c3750fb760021d7016d41eacd1ed81eb23ec56de845b47af6055906",
+    "include/megafmm/gemm.h": "e17c2c9d9083b8632e42f962e9e236a2a7322c6631250021ec3f5600c3e8237b",
+    "include/megafmm/kernels.h": "b6b504234402ca32220425862295e2799412e89388a767b24808dda4407d4978",
+    "solution/plan.cpp": "f92cf18532222ec80b7a0fa4a1e0160a9a1a58b8a17df0affa3089fefe528f72",
+    "tests/test_correctness.cu": "8ea240cff0e89269e25414e7f57cd224f88703e82b6bf62786741795dcaf4d57",
+    "solution/megakernel_wgmma_psplit_bk64.cu": "d25ebadf929865246a231a3af363054508f376f64246a17b5194c7e7ad950a2c"
+  },
+  "frozen_binaries": {
+    "build/megafmm_bench": "c7e60233d9413703d0a2abbdfc8951370a3e9866bb68ce4778e8cb490407aa64",
+    "build/test_correctness": "a999feca07d08ceda48196b76171ed79e71ca22120e0880ace58f85e8c291c36"
+  },
+  "csv_paths": [
+    "results/small_psplit_bk6438_launch_iter35_full1024.csv",
+    "results/small_psplit_bk6438_graph_iter35_full1024.csv",
+    "results/small_psplit36_launch_iter35_full1024.csv",
+    "results/small_psplit36_graph_iter35_full1024.csv",
+    "results/small_pipeline29_launch_iter35_full1024.csv",
+    "results/small_pipeline29_graph_iter35_full1024.csv",
+    "results/small_packed_lt1_launch_iter35_full1024.csv",
+    "results/small_packed_lt1_graph_iter35_full1024.csv"
+  ],
+  "freeze_status": "Before firsttiming; finalsource7/bin2 frozen. Independent fresh CAN_LAUNCH38 resource/role/API/linkeddevice gate PASS; original numerical/actualGPUchecks pending. Registered37 remainsdisabled and is not a measured route.",
+  "route_configurations": {
+    "38": {
+      "actual_name": "megakernel_wgmma_psplit_bk64_64x32",
+      "producer_quota": 64,
+      "consumer_quotas": [
+        96,
+        96
+      ],
+      "launch_bounds_min_ctas": 1,
+      "enabled": true,
+      "BM": 64,
+      "BN": 32,
+      "BK": 64,
+      "threads": 384,
+      "dynamic_shared_bytes": 172160,
+      "static_shared_bytes": 1024,
+      "drain_barrier": "nonaligned barrier.sync6,384; 3 collective epochs0/6/0",
+      "compiled_gate": "Independent fresh CAN_LAUNCH38 actualsource d25/full3role/newobjectbenchtest"
+    },
+    "36": {
+      "actual_name": "megakernel_wgmma_psplit_64x32",
+      "producer_quota": 64,
+      "consumer_quotas": [
+        96,
+        96
+      ],
+      "launch_bounds_min_ctas": 1,
+      "enabled": true,
+      "BM": 64,
+      "BN": 32,
+      "BK": 32,
+      "threads": 384,
+      "dynamic_shared_bytes": 86144,
+      "static_shared_bytes": 1024
+    }
+  },
+  "expected_row_count": 16,
+  "enabled_row_count": 16
+}

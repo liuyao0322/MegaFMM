@@ -1,0 +1,97 @@
+{
+  "schema": "megafmm.iter35.bk64-source-normalization.v1",
+  "formal_source": "solution/megakernel_wgmma_psplit_bk64.cu",
+  "formal_sha256": "d25ebadf929865246a231a3af363054508f376f64246a17b5194c7e7ad950a2c",
+  "rename_comment_inverse_exact_frozen_candidate": true,
+  "three_geometry_inverse_exact_current_retained36": true,
+  "retained36_sha256": "fdaae75a80893ee161a9db202d4746e86daf3d38135332759098bd9f7faa7f91",
+  "geometry_changes": [
+    "BK32to64",
+    "A_task_div4_and3to_div8_and7",
+    "parentKmod64to128"
+  ],
+  "frozen_CPU_prototype_files": {
+    ".scratch/psplit_bk64_candidate.cu": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_candidate_iter35.cu",
+      "sha256": "55f119259536c1c788f0d8508c8005f820463ef8fa6b316018ea2733caf0d8e1"
+    },
+    ".scratch/psplit_bk64_candidate.diff": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_candidate_iter35.diff",
+      "sha256": "01a89aa9a76507f001e194ae1dd689bea626163010c34ce8a51183c225d80e46"
+    },
+    ".scratch/psplit_bk64_semantic.diff": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_semantic_iter35.diff",
+      "sha256": "b8af599805471d5900400d077c2efe98acba25d49d33cf86c13fb589d38084ec"
+    },
+    ".scratch/psplit_bk64_model.py": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_model_iter35.py",
+      "sha256": "1eb0197f886ad7c160728564cc18c853c2b60792c7283695e3e24de23270c8f7"
+    },
+    ".scratch/psplit_bk64_review.json": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_review_iter35.json",
+      "sha256": "1c39822e56988b8e898274ff77467411affb2a16bfa7998e1727ddd00d87d11e"
+    },
+    ".scratch/psplit_bk64_protocol.md": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_protocol_iter35.md",
+      "sha256": "e3d3347c97ac03723f78b05fadf974f9408cc478704b3ac192f82f92baefddde"
+    },
+    ".scratch/psplit_bk64_manifest.json": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_manifest_iter35.json",
+      "sha256": "2caddaef0db928f9c2fab85cf1ff000dbee1699141dd622714fa434b43548e6b"
+    },
+    ".scratch/psplit_bk64_scope34_baseline.cu": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_scope34_baseline_iter35.cu",
+      "sha256": "fdaae75a80893ee161a9db202d4746e86daf3d38135332759098bd9f7faa7f91"
+    },
+    ".scratch/psplit_bk64_scope34_candidate.cu": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_scope34_candidate_iter35.cu",
+      "sha256": "d119f6cf9e922f870a2acca90803231feb330d8cba134ea91942e101b4b4baeb"
+    },
+    ".scratch/psplit_bk64_scope34_candidate.diff": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_scope34_candidate_iter35.diff",
+      "sha256": "2258b1264c30a742934f64faa5cd61f6ae8cad9586cb9cf7476d76cebb424d02"
+    },
+    ".scratch/psplit_bk64_scope34_model.py": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_scope34_model_iter35.py",
+      "sha256": "524bc7571e8a47668542c6d5cbc88af5184edadf5a9b0e8458a2067b64098ded"
+    },
+    ".scratch/psplit_bk64_scope34_stdout.json": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_scope34_stdout_iter35.json",
+      "sha256": "c36fbd570d8906bf12902490f4697429a089ac8708a848f0da1de85bd5463dcf"
+    },
+    ".scratch/psplit_bk64_scope34_stderr.txt": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_scope34_stderr_iter35.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    ".scratch/psplit_bk64_scope34_cpu.exit": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_scope34_cpu_iter35.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    ".scratch/psplit_bk64_scope34_review.json": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_scope34_review_iter35.json",
+      "sha256": "4d53737e7cc89441c5d58048c2e050075742acd0410c55b3bb80fc1b483f43ef"
+    },
+    ".scratch/psplit_bk64_scope34_protocol.md": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_scope34_protocol_iter35.md",
+      "sha256": "3400ffc3a8898c7037fe25e35cd296b0f00609576ca0bb6d178534ac0d097921"
+    },
+    ".scratch/psplit_bk64_scope34_manifest.json": {
+      "path": "results/psplit_bk64_frozen_psplit_bk64_scope34_manifest_iter35.json",
+      "sha256": "adc13625a2b238b94e27feb994af6237e2a2fa578b9b1fe5a5291447d44146a9"
+    }
+  },
+  "CPU_actual_model_path": ".scratch/psplit_bk64_scope34_model.py",
+  "CPU_actual_model_sha256": "524bc7571e8a47668542c6d5cbc88af5184edadf5a9b0e8458a2067b64098ded",
+  "CPU_stdout_path": "results/psplit_bk64_cpu_geometry_model_iter35.txt",
+  "CPU_exit_path": "results/psplit_bk64_cpu_geometry_model_iter35.exit",
+  "compiled_and_GPU_gate_inherited": false,
+  "comment_changes_after_initial_build": [
+    "A512tasks",
+    "B128tasksforBN16or256foractualBN32"
+  ],
+  "initial_compiled_source_archive": {
+    "path": "results/psplit_bk64_initial_source_iter35.cu",
+    "sha256": "e3a17f99c267593a0a293d84ae02fe20291ab30bae8c850cd692bc062e8a0f15"
+  },
+  "comment_inverse_to_initial_source_exact": true
+}

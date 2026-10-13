@@ -1,0 +1,381 @@
+--- .scratch/cooperative_st_once_psplit_candidate.cu (frozen84e56)
++++ .scratch/psplit_bk64_candidate.cu
+@@ -1,3 +1,5 @@
++// Future scratch BK64 axis with required A-task geometry and full-leaf guard corrections.
++// CPU-only; no actual CuTe/CUDA build, register/resource gate, GPU or timing result.
+ // Scratch-only P3+4 consumer split. No compile, GPU, performance or certification.
+ // One ordinary launch, zero global ST/P workspace, full seven P then fixed U.
+ // Preserves source30 vector producer and source-level per-P ascending K order.
+@@ -23,7 +25,7 @@
+ template <class Layout, int ContiguousMode>
+ // Keep CUDA12.4 constexpr work bounded; full geometry is independently checked
+ // in the frozen CPU prototype. This verifies four aligned edge vectors per slot.
+-constexpr bool psplit_contiguous_eight_sentinels() {
++constexpr bool psplit_bk64_contiguous_eight_sentinels() {
+   constexpr int rows = size<0>(Layout{});
+   constexpr int cols = size<1>(Layout{});
+   constexpr int slots = size<2>(Layout{});
+@@ -46,11 +48,11 @@
+ }
+ 
+ template <class Element, int Cols>
+-struct PSplitTraits {
++struct PSplitBK64Traits {
+   static_assert(Cols == 32,"this prototype uses BN32 only");
+   static constexpr int BM = 64;
+   static constexpr int BN = Cols;
+-  static constexpr int BK = 32;
++  static constexpr int BK = 64;
+   static constexpr int Threads = 384;
+   static constexpr int ProducerThreads = 128;
+   static constexpr int ConsumerThreads = 128; // each independent WG
+@@ -87,13 +89,13 @@
+       "compact product slots must have no padding or overlap");
+   static_assert(BankElements * sizeof(Element) % 128 == 0,
+       "each final bank and the barrier storage must retain 128B alignment");
+-  static_assert(psplit_contiguous_eight_sentinels<LayoutA,1>(),
++  static_assert(psplit_bk64_contiguous_eight_sentinels<LayoutA,1>(),
+       "A edge vectors must be contiguous and 16B aligned in every product slot");
+-  static_assert(psplit_contiguous_eight_sentinels<LayoutB,0>(),
++  static_assert(psplit_bk64_contiguous_eight_sentinels<LayoutB,0>(),
+       "B edge vectors must be contiguous and 16B aligned in every product slot");
+ };
+ 
+-struct PSplitPackedEight {
++struct PSplitBK64PackedEight {
+   uint4 bits;
+   CUTE_DEVICE uint16_t raw(int lane) const {
+     const uint32_t word = lane < 2 ? bits.x : lane < 4 ? bits.y
+@@ -103,8 +105,8 @@
+ };
+ 
+ template <class Element>
+-CUTE_DEVICE PSplitPackedEight psplit_read_eight(const Element* ptr) {
+-  PSplitPackedEight result;
++CUTE_DEVICE PSplitBK64PackedEight psplit_bk64_read_eight(const Element* ptr) {
++  PSplitBK64PackedEight result;
+   asm volatile("ld.global.v4.u32 {%0, %1, %2, %3}, [%4];"
+       : "=r"(result.bits.x),"=r"(result.bits.y),
+         "=r"(result.bits.z),"=r"(result.bits.w)
+@@ -113,11 +115,11 @@
+ }
+ 
+ template <class Element>
+-CUTE_DEVICE float psplit_unpack(const PSplitPackedEight& packed,int lane) {
++CUTE_DEVICE float psplit_bk64_unpack(const PSplitBK64PackedEight& packed,int lane) {
+   return float(Element::bitcast(packed.raw(lane)));
+ }
+ 
+-CUTE_DEVICE void psplit_store_eight(void* ptr,const PSplitPackedEight& v) {
++CUTE_DEVICE void psplit_bk64_store_eight(void* ptr,const PSplitBK64PackedEight& v) {
+   const uint32_t address = uint32_t(__cvta_generic_to_shared(ptr));
+   asm volatile("st.shared.v4.b32 [%0], {%1, %2, %3, %4};"
+       :: "r"(address),"r"(v.bits.x),"r"(v.bits.y),
+@@ -125,7 +127,7 @@
+ }
+ 
+ template <class Element>
+-CUTE_DEVICE uint32_t psplit_round_pair(float even,float odd) {
++CUTE_DEVICE uint32_t psplit_bk64_round_pair(float even,float odd) {
+   cutlass::Array<float,2> source;
+   source[0] = even; source[1] = odd;
+   using Converter = cutlass::NumericArrayConverter<
+@@ -136,115 +138,115 @@
+   return reinterpret_cast<const uint32_t&>(rounded);
+ }
+ 
+-CUTE_DEVICE void psplit_put_word(PSplitPackedEight& out,int pair,uint32_t word) {
++CUTE_DEVICE void psplit_bk64_put_word(PSplitBK64PackedEight& out,int pair,uint32_t word) {
+   if (pair == 0) out.bits.x = word;
+   else if (pair == 1) out.bits.y = word;
+   else if (pair == 2) out.bits.z = word;
+   else out.bits.w = word;
+ }
+ 
+-// Each task owns eight K elements of one row. All256 tasks are assigned once
++// Each task owns eight K elements of one row. All512 BK64 tasks are assigned once
+ // to128 producer threads. Every original quadrant vector is read exactly once
+ // for this CTA/stage and every final seven-slot A element has one writer.
+ template <class Element,class SmemA>
+-CUTE_DEVICE void psplit_fill_a(const Problem& p,const Element* A,
++CUTE_DEVICE void psplit_bk64_fill_a(const Problem& p,const Element* A,
+     int64_t row_base,int64_t k_base,int task,SmemA sA) {
+   const int64_t mh = p.m/2, kh = p.k/2;
+-  const int row = task/4, k = (task&3)*8;
++  const int row = task/8, k = (task&7)*8;
+   const int64_t gr = row_base+row, gk = k_base+k;
+-  const auto a11 = psplit_read_eight(A + gr*p.lda + gk);
+-  const auto a12 = psplit_read_eight(A + gr*p.lda + gk + kh);
+-  const auto a21 = psplit_read_eight(A + (gr+mh)*p.lda + gk);
+-  const auto a22 = psplit_read_eight(A + (gr+mh)*p.lda + gk + kh);
+-  psplit_store_eight(&sA(row,k,0),a11);
+-  psplit_store_eight(&sA(row,k,1),a12);
+-  psplit_store_eight(&sA(row,k,3),a22);
+-  PSplitPackedEight s1{make_uint4(0,0,0,0)},s2{make_uint4(0,0,0,0)};
+-  PSplitPackedEight s3{make_uint4(0,0,0,0)},s4{make_uint4(0,0,0,0)};
++  const auto a11 = psplit_bk64_read_eight(A + gr*p.lda + gk);
++  const auto a12 = psplit_bk64_read_eight(A + gr*p.lda + gk + kh);
++  const auto a21 = psplit_bk64_read_eight(A + (gr+mh)*p.lda + gk);
++  const auto a22 = psplit_bk64_read_eight(A + (gr+mh)*p.lda + gk + kh);
++  psplit_bk64_store_eight(&sA(row,k,0),a11);
++  psplit_bk64_store_eight(&sA(row,k,1),a12);
++  psplit_bk64_store_eight(&sA(row,k,3),a22);
++  PSplitBK64PackedEight s1{make_uint4(0,0,0,0)},s2{make_uint4(0,0,0,0)};
++  PSplitBK64PackedEight s3{make_uint4(0,0,0,0)},s4{make_uint4(0,0,0,0)};
+   CUTE_UNROLL
+   for (int pair = 0; pair < 4; ++pair) {
+     float f1[2],f2[2],f3[2],f4[2];
+     CUTE_UNROLL
+     for (int j = 0; j < 2; ++j) {
+       const int lane = 2*pair+j;
+-      const float x11 = psplit_unpack<Element>(a11,lane);
+-      const float x12 = psplit_unpack<Element>(a12,lane);
+-      const float x21 = psplit_unpack<Element>(a21,lane);
+-      const float x22 = psplit_unpack<Element>(a22,lane);
++      const float x11 = psplit_bk64_unpack<Element>(a11,lane);
++      const float x12 = psplit_bk64_unpack<Element>(a12,lane);
++      const float x21 = psplit_bk64_unpack<Element>(a21,lane);
++      const float x22 = psplit_bk64_unpack<Element>(a22,lane);
+       f1[j] = __fadd_rn(x21,x22);
+       f2[j] = __fsub_rn(f1[j],x11);
+       f3[j] = __fsub_rn(x11,x21);
+       f4[j] = __fsub_rn(x12,f2[j]);
+     }
+-    psplit_put_word(s1,pair,psplit_round_pair<Element>(f1[0],f1[1]));
+-    psplit_put_word(s2,pair,psplit_round_pair<Element>(f2[0],f2[1]));
+-    psplit_put_word(s3,pair,psplit_round_pair<Element>(f3[0],f3[1]));
+-    psplit_put_word(s4,pair,psplit_round_pair<Element>(f4[0],f4[1]));
+-  }
+-  psplit_store_eight(&sA(row,k,2),s4);
+-  psplit_store_eight(&sA(row,k,4),s1);
+-  psplit_store_eight(&sA(row,k,5),s2);
+-  psplit_store_eight(&sA(row,k,6),s3);
+-}
+-
+-// BN16:64 tasks; BN32:128 tasks. All use vector8 original reads/stores.
++    psplit_bk64_put_word(s1,pair,psplit_bk64_round_pair<Element>(f1[0],f1[1]));
++    psplit_bk64_put_word(s2,pair,psplit_bk64_round_pair<Element>(f2[0],f2[1]));
++    psplit_bk64_put_word(s3,pair,psplit_bk64_round_pair<Element>(f3[0],f3[1]));
++    psplit_bk64_put_word(s4,pair,psplit_bk64_round_pair<Element>(f4[0],f4[1]));
++  }
++  psplit_bk64_store_eight(&sA(row,k,2),s4);
++  psplit_bk64_store_eight(&sA(row,k,4),s1);
++  psplit_bk64_store_eight(&sA(row,k,5),s2);
++  psplit_bk64_store_eight(&sA(row,k,6),s3);
++}
++
++// BN32/BK64:256 tasks. All use the unchanged vector8 original reads/stores.
+ // A temporaries are dead before this helper starts; there is no raw shared bank.
+ template <class Element,int Cols,class SmemB>
+-CUTE_DEVICE void psplit_fill_b(const Problem& p,const Element* B,
++CUTE_DEVICE void psplit_bk64_fill_b(const Problem& p,const Element* B,
+     int64_t col_base,int64_t k_base,int task,SmemB sB) {
+   constexpr int VectorsPerRow = Cols/8;
+   const int64_t nh = p.n/2, kh = p.k/2;
+   const int k = task/VectorsPerRow, col = (task%VectorsPerRow)*8;
+   const int64_t gk = k_base+k, gc = col_base+col;
+-  const auto b11 = psplit_read_eight(B + gk*p.ldb + gc);
+-  const auto b12 = psplit_read_eight(B + gk*p.ldb + gc + nh);
+-  const auto b21 = psplit_read_eight(B + (gk+kh)*p.ldb + gc);
+-  const auto b22 = psplit_read_eight(B + (gk+kh)*p.ldb + gc + nh);
+-  psplit_store_eight(&sB(col,k,0),b11);
+-  psplit_store_eight(&sB(col,k,1),b21);
+-  psplit_store_eight(&sB(col,k,2),b22);
+-  PSplitPackedEight t1{make_uint4(0,0,0,0)},t2{make_uint4(0,0,0,0)};
+-  PSplitPackedEight t3{make_uint4(0,0,0,0)},t4{make_uint4(0,0,0,0)};
++  const auto b11 = psplit_bk64_read_eight(B + gk*p.ldb + gc);
++  const auto b12 = psplit_bk64_read_eight(B + gk*p.ldb + gc + nh);
++  const auto b21 = psplit_bk64_read_eight(B + (gk+kh)*p.ldb + gc);
++  const auto b22 = psplit_bk64_read_eight(B + (gk+kh)*p.ldb + gc + nh);
++  psplit_bk64_store_eight(&sB(col,k,0),b11);
++  psplit_bk64_store_eight(&sB(col,k,1),b21);
++  psplit_bk64_store_eight(&sB(col,k,2),b22);
++  PSplitBK64PackedEight t1{make_uint4(0,0,0,0)},t2{make_uint4(0,0,0,0)};
++  PSplitBK64PackedEight t3{make_uint4(0,0,0,0)},t4{make_uint4(0,0,0,0)};
+   CUTE_UNROLL
+   for (int pair = 0; pair < 4; ++pair) {
+     float f1[2],f2[2],f3[2],f4[2];
+     CUTE_UNROLL
+     for (int j = 0; j < 2; ++j) {
+       const int lane = 2*pair+j;
+-      const float x11 = psplit_unpack<Element>(b11,lane);
+-      const float x12 = psplit_unpack<Element>(b12,lane);
+-      const float x21 = psplit_unpack<Element>(b21,lane);
+-      const float x22 = psplit_unpack<Element>(b22,lane);
++      const float x11 = psplit_bk64_unpack<Element>(b11,lane);
++      const float x12 = psplit_bk64_unpack<Element>(b12,lane);
++      const float x21 = psplit_bk64_unpack<Element>(b21,lane);
++      const float x22 = psplit_bk64_unpack<Element>(b22,lane);
+       f1[j] = __fsub_rn(x12,x11);
+       f2[j] = __fsub_rn(x22,f1[j]);
+       f3[j] = __fsub_rn(x22,x12);
+       f4[j] = __fsub_rn(f2[j],x21);
+     }
+-    psplit_put_word(t1,pair,psplit_round_pair<Element>(f1[0],f1[1]));
+-    psplit_put_word(t2,pair,psplit_round_pair<Element>(f2[0],f2[1]));
+-    psplit_put_word(t3,pair,psplit_round_pair<Element>(f3[0],f3[1]));
+-    psplit_put_word(t4,pair,psplit_round_pair<Element>(f4[0],f4[1]));
+-  }
+-  psplit_store_eight(&sB(col,k,3),t4);
+-  psplit_store_eight(&sB(col,k,4),t1);
+-  psplit_store_eight(&sB(col,k,5),t2);
+-  psplit_store_eight(&sB(col,k,6),t3);
++    psplit_bk64_put_word(t1,pair,psplit_bk64_round_pair<Element>(f1[0],f1[1]));
++    psplit_bk64_put_word(t2,pair,psplit_bk64_round_pair<Element>(f2[0],f2[1]));
++    psplit_bk64_put_word(t3,pair,psplit_bk64_round_pair<Element>(f3[0],f3[1]));
++    psplit_bk64_put_word(t4,pair,psplit_bk64_round_pair<Element>(f4[0],f4[1]));
++  }
++  psplit_bk64_store_eight(&sB(col,k,3),t4);
++  psplit_bk64_store_eight(&sB(col,k,4),t1);
++  psplit_bk64_store_eight(&sB(col,k,5),t2);
++  psplit_bk64_store_eight(&sB(col,k,6),t3);
+ }
+ 
+ 
+ // Tail FP32 rendezvous aliases the complete drained TWO-bank operands payload.
+ // XOR permutation is a bijection within each row, does not add padding, and is
+ // separate from the WGMMA layouts used only before the first tail CTA barrier.
+-CUTE_DEVICE int psplit_tail_word(int product,int row,int col) {
++CUTE_DEVICE int psplit_bk64_tail_word(int product,int row,int col) {
+   const int xor_mask = (row&1) | ((row&6)<<2);
+   return product*2048+row*32+(col^xor_mask);
+ }
+ 
+ template <class Element,int Cols>
+ __global__ __launch_bounds__(384,1)
+-void winograd_wgmma_psplit(Problem p,const Element* __restrict__ A,
++void winograd_wgmma_psplit_bk64(Problem p,const Element* __restrict__ A,
+     const Element* __restrict__ B,const float* C0,float* D) {
+-  using T = PSplitTraits<Element,Cols>;
++  using T = PSplitBK64Traits<Element,Cols>;
+   using Pipeline = typename T::Pipeline;
+   const int tid = int(threadIdx.x);
+   const int64_t row_base = int64_t(blockIdx.x)*T::BM;
+@@ -292,10 +294,10 @@
+       auto sB = make_tensor(make_smem_ptr(bank+T::ElementsA),typename T::LayoutB{});
+       CUTE_UNROLL
+       for (int task = tid; task < T::BM*T::BK/8; task += T::ProducerThreads)
+-        psplit_fill_a(p,A,row_base,k_base,task,sA);
++        psplit_bk64_fill_a(p,A,row_base,k_base,task,sA);
+       CUTE_UNROLL
+       for (int task = tid; task < T::BN*T::BK/8; task += T::ProducerThreads)
+-        psplit_fill_b<Element,Cols>(p,B,col_base,k_base,task,sB);
++        psplit_bk64_fill_b<Element,Cols>(p,B,col_base,k_base,task,sB);
+       // Each writer fences its own generic shared stores into WGMMA's async
+       // proxy before its full-barrier arrival. The128th arrival publishes all.
+       asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
+@@ -325,7 +327,7 @@
+       if (tid >= 256) warpgroup_fence_operand(q3);
+       warpgroup_arrive();
+       // Both paths are warpgroup-uniform. Each P retains the original N32 atom,
+-      // two ascending K16 steps/stage and a complete ascending whole-K sum.
++      // four ascending K16 steps/stage and a complete ascending whole-K sum.
+       if (tid < 256) {
+         gemm(mma,tCrA(_,_,_,Int<0>{}),tCrB(_,_,_,Int<0>{}),q0); // P1
+         gemm(mma,tCrA(_,_,_,Int<1>{}),tCrB(_,_,_,Int<1>{}),q1); // P2
+@@ -356,10 +358,10 @@
+     for (int i = 0; i < size(q0); ++i) {
+       const auto c = coords(i);
+       const int row = get<0>(c),col = get<1>(c);
+-      tail[psplit_tail_word(first_product+0,row,col)] = q0(i);
+-      tail[psplit_tail_word(first_product+1,row,col)] = q1(i);
+-      tail[psplit_tail_word(first_product+2,row,col)] = q2(i);
+-      if (tid >= 256) tail[psplit_tail_word(6,row,col)] = q3(i);
++      tail[psplit_bk64_tail_word(first_product+0,row,col)] = q0(i);
++      tail[psplit_bk64_tail_word(first_product+1,row,col)] = q1(i);
++      tail[psplit_bk64_tail_word(first_product+2,row,col)] = q2(i);
++      if (tid >= 256) tail[psplit_bk64_tail_word(6,row,col)] = q3(i);
+     }
+   }
+   // Complete all14336 FP32 P words before any generic U load across WGs.
+@@ -370,13 +372,13 @@
+     const int64_t mh = p.m/2,nh = p.n/2;
+     // Each unique U owner loads all seven products once; no partial P sum,
+     // atomics, changed contribution ordering, or output scratch is introduced.
+-    const float p1 = tail[psplit_tail_word(0,local_row,local_col)];
+-    const float p2 = tail[psplit_tail_word(1,local_row,local_col)];
+-    const float p3 = tail[psplit_tail_word(2,local_row,local_col)];
+-    const float p4 = tail[psplit_tail_word(3,local_row,local_col)];
+-    const float p5 = tail[psplit_tail_word(4,local_row,local_col)];
+-    const float p6 = tail[psplit_tail_word(5,local_row,local_col)];
+-    const float p7 = tail[psplit_tail_word(6,local_row,local_col)];
++    const float p1 = tail[psplit_bk64_tail_word(0,local_row,local_col)];
++    const float p2 = tail[psplit_bk64_tail_word(1,local_row,local_col)];
++    const float p3 = tail[psplit_bk64_tail_word(2,local_row,local_col)];
++    const float p4 = tail[psplit_bk64_tail_word(3,local_row,local_col)];
++    const float p5 = tail[psplit_bk64_tail_word(4,local_row,local_col)];
++    const float p6 = tail[psplit_bk64_tail_word(5,local_row,local_col)];
++    const float p7 = tail[psplit_bk64_tail_word(6,local_row,local_col)];
+     const float u1 = __fadd_rn(p1,p2);
+     const float u2 = __fadd_rn(p1,p6);
+     const float u3 = __fadd_rn(u2,p7);
+@@ -400,41 +402,41 @@
+ }
+ 
+ template <class Element>
+-void prepare_wgmma_psplit_typed() {
+-  constexpr size_t shared = PSplitTraits<Element,32>::SharedBytes;
++void prepare_wgmma_psplit_bk64_typed() {
++  constexpr size_t shared = PSplitBK64Traits<Element,32>::SharedBytes;
+   static_assert(shared > 48*1024 && shared < 227*1024,"H100 two-bank shared budget");
+-  const auto e = cudaFuncSetAttribute(winograd_wgmma_psplit<Element,32>,
++  const auto e = cudaFuncSetAttribute(winograd_wgmma_psplit_bk64<Element,32>,
+       cudaFuncAttributeMaxDynamicSharedMemorySize,int(shared));
+   if (e != cudaSuccess) throw std::runtime_error(std::string("Psplit shared opt-in: ")+cudaGetErrorString(e));
+ }
+ 
+ template <class Element>
+-void launch_wgmma_psplit_typed(const Problem& p,const void* A,const void* B,
++void launch_wgmma_psplit_bk64_typed(const Problem& p,const void* A,const void* B,
+     const float* C0,float* D,cudaStream_t stream) {
+-  using T = PSplitTraits<Element,32>;
++  using T = PSplitBK64Traits<Element,32>;
+   const dim3 grid(unsigned(p.m/(2*T::BM)),unsigned(p.n/(2*T::BN)));
+-  winograd_wgmma_psplit<Element,32><<<grid,T::Threads,T::SharedBytes,stream>>>(
++  winograd_wgmma_psplit_bk64<Element,32><<<grid,T::Threads,T::SharedBytes,stream>>>(
+       p,static_cast<const Element*>(A),static_cast<const Element*>(B),C0,D);
+ }
+ } // namespace
+ 
+-bool wgmma_psplit_can_implement(const Problem& p,int configuration) {
++bool wgmma_psplit_bk64_can_implement(const Problem& p,int configuration) {
+   return configuration == 0 && megakernel_can_implement(p,0) &&
+-      p.m%128 == 0 && p.n%64 == 0 && p.k%64 == 0 && p.lda%8 == 0 && p.ldb%8 == 0;
+-}
+-bool wgmma_psplit_full_tiles(const Problem& p,const void* A,const void* B,int configuration) {
+-  return wgmma_psplit_can_implement(p,configuration) && A && B &&
++      p.m%128 == 0 && p.n%64 == 0 && p.k%128 == 0 && p.lda%8 == 0 && p.ldb%8 == 0;
++}
++bool wgmma_psplit_bk64_full_tiles(const Problem& p,const void* A,const void* B,int configuration) {
++  return wgmma_psplit_bk64_can_implement(p,configuration) && A && B &&
+       (reinterpret_cast<uintptr_t>(A)&15) == 0 && (reinterpret_cast<uintptr_t>(B)&15) == 0;
+ }
+-void prepare_wgmma_psplit(const Problem& p,int configuration) {
+-  if (!wgmma_psplit_can_implement(p,configuration))
++void prepare_wgmma_psplit_bk64(const Problem& p,int configuration) {
++  if (!wgmma_psplit_bk64_can_implement(p,configuration))
+     throw std::invalid_argument("unsupported Psplit metadata/configuration");
+-  if (p.dtype == DType::BF16) prepare_wgmma_psplit_typed<cutlass::bfloat16_t>();
+-  else prepare_wgmma_psplit_typed<cutlass::half_t>();
+-}
+-void launch_wgmma_psplit(const Problem& p,const void* A,const void* B,
++  if (p.dtype == DType::BF16) prepare_wgmma_psplit_bk64_typed<cutlass::bfloat16_t>();
++  else prepare_wgmma_psplit_bk64_typed<cutlass::half_t>();
++}
++void launch_wgmma_psplit_bk64(const Problem& p,const void* A,const void* B,
+     const float* C0,float* D,cudaStream_t stream,int configuration) {
+-  if (!wgmma_psplit_can_implement(p,configuration) || !wgmma_psplit_full_tiles(p,A,B,configuration))
++  if (!wgmma_psplit_bk64_can_implement(p,configuration) || !wgmma_psplit_bk64_full_tiles(p,A,B,configuration))
+     throw std::invalid_argument("Psplit requires native full tiles and current AB16B");
+   if (!D || (p.beta != 0.0f && !C0)) throw std::invalid_argument("Psplit active output/source is null");
+   // Native-only helper. Integrating Plan retains common current span/end,
+@@ -442,7 +444,7 @@
+   // invalid policy before empty/scale, truthful packed7/Dense fallback and Auto.
+   // prepare is outside timing. Every run/capture reads current original AB;
+   // replay fixed captured addresses still recomputes fresh ST on device.
+-  if (p.dtype == DType::BF16) launch_wgmma_psplit_typed<cutlass::bfloat16_t>(p,A,B,C0,D,stream);
+-  else launch_wgmma_psplit_typed<cutlass::half_t>(p,A,B,C0,D,stream);
++  if (p.dtype == DType::BF16) launch_wgmma_psplit_bk64_typed<cutlass::bfloat16_t>(p,A,B,C0,D,stream);
++  else launch_wgmma_psplit_bk64_typed<cutlass::half_t>(p,A,B,C0,D,stream);
+ }
+ } // namespace megafmm

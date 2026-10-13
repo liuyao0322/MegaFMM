@@ -104,3 +104,15 @@
 ### Iteration34 final scope before timing
 
 Mega36 restores64/96/96 after consumer-only accumulator scope repair; same whole-K7P/fixedU and two-bank ST. Three collective CTA epochs are initbar0, nonaligned drainbar6 count384, publishbar0. Mega37 64/80/96 still has actual STACK128/spill384store256load/C7512 and is publicly disabled before degenerate handling; raw helpers reject. Measure legal16 of expected20 rows with four explicit compiled-safety exclusions. Do not execute blocked37 or claim original60strict/sixSAN: current strict30 and threeSAN scope is Mega36 only. Originaldefault/strict/precision gates remain unchanged for enabled candidates.
+
+
+## Current experimental evidence (iteration34)
+
+- Final legal Mega36 P3+4 dualconsumer, producer64/WG96/WG96 and consumer-only accumulators/nonaligned drain6, improves own complete1024 latency versus samebinary29 by7.394%/7.039% ordinary BF/FP and7.217%/7.821% Graph. Ordinary23.426239/23.645761us, Graph23.054399/23.157120us; original FP64gate stillFAIL. Mega37 compiledSTACK/spill/C7512 remains publiclydisabled/no native37 launches. AutoDense and goalactive unchanged.
+- All16 legalrows48fresh originalFAIL NF0, strict36only30=18PASS12FAIL NF0, default2298CASE1361PASS, selected36/93, threeCUDA12.8SANzeroerror/memleak0. Full1560 is unexecuted source-domain; scope doesnotclaim blocked37 checks. PreserveallfiveDense groups, including ordinaryFP DenseCV26.632093%; SWownlatency determines gain.
+
+## Current experimental direction (iteration35)
+
+- From the authorized continuing1024 singlelaunch goal: add onlyMega38 BK64 at BM64/BN32,384threads/producer64/two96consumers/twooperandbanks, preserving successful36consumer-onlyscope/nonalignedbarrier.sync6,384/threeCTAcollectiveepochs/wholeascendingP-K16/fixedU/FP32STonecast/RNalphaFMA/currentguards/AutoDense. OnlyBK32to64,Atask/4&3to/8&7,parentKguard%64to%128; noTMA/threebank/emptyrelease1/precisionaxis.
+- Requiredbeforefirstlaunch: newactualfeedingPTX/ELF/objectbenchtest/full3roleCFGimplicitwidth/ownedinitialpool/direction/afterincaccinit/noinflightgenericP/STACKLOCALspill0 and actualsharedhostoptin. Predicted172160 is notactualproof. EachP has4K16perstage,1024stage8; tailallbank0 butbothbankdrain remains. ID38 explicitlyN32/reference36, registered37 remainsblocked beforedegenerate, max38invalid39.
+- Mandatorysamebinaryfull1024 new38/currentbest36/control29/multi-launchLt1 bothdtype ordinaryGraph16rows,20warm100calls5groups3fresh/rotate1/32Lt8GiB regardlessquick3percent. ReportSWown changesvs36/29,same-rowindependentlytunedDense/SW,event+100callbatchwall andalloriginalFAIL/NF; originalFP64gate/floors unchanged. Default/selected38,newstrict30/3serialCUDA12.8SAN/CPUactualstdout+exit/newindependentcompiled/datafinalreviews required. Preserve31oldCUDA/source23–34evidencebytes.
