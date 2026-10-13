@@ -1,0 +1,24 @@
+{
+  "model_path": "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_selective_tmaA_root_future40_model.py",
+  "model_sha256": "57284d4f3ecee1039bf955901ad70e443d6786980dc57997de58824c55703d77",
+  "removed_statements": [
+    {
+      "line": 583,
+      "statement": "assert all(not p.exists() for p in out.values())"
+    },
+    {
+      "line": 584,
+      "statement": "out[\"candidate\"].write_text(source)"
+    },
+    {
+      "line": 585,
+      "statement": "out[\"delta\"].write_text(json.dumps({\"scope\":\"names/rawA SW128+required alignment/TMA raw stage+single-currentA host descriptor/necessary A stride bound only\",\n    \"parent_path\":str(PARENT),\"parent_sha256\":PARENT_SHA,\"candidate_path\":str(out[\"candidate\"]),\n    \"candidate_sha256\":sha(out[\"candidate\"]),\"ordered_exact_replacements\":changes,\n    \"forward_inverse_exact\":True,\"normalized_unchanged_sections_sha256\":sections},indent=2)+\"\\n\")"
+    },
+    {
+      "line": 617,
+      "statement": "out[\"review\"].write_text(json.dumps(report,indent=2)+\"\\n\")"
+    }
+  ],
+  "writes_denied": true,
+  "scope": "Actual reexecution of old model mathematics/source checks with artifact-writing tail removed; no CUDA allocation or hardware proof."
+}

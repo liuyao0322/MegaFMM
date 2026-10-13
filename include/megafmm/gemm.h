@@ -79,6 +79,7 @@ struct Policy {
   // 43=SS BN16 BK32 P3+4, finalA7/finalB7; initial quotas64/80/80 and minCTAs2.
   // WholeK/fixedU/onecast and currentAB16/parentK%64; actual fresh gate required.
   // 44=BK64 RS-A single owning stageA; perP fourK16 commit/wait0 before A reuse.
+  // 45=BK64 RS-A rawA4 TMA/finalB7 SIMT; one currentA map per run, A lda<2^39.
   int mega_variant=0;
 };
 class Plan {

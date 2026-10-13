@@ -1,0 +1,192 @@
+{
+  "base_sha256": "e4de81a44de4931ad3f227ff25f245bb9f3181186670e26dd9f0607c543123b7",
+  "source_sha256": "da1f6e02386f3f6366637e31e30d22c4ccb459ed98db222307b7b83f22444473",
+  "inverse_normalization_byte_identical": true,
+  "inverse_normalized_sha256": "e4de81a44de4931ad3f227ff25f245bb9f3181186670e26dd9f0607c543123b7",
+  "delimiter_balance_check": true,
+  "trailing_whitespace_check": true,
+  "operations": [
+    {
+      "old": "const char* warp_mma_name(int variant,const megafmm::Problem& p) {\n",
+      "new": "const char* warp_mma_name(int variant,const megafmm::Problem& p) {\n  if(variant==45) {\n    if(p.lda%8!=0 || p.ldb%8!=0)return \"dense_cublaslt\";\n    // Only rawA uses TMA; B remains SIMT and has no tensor-map stride bound.\n    return p.m%128==0 && p.n%64==0 && p.k%128==0 && uint64_t(p.lda)<(uint64_t(1)<<39) ?\n           \"megakernel_wgmma_psplit_selective_tma_a_64x32\":\n           \"megakernel_warp_mma_packed\";\n  }\n",
+      "count": 1
+    },
+    {
+      "old": " || variant==43 || variant==44)",
+      "new": " || variant==43 || variant==44 || variant==45)",
+      "count": 2
+    },
+    {
+      "old": " || variant==43 || variant==44,\"",
+      "new": " || variant==43 || variant==44 || variant==45,\"",
+      "count": 2
+    },
+    {
+      "old": "needs enabled Mega30..36 or Mega38..44",
+      "new": "needs enabled Mega30..36 or Mega38..45",
+      "count": 2
+    },
+    {
+      "old": "  return variant==44 ? \"PSPLIT_MICROBATCH\":",
+      "new": "  return variant==45 ? \"PSPLIT_SELECTIVE_TMA_A\":variant==44 ? \"PSPLIT_MICROBATCH\":",
+      "count": 1
+    },
+    {
+      "old": "  return variant==38 || variant==39 || variant==44;",
+      "new": "  return variant==38 || variant==39 || variant==44 || variant==45;",
+      "count": 1
+    },
+    {
+      "old": "std::vector<int> wgmma_scheduled_parent_ks(int variant,bool bitwise=false) {\n",
+      "new": "bool psplit_selective_tma_a_route_enabled() {\n  static int cached=-1;\n  if(cached>=0)return cached!=0;\n  int enabled_dtypes=0,disabled_dtypes=0;\n  for(auto dtype:{megafmm::DType::BF16,megafmm::DType::FP16}) {\n    auto p=problem(128,64,128,dtype);\n    megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::Megakernel;\n    policy.mega_variant=45;policy.certified_range=true;policy.workspace_limit=0;\n    try {\n      auto plan=megafmm::create_plan(p,policy);\n      require(plan->algorithm_name()==warp_mma_name(45,p) && plan->workspace_bytes()==0,\n              \"selective TMA-A45 registered route silently substituted another algorithm\");\n      ++enabled_dtypes;\n    } catch(const std::invalid_argument& e) {\n      const std::string message=e.what();\n      if(message.find(\"disabled\")==std::string::npos || message.find(\"45\")==std::string::npos)throw;\n      ++disabled_dtypes;\n    }\n  }\n  require(enabled_dtypes==2 || disabled_dtypes==2,\"selective TMA-A45 enable state differs between dtypes\");\n  cached=enabled_dtypes==2;\n  std::cout << \"SELECTIVE_TMA_A_ROUTE_SCOPE variant=45 enabled=\" << cached\n            << \" dtypes=2 metadata_only=1 native_runs=0\\n\";\n  return cached!=0;\n}\nvoid psplit_selective_tma_a_blocked_policy_suite() {\n  require(!psplit_selective_tma_a_route_enabled(),\"selective TMA-A blocked policy requires an explicitly disabled45 route\");\n  size_t rejected_cases=0,auto_dense_cases=0;\n  for(auto dtype:{megafmm::DType::BF16,megafmm::DType::FP16}) {\n    megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::Megakernel;\n    policy.mega_variant=45;policy.certified_range=true;policy.workspace_limit=0;\n    for(int scenario=0;scenario<4;++scenario) {\n      auto p=problem(128,64,128,dtype);\n      if(scenario==1)p.m=0;if(scenario==2)p.alpha=0;if(scenario==3)p.k=0;\n      bool rejected=false;\n      try {auto plan=megafmm::create_plan(p,policy);}\n      catch(const std::invalid_argument& e) {\n        const std::string message=e.what();\n        rejected=message.find(\"disabled\")!=std::string::npos && message.find(\"45\")!=std::string::npos;\n      }\n      require(rejected,\"disabled selective TMA-A45 accepted before normal/empty/alpha0/K0 dispatch\");\n      ++rejected_cases;\n    }\n    policy.algorithm=megafmm::Algorithm::Auto;\n    auto p=problem(128,64,128,dtype);\n    require(megafmm::create_plan(p,policy)->algorithm_name()==\"dense_cublaslt\",\n            \"Auto selective TMA-A metadata did not retain Dense policy\");\n    ++auto_dense_cases;\n  }\n  std::cout << \"PASS_WGMMA_PSPLIT_SELECTIVE_TMA_A_BLOCKED_POLICY variant=45 forced_rejections=\" << rejected_cases\n            << \" validate_before_empty_scale=1 auto_dense_dtypes=\" << auto_dense_cases << \" native_runs=0\\n\";\n}\nvoid psplit_selective_tma_a_stride_metadata_suite() {\n  // These shapes have valid finite size_t spans, but are never allocated or run.\n  // TMA encode is a launch-only operation; Plan metadata setup cannot encode A.\n  constexpr int64_t limit=int64_t(1)<<39;\n  size_t cases=0,native_cases=0,packed_cases=0,dense_cases=0;\n  for(auto dtype:{megafmm::DType::BF16,megafmm::DType::FP16})\n  for(int scenario=0;scenario<5;++scenario) {\n    auto p=problem(128,64,128,dtype);\n    if(scenario==0)p.lda=limit-8;\n    if(scenario==1)p.lda=limit;\n    if(scenario==2)p.lda=limit+8;\n    if(scenario==3)p.lda=limit+1;\n    if(scenario==4)p.ldb=limit; // B is SIMT: the A-only bound must not reject B.\n    const size_t a_span=(size_t(p.m-1)*size_t(p.lda)+size_t(p.k))*2;\n    const size_t b_span=(size_t(p.k-1)*size_t(p.ldb)+size_t(p.n))*2;\n    require(a_span<(size_t(1)<<48) && b_span<(size_t(1)<<48),\"selective TMA-A metadata span is not safely bounded\");\n    const bool native=scenario==0 || scenario==4;\n    require(megafmm::wgmma_psplit_selective_tma_a_can_implement(p,0)==native,\n            \"selective TMA-A guard incorrectly handles A-only stride bound or SIMT B\");\n    const char* expected=warp_mma_name(45,p);\n    std::cout << \"BEGIN_WGMMA_PSPLIT_SELECTIVE_TMA_A_STRIDE_METADATA dtype=\" << megafmm::dtype_name(dtype)\n              << \" variant=45 scenario=\" << scenario << \" lda=\" << p.lda << \" ldb=\" << p.ldb\n              << \" expected=\" << expected << \" native_guard=\" << native\n              << \" safe_a_span_bytes=\" << a_span << \" safe_b_span_bytes=\" << b_span << \" metadata_only=1 native_runs=0\" << std::endl;\n    megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::Megakernel;\n    policy.mega_variant=45;policy.certified_range=true;policy.workspace_limit=0;\n    auto plan=megafmm::create_plan(p,policy);\n    require(plan->algorithm_name()==expected,\"selective TMA-A Plan stride boundary route differs before encode\");\n    if(native || scenario==1 || scenario==2)require(plan->workspace_bytes()==0,\"metadata native/P7 route unexpectedly allocated workspace\");\n    std::cout << \"META_WGMMA_PSPLIT_SELECTIVE_TMA_A_STRIDE_METADATA dtype=\" << megafmm::dtype_name(dtype)\n              << \" variant=45 scenario=\" << scenario << \" lda=\" << p.lda << \" ldb=\" << p.ldb\n              << \" actual=\" << plan->algorithm_name() << \" native_guard=\" << native\n              << \" safe_a_span_bytes=\" << a_span << \" safe_b_span_bytes=\" << b_span\n              << \" metadata_only=1 allocated_input_bytes=0 tensor_map_encodes=0 native_runs=0\\n\";\n    ++cases;native_cases+=native;packed_cases+=scenario==1 || scenario==2;dense_cases+=scenario==3;\n  }\n  std::cout << \"PASS_WGMMA_PSPLIT_SELECTIVE_TMA_A_STRIDE_METADATA variant=45 cases=\" << cases\n            << \" native_guard_cases=\" << native_cases << \" packed_guard_cases=\" << packed_cases << \" dense_guard_cases=\" << dense_cases\n            << \" A_only_limit=549755813888 B_bound_not_applied=1 metadata_only=1 allocated_input_bytes=0 tensor_map_encodes=0 native_runs=0\\n\";\n}\nstd::vector<int> wgmma_scheduled_parent_ks(int variant,bool bitwise=false) {\n",
+      "count": 1
+    },
+    {
+      "old": "variant==44 ? 39:variant==39 ? 38:",
+      "new": "variant==45 || variant==44 ? 39:variant==39 ? 38:",
+      "count": 1
+    },
+    {
+      "old": "                  variant==44 ? \" reference=sameatom_N32_bk64_rsa39_raw_u+specified_host_epilogue\":",
+      "new": "                  variant==45 || variant==44 ? \" reference=sameatom_N32_bk64_rsa39_raw_u+specified_host_epilogue\":",
+      "count": 1
+    },
+    {
+      "old": " && variant!=43 && variant!=44)continue;",
+      "new": " && variant!=43 && variant!=44 && variant!=45)continue;",
+      "count": 1
+    },
+    {
+      "old": "(variant==44 ? \"BEGIN_WGMMA_PSPLIT_MICROBATCH_EPILOGUE_REBIND dtype=\":",
+      "new": "(variant==45 ? \"BEGIN_WGMMA_PSPLIT_SELECTIVE_TMA_A_EPILOGUE_REBIND dtype=\":variant==44 ? \"BEGIN_WGMMA_PSPLIT_MICROBATCH_EPILOGUE_REBIND dtype=\":",
+      "count": 1
+    },
+    {
+      "old": "(variant==44 ? \"PASS_WGMMA_PSPLIT_MICROBATCH_EPILOGUE_REBIND dtype=\":",
+      "new": "(variant==45 ? \"PASS_WGMMA_PSPLIT_SELECTIVE_TMA_A_EPILOGUE_REBIND dtype=\":variant==44 ? \"PASS_WGMMA_PSPLIT_MICROBATCH_EPILOGUE_REBIND dtype=\":",
+      "count": 1
+    },
+    {
+      "old": "invalid.mega_variant=45;",
+      "new": "invalid.mega_variant=46;",
+      "count": 2
+    },
+    {
+      "old": "invalid Mega45 accepted",
+      "new": "invalid Mega46 accepted",
+      "count": 2
+    },
+    {
+      "old": "invalid45_cases",
+      "new": "invalid46_cases",
+      "count": 2
+    },
+    {
+      "old": "family==1 ? 13:45}",
+      "new": "family==1 ? 13:46}",
+      "count": 1
+    },
+    {
+      "old": "bool microbatch_only=false) {",
+      "new": "bool microbatch_only=false,bool selective_tma_a_only=false) {",
+      "count": 1
+    },
+    {
+      "old": " && !microbatch_only)\n    for(int variant:{42,43})",
+      "new": " && !microbatch_only && !selective_tma_a_only)\n    for(int variant:{42,43})",
+      "count": 1
+    },
+    {
+      "old": " && !microbatch_only && psplit_microbatch_route_enabled())",
+      "new": " && !microbatch_only && !selective_tma_a_only && psplit_microbatch_route_enabled())",
+      "count": 1
+    },
+    {
+      "old": "  if(bn16_filter) {\n",
+      "new": "  if(!k128_only && !pipeline_only && !tma_only && !wait1_only && !three_stage_only &&\n     !psplit_only && !psplit_bk64_only && !psplit_rsa_only && !psplit_rsa_bk32_only && !hybrid_s_only &&\n     bn16_filter==0 && !microbatch_only && !selective_tma_a_only && psplit_selective_tma_a_route_enabled())\n    candidates.push_back({megafmm::Algorithm::Megakernel,45});\n  if(selective_tma_a_only) {\n    require(psplit_selective_tma_a_route_enabled(),\"requested selective TMA-A numerical scope has no enabled routes\");\n    candidates={{megafmm::Algorithm::Megakernel,45}};\n  }\n  if(bn16_filter) {\n",
+      "count": 1
+    },
+    {
+      "old": " && !microbatch_only);",
+      "new": " && !microbatch_only && !selective_tma_a_only);",
+      "count": 1
+    },
+    {
+      "old": " | --strict-microbatch-only]",
+      "new": " | --strict-microbatch-only | --strict-selective-tma-a-only]",
+      "count": 1
+    },
+    {
+      "old": "--mega-variant 0..44 (37 and compiled-blocked routes disabled)",
+      "new": "--mega-variant 0..45 (37 and compiled-blocked routes disabled)",
+      "count": 1
+    },
+    {
+      "old": "microbatch_numeric_only=false,candidates_only=false",
+      "new": "microbatch_numeric_only=false,selective_tma_a_numeric_only=false,candidates_only=false",
+      "count": 1
+    },
+    {
+      "old": "      else if(std::string(argv[i])==\"--strict-microbatch-only\")microbatch_numeric_only=true;\n",
+      "new": "      else if(std::string(argv[i])==\"--strict-microbatch-only\")microbatch_numeric_only=true;\n      else if(std::string(argv[i])==\"--strict-selective-tma-a-only\")selective_tma_a_numeric_only=true;\n",
+      "count": 1
+    },
+    {
+      "old": "mega_filter<=44,usage)",
+      "new": "mega_filter<=45,usage)",
+      "count": 1
+    },
+    {
+      "old": " && !candidates_only && !batched_only)",
+      "new": " && !selective_tma_a_numeric_only && !candidates_only && !batched_only)",
+      "count": 11
+    },
+    {
+      "old": "    if(microbatch_numeric_only) {\n",
+      "new": "    require(!selective_tma_a_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !wait1_numeric_only && !three_stage_numeric_only && !psplit_numeric_only && !psplit_bk64_numeric_only && !psplit_rsa_numeric_only && !psplit_rsa_bk32_numeric_only && !hybrid_s_numeric_only && !microbatch_numeric_only && bn16_numeric_filter==0 && !candidates_only && !batched_only),\n            \"--strict-selective-tma-a-only is a separate numerical scope; \"+usage);\n    if(selective_tma_a_numeric_only) {\n      bool bf16_pass=strict_numerics<__nv_bfloat16>(megafmm::DType::BF16,false,false,false,false,false,false,false,false,false,false,0,false,true);\n      bool fp16_pass=strict_numerics<__half>(megafmm::DType::FP16,false,false,false,false,false,false,false,false,false,false,0,false,true);\n      return bf16_pass && fp16_pass ? 0:2;\n    }\n    if(microbatch_numeric_only) {\n",
+      "count": 1
+    },
+    {
+      "old": "      if(mega_filter==44) {",
+      "new": "      if(mega_filter==45) {\n        require(psplit_selective_tma_a_route_enabled(),\"Mega45 is disabled: compiled selective TMA-A register/spill gate failed before launch\");\n        wgmma_scheduled_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);\n        wgmma_scheduled_suite<__half>(megafmm::DType::FP16,mega_filter);\n        wgmma_scheduled_native_bitwise_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);\n        wgmma_scheduled_native_bitwise_suite<__half>(megafmm::DType::FP16,mega_filter);\n        wgmma_scheduled_input_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);\n        wgmma_scheduled_input_rebind_suite<__half>(megafmm::DType::FP16,mega_filter);\n        epilogue_output_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);\n        epilogue_output_rebind_suite<__half>(megafmm::DType::FP16,mega_filter);\n        wgmma_scheduled_graph_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);\n        wgmma_scheduled_graph_suite<__half>(megafmm::DType::FP16,mega_filter);\n        wgmma_scheduled_policy_suite(mega_filter);\n        psplit_selective_tma_a_stride_metadata_suite();\n        psplit_disabled37_policy_suite();\n        std::cout << \"PASS selected WGMMA selective TMA-A integer DAG, BK64 stage8 K1024, partial-K fallback, sameatom N32 raw U vs39, host epilogue, current inputs, scalar outputs, Graph and policy tests\\n\";\n        return 0;\n      }\n      if(mega_filter==44) {",
+      "count": 1
+    },
+    {
+      "old": "    for(int variant:{44}) {\n      if(!psplit_microbatch_route_enabled()) {psplit_microbatch_blocked_policy_suite();continue;}\n      wgmma_scheduled_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      wgmma_scheduled_suite<__half>(megafmm::DType::FP16,variant);\n      wgmma_scheduled_native_bitwise_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      wgmma_scheduled_native_bitwise_suite<__half>(megafmm::DType::FP16,variant);\n      wgmma_scheduled_input_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      wgmma_scheduled_input_rebind_suite<__half>(megafmm::DType::FP16,variant);\n      epilogue_output_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      epilogue_output_rebind_suite<__half>(megafmm::DType::FP16,variant);\n      wgmma_scheduled_graph_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      wgmma_scheduled_graph_suite<__half>(megafmm::DType::FP16,variant);\n      wgmma_scheduled_policy_suite(variant);\n    }\n",
+      "new": "    for(int variant:{44}) {\n      if(!psplit_microbatch_route_enabled()) {psplit_microbatch_blocked_policy_suite();continue;}\n      wgmma_scheduled_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      wgmma_scheduled_suite<__half>(megafmm::DType::FP16,variant);\n      wgmma_scheduled_native_bitwise_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      wgmma_scheduled_native_bitwise_suite<__half>(megafmm::DType::FP16,variant);\n      wgmma_scheduled_input_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      wgmma_scheduled_input_rebind_suite<__half>(megafmm::DType::FP16,variant);\n      epilogue_output_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      epilogue_output_rebind_suite<__half>(megafmm::DType::FP16,variant);\n      wgmma_scheduled_graph_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      wgmma_scheduled_graph_suite<__half>(megafmm::DType::FP16,variant);\n      wgmma_scheduled_policy_suite(variant);\n    }\n    for(int variant:{45}) {\n      if(!psplit_selective_tma_a_route_enabled()) {psplit_selective_tma_a_blocked_policy_suite();continue;}\n      wgmma_scheduled_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      wgmma_scheduled_suite<__half>(megafmm::DType::FP16,variant);\n      wgmma_scheduled_native_bitwise_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      wgmma_scheduled_native_bitwise_suite<__half>(megafmm::DType::FP16,variant);\n      wgmma_scheduled_input_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      wgmma_scheduled_input_rebind_suite<__half>(megafmm::DType::FP16,variant);\n      epilogue_output_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      epilogue_output_rebind_suite<__half>(megafmm::DType::FP16,variant);\n      wgmma_scheduled_graph_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);\n      wgmma_scheduled_graph_suite<__half>(megafmm::DType::FP16,variant);\n      wgmma_scheduled_policy_suite(variant);\n      psplit_selective_tma_a_stride_metadata_suite();\n    }\n",
+      "count": 1
+    },
+    {
+      "old": "#include <limits>\n",
+      "new": "#include <limits>\n#include <memory>\n",
+      "count": 1
+    },
+    {
+      "old": "size_t cases=0,native_cases=0,packed_cases=0,dense_cases=0;",
+      "new": "size_t cases=0,native_cases=0,packed_cases=0,dense_cases=0,setup_success=0,setup_unavailable=0;",
+      "count": 1
+    },
+    {
+      "old": "    auto plan=megafmm::create_plan(p,policy);\n    require(plan->algorithm_name()==expected,\"selective TMA-A Plan stride boundary route differs before encode\");\n    if(native || scenario==1 || scenario==2)require(plan->workspace_bytes()==0,\"metadata native/P7 route unexpectedly allocated workspace\");",
+      "new": "    std::unique_ptr<megafmm::Plan> plan;\n    std::string setup_message;\n    try {plan=megafmm::create_plan(p,policy);}\n    catch(const std::runtime_error& error) {\n      setup_message=error.what();\n      // Only independent Dense-backend layout/heuristic setup can be unavailable\n      // at these unbacked metadata strides. Predicate/prepare/route errors fail.\n      if(setup_message.find(\"query Lt heuristics:\")!=0 &&\n         setup_message.find(\"create matrix layout:\")!=0 &&\n         setup_message.find(\"cuBLASLt has no valid heuristic for this problem\")==std::string::npos)throw;\n    }\n    if(plan) {\n      require(plan->algorithm_name()==expected,\"selective TMA-A Plan stride boundary route differs before encode\");\n      if(native || scenario==1 || scenario==2)require(plan->workspace_bytes()==0,\"metadata native/P7 route unexpectedly allocated workspace\");\n    } else {\n      std::cout << \"SETUP_UNAVAILABLE_WGMMA_PSPLIT_SELECTIVE_TMA_A_STRIDE_METADATA dtype=\" << megafmm::dtype_name(dtype)\n                << \" variant=45 scenario=\" << scenario << \" message=\" << setup_message << '\\n';\n    }",
+      "count": 1
+    },
+    {
+      "old": "<< \" actual=\" << plan->algorithm_name() << \" native_guard=\" << native\n              << \" safe_a_span_bytes=\"",
+      "new": "<< \" actual=\" << (plan ? plan->algorithm_name():\"setup_unavailable\") << \" setup_supported=\" << bool(plan)\n              << \" expected=\" << expected << \" native_guard=\" << native\n              << \" safe_a_span_bytes=\"",
+      "count": 1
+    },
+    {
+      "old": "++cases;native_cases+=native;packed_cases+=scenario==1 || scenario==2;dense_cases+=scenario==3;",
+      "new": "++cases;native_cases+=native;packed_cases+=scenario==1 || scenario==2;dense_cases+=scenario==3;\n    setup_success+=bool(plan);setup_unavailable+=!plan;",
+      "count": 1
+    },
+    {
+      "old": "<< \" A_only_limit=549755813888 B_bound_not_applied=1 metadata_only=1 allocated_input_bytes=0 tensor_map_encodes=0 native_runs=0\\n\";",
+      "new": "<< \" setup_success_cases=\" << setup_success << \" setup_unavailable_cases=\" << setup_unavailable\n            << \" native_helper_guards_all_checked=1 Plan_setup_claimed_only_if_supported=1\"\n            << \" A_only_limit=549755813888 B_bound_not_applied=1 metadata_only=1 allocated_input_bytes=0 tensor_map_encodes=0 native_runs=0\\n\";",
+      "count": 1
+    }
+  ],
+  "no_GPU_build_Git_or_other_formal_write": true,
+  "metadata_setup_unavailable_scope": "only known independent Dense-backend layout/heuristic errors; raw actual message retained; never Plan/native run PASS claimed"
+}

@@ -1,0 +1,131 @@
+{
+  "scope": "names/rawA SW128+required alignment/TMA raw stage+single-currentA host descriptor/necessary A stride bound only",
+  "parent_path": "/share/home/liuyao/workspace/MegaFMM/solution/megakernel_wgmma_psplit_rsa.cu",
+  "parent_sha256": "1f964339034c3e800455704b6d33482d072ea99a2b6eb9f08773df57f705f054",
+  "candidate_path": "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_selective_tmaA_root_future40_candidate.cu",
+  "candidate_sha256": "dc0a07bcbf238586313d05a4feee2830a06d4d6b0223c22f777d58134d100ff8",
+  "ordered_exact_replacements": [
+    {
+      "old": "psplit_rsa",
+      "new": "psplit_selective_tmaA_root_future40",
+      "count": 92
+    },
+    {
+      "old": "PSplitRSATraits",
+      "new": "PSplitSelectiveTmaARootFuture40Traits",
+      "count": 4
+    },
+    {
+      "old": "// Iteration36 RS-A candidate: raw A4 shared, final B7 shared, whole-stage RS A.\n",
+      "new": "// CPU-only selective rawA TMA future40; uncompiled and unregistered.\n",
+      "count": 1
+    },
+    {
+      "old": "#include <cute/tensor.hpp>\n",
+      "new": "#include <cute/tensor.hpp>\n#include <cute/arch/copy_sm90_tma.hpp>\n#include <cute/arch/copy_sm90_desc.hpp>\n#include <cuda.h>\n",
+      "count": 1
+    },
+    {
+      "old": "#include <cstdint>\n",
+      "new": "#include <cstdint>\n#include <cstddef>\n",
+      "count": 1
+    },
+    {
+      "old": "template <class Element, int Cols>\nstruct PSplitSelectiveTmaARootFuture40Traits",
+      "new": "// Flagged CuTe swizzles are byte functions, not element-address functions.\n// A full BK64 row is128B, so four one-box raw copies require SW128.\ntemplate <class Layout>\nconstexpr bool selective_tmaA_dense_box_sentinels() {\n  for(int q=0;q<4;++q) {\n    for(int ri=0;ri<4;++ri) {\n      const int r=ri==0 ? 0 : ri==1 ? 7 : ri==2 ? 8 : 63;\n      for(int ki=0;ki<6;++ki) {\n        const int k=ki==0 ? 0 : ki==1 ? 7 : ki==2 ? 8 : ki==3 ? 15 : ki==4 ? 16 : 63;\n        const int plain=q*4096+r*64+k;\n        const int actual_raw=Layout{}.layout_b()(make_coord(r,k,q));\n        if(actual_raw!=plain) return false;\n        const int actual=Layout{}.layout_a()(2*actual_raw)/2;\n        const int hardware=plain^(((plain>>6)&7)<<3);\n        if(actual!=hardware) return false;\n      }\n    }\n  }\n  return true;\n}\n\ntemplate <class Element, int Cols>\nstruct PSplitSelectiveTmaARootFuture40Traits",
+      "count": 1
+    },
+    {
+      "old": "GMMA::Layout_K_SW32_Atom<Element>{}",
+      "new": "GMMA::Layout_K_SW128_Atom<Element>{}",
+      "count": 1
+    },
+    {
+      "old": "struct alignas(128) SharedStorage {",
+      "new": "struct alignas(1024) SharedStorage {",
+      "count": 1
+    },
+    {
+      "old": "    typename Pipeline::SharedStorage barriers;\n",
+      "new": "    typename Pipeline::SharedStorage barriers;\n    alignas(8) uint64_t raw_done[Stages];\n",
+      "count": 1
+    },
+    {
+      "old": "  static constexpr size_t SharedBytes = sizeof(SharedStorage);\n",
+      "new": "  static constexpr size_t SharedBytes = sizeof(SharedStorage);\n  static constexpr uint32_t RawABytes = 4*BM*BK*sizeof(Element);\n  static_assert(RawABytes==32768,\"only four rawA boxes count as transaction bytes\");\n  static_assert(BankElements*sizeof(Element)%1024==0 && ElementsA*sizeof(Element)%1024==0 &&\n      BM*BK*sizeof(Element)%1024==0,\"all absolute SW128 pattern bases are zero-offset\");\n  static_assert(offsetof(SharedStorage,raw_done)>=offsetof(SharedStorage,barriers)+sizeof(typename Pipeline::SharedStorage),\n      \"raw transaction barriers never alias operands or pipeline barriers\");\n",
+      "count": 1
+    },
+    {
+      "old": "psplit_selective_tmaA_root_future40_contiguous_eight_sentinels<LayoutA,1>()",
+      "new": "selective_tmaA_dense_box_sentinels<LayoutA>()",
+      "count": 1
+    },
+    {
+      "old": "\"A edge vectors must be contiguous and 16B aligned in every product slot\"",
+      "new": "\"A dense SW128 TMA box sentinels match flagged CuTe byte coordinates\"",
+      "count": 1
+    },
+    {
+      "old": "// Producer writes four raw original A quadrants, with no A transform/cast.\ntemplate <class Element,int BK,class SmemA>\nCUTE_DEVICE void psplit_selective_tmaA_root_future40_fill_a(const Problem& p,const Element* A,\n    int64_t row_base,int64_t k_base,int task,SmemA sA) {\n  const int64_t mh=p.m/2,kh=p.k/2;\n  const int row=task/(BK/8),k=(task%(BK/8))*8;\n  const int64_t gr=row_base+row,gk=k_base+k;\n  const auto a11=psplit_selective_tmaA_root_future40_read_eight(A+gr*p.lda+gk);\n  const auto a12=psplit_selective_tmaA_root_future40_read_eight(A+gr*p.lda+gk+kh);\n  const auto a21=psplit_selective_tmaA_root_future40_read_eight(A+(gr+mh)*p.lda+gk);\n  const auto a22=psplit_selective_tmaA_root_future40_read_eight(A+(gr+mh)*p.lda+gk+kh);\n  psplit_selective_tmaA_root_future40_store_eight(&sA(row,k,0),a11);\n  psplit_selective_tmaA_root_future40_store_eight(&sA(row,k,1),a12);\n  psplit_selective_tmaA_root_future40_store_eight(&sA(row,k,2),a21);\n  psplit_selective_tmaA_root_future40_store_eight(&sA(row,k,3),a22);\n}\n\n",
+      "new": "// Four raw A quadrants are copied by TMA, without transform or cast.\n",
+      "count": 1
+    },
+    {
+      "old": "template <class Element,int Cols>\n__global__",
+      "new": "// One current-A descriptor, no B descriptor and no pointer-bound cache.\nstruct alignas(64) SelectiveTmaADescriptor {\n  CUtensorMap a;\n};\nstatic_assert(sizeof(SelectiveTmaADescriptor)==128 && alignof(SelectiveTmaADescriptor)==64 &&\n    std::is_trivially_copyable<SelectiveTmaADescriptor>::value,\n    \"immutable A descriptor is passed by value in kernel parameter space\");\n\ntemplate <class Element,int Cols>\n__global__",
+      "count": 1
+    },
+    {
+      "old": "void winograd_wgmma_psplit_selective_tmaA_root_future40(Problem p,const Element* __restrict__ A,\n",
+      "new": "void winograd_wgmma_psplit_selective_tmaA_root_future40(Problem p,CUTE_GRID_CONSTANT const SelectiveTmaADescriptor maps,\n",
+      "count": 1
+    },
+    {
+      "old": "extern __shared__ __align__(128) unsigned char raw_storage[];",
+      "new": "extern __shared__ __align__(1024) unsigned char raw_storage[];",
+      "count": 1
+    },
+    {
+      "old": "  Pipeline pipeline(storage.barriers,params);\n",
+      "new": "  Pipeline pipeline(storage.barriers,params);\n  if(tid==0) {\n    CUTE_UNROLL\n    for(int b=0;b<T::Stages;++b)\n      cutlass::arch::ClusterTransactionBarrier::init(&storage.raw_done[b],1);\n    cutlass::arch::fence_barrier_init();\n  }\n",
+      "count": 1
+    },
+    {
+      "old": "      CUTE_UNROLL\n      for (int task = tid; task < T::BM*T::BK/8; task += T::ProducerThreads)\n        psplit_selective_tmaA_root_future40_fill_a<Element,T::BK>(p,A,row_base,k_base,task,sA);\n",
+      "new": "      // A raw transaction is distinct from final-ready PipelineAsync.\n      if(tid==0) {\n        auto* raw_done=&storage.raw_done[state.index()];\n        cutlass::arch::ClusterTransactionBarrier::arrive_and_expect_tx(raw_done,T::RawABytes);\n        constexpr uint64_t hint=uint64_t(TMA::CacheHintSm90::EVICT_NORMAL);\n        const int32_t r=int32_t(row_base),k=int32_t(k_base);\n        const int32_t mh=int32_t(p.m/2),kh=int32_t(p.k/2);\n        SM90_TMA_LOAD_2D::copy(&maps.a,raw_done,hint,&sA(0,0,0),k,r);\n        SM90_TMA_LOAD_2D::copy(&maps.a,raw_done,hint,&sA(0,0,1),k+kh,r);\n        SM90_TMA_LOAD_2D::copy(&maps.a,raw_done,hint,&sA(0,0,2),k,r+mh);\n        SM90_TMA_LOAD_2D::copy(&maps.a,raw_done,hint,&sA(0,0,3),k+kh,r+mh);\n      }\n      // The unchanged SIMT B producer can overlap rawA TMA completion.\n",
+      "count": 1
+    },
+    {
+      "old": "      asm volatile(\"fence.proxy.async.shared::cta;\" ::: \"memory\");\n      pipeline.producer_commit(state);",
+      "new": "      asm volatile(\"fence.proxy.async.shared::cta;\" ::: \"memory\");\n      // raw_done starts phase0, opposite the producer start phase1.\n      // Every writer waits for all32768 A bytes before final publication.\n      cutlass::arch::ClusterTransactionBarrier::wait(\n          &storage.raw_done[state.index()],state.phase()^1u);\n      asm volatile(\"\" ::: \"memory\"); // pinned wait lacks compiler memory clobber\n      pipeline.producer_commit(state);",
+      "count": 1
+    },
+    {
+      "old": "template <class Element>\nvoid launch_wgmma_psplit_selective_tmaA_root_future40_typed",
+      "new": "// This encode remains inside each ordinary timed host invocation/capture.\n// Graph replay retains fixed captured addresses and reads fresh A content.\nSelectiveTmaADescriptor make_selective_tmaA_descriptor(const Problem& p,const void* A) {\n  SelectiveTmaADescriptor maps{};\n  const CUtensorMapDataType type=p.dtype==DType::BF16 ?\n      CU_TENSOR_MAP_DATA_TYPE_BFLOAT16 : CU_TENSOR_MAP_DATA_TYPE_FLOAT16;\n  const cuuint64_t dims[2]={cuuint64_t(p.k),cuuint64_t(p.m)};\n  const cuuint64_t stride[1]={cuuint64_t(p.lda)*2};\n  const cuuint32_t box[2]={64,64},step[2]={1,1};\n  const auto result=cuTensorMapEncodeTiled(&maps.a,type,2,const_cast<void*>(A),\n      dims,stride,box,step,CU_TENSOR_MAP_INTERLEAVE_NONE,CU_TENSOR_MAP_SWIZZLE_128B,\n      CU_TENSOR_MAP_L2_PROMOTION_L2_128B,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);\n  if(result!=CUDA_SUCCESS)\n    throw std::runtime_error(\"Selective rawA TMA tensor-map encode error=\"+std::to_string(int(result)));\n  return maps;\n}\n\ntemplate <class Element>\nvoid launch_wgmma_psplit_selective_tmaA_root_future40_typed",
+      "count": 1
+    },
+    {
+      "old": "  using T = PSplitSelectiveTmaARootFuture40Traits<Element,32>;\n  const dim3 grid",
+      "new": "  using T = PSplitSelectiveTmaARootFuture40Traits<Element,32>;\n  const auto maps=make_selective_tmaA_descriptor(p,A);\n  const dim3 grid",
+      "count": 1
+    },
+    {
+      "old": "      p,static_cast<const Element*>(A),static_cast<const Element*>(B),C0,D);",
+      "new": "      p,maps,static_cast<const Element*>(B),C0,D);",
+      "count": 1
+    },
+    {
+      "old": "p.k%128 == 0 && p.lda%8 == 0 && p.ldb%8 == 0;",
+      "new": "p.k%128 == 0 && p.lda%8 == 0 && p.ldb%8 == 0 &&\n      uint64_t(p.lda)<(uint64_t(1)<<39); // TMA byte stride must be <2^40",
+      "count": 1
+    }
+  ],
+  "forward_inverse_exact": true,
+  "normalized_unchanged_sections_sha256": {
+    "A_math_and_register_builder": "65a24a3fe0a468fd1e7f0816c2216a36a81a7fa587a94f79ccf7b8d87104fba8",
+    "producer_B_math_and_layout": "193546bd93a4ba9f382eb08536459ce80f16ee201e33825546771e5c1223d190",
+    "consumer_wholeK_issue_release": "6fbcb6d39874bf1a50c0d8e764f290a264834d872ae43c7885b81e726f25ee54",
+    "tail_fixedU_alphaRN_betaFMA": "19b800eaab92a3d9dcf75dd89a40c7337a7827eab2fce9b394bb46d511d84729"
+  }
+}

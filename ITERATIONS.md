@@ -1776,3 +1776,35 @@ Freshfourinstancecompiledgate independentlyPASS, completeobject/bench/test addre
 #### Iter40 full closure evidence
 
 Mandatory full20/200TIME/60CHECK completed;60 originalFAIL/NF0,10 innerexit2.44 ordinaryBF23.6076807976/FP23.2681608200us versus39 23.1145596504/23.1103992462us;Graph44 23.3548808098/23.1475210190 versus39 22.9222393036/22.9046392441us.44 failed to improve its samegeometryparent39; all20DenseCV<2% and allgroups kept. Default2690/2292 and selected56/135 exit0, strict30=18PASS12FAILNF0/exit2, SAN3zeroerror with leakonlymem0. RawU reference39/hostspecifiedepilogue/Graph/CPU abstractions are separate from originalFP64certification. No45/no precision relaxation/no promotion,AutoDense/goalactive. Single-A payload savings did not establish speedup or occupancy/stall cause. Exact current evidence is the microbatchreport/profile/measurement/coverage; future selectiveTMAA and role-clock prefixes are CPU-only and not current40 measurements.
+
+### Iter41 — BK64 selective rawA4 TMA / B SIMT
+
+- **Hypothesis:** Selective four raw A TMA transfers avoid SIMT A loads/stores; B transforms remain SIMT. Four8192-byte boxes and a separate raw32768-byte TX barrier, SW128/absolute1024 alignment; extra wait/encode costs can offset producer savings.
+- **Changes:** New45 only, parent39 BM64BN32BK64/2banks/wholeP3+4/ascendingK16/onecast/fixedU/RNalphaFMA and original floors preserved. A-only lda<2^39 checked before map encode; ordinary each run encodes one current A map, Graph captures fixed bindings then replays fresh contents. Fresh standalone gate and original failure archives remain distinct.
+- **Stall re-assessment:** Iter38–40 produced no observed >=3% own complete-call improvement; current39/44 SW CV in40 was0.0147–0.0907% with44 below0.063%, without a measured physical-floor claim. No repeat ncu after prior IPC failure. NVIDIA Hopper Tuning Guide describes one-thread TMA bulk transfer reducing SM transfer instructions/register payload; selective rawA4 differs from historical all-eight TMA31. Published Strassen-like A100/H200 results do not prove this H100 acceptance gate. Sources: https://docs.nvidia.com/cuda/hopper-tuning-guide/ ; https://www.microsoft.com/en-us/research/publication/compiling-strassen-like-matrix-multiplication-algorithms-to-fast-cuda-kernels/ ; https://github.com/microsoft/subcuber/blob/main/README.md .
+- **Bench:** quick20warm/20calls/5groups/1fresh, screen only; failed numerical results retained.
+
+| M,N,K | dtype | route | mode | Dense us | complete SW us | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 5.856000 | 6.475200 | 0.904374 | FAIL |
+| 128,128,128 | fp16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 5.771200 | 6.630400 | 0.870415 | FAIL |
+| 256,256,256 | bf16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 5.876800 | 8.049600 | 0.730074 | FAIL |
+| 256,256,256 | fp16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 6.244800 | 8.104000 | 0.770582 | FAIL |
+| 512,512,512 | bf16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 6.388800 | 11.526400 | 0.554275 | FAIL |
+| 512,512,512 | fp16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 6.544000 | 11.472000 | 0.570432 | FAIL |
+| 1024,1024,1024 | bf16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 13.513599 | 18.142401 | 0.744863 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 10.387200 | 18.136001 | 0.572739 | FAIL |
+| 2048,2048,2048 | bf16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 32.120001 | 135.726404 | 0.236653 | FAIL |
+| 2048,2048,2048 | fp16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 33.216000 | 135.292804 | 0.245512 | FAIL |
+| 3072,3072,3072 | bf16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 87.284797 | 445.889616 | 0.195754 | FAIL |
+| 3072,3072,3072 | fp16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 89.535999 | 438.430405 | 0.204219 | FAIL |
+| 4096,4096,4096 | bf16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 195.870399 | 1084.815979 | 0.180556 | FAIL |
+| 4096,4096,4096 | fp16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 205.849600 | 1092.535973 | 0.188414 | FAIL |
+| 1024,512,1024 | bf16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 11.646400 | 18.070400 | 0.644501 | FAIL |
+| 1024,512,1024 | fp16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 11.921600 | 18.051200 | 0.660433 | FAIL |
+| 512,1024,1024 | bf16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 8.470400 | 17.830400 | 0.475054 | FAIL |
+| 512,1024,1024 | fp16 | megakernel_wgmma_psplit_selective_tma_a_64x32 v45 | launch | 8.819200 | 17.881601 | 0.493200 | FAIL |
+
+- **Analysis:** Own complete SW latency ranks code changes; Dense timing variation and machine/fixture/SAN PASS do not certify original FP64 numerical accuracy.
+- **Next:** Mandatory samebinaryfull20 for45/39/44/36/Lt1,100calls5groups3fresh irrespectivequick3%, originalstrict30 andserialSAN3, coverage/profile/report/twoindependentfinal audits.
+- **Archive:** trajectory/20261014_071808_iter-41/
