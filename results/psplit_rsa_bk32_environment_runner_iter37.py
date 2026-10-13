@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only prelaunch iteration37 device/toolchain snapshot; no kernel launch."""
+"""Read-only iteration37 device/toolchain snapshot after performance and serial SAN; no kernel launch."""
 import ctypes
 import json
 import socket
@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 
 print('POST_PERFORMANCE_SAN_SNAPSHOT_UTC', datetime.now(timezone.utc).isoformat(), flush=True)
 print('HOST', socket.gethostname(), flush=True)
-print('SCOPE read-only snapshot before new40 launch and timing; no device kernel launched', flush=True)
+print('SCOPE read-only snapshot after full performance and serial SAN work; no device kernel launched; idle clocks do not prove timing-group clocks', flush=True)
 for command in [
     ['nvidia-smi', '--query-gpu=name,uuid,driver_version,memory.total,compute_cap,clocks.current.sm,clocks.current.memory,temperature.gpu,pstate', '--format=csv,noheader'],
     ['nvcc', '--version'],

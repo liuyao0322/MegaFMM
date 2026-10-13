@@ -123,3 +123,16 @@ Mega36 restores64/96/96 after consumer-only accumulator scope repair; same whole
 - Mandatory1024 full16 same-binary comparison (20warm/100calls/group/5groups/3fresh): BK64 was slower than successfulBK32 Mega36 by ordinary BF0.8624%/FP2.3005%, Graph BF1.6970%/FP3.0219%. Do not infer a stall or occupancy cause from static shared-memory size. Current fastest measured singlelaunch remains36.
 - New38 ordinary eventmedians BF23.7651205063us/FP24.0908789635us; same-row independently tuned cuBLASLt Dense/SW0.518352920711/0.415931668502. New38 BF Dense CV2.3983% has all five timing groups retained; code benefit uses own SW latency.
 - All48 full fresh original numerical gates FAIL/NF0; new38-only strict30=18PASS12FAIL/NF0. Structural bitwise/hostepilogue and3zero-errorSAN are separate evidence, not FP64 numerical certification. Auto remainsDense and goal remainsactive.
+
+
+## Iteration36 measured RS-A BK64 outcome
+
+- Mega39 RS-A BK64 passed a fresh source/object/bench/test gate with initial168, producer64/two192consumers, no stack/local/spill, full-stage A48/64 and P48/64 operand lifetime through wait0. Its complete1024 event latency improved against samebinary36 by ordinary BF1.3304%/FP1.5905%, Graph BF0.7847%/FP1.5962%. Original72freshgates FAIL/NF0 and strict30=18PASS12FAIL/NF0, threeSAN zeroerror; AutoDense/goalactive.
+- The requested fusedsingleP10 and S/T-once12 routes were also measured with all transforms/packing/combine in full2/3launch calls: ordinary BF38.333120/34.119999us, FP38.501761/34.502721us; Graph BF36.454079/31.372161us, FP36.701441/32.098880us. These are iteration36samebinary results, not iteration37controls. Full24 report/CSV evidence stays frozen.
+
+## Iteration37 measured RS-A BK32 outcome
+
+- New40 uses BM64/BN32/BK32 two banks384threads/source64-192-192 with the verified numeric dense Element ARLayout adapter. Fresh actual initial168/owned64512>=57344, FP16roleGPR39/124/141 and BF16 39/150/141, no STACK/LOCAL/spill/newC7512; A24/32+P48/64 stage lifetime and cross-bank tail drain proved before launch. Actual61568dynamic+1024static shared. The different consumer maxima are static compiler facts, not measured occupancy or issue/stall cause.
+- Mandatory samebinary1024 full16 shows40 slower than39 by ordinary BF9.9354%/FP5.4027%, Graph BF9.5833%/FP5.6068%; also slower than36. New40 ordinary eventmedians BF25.4972791672us/FP24.3225598335us, same-row cuBLASLt Dense/SW0.481130568767/0.408878010661; Graph25.130879879/24.1577601433us. All五timinggroups preserved. Own SW latency defines code benefit; Dense denominator variation does not.
+- All48fullfresh numericalgates FAIL/NF0, new40onlystrict30=18PASS12FAIL/NF0; actualdefault2466CASE1760PASS, selected56CASE135PASS; threeCUDA12.8SANzeroerror and memleak0. Full1650 is unexecuted code scope. RawU reference36, host specified epilogue/Graph and SAN are independent evidence, not FP64 numerical certification. Registered37 remains disabled, AutoDense and true1024singlelaunch goalactive.
+- Among native routes measured in this batch (36/39/40),39 remains fastest. Any future quota160/176 or hybrid-A proposal requires a distinct actual source/binary/initialpool/direction/operand lifetime fresh gate and same-binary full measurement; current168 must not be inherited as a future quota initial allocation. No ncuretry thissession.
