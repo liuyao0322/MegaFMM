@@ -1,0 +1,278 @@
+{
+  "schema": "megafmm.iter42.sw128-simt-control-final-static-contract-evidence-review.v1",
+  "status": "PASS_FINAL_REVIEW_ORIGINAL_NUMERICAL_GATE_FAIL_NO_PROMOTION",
+  "issues": [],
+  "reviewed_document_snapshot": {
+    "prestatus_checkpoint": "dc8ccf3136a249497fe59ac582ad665277d787c7",
+    "checkpoint_clean_status_provided_by_owner": true,
+    "primary_artifacts": {
+      "results/small_psplit_sw128_simt_control_profile_iter42.json": "58bda943e4c904102d10e2624b4b01dcc0d8384c71bcd55d054d684e85d18eb9",
+      "results/1024_MEGAKERNEL_PSPLIT_SW128_SIMT_CONTROL_REPORT.md": "5b9f81050f80a217d9be9685c4589fb2cff2af840fd67c8d473095037ad98f9c",
+      "results/small_psplit_sw128_simt_control_measurements_iter42.json": "f34d3edb49937b6e48ca71b13cd3b606929454856deaa7990bc99847cc2f1311",
+      "results/psplit_sw128_simt_control_test_coverage_iter42.json": "4ddbe0b2fb124a3e10bbc004886b86b79caddfb51c6bf40d4cec921d913bb4f4"
+    },
+    "scope": "Unique owner prestatus. Later audit metadata/copies may update profile hash; this frozen certificate is not backfilled or self-referenced."
+  },
+  "source_binary_bindings": {
+    "CMakeLists.txt": "fd718d138b8bdadd6da512717df427a26a4fdeea53f006dca0a1c48f8d85c7cd",
+    "bench/benchmark.cu": "1e326b2fce8eb60f0c6f8f6f19d2779d23cbea8b81f363bae59a3b312364a691",
+    "include/megafmm/gemm.h": "934859b65a4b8f249a42aca52ea40d98b0611b9f986241222f9acc11667c0c84",
+    "include/megafmm/kernels.h": "02d9bf187f0e90f4eceacea8d8f20a7c4b8b7af12087f558773d2e19923807d2",
+    "solution/plan.cpp": "4f3597e066e3a347771f9f69d6d24d42403b632bce9c8d71730dbd9b76714f1e",
+    "tests/test_correctness.cu": "a6a9658cb4864ed72db1a519c363d9f08d6e237f3c4afb9c0838ea5580c0f6b3",
+    "solution/megakernel_wgmma_psplit_sw128_simt_control.cu": "fe970244906a10d84b172d1c4255d2633285820bf3f7f1bd1f14fde54daa1a11",
+    "build/megafmm_bench": "e2faf8111ce7efa6a2751d0774a018389ee6568a49762bb2e483086152125bf0",
+    "build/test_correctness": "7fe2e01f38b2525fa3f3c2e8ffd25e549e6ad28e5099feac833035b8d6895df9"
+  },
+  "evidence_bindings": {
+    "results/correctness_psplit_sw128_simt_control_iter42.txt": "d384fb92e7044f1f7d54cd7625c15385880764463979b9d7725df8e7de46b8b3",
+    "results/correctness_psplit_sw128_simt_control_iter42.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/correctness_psplit_sw128_simt_control46_targeted_iter42.txt": "0072f8eb3a39fa5cdeebd734b427a79f8ae4648078cac5c2d1b648a137adcc40",
+    "results/correctness_psplit_sw128_simt_control46_targeted_iter42.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/strict_psplit_sw128_simt_control_iter42.txt": "9e3059511753b600e90502c1dd1d111c5056143920cd78d6f7f31b5d0556a4b3",
+    "results/strict_psplit_sw128_simt_control_iter42.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/disabled_psplit_sw128_simt_control37_cli_iter42.txt": "a9fccfc2796ef871f2689d23d493ec40e436bdb52ea22616bcd2c8e1a256bf64",
+    "results/disabled_psplit_sw128_simt_control37_cli_iter42.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "results/sanitizer_psplit_sw128_simt_control46_memcheck_iter42.txt": "39cbf8782e589cc018836ae4e06e57b76ab4ddf1c23941cbe0c015daf88dbf3c",
+    "results/sanitizer_psplit_sw128_simt_control46_memcheck_iter42.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/sanitizer_psplit_sw128_simt_control46_racecheck_iter42.txt": "2fd5ba8ee3d6ee9ecda1910f3d6da195fae00f5fd702c26e6ec081c7601d80f4",
+    "results/sanitizer_psplit_sw128_simt_control46_racecheck_iter42.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/sanitizer_psplit_sw128_simt_control46_synccheck_iter42.txt": "42ec768aec317cc94cba62c82bceb9527fe0f051ef4e3d1bd64a1d1d634e3f75",
+    "results/sanitizer_psplit_sw128_simt_control46_synccheck_iter42.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/psplit_sw128_simt_control_actual_coverage_chronology_correction_iter42.json": "308fe0198d1d0dd63a4a1e0774bbfbf60e57de9b4822becc837d45bff8a8f296",
+    "results/psplit_sw128_simt_control_test_coverage_prechronology_snapshot_iter42.json": "b948fbb7d693bdb368201ea2ea1a4795d67546533c346d2902d6676e729266fd",
+    "results/psplit_sw128_simt_control_actual_coverage_version_adapter_iter42.py": "f66509dbc6eb96f7fa7d242bc204894368d8e0cf7f80bb657dac362c6da81124",
+    "results/psplit_sw128_simt_control_actual_test_coverage_generator_iter42.py": "0099ed61d28b082dae336b20ce07acfe76b8dbaf3e51bba33978b3297c5cd13c",
+    "results/psplit_sw128_simt_control_actual_coverage_adapter_provenance_iter42.json": "07cf895a5f30f087e257b4b1bdf20ae912018693d24cfaa32aee4203987de6da",
+    "results/psplit_sw128_simt_control_actual_coverage_runner_adapter_provenance_iter42.json": "68a0c12b5acf3215b54fe6780986867ace10dbf1c642ece5b83513bde1ace538",
+    "results/psplit_sw128_simt_control_actual_coverage_version_adapter_provenance_iter42.json": "ab6227d4212c1687c5d932bfcc5dac040590de51c0a9120f32327e4207e2a769",
+    "results/psplit_sw128_simt_control_compiled_metadata_iter42.json": "dd81a4692530fab5427be27997eb2ef204d8b0a1450c50c654480cf315226ce1",
+    "results/psplit_sw128_simt_control_initial_frozen_identity_iter42.json": "4697db52e225f6103215b4bbee8b6edc8d11f1fbce76354fa227fa7269d0e7bd",
+    "results/psplit_sw128_simt_control_final_link_identity_iter42.json": "9ac9da1019f8fa130b9e410644d3791df199ebff7ed9c753805ee1dfd1995b59",
+    ".scratch/psplit_sw128_simt_control_review_iter42_initial.json": "af06b801dc5c0ec6e65889154935b56870f30d16e68872050710affe1bfeeade",
+    ".scratch/psplit_sw128_simt_control_review_iter42_initial.md": "c05a0e3b5e1d4149012ac4646fd33a7af468b48083c836f800a432f50babe56b"
+  },
+  "compiled_gate": {
+    "path": ".scratch/psplit_sw128_simt_control_review_iter42_initial.json",
+    "sha256": "af06b801dc5c0ec6e65889154935b56870f30d16e68872050710affe1bfeeade",
+    "status": "PASS_COMPILED_CAN_LAUNCH_46_ONLY",
+    "allowed_native_launch_variants": [
+      46
+    ],
+    "compiled_gate_inherited_from_iteration41": false,
+    "compiled_gate_inherited_from_older_iterations": false,
+    "all_original_two_dtype_instance_fields_preserved_exactly": true,
+    "initial_REG": 168,
+    "initial_owned_CTA_pool_registers": 64512,
+    "requested_role_pool_registers": 57344,
+    "role_max_implicit_GPR": [
+      40,
+      166,
+      170
+    ],
+    "quotas": [
+      64,
+      192,
+      192
+    ],
+    "grown_R168_R170_definite_write_after_INC": true,
+    "dynamic_shared_bytes": 123904,
+    "Driver_static_shared_bytes": 0,
+    "resource_tool_SHARED_bytes": 1024,
+    "occupancy_API_prediction": 1,
+    "measured_residency": null,
+    "object_bench_test_complete_streams": "2704x2 exact",
+    "machine_gate_repeated_in_final": false
+  },
+  "actual_validation": {
+    "default": {
+      "CASE": 2802,
+      "PASS": 2560,
+      "BEGIN": 4876,
+      "exit": 0
+    },
+    "selected46": {
+      "CASE": 56,
+      "PASS": 136,
+      "BEGIN": 196,
+      "exit": 0
+    },
+    "sameatom_reference": "39 N32BK64 RS-A + specifiedRNalpha/FMAhostepilogue",
+    "rawU_hostepilogue": {
+      "PASS_groups": 84,
+      "identity_groups": 6,
+      "active_groups": 78,
+      "kernel_runs_completed_by_PASS_bound_fixture_loops": 246,
+      "reference_kernel_runs_completed_by_PASS_bound_fixture_loops": 84,
+      "candidate_kernel_runs_completed_by_PASS_bound_fixture_loops": 162,
+      "total_kernel_runs_include_reference": true,
+      "BEGIN_groups": 84,
+      "reference_variant": 39,
+      "reference_relationship": "sameatom_N32_BK64",
+      "reference_label": "sameatom_N32_bk64_rsa39_raw_u+specified_host_epilogue",
+      "PASS_suffix": "NATIVE_BITWISE",
+      "complete_unique_domain": true,
+      "completed_PASS_groups_assert_rawU_bits_host_RNalpha_betaFMA_padding_guard": true,
+      "mismatch_diagnostics": [],
+      "unrelaxed_bit_comparison_failed": false,
+      "kernel_runs_in_incomplete_BEGIN_not_claimed": true
+    },
+    "current_A_B_rebind": {
+      "PASS_groups": 2,
+      "bindings": 20,
+      "native_bindings": 14,
+      "Dense_bindings": 6,
+      "complete": true
+    },
+    "epilogue_rebind": {
+      "PASS_groups": 10,
+      "kernel_runs_completed_by_PASS_bound_fixture_loops": 30,
+      "complete_unique_domain": true
+    },
+    "Graph": {
+      "config_groups": 36,
+      "actual_routes": {
+        "megakernel_wgmma_psplit_sw128_simt_control_64x32": 28,
+        "megakernel_warp_mma_packed": 8
+      },
+      "fresh_AB_replays": 108,
+      "complete_unique_domain": true,
+      "one_kernel_node_each_completed_PASS": true,
+      "partial_K_P7": [
+        64,
+        192,
+        320
+      ],
+      "immutable_C0_restore_asserted_by_frozen_fixture": true
+    },
+    "native_stage_domain": {
+      "observed_parent_K": [
+        128,
+        256,
+        384,
+        512,
+        768,
+        896,
+        1024,
+        1152,
+        1280,
+        2048,
+        2176,
+        2304,
+        4224,
+        4352
+      ],
+      "stage_divisor": 128,
+      "stage_counts": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        16,
+        17,
+        18,
+        33,
+        34
+      ],
+      "CASE_lines": 28,
+      "stage8_K1024": true,
+      "complete": true
+    },
+    "partial_parent_K": [
+      64,
+      192,
+      320
+    ],
+    "stride_metadata_scope": "10 helperguard checks only; all10 Plan setups unavailable/status15, no successfulactualPlanroute, hugeallocation, encode or native run. Source preencodefallback checked separately.",
+    "strict_original_FP64": {
+      "candidate_gates": 30,
+      "PASS": 18,
+      "FAIL": 12,
+      "nonfinite": 0,
+      "native_candidate_gates": 24,
+      "native_PASS": 12,
+      "native_FAIL": 12,
+      "Dense_range_fallback_gates": 6,
+      "Dense_range_fallback_PASS": 6,
+      "Dense_reference_CASE": 30,
+      "total_CASE": 60,
+      "exit": 2,
+      "full1830_code_domain_executed": false,
+      "floors_changed": false
+    },
+    "SAN": {
+      "tools": [
+        "memcheck",
+        "racecheck",
+        "synccheck"
+      ],
+      "all_actual_exit0_errors0": true,
+      "exact_selected_CASE_PASS_BEGIN_multisets": true,
+      "memcheck_full_leaks_bytes": 0,
+      "race_hazards_warnings": 0,
+      "nonmem_leaks": null
+    },
+    "old37_native_runs": 0
+  },
+  "measurement_contract": {
+    "mandatory_same_binary_routes": [
+      "Mega46",
+      "Mega45",
+      "Mega39",
+      "Mega36",
+      "Lt1"
+    ],
+    "rows": 20,
+    "TIME_group_records": 200,
+    "fresh_CHECK": 60,
+    "original_PASS": 0,
+    "original_FAIL": 60,
+    "nonfinite": 0,
+    "warmup": 20,
+    "calls_per_group": 100,
+    "groups": 5,
+    "fresh_trials_per_row": 3,
+    "Lt_candidates": 32,
+    "workspace_cap_bytes": 8589934592,
+    "event_and_batchwall": "Separate event timing and median5(batchwall100calls+batch-end-sync)/100, not individually synchronized wall; quantiles are groupmeans.",
+    "ordinary46": "One current-A encode inside each native host invocation, encoded map deliberately unused by SIMT kernel, explicit currentA SIMT loads then one kernel/zeroGWS.",
+    "Graph46": "Capture encodes map once; replay fixedaddress freshcontents without encode, separate from ordinary.",
+    "control_comparison_scope": "46 retains45 SW128/logicalshared/unusedraw_done and encode, but changes Atransport, rawTXwait protocol, explicitA parameter/ABI and compiler scheduling; no isolated bank/TMA/stall/traffic cause or isolatedencodecost claim."
+  },
+  "coverage_parser_chronology": {
+    "identity": {
+      "path": "results/psplit_sw128_simt_control_actual_coverage_version_adapter_iter42.py",
+      "sha256": "f66509dbc6eb96f7fa7d242bc204894368d8e0cf7f80bb657dac362c6da81124",
+      "CPU_only": true,
+      "no_GPU_build_formal_write_or_git_mutation": true,
+      "prepared_after_source_freeze_before_actual_validation": false,
+      "actual_adapter_created_after_validation_closed": true,
+      "original_prepared_generator": {
+        "path": "results/psplit_sw128_simt_control_actual_test_coverage_generator_iter42.py",
+        "sha256": "0099ed61d28b082dae336b20ce07acfe76b8dbaf3e51bba33978b3297c5cd13c",
+        "prepared_after_source_freeze_before_actual_validation": true,
+        "frozen_prevalidation_Git_commit": "d372045901ed1ef97ed4a933109d409835ed1d83"
+      }
+    },
+    "only_audit_generator_identity_changed_from_preserved_prior_coverage": true,
+    "original_prepared_generator_preserved": true,
+    "CPU_adapters_not_GPU_reruns": true
+  },
+  "documentation_review": {
+    "status": "PASS_NECESSARY_CURRENT_SCOPE",
+    "no_precision_promotion": true,
+    "no_measured_residency_claim": true,
+    "huge_stride_setup_unavailable_scope_truthful": true,
+    "oldCUDA_history_frozen_scope": "Owner/data/ROOT archive audit, no repeated old machine/GPU evidence by this final review."
+  },
+  "precision_certified": false,
+  "Auto_policy": "Dense retained",
+  "goal_complete": false,
+  "all_handles_closed_provided_by_owner": true,
+  "write_scope": "Own iteration42 scratch only; no compiler/GPU/formal/Git mutations."
+}
