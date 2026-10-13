@@ -15,7 +15,8 @@ WGMMA/Sm80 batched leaves，以及 M1/M2/M3、warp/product/cluster megakernel。
 用户已要求持续优化，并优先处理小矩阵。本快照记录 iteration23 的完整复测，
 不表示优化停止、达到物理延迟下限或整份 PLAN 已完成。直接寄存器传递 operand
 已在 iteration24 作为 Mega20/21 加入并完成诊断验证，未更新本快照的最优包络。
-iteration25 的连续向量加载与寄存器重排控制已完成诊断和验证，仍未更新最优包络。
+iteration25 的连续向量加载/寄存器重排和26的K128循环控制都已完成诊断与验证，
+仍未更新最优包络。
 持续优化目标为128/256/512/1024四尺寸都快于同行调优cuBLASLt；当前证据尚未满足。
 
 证据在 [小矩阵报告](results/SMALL_REPORT.md)、[small manifest](results/small_manifest.json)
@@ -127,6 +128,31 @@ Lt算法字段相同，FP128所选stage从19变为13；原始TUNE配置保留，
 [Mega23控制数据](results/small_coalesced23_launch_iter25.csv)另存，旧快照保持冻结。
 下一轮检验K128固定循环边界/展开，原有最优路径保留；本checkpoint不是延迟下限
 或可行方向耗尽的判断。
+
+Iteration26 将原Mega19在parent K128下的四个K16阶段固定，分别禁用展开
+(Mega24)和完全展开(Mega25)。同binary诊断128 BF16/FP16分别为
+4.2096/4.3440µs和4.0016/4.1344µs；仍未改善先前SW自身最低观测值，未触发
+完整性能扩测。只有K128两行实际使用新kernel，其余16行仍走原19链，不能据此
+声称K256/512/1024获得特化收益。所有36诊断行数值失败、nonfinite零。
+
+实际SASS确认24保留循环、25展开四阶段，各自REG94/86、静态指令416/760；
+两者K128每warp仍执行28个active HMMA和32个active原输入64bit加载。
+ptxas记录shared5376B，cuobjdump ELF字段6400B，STACK/LOCAL及spill均零。
+默认GPU结构/API测试exit0，新增48组与19的原生随机逐位比较通过，60项Graph
+检查含180次fresh-A/B重放；两个控制六次定向sanitizer全部exit0。
+Strict在旧1050检查外加入60项K128候选检查（48native、12必需Dense回退），
+总1110项666通过、444失败、nonfinite零，Auto保持Dense。
+[第26轮独立证据](results/small_k128_profile_iter26.json)绑定实际source
+`d5ea407e42b96fe8222a0a995591da9be36109b9`；
+[全展开控制原始数据](results/small_k128_unroll25_launch_iter26.csv)另存。
+
+[24–26轮重新评估](results/small_reassessment_iter26.json)检查了三种成本方向，
+并重新核对[CUDA12.4循环展开语义](https://docs.nvidia.com/cuda/archive/12.4.1/cuda-c-programming-guide/index.html#pragma-unroll)
+与[固定版本CuTe宏](https://github.com/NVIDIA/cutlass/blob/f7b19de32c5d1f3cedfc735c2849f12b537522ee/include/cute/config.hpp)。
+静态加载/寄存器/循环减少没有证明新的最佳延迟；旧ncu因lock文件失败且本session
+不重试，也不是性能下限证据。接下来可分别检验融合原输入变换与批量leaf的
+两launch完整P/U路线，以及小矩阵的进一步复用/阶段几何；原较快路径继续保留，
+四尺寸目标与固定数值要求仍未满足。
 
 ## 构建、验证与复现
 
