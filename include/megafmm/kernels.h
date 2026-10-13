@@ -129,4 +129,13 @@ void prepare_direct_mma(const Problem& p, int variant=20);
 void launch_direct_mma(const Problem& p, const void* A, const void* B,
                        const float* C0, float* D, cudaStream_t stream,
                        int variant=20);
+// Original vector64 inputs routed by full-warp butterfly/PRMT to native MMA.
+// 22 owns 16x8; 23 owns 8x8 with lower A zero. Each falls back through 16/15/14/12/7.
+bool coalesced_mma_can_implement(const Problem& p, int variant=22);
+bool coalesced_mma_full_tiles(const Problem& p, const void* A, const void* B,
+                            const float* C0, const float* D, int variant=22);
+void prepare_coalesced_mma(const Problem& p, int variant=22);
+void launch_coalesced_mma(const Problem& p, const void* A, const void* B,
+                         const float* C0, float* D, cudaStream_t stream,
+                         int variant=22);
 }

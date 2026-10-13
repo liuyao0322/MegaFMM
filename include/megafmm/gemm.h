@@ -47,7 +47,9 @@ struct Policy {
   // 19=identity 8x8 output owners with raw register prefetch
   //    (otherwise variants 16/15/14/12/7 using current pointer guards),
   // 20/21=direct native register operands with 16x8/8x8 identity owners
-  //    (each otherwise uses 16/15/14/12/7; no mutual fallback).
+  //    (each otherwise uses 16/15/14/12/7; no mutual fallback),
+  // 22/23=vector64 original inputs with butterfly/PRMT native register routing
+  //    and 16x8/8x8 identity owners (each otherwise 16/15/14/12/7; no mutual fallback).
   int mega_variant=0;
 };
 class Plan {

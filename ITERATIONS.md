@@ -77,6 +77,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 24 | Construct native MMA operands directly in registers | 0.3401 | 0.617107 | screen-numerical-fail |
 
+| 25 | Coalesce native MMA inputs with vector64 register routing | 0.3587 | 0.872000 | screened |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -1018,3 +1020,35 @@ Historical Graph coverage prose is corrected in `results/small_evidence_errata.m
 Next viable operand-delivery experiment is coalesced vector64 raw input plus native register permutation, preserving full M1 P/U, tested separately for M16A64+B64 and M8A64+B64. Frozen scratch CUDA SHA256 `0e0b94d39ea4c6760a5f49aaed9fc27906720a5677ffaf1b375b3962cbfdb232` and independent actual-source CPU ABI/DAG/alignment audits PASS:6144 byte comparisons,4480 expression-tree comparisons,11520 boundary/alignment checks, plus8 frozen permutation tests. Explicit source schedules are12 global-vector loads/20SHFL/36 pair choices/8PRMT for M16 and8/16/24/8 for M8; they do not predict total issue, DRAM or time. M16 A phases can repeat requests for the same sector. This remains a viable measured experiment, not floor/exhaustion evidence or an optimization stop.
 
 Independent24 evidence is frozen in `results/small_direct_profile_iter24.json`, SHA256 `fa652362742b093bc1d6d479fa9408323fcb55aaa3e82b1375b643209615d9b8` (103646 bytes). Its57 raw input hashes and2 binary hashes match before publication, and source23 report/manifest/profile retain their previously recorded SHA256 values. New-source iteration25 can now begin; its future strengthened Graph results must be attributed to that source, never retroactively to24.
+
+### Iter 25 — Coalesce native MMA inputs with vector64 register routing
+
+- **Hypothesis:** A64/B64 producer lanes and full-warp butterfly/PRMT can reduce explicit global-load operations while testing the added shuffle and register cost independently for M16 and M8 owners.
+- **Changes:** Added independent Mega22 M16 and Mega23 M8 coalesced-register controls with full-P fixed-U M1, current-binding fallback through16/15/14/12/7, unchanged old CUDA functions, max23 policy, native-bitwise and guard coverage, and fresh original A/B Graph replay references.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.872000 ms; mean speedup=0.3587x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.005874 | 0.004653 | 1.2624 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.005746 | 0.004827 | 1.1903 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.005747 | 0.007179 | 0.8005 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.005675 | 0.007330 | 0.7743 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.006333 | 0.013909 | 0.4553 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.006286 | 0.013590 | 0.4626 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.013256 | 0.081770 | 0.1621 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.010243 | 0.081053 | 0.1264 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.032570 | 0.670130 | 0.0486 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.033386 | 0.653080 | 0.0511 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.086091 | 2.048141 | 0.0420 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.089293 | 2.040165 | 0.0438 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.195094 | 4.921531 | 0.0396 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.206064 | 4.982055 | 0.0414 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.011555 | 0.041798 | 0.2765 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.011619 | 0.041603 | 0.2793 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.008168 | 0.041629 | 0.1962 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_warp_mma_coalesced_16x8 v22 | launch | 0.008475 | 0.041550 | 0.2040 | 0.00075151 | 0 |
+
+- **Analysis:** This is the predeclared nine-shape diagnostic20warm/20calls/5groups/1fresh launch screen of Mega22; default GPU structural/API/M1 bits and refreshed-input Graph tests passed before the screen. Fixed numerical gates and AutoDense remain unchanged. Own latency and prior-envelope comparison, Mega23 same-binary control, strict1050, six CUDA12.8 sanitizer runs, and compiled-resource audit follow this mandatory closure; no complete acceptance or floor is inferred from screening.
+- **Next:** Validate the same frozen source25 binaries and Mega23 control, inspect SASS/resources, and run same-binary full launch/Graph comparisons if a primary own-latency improvement crosses3percent.
+- **Archive:** trajectory/20261013_180222_iter-25/

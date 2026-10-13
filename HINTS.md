@@ -9,6 +9,7 @@
 - Automatic dispatch selects ordinary GEMM unless a shape/dtype/mode has passed both numerical and measured end-to-end performance gates. Unsupported shapes/transpose/ranges fall back safely.
 - Session profiler probe: ncu2024.1 failed with `InterprocessLockFailed` because `/tmp/nsight-compute-lock` is not writable. Per AKO4ALL, no repeated ncu probe this session; use end-to-end/stage event or Nsight Systems timing and compiler-resource analysis.
 - User resumed from the final large-shape report: continue optimizing and focus on small-matrix speedup. Prioritize128/256/512/1024/2048/4096 squares and small rectangular controls; ordinary launch and CUDA Graph remain separate. Numerical failures must remain visible, but are not a reason to stop the requested execution-performance experiments.
+- From the user's explicit active goal: continuously optimize the SW operator until all four square sizes 128, 256, 512 and 1024 are faster than cuBLAS. Keep every size in scope and verify against the same-row independently tuned ordinary cuBLASLt baseline under the existing dtype/output, numerical and timing contracts. A near-unity noisy observation, Dense fallback or an improvement at only a subset of sizes does not complete this goal.
 
 <!-- User-supplied behavior directives. The skill reads this at session start
      and respects any constraint named here. Examples:

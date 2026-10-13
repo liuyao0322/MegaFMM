@@ -17,7 +17,8 @@ add_library(megafmm STATIC solution/plan.cpp solution/pack_winograd.cu
   solution/small_product_cluster.cu solution/small_mma_16x8_epilogue.cu
   solution/small_mma_16x8_identity.cu solution/small_mma_16x8_prefetch.cu
   solution/small_mma_cpasync.cu solution/small_mma_stage.cu
-  solution/small_mma_8x8_prefetch.cu solution/small_mma_direct_register.cu)
+  solution/small_mma_8x8_prefetch.cu solution/small_mma_direct_register.cu
+  solution/small_mma_coalesced_register.cu)
 target_include_directories(megafmm PUBLIC include PRIVATE solution "${CUTLASS_ROOT}/include" "${CUTLASS_ROOT}/tools/util/include")
 target_link_libraries(megafmm PUBLIC CUDA::cudart CUDA::cublasLt CUDA::cublas CUDA::cuda_driver)
 target_compile_options(megafmm PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_90a,code=sm_90a;--expt-relaxed-constexpr;--expt-extended-lambda;-lineinfo;-Xptxas=-v>)
