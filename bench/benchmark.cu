@@ -166,7 +166,7 @@ struct Options {
   int trials = 100, warmup = 20, groups = 5, correct_trials = 3;
   int lt_variant = 0, mega_variant = 0, hopper_variant = 0;
   int rotate_inputs = 1;
-  bool graph = false, profile = false;
+  bool graph = false, profile = false, profile_dense = false;
 };
 std::vector<std::tuple<int,int,int>> parse_shapes(std::string text) {
   std::vector<std::tuple<int,int,int>> result;
@@ -192,7 +192,7 @@ Options options(int argc, char** argv) {
     if (arg == "--help") {
       std::cout << "megafmm_bench --shapes 'M,N,K;...' --dtype bf16|fp16|both "
         "--algorithm lt|hopper|mega --lt-variant 0|1 --mega-variant 0..17 --hopper-variant 0..8 "
-        "--trials N --warmup N --groups N --correct-trials N --rotate-inputs N --graph --output CSV --profile\n";
+        "--trials N --warmup N --groups N --correct-trials N --rotate-inputs N --graph --output CSV --profile [--profile-dense]\n";
       std::exit(0);
     } else if (arg == "--shapes") o.shapes = parse_shapes(next());
     else if (arg == "--dtype") o.dtype = next();
@@ -208,8 +208,10 @@ Options options(int argc, char** argv) {
     else if (arg == "--rotate-inputs") o.rotate_inputs = std::stoi(next());
     else if (arg == "--graph") o.graph = true;
     else if (arg == "--profile") o.profile = true;
+    else if (arg == "--profile-dense") o.profile_dense = true;
     else throw std::runtime_error("unknown option: " + arg);
   }
+  if (o.profile_dense && !o.profile) throw std::runtime_error("--profile-dense requires --profile");
   if (o.dtype != "bf16" && o.dtype != "fp16" && o.dtype != "both") throw std::runtime_error("invalid dtype");
   if (o.algorithm != "lt" && o.algorithm != "hopper" && o.algorithm != "mega") throw std::runtime_error("invalid algorithm");
   if (o.lt_variant < 0 || o.lt_variant > 1) throw std::runtime_error("lt-variant must be 0 or 1");
@@ -275,7 +277,7 @@ std::string csv_string(const std::string& input) {
   for (char c : input) { output += c; if (c == '"') output += c; }
   return output + "\"";
 }
-constexpr const char* csv_header = "m,n,k,dtype,requested,actual,variant,mode,cache,rotate_inputs,input_working_set_bytes,quantile_unit,trials,groups,correct_trials,workspace_limit,dense_workspace,solution_workspace,setup_ms,tune_ms,graph_setup_ms,dense_event_ms,dense_p10_ms,dense_p90_ms,dense_cv,solution_event_ms,solution_p10_ms,solution_p90_ms,solution_cv,dense_wall_ms,solution_wall_ms,speedup,equivalent_tflops,atol,rtol,dense_maxabs,dense_ef,dense_scaled,dense_normalized,dense_nearzero_abs,solution_maxabs,solution_ef,solution_scaled,solution_normalized,solution_nearzero_abs,nonfinite,gate_floor,gate_limit,numerical_pass\n";
+constexpr const char* csv_header = "m,n,k,dtype,requested,actual,variant,mode,cache,rotate_inputs,input_working_set_bytes,quantile_unit,trials,groups,correct_trials,workspace_limit,dense_workspace,solution_workspace,setup_ms,tune_ms,graph_setup_ms,dense_event_ms,dense_p10_ms,dense_p90_ms,dense_cv,solution_event_ms,solution_p10_ms,solution_p90_ms,solution_cv,dense_wall_ms,solution_wall_ms,speedup,equivalent_tflops,atol,rtol,dense_maxabs,dense_ef,dense_scaled,dense_normalized,dense_nearzero_abs,solution_maxabs,solution_ef,solution_scaled,solution_normalized,solution_nearzero_abs,nonfinite,gate_floor,gate_limit,numerical_pass,dense_lt_config,solution_lt_config\n";
 template <class T> bool benchmark(const Options& o, int m, int n, int k, megafmm::DType dtype, std::ostream& csv) {
   Stream stream;
   megafmm::Problem problem;
@@ -285,6 +287,7 @@ template <class T> bool benchmark(const Options& o, int m, int n, int k, megafmm
   policy.lt_variant=o.lt_variant; policy.hopper_variant=o.hopper_variant; policy.mega_variant=o.mega_variant;
   policy.algorithm=o.algorithm=="lt" ? megafmm::Algorithm::WinogradLt :
     o.algorithm=="hopper" ? megafmm::Algorithm::WinogradHopper : megafmm::Algorithm::Megakernel;
+  if (o.profile && o.profile_dense) policy.algorithm=megafmm::Algorithm::Dense;
   auto setup_start=Clock::now();
   auto solution=megafmm::create_plan(problem,policy);
   policy.algorithm=megafmm::Algorithm::Dense;
@@ -321,6 +324,12 @@ template <class T> bool benchmark(const Options& o, int m, int n, int k, megafmm
   megafmm::tune(*solution,a.data,b.data,nullptr,sd.as<float>(),workspace.data,stream.value);
   check(cudaStreamSynchronize(stream.value));
   double tune_ms=std::chrono::duration<double,std::milli>(Clock::now()-tune_start).count();
+  const std::string dense_lt_config=dense ? dense->lt_algorithm_config(a.data,b.data,nullptr,dd.as<float>(),workspace.data) : "none";
+  const std::string solution_lt_config=solution->lt_algorithm_config(a.data,b.data,nullptr,sd.as<float>(),workspace.data);
+  if (dense) std::cerr << "TUNE shape=" << m << ',' << n << ',' << k << " dtype=" << megafmm::dtype_name(dtype)
+                       << " case=dense config=" << dense_lt_config << '\n';
+  std::cerr << "TUNE shape=" << m << ',' << n << ',' << k << " dtype=" << megafmm::dtype_name(dtype)
+            << " case=solution config=" << solution_lt_config << '\n';
   if (o.profile) {
     // Exactly one complete measured invocation; tune kernels precede this invocation.
     check(cudaProfilerStart());
@@ -328,7 +337,8 @@ template <class T> bool benchmark(const Options& o, int m, int n, int k, megafmm
     check(cudaStreamSynchronize(stream.value));
     check(cudaProfilerStop());
     std::cerr << "PROFILE " << m << ',' << n << ',' << k << ' ' << megafmm::dtype_name(dtype)
-              << ' ' << solution->algorithm_name() << " workspace=" << solution_workspace << '\n';
+              << ' ' << solution->algorithm_name() << " workspace=" << solution_workspace
+              << " target=" << (o.profile_dense ? "dense" : "solution") << " lt_config=" << solution_lt_config << '\n';
     return true;
   }
   Error de, se;
@@ -397,7 +407,7 @@ template <class T> bool benchmark(const Options& o, int m, int n, int k, megafmm
       << se.maxabs << ',' << se.frobenius << ',' << se.scaled << ',' << se.normalized << ',' << se.nearzero << ','
       << de.nonfinite+se.nonfinite << ',' << floor << ',' << gate_limit << ',';
   if (o.correct_trials) csv << int(pass); else csv << "unchecked";
-  csv << '\n'; csv.flush();
+  csv << ',' << csv_string(dense_lt_config) << ',' << csv_string(solution_lt_config) << '\n'; csv.flush();
   return pass;
 }
 } // namespace
@@ -415,6 +425,14 @@ int main(int argc,char** argv) {
     if (!o.output.empty()) {
       std::ifstream previous(o.output,std::ios::binary|std::ios::ate);
       header=!previous || previous.tellg()==0;
+      if (!header && !o.profile) {
+        previous.seekg(0);
+        std::string found, expected(csv_header);
+        std::getline(previous, found);
+        if (!found.empty() && found.back() == '\r') found.pop_back();
+        expected.pop_back();  // csv_header's terminal newline
+        if (found != expected) throw std::runtime_error("output CSV header differs from this binary; choose a fresh output: "+o.output);
+      }
       file.open(o.output,std::ios::app);
       if (!file) throw std::runtime_error("cannot open output: "+o.output);
     }

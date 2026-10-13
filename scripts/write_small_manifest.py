@@ -20,6 +20,7 @@ import re
 import shlex
 import subprocess
 from collections import Counter, defaultdict
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from summarize_small import FLOORS, Record, WORKSPACE_LIMIT, read_records
@@ -30,6 +31,12 @@ PATTERN_NAMES = {"Uniform": "uniform", "Positive": "positive", "Range": "range",
                  "Cancellation": "cancellation", "HighHalf": "fp16_upper_range"}
 ALGORITHM_NAMES = {"WinogradLt": "lt", "WinogradHopper": "hopper", "Megakernel": "mega"}
 METADATA_FIELDS = {"label", "source_commit", "binary_sha256", "exit_code"}
+LT_COLUMNS = ("dense_lt_config", "solution_lt_config")
+LT_ATTRIBUTES = ("id", "tile", "split_k", "reduction", "swizzle", "stages", "custom", "inner", "cluster")
+LT_PROTOCOLS = {
+    "4w/3x10median": {"warmup_calls":4,"groups":3,"calls_per_group":10,"selection_statistic":"median_group_duration"},
+    "1w/1x3": {"warmup_calls":1,"groups":1,"calls_per_group":3,"selection_statistic":"single_group_duration"},
+}
 
 
 def require(condition: bool, message: str) -> None:
@@ -137,27 +144,220 @@ def log_fields(text: str, prefix: str) -> list[dict[str,str]]:
     return [dict(re.findall(r"(\w+)=(\S+)",line)) for line in text.splitlines() if line.startswith(prefix+" ")]
 
 
+def printed_interval(token: str, precision: int) -> tuple[Decimal,Decimal]|None:
+    """Conservative defaultfloat rounding interval, not an inferred true metric.
+
+    Trailing zeros are suppressed, so literal digit count is not the precision.
+    The benchmark CHECK stream uses six significant digits, CSV uses twelve.
+    At powers of ten this symmetric interval deliberately overbounds one side.
+    """
+    try:
+        value=Decimal(token)
+    except InvalidOperation as error:
+        raise ValueError(f"invalid printed metric: {token}") from error
+    if not value.is_finite():
+        return None
+    require(value>=0,f"negative error/gate metric: {token}")
+    if value==0:
+        return Decimal(0),Decimal(0)
+    radius=Decimal(5).scaleb(value.adjusted()-precision)
+    return max(Decimal(0),value-radius),value+radius
+
+
+def intervals_overlap(a: tuple[Decimal,Decimal], b: tuple[Decimal,Decimal]) -> bool:
+    return max(a[0],b[0])<=min(a[1],b[1])
+
+
+def parse_lt_config(raw: str|None) -> dict:
+    if raw is None:
+        return {"kind":"legacy_not_recorded","operations":[]}
+    require(bool(raw),"empty Lt config column")
+    if raw=="none":
+        return {"kind":"no_lt","operations":[],"meaning":"custom/empty/scale path; no cuBLASLt operation"}
+    pieces=raw.split("|")
+    operations=[]
+    for piece in pieces:
+        slot,separator,body=piece.partition(":")
+        require(separator and (slot in {"dense","batch7"} or re.fullmatch(r"leaf[0-6]",slot)),
+                f"unknown Lt config slot: {slot}")
+        fields={}
+        for item in body.split(";"):
+            name,separator,value=item.partition("=")
+            require(separator and name not in fields,f"malformed/duplicate Lt config field: {item}")
+            fields[name]=value
+        required=set(LT_ATTRIBUTES)|{"bound_candidate","tuned_candidate","bound_workspace","tuned","tune","tuning_ms"}|{f"align{i}" for i in range(4)}
+        require(required.issubset(fields),f"missing Lt config fields: {sorted(required-set(fields))}")
+        attributes={};query_na={}
+        for name in LT_ATTRIBUTES:
+            value=fields[name]
+            missing=re.fullmatch(r"NA\(status=(-?\d+)\)",value)
+            if missing:
+                attributes[name]=None;query_na[name]=int(missing.group(1))
+            else:
+                require(re.fullmatch(r"-?\d+",value) is not None,f"invalid Lt attribute {name}: {value}")
+                attributes[name]=int(value)
+        bound=re.fullmatch(r"(\d+)/(\d+)",fields["bound_candidate"])
+        require(bound is not None,"invalid bound_candidate index/pool")
+        index,pool=map(int,bound.groups())
+        selected=int(fields["tuned_candidate"]);workspace=int(fields["bound_workspace"])
+        require(pool>0 and 0<=index<pool and 0<=selected<pool and workspace>=0,"invalid Lt candidate/workspace metadata")
+        require(fields["tuned"] in {"0","1"} and fields["tune"] in LT_PROTOCOLS,"unknown Lt tuning state/profile")
+        tuned=fields["tuned"]=="1";score=fields["tuning_ms"]
+        if not tuned:
+            require(score=="NA(untuned)","untuned Lt config carries a false measured score")
+            score_state="untuned";score_value=None
+        elif index!=selected:
+            require(score=="NA(rebound)","rebound Lt config carries another candidate's score")
+            score_state="rebound";score_value=None
+        else:
+            score_value=float(score)
+            require(math.isfinite(score_value) and score_value>=0,"invalid measured Lt score")
+            score_state="measured_bound"
+        alignment=[int(fields[f"align{i}"]) for i in range(4)]
+        require(all(n>0 for n in alignment),"invalid Lt alignment metadata")
+        operations.append({"slot":slot,"attributes":attributes,"query_na_statuses":query_na,
+            "config_query_state":"partial_query_na" if query_na else "complete",
+            "actual_bound_algorithm_id":attributes["id"],"algorithm_id_state":"query_na" if "id" in query_na else "known",
+            "bound_candidate":index,"candidate_pool_size":pool,"tuned_candidate":selected,
+            "bound_workspace_bytes":workspace,"tuned":tuned,"configured_protocol":fields["tune"],
+            "protocol":LT_PROTOCOLS[fields["tune"]],"tuning_score_state":score_state,
+            "tuning_ms":score_value,"alignment_bytes":alignment,
+            "unrecognized_fields":{key:value for key,value in fields.items() if key not in required}})
+    slots=[op["slot"] for op in operations]
+    if slots==["dense"]:kind="dense"
+    elif slots==["batch7"]:kind="batch7"
+    else:
+        require(slots==[f"leaf{i}" for i in range(7)],"Lt leaves must contain leaf0 through leaf6 in order")
+        kind="seven_leaves"
+    return {"kind":kind,"operations":operations}
+
+
+def collect_lt_metadata(records: list[Record], required: bool=False) -> dict:
+    rows=[];summaries={}
+    for r in records:
+        present=[name in r.values for name in LT_COLUMNS]
+        require(all(present) or not any(present),"partial Lt CSV metadata schema")
+        require(None not in r.values,"extra CSV cells beyond header; possible stale schema append")
+        require(not required or all(present),"current benchmark schema requires both Lt config columns")
+        entry={"csv_line":r.line,"dtype":r.values["dtype"],"shape":list(r.shape),"actual":r.actual,
+               "variant":r.integer("variant"),"mode":r.values["mode"]}
+        for role,column in zip(("dense","solution"),LT_COLUMNS):
+            raw=r.values.get(column)
+            require(not all(present) or isinstance(raw,str),"missing Lt config CSV cell")
+            parsed=parse_lt_config(raw)
+            if all(present):
+                if role=="dense" or r.backend in {"dense","dense_fallback"}:
+                    require(parsed["kind"]=="dense",f"actual Dense route lacks Dense Lt config: {r.source}:{r.line}")
+                elif r.values["requested"]=="lt" and r.backend=="sw":
+                    require(parsed["kind"] in {"seven_leaves","batch7"},"actual Lt SW route lacks leaf/batch config")
+                else:
+                    require(parsed["kind"]=="no_lt","custom route unexpectedly reports an Lt operation")
+                allocated=r.integer(f"{role}_workspace")
+                require(all(op["bound_workspace_bytes"]<=allocated for op in parsed["operations"]),
+                        "bound Lt workspace exceeds recorded Plan workspace")
+            entry[column]=raw;entry[role]=parsed
+        rows.append(entry)
+    for role in ("dense","solution"):
+        operations=[op for row in rows for op in row[role]["operations"]]
+        ids=Counter((op["slot"],op["actual_bound_algorithm_id"],op["algorithm_id_state"]) for op in operations)
+        summaries[role]={"row_kind_counts":dict(Counter(row[role]["kind"] for row in rows)),
+            "operation_count":len(operations),
+            "configured_protocol_counts":dict(Counter(op["configured_protocol"] for op in operations)),
+            "tuning_score_state_counts":dict(Counter(op["tuning_score_state"] for op in operations)),
+            "config_query_state_counts":dict(Counter(op["config_query_state"] for op in operations)),
+            "actual_bound_algorithm_ids":[{"slot":slot,"id":value,"state":state,"operations":count}
+                for (slot,value,state),count in sorted(ids.items(),key=lambda item:str(item[0]))]}
+    return {"schema":"lt-config-v1" if all(all(name in r.values for name in LT_COLUMNS) for r in records) else "legacy_not_recorded",
+            "rows":rows,"summaries":summaries,
+            "score_scope":"selected candidate's setup tuning; rebound/untuned scores unavailable",
+            "raw_configuration_scope":"exact CSV cells, read outside final timing/capture; not a reconstructed kernel trace"}
+
+
+def benchmark_lt_schema(text: str) -> dict:
+    header=re.search(r'\bcsv_header\s*=\s*"([^"\r\n]+)"',text)
+    require(header is not None,"cannot identify measured benchmark CSV header")
+    columns=header.group(1).removesuffix(r"\n").split(",")
+    present=[name in columns for name in LT_COLUMNS]
+    require(all(present) or not any(present),"partial Lt columns in measured benchmark source schema")
+    return {"columns":list(LT_COLUMNS),"required_by_measurement_source":all(present),
+            "source_csv_column_count":len(columns)}
+
+
 def check_benchmark_log(path: Path, records: list[Record]) -> dict:
     require(path.is_file() and path.stat().st_size > 0, f"missing benchmark log: {path}")
     text = path.read_text(encoding="utf-8",errors="replace")
     pattern = re.compile(r"^CHECK (\d+),(\d+),(\d+) (bf16|fp16) trial=(\d+) "
                          r"dense_eF=(\S+) solution_eF=(\S+) gate=(\S+) pass=([01])",re.M)
-    trials = {}
+    trials = {};metrics=[]
+    by_row={(r.values["dtype"],r.shape):r for r in records}
     for match in pattern.finditer(text):
-        m,n,k,dtype,trial,_,_,_,passed = match.groups()
-        key = (dtype,(int(m),int(n),int(k)),int(trial))
+        m,n,k,dtype,trial,dense,solution,gate,passed = match.groups()
+        shape=(int(m),int(n),int(k));key=(dtype,shape,int(trial))
         require(key not in trials, f"duplicate fresh-input correctness trial: {path}: {key}")
-        trials[key] = int(passed)
+        require((dtype,shape) in by_row,f"unexpected correctness trial: {path}: {key}")
+        r=by_row[dtype,shape];flag=int(passed)
+        dense_interval=printed_interval(dense,6);solution_interval=printed_interval(solution,6)
+        gate_interval=printed_interval(gate,6)
+        require(dense_interval is not None and gate_interval is not None,
+                f"nonfinite dense/gate CHECK metric: {path}: {key}")
+        floor=Decimal(str(FLOORS[dtype]))
+        limit_interval=(floor+3*dense_interval[0],floor+3*dense_interval[1])
+        require(intervals_overlap(gate_interval,limit_interval),
+                f"CHECK gate formula contradicts rounded metrics: {path}: {key}")
+        if solution_interval is None:
+            require(flag==0,f"CHECK pass carries a nonfinite error: {path}: {key}")
+            relation="nonfinite_error"
+        elif solution_interval[0]>gate_interval[1]:
+            require(flag==0,f"CHECK pass contradicts error/gate: {path}: {key}")
+            relation="certain_metric_fail"
+        elif solution_interval[1]<=gate_interval[0]:
+            require(flag==1 or r.integer("nonfinite")>0,
+                    f"CHECK fail contradicts finite error/gate: {path}: {key}")
+            relation="certain_metric_pass" if flag else "uncertain_per_trial_nonfinite_scope"
+        else:
+            relation="uncertain_print_rounding"
+        intervals={"dense_ef":dense_interval,"solution_ef":solution_interval,"gate":gate_interval}
+        metrics.append({"dtype":dtype,"shape":list(shape),"trial":int(trial),"reported_pass":flag,
+            "printed_metrics":{"dense_ef":dense,"solution_ef":solution,"gate":gate},
+            "consistency":relation,
+            "conservative_print_intervals":{name:[str(n) for n in value] if value else None
+                for name,value in intervals.items()}})
+        trials[key]=flag
     expected = {(r.values["dtype"],r.shape,i) for r in records for i in range(r.integer("correct_trials"))}
     require(set(trials) == expected, f"partial correctness trial log: {path}; expected {len(expected)} CHECK lines")
     for r in records:
         passed = all(trials[r.values["dtype"],r.shape,i] for i in range(r.integer("correct_trials")))
         require(int(r.values["numerical_pass"]) == int(passed), f"CSV/trial conjunction disagrees: {path}: {r.shape}")
+        group=[item for item in metrics if item["dtype"]==r.values["dtype"] and tuple(item["shape"])==r.shape]
+        for field,log_field in (("dense_ef","dense_ef"),("solution_ef","solution_ef"),("gate_limit","gate")):
+            printed=[printed_interval(item["printed_metrics"][log_field],6) for item in group]
+            summary_interval=printed_interval(r.values[field],12)
+            if summary_interval is not None and all(value is not None for value in printed):
+                maximum=(max(value[0] for value in printed),max(value[1] for value in printed))
+                require(intervals_overlap(summary_interval,maximum),
+                        f"CSV maximum disagrees with rounded CHECK metrics: {path}: {r.shape}: {field}")
+    tuning={}
+    for match in re.finditer(r"^TUNE shape=(\d+),(\d+),(\d+) dtype=(bf16|fp16) case=(dense|solution) config=(\S+)\s*$",text,re.M):
+        m,n,k,dtype,role,raw=match.groups();key=(dtype,(int(m),int(n),int(k)),role)
+        require(key not in tuning,f"duplicate TUNE config: {path}: {key}")
+        tuning[key]=raw
+    has_configs=all(all(name in r.values for name in LT_COLUMNS) for r in records)
+    if has_configs:
+        expected_configs={(r.values["dtype"],r.shape,role):r.values[column]
+            for r in records for role,column in zip(("dense","solution"),LT_COLUMNS)}
+        require(tuning==expected_configs,f"TUNE log/config CSV mismatch or partial metadata: {path}")
+    counts=Counter(item["consistency"] for item in metrics)
     return {"fresh_input_trials":len(trials),"pass_trials":sum(trials.values()),
-            "failed_trials":len(trials)-sum(trials.values())}
+            "failed_trials":len(trials)-sum(trials.values()),"metric_consistency_counts":dict(counts),
+            "rounding_uncertain_trials":counts["uncertain_print_rounding"],
+            "per_trial_metrics":metrics,
+            "metric_precision_scope":"CHECK six significant digits / CSV twelve; intervals preserve ambiguity, not exact original metrics",
+            "nonfinite_scope":"CSV gives aggregate count; per-trial count is unavailable in CHECK",
+            "lt_config_log":{"records":len(tuning),"status":"matched_csv" if has_configs else "legacy_not_recorded"}}
 
 
-def collect_dataset(path: Path, case: dict, status: int, shapes: list[tuple[int,int,int]]) -> tuple[list[Record],dict]:
+def collect_dataset(path: Path, case: dict, status: int, shapes: list[tuple[int,int,int]],
+                    require_lt_metadata: bool=False) -> tuple[list[Record],dict]:
     records, warnings = read_records([path],"candidate")
     require(not warnings, f"CSV inconsistencies in {path}: {'; '.join(warnings)}")
     expected = {(dtype,shape) for dtype in FLOORS for shape in shapes}
@@ -188,7 +388,8 @@ def collect_dataset(path: Path, case: dict, status: int, shapes: list[tuple[int,
                      "numerical_pass_rows":sum(r.numerical_pass for r in records),
                      "sw_numerical_pass_rows":sum(r.backend=="sw" and r.numerical_pass for r in records),
                      "dense_fallback_pass_rows":sum(r.backend=="dense_fallback" and r.numerical_pass for r in records),
-                     "nonfinite_elements":sum(r.integer("nonfinite") for r in records)}
+                     "nonfinite_elements":sum(r.integer("nonfinite") for r in records),
+                     "lt_tuning":collect_lt_metadata(records,require_lt_metadata)}
 
 
 def source_test_profile(text: str) -> tuple[set[tuple[str,int]],list[str],int,set[tuple[str,int]]]:
@@ -412,12 +613,13 @@ def build_manifest(root: Path,results: Path,suite_path: Path,bench_binary: Path,
     require(digest(bench_binary)==bench_sha,"current benchmark binary differs from measured binary SHA256")
     require(digest(test_binary)==test_sha,"current correctness binary differs from verified binary SHA256")
     source=collect_source_identity(root,source_commit)
+    lt_schema=benchmark_lt_schema((root/"bench/benchmark.cu").read_text(encoding="utf-8"))
     metadata={row["label"]:row for row in bench_rows}
     datasets=[];records=[];telemetry_paths=[]
     for label,case in cases.items():
         path=results/f"small_final_{label}.csv"
         status=int(metadata[label]["exit_code"])
-        samples,summary=collect_dataset(path,case,status,shapes)
+        samples,summary=collect_dataset(path,case,status,shapes,lt_schema["required_by_measurement_source"])
         log=results/f"small_final_{label}.log"
         log_summary=check_benchmark_log(log,samples)
         entry=artifact(path,root,label=label,source_commit=source_commit,binary_sha256=bench_sha,
@@ -451,6 +653,11 @@ def build_manifest(root: Path,results: Path,suite_path: Path,bench_binary: Path,
               "cache":"warm_cache","rotate_inputs":1,"shapes":[list(s) for s in shapes],
               "warmup_evidence":"declared suite/script; warmup is not stored per CSV row",
               "input_transforms":"recomputed in every full invocation, including Graph replay"}
+    lt_evidence={**lt_schema,"protocol_definitions":LT_PROTOCOLS,
+                 "configuration_evidence":"dataset rows preserve exact raw CSV cells and parsed actual-bound configs",
+                 "algorithm_id_scope":"bound algorithm config ID, not the tuned candidate index or a GPU trace",
+                 "timing_scope":"configuration read after explicit tuning, outside final capture/timing",
+                 "old_csv_compatibility":"legacy helper reads are marked not recorded; current source schema requires its new columns"}
     return {"schema_version":1,"campaign":"predeclared small-matrix optimization",
             "generated_utc":dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),**source,
             "binary_sha256":{path_label(bench_binary,root):bench_sha,path_label(test_binary,root):test_sha},
@@ -458,6 +665,7 @@ def build_manifest(root: Path,results: Path,suite_path: Path,bench_binary: Path,
             "acceptance":suite["acceptance"],"aggregate_evidence_counts":aggregate,
             "run_metadata":[artifact(results/"small_final_runs.csv",root),artifact(results/"small_verify_runs.csv",root)],
             "datasets":datasets,"verification":verification,"strict_numerical_checks":strict,
+            "lt_tuning_metadata":lt_evidence,
             "telemetry":telemetry,"environment":build_environment(root,results,device_info,device),
             "report_and_reproduction_artifacts":artifacts,
             "acceptance_status":"manifest validates evidence completeness and identity; it does not enable Auto",

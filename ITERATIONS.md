@@ -69,6 +69,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 20 | Double-buffer raw quadrants through cp.async | 0.3526 | 0.497472 | screen-numerical-fail |
 
+| 21 | Strengthen smallLt tuning and record actual bound algorithms | 0.5287 | 0.072138 | measurement-traceability-numerical-fail |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -801,3 +803,51 @@ Iter19 validation: full structural/API/M1bits through16 PASS; Hopper7 and8 each1
 - **Analysis:** Quick20/5/1 screening completed18 finite rows, all frozen numeric gatesfail exit2. This tests a16x16 owner rather than16x8 prefetch16, with extra shared raw loads and different cache policy; per-primary prior-envelope comparison follows closure. No numerical threshold or completeP/fixedU order changed.
 - **Next:** Validate17 full structural/bitwise/Graph plus three standaloneCUDA12.8sanitizers and actual LDGSTS/wait/shared resources, then strengthen setup-only smallLt tuning and record bound algorithm identities before final comparison.
 - **Archive:** trajectory/20261013_150459_iter-20/
+
+### Iter18 post-closure prefetch16 source, SASS and validation evidence
+
+Independent CPU-only analysis is frozen in [results/small_prefetch_profile_iter18.json](results/small_prefetch_profile_iter18.json). Parent reported source c029e46; current18 benchmark/test hashes were read before19 build. Identity15 remains instruction/resource-identical to17. Prefetch16 uses120 registers versus15's96, compiled static shared6400 bytes for both, zero STACK/LOCAL and no LDL/STL. Its single24-u32 raw bank is96 bytes in R62–R85, with no source shared addition; declared operand shared5376 bytes remains distinct from the6400-byte resource total.
+
+Next-bank LDGs at0x1440..0x1660(FP16)/0x1670(BF16) are all @!P6 and precede all seven HMMA at0x1700..0x17b0. Five of fourteen current LDSM precede the first next LDG, so the compiled path overlaps some LDSM and all HMMA rather than issuing all next loads before all shared reads. No raw-dependent MOV/repack/cast occurs before the0x17c0 backedge. Every next LDG assigns encoded completion barrier5; that interval has no wait on bit5. The next-loop head0xb20 waits0x20 before raw use. Bits0..4 waits release address-read hazards before LDSM register reuse, not raw-result completion. This supports exposed lookahead without measuring whether all memory latency is hidden.
+
+Cache modifiers change from15's LDG.E.128.CONSTANT / LDG.E.64.CONSTANT to16's LDG.E.128 / LDG.E.64. Speed cannot be attributed solely to prefetch scheduling. Seven full-K products, fixed U,24 packed RN converters and eight float2 output STG.E.64 remain. Static instructions rise440→480;16 static global-load sites consist of eight prologue plus eight guarded next-load sites, not doubled dynamic traffic. Source next_k<kh, decoded final predicate, CPU enumeration of all1024 allowed parent-K values/524800 stages, and short-K sanitizer evidence together support no final out-of-range read; static counts alone do not.
+
+Correctness18 has1012 finite CASE rows (506/dtype),97 explicit PASS markers and574 route checks without mismatch. Its76 Mega16 CASE rows across prefetch/fallback routes all report zero errors/nonfinite. All24 bitwise records include16. Each of three16 sanitizer logs includes44 exact structural cases, with18 short-K cases spanning both dtypes,128×128/32×16/32×48 owners andK32/64/96, plus ten output-rebind PASS markers. Observed summaries are memcheck0 errors, racecheck0 errors/0 warnings, synccheck0 errors; parent separately reports all exit0. No prefetch-specific Graph PASS or strict precision certification is inferred.
+
+The one warmed128BF NsightSystems capture observes one GPU kernel lasting3392ns (3.392us). Its instrumented host cudaLaunchKernel API lasts74266ns, which is not steady launch overhead. Quick20/5/1 medians are128 BF4.1264us/FP4.3392us and512 BF10.9936us/FP11.0864us; all18 frozen gates fail. These are promising own-latency signals requiring full same-binary confirmation. A single instrumented GPU sample, batch launch median and inflated host API duration do not form an overhead decomposition or certified speedup. No source/script edit or GPU/build/benchmark/git action was performed for this evidence audit.
+
+Iter20 post-closure primary comparison (quick20/5/1, mixed historicalfull protocols, notacceptance): bf16 128^3 4.566us Dense/SW=0.908x priorbest/SW=0.904x; fp16 128^3 4.787us Dense/SW=0.864x priorbest/SW=0.906x; bf16 256^3 6.354us Dense/SW=0.832x priorbest/SW=0.999x; fp16 256^3 6.522us Dense/SW=0.738x priorbest/SW=0.982x; bf16 512^3 13.378us Dense/SW=0.462x priorbest/SW=0.822x; fp16 512^3 13.221us Dense/SW=0.463x priorbest/SW=0.839x; bf16 1024^3 51.638us Dense/SW=0.250x priorbest/SW=0.384x; fp16 1024^3 51.066us Dense/SW=0.198x priorbest/SW=0.385x. No primary shape beats prior observed SW envelope by3%.
+
+Iter20 GPUvalidation: complete structural/API/M1bitwise through17 and Graph full32/full96/tail80 with3fresh replays PASS; isolation17 shortK32/64/96, generalcoeffalias/padding, input+2/output+4rebindings PASS; standaloneCUDA12.8 three17sanitizers zeromem/syncerrors and zeroracehazards/errors/warnings.
+
+### Iter 21 — Strengthen smallLt tuning and record actual bound algorithms
+
+- **Hypothesis:** Setup-only median-of-three ten-call candidate groups improve smallLt selection evidence while actual configuration metadata makes Dense baseline variation traceable.
+- **Changes:** Small actualdescriptors≤4096 tune4warm/3x10median, largedescriptors old1warm/3calls; readonly actualbound Lt config API with9typedattrs, explicit NA/score/workspace;51columnCSV with TUNE logs outsidecapture/time and strict appendheader; exact --profile-dense single invocation; APIalias/rebindtests and manifest rawconfig/log/printing-consistency evidence.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.072138 ms; mean speedup=0.5287x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | winograd_lt_batched v1 | launch | 0.004190 | 0.009987 | 0.4196 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | winograd_lt_batched v1 | launch | 0.004050 | 0.010195 | 0.3972 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | winograd_lt_batched v1 | launch | 0.005296 | 0.011078 | 0.4780 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | winograd_lt_batched v1 | launch | 0.004830 | 0.010955 | 0.4409 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | winograd_lt_batched v1 | launch | 0.006082 | 0.012027 | 0.5057 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | winograd_lt_batched v1 | launch | 0.006123 | 0.011946 | 0.5126 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | winograd_lt_batched v1 | launch | 0.012822 | 0.020034 | 0.6400 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | winograd_lt_batched v1 | launch | 0.010152 | 0.019824 | 0.5121 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | winograd_lt_batched v1 | launch | 0.032293 | 0.073070 | 0.4419 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | winograd_lt_batched v1 | launch | 0.033163 | 0.067541 | 0.4910 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | winograd_lt_batched v1 | launch | 0.085387 | 0.175542 | 0.4864 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | winograd_lt_batched v1 | launch | 0.088544 | 0.154690 | 0.5724 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | winograd_lt_batched v1 | launch | 0.196011 | 0.353909 | 0.5538 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | winograd_lt_batched v1 | launch | 0.207480 | 0.305123 | 0.6800 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | winograd_lt_batched v1 | launch | 0.010440 | 0.016245 | 0.6427 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | winograd_lt_batched v1 | launch | 0.009984 | 0.015952 | 0.6259 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | winograd_lt_batched v1 | launch | 0.008464 | 0.015315 | 0.5527 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | winograd_lt_batched v1 | launch | 0.008486 | 0.015042 | 0.5642 | 0.00075151 | 0 |
+
+- **Analysis:** Quick20/5/1 Lt1 screen completed18 finite rows, all frozen numerical gatesfailed exit2. Configurations now record actual IDs/tile/stage/index/workspace and explicit tuning protocol. Candidate pool/alignment/dedup/budget/numerics/steady timing and immutable aliased C0snapshot unchanged. This does not by itself establish that earlier Dense anomalies are solved; per-primary envelope analysis and exact Dense GPU capture follow closure.
+- **Next:** Validate API/aliases/rebounds, capture Dense128GPU, reassess three-iteration outcomes and compiler/timeline/primary-source evidence before separately testing PLAN M2 stage contributions.
+- **Archive:** trajectory/20261013_153023_iter-21/

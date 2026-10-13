@@ -1,0 +1,2296 @@
+{
+  "schema_version": 1,
+  "iteration": 20,
+  "kind": "CPU-only archived source/SASS/resource/log audit; static counts and schedule are not dynamic performance",
+  "generated_utc": "2026-10-13T07:21:10.995758+00:00",
+  "parent_reported_measured_source_commit": "a1a77c8",
+  "source_commit_independently_verified_with_git": false,
+  "measured_test_source_archive": {
+    "path": ".scratch/test_correctness_iter20.cu",
+    "sha256": "bfd197b574a20190c4b1c3385f0e04ce29b187b0a994654a78b3aaa486203b32",
+    "provenance": "Parent extracted exact measured build commit a1a77c8 with git show; reviewer independently hashed and read this archive, without running git."
+  },
+  "binary_identity_observed_while_parent_confirmed_iter20_binary_before_iter21_build": {
+    "bench": {
+      "path": "build/megafmm_bench",
+      "bytes": 8675760,
+      "sha256": "1e3ed27d11566c1c94e2629fe14faff6273c3138b916f09aade5c715d1b19650"
+    },
+    "test": {
+      "path": "build/test_correctness",
+      "bytes": 8744400,
+      "sha256": "b2804e92eaf12a4bebe3adc675367aa40281da806a30309f07934ee1a949a349"
+    }
+  },
+  "inputs": [
+    {
+      "path": ".scratch/small_sass_iter20.txt",
+      "bytes": 23996100,
+      "sha256": "b3637304fe19904d94aeaf033dff84f20d7a4a686e881493e125676630d30a6a"
+    },
+    {
+      "path": ".scratch/small_resources_iter20.txt",
+      "bytes": 42842,
+      "sha256": "63499e706f1b9d778205cd85c9909dea314dab5509457a9d97d9f8e55e324ec7"
+    },
+    {
+      "path": "solution/small_mma_cpasync.cu",
+      "bytes": 17954,
+      "sha256": "56b3ec66e81b7ee066c9fe18f550b91beaba7fefff4b8b2ead8c4d832e263660"
+    },
+    {
+      "path": "solution/small_mma_fast.cu",
+      "bytes": 16540,
+      "sha256": "8fddc0a59e8ed2b1ec7fbc78baa206261a952c492c8b8d94e4511b8ec1e45924"
+    },
+    {
+      "path": ".scratch/test_correctness_iter20.cu",
+      "bytes": 64562,
+      "sha256": "bfd197b574a20190c4b1c3385f0e04ce29b187b0a994654a78b3aaa486203b32"
+    },
+    {
+      "path": "third_party/cutlass/include/cute/arch/copy_sm80.hpp",
+      "bytes": 6856,
+      "sha256": "e4147df9e8a94d82302b903d5db4b6dc07706192b134a3966a02aeaef068b38f"
+    },
+    {
+      "path": "trajectory/20261013_150459_iter-20/results.csv",
+      "bytes": 10197,
+      "sha256": "b33ee42fa3aed5b5672fb8fe3c108821adc6f2afb49f40bb14527ae0d9735895"
+    },
+    {
+      "path": "results/correctness_iter20.txt",
+      "bytes": 293617,
+      "sha256": "559759bae9a82c0acb2c260ec65e300578a1c062a29ec68b6be578a5d37cd650"
+    },
+    {
+      "path": "results/sanitizer_small_cpasync17_memcheck.txt",
+      "bytes": 11113,
+      "sha256": "cc4e142300ed410efc8deecd253b58b27b27fddeba001a819e7ea9290dede3f1"
+    },
+    {
+      "path": "results/sanitizer_small_cpasync17_racecheck.txt",
+      "bytes": 11151,
+      "sha256": "3c1eeb0b979797fbf6dc7b86ef92bfd5a8d540527604161b5cbd151578df7e3e"
+    },
+    {
+      "path": "results/sanitizer_small_cpasync17_synccheck.txt",
+      "bytes": 11113,
+      "sha256": "cc4e142300ed410efc8deecd253b58b27b27fddeba001a819e7ea9290dede3f1"
+    }
+  ],
+  "parser_contract": "Every offset-bearing instruction is counted, including predicate-false @!UPT UIADD3, @!PT LDS RZ placeholders, terminal self-BRA and NOP padding. Encoding-only lines excluded; no unrecognized selected instruction lines. Both runtime beta paths contribute to static epilogue counts. Counts 880/952 are not per-launch instruction totals. Earlier 879 baseline count omitted predicate-false UIADD3.",
+  "targets": [
+    {
+      "variant": 8,
+      "dtype": "fp16",
+      "symbol": "_ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass6half_tELb1EEEvNS_7ProblemEPKT_S7_PKfPf",
+      "resource_usage": {
+        "REG": 126,
+        "STACK": 0,
+        "SHARED": 8192,
+        "LOCAL": 0
+      },
+      "source_declared_transformed_operand_shared_bytes": 7168,
+      "source_raw_shared_bank_count": 0,
+      "source_raw_shared_bank_bytes": 0,
+      "source_total_shared_bytes": 7168,
+      "compiled_shared_beyond_source_buffer_bytes": 1024,
+      "compiled_extra_shared_origin_verified": false,
+      "static_instruction_count_including_padding_and_predicate_false": 880,
+      "opcode_counts": {
+        "BRA": 5,
+        "CS2R": 56,
+        "EXIT": 2,
+        "F2FP.F16.F32.PACK_AB": 32,
+        "FADD": 169,
+        "FFMA": 32,
+        "FMUL": 60,
+        "FSETP.NEU.AND": 1,
+        "HADD2.F32": 64,
+        "HMMA.16816.F32": 14,
+        "IADD3": 44,
+        "IADD3.X": 27,
+        "IMAD": 32,
+        "IMAD.IADD": 3,
+        "IMAD.SHL.U32": 6,
+        "IMAD.U32": 2,
+        "IMAD.WIDE.U32": 22,
+        "IMAD.X": 5,
+        "ISETP.GE.AND.EX": 1,
+        "ISETP.GT.AND.EX": 1,
+        "ISETP.GT.U32.AND": 1,
+        "ISETP.LE.U32.AND": 1,
+        "LDC": 1,
+        "LDC.64": 3,
+        "LDG.E": 32,
+        "LDG.E.128.CONSTANT": 8,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.4": 7,
+        "LEA": 22,
+        "LEA.HI": 2,
+        "LEA.HI.X": 14,
+        "LOP3.LUT": 29,
+        "MOV": 6,
+        "NOP": 13,
+        "S2R": 7,
+        "S2UR": 3,
+        "SHF.L.U32": 2,
+        "SHF.L.U64.HI": 3,
+        "SHF.R.S32.HI": 1,
+        "SHF.R.S64": 1,
+        "SHF.R.U32.HI": 12,
+        "SHF.R.U64": 1,
+        "STG.E": 64,
+        "STS.128": 14,
+        "UIADD3": 3,
+        "UIADD3.X": 5,
+        "UIMAD.WIDE.U32": 2,
+        "ULDC.64": 14,
+        "ULEA.HI": 3,
+        "ULOP3.LUT": 1,
+        "UMOV": 3,
+        "UPRMT": 1,
+        "USHF.L.U32": 3,
+        "USHF.L.U64.HI": 3,
+        "USHF.R.S32.HI": 2,
+        "USHF.R.S64": 2,
+        "VIADD": 6
+      },
+      "spill_load_store_opcodes_observed": false,
+      "mma_accumulator_destination_order": [
+        {
+          "offset": "0x18b0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R4, R60, R64, R4"
+        },
+        {
+          "offset": "0x18d0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R8, R60, R66, R8"
+        },
+        {
+          "offset": "0x18f0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R12, R68, R72, R12"
+        },
+        {
+          "offset": "0x1910",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R16, R68, R74, R16"
+        },
+        {
+          "offset": "0x1950",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R20, R60, R64, R20"
+        },
+        {
+          "offset": "0x1960",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R24, R60, R66, R24"
+        },
+        {
+          "offset": "0x1970",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R28, R68, R72, R28"
+        },
+        {
+          "offset": "0x19a0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R32, R68, R74, R32"
+        },
+        {
+          "offset": "0x19b0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R36, R76, R80, R36"
+        },
+        {
+          "offset": "0x19c0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R40, R76, R82, R40"
+        },
+        {
+          "offset": "0x19d0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R44, R84, R88, R44"
+        },
+        {
+          "offset": "0x19e0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R48, R84, R90, R48"
+        },
+        {
+          "offset": "0x19f0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R52, R92, R96, R52"
+        },
+        {
+          "offset": "0x1a00",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R56, R92, R98, R56"
+        }
+      ],
+      "LDSM_instructions": [
+        {
+          "offset": "0x1820",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R60, [R0]"
+        },
+        {
+          "offset": "0x1830",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R64, [R0+0xe00]"
+        },
+        {
+          "offset": "0x1840",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R68, [R0+0x200]"
+        },
+        {
+          "offset": "0x1850",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R72, [R0+0x1000]"
+        },
+        {
+          "offset": "0x1860",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R76, [R0+0x800]"
+        },
+        {
+          "offset": "0x1870",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R80, [R0+0x1600]"
+        },
+        {
+          "offset": "0x1880",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R84, [R0+0xa00]"
+        },
+        {
+          "offset": "0x1890",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R88, [R0+0x1800]"
+        },
+        {
+          "offset": "0x18a0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R92, [R0+0xc00]"
+        },
+        {
+          "offset": "0x18c0",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R96, [R0+0x1a00]"
+        },
+        {
+          "offset": "0x18e0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R60, [R0+0x400]"
+        },
+        {
+          "offset": "0x1900",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R64, [R0+0x1200]"
+        },
+        {
+          "offset": "0x1920",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R68, [R0+0x600]"
+        },
+        {
+          "offset": "0x1930",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R72, [R0+0x1400]"
+        }
+      ],
+      "global_input_cache_policy": "LDG.E.128.CONSTANT"
+    },
+    {
+      "variant": 8,
+      "dtype": "bf16",
+      "symbol": "_ZN7megafmm50_GLOBAL__N__cf37cb40_17_small_mma_fast_cu_c25d357416small_mma_kernelIN7cutlass10bfloat16_tELb1EEEvNS_7ProblemEPKT_S7_PKfPf",
+      "resource_usage": {
+        "REG": 126,
+        "STACK": 0,
+        "SHARED": 8192,
+        "LOCAL": 0
+      },
+      "source_declared_transformed_operand_shared_bytes": 7168,
+      "source_raw_shared_bank_count": 0,
+      "source_raw_shared_bank_bytes": 0,
+      "source_total_shared_bytes": 7168,
+      "compiled_shared_beyond_source_buffer_bytes": 1024,
+      "compiled_extra_shared_origin_verified": false,
+      "static_instruction_count_including_padding_and_predicate_false": 880,
+      "opcode_counts": {
+        "BRA": 5,
+        "CS2R": 56,
+        "EXIT": 2,
+        "F2FP.BF16.F32.PACK_AB": 32,
+        "FADD": 169,
+        "FFMA": 32,
+        "FMUL": 60,
+        "FSETP.NEU.AND": 1,
+        "HMMA.16816.F32.BF16": 14,
+        "IADD3": 44,
+        "IADD3.X": 27,
+        "IMAD": 32,
+        "IMAD.IADD": 3,
+        "IMAD.MOV.U32": 3,
+        "IMAD.SHL.U32": 6,
+        "IMAD.U32": 25,
+        "IMAD.WIDE.U32": 22,
+        "IMAD.X": 5,
+        "ISETP.GE.AND.EX": 1,
+        "ISETP.GT.AND.EX": 1,
+        "ISETP.GT.U32.AND": 1,
+        "ISETP.LE.U32.AND": 1,
+        "LDC": 1,
+        "LDC.64": 3,
+        "LDG.E": 32,
+        "LDG.E.128.CONSTANT": 8,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.4": 7,
+        "LEA": 22,
+        "LEA.HI": 2,
+        "LEA.HI.X": 14,
+        "LOP3.LUT": 61,
+        "MOV": 2,
+        "NOP": 13,
+        "S2R": 7,
+        "S2UR": 3,
+        "SHF.L.U32": 12,
+        "SHF.L.U64.HI": 3,
+        "SHF.R.S32.HI": 1,
+        "SHF.R.S64": 1,
+        "SHF.R.U32.HI": 12,
+        "SHF.R.U64": 1,
+        "STG.E": 64,
+        "STS.128": 14,
+        "UIADD3": 3,
+        "UIADD3.X": 5,
+        "UIMAD.WIDE.U32": 2,
+        "ULDC.64": 14,
+        "ULEA.HI": 3,
+        "ULOP3.LUT": 1,
+        "UMOV": 3,
+        "UPRMT": 1,
+        "USHF.L.U32": 3,
+        "USHF.L.U64.HI": 3,
+        "USHF.R.S32.HI": 2,
+        "USHF.R.S64": 2,
+        "VIADD": 6
+      },
+      "spill_load_store_opcodes_observed": false,
+      "mma_accumulator_destination_order": [
+        {
+          "offset": "0x18b0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R4, R60, R64, R4"
+        },
+        {
+          "offset": "0x18d0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R8, R60, R66, R8"
+        },
+        {
+          "offset": "0x18f0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R12, R68, R72, R12"
+        },
+        {
+          "offset": "0x1910",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R16, R68, R74, R16"
+        },
+        {
+          "offset": "0x1950",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R20, R60, R64, R20"
+        },
+        {
+          "offset": "0x1960",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R24, R60, R66, R24"
+        },
+        {
+          "offset": "0x1970",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R28, R68, R72, R28"
+        },
+        {
+          "offset": "0x1990",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R32, R68, R74, R32"
+        },
+        {
+          "offset": "0x19b0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R36, R76, R80, R36"
+        },
+        {
+          "offset": "0x19c0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R40, R76, R82, R40"
+        },
+        {
+          "offset": "0x19d0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R44, R84, R88, R44"
+        },
+        {
+          "offset": "0x19e0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R48, R84, R90, R48"
+        },
+        {
+          "offset": "0x19f0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R52, R92, R96, R52"
+        },
+        {
+          "offset": "0x1a00",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R56, R92, R98, R56"
+        }
+      ],
+      "LDSM_instructions": [
+        {
+          "offset": "0x1820",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R60, [R0]"
+        },
+        {
+          "offset": "0x1830",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R64, [R0+0xe00]"
+        },
+        {
+          "offset": "0x1840",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R68, [R0+0x200]"
+        },
+        {
+          "offset": "0x1850",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R72, [R0+0x1000]"
+        },
+        {
+          "offset": "0x1860",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R76, [R0+0x800]"
+        },
+        {
+          "offset": "0x1870",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R80, [R0+0x1600]"
+        },
+        {
+          "offset": "0x1880",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R84, [R0+0xa00]"
+        },
+        {
+          "offset": "0x1890",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R88, [R0+0x1800]"
+        },
+        {
+          "offset": "0x18a0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R92, [R0+0xc00]"
+        },
+        {
+          "offset": "0x18c0",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R96, [R0+0x1a00]"
+        },
+        {
+          "offset": "0x18e0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R60, [R0+0x400]"
+        },
+        {
+          "offset": "0x1900",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R64, [R0+0x1200]"
+        },
+        {
+          "offset": "0x1920",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R68, [R0+0x600]"
+        },
+        {
+          "offset": "0x1930",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R72, [R0+0x1400]"
+        }
+      ],
+      "global_input_cache_policy": "LDG.E.128.CONSTANT"
+    },
+    {
+      "variant": 17,
+      "dtype": "fp16",
+      "symbol": "_ZN7megafmm53_GLOBAL__N__79c648b9_20_small_mma_cpasync_cu_3102536120small_cpasync_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf",
+      "resource_usage": {
+        "REG": 145,
+        "STACK": 0,
+        "SHARED": 16384,
+        "LOCAL": 0
+      },
+      "source_declared_transformed_operand_shared_bytes": 7168,
+      "source_raw_shared_bank_count": 2,
+      "source_raw_shared_bank_bytes": 4096,
+      "source_total_shared_bytes": 15360,
+      "compiled_shared_beyond_source_buffer_bytes": 1024,
+      "compiled_extra_shared_origin_verified": false,
+      "static_instruction_count_including_padding_and_predicate_false": 952,
+      "opcode_counts": {
+        "BRA": 7,
+        "CS2R": 28,
+        "DEPBAR.LE": 2,
+        "EXIT": 2,
+        "F2FP.F16.F32.PACK_AB": 32,
+        "FADD": 169,
+        "FFMA": 32,
+        "FMUL": 60,
+        "FSETP.NEU.AND": 1,
+        "HADD2.F32": 64,
+        "HMMA.16816.F32": 14,
+        "IADD3": 56,
+        "IADD3.X": 33,
+        "IMAD": 38,
+        "IMAD.IADD": 5,
+        "IMAD.MOV.U32": 4,
+        "IMAD.SHL.U32": 8,
+        "IMAD.U32": 3,
+        "IMAD.WIDE.U32": 22,
+        "IMAD.X": 14,
+        "ISETP.GE.AND.EX": 3,
+        "ISETP.GE.U32.AND": 1,
+        "ISETP.LE.U32.AND": 2,
+        "LDC": 1,
+        "LDC.64": 8,
+        "LDG.E": 32,
+        "LDGDEPBAR": 4,
+        "LDGSTS.E.LTC128B.128": 16,
+        "LDS": 6,
+        "LDS.128": 8,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.4": 7,
+        "LEA": 29,
+        "LEA.HI": 4,
+        "LEA.HI.X": 18,
+        "LOP3.LUT": 29,
+        "MOV": 4,
+        "NOP": 18,
+        "S2R": 3,
+        "S2UR": 3,
+        "SHF.L.U32": 1,
+        "SHF.L.U64.HI": 5,
+        "SHF.R.S32.HI": 4,
+        "SHF.R.S64": 4,
+        "SHF.R.U32.HI": 10,
+        "STG.E": 64,
+        "STS.128": 14,
+        "UIADD3": 4,
+        "UIADD3.X": 5,
+        "UIMAD.WIDE.U32": 2,
+        "ULDC.64": 12,
+        "ULEA.HI": 3,
+        "ULOP3.LUT": 1,
+        "UMOV": 3,
+        "UPRMT": 1,
+        "USHF.L.U32": 5,
+        "USHF.L.U64.HI": 4,
+        "USHF.R.S32.HI": 3,
+        "USHF.R.S64": 3,
+        "USHF.R.U32.HI": 1,
+        "VIADD": 6
+      },
+      "spill_load_store_opcodes_observed": false,
+      "mma_accumulator_destination_order": [
+        {
+          "offset": "0x1cf0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R4, R60, R64, R4"
+        },
+        {
+          "offset": "0x1d20",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R8, R60, R66, R8"
+        },
+        {
+          "offset": "0x1d40",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R12, R68, R72, R12"
+        },
+        {
+          "offset": "0x1d70",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R16, R68, R74, R16"
+        },
+        {
+          "offset": "0x1da0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R20, R76, R80, R20"
+        },
+        {
+          "offset": "0x1dc0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R24, R76, R82, R24"
+        },
+        {
+          "offset": "0x1dd0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R28, R84, R88, R28"
+        },
+        {
+          "offset": "0x1de0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R32, R84, R90, R32"
+        },
+        {
+          "offset": "0x1df0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R36, R92, R96, R36"
+        },
+        {
+          "offset": "0x1e00",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R40, R92, R98, R40"
+        },
+        {
+          "offset": "0x1e10",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R44, R100, R104, R44"
+        },
+        {
+          "offset": "0x1e20",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R48, R100, R106, R48"
+        },
+        {
+          "offset": "0x1e30",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R52, R108, R112, R52"
+        },
+        {
+          "offset": "0x1e40",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R56, R108, R114, R56"
+        }
+      ],
+      "LDSM_instructions": [
+        {
+          "offset": "0x1c40",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R60, [R0+0x2000]"
+        },
+        {
+          "offset": "0x1c50",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R64, [R0+0x2e00]"
+        },
+        {
+          "offset": "0x1c60",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R68, [R0+0x2200]"
+        },
+        {
+          "offset": "0x1c70",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R72, [R0+0x3000]"
+        },
+        {
+          "offset": "0x1c80",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R76, [R0+0x2400]"
+        },
+        {
+          "offset": "0x1c90",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R80, [R0+0x3200]"
+        },
+        {
+          "offset": "0x1ca0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R84, [R0+0x2600]"
+        },
+        {
+          "offset": "0x1cb0",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R88, [R0+0x3400]"
+        },
+        {
+          "offset": "0x1cd0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R92, [R0+0x2800]"
+        },
+        {
+          "offset": "0x1ce0",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R96, [R0+0x3600]"
+        },
+        {
+          "offset": "0x1d00",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R100, [R0+0x2a00]"
+        },
+        {
+          "offset": "0x1d10",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R104, [R0+0x3800]"
+        },
+        {
+          "offset": "0x1d30",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R108, [R0+0x2c00]"
+        },
+        {
+          "offset": "0x1d50",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R112, [R0+0x3a00]"
+        }
+      ],
+      "global_input_cache_policy": "source cp.async.ca.shared.global.L2::128B; compiled LDGSTS.E.LTC128B.128",
+      "async_instructions": [
+        {
+          "offset": "0x0480",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118], desc[UR14][R12.64]"
+        },
+        {
+          "offset": "0x0640",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0x200], desc[UR14][R12.64]"
+        },
+        {
+          "offset": "0x0670",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0x400], desc[UR14][R20.64]"
+        },
+        {
+          "offset": "0x0690",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0x600], desc[UR14][R8.64]"
+        },
+        {
+          "offset": "0x06b0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0x800], desc[UR14][R10.64]"
+        },
+        {
+          "offset": "0x06c0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0xa00], desc[UR14][R4.64]"
+        },
+        {
+          "offset": "0x06d0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0xc00], desc[UR14][R18.64]"
+        },
+        {
+          "offset": "0x06e0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0xe00], desc[UR14][R6.64]"
+        },
+        {
+          "offset": "0x0700",
+          "predicate": null,
+          "opcode": "LDGDEPBAR",
+          "operands": ""
+        },
+        {
+          "offset": "0x0720",
+          "predicate": null,
+          "opcode": "LDGDEPBAR",
+          "operands": ""
+        },
+        {
+          "offset": "0x0780",
+          "predicate": null,
+          "opcode": "DEPBAR.LE",
+          "operands": "SB0, 0x0"
+        },
+        {
+          "offset": "0x0ec0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61], desc[UR14][R66.64+0x20]"
+        },
+        {
+          "offset": "0x0f00",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0x200], desc[UR14][R64.64+0x20]"
+        },
+        {
+          "offset": "0x0f10",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0x400], desc[UR14][R62.64+0x20]"
+        },
+        {
+          "offset": "0x0f20",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0x600], desc[UR14][R70.64+0x20]"
+        },
+        {
+          "offset": "0x0f30",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0x800], desc[UR14][R68.64]"
+        },
+        {
+          "offset": "0x0f90",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0xa00], desc[UR14][R66.64]"
+        },
+        {
+          "offset": "0x0fb0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0xc00], desc[UR14][R64.64]"
+        },
+        {
+          "offset": "0x0fc0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0xe00], desc[UR14][R62.64]"
+        },
+        {
+          "offset": "0x0fd0",
+          "predicate": null,
+          "opcode": "LDGDEPBAR",
+          "operands": ""
+        },
+        {
+          "offset": "0x1cc0",
+          "predicate": null,
+          "opcode": "LDGDEPBAR",
+          "operands": ""
+        },
+        {
+          "offset": "0x1d60",
+          "predicate": null,
+          "opcode": "DEPBAR.LE",
+          "operands": "SB0, 0x0"
+        }
+      ],
+      "raw_consumption_instructions": [
+        {
+          "offset": "0x10b0",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R60, [R88+0x400]"
+        },
+        {
+          "offset": "0x10e0",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R76, [R88+0x600]"
+        },
+        {
+          "offset": "0x10f0",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R84, [R88]"
+        },
+        {
+          "offset": "0x1100",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R80, [R88+0x200]"
+        },
+        {
+          "offset": "0x1680",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R68, [R88+0x800]"
+        },
+        {
+          "offset": "0x1690",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R60, [R88+0xc00]"
+        },
+        {
+          "offset": "0x16a0",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R64, [R88+0xa00]"
+        },
+        {
+          "offset": "0x16b0",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R88, [R88+0xe00]"
+        }
+      ],
+      "predicate_false_LDS_placeholders": [
+        {
+          "offset": "0x0450",
+          "predicate": "@!PT",
+          "opcode": "LDS",
+          "operands": "RZ, [RZ]"
+        },
+        {
+          "offset": "0x0460",
+          "predicate": "@!PT",
+          "opcode": "LDS",
+          "operands": "RZ, [RZ]"
+        },
+        {
+          "offset": "0x0470",
+          "predicate": "@!PT",
+          "opcode": "LDS",
+          "operands": "RZ, [RZ]"
+        },
+        {
+          "offset": "0x0e90",
+          "predicate": "@!PT",
+          "opcode": "LDS",
+          "operands": "RZ, [RZ]"
+        },
+        {
+          "offset": "0x0ea0",
+          "predicate": "@!PT",
+          "opcode": "LDS",
+          "operands": "RZ, [RZ]"
+        },
+        {
+          "offset": "0x0eb0",
+          "predicate": "@!PT",
+          "opcode": "LDS",
+          "operands": "RZ, [RZ]"
+        }
+      ],
+      "compiled_stage_wait": {
+        "offset": "0x1d60",
+        "opcode": "DEPBAR.LE SB0, 0x0",
+        "HMMA_before_wait": 3,
+        "HMMA_after_wait": 11,
+        "all_14_LDSM_before_wait": true,
+        "interpretation": "Next raw-bank completion wait occurs after the first three HMMAs, despite the source wait appearing after all seven products. Static schedule therefore provides less MMA overlap than a source-only description would imply; no dynamic overlap fraction or stall duration is measured."
+      },
+      "lookahead_guard_instructions": [
+        {
+          "offset": "0x0ff0",
+          "predicate": null,
+          "opcode": "LOP3.LUT",
+          "operands": "R141, R60, 0x1, RZ, 0x3c, !PT"
+        },
+        {
+          "offset": "0x1000",
+          "predicate": null,
+          "opcode": "UIADD3",
+          "operands": "UR6, UP0, UR6, 0x10, URZ"
+        },
+        {
+          "offset": "0x1010",
+          "predicate": null,
+          "opcode": "UIADD3.X",
+          "operands": "UR7, URZ, UR7, URZ, UP0, !UPT"
+        },
+        {
+          "offset": "0x1020",
+          "predicate": null,
+          "opcode": "ISETP.LE.U32.AND",
+          "operands": "P0, PT, R117, UR6, PT"
+        },
+        {
+          "offset": "0x1030",
+          "predicate": null,
+          "opcode": "IMAD.U32",
+          "operands": "R61, RZ, RZ, UR7"
+        },
+        {
+          "offset": "0x1040",
+          "predicate": null,
+          "opcode": "ISETP.GE.AND.EX",
+          "operands": "P0, PT, R61, R116, PT, P0"
+        },
+        {
+          "offset": "0x1050",
+          "predicate": "@!UPT",
+          "opcode": "UIADD3",
+          "operands": "URZ, URZ, URZ, URZ"
+        },
+        {
+          "offset": "0x1060",
+          "predicate": "@!P0",
+          "opcode": "BRA",
+          "operands": "0xe10"
+        }
+      ],
+      "backedge_instructions": [
+        {
+          "offset": "0x1e40",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R56, R108, R114, R56"
+        },
+        {
+          "offset": "0x1e50",
+          "predicate": null,
+          "opcode": "NOP",
+          "operands": ""
+        },
+        {
+          "offset": "0x1e60",
+          "predicate": "@!UPT",
+          "opcode": "UIADD3",
+          "operands": "URZ, URZ, URZ, URZ"
+        },
+        {
+          "offset": "0x1e70",
+          "predicate": "@!P1",
+          "opcode": "BRA",
+          "operands": "0xff0"
+        },
+        {
+          "offset": "0x1e80",
+          "predicate": null,
+          "opcode": "S2R",
+          "operands": "R0, SR_TID.X"
+        }
+      ],
+      "warp_barrier_opcode_observed": false
+    },
+    {
+      "variant": 17,
+      "dtype": "bf16",
+      "symbol": "_ZN7megafmm53_GLOBAL__N__79c648b9_20_small_mma_cpasync_cu_3102536120small_cpasync_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf",
+      "resource_usage": {
+        "REG": 145,
+        "STACK": 0,
+        "SHARED": 16384,
+        "LOCAL": 0
+      },
+      "source_declared_transformed_operand_shared_bytes": 7168,
+      "source_raw_shared_bank_count": 2,
+      "source_raw_shared_bank_bytes": 4096,
+      "source_total_shared_bytes": 15360,
+      "compiled_shared_beyond_source_buffer_bytes": 1024,
+      "compiled_extra_shared_origin_verified": false,
+      "static_instruction_count_including_padding_and_predicate_false": 952,
+      "opcode_counts": {
+        "BRA": 7,
+        "CS2R": 28,
+        "DEPBAR.LE": 2,
+        "EXIT": 2,
+        "F2FP.BF16.F32.PACK_AB": 32,
+        "FADD": 169,
+        "FFMA": 32,
+        "FMUL": 60,
+        "FSETP.NEU.AND": 1,
+        "HMMA.16816.F32.BF16": 14,
+        "IADD3": 56,
+        "IADD3.X": 33,
+        "IMAD": 39,
+        "IMAD.IADD": 5,
+        "IMAD.MOV.U32": 5,
+        "IMAD.SHL.U32": 8,
+        "IMAD.U32": 20,
+        "IMAD.WIDE.U32": 22,
+        "IMAD.X": 14,
+        "ISETP.GE.AND.EX": 3,
+        "ISETP.GE.U32.AND": 1,
+        "ISETP.LE.U32.AND": 2,
+        "LDC": 1,
+        "LDC.64": 8,
+        "LDG.E": 32,
+        "LDGDEPBAR": 4,
+        "LDGSTS.E.LTC128B.128": 16,
+        "LDS": 6,
+        "LDS.128": 8,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.4": 7,
+        "LEA": 28,
+        "LEA.HI": 4,
+        "LEA.HI.X": 18,
+        "LOP3.LUT": 61,
+        "MOV": 2,
+        "NOP": 18,
+        "S2R": 3,
+        "S2UR": 3,
+        "SHF.L.U32": 17,
+        "SHF.L.U64.HI": 5,
+        "SHF.R.S32.HI": 4,
+        "SHF.R.S64": 4,
+        "SHF.R.U32.HI": 10,
+        "STG.E": 64,
+        "STS.128": 14,
+        "UIADD3": 4,
+        "UIADD3.X": 5,
+        "UIMAD.WIDE.U32": 2,
+        "ULDC.64": 12,
+        "ULEA.HI": 3,
+        "ULOP3.LUT": 1,
+        "UMOV": 3,
+        "UPRMT": 1,
+        "USHF.L.U32": 5,
+        "USHF.L.U64.HI": 4,
+        "USHF.R.S32.HI": 3,
+        "USHF.R.S64": 3,
+        "USHF.R.U32.HI": 1,
+        "VIADD": 6
+      },
+      "spill_load_store_opcodes_observed": false,
+      "mma_accumulator_destination_order": [
+        {
+          "offset": "0x1cf0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R4, R60, R64, R4"
+        },
+        {
+          "offset": "0x1d20",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R8, R60, R66, R8"
+        },
+        {
+          "offset": "0x1d40",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R12, R68, R72, R12"
+        },
+        {
+          "offset": "0x1d70",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R16, R68, R74, R16"
+        },
+        {
+          "offset": "0x1d90",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R20, R76, R80, R20"
+        },
+        {
+          "offset": "0x1db0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R24, R76, R82, R24"
+        },
+        {
+          "offset": "0x1dd0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R28, R84, R88, R28"
+        },
+        {
+          "offset": "0x1de0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R32, R84, R90, R32"
+        },
+        {
+          "offset": "0x1df0",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R36, R92, R96, R36"
+        },
+        {
+          "offset": "0x1e00",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R40, R92, R98, R40"
+        },
+        {
+          "offset": "0x1e10",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R44, R100, R104, R44"
+        },
+        {
+          "offset": "0x1e20",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R48, R100, R106, R48"
+        },
+        {
+          "offset": "0x1e30",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R52, R108, R112, R52"
+        },
+        {
+          "offset": "0x1e40",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R56, R108, R114, R56"
+        }
+      ],
+      "LDSM_instructions": [
+        {
+          "offset": "0x1c40",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R60, [R0+0x2000]"
+        },
+        {
+          "offset": "0x1c50",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R64, [R0+0x2e00]"
+        },
+        {
+          "offset": "0x1c60",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R68, [R0+0x2200]"
+        },
+        {
+          "offset": "0x1c70",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R72, [R0+0x3000]"
+        },
+        {
+          "offset": "0x1c80",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R76, [R0+0x2400]"
+        },
+        {
+          "offset": "0x1c90",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R80, [R0+0x3200]"
+        },
+        {
+          "offset": "0x1ca0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R84, [R0+0x2600]"
+        },
+        {
+          "offset": "0x1cb0",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R88, [R0+0x3400]"
+        },
+        {
+          "offset": "0x1cd0",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R92, [R0+0x2800]"
+        },
+        {
+          "offset": "0x1ce0",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R96, [R0+0x3600]"
+        },
+        {
+          "offset": "0x1d00",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R100, [R0+0x2a00]"
+        },
+        {
+          "offset": "0x1d10",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R104, [R0+0x3800]"
+        },
+        {
+          "offset": "0x1d30",
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R108, [R0+0x2c00]"
+        },
+        {
+          "offset": "0x1d50",
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.4",
+          "operands": "R112, [R0+0x3a00]"
+        }
+      ],
+      "global_input_cache_policy": "source cp.async.ca.shared.global.L2::128B; compiled LDGSTS.E.LTC128B.128",
+      "async_instructions": [
+        {
+          "offset": "0x0480",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118], desc[UR14][R12.64]"
+        },
+        {
+          "offset": "0x0640",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0x200], desc[UR14][R12.64]"
+        },
+        {
+          "offset": "0x0670",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0x400], desc[UR14][R20.64]"
+        },
+        {
+          "offset": "0x0690",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0x600], desc[UR14][R8.64]"
+        },
+        {
+          "offset": "0x06b0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0x800], desc[UR14][R10.64]"
+        },
+        {
+          "offset": "0x06c0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0xa00], desc[UR14][R4.64]"
+        },
+        {
+          "offset": "0x06d0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0xc00], desc[UR14][R18.64]"
+        },
+        {
+          "offset": "0x06e0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R118+0xe00], desc[UR14][R6.64]"
+        },
+        {
+          "offset": "0x0700",
+          "predicate": null,
+          "opcode": "LDGDEPBAR",
+          "operands": ""
+        },
+        {
+          "offset": "0x0720",
+          "predicate": null,
+          "opcode": "LDGDEPBAR",
+          "operands": ""
+        },
+        {
+          "offset": "0x0780",
+          "predicate": null,
+          "opcode": "DEPBAR.LE",
+          "operands": "SB0, 0x0"
+        },
+        {
+          "offset": "0x0ec0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61], desc[UR14][R66.64+0x20]"
+        },
+        {
+          "offset": "0x0f00",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0x200], desc[UR14][R64.64+0x20]"
+        },
+        {
+          "offset": "0x0f10",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0x400], desc[UR14][R62.64+0x20]"
+        },
+        {
+          "offset": "0x0f20",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0x600], desc[UR14][R70.64+0x20]"
+        },
+        {
+          "offset": "0x0f30",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0x800], desc[UR14][R68.64]"
+        },
+        {
+          "offset": "0x0f90",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0xa00], desc[UR14][R66.64]"
+        },
+        {
+          "offset": "0x0fb0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0xc00], desc[UR14][R64.64]"
+        },
+        {
+          "offset": "0x0fc0",
+          "predicate": null,
+          "opcode": "LDGSTS.E.LTC128B.128",
+          "operands": "[R61+0xe00], desc[UR14][R62.64]"
+        },
+        {
+          "offset": "0x0fd0",
+          "predicate": null,
+          "opcode": "LDGDEPBAR",
+          "operands": ""
+        },
+        {
+          "offset": "0x1cc0",
+          "predicate": null,
+          "opcode": "LDGDEPBAR",
+          "operands": ""
+        },
+        {
+          "offset": "0x1d60",
+          "predicate": null,
+          "opcode": "DEPBAR.LE",
+          "operands": "SB0, 0x0"
+        }
+      ],
+      "raw_consumption_instructions": [
+        {
+          "offset": "0x10c0",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R60, [R88+0x400]"
+        },
+        {
+          "offset": "0x10e0",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R76, [R88+0x600]"
+        },
+        {
+          "offset": "0x10f0",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R84, [R88]"
+        },
+        {
+          "offset": "0x1100",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R80, [R88+0x200]"
+        },
+        {
+          "offset": "0x1680",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R68, [R88+0x800]"
+        },
+        {
+          "offset": "0x1690",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R60, [R88+0xc00]"
+        },
+        {
+          "offset": "0x16a0",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R64, [R88+0xa00]"
+        },
+        {
+          "offset": "0x16b0",
+          "predicate": null,
+          "opcode": "LDS.128",
+          "operands": "R88, [R88+0xe00]"
+        }
+      ],
+      "predicate_false_LDS_placeholders": [
+        {
+          "offset": "0x0450",
+          "predicate": "@!PT",
+          "opcode": "LDS",
+          "operands": "RZ, [RZ]"
+        },
+        {
+          "offset": "0x0460",
+          "predicate": "@!PT",
+          "opcode": "LDS",
+          "operands": "RZ, [RZ]"
+        },
+        {
+          "offset": "0x0470",
+          "predicate": "@!PT",
+          "opcode": "LDS",
+          "operands": "RZ, [RZ]"
+        },
+        {
+          "offset": "0x0e90",
+          "predicate": "@!PT",
+          "opcode": "LDS",
+          "operands": "RZ, [RZ]"
+        },
+        {
+          "offset": "0x0ea0",
+          "predicate": "@!PT",
+          "opcode": "LDS",
+          "operands": "RZ, [RZ]"
+        },
+        {
+          "offset": "0x0eb0",
+          "predicate": "@!PT",
+          "opcode": "LDS",
+          "operands": "RZ, [RZ]"
+        }
+      ],
+      "compiled_stage_wait": {
+        "offset": "0x1d60",
+        "opcode": "DEPBAR.LE SB0, 0x0",
+        "HMMA_before_wait": 3,
+        "HMMA_after_wait": 11,
+        "all_14_LDSM_before_wait": true,
+        "interpretation": "Next raw-bank completion wait occurs after the first three HMMAs, despite the source wait appearing after all seven products. Static schedule therefore provides less MMA overlap than a source-only description would imply; no dynamic overlap fraction or stall duration is measured."
+      },
+      "lookahead_guard_instructions": [
+        {
+          "offset": "0x0ff0",
+          "predicate": null,
+          "opcode": "LOP3.LUT",
+          "operands": "R141, R60, 0x1, RZ, 0x3c, !PT"
+        },
+        {
+          "offset": "0x1000",
+          "predicate": null,
+          "opcode": "UIADD3",
+          "operands": "UR6, UP0, UR6, 0x10, URZ"
+        },
+        {
+          "offset": "0x1010",
+          "predicate": null,
+          "opcode": "UIADD3.X",
+          "operands": "UR7, URZ, UR7, URZ, UP0, !UPT"
+        },
+        {
+          "offset": "0x1020",
+          "predicate": null,
+          "opcode": "ISETP.LE.U32.AND",
+          "operands": "P0, PT, R117, UR6, PT"
+        },
+        {
+          "offset": "0x1030",
+          "predicate": null,
+          "opcode": "IMAD.U32",
+          "operands": "R61, RZ, RZ, UR7"
+        },
+        {
+          "offset": "0x1040",
+          "predicate": null,
+          "opcode": "ISETP.GE.AND.EX",
+          "operands": "P0, PT, R61, R116, PT, P0"
+        },
+        {
+          "offset": "0x1050",
+          "predicate": "@!UPT",
+          "opcode": "UIADD3",
+          "operands": "URZ, URZ, URZ, URZ"
+        },
+        {
+          "offset": "0x1060",
+          "predicate": "@!P0",
+          "opcode": "BRA",
+          "operands": "0xe10"
+        }
+      ],
+      "backedge_instructions": [
+        {
+          "offset": "0x1e40",
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R56, R108, R114, R56"
+        },
+        {
+          "offset": "0x1e50",
+          "predicate": null,
+          "opcode": "NOP",
+          "operands": ""
+        },
+        {
+          "offset": "0x1e60",
+          "predicate": "@!UPT",
+          "opcode": "UIADD3",
+          "operands": "URZ, URZ, URZ, URZ"
+        },
+        {
+          "offset": "0x1e70",
+          "predicate": "@!P1",
+          "opcode": "BRA",
+          "operands": "0xff0"
+        },
+        {
+          "offset": "0x1e80",
+          "predicate": null,
+          "opcode": "S2R",
+          "operands": "R0, SR_TID.X"
+        }
+      ],
+      "warp_barrier_opcode_observed": false
+    }
+  ],
+  "resource_and_operand_lifetime_observations": {
+    "baseline": "FullTiles paired Mega8, not narrow Mega16 or identity specialization",
+    "registers_baseline8": 126,
+    "registers_cpasync17": 145,
+    "register_difference": 19,
+    "static_shared_baseline8": 8192,
+    "static_shared_cpasync17": 16384,
+    "stack_and_local_all_zero": true,
+    "source_shared_delta_bytes": 8192,
+    "extra_compiled_shared_each_bytes": 1024,
+    "extra_compiled_shared_origin": "Unattributed; raw source sizes and cuobjdump reservation are reported separately.",
+    "operand_register_names": "Baseline MMA sources reuse R60/R64 for P1 then P3 and R68/R72 for P2 then P4; cp.async MMA operand register sets extend separately through R114. This is static register-allocation evidence, not a dynamic liveness or occupancy measurement.",
+    "compiled_pipeline_wait_caution": "Both dtype functions wait for next raw bank at 0x1d60 after only three HMMAs, leaving eleven remaining. Higher registers, larger shared reservation, raw LDS overhead and cache changes are simultaneous differences; timing causality is unmeasured.",
+    "barrier_caution": "Source uses full-warp __syncwarp publication/reuse barriers, but selected one-warp convergent SASS has no explicit BAR.WARP.SYNC opcode. Absence alone does not establish a synchronization defect; source bank separation, generated completion waits, backedge order and sanitizers are the supporting evidence."
+  },
+  "source_contract_checks": {
+    "small_leaf_exact_body_equal": true,
+    "small_round_pair_exact_body_equal": true,
+    "small_store_eight_exact_body_equal": true,
+    "small_put_word_exact_body_equal": true,
+    "FP32_S_T_dependencies": {
+      "same_order_and_text": true,
+      "expression_count": 8
+    },
+    "final_operand_pair_casts": {
+      "same_order_and_text": true,
+      "expression_count": 8
+    },
+    "seven_operand_slot_stores": {
+      "same_order_and_text": true,
+      "expression_count": 14
+    },
+    "U_DAG_order": {
+      "same_order_and_text": true,
+      "expression_count": 7
+    },
+    "alpha_RN": {
+      "same_order_and_text": true,
+      "expression_count": 4
+    },
+    "beta_FMA": {
+      "same_order_and_text": true,
+      "expression_count": 4
+    }
+  },
+  "source_pipeline": {
+    "CTA_threads": 32,
+    "owner_tile_M_N_K": [
+      16,
+      16,
+      16
+    ],
+    "raw_bank_bytes": 4096,
+    "raw_bank_count": 2,
+    "transformed_operand_bytes": 7168,
+    "declared_static_shared_bytes": 15360,
+    "prologue": "Issue all eight original-quadrant 16-byte vectors per lane into bank0; commit; wait_all; compiler memory clobber; full-warp publish barrier.",
+    "steady_stage": "Conditionally issue next K16 original quadrant bits to opposite bank, then read current raw bank, compute unchanged FP32 S/T DAG, final pair RN casts, publish transformed operands, accumulate seven P in ascending order, wait/publish, flip.",
+    "raw_bank_lifetime": "Next writes are disjoint from current reads; a bank is reused only after its previous consumers and stage-end publication have completed. Transformed operands occupy a separate fixed buffer.",
+    "numeric_order": "Unchanged M1: full-K FP32 P1..P7 accumulation; same final U DAG; alpha __fmul_rn then beta fmaf once per output. Original input copies do not quantize again.",
+    "alias_and_beta0": "C0 and D have no restrict alias promise. Each owner uniquely writes its four output quadrants and loads those active-beta C0 values before stores. beta0 bypasses all C0 loads, permitting null C0.",
+    "public_guard": "Variant17 delegates generic packed7 contract: positive even <=32768 dimensions, row-major FP16/BF16, finite coefficients, valid leading dimensions and int64 address-range bounds. Specialized full path additionally requires all parent dimensions multiples of32, lda/ldb multiples8 and 16-byte aligned A/B. D and active C0 require float alignment. Full tiles launch grid(n/32,m/32) and each launch rechecks pointers; other valid calls fall back to packed7, with public dispatch choosing Dense for incompatible bindings.",
+    "run_setup": "Full path uses static shared, no runtime allocation or host synchronization. prepare delegates packed7; run launches on supplied stream."
+  },
+  "CPU_address_and_bank_model": {
+    "scope": "CPU enumeration of formulas extracted from source; not GPU execution",
+    "allowed_full_tile_parent_K_values": 1024,
+    "parent_K_range_inclusive": [
+      32,
+      32768
+    ],
+    "parent_K_step": 32,
+    "total_current_K16_stages_checked": 524800,
+    "total_lookahead_stage_issues_checked": 523776,
+    "one_prologue_per_K_value": 1024,
+    "every_stage_fetched_and_consumed_exactly_once": true,
+    "all_last_stages_skip_lookahead": true,
+    "opposite_bank_disjoint_until_previous_consumer_finished": true,
+    "raw_vector_starts_per_warp_per_bank": 256,
+    "raw_vector_width_bytes": 16,
+    "unique_contiguous_byte_coverage": [
+      0,
+      4096
+    ],
+    "all_raw_vector_starts_16_byte_aligned": true,
+    "global_bound_reason": "Full guard makes each half dimension a multiple16. Max lane row/K index15 and vector span0..15 stay inside each16x16 owner/quadrant; next_k<kh prevents a speculative copy after the last stage. lda/ldb%8 and aligned bases keep each16-byte vector aligned, including quadrant offsets and ld+8 padding. Stride products use int64 and inherit generic overflow bounds."
+  },
+  "compiled_async_schedule": {
+    "input_copy_sites_per_lane_static": 16,
+    "input_copy_sites_description": "8 prologue +8 conditional lookahead; dynamic total is8 times actual K16 stages, not16 per stage.",
+    "raw_reads_per_lane_per_current_stage": 8,
+    "prologue_copy_offsets": [
+      "0x0480",
+      "0x0640",
+      "0x0670",
+      "0x0690",
+      "0x06b0",
+      "0x06c0",
+      "0x06d0",
+      "0x06e0"
+    ],
+    "prologue_completion_wait": "0x0780 DEPBAR.LE SB0,0; before any current raw LDS.",
+    "lookahead_copy_offset_range": [
+      "0x0ec0",
+      "0x0fc0"
+    ],
+    "lookahead_commit": "0x0fd0 LDGDEPBAR",
+    "guard": "UR7:UR6 is incremented64-bit next_k; R116:R117 is kh. 0x1020/0x1040 combine next_k>=kh into P0; @!P0 BRA0x1060→0x0e10 enters lookahead copies only while next_k<kh. Otherwise falls through to current consumption.",
+    "bank_addresses": "next R61=R118+R141*0x1000 with R141=currentxor1; current raw base R88=R118+current*0x1000. Raw slot offsets0..0xe00; transformed slots start+0x2000.",
+    "raw_read_offsets_fp16": [
+      "0x10b0",
+      "0x10e0",
+      "0x10f0",
+      "0x1100",
+      "0x1680",
+      "0x1690",
+      "0x16a0",
+      "0x16b0"
+    ],
+    "raw_read_offsets_bf16": [
+      "0x10c0",
+      "0x10e0",
+      "0x10f0",
+      "0x1100",
+      "0x1680",
+      "0x1690",
+      "0x16a0",
+      "0x16b0"
+    ],
+    "steady_wait": "0x1cc0 LDGDEPBAR then 0x1d60 DEPBAR.LE SB0,0. All14 LDSM are before wait, only first3 HMMA are before wait; remaining11 HMMA execute after.",
+    "backedge": "@!P1 BRA0x1e70→0x0ff0 occurs after all14 HMMA and completion wait; final-stage fallthrough begins final U.",
+    "CuTe_local_helper": "SM80_CP_ASYNC_CACHEALWAYS<uint4> emits cp.async.ca.shared.global.L2::128B16B; cp_async_fence emits commit_group; cp_async_wait<0> emits wait_all. Extra LDGDEPBAR sites coexist with wait_all lowering; do not count each as a separately populated data group. Source wrappers add compiler memory clobbers around commit and after wait, then full-warp sync.",
+    "last_read_proof_limit": "Static LDGSTS count alone cannot prove the absence of a last-stage extra read. The guarded compiled branch, frozen source, CPU enumeration and actual short-K sanitizer paths jointly support that claim; full-K exhaustive GPU validation was not performed."
+  },
+  "validation_logs": [
+    {
+      "path": "results/correctness_iter20.txt",
+      "complete_final_newline": true,
+      "line_count": 2226,
+      "CASE_count": 1172,
+      "CASE_by_dtype": {
+        "bf16": 586,
+        "fp16": 586
+      },
+      "explicit_PASS_count": 115,
+      "PASS_marker_counts": {
+        "PASS_MMA_BITWISE": 24,
+        "PASS_CLUSTER_GRAPH": 6,
+        "PASS_CPASYNC_GRAPH": 6,
+        "PASS_POINTER_REBIND": 46,
+        "PASS_EPILOGUE_OUTPUT_REBIND": 32,
+        "PASS": 1
+      },
+      "Mega17_CASE_count": 64,
+      "Mega17_CASE_actual_routes": {
+        "megakernel_warp_mma_cpasync": 34,
+        "megakernel_warp_mma_packed": 12,
+        "dense_cublaslt": 18
+      },
+      "all_CASE_metrics_finite": true,
+      "all_CASE_nonfinite_zero": true,
+      "Mega17_CASE_metrics_all_zero": true,
+      "footer": "Forced SW mixed-precision certification is a separate gate: use --strict-numerics or megafmm_bench",
+      "process_exit_status": "parent-reported 0; this audit reads logs rather than an independent captured exit file"
+    },
+    {
+      "path": "results/sanitizer_small_cpasync17_memcheck.txt",
+      "complete_final_newline": true,
+      "line_count": 105,
+      "CASE_count": 38,
+      "CASE_by_dtype": {
+        "bf16": 19,
+        "fp16": 19
+      },
+      "explicit_PASS_count": 15,
+      "PASS_marker_counts": {
+        "PASS_EPILOGUE_OUTPUT_REBIND": 6,
+        "PASS_CPASYNC_GRAPH": 6,
+        "PASS_POINTER_REBIND": 2,
+        "PASS": 1
+      },
+      "Mega17_CASE_count": 38,
+      "Mega17_CASE_actual_routes": {
+        "megakernel_warp_mma_cpasync": 28,
+        "megakernel_warp_mma_packed": 10
+      },
+      "all_CASE_metrics_finite": true,
+      "all_CASE_nonfinite_zero": true,
+      "Mega17_CASE_metrics_all_zero": true,
+      "footer": "========= ERROR SUMMARY: 0 errors",
+      "process_exit_status": "parent-reported 0; this audit reads logs rather than an independent captured exit file"
+    },
+    {
+      "path": "results/sanitizer_small_cpasync17_racecheck.txt",
+      "complete_final_newline": true,
+      "line_count": 105,
+      "CASE_count": 38,
+      "CASE_by_dtype": {
+        "bf16": 19,
+        "fp16": 19
+      },
+      "explicit_PASS_count": 15,
+      "PASS_marker_counts": {
+        "PASS_EPILOGUE_OUTPUT_REBIND": 6,
+        "PASS_CPASYNC_GRAPH": 6,
+        "PASS_POINTER_REBIND": 2,
+        "PASS": 1
+      },
+      "Mega17_CASE_count": 38,
+      "Mega17_CASE_actual_routes": {
+        "megakernel_warp_mma_cpasync": 28,
+        "megakernel_warp_mma_packed": 10
+      },
+      "all_CASE_metrics_finite": true,
+      "all_CASE_nonfinite_zero": true,
+      "Mega17_CASE_metrics_all_zero": true,
+      "footer": "========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)",
+      "process_exit_status": "parent-reported 0; this audit reads logs rather than an independent captured exit file"
+    },
+    {
+      "path": "results/sanitizer_small_cpasync17_synccheck.txt",
+      "complete_final_newline": true,
+      "line_count": 105,
+      "CASE_count": 38,
+      "CASE_by_dtype": {
+        "bf16": 19,
+        "fp16": 19
+      },
+      "explicit_PASS_count": 15,
+      "PASS_marker_counts": {
+        "PASS_EPILOGUE_OUTPUT_REBIND": 6,
+        "PASS_CPASYNC_GRAPH": 6,
+        "PASS_POINTER_REBIND": 2,
+        "PASS": 1
+      },
+      "Mega17_CASE_count": 38,
+      "Mega17_CASE_actual_routes": {
+        "megakernel_warp_mma_cpasync": 28,
+        "megakernel_warp_mma_packed": 10
+      },
+      "all_CASE_metrics_finite": true,
+      "all_CASE_nonfinite_zero": true,
+      "Mega17_CASE_metrics_all_zero": true,
+      "footer": "========= ERROR SUMMARY: 0 errors",
+      "process_exit_status": "parent-reported 0; this audit reads logs rather than an independent captured exit file"
+    }
+  ],
+  "validation_coverage": {
+    "expected_actual_warp_route_checks": 624,
+    "expected_actual_route_mismatches": 0,
+    "short_K_cases": 12,
+    "short_K_matrix": "Both dtype × (M,N)128,128 or32,32 × K32/64/96; all actual cp.async, covering one/two/three K16 stages and last-bank skip.",
+    "short_K_correctness_lines": [
+      2019,
+      2042
+    ],
+    "short_K_each_sanitizer_lines": [
+      66,
+      89
+    ],
+    "Graph_PASS_cases": 6,
+    "Graph_total_replays_reported": 18,
+    "Graph_actual_cpasync_replays": 12,
+    "Graph_packed_fallback_replays": 6,
+    "Graph_shapes": [
+      [
+        32,
+        32,
+        32
+      ],
+      [
+        96,
+        96,
+        96
+      ],
+      [
+        80,
+        112,
+        48
+      ]
+    ],
+    "Graph_coefficients_alias": "alpha0.5 beta-0.25 C0=D, fresh C0 restored before each of3 replays on same stream",
+    "Graph_padding_evidence": "Measured test-source archive lines497 and529–542 use allld+8, independent FP64 ordinaryAB, and require every output-padding element remain-777 on each replay. Graph PASS logs provide completion evidence but do not themselves print padding markers.",
+    "bitwise_PASS_cases_including17": 24,
+    "bitwise_scope": "Both dtype ×4shapes128³/80x112x48/32x16x32/32x48x32 × identity or general alpha0.375 beta-0.625 nonalias/alias. Variant17 enters full cp.async only for128³ here; remaining shapes exercise generic fallback, so not all24 compare actual cp.async.",
+    "input_rebind_PASS_cases17": 2,
+    "input_rebind_correctness_lines": [
+      2137,
+      2160
+    ],
+    "input_rebind_meaning": "aligned→element-aligned→aligned against same plan, from frozen test source; passing logs do not print every intermediate runtime backend.",
+    "output_rebind_PASS_cases17": 6,
+    "output_rebind_correctness_lines": [
+      2214,
+      2224
+    ],
+    "output_rebind_meaning": "Both dtype × modes0D/1C0/2exactalias with aligned→float-aligned→aligned output/source pointers; dynamic alpha0.5 beta-0.25.",
+    "sanitizers": "Allthree report zero errors; racecheck also zero hazards and warnings. Parent-reported process exits0 are distinguished from this independent log audit.",
+    "strict_gate": "Correctness footer explicitly leaves strict mixed-precision certification to a separate gate; integer structural/bitwise/sanitizer success does not certify SW random-input precision."
+  },
+  "quick_performance": {
+    "path": "trajectory/20261013_150459_iter-20/results.csv",
+    "rows": 18,
+    "protocol": {
+      "warmup": "20 per parent quick invocation, not a CSV column",
+      "calls_per_group": 20,
+      "groups": 5,
+      "correctness_trials": 1,
+      "mode": "launch",
+      "cache": "warm_cache",
+      "rotate_inputs": 1
+    },
+    "all_rows_actual_cpasync17": true,
+    "all_rows_numerical_pass": false,
+    "numerical_failure_rows": 18,
+    "observations": [
+      {
+        "dtype": "bf16",
+        "shape": [
+          128,
+          128,
+          128
+        ],
+        "candidate_median_us": 4.5664001256199995,
+        "same_row_Dense_median_us": 4.14719991386,
+        "same_row_Dense_over_candidate": 0.908198975072,
+        "solution_eF": 0.00605215821303,
+        "frozen_gate_floor": 0.001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          128,
+          128,
+          128
+        ],
+        "candidate_median_us": 4.78719994426,
+        "same_row_Dense_median_us": 4.13599982858,
+        "same_row_Dense_over_candidate": 0.863970562487,
+        "solution_eF": 0.000744324700865,
+        "frozen_gate_floor": 0.0001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          256,
+          256,
+          256
+        ],
+        "candidate_median_us": 6.3536003232,
+        "same_row_Dense_median_us": 5.28319999576,
+        "same_row_Dense_over_candidate": 0.831528539254,
+        "solution_eF": 0.00597913706249,
+        "frozen_gate_floor": 0.001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          256,
+          256,
+          256
+        ],
+        "candidate_median_us": 6.52159973979,
+        "same_row_Dense_median_us": 4.812800139189999,
+        "same_row_Dense_over_candidate": 0.737978460994,
+        "solution_eF": 0.000737164856682,
+        "frozen_gate_floor": 0.0001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          512,
+          512,
+          512
+        ],
+        "candidate_median_us": 13.377599418199999,
+        "same_row_Dense_median_us": 6.18240013719,
+        "same_row_Dense_over_candidate": 0.46214570671,
+        "solution_eF": 0.00598238461014,
+        "frozen_gate_floor": 0.001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          512,
+          512,
+          512
+        ],
+        "candidate_median_us": 13.2208004594,
+        "same_row_Dense_median_us": 6.12000003457,
+        "same_row_Dense_over_candidate": 0.462906921058,
+        "solution_eF": 0.000753206857909,
+        "frozen_gate_floor": 0.0001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          1024,
+          1024,
+          1024
+        ],
+        "candidate_median_us": 51.6384005547,
+        "same_row_Dense_median_us": 12.8992006183,
+        "same_row_Dense_over_candidate": 0.249798608782,
+        "solution_eF": 0.00600975092785,
+        "frozen_gate_floor": 0.001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          1024,
+          1024,
+          1024
+        ],
+        "candidate_median_us": 51.0655999184,
+        "same_row_Dense_median_us": 10.1216003299,
+        "same_row_Dense_over_candidate": 0.19820780224,
+        "solution_eF": 0.000751819326939,
+        "frozen_gate_floor": 0.0001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          2048,
+          2048,
+          2048
+        ],
+        "candidate_median_us": 360.084795952,
+        "same_row_Dense_median_us": 31.8287998438,
+        "same_row_Dense_over_candidate": 0.088392512546,
+        "solution_eF": 0.00602393091422,
+        "frozen_gate_floor": 0.001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          2048,
+          2048,
+          2048
+        ],
+        "candidate_median_us": 360.556793213,
+        "same_row_Dense_median_us": 32.489600777599996,
+        "same_row_Dense_over_candidate": 0.0901095233517,
+        "solution_eF": 0.00075220162356,
+        "frozen_gate_floor": 0.0001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          3072,
+          3072,
+          3072
+        ],
+        "candidate_median_us": 1204.64801788,
+        "same_row_Dense_median_us": 86.1007988453,
+        "same_row_Dense_over_candidate": 0.0714738226993,
+        "solution_eF": 0.0060182409995,
+        "frozen_gate_floor": 0.001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          3072,
+          3072,
+          3072
+        ],
+        "candidate_median_us": 1195.29924393,
+        "same_row_Dense_median_us": 89.113599062,
+        "same_row_Dense_over_candidate": 0.0745533802642,
+        "solution_eF": 0.000752812357912,
+        "frozen_gate_floor": 0.0001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "candidate_median_us": 2779.27360535,
+        "same_row_Dense_median_us": 194.423997402,
+        "same_row_Dense_over_candidate": 0.0699549684594,
+        "solution_eF": 0.00602272325234,
+        "frozen_gate_floor": 0.001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "candidate_median_us": 2780.10883331,
+        "same_row_Dense_median_us": 204.471993446,
+        "same_row_Dense_over_candidate": 0.0735481974649,
+        "solution_eF": 0.000753132541415,
+        "frozen_gate_floor": 0.0001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          1024,
+          512,
+          1024
+        ],
+        "candidate_median_us": 30.6383997202,
+        "same_row_Dense_median_us": 9.444800019259999,
+        "same_row_Dense_over_candidate": 0.308266753666,
+        "solution_eF": 0.00599042321269,
+        "frozen_gate_floor": 0.001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          1024,
+          512,
+          1024
+        ],
+        "candidate_median_us": 30.9439986944,
+        "same_row_Dense_median_us": 9.48640033603,
+        "same_row_Dense_over_candidate": 0.306566724931,
+        "solution_eF": 0.000749332745815,
+        "frozen_gate_floor": 0.0001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "bf16",
+        "shape": [
+          512,
+          1024,
+          1024
+        ],
+        "candidate_median_us": 30.8127999306,
+        "same_row_Dense_median_us": 8.259200304750001,
+        "same_row_Dense_over_candidate": 0.268044459554,
+        "solution_eF": 0.00601884687231,
+        "frozen_gate_floor": 0.001,
+        "numerical_pass": false
+      },
+      {
+        "dtype": "fp16",
+        "shape": [
+          512,
+          1024,
+          1024
+        ],
+        "candidate_median_us": 30.5999994278,
+        "same_row_Dense_median_us": 8.58559980989,
+        "same_row_Dense_over_candidate": 0.280575162432,
+        "solution_eF": 0.000751510131859,
+        "frozen_gate_floor": 0.0001,
+        "numerical_pass": false
+      }
+    ],
+    "parent_historical_envelope_assessment": "No improvement of prior primary envelope; historical comparisons are diagnostic and not a controlled same-row ablation.",
+    "qualification": "20/5/1 quick diagnostic, not final100/5/3 acceptance. Same-row Dense ratios are the directly paired comparisons; historical hardware/host/tuning state is not controlled. No speedup attribution solely to cp.async because owner path, registers, shared reservation, raw LDS, compiled wait placement and input cache policy differ from comparison paths.",
+    "Auto_dispatch": "Remains Dense by parent policy; this variant is experimental and fails frozen gates in all18 quick rows."
+  },
+  "closing_assessment": "No new concrete correctness blocker identified by source/SASS/log audit. cp.async17 preserves paired8 numeric DAG and passes the observed structural, Graph, alias/rebind and sanitizer coverage. Its resource and compiled schedule changes have not produced a diagnostic performance improvement; strict numerical certification is not achieved."
+}

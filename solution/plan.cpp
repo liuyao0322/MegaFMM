@@ -85,6 +85,9 @@ struct LtOp {
   std::vector<cublasLtMatmulHeuristicResult_t> candidates;
   std::vector<std::array<uint32_t, 4>> alignments;
   int32_t batch_count = 1;
+  bool robust_small_tuning = false;
+  bool tuned = false;
+  float selected_tuning_ms = std::numeric_limits<float>::quiet_NaN();
   std::array<size_t, 4> batch_stride_bytes{};
   size_t selected = 0;
   float alpha = 1.0f, beta = 0.0f;
@@ -116,6 +119,7 @@ std::unique_ptr<LtOp> make_lt_op(cublasLtHandle_t handle, const Problem& p,
                                std::array<int64_t, 4> batch_strides={}) {
   auto op = std::make_unique<LtOp>();
   op->batch_count = batch_count;
+  op->robust_small_tuning = std::max({p.m, p.n, p.k}) <= 4096;
   op->alpha = p.alpha;
   op->beta = p.beta;
   lt_check(cublasLtMatmulDescCreate(&op->operation, CUBLAS_COMPUTE_32F, CUDA_R_32F), "create matmul descriptor");
@@ -235,27 +239,46 @@ cublasStatus_t execute_lt(cublasLtHandle_t handle, const LtOp& op, size_t candid
 }
 void tune_lt(cublasLtHandle_t handle, LtOp& op, const void* A, const void* B,
              const float* C0, float* D, void* scratch, cudaStream_t stream) {
+  op.tuned = false;
+  op.selected_tuning_ms = std::numeric_limits<float>::quiet_NaN();
   cudaEvent_t start = nullptr, stop = nullptr;
   cuda_check(cudaEventCreate(&start), "create tuning start event");
   try {
     cuda_check(cudaEventCreate(&stop), "create tuning stop event");
+    // Reuse the same candidate pool, alignment checks and workspace budget.
+    // Small operators use a median of three batches rather than one tiny batch.
+    const int warmup = op.robust_small_tuning ? 4 : 1;
+    const int groups = op.robust_small_tuning ? 3 : 1;
+    const int repetitions = op.robust_small_tuning ? 10 : 3;
     float best = std::numeric_limits<float>::infinity();
     size_t chosen = 0;
     bool found = false;
     for (size_t i = 0; i < op.candidates.size(); ++i) {
-      if (execute_lt(handle, op, i, A, B, C0, D, scratch, stream) != CUBLAS_STATUS_SUCCESS) continue;
-      cuda_check(cudaEventRecord(start, stream), "record tuning start");
       bool valid = true;
-      for (int rep = 0; rep < 3; ++rep)
-        if (execute_lt(handle, op, i, A, B, C0, D, scratch, stream) != CUBLAS_STATUS_SUCCESS) valid = false;
-      cuda_check(cudaEventRecord(stop, stream), "record tuning stop");
-      cuda_check(cudaEventSynchronize(stop), "wait for tuning candidate");
-      float ms = 0.0f;
-      cuda_check(cudaEventElapsedTime(&ms, start, stop), "measure tuning candidate");
-      if (valid && ms < best) { best = ms; chosen = i; found = true; }
+      for (int rep = 0; rep < warmup; ++rep) {
+        if (execute_lt(handle, op, i, A, B, C0, D, scratch, stream) != CUBLAS_STATUS_SUCCESS) {
+          valid = false;
+          break;
+        }
+      }
+      if (!valid) continue;
+      std::array<float, 3> samples{};
+      for (int group = 0; group < groups; ++group) {
+        cuda_check(cudaEventRecord(start, stream), "record tuning start");
+        for (int rep = 0; rep < repetitions; ++rep)
+          if (execute_lt(handle, op, i, A, B, C0, D, scratch, stream) != CUBLAS_STATUS_SUCCESS) valid = false;
+        cuda_check(cudaEventRecord(stop, stream), "record tuning stop");
+        cuda_check(cudaEventSynchronize(stop), "wait for tuning candidate");
+        cuda_check(cudaEventElapsedTime(&samples[size_t(group)], start, stop), "measure tuning candidate");
+      }
+      std::sort(samples.begin(), samples.begin() + groups);
+      const float score = samples[size_t(groups / 2)];
+      if (valid && score < best) { best = score; chosen = i; found = true; }
     }
     if (!found) throw std::runtime_error("all cuBLASLt tuning candidates rejected their bound pointers");
     op.selected = chosen;
+    op.selected_tuning_ms = best / repetitions;
+    op.tuned = true;
   } catch (...) {
     if (stop) cudaEventDestroy(stop);
     cudaEventDestroy(start);
@@ -264,6 +287,45 @@ void tune_lt(cublasLtHandle_t handle, LtOp& op, const void* A, const void* B,
   cudaEventDestroy(stop);
   cudaEventDestroy(start);
 }
+template <class T>
+std::string lt_config_value(const cublasLtMatmulAlgo_t& algorithm,
+                            cublasLtMatmulAlgoConfigAttributes_t attribute) {
+  T value{};
+  size_t written = 0;
+  const auto status = cublasLtMatmulAlgoConfigGetAttribute(&algorithm, attribute,
+                                                        &value, sizeof(value), &written);
+  if (status != CUBLAS_STATUS_SUCCESS || written != sizeof(value))
+    return "NA(status=" + std::to_string(int(status)) + ")";
+  return std::to_string(value);
+}
+std::string describe_lt(const LtOp& op, size_t bound) {
+  const auto& candidate = op.candidates[bound];
+  const auto& algorithm = candidate.algo;
+  // Types match the installed CUDA 12.4 cublasLt.h attribute definitions.
+  std::string result = "id=" + lt_config_value<int32_t>(algorithm, CUBLASLT_ALGO_CONFIG_ID);
+  result += ";tile=" + lt_config_value<uint32_t>(algorithm, CUBLASLT_ALGO_CONFIG_TILE_ID);
+  result += ";split_k=" + lt_config_value<int32_t>(algorithm, CUBLASLT_ALGO_CONFIG_SPLITK_NUM);
+  result += ";reduction=" + lt_config_value<uint32_t>(algorithm, CUBLASLT_ALGO_CONFIG_REDUCTION_SCHEME);
+  result += ";swizzle=" + lt_config_value<uint32_t>(algorithm, CUBLASLT_ALGO_CONFIG_CTA_SWIZZLING);
+  result += ";stages=" + lt_config_value<uint32_t>(algorithm, CUBLASLT_ALGO_CONFIG_STAGES_ID);
+  result += ";custom=" + lt_config_value<uint32_t>(algorithm, CUBLASLT_ALGO_CONFIG_CUSTOM_OPTION);
+  result += ";inner=" + lt_config_value<uint16_t>(algorithm, CUBLASLT_ALGO_CONFIG_INNER_SHAPE_ID);
+  result += ";cluster=" + lt_config_value<uint16_t>(algorithm, CUBLASLT_ALGO_CONFIG_CLUSTER_SHAPE_ID);
+  result += ";bound_candidate=" + std::to_string(bound) + "/" + std::to_string(op.candidates.size());
+  result += ";tuned_candidate=" + std::to_string(op.selected);
+  result += ";bound_workspace=" + std::to_string(candidate.workspaceSize);
+  result += ";tuned=" + std::string(op.tuned ? "1" : "0");
+  result += ";tune=" + std::string(op.robust_small_tuning ? "4w/3x10median" : "1w/1x3");
+  // A rebound pointer can legitimately use another compatible candidate. Its
+  // identity is reported above, but the selected candidate's score is not its score.
+  if (!op.tuned) result += ";tuning_ms=NA(untuned)";
+  else if (bound != op.selected) result += ";tuning_ms=NA(rebound)";
+  else result += ";tuning_ms=" + std::to_string(op.selected_tuning_ms);
+  for (int operand = 0; operand < 4; ++operand)
+    result += ";align" + std::to_string(operand) + "=" + std::to_string(op.alignments[bound][operand]);
+  return result;
+}
+
 }  // namespace
 
 struct Plan::Impl {
@@ -456,6 +518,33 @@ Plan::Plan(Plan&&) noexcept = default;
 Plan& Plan::operator=(Plan&&) noexcept = default;
 size_t Plan::workspace_bytes() const { return impl_->bytes; }
 const Problem& Plan::problem() const { return impl_->problem; }
+std::string Plan::lt_algorithm_config(const void* A, const void* B, const float* C0,
+                                      float* D, void* workspace) const {
+  const auto& impl = *impl_;
+  validate_binding(impl, A, B, C0, D, workspace);
+  if (impl.empty || impl.scale) return "none";
+  if (use_dense(impl, A, B))
+    return "dense:" + describe_lt(*impl.dense, bound_candidate(*impl.dense, A, B, C0, D));
+  if (impl.algorithm != Algorithm::WinogradLt) return "none";
+  auto* base = static_cast<unsigned char*>(workspace);
+  float* products = reinterpret_cast<float*>(base + impl.p_offset);
+  if (impl.batched) {
+    const void* left = base + impl.s_offset;
+    const void* right = base + impl.t_offset;
+    return "batch7:" + describe_lt(*impl.batched, bound_candidate(*impl.batched, left, right, nullptr, products));
+  }
+  std::array<const void*, 7> left{}, right{};
+  operands(impl, A, B, workspace, left, right);
+  const size_t stride = size_t(impl.problem.m / 2) * size_t(impl.problem.n / 2);
+  std::string result;
+  for (int i = 0; i < 7; ++i) {
+    if (i) result += "|";
+    float* output = products + size_t(i) * stride;
+    result += "leaf" + std::to_string(i) + ":" + describe_lt(*impl.leaves[i],
+        bound_candidate(*impl.leaves[i], left[i], right[i], nullptr, output));
+  }
+  return result;
+}
 std::string Plan::algorithm_name() const {
   if (impl_->empty) return "empty";
   if (impl_->scale) return "degenerate_scale";

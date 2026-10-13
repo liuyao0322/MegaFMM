@@ -100,6 +100,53 @@ const char* warp_mma_name(int variant,const megafmm::Problem& p) {
   if(variant==8 && p.m%32==0 && p.n%32==0 && p.k%32==0)return "megakernel_warp_mma_fast";
   return "megakernel_warp_mma_packed";
 }
+const char* lt_config_kind(const megafmm::Plan& plan) {
+  const auto name=plan.algorithm_name();
+  if(name=="dense_cublaslt")return "dense";
+  if(name=="winograd_lt_v1")return "leaf";
+  if(name=="winograd_lt_batched")return "batch7";
+  return "none";
+}
+std::string check_lt_config(const megafmm::Plan& plan,const void* A,const void* B,
+                            const float* C0,float* D,void* workspace,
+                            const std::string& kind,bool tuned) {
+  const auto config=plan.lt_algorithm_config(A,B,C0,D,workspace);
+  if(kind=="none") {require(config=="none","custom/degenerate Lt metadata not none");return config;}
+  size_t begin=0;int records=0;
+  do {
+    size_t end=config.find('|',begin);
+    auto record=config.substr(begin,end==std::string::npos ? end:end-begin);
+    auto prefix=kind=="leaf" ? "leaf"+std::to_string(records):kind;
+    require(record.rfind(prefix+":",0)==0,"Lt metadata operator identity incorrect");
+    record=record.substr(prefix.size()+1);
+    auto value=[&](const std::string& key) {
+      auto at=record.find(key+"=");
+      require(at!=std::string::npos && (at==0 || record[at-1]==';'),"Lt metadata field missing: "+key);
+      at+=key.size()+1;return record.substr(at,record.find(';',at)-at);
+    };
+    for(const char* attr:{"id","tile","split_k","reduction","swizzle","stages","custom","inner","cluster"})
+      require(!value(attr).empty(),"empty Lt algorithm attribute");
+    auto bound=value("bound_candidate");auto slash=bound.find('/');
+    require(slash!=std::string::npos,"Lt metadata candidate pool missing");
+    auto index=std::stoull(bound.substr(0,slash)),pool=std::stoull(bound.substr(slash+1));
+    auto selected=std::stoull(value("tuned_candidate"));
+    require(index<pool && selected<pool,"Lt metadata candidate index out of range");
+    require(std::stoull(value("bound_workspace"))<=plan.workspace_bytes(),"Lt bound workspace exceeds allocation");
+    require(value("tuned")== (tuned ? "1":"0"),"Lt metadata tuned state incorrect");
+    const auto& p=plan.problem();auto descriptor_max=std::max({p.m,p.n,p.k});
+    if(kind!="dense")descriptor_max/=2;
+    require(value("tune")== (descriptor_max<=4096 ? "4w/3x10median":"1w/1x3"),"Lt actual descriptor tuning profile incorrect");
+    auto score=value("tuning_ms");
+    if(!tuned)require(score=="NA(untuned)","untuned Lt metadata reports a score");
+    else if(index!=selected)require(score=="NA(rebound)","rebound Lt metadata reports another candidate's score");
+    else {auto ms=std::stod(score);require(std::isfinite(ms) && ms>=0,"invalid Lt tuning score");}
+    for(const char* alignment:{"align0","align1","align2","align3"})
+      require(std::stoull(value(alignment))>0,"invalid Lt alignment requirement");
+    ++records;if(end==std::string::npos)break;begin=end+1;
+  } while(true);
+  require(records==(kind=="leaf" ? 7:1),"Lt metadata operator count incorrect");
+  return config;
+}
 template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorithm,
                                   Pattern pattern,bool alias,bool certified,uint32_t seed=1234567,int variant=0,
                                   bool do_tune=true,size_t workspace_limit=size_t(8)<<30,
@@ -168,8 +215,20 @@ template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorit
   Buffer workspace(plan->workspace_bytes());
   float* output=alias ? dc.as<float>():dd.as<float>();
   require(!alias || p.ldc==p.ldd,"test alias needs equal C/D strides");
+  if(pattern==Pattern::Integers) {
+    check_lt_config(*plan,da.data,db.data,p.beta==0 ? nullptr:dc.as<float>(),output,workspace.data,
+                    lt_config_kind(*plan),false);
+    // A representative alias binding must remain byte-identical after reading metadata.
+    if(alias && algorithm==megafmm::Algorithm::Dense && p.m==128 && p.n==128 && p.k==128) {
+      check(cudaMemcpy(result.data(),output,result.size()*sizeof(float),cudaMemcpyDeviceToHost));
+      require(std::memcmp(result.data(),c.data(),result.size()*sizeof(float))==0,"Lt metadata modified C0/D");
+    }
+  }
   if(do_tune) {
     megafmm::tune(*plan,da.data,db.data,p.beta==0 ? nullptr:dc.as<float>(),output,workspace.data);
+    if(pattern==Pattern::Integers)
+      check_lt_config(*plan,da.data,db.data,p.beta==0 ? nullptr:dc.as<float>(),output,workspace.data,
+                      lt_config_kind(*plan),true);
     if(alias && pattern==Pattern::Integers) {
       check(cudaMemcpy(result.data(),output,result.size()*sizeof(float),cudaMemcpyDeviceToHost));
       for(int i=0;i<p.m;++i) for(int j=0;j<p.n;++j)
@@ -607,7 +666,7 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
     a[size_t(i)*p.k+l]=round_value<T>(float(i%5-2));
   for(int l=0;l<p.k;++l) for(int j=0;j<p.n;++j)
     b[size_t(l)*p.n+j]=round_value<T>(float(j%7-3));
-  Buffer da((a.size()+1)*sizeof(T)),db((b.size()+1)*sizeof(T)),dd(size_t(p.m)*p.n*sizeof(float));
+  Buffer da((a.size()+8)*sizeof(T)),db((b.size()+8)*sizeof(T)),dd(size_t(p.m)*p.n*sizeof(float));
   std::vector<float> actual(size_t(p.m)*p.n);
   for(auto candidate:{std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Dense,0},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradLt,0},
@@ -651,10 +710,16 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
     check(cudaMemcpy(da.data,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice));
     check(cudaMemcpy(db.data,b.data(),b.size()*sizeof(T),cudaMemcpyHostToDevice));
     megafmm::tune(*plan,da.data,db.data,nullptr,dd.as<float>(),workspace.data);
-    for(bool shifted:{false,true,false}) {
-      T* left=da.as<T>()+int(shifted),*right=db.as<T>()+int(shifted);
+    const auto original_config=check_lt_config(*plan,da.data,db.data,nullptr,dd.as<float>(),workspace.data,
+                                               lt_config_kind(*plan),true);
+    for(int shift:{0,1,8,0}) {
+      T* left=da.as<T>()+shift,*right=db.as<T>()+shift;
       check(cudaMemcpy(left,a.data(),a.size()*sizeof(T),cudaMemcpyHostToDevice));
       check(cudaMemcpy(right,b.data(),b.size()*sizeof(T),cudaMemcpyHostToDevice));
+      const bool dense_fallback=shift==1 && algo!=megafmm::Algorithm::Dense;
+      auto config=check_lt_config(*plan,left,right,nullptr,dd.as<float>(),workspace.data,
+                                  dense_fallback ? "dense":lt_config_kind(*plan),!dense_fallback);
+      if(shift==0)require(config==original_config,"readonly metadata changed after pointer rebind");
       megafmm::run(*plan,left,right,nullptr,dd.as<float>(),workspace.data);
       check(cudaDeviceSynchronize());
       check(cudaMemcpy(actual.data(),dd.data,actual.size()*sizeof(float),cudaMemcpyDeviceToHost));
@@ -690,6 +755,7 @@ void degenerate_suite() {
     for(int zero_dim:{0,1}) {
       auto p=problem(zero_dim==0 ? 0:9,zero_dim==1 ? 0:11,17,megafmm::DType::BF16);
       auto plan=megafmm::create_plan(p,policy);
+      require(plan->lt_algorithm_config(nullptr,nullptr,nullptr,nullptr,nullptr)=="none","empty metadata not none");
       megafmm::run(*plan,nullptr,nullptr,nullptr,nullptr,nullptr);
       check(cudaDeviceSynchronize());
     }
@@ -700,6 +766,14 @@ void degenerate_suite() {
       Buffer dc(c.size()*sizeof(float)),dd(c.size()*sizeof(float));
       check(cudaMemcpy(dc.data,c.data(),c.size()*sizeof(float),cudaMemcpyHostToDevice));
       auto plan=megafmm::create_plan(p,policy);Buffer workspace(plan->workspace_bytes());
+      require(plan->lt_algorithm_config(nullptr,nullptr,beta==0 ? nullptr:dc.as<float>(),dd.as<float>(),workspace.data)=="none",
+              "degenerate metadata not none");
+      if(beta!=0) {
+        bool invalid=false;
+        try {plan->lt_algorithm_config(nullptr,nullptr,nullptr,dd.as<float>(),workspace.data);}
+        catch(const std::exception&) {invalid=true;}
+        require(invalid,"metadata accepted missing active C0");
+      }
       megafmm::run(*plan,nullptr,nullptr,beta==0 ? nullptr:dc.as<float>(),dd.as<float>(),workspace.data);
       check(cudaDeviceSynchronize());check(cudaMemcpy(out.data(),dd.data,out.size()*sizeof(float),cudaMemcpyDeviceToHost));
       for(size_t i=0;i<c.size();++i)require(out[i]==beta*c[i],"degenerate beta C0 failed");
@@ -725,6 +799,10 @@ void rejection_suite() {
   try { megafmm::run(*plan,memory.data,memory.as<char>()+4096,nullptr,memory.as<float>(),workspace.data); }
   catch(const std::exception&) { overlap_rejected=true; }
   require(overlap_rejected,"A/D overlap accepted");
+  overlap_rejected=false;
+  try {plan->lt_algorithm_config(memory.data,memory.as<char>()+4096,nullptr,memory.as<float>(),workspace.data);}
+  catch(const std::exception&) {overlap_rejected=true;}
+  require(overlap_rejected,"metadata accepted A/D overlap");
   if(plan->workspace_bytes()) {
     overlap_rejected=false;
     try { megafmm::run(*plan,workspace.data,memory.data,nullptr,memory.as<float>()+2048,workspace.data); }

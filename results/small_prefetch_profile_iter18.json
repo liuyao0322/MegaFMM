@@ -1,0 +1,3134 @@
+{
+  "schema_version": 1,
+  "iteration": 18,
+  "kind": "CPU-only archived SASS/resource/source/validation/timeline audit; static scheduling evidence is not dynamic performance",
+  "generated_utc": "2026-10-13T07:07:33.273464+00:00",
+  "parent_reported_source_commit": "c029e46",
+  "source_commit_independently_verified_with_git": false,
+  "binary_identity_observed_before_iter19_build": {
+    "bench": {
+      "path": "build/megafmm_bench",
+      "sha256": "e8ec58cd2940a80df35463fc460f25485883f328815e89fd555949cf7baa1dbe"
+    },
+    "test": {
+      "path": "build/test_correctness",
+      "sha256": "404eedf77a5cd24a0fc8f2ef69bced0b0a9087ea54f5c988a0177c32c0b51526"
+    },
+    "note": "Hashes read while parent confirmed current binary remained iter18; no git command was executed."
+  },
+  "inputs": [
+    {
+      "path": ".scratch/small_sass_iter17.txt",
+      "bytes": 22442587,
+      "sha256": "d40a6cffd21ea556a8de7b70e27b096da4f684e27938c7eb1d4719999787d90b"
+    },
+    {
+      "path": ".scratch/small_resources_iter17.txt",
+      "bytes": 34657,
+      "sha256": "80a89c05e2585cecad7e4e2697e62c95da322eee04e9b77dd421f9e4b15e9e66"
+    },
+    {
+      "path": ".scratch/small_sass_iter18.txt",
+      "bytes": 22662276,
+      "sha256": "71e79c3b2f425fcc6726add7d454fc37c12f764610918ebe4d17e49d804eedaf"
+    },
+    {
+      "path": ".scratch/small_resources_iter18.txt",
+      "bytes": 35374,
+      "sha256": "e89945da41a7013c77e06dd74055d55790b893ee5c982d0ec14eab979c8de5ac"
+    },
+    {
+      "path": "results/correctness_iter18.txt",
+      "bytes": 245991,
+      "sha256": "d95654e44df782e2f3df841f2f232a9eac01ca4f971007e51a74cc760a0fa181"
+    },
+    {
+      "path": "results/sanitizer_small_prefetch16_memcheck.txt",
+      "bytes": 11691,
+      "sha256": "ceac2339801e3fbca25e66d8e6e41f12f872c4bb30f94f3ef1ccae181beec92c"
+    },
+    {
+      "path": "results/sanitizer_small_prefetch16_racecheck.txt",
+      "bytes": 11729,
+      "sha256": "aab7c9ca926a43863660d0dcf78241723c37ef068e54ba08290477af893e2eff"
+    },
+    {
+      "path": "results/sanitizer_small_prefetch16_synccheck.txt",
+      "bytes": 11691,
+      "sha256": "ceac2339801e3fbca25e66d8e6e41f12f872c4bb30f94f3ef1ccae181beec92c"
+    },
+    {
+      "path": "results/timeline_small_prefetch16_iter18.txt",
+      "bytes": 1789,
+      "sha256": "4faef165e438f36a8940500757b10307126099e42467d60979fe9cdd16d2d266"
+    },
+    {
+      "path": "trajectory/20261013_144926_iter-18/results.csv",
+      "bytes": 10307,
+      "sha256": "682096872d6973c664c72848b95ad84623f6eb10ea65a334916d96daae605521"
+    },
+    {
+      "path": "solution/small_mma_16x8_prefetch.cu",
+      "bytes": 18000,
+      "sha256": "9399cafb6644778a52d2a63527e6a5e7bdae8b89adc71a59533cee0057b4664d"
+    }
+  ],
+  "parser_contract": "One record for every offset-bearing instruction line, including @!UPT predicate-false UIADD3, NOP padding and terminal self-BRA. Opcode counts include both runtime beta branches. Scheduling/encoding lines are excluded. No unrecognized instruction lines in selected functions.",
+  "targets": [
+    {
+      "iteration": 18,
+      "variant": 15,
+      "dtype": "fp16",
+      "symbol": "_ZN7megafmm59_GLOBAL__N__ed766fd4_26_small_mma_16x8_identity_cu_a00e88b423mma16x8_identity_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_Pf",
+      "resource_usage": {
+        "REG": 96,
+        "STACK": 0,
+        "SHARED": 6400,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 5376,
+      "source_raw_bank_shared_bytes": 0,
+      "source_raw_bank_register_payload_bytes": null,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "static_instruction_count_including_padding_and_predicate_false": 440,
+      "opcode_counts": {
+        "BRA": 4,
+        "CS2R": 28,
+        "EXIT": 1,
+        "F2FP.F16.F32.PACK_AB": 24,
+        "FADD": 76,
+        "HADD2.F32": 48,
+        "HMMA.16816.F32": 7,
+        "IADD3": 16,
+        "IADD3.X": 8,
+        "IMAD": 20,
+        "IMAD.IADD": 4,
+        "IMAD.SHL.U32": 6,
+        "IMAD.WIDE": 6,
+        "IMAD.WIDE.U32": 11,
+        "ISETP.GT.AND": 1,
+        "ISETP.LE.AND": 1,
+        "LDC": 4,
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64.CONSTANT": 4,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.2": 7,
+        "LEA": 18,
+        "LEA.HI": 4,
+        "LEA.HI.SX32": 1,
+        "LEA.HI.X": 8,
+        "LOP3.LUT": 26,
+        "MOV": 4,
+        "NOP": 15,
+        "S2R": 5,
+        "S2UR": 1,
+        "SHF.L.U32": 2,
+        "SHF.L.U64.HI": 2,
+        "SHF.R.S32.HI": 13,
+        "SHF.R.U32.HI": 9,
+        "SHF.R.U64": 1,
+        "STG.E.64": 8,
+        "STS.128": 7,
+        "STS.64": 7,
+        "UIADD3": 3,
+        "UIADD3.X": 1,
+        "ULDC.64": 7,
+        "UMOV": 2,
+        "UPRMT": 1,
+        "USHF.L.U32": 1,
+        "USHF.L.U64.HI": 1,
+        "VIADD": 6
+      },
+      "local_load_store_instruction_count": 0,
+      "global_load_counts": {
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64.CONSTANT": 4
+      },
+      "global_store_counts": {
+        "STG.E.64": 8
+      },
+      "parsed_instruction_sha256": "421b7f7ba2b951276ddde6ec7f059f9dbca7c921363ad6e95319300dd4fdf979",
+      "unchanged_vs_archived_iter17_identity15": true
+    },
+    {
+      "iteration": 18,
+      "variant": 15,
+      "dtype": "bf16",
+      "symbol": "_ZN7megafmm59_GLOBAL__N__ed766fd4_26_small_mma_16x8_identity_cu_a00e88b423mma16x8_identity_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_Pf",
+      "resource_usage": {
+        "REG": 96,
+        "STACK": 0,
+        "SHARED": 6400,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 5376,
+      "source_raw_bank_shared_bytes": 0,
+      "source_raw_bank_register_payload_bytes": null,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "static_instruction_count_including_padding_and_predicate_false": 440,
+      "opcode_counts": {
+        "BRA": 4,
+        "CS2R": 28,
+        "EXIT": 1,
+        "F2FP.BF16.F32.PACK_AB": 24,
+        "FADD": 76,
+        "HMMA.16816.F32.BF16": 7,
+        "IADD3": 16,
+        "IADD3.X": 7,
+        "IMAD": 20,
+        "IMAD.IADD": 4,
+        "IMAD.MOV.U32": 3,
+        "IMAD.SHL.U32": 6,
+        "IMAD.U32": 17,
+        "IMAD.WIDE": 6,
+        "IMAD.WIDE.U32": 11,
+        "IMAD.X": 1,
+        "ISETP.GT.AND": 1,
+        "ISETP.LE.AND": 1,
+        "LDC": 4,
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64.CONSTANT": 4,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.2": 7,
+        "LEA": 18,
+        "LEA.HI": 4,
+        "LEA.HI.SX32": 1,
+        "LEA.HI.X": 8,
+        "LOP3.LUT": 50,
+        "MOV": 1,
+        "NOP": 15,
+        "S2R": 5,
+        "S2UR": 1,
+        "SHF.L.U32": 9,
+        "SHF.L.U64.HI": 2,
+        "SHF.R.S32.HI": 13,
+        "SHF.R.U32.HI": 9,
+        "SHF.R.U64": 1,
+        "STG.E.64": 8,
+        "STS.128": 7,
+        "STS.64": 7,
+        "UIADD3": 3,
+        "UIADD3.X": 1,
+        "ULDC.64": 7,
+        "UMOV": 2,
+        "UPRMT": 1,
+        "USHF.L.U32": 1,
+        "USHF.L.U64.HI": 1,
+        "VIADD": 6
+      },
+      "local_load_store_instruction_count": 0,
+      "global_load_counts": {
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64.CONSTANT": 4
+      },
+      "global_store_counts": {
+        "STG.E.64": 8
+      },
+      "parsed_instruction_sha256": "a0aae6b575b5a4e1df0407d5bf1164073278d953de3dc0dc51c1c342f49bd15e",
+      "unchanged_vs_archived_iter17_identity15": true
+    },
+    {
+      "iteration": 18,
+      "variant": 16,
+      "dtype": "fp16",
+      "symbol": "_ZN7megafmm59_GLOBAL__N__851c82d7_26_small_mma_16x8_prefetch_cu_2f99ffa923mma16x8_prefetch_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_Pf",
+      "resource_usage": {
+        "REG": 120,
+        "STACK": 0,
+        "SHARED": 6400,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 5376,
+      "source_raw_bank_shared_bytes": 0,
+      "source_raw_bank_register_payload_bytes": 96,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "static_instruction_count_including_padding_and_predicate_false": 480,
+      "opcode_counts": {
+        "BRA": 3,
+        "CS2R": 28,
+        "EXIT": 1,
+        "F2FP.F16.F32.PACK_AB": 24,
+        "FADD": 76,
+        "HADD2.F32": 48,
+        "HMMA.16816.F32": 7,
+        "IADD3": 25,
+        "IADD3.X": 13,
+        "IMAD": 21,
+        "IMAD.IADD": 5,
+        "IMAD.MOV.U32": 2,
+        "IMAD.SHL.U32": 6,
+        "IMAD.WIDE": 3,
+        "IMAD.WIDE.U32": 12,
+        "IMAD.X": 4,
+        "ISETP.GE.AND": 1,
+        "ISETP.LE.AND": 2,
+        "LDC": 3,
+        "LDC.64": 3,
+        "LDG.E.128": 8,
+        "LDG.E.64": 8,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.2": 7,
+        "LEA": 21,
+        "LEA.HI": 3,
+        "LEA.HI.X": 12,
+        "LOP3.LUT": 27,
+        "MOV": 4,
+        "NOP": 13,
+        "S2R": 4,
+        "S2UR": 1,
+        "SHF.L.U32": 4,
+        "SHF.L.U64.HI": 3,
+        "SHF.R.S32.HI": 13,
+        "SHF.R.U32.HI": 9,
+        "SHF.R.U64": 1,
+        "STG.E.64": 8,
+        "STS.128": 7,
+        "STS.64": 7,
+        "UIADD3": 2,
+        "ULDC": 3,
+        "ULDC.64": 6,
+        "ULEA.HI": 1,
+        "UMOV": 2,
+        "UPRMT": 1,
+        "USHF.L.U32": 1,
+        "USHF.L.U64.HI": 1,
+        "USHF.R.S32.HI": 1,
+        "VIADD": 8
+      },
+      "local_load_store_instruction_count": 0,
+      "global_load_counts": {
+        "LDG.E.128": 8,
+        "LDG.E.64": 8
+      },
+      "global_store_counts": {
+        "STG.E.64": 8
+      },
+      "parsed_instruction_sha256": "0dad390dc321c779f71dad27715c4b29e59927079a1f3cb6e58152d19b8bafa9"
+    },
+    {
+      "iteration": 18,
+      "variant": 16,
+      "dtype": "bf16",
+      "symbol": "_ZN7megafmm59_GLOBAL__N__851c82d7_26_small_mma_16x8_prefetch_cu_2f99ffa923mma16x8_prefetch_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_Pf",
+      "resource_usage": {
+        "REG": 120,
+        "STACK": 0,
+        "SHARED": 6400,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 5376,
+      "source_raw_bank_shared_bytes": 0,
+      "source_raw_bank_register_payload_bytes": 96,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "static_instruction_count_including_padding_and_predicate_false": 480,
+      "opcode_counts": {
+        "BRA": 3,
+        "CS2R": 28,
+        "EXIT": 1,
+        "F2FP.BF16.F32.PACK_AB": 24,
+        "FADD": 76,
+        "HMMA.16816.F32.BF16": 7,
+        "IADD3": 24,
+        "IADD3.X": 11,
+        "IMAD": 21,
+        "IMAD.IADD": 6,
+        "IMAD.MOV.U32": 4,
+        "IMAD.SHL.U32": 8,
+        "IMAD.U32": 18,
+        "IMAD.WIDE": 3,
+        "IMAD.WIDE.U32": 12,
+        "IMAD.X": 6,
+        "ISETP.GE.AND": 1,
+        "ISETP.LE.AND": 2,
+        "LDC": 3,
+        "LDC.64": 3,
+        "LDG.E.128": 8,
+        "LDG.E.64": 8,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.2": 7,
+        "LEA": 21,
+        "LEA.HI": 3,
+        "LEA.HI.X": 12,
+        "LOP3.LUT": 51,
+        "MOV": 2,
+        "NOP": 13,
+        "S2R": 4,
+        "S2UR": 1,
+        "SHF.L.U32": 8,
+        "SHF.L.U64.HI": 3,
+        "SHF.R.S32.HI": 13,
+        "SHF.R.U32.HI": 9,
+        "SHF.R.U64": 1,
+        "STG.E.64": 8,
+        "STS.128": 7,
+        "STS.64": 7,
+        "UIADD3": 2,
+        "ULDC": 3,
+        "ULDC.64": 6,
+        "ULEA.HI": 1,
+        "UMOV": 2,
+        "UPRMT": 1,
+        "USHF.L.U32": 1,
+        "USHF.L.U64.HI": 1,
+        "USHF.R.S32.HI": 1,
+        "VIADD": 8
+      },
+      "local_load_store_instruction_count": 0,
+      "global_load_counts": {
+        "LDG.E.128": 8,
+        "LDG.E.64": 8
+      },
+      "global_store_counts": {
+        "STG.E.64": 8
+      },
+      "parsed_instruction_sha256": "d5c2d879ce61c7005ecfa2092f92961f045c087301db8348be861633e46352e8"
+    }
+  ],
+  "scoreboard_decode": {
+    "interpretation": "Static controls decoded from archived high64 and cross-checked against LDG/LDSM completion and dependent HMMA waits; not a runtime stall measurement.",
+    "control": "high64 >>41",
+    "write_barrier": "(control >>5)&7",
+    "read_barrier": "(control >>8)&7",
+    "wait_mask": "(control >>11)&63",
+    "raw_completion_barrier": 5,
+    "raw_completion_wait_bit": 32
+  },
+  "schedules": [
+    {
+      "dtype": "fp16",
+      "prologue_raw_loads": [
+        {
+          "offset": 1344,
+          "predicate": null,
+          "opcode": "LDG.E.128",
+          "operands": "R76, desc[UR8][R76.64]",
+          "encoding_low64": "000000084c4c7981",
+          "encoding_high64": "000f66000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1376,
+          "predicate": null,
+          "opcode": "LDG.E.64",
+          "operands": "R84, desc[UR8][R84.64]",
+          "encoding_low64": "0000000854547981",
+          "encoding_high64": "000f68000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1392,
+          "predicate": null,
+          "opcode": "LDG.E.128",
+          "operands": "R72, desc[UR8][R72.64]",
+          "encoding_low64": "0000000848487981",
+          "encoding_high64": "000f68000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1408,
+          "predicate": null,
+          "opcode": "LDG.E.128",
+          "operands": "R68, desc[UR8][R68.64]",
+          "encoding_low64": "0000000844447981",
+          "encoding_high64": "000f68000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1424,
+          "predicate": null,
+          "opcode": "LDG.E.128",
+          "operands": "R64, desc[UR8][R64.64]",
+          "encoding_low64": "0000000840407981",
+          "encoding_high64": "000f62000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1472,
+          "predicate": null,
+          "opcode": "LDG.E.64",
+          "operands": "R80, desc[UR8][R80.64]",
+          "encoding_low64": "0000000850507981",
+          "encoding_high64": "000f62000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1520,
+          "predicate": null,
+          "opcode": "LDG.E.64",
+          "operands": "R82, desc[UR8][R82.64]",
+          "encoding_low64": "0000000852527981",
+          "encoding_high64": "000f68000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1536,
+          "predicate": null,
+          "opcode": "LDG.E.64",
+          "operands": "R62, desc[UR8][R62.64]",
+          "encoding_low64": "000000083e3e7981",
+          "encoding_high64": "000f62000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        }
+      ],
+      "next_raw_loads": [
+        {
+          "offset": 5184,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R84, desc[UR8][R34.64]",
+          "encoding_low64": "000000082254e981",
+          "encoding_high64": "010564000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 2,
+          "decoded_wait_mask": 16
+        },
+        {
+          "offset": 5232,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R82, desc[UR8][R34.64]",
+          "encoding_low64": "000000082252e981",
+          "encoding_high64": "000764000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 3,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5424,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R76, desc[UR8][R40.64+0x20]",
+          "encoding_low64": "00002008284ce981",
+          "encoding_high64": "000362000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 1,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5520,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R72, desc[UR8][R42.64+0x20]",
+          "encoding_low64": "000020082a48e981",
+          "encoding_high64": "000562000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 2,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5568,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R80, desc[UR8][R32.64]",
+          "encoding_low64": "000000082050e981",
+          "encoding_high64": "001f62000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 5616,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R68, desc[UR8][R2.64+0x20]",
+          "encoding_low64": "000020080244e981",
+          "encoding_high64": "000162000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 0,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5680,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R64, desc[UR8][R36.64+0x20]",
+          "encoding_low64": "000020082440e981",
+          "encoding_high64": "000762000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 3,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5728,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R62, desc[UR8][R34.64]",
+          "encoding_low64": "00000008223ee981",
+          "encoding_high64": "000962000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 4,
+          "decoded_wait_mask": 0
+        }
+      ],
+      "current_ldsm_before_first_next_load": [
+        {
+          "offset": 5088,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R44, [R60+0x800]",
+          "encoding_low64": "000800003c2c783b",
+          "encoding_high64": "000fe20000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5120,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R52, [R0+UR4+0x1300]",
+          "encoding_low64": "001300040034783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5136,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R48, [R60+0xa00]",
+          "encoding_low64": "000a00003c30783b",
+          "encoding_high64": "000fe80000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5152,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R54, [R0+UR4+0x1400]",
+          "encoding_low64": "001400040036783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5168,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R56, [R60+0xc00]",
+          "encoding_low64": "000c00003c38783b",
+          "encoding_high64": "000fe80000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        }
+      ],
+      "current_ldsm_after_last_next_load": [
+        {
+          "offset": 5776,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R40, [R0+UR4+0xf00]",
+          "encoding_low64": "000f00040028783b",
+          "encoding_high64": "002fe20008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 2
+        },
+        {
+          "offset": 5824,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R42, [R0+UR4+0x1200]",
+          "encoding_low64": "00120004002a783b",
+          "encoding_high64": "004fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 4
+        },
+        {
+          "offset": 5840,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R2, [R0+UR4+0xe00]",
+          "encoding_low64": "000e00040002783b",
+          "encoding_high64": "001fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 5856,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R36, [R60+0x200]",
+          "encoding_low64": "000200003c24783b",
+          "encoding_high64": "008fe80000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 8
+        },
+        {
+          "offset": 5872,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R32, [R60]",
+          "encoding_low64": "000000003c20783b",
+          "encoding_high64": "010e240000000200",
+          "decoded_write_barrier": 0,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 16
+        },
+        {
+          "offset": 5904,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R2, [R0+UR4+0x1000]",
+          "encoding_low64": "001000040002783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5920,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R32, [R60+0x400]",
+          "encoding_low64": "000400003c20783b",
+          "encoding_high64": "000e220000000200",
+          "decoded_write_barrier": 0,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5952,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R40, [R0+UR4+0x1100]",
+          "encoding_low64": "001100040028783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5968,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R36, [R60+0x600]",
+          "encoding_low64": "000600003c24783b",
+          "encoding_high64": "000e620000000200",
+          "decoded_write_barrier": 1,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        }
+      ],
+      "all_current_hmma": [
+        {
+          "offset": 5888,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R4, R32, R2, R4",
+          "encoding_low64": "000000022004723c",
+          "encoding_high64": "001fe40000001804",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 5936,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R8, R36, R40, R8",
+          "encoding_low64": "000000282408723c",
+          "encoding_high64": "000fe60000001808",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6000,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R12, R32, R2, R12",
+          "encoding_low64": "00000002200c723c",
+          "encoding_high64": "001fec000000180c",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 6016,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R16, R36, R40, R16",
+          "encoding_low64": "000000282410723c",
+          "encoding_high64": "002fec0000001810",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 2
+        },
+        {
+          "offset": 6032,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R20, R44, R42, R20",
+          "encoding_low64": "0000002a2c14723c",
+          "encoding_high64": "000fec0000001814",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6048,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R24, R48, R52, R24",
+          "encoding_low64": "000000343018723c",
+          "encoding_high64": "000fec0000001818",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6064,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R28, R56, R54, R28",
+          "encoding_low64": "00000036381c723c",
+          "encoding_high64": "000fe2000000181c",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        }
+      ],
+      "loop_backedge": {
+        "offset": 6080,
+        "predicate": "@!P4",
+        "opcode": "BRA",
+        "operands": "0xb20",
+        "encoding_low64": "fffffff000d4c947",
+        "encoding_high64": "000ff6000383ffff",
+        "decoded_write_barrier": 7,
+        "decoded_read_barrier": 7,
+        "decoded_wait_mask": 0
+      },
+      "first_next_loop_raw_instruction": {
+        "offset": 2848,
+        "predicate": null,
+        "opcode": "STS.128",
+        "operands": "[R98], R76",
+        "encoding_low64": "0000004c62007388",
+        "encoding_high64": "020fe20000000c00",
+        "decoded_write_barrier": 7,
+        "decoded_read_barrier": 7,
+        "decoded_wait_mask": 32
+      },
+      "all_next_loads_before_all_hmma": true,
+      "all_next_loads_before_all_ldsm": false,
+      "early_raw_register_consumers": [],
+      "early_raw_completion_barrier5_waits": [],
+      "issue_region_with_encoding_and_decoded_controls": [
+        {
+          "offset": 5072,
+          "predicate": null,
+          "opcode": "NOP",
+          "operands": "",
+          "encoding_low64": "0000000000007918",
+          "encoding_high64": "000fe60000000000",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5088,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R44, [R60+0x800]",
+          "encoding_low64": "000800003c2c783b",
+          "encoding_high64": "000fe20000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5104,
+          "predicate": "@!P6",
+          "opcode": "SHF.L.U32",
+          "operands": "R36, R112.reuse, 0x1, RZ",
+          "encoding_low64": "000000017024e819",
+          "encoding_high64": "044fe600000006ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 4
+        },
+        {
+          "offset": 5120,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R52, [R0+UR4+0x1300]",
+          "encoding_low64": "001300040034783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5136,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R48, [R60+0xa00]",
+          "encoding_low64": "000a00003c30783b",
+          "encoding_high64": "000fe80000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5152,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R54, [R0+UR4+0x1400]",
+          "encoding_low64": "001400040036783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5168,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R56, [R60+0xc00]",
+          "encoding_low64": "000c00003c38783b",
+          "encoding_high64": "000fe80000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5184,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R84, desc[UR8][R34.64]",
+          "encoding_low64": "000000082254e981",
+          "encoding_high64": "010564000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 2,
+          "decoded_wait_mask": 16
+        },
+        {
+          "offset": 5200,
+          "predicate": "@!P6",
+          "opcode": "MOV",
+          "operands": "R34, R91",
+          "encoding_low64": "0000005b0022e202",
+          "encoding_high64": "004fe40000000f00",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 4
+        },
+        {
+          "offset": 5216,
+          "predicate": "@!P6",
+          "opcode": "MOV",
+          "operands": "R35, R90",
+          "encoding_low64": "0000005a0023e202",
+          "encoding_high64": "000fea0000000f00",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5232,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R82, desc[UR8][R34.64]",
+          "encoding_low64": "000000082252e981",
+          "encoding_high64": "000764000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 3,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5248,
+          "predicate": "@!P6",
+          "opcode": "IMAD",
+          "operands": "R34, R97, R2.reuse, RZ",
+          "encoding_low64": "000000026122e224",
+          "encoding_high64": "088fe200078e02ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 8
+        },
+        {
+          "offset": 5264,
+          "predicate": "@!P6",
+          "opcode": "SHF.L.U64.HI",
+          "operands": "R35, R112, 0x1, R88",
+          "encoding_low64": "000000017023e819",
+          "encoding_high64": "000fe20000010258",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5280,
+          "predicate": "@!P6",
+          "opcode": "IMAD.WIDE.U32",
+          "operands": "R38, R89.reuse, R2, R110",
+          "encoding_low64": "000000025926e225",
+          "encoding_high64": "040fe200078e006e",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5296,
+          "predicate": "@!P6",
+          "opcode": "SHF.L.U32",
+          "operands": "R2, R114.reuse, 0x1, RZ",
+          "encoding_low64": "000000017202e819",
+          "encoding_high64": "040fe600000006ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5312,
+          "predicate": "@!P6",
+          "opcode": "IMAD",
+          "operands": "R3, R89, R3, R34",
+          "encoding_low64": "000000035903e224",
+          "encoding_high64": "000fe200078e0222",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5328,
+          "predicate": "@!P6",
+          "opcode": "IADD3",
+          "operands": "R40, P0, R95, R2, RZ",
+          "encoding_low64": "000000025f28e210",
+          "encoding_high64": "000fe40007f1e0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5344,
+          "predicate": "@!P6",
+          "opcode": "SHF.L.U64.HI",
+          "operands": "R34, R114, 0x1, R87",
+          "encoding_low64": "000000017222e819",
+          "encoding_high64": "000fe40000010257",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5360,
+          "predicate": "@!P6",
+          "opcode": "IADD3",
+          "operands": "R3, R39, R3, RZ",
+          "encoding_low64": "000000032703e210",
+          "encoding_high64": "000fe40007ffe0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5376,
+          "predicate": "@!P6",
+          "opcode": "IADD3.X",
+          "operands": "R41, R94, R34, RZ, P0, !PT",
+          "encoding_low64": "000000225e29e210",
+          "encoding_high64": "000fe400007fe4ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5392,
+          "predicate": "@!P6",
+          "opcode": "IADD3",
+          "operands": "R42, P5, P4, R95.reuse, R2, R116.reuse",
+          "encoding_low64": "000000025f2ae210",
+          "encoding_high64": "140fe40007cbe074",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5408,
+          "predicate": "@!P6",
+          "opcode": "LEA",
+          "operands": "R32, P0, R38, R32, 0x1",
+          "encoding_low64": "000000202620e211",
+          "encoding_high64": "002fe200078008ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 2
+        },
+        {
+          "offset": 5424,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R76, desc[UR8][R40.64+0x20]",
+          "encoding_low64": "00002008284ce981",
+          "encoding_high64": "000362000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 1,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5440,
+          "predicate": "@!P6",
+          "opcode": "IADD3",
+          "operands": "R2, P3, R95, R36, RZ",
+          "encoding_low64": "000000245f02e210",
+          "encoding_high64": "000fe40007f7e0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5456,
+          "predicate": "@!P6",
+          "opcode": "IADD3",
+          "operands": "R36, P2, P1, R95, R36, R116",
+          "encoding_low64": "000000245f24e210",
+          "encoding_high64": "000fe4000795e074",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5472,
+          "predicate": "@!P6",
+          "opcode": "IADD3.X",
+          "operands": "R43, R94, R34, R117, P5, P4",
+          "encoding_low64": "000000225e2be210",
+          "encoding_high64": "000fe40002fe8475",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5488,
+          "predicate": "@!P6",
+          "opcode": "LEA.HI.X",
+          "operands": "R33, R38, R33, R3, 0x1, P0",
+          "encoding_low64": "000000212621e211",
+          "encoding_high64": "000fe400000f0c03",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5504,
+          "predicate": "@!P6",
+          "opcode": "LEA",
+          "operands": "R34, P0, R106, R32, 0x1",
+          "encoding_low64": "000000206a22e211",
+          "encoding_high64": "000fe200078008ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5520,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R72, desc[UR8][R42.64+0x20]",
+          "encoding_low64": "000020082a48e981",
+          "encoding_high64": "000562000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 2,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5536,
+          "predicate": "@!P6",
+          "opcode": "IADD3.X",
+          "operands": "R3, R94, R35, RZ, P3, !PT",
+          "encoding_low64": "000000235e03e210",
+          "encoding_high64": "000fe40001ffe4ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5552,
+          "predicate": "@!P6",
+          "opcode": "IADD3.X",
+          "operands": "R37, R94, R35, R117, P2, P1",
+          "encoding_low64": "000000235e25e210",
+          "encoding_high64": "000fe200017e2475",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5568,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R80, desc[UR8][R32.64]",
+          "encoding_low64": "000000082050e981",
+          "encoding_high64": "001f62000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 5584,
+          "predicate": "@!P6",
+          "opcode": "LEA.HI.X",
+          "operands": "R35, R106, R33, R107, 0x1, P0",
+          "encoding_low64": "000000216a23e211",
+          "encoding_high64": "000fe400000f0c6b",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5600,
+          "predicate": null,
+          "opcode": "ISETP.LE.AND",
+          "operands": "P4, PT, R96, UR5, PT",
+          "encoding_low64": "0000000560007c0c",
+          "encoding_high64": "000fe2000bf83270",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5616,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R68, desc[UR8][R2.64+0x20]",
+          "encoding_low64": "000020080244e981",
+          "encoding_high64": "000162000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 0,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5632,
+          "predicate": null,
+          "opcode": "IADD3",
+          "operands": "R91, P2, R91, UR6, RZ",
+          "encoding_low64": "000000065b5b7c10",
+          "encoding_high64": "000fe2000ff5e0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5648,
+          "predicate": null,
+          "opcode": "UIADD3",
+          "operands": "UR5, UR5, 0x10, URZ",
+          "encoding_low64": "0000001005057890",
+          "encoding_high64": "000fe2000fffe03f",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5664,
+          "predicate": null,
+          "opcode": "IADD3",
+          "operands": "R93, P1, R93, UR6, RZ",
+          "encoding_low64": "000000065d5d7c10",
+          "encoding_high64": "000fe2000ff3e0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5680,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R64, desc[UR8][R36.64+0x20]",
+          "encoding_low64": "000020082440e981",
+          "encoding_high64": "000762000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 3,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5696,
+          "predicate": null,
+          "opcode": "IADD3",
+          "operands": "R95, P0, R95, 0x20, RZ",
+          "encoding_low64": "000000205f5f7810",
+          "encoding_high64": "000fe40007f1e0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5712,
+          "predicate": null,
+          "opcode": "IADD3",
+          "operands": "R89, P3, R89, 0x10, RZ",
+          "encoding_low64": "0000001059597810",
+          "encoding_high64": "000fe20007f7e0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5728,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R62, desc[UR8][R34.64]",
+          "encoding_low64": "00000008223ee981",
+          "encoding_high64": "000962000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 4,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5744,
+          "predicate": null,
+          "opcode": "IADD3.X",
+          "operands": "R90, R90, UR7, RZ, P2, !PT",
+          "encoding_low64": "000000075a5a7c10",
+          "encoding_high64": "000fe400097fe4ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5760,
+          "predicate": null,
+          "opcode": "IADD3.X",
+          "operands": "R92, R92, UR7, RZ, P1, !PT",
+          "encoding_low64": "000000075c5c7c10",
+          "encoding_high64": "000fe20008ffe4ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5776,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R40, [R0+UR4+0xf00]",
+          "encoding_low64": "000f00040028783b",
+          "encoding_high64": "002fe20008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 2
+        },
+        {
+          "offset": 5792,
+          "predicate": null,
+          "opcode": "IADD3.X",
+          "operands": "R94, RZ, R94, RZ, P0, !PT",
+          "encoding_low64": "0000005eff5e7210",
+          "encoding_high64": "000fe400007fe4ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5808,
+          "predicate": null,
+          "opcode": "IADD3.X",
+          "operands": "R97, RZ, R97, RZ, P3, !PT",
+          "encoding_low64": "00000061ff617210",
+          "encoding_high64": "000fe20001ffe4ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5824,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R42, [R0+UR4+0x1200]",
+          "encoding_low64": "00120004002a783b",
+          "encoding_high64": "004fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 4
+        },
+        {
+          "offset": 5840,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R2, [R0+UR4+0xe00]",
+          "encoding_low64": "000e00040002783b",
+          "encoding_high64": "001fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 5856,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R36, [R60+0x200]",
+          "encoding_low64": "000200003c24783b",
+          "encoding_high64": "008fe80000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 8
+        },
+        {
+          "offset": 5872,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R32, [R60]",
+          "encoding_low64": "000000003c20783b",
+          "encoding_high64": "010e240000000200",
+          "decoded_write_barrier": 0,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 16
+        },
+        {
+          "offset": 5888,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R4, R32, R2, R4",
+          "encoding_low64": "000000022004723c",
+          "encoding_high64": "001fe40000001804",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 5904,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R2, [R0+UR4+0x1000]",
+          "encoding_low64": "001000040002783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5920,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R32, [R60+0x400]",
+          "encoding_low64": "000400003c20783b",
+          "encoding_high64": "000e220000000200",
+          "decoded_write_barrier": 0,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5936,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R8, R36, R40, R8",
+          "encoding_low64": "000000282408723c",
+          "encoding_high64": "000fe60000001808",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5952,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R40, [R0+UR4+0x1100]",
+          "encoding_low64": "001100040028783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5968,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R36, [R60+0x600]",
+          "encoding_low64": "000600003c24783b",
+          "encoding_high64": "000e620000000200",
+          "decoded_write_barrier": 1,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5984,
+          "predicate": null,
+          "opcode": "NOP",
+          "operands": "",
+          "encoding_low64": "0000000000007918",
+          "encoding_high64": "000fe20000000000",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6000,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R12, R32, R2, R12",
+          "encoding_low64": "00000002200c723c",
+          "encoding_high64": "001fec000000180c",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 6016,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R16, R36, R40, R16",
+          "encoding_low64": "000000282410723c",
+          "encoding_high64": "002fec0000001810",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 2
+        },
+        {
+          "offset": 6032,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R20, R44, R42, R20",
+          "encoding_low64": "0000002a2c14723c",
+          "encoding_high64": "000fec0000001814",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6048,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R24, R48, R52, R24",
+          "encoding_low64": "000000343018723c",
+          "encoding_high64": "000fec0000001818",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6064,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32",
+          "operands": "R28, R56, R54, R28",
+          "encoding_low64": "00000036381c723c",
+          "encoding_high64": "000fe2000000181c",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6080,
+          "predicate": "@!P4",
+          "opcode": "BRA",
+          "operands": "0xb20",
+          "encoding_low64": "fffffff000d4c947",
+          "encoding_high64": "000ff6000383ffff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        }
+      ],
+      "raw_bank_mapping": [
+        {
+          "quadrant": "A11",
+          "register_first": 76,
+          "register_words": 4,
+          "prefetch_offset": 5424,
+          "first_next_loop_raw_consumer_offset": 2848
+        },
+        {
+          "quadrant": "A12",
+          "register_first": 72,
+          "register_words": 4,
+          "prefetch_offset": 5520,
+          "first_next_loop_raw_consumer_offset": 2912
+        },
+        {
+          "quadrant": "A21",
+          "register_first": 68,
+          "register_words": 4,
+          "prefetch_offset": 5616,
+          "first_next_loop_raw_consumer_offset": 2864
+        },
+        {
+          "quadrant": "A22",
+          "register_first": 64,
+          "register_words": 4,
+          "prefetch_offset": 5680,
+          "first_next_loop_raw_consumer_offset": 2896
+        },
+        {
+          "quadrant": "B11",
+          "register_first": 84,
+          "register_words": 2,
+          "prefetch_offset": 5184,
+          "first_next_loop_raw_consumer_offset": 3808
+        },
+        {
+          "quadrant": "B12",
+          "register_first": 82,
+          "register_words": 2,
+          "prefetch_offset": 5232,
+          "first_next_loop_raw_consumer_offset": 3824
+        },
+        {
+          "quadrant": "B21",
+          "register_first": 80,
+          "register_words": 2,
+          "prefetch_offset": 5568,
+          "first_next_loop_raw_consumer_offset": 4592
+        },
+        {
+          "quadrant": "B22",
+          "register_first": 62,
+          "register_words": 2,
+          "prefetch_offset": 5728,
+          "first_next_loop_raw_consumer_offset": 3984
+        }
+      ]
+    },
+    {
+      "dtype": "bf16",
+      "prologue_raw_loads": [
+        {
+          "offset": 1344,
+          "predicate": null,
+          "opcode": "LDG.E.128",
+          "operands": "R76, desc[UR8][R76.64]",
+          "encoding_low64": "000000084c4c7981",
+          "encoding_high64": "000f66000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1376,
+          "predicate": null,
+          "opcode": "LDG.E.64",
+          "operands": "R84, desc[UR8][R84.64]",
+          "encoding_low64": "0000000854547981",
+          "encoding_high64": "000f68000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1392,
+          "predicate": null,
+          "opcode": "LDG.E.128",
+          "operands": "R72, desc[UR8][R72.64]",
+          "encoding_low64": "0000000848487981",
+          "encoding_high64": "000f68000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1408,
+          "predicate": null,
+          "opcode": "LDG.E.128",
+          "operands": "R68, desc[UR8][R68.64]",
+          "encoding_low64": "0000000844447981",
+          "encoding_high64": "000f68000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1424,
+          "predicate": null,
+          "opcode": "LDG.E.128",
+          "operands": "R64, desc[UR8][R64.64]",
+          "encoding_low64": "0000000840407981",
+          "encoding_high64": "000f62000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1472,
+          "predicate": null,
+          "opcode": "LDG.E.64",
+          "operands": "R80, desc[UR8][R80.64]",
+          "encoding_low64": "0000000850507981",
+          "encoding_high64": "000f62000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1520,
+          "predicate": null,
+          "opcode": "LDG.E.64",
+          "operands": "R82, desc[UR8][R82.64]",
+          "encoding_low64": "0000000852527981",
+          "encoding_high64": "000f68000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 1536,
+          "predicate": null,
+          "opcode": "LDG.E.64",
+          "operands": "R62, desc[UR8][R62.64]",
+          "encoding_low64": "000000083e3e7981",
+          "encoding_high64": "000f62000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        }
+      ],
+      "next_raw_loads": [
+        {
+          "offset": 5184,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R84, desc[UR8][R34.64]",
+          "encoding_low64": "000000082254e981",
+          "encoding_high64": "010564000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 2,
+          "decoded_wait_mask": 16
+        },
+        {
+          "offset": 5232,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R82, desc[UR8][R34.64]",
+          "encoding_low64": "000000082252e981",
+          "encoding_high64": "000764000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 3,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5440,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R76, desc[UR8][R40.64+0x20]",
+          "encoding_low64": "00002008284ce981",
+          "encoding_high64": "000362000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 1,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5536,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R72, desc[UR8][R42.64+0x20]",
+          "encoding_low64": "000020082a48e981",
+          "encoding_high64": "000562000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 2,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5584,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R68, desc[UR8][R2.64+0x20]",
+          "encoding_low64": "000020080244e981",
+          "encoding_high64": "000762000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 3,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5648,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R64, desc[UR8][R36.64+0x20]",
+          "encoding_low64": "000020082440e981",
+          "encoding_high64": "000962000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 4,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5696,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R80, desc[UR8][R32.64]",
+          "encoding_low64": "000000082050e981",
+          "encoding_high64": "001f62000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 5744,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R62, desc[UR8][R34.64]",
+          "encoding_low64": "00000008223ee981",
+          "encoding_high64": "000162000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 0,
+          "decoded_wait_mask": 0
+        }
+      ],
+      "current_ldsm_before_first_next_load": [
+        {
+          "offset": 5088,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R44, [R60+0x800]",
+          "encoding_low64": "000800003c2c783b",
+          "encoding_high64": "000fe20000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5120,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R52, [R0+UR4+0x1300]",
+          "encoding_low64": "001300040034783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5136,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R48, [R60+0xa00]",
+          "encoding_low64": "000a00003c30783b",
+          "encoding_high64": "000fe80000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5152,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R54, [R0+UR4+0x1400]",
+          "encoding_low64": "001400040036783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5168,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R56, [R60+0xc00]",
+          "encoding_low64": "000c00003c38783b",
+          "encoding_high64": "000fe80000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        }
+      ],
+      "current_ldsm_after_last_next_load": [
+        {
+          "offset": 5808,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R40, [R0+UR4+0xf00]",
+          "encoding_low64": "000f00040028783b",
+          "encoding_high64": "002fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 2
+        },
+        {
+          "offset": 5824,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R42, [R0+UR4+0x1200]",
+          "encoding_low64": "00120004002a783b",
+          "encoding_high64": "004fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 4
+        },
+        {
+          "offset": 5840,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R2, [R0+UR4+0xe00]",
+          "encoding_low64": "000e00040002783b",
+          "encoding_high64": "008fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 8
+        },
+        {
+          "offset": 5856,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R36, [R60+0x200]",
+          "encoding_low64": "000200003c24783b",
+          "encoding_high64": "010fe80000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 16
+        },
+        {
+          "offset": 5872,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R32, [R60]",
+          "encoding_low64": "000000003c20783b",
+          "encoding_high64": "001e240000000200",
+          "decoded_write_barrier": 0,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 5904,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R2, [R0+UR4+0x1000]",
+          "encoding_low64": "001000040002783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5920,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R32, [R60+0x400]",
+          "encoding_low64": "000400003c20783b",
+          "encoding_high64": "000e220000000200",
+          "decoded_write_barrier": 0,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5952,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R40, [R0+UR4+0x1100]",
+          "encoding_low64": "001100040028783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5968,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R36, [R60+0x600]",
+          "encoding_low64": "000600003c24783b",
+          "encoding_high64": "000e620000000200",
+          "decoded_write_barrier": 1,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        }
+      ],
+      "all_current_hmma": [
+        {
+          "offset": 5888,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R4, R32, R2, R4",
+          "encoding_low64": "000000022004723c",
+          "encoding_high64": "001fe40000041804",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 5936,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R8, R36, R40, R8",
+          "encoding_low64": "000000282408723c",
+          "encoding_high64": "000fe60000041808",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6000,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R12, R32, R2, R12",
+          "encoding_low64": "00000002200c723c",
+          "encoding_high64": "001fec000004180c",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 6016,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R16, R36, R40, R16",
+          "encoding_low64": "000000282410723c",
+          "encoding_high64": "002fec0000041810",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 2
+        },
+        {
+          "offset": 6032,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R20, R44, R42, R20",
+          "encoding_low64": "0000002a2c14723c",
+          "encoding_high64": "000fec0000041814",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6048,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R24, R48, R52, R24",
+          "encoding_low64": "000000343018723c",
+          "encoding_high64": "000fec0000041818",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6064,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R28, R56, R54, R28",
+          "encoding_low64": "00000036381c723c",
+          "encoding_high64": "000fe2000004181c",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        }
+      ],
+      "loop_backedge": {
+        "offset": 6080,
+        "predicate": "@!P4",
+        "opcode": "BRA",
+        "operands": "0xb20",
+        "encoding_low64": "fffffff000d4c947",
+        "encoding_high64": "000ff6000383ffff",
+        "decoded_write_barrier": 7,
+        "decoded_read_barrier": 7,
+        "decoded_wait_mask": 0
+      },
+      "first_next_loop_raw_instruction": {
+        "offset": 2848,
+        "predicate": null,
+        "opcode": "SHF.L.U32",
+        "operands": "R48, R69.reuse, 0x10, RZ",
+        "encoding_low64": "0000001045307819",
+        "encoding_high64": "060fe200000006ff",
+        "decoded_write_barrier": 7,
+        "decoded_read_barrier": 7,
+        "decoded_wait_mask": 32
+      },
+      "all_next_loads_before_all_hmma": true,
+      "all_next_loads_before_all_ldsm": false,
+      "early_raw_register_consumers": [],
+      "early_raw_completion_barrier5_waits": [],
+      "issue_region_with_encoding_and_decoded_controls": [
+        {
+          "offset": 5072,
+          "predicate": null,
+          "opcode": "NOP",
+          "operands": "",
+          "encoding_low64": "0000000000007918",
+          "encoding_high64": "000fe60000000000",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5088,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R44, [R60+0x800]",
+          "encoding_low64": "000800003c2c783b",
+          "encoding_high64": "000fe20000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5104,
+          "predicate": "@!P6",
+          "opcode": "IMAD.SHL.U32",
+          "operands": "R36, R112.reuse, 0x2, RZ",
+          "encoding_low64": "000000027024e824",
+          "encoding_high64": "044fe600078e00ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 4
+        },
+        {
+          "offset": 5120,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R52, [R0+UR4+0x1300]",
+          "encoding_low64": "001300040034783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5136,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R48, [R60+0xa00]",
+          "encoding_low64": "000a00003c30783b",
+          "encoding_high64": "000fe80000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5152,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R54, [R0+UR4+0x1400]",
+          "encoding_low64": "001400040036783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5168,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R56, [R60+0xc00]",
+          "encoding_low64": "000c00003c38783b",
+          "encoding_high64": "000fe80000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5184,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R84, desc[UR8][R34.64]",
+          "encoding_low64": "000000082254e981",
+          "encoding_high64": "010564000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 2,
+          "decoded_wait_mask": 16
+        },
+        {
+          "offset": 5200,
+          "predicate": "@!P6",
+          "opcode": "IMAD.MOV.U32",
+          "operands": "R34, RZ, RZ, R91",
+          "encoding_low64": "000000ffff22e224",
+          "encoding_high64": "004fe200078e005b",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 4
+        },
+        {
+          "offset": 5216,
+          "predicate": "@!P6",
+          "opcode": "MOV",
+          "operands": "R35, R90",
+          "encoding_low64": "0000005a0023e202",
+          "encoding_high64": "000fea0000000f00",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5232,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R82, desc[UR8][R34.64]",
+          "encoding_low64": "000000082252e981",
+          "encoding_high64": "000764000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 3,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5248,
+          "predicate": "@!P6",
+          "opcode": "IMAD",
+          "operands": "R34, R97, R2.reuse, RZ",
+          "encoding_low64": "000000026122e224",
+          "encoding_high64": "088fe200078e02ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 8
+        },
+        {
+          "offset": 5264,
+          "predicate": "@!P6",
+          "opcode": "SHF.L.U64.HI",
+          "operands": "R35, R112, 0x1, R88",
+          "encoding_low64": "000000017023e819",
+          "encoding_high64": "000fe20000010258",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5280,
+          "predicate": "@!P6",
+          "opcode": "IMAD.WIDE.U32",
+          "operands": "R38, R89.reuse, R2, R110",
+          "encoding_low64": "000000025926e225",
+          "encoding_high64": "040fe800078e006e",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5296,
+          "predicate": "@!P6",
+          "opcode": "IMAD.SHL.U32",
+          "operands": "R2, R114.reuse, 0x2, RZ",
+          "encoding_low64": "000000027202e824",
+          "encoding_high64": "040fe400078e00ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5312,
+          "predicate": "@!P6",
+          "opcode": "IMAD",
+          "operands": "R3, R89, R3, R34",
+          "encoding_low64": "000000035903e224",
+          "encoding_high64": "000fe200078e0222",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5328,
+          "predicate": "@!P6",
+          "opcode": "SHF.L.U64.HI",
+          "operands": "R34, R114, 0x1, R87",
+          "encoding_low64": "000000017222e819",
+          "encoding_high64": "000fe40000010257",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5344,
+          "predicate": "@!P6",
+          "opcode": "IADD3",
+          "operands": "R40, P0, R95, R2, RZ",
+          "encoding_low64": "000000025f28e210",
+          "encoding_high64": "000fe20007f1e0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5360,
+          "predicate": "@!P6",
+          "opcode": "IMAD.IADD",
+          "operands": "R3, R39, 0x1, R3",
+          "encoding_low64": "000000012703e824",
+          "encoding_high64": "000fe200078e0203",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5376,
+          "predicate": "@!P6",
+          "opcode": "IADD3",
+          "operands": "R42, P5, P4, R95.reuse, R2, R116.reuse",
+          "encoding_low64": "000000025f2ae210",
+          "encoding_high64": "140fe40007cbe074",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5392,
+          "predicate": "@!P6",
+          "opcode": "IADD3.X",
+          "operands": "R41, R94, R34, RZ, P0, !PT",
+          "encoding_low64": "000000225e29e210",
+          "encoding_high64": "000fe400007fe4ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5408,
+          "predicate": "@!P6",
+          "opcode": "LEA",
+          "operands": "R32, P0, R38, R32, 0x1",
+          "encoding_low64": "000000202620e211",
+          "encoding_high64": "002fe400078008ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 2
+        },
+        {
+          "offset": 5424,
+          "predicate": "@!P6",
+          "opcode": "IADD3",
+          "operands": "R2, P3, R95, R36, RZ",
+          "encoding_low64": "000000245f02e210",
+          "encoding_high64": "000fe20007f7e0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5440,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R76, desc[UR8][R40.64+0x20]",
+          "encoding_low64": "00002008284ce981",
+          "encoding_high64": "000362000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 1,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5456,
+          "predicate": "@!P6",
+          "opcode": "IADD3",
+          "operands": "R36, P2, P1, R95, R36, R116",
+          "encoding_low64": "000000245f24e210",
+          "encoding_high64": "000fe4000795e074",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5472,
+          "predicate": "@!P6",
+          "opcode": "IADD3.X",
+          "operands": "R43, R94, R34, R117, P5, P4",
+          "encoding_low64": "000000225e2be210",
+          "encoding_high64": "000fe40002fe8475",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5488,
+          "predicate": "@!P6",
+          "opcode": "LEA.HI.X",
+          "operands": "R33, R38, R33, R3, 0x1, P0",
+          "encoding_low64": "000000212621e211",
+          "encoding_high64": "000fe200000f0c03",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5504,
+          "predicate": "@!P6",
+          "opcode": "IMAD.X",
+          "operands": "R3, R94, 0x1, R35, P3",
+          "encoding_low64": "000000015e03e824",
+          "encoding_high64": "000fe200018e0623",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5520,
+          "predicate": "@!P6",
+          "opcode": "LEA",
+          "operands": "R34, P0, R106, R32, 0x1",
+          "encoding_low64": "000000206a22e211",
+          "encoding_high64": "000fe200078008ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5536,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R72, desc[UR8][R42.64+0x20]",
+          "encoding_low64": "000020082a48e981",
+          "encoding_high64": "000562000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 2,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5552,
+          "predicate": "@!P6",
+          "opcode": "IADD3.X",
+          "operands": "R37, R94, R35, R117, P2, P1",
+          "encoding_low64": "000000235e25e210",
+          "encoding_high64": "000fe400017e2475",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5568,
+          "predicate": "@!P6",
+          "opcode": "LEA.HI.X",
+          "operands": "R35, R106, R33, R107, 0x1, P0",
+          "encoding_low64": "000000216a23e211",
+          "encoding_high64": "000fe200000f0c6b",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5584,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R68, desc[UR8][R2.64+0x20]",
+          "encoding_low64": "000020080244e981",
+          "encoding_high64": "000762000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 3,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5600,
+          "predicate": null,
+          "opcode": "ISETP.LE.AND",
+          "operands": "P4, PT, R96, UR5, PT",
+          "encoding_low64": "0000000560007c0c",
+          "encoding_high64": "000fe2000bf83270",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5616,
+          "predicate": null,
+          "opcode": "UIADD3",
+          "operands": "UR5, UR5, 0x10, URZ",
+          "encoding_low64": "0000001005057890",
+          "encoding_high64": "000fe2000fffe03f",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5632,
+          "predicate": null,
+          "opcode": "IADD3",
+          "operands": "R91, P2, R91, UR6, RZ",
+          "encoding_low64": "000000065b5b7c10",
+          "encoding_high64": "000fe2000ff5e0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5648,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.128",
+          "operands": "R64, desc[UR8][R36.64+0x20]",
+          "encoding_low64": "000020082440e981",
+          "encoding_high64": "000962000c1e1d00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 4,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5664,
+          "predicate": null,
+          "opcode": "IADD3",
+          "operands": "R93, P1, R93, UR6, RZ",
+          "encoding_low64": "000000065d5d7c10",
+          "encoding_high64": "000fe4000ff3e0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5680,
+          "predicate": null,
+          "opcode": "IADD3",
+          "operands": "R89, P3, R89, 0x10, RZ",
+          "encoding_low64": "0000001059597810",
+          "encoding_high64": "000fe20007f7e0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5696,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R80, desc[UR8][R32.64]",
+          "encoding_low64": "000000082050e981",
+          "encoding_high64": "001f62000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 5712,
+          "predicate": null,
+          "opcode": "IADD3",
+          "operands": "R95, P0, R95, 0x20, RZ",
+          "encoding_low64": "000000205f5f7810",
+          "encoding_high64": "000fe40007f1e0ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5728,
+          "predicate": null,
+          "opcode": "IADD3.X",
+          "operands": "R90, R90, UR7, RZ, P2, !PT",
+          "encoding_low64": "000000075a5a7c10",
+          "encoding_high64": "000fe200097fe4ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5744,
+          "predicate": "@!P6",
+          "opcode": "LDG.E.64",
+          "operands": "R62, desc[UR8][R34.64]",
+          "encoding_low64": "00000008223ee981",
+          "encoding_high64": "000162000c1e1b00",
+          "decoded_write_barrier": 5,
+          "decoded_read_barrier": 0,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5760,
+          "predicate": null,
+          "opcode": "IADD3.X",
+          "operands": "R92, R92, UR7, RZ, P1, !PT",
+          "encoding_low64": "000000075c5c7c10",
+          "encoding_high64": "000fe20008ffe4ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5776,
+          "predicate": null,
+          "opcode": "IMAD.X",
+          "operands": "R97, RZ, RZ, R97, P3",
+          "encoding_low64": "000000ffff617224",
+          "encoding_high64": "000fe200018e0661",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5792,
+          "predicate": null,
+          "opcode": "IADD3.X",
+          "operands": "R94, RZ, R94, RZ, P0, !PT",
+          "encoding_low64": "0000005eff5e7210",
+          "encoding_high64": "000fe200007fe4ff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5808,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R40, [R0+UR4+0xf00]",
+          "encoding_low64": "000f00040028783b",
+          "encoding_high64": "002fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 2
+        },
+        {
+          "offset": 5824,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R42, [R0+UR4+0x1200]",
+          "encoding_low64": "00120004002a783b",
+          "encoding_high64": "004fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 4
+        },
+        {
+          "offset": 5840,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R2, [R0+UR4+0xe00]",
+          "encoding_low64": "000e00040002783b",
+          "encoding_high64": "008fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 8
+        },
+        {
+          "offset": 5856,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R36, [R60+0x200]",
+          "encoding_low64": "000200003c24783b",
+          "encoding_high64": "010fe80000000200",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 16
+        },
+        {
+          "offset": 5872,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R32, [R60]",
+          "encoding_low64": "000000003c20783b",
+          "encoding_high64": "001e240000000200",
+          "decoded_write_barrier": 0,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 5888,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R4, R32, R2, R4",
+          "encoding_low64": "000000022004723c",
+          "encoding_high64": "001fe40000041804",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 5904,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R2, [R0+UR4+0x1000]",
+          "encoding_low64": "001000040002783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5920,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R32, [R60+0x400]",
+          "encoding_low64": "000400003c20783b",
+          "encoding_high64": "000e220000000200",
+          "decoded_write_barrier": 0,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5936,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R8, R36, R40, R8",
+          "encoding_low64": "000000282408723c",
+          "encoding_high64": "000fe60000041808",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5952,
+          "predicate": null,
+          "opcode": "LDSM.16.MT88.2",
+          "operands": "R40, [R0+UR4+0x1100]",
+          "encoding_low64": "001100040028783b",
+          "encoding_high64": "000fe80008004100",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5968,
+          "predicate": null,
+          "opcode": "LDSM.16.M88.4",
+          "operands": "R36, [R60+0x600]",
+          "encoding_low64": "000600003c24783b",
+          "encoding_high64": "000e620000000200",
+          "decoded_write_barrier": 1,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 5984,
+          "predicate": null,
+          "opcode": "NOP",
+          "operands": "",
+          "encoding_low64": "0000000000007918",
+          "encoding_high64": "000fe20000000000",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6000,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R12, R32, R2, R12",
+          "encoding_low64": "00000002200c723c",
+          "encoding_high64": "001fec000004180c",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 1
+        },
+        {
+          "offset": 6016,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R16, R36, R40, R16",
+          "encoding_low64": "000000282410723c",
+          "encoding_high64": "002fec0000041810",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 2
+        },
+        {
+          "offset": 6032,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R20, R44, R42, R20",
+          "encoding_low64": "0000002a2c14723c",
+          "encoding_high64": "000fec0000041814",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6048,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R24, R48, R52, R24",
+          "encoding_low64": "000000343018723c",
+          "encoding_high64": "000fec0000041818",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6064,
+          "predicate": null,
+          "opcode": "HMMA.16816.F32.BF16",
+          "operands": "R28, R56, R54, R28",
+          "encoding_low64": "00000036381c723c",
+          "encoding_high64": "000fe2000004181c",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        },
+        {
+          "offset": 6080,
+          "predicate": "@!P4",
+          "opcode": "BRA",
+          "operands": "0xb20",
+          "encoding_low64": "fffffff000d4c947",
+          "encoding_high64": "000ff6000383ffff",
+          "decoded_write_barrier": 7,
+          "decoded_read_barrier": 7,
+          "decoded_wait_mask": 0
+        }
+      ],
+      "raw_bank_mapping": [
+        {
+          "quadrant": "A11",
+          "register_first": 76,
+          "register_words": 4,
+          "prefetch_offset": 5440,
+          "first_next_loop_raw_consumer_offset": 2864
+        },
+        {
+          "quadrant": "A12",
+          "register_first": 72,
+          "register_words": 4,
+          "prefetch_offset": 5536,
+          "first_next_loop_raw_consumer_offset": 2928
+        },
+        {
+          "quadrant": "A21",
+          "register_first": 68,
+          "register_words": 4,
+          "prefetch_offset": 5584,
+          "first_next_loop_raw_consumer_offset": 2848
+        },
+        {
+          "quadrant": "A22",
+          "register_first": 64,
+          "register_words": 4,
+          "prefetch_offset": 5648,
+          "first_next_loop_raw_consumer_offset": 2896
+        },
+        {
+          "quadrant": "B11",
+          "register_first": 84,
+          "register_words": 2,
+          "prefetch_offset": 5184,
+          "first_next_loop_raw_consumer_offset": 3776
+        },
+        {
+          "quadrant": "B12",
+          "register_first": 82,
+          "register_words": 2,
+          "prefetch_offset": 5232,
+          "first_next_loop_raw_consumer_offset": 3808
+        },
+        {
+          "quadrant": "B21",
+          "register_first": 80,
+          "register_words": 2,
+          "prefetch_offset": 5696,
+          "first_next_loop_raw_consumer_offset": 4576
+        },
+        {
+          "quadrant": "B22",
+          "register_first": 62,
+          "register_words": 2,
+          "prefetch_offset": 5744,
+          "first_next_loop_raw_consumer_offset": 3744
+        }
+      ]
+    }
+  ],
+  "bounds_evidence": {
+    "source_initial_load_k_base": 0,
+    "source_next_load_guard": "next_k=k_base+16; if(next_k<kh) small_load_raw(...next_k...,raw)",
+    "sass_predicate": "R96=kh; UR5=next_k, initialized16 and incremented16; P6=(kh<=next_k); all8 next LDGs use @!P6.",
+    "source_full_tiles_parent_K_domain": [
+      32,
+      32768,
+      32
+    ],
+    "cpu_parent_K_cases": 1024,
+    "cpu_K16_stages_checked": 524800,
+    "cpu_each_stage_loaded_and_consumed_once": true,
+    "cpu_last_stage_extra_next_load": false,
+    "short_K_shapes": [
+      [
+        128,
+        128
+      ],
+      [
+        32,
+        16
+      ],
+      [
+        32,
+        48
+      ]
+    ],
+    "short_K_parent_K_values": [
+      32,
+      64,
+      96
+    ],
+    "short_K_cases_per_log": 18,
+    "note": "No-final-extra-read combines source guard, CPU enumeration, predicate interpretation and observed short-K correctness/sanitizers. Static load counts alone are insufficient."
+  },
+  "findings": [
+    "Identity15 remains instruction/resource-identical between iter17 and18. Prefetch16 uses120 registers versus96, static shared6400 for both, STACK/LOCAL0 and no LDL/STL. One24-word/96-byte raw bank resides in R62..R85 and adds no source shared allocation. Nominal operand shared5376 bytes and compiled total6400 differ by1024 bytes; cause is not attributed.",
+    "All8 next raw loads precede all7 current HMMA. Five of14 current LDSM precede first next LDG; compiled overlap is with some LDSM and all HMMA, not before every shared load.",
+    "No early next-raw register use/repack or completion barrier5 wait occurs before backedge. Next-loop head0xb20 waits0x20 before raw use. Bits0..4 waits release address-read hazards before current LDSM register reuse, not raw-result completion.",
+    "SASS retains24 packed RN converters,7 HMMA,7 A LDSM.x4,7 B transposed LDSM.x2,7 STS.128,7 STS.64 and8 float2 STG.E.64. Seven full-K P, fixed U and identity output remain.",
+    "Identity15 loads use LDG.E.128.CONSTANT / LDG.E.64.CONSTANT; prefetch16 uses LDG.E.128 / LDG.E.64. Cache/load policy changed along with scheduling, so timing gains cannot be attributed solely to prefetch.",
+    "Static LDG count16 includes8 prologue and8 guarded lookahead sites; actual fetch count remains8 per consumed K16 stage. Static count480 versus440 is not a dynamic performance ratio."
+  ],
+  "validation": [
+    {
+      "path": "results/correctness_iter18.txt",
+      "lines": 1878,
+      "complete_terminal_newline": true,
+      "case_count": 1012,
+      "case_count_by_dtype": {
+        "bf16": 506,
+        "fp16": 506
+      },
+      "explicit_pass_marker_count": 97,
+      "mega16_case_count": 76,
+      "mega16_actual_route_counts": {
+        "megakernel_warp_mma_16x8_prefetch": 36,
+        "megakernel_warp_mma_16x8_epilogue": 4,
+        "megakernel_warp_mma_16x8_vec4": 6,
+        "megakernel_warp_mma_packed": 12,
+        "dense_cublaslt": 18
+      },
+      "all_case_metrics_finite": true,
+      "all_case_nonfinite_zero": true,
+      "mega16_metrics_all_exact_zero": true,
+      "short_K_cases": 18,
+      "footer": [
+        "PASS structural DAG, fallback numerics, strides/transposes, alias, degenerate and rejection tests",
+        "Forced SW mixed-precision certification is a separate gate: use --strict-numerics or megafmm_bench"
+      ],
+      "parent_reported_process_exit_code": 0,
+      "independently_observed_process_exit_code": null
+    },
+    {
+      "path": "results/sanitizer_small_prefetch16_memcheck.txt",
+      "lines": 111,
+      "complete_terminal_newline": true,
+      "case_count": 44,
+      "case_count_by_dtype": {
+        "bf16": 22,
+        "fp16": 22
+      },
+      "explicit_pass_marker_count": 11,
+      "mega16_case_count": 44,
+      "mega16_actual_route_counts": {
+        "megakernel_warp_mma_16x8_prefetch": 26,
+        "megakernel_warp_mma_16x8_epilogue": 6,
+        "megakernel_warp_mma_packed": 6,
+        "megakernel_warp_mma_16x8_vec4": 6
+      },
+      "all_case_metrics_finite": true,
+      "all_case_nonfinite_zero": true,
+      "mega16_metrics_all_exact_zero": true,
+      "short_K_cases": 18,
+      "footer": [
+        "PASS selected candidate kernel paths, beta0, alpha/beta alias and rectangular fallback",
+        "========= ERROR SUMMARY: 0 errors"
+      ],
+      "parent_reported_process_exit_code": 0,
+      "independently_observed_process_exit_code": null
+    },
+    {
+      "path": "results/sanitizer_small_prefetch16_racecheck.txt",
+      "lines": 111,
+      "complete_terminal_newline": true,
+      "case_count": 44,
+      "case_count_by_dtype": {
+        "bf16": 22,
+        "fp16": 22
+      },
+      "explicit_pass_marker_count": 11,
+      "mega16_case_count": 44,
+      "mega16_actual_route_counts": {
+        "megakernel_warp_mma_16x8_prefetch": 26,
+        "megakernel_warp_mma_16x8_epilogue": 6,
+        "megakernel_warp_mma_packed": 6,
+        "megakernel_warp_mma_16x8_vec4": 6
+      },
+      "all_case_metrics_finite": true,
+      "all_case_nonfinite_zero": true,
+      "mega16_metrics_all_exact_zero": true,
+      "short_K_cases": 18,
+      "footer": [
+        "PASS selected candidate kernel paths, beta0, alpha/beta alias and rectangular fallback",
+        "========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)"
+      ],
+      "parent_reported_process_exit_code": 0,
+      "independently_observed_process_exit_code": null
+    },
+    {
+      "path": "results/sanitizer_small_prefetch16_synccheck.txt",
+      "lines": 111,
+      "complete_terminal_newline": true,
+      "case_count": 44,
+      "case_count_by_dtype": {
+        "bf16": 22,
+        "fp16": 22
+      },
+      "explicit_pass_marker_count": 11,
+      "mega16_case_count": 44,
+      "mega16_actual_route_counts": {
+        "megakernel_warp_mma_16x8_prefetch": 26,
+        "megakernel_warp_mma_16x8_epilogue": 6,
+        "megakernel_warp_mma_packed": 6,
+        "megakernel_warp_mma_16x8_vec4": 6
+      },
+      "all_case_metrics_finite": true,
+      "all_case_nonfinite_zero": true,
+      "mega16_metrics_all_exact_zero": true,
+      "short_K_cases": 18,
+      "footer": [
+        "PASS selected candidate kernel paths, beta0, alpha/beta alias and rectangular fallback",
+        "========= ERROR SUMMARY: 0 errors"
+      ],
+      "parent_reported_process_exit_code": 0,
+      "independently_observed_process_exit_code": null
+    }
+  ],
+  "validation_details": {
+    "structural_pass_markers": {
+      "mma_bitwise": 24,
+      "cluster_graph": 6,
+      "input_pointer_rebind": 40,
+      "output_epilogue_rebind": 26,
+      "structural_summary": 1
+    },
+    "begin_warp_mma_expected_actual_checks": 574,
+    "expected_actual_mismatches": 0,
+    "mega16_case_count": 76,
+    "mega16_case_count_per_dtype": 38,
+    "short_K_cases": 18,
+    "all24_bitwise_pass_records_include_variant16": true,
+    "sanitizer_payload_identical_ignoring_banner_scheduler_summary": true,
+    "sanitizer_output_rebind_pass_count_each": 10,
+    "memcheck_observed_errors": 0,
+    "racecheck_observed_hazards": 0,
+    "racecheck_observed_errors": 0,
+    "racecheck_observed_warnings": 0,
+    "synccheck_observed_errors": 0,
+    "parent_reports_all_process_exit_codes_zero": true
+  },
+  "quick_screening": {
+    "csv_path": "trajectory/20261013_144926_iter-18/results.csv",
+    "rows": 18,
+    "protocol": {
+      "iterations_per_group": 20,
+      "groups": 5,
+      "correctness_trials": 1,
+      "mode": "launch",
+      "quantile_unit": "group_mean"
+    },
+    "numerical_gate_pass_rows": 0,
+    "numerical_gate_fail_rows": 18,
+    "selected_rows": [
+      {
+        "m": "128",
+        "n": "128",
+        "k": "128",
+        "dtype": "bf16",
+        "actual": "megakernel_warp_mma_16x8_prefetch",
+        "variant": "16",
+        "mode": "launch",
+        "cache": "warm_cache",
+        "trials": "20",
+        "groups": "5",
+        "correct_trials": "1",
+        "dense_event_ms": "0.00420319996774",
+        "solution_event_ms": "0.00412640012801",
+        "solution_p10_ms": "0.0041254401207",
+        "solution_p90_ms": "0.00422624006867",
+        "solution_cv": "0.0124125088479",
+        "speedup": "1.01861182565",
+        "solution_ef": "0.00605215821303",
+        "gate_floor": "0.001",
+        "gate_limit": "0.00100028838501",
+        "numerical_pass": "0"
+      },
+      {
+        "m": "128",
+        "n": "128",
+        "k": "128",
+        "dtype": "fp16",
+        "actual": "megakernel_warp_mma_16x8_prefetch",
+        "variant": "16",
+        "mode": "launch",
+        "cache": "warm_cache",
+        "trials": "20",
+        "groups": "5",
+        "correct_trials": "1",
+        "dense_event_ms": "0.00412640012801",
+        "solution_event_ms": "0.00433919988573",
+        "solution_p10_ms": "0.0042739199847",
+        "solution_p90_ms": "0.00434463992715",
+        "solution_cv": "0.00771468460212",
+        "speedup": "0.950958756609",
+        "solution_ef": "0.000744324700865",
+        "gate_floor": "0.0001",
+        "gate_limit": "0.000100546932244",
+        "numerical_pass": "0"
+      },
+      {
+        "m": "512",
+        "n": "512",
+        "k": "512",
+        "dtype": "bf16",
+        "actual": "megakernel_warp_mma_16x8_prefetch",
+        "variant": "16",
+        "mode": "launch",
+        "cache": "warm_cache",
+        "trials": "20",
+        "groups": "5",
+        "correct_trials": "1",
+        "dense_event_ms": "0.00617920011282",
+        "solution_event_ms": "0.0109935998917",
+        "solution_p10_ms": "0.0109609602392",
+        "solution_p90_ms": "0.0110921598971",
+        "solution_cv": "0.00538692978562",
+        "speedup": "0.562072494334",
+        "solution_ef": "0.00598238461014",
+        "gate_floor": "0.001",
+        "gate_limit": "0.00100117345784",
+        "numerical_pass": "0"
+      },
+      {
+        "m": "512",
+        "n": "512",
+        "k": "512",
+        "dtype": "fp16",
+        "actual": "megakernel_warp_mma_16x8_prefetch",
+        "variant": "16",
+        "mode": "launch",
+        "cache": "warm_cache",
+        "trials": "20",
+        "groups": "5",
+        "correct_trials": "1",
+        "dense_event_ms": "0.00614079982042",
+        "solution_event_ms": "0.0110863998532",
+        "solution_p10_ms": "0.0110703998804",
+        "solution_p90_ms": "0.0111257597804",
+        "solution_cv": "0.0022647604709",
+        "speedup": "0.553903873369",
+        "solution_ef": "0.000753206857909",
+        "gate_floor": "0.0001",
+        "gate_limit": "0.000101925941157",
+        "numerical_pass": "0"
+      }
+    ],
+    "interpretation": "128/512 own latency improves prior observed envelope by>3% per parent assessment; historical revisions/quick protocols differ. Full same-binary launch/Graph repeats and unchanged certification remain required."
+  },
+  "once_warmed_timeline": {
+    "path": "results/timeline_small_prefetch16_iter18.txt",
+    "shape": [
+      128,
+      128,
+      128
+    ],
+    "dtype": "bf16",
+    "actual": "megakernel_warp_mma_16x8_prefetch",
+    "device": "NVIDIA H100 80GB HBM3,132SM,cc9.0",
+    "driver": 12090,
+    "runtime": 12040,
+    "gpu_kernel_instances": 1,
+    "gpu_kernel_total_ns": 3392,
+    "host_cudaLaunchKernel_calls": 1,
+    "host_cudaLaunchKernel_total_ns": 74266,
+    "host_cudaStreamSynchronize_total_ns": 70509,
+    "interpretation": "Single profiler sample3.392us GPU busy time; quick launch group median4.1264us BF16. Instrumented host API74.266us is not steady launch overhead. Do not subtract differently measured samples to infer validated overhead."
+  },
+  "limitations": [
+    "No GPU/build/benchmark/git was executed by this audit; only authorized evidence JSON and ITERATIONS.md are written.",
+    "Static scheduling controls expose overlap, not fully hidden latency, measured utilization/bandwidth/occupancy, or a physical floor.",
+    "A cache-policy-matched comparison or further runtime profiling is needed to isolate scheduling from load policy.",
+    "Structural/bitwise/integer sanitizer PASS does not certify mixed precision. All18 quick gates fail; Auto remains Dense.",
+    "Six Graph PASS records cover cluster/warps, not Mega16-specific Graph replay.",
+    "Parent-reported exit0 is distinct from observed complete PASS/footer; no captured exit files were read."
+  ]
+}

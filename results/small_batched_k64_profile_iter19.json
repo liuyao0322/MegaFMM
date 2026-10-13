@@ -1,0 +1,2607 @@
+{
+  "schema_version": 1,
+  "iteration": 19,
+  "audit_date": "2026-10-13",
+  "measured_source_commit_reported_by_root": "36d9b45",
+  "scope": "Read-only source, archived SASS/resources, timing CSV and validation-log audit; only this JSON artifact is written. No new GPU run, build, benchmark or git command.",
+  "provenance": {
+    "frozen_source_sha256": "a54a6772a118d00cc78e01da4198826e1d105e20ccbdd8930dfcc301eeb0542c",
+    "source_files": [
+      {
+        "path": ".scratch/small_batched_k64.cu",
+        "sha256": "a54a6772a118d00cc78e01da4198826e1d105e20ccbdd8930dfcc301eeb0542c"
+      },
+      {
+        "path": "solution/gemm_batched_k64.cu",
+        "sha256": "a54a6772a118d00cc78e01da4198826e1d105e20ccbdd8930dfcc301eeb0542c"
+      },
+      {
+        "path": "trajectory/20261013_145706_iter-19/gemm_batched_k64.cu",
+        "sha256": "a54a6772a118d00cc78e01da4198826e1d105e20ccbdd8930dfcc301eeb0542c"
+      }
+    ],
+    "cutlass_version": "3.5.1",
+    "cutlass_pinned_commit": "f7b19de32c5d1f3cedfc735c2849f12b537522ee",
+    "sass_snapshot": {
+      "path": ".scratch/small_sass_iter19.txt",
+      "sha256": "b224681be7a86bec4ece39a77621b1d1c9941ef83d80d324b4a1e36a7011007c"
+    },
+    "resource_snapshot": {
+      "path": ".scratch/small_resources_iter19.txt",
+      "sha256": "6b56d0899c67470bd0545e510bf106d0ce0892272f87d5cb93d526633f87962f"
+    },
+    "build_log": {
+      "path": "trajectory/20261013_145706_iter-19/output.txt",
+      "sha256": "9e2634cf39a6955a5dcc006ddf557d153d3bb0f3089ecae00db3745164a4b974"
+    },
+    "binary_sha256": null,
+    "binary_sha256_note": "Current build is under another source lease; audit identifies archived disassembly/resources by their own hashes and does not fingerprint a potentially replaced binary."
+  },
+  "kernel_entry_mapping_method": "Select resource identifier solution/gemm_batched_k64.cu, match each full entry name to SASS, confirm CTA32x64x64, pipeline family and half_t/bfloat16_t; exactly four entries.",
+  "kernels": [
+    {
+      "variant": 7,
+      "stages": 3,
+      "dtype": "bf16",
+      "mangled_entry": "_ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock13MmaMultistageINS1_9GemmShapeILi32ELi64ELi64EEENS_9transform11threadblock28PredicatedTileAccessIteratorINS_11MatrixShapeILi32ELi64EEENS_10bfloat16_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi64ELi32EEELi64ENSH_ILi8ELi4EEELi8EEENS_5ArrayISD_Li8ELb0EEELb0ENSE_9NoPermuteEEENS9_25RegularTileAccessIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi64EEELi0ESK_Li16EEELNS_4arch14CacheOperation4KindE1ENSA_INSB_ILi64ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi64EEELi64ESJ_Li8EEESM_Lb0ESN_EENSP_ISW_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0ESY_Li16EEELSV_1EfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi64EEESD_SR_SD_S11_fSF_NS14_17MmaTensorOpPolicyINST_3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NST_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1G_Li1EEELi3ELNS1_23SharedMemoryClearOptionE0EbEENS_8epilogue11threadblock8EpilogueIS7_S1F_Li1ENS1L_22PredicatedTileIteratorINS1L_26OutputTileOptimalThreadMapINS1L_15OutputTileShapeILi64ELi8ELi1ELi1ELi1EEENS1P_ILi1ELi4ELi1ELi1ELi4EEELi64ELi4ELi32EEEfLb0ESN_Lb0EEENS1K_4warp24FragmentIteratorTensorOpIS16_S19_fNSL_IfLi4ELb1EEESF_EENS1U_20TileIteratorTensorOpIS16_S19_fSF_EENS1L_18SharedLoadIteratorINS1S_18CompactedThreadMapEfLi16EEENS1K_6thread17LinearCombinationIfLi4EffLNS23_9ScaleType4KindE2ELNS_15FloatRoundStyleE2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE",
+      "target": "sm_90a",
+      "cta_shape": [
+        32,
+        64,
+        64
+      ],
+      "warp_shape": [
+        32,
+        32,
+        64
+      ],
+      "instruction_shape": [
+        16,
+        8,
+        16
+      ],
+      "threads": 64,
+      "batch_count": 7,
+      "accumulator_dtype": "fp32",
+      "output_dtype": "fp32",
+      "pipeline": "MmaMultistage",
+      "resources": {
+        "registers_per_thread": 128,
+        "stack_bytes": 0,
+        "local_memory_bytes": 0,
+        "cuobjdump_shared_field_bytes": 1024,
+        "dynamic_shared_launch_bytes_derived_from_source": 36864,
+        "static_plus_dynamic_shared_bytes_inferred": 37888,
+        "raw_cuobjdump_resource_line": "REG:128 STACK:0 SHARED:1024 LOCAL:0 CONSTANT[0]:896 TEXTURE:0 SURFACE:0 SAMPLER:0",
+        "ptxas_stack_frame_bytes": 0,
+        "ptxas_spill_store_bytes": 0,
+        "ptxas_spill_load_bytes": 0,
+        "resource_source": {
+          "path": ".scratch/small_resources_iter19.txt",
+          "line": 147
+        },
+        "ptxas_source": {
+          "path": "trajectory/20261013_145706_iter-19/output.txt",
+          "line": 99
+        }
+      },
+      "sass": {
+        "source_path": ".scratch/small_sass_iter19.txt",
+        "function_header_line": 56707,
+        "static_instruction_count": 841,
+        "opcode_histogram": {
+          "BAR.SYNC.DEFER_BLOCKING": 11,
+          "BRA": 10,
+          "CS2R": 16,
+          "DEPBAR.LE": 3,
+          "EXIT": 3,
+          "FMUL": 32,
+          "HMMA.16816.F32.BF16": 32,
+          "IADD3": 67,
+          "IADD3.X": 22,
+          "IMAD": 34,
+          "IMAD.IADD": 33,
+          "IMAD.MOV.U32": 12,
+          "IMAD.SHL.U32": 30,
+          "IMAD.U32": 2,
+          "IMAD.WIDE": 1,
+          "IMAD.WIDE.U32": 9,
+          "IMAD.X": 30,
+          "ISETP.GE.AND": 7,
+          "ISETP.GE.OR": 1,
+          "ISETP.GT.AND": 1,
+          "ISETP.LE.AND": 2,
+          "ISETP.LT.AND": 21,
+          "ISETP.NE.AND": 8,
+          "ISETP.NE.AND.EX": 4,
+          "ISETP.NE.U32.AND": 22,
+          "LD.E": 1,
+          "LDC": 7,
+          "LDC.64": 9,
+          "LDG.E": 1,
+          "LDG.E.64": 1,
+          "LDGDEPBAR": 5,
+          "LDGSTS.E.BYPASS.LTC128B.128": 36,
+          "LDS.128": 8,
+          "LDSM.16.M88.4": 10,
+          "LDSM.16.MT88.4": 10,
+          "LEA": 11,
+          "LEA.HI": 19,
+          "LEA.HI.SX32": 2,
+          "LEA.HI.X": 3,
+          "LOP3.LUT": 90,
+          "MOV": 2,
+          "NOP": 11,
+          "P2R": 4,
+          "PLOP3.LUT": 1,
+          "R2UR": 1,
+          "S2R": 3,
+          "S2UR": 2,
+          "SEL": 27,
+          "SHF.L.U32": 2,
+          "SHF.L.U64.HI": 2,
+          "SHF.R.S32.HI": 26,
+          "SHF.R.U32.HI": 21,
+          "SHFL.IDX": 1,
+          "STG.E.128": 8,
+          "STS.64": 16,
+          "UIADD3": 8,
+          "UIADD3.X": 2,
+          "UIMAD": 1,
+          "UISETP.NE.AND": 1,
+          "UISETP.NE.U32.AND": 1,
+          "ULDC": 11,
+          "ULDC.64": 18,
+          "ULEA": 2,
+          "ULEA.HI": 1,
+          "ULOP3.LUT": 3,
+          "UMOV": 6,
+          "UPRMT": 1,
+          "USHF.L.U32": 6,
+          "USHF.L.U64.HI": 1,
+          "USHF.R.S32.HI": 3,
+          "VIADD": 22,
+          "VIMNMX": 1
+        },
+        "mechanism_samples": {
+          "LDGSTS": {
+            "static_count": 36,
+            "examples": [
+              {
+                "address": "0x1170",
+                "opcode": "LDGSTS.E.BYPASS.LTC128B.128",
+                "operands": "[R88], desc[UR16][R12.64], P6",
+                "sass": "/*1170*/                   LDGSTS.E.BYPASS.LTC128B.128 [R88], desc[UR16][R12.64], P6 ;"
+              },
+              {
+                "address": "0x11c0",
+                "opcode": "LDGSTS.E.BYPASS.LTC128B.128",
+                "operands": "[R86+0x600], desc[UR16][R20.64], P5",
+                "sass": "/*11c0*/                   LDGSTS.E.BYPASS.LTC128B.128 [R86+0x600], desc[UR16][R20.64], P5 ;"
+              },
+              {
+                "address": "0x1230",
+                "opcode": "LDGSTS.E.BYPASS.LTC128B.128",
+                "operands": "[R88+0xc00], desc[UR16][R18.64], P2",
+                "sass": "/*1230*/                   LDGSTS.E.BYPASS.LTC128B.128 [R88+0xc00], desc[UR16][R18.64], P2 ;"
+              }
+            ]
+          },
+          "LDG.E.LTC128B.128": {
+            "static_count": 0,
+            "examples": []
+          },
+          "STS.128": {
+            "static_count": 0,
+            "examples": []
+          },
+          "LDGDEPBAR": {
+            "static_count": 5,
+            "examples": [
+              {
+                "address": "0x1600",
+                "opcode": "LDGDEPBAR",
+                "operands": "",
+                "sass": "/*1600*/                   LDGDEPBAR ;"
+              },
+              {
+                "address": "0x1bb0",
+                "opcode": "LDGDEPBAR",
+                "operands": "",
+                "sass": "/*1bb0*/                   LDGDEPBAR ;"
+              },
+              {
+                "address": "0x28d0",
+                "opcode": "LDGDEPBAR",
+                "operands": "",
+                "sass": "/*28d0*/                   LDGDEPBAR ;"
+              }
+            ]
+          },
+          "DEPBAR": {
+            "static_count": 3,
+            "examples": [
+              {
+                "address": "0x1ce0",
+                "opcode": "DEPBAR.LE",
+                "operands": "SB0, 0x1",
+                "sass": "/*1ce0*/                   DEPBAR.LE SB0, 0x1 ;"
+              },
+              {
+                "address": "0x29c0",
+                "opcode": "DEPBAR.LE",
+                "operands": "SB0, 0x1",
+                "sass": "/*29c0*/                   DEPBAR.LE SB0, 0x1 ;"
+              },
+              {
+                "address": "0x2aa0",
+                "opcode": "DEPBAR.LE",
+                "operands": "SB0, 0x0",
+                "sass": "/*2aa0*/                   DEPBAR.LE SB0, 0x0 ;"
+              }
+            ]
+          },
+          "LDSM": {
+            "static_count": 20,
+            "examples": [
+              {
+                "address": "0x1e50",
+                "opcode": "LDSM.16.M88.4",
+                "operands": "R36, [R3]",
+                "sass": "/*1e50*/                   LDSM.16.M88.4 R36, [R3] ;"
+              },
+              {
+                "address": "0x1e60",
+                "opcode": "LDSM.16.M88.4",
+                "operands": "R48, [R48+0x1800]",
+                "sass": "/*1e60*/                   LDSM.16.M88.4 R48, [R48+0x1800] ;"
+              },
+              {
+                "address": "0x1e70",
+                "opcode": "LDSM.16.MT88.4",
+                "operands": "R40, [R2+UR6]",
+                "sass": "/*1e70*/                   LDSM.16.MT88.4 R40, [R2+UR6] ;"
+              }
+            ]
+          },
+          "HMMA": {
+            "static_count": 32,
+            "examples": [
+              {
+                "address": "0x2010",
+                "opcode": "HMMA.16816.F32.BF16",
+                "operands": "R4, R36, R40, R4",
+                "sass": "/*2010*/                   HMMA.16816.F32.BF16 R4, R36, R40, R4 ;"
+              },
+              {
+                "address": "0x2060",
+                "opcode": "HMMA.16816.F32.BF16",
+                "operands": "R8, R36, R42, R8",
+                "sass": "/*2060*/                   HMMA.16816.F32.BF16 R8, R36, R42, R8 ;"
+              },
+              {
+                "address": "0x20b0",
+                "opcode": "HMMA.16816.F32.BF16",
+                "operands": "R12, R36, R44, R12",
+                "sass": "/*20b0*/                   HMMA.16816.F32.BF16 R12, R36, R44, R12 ;"
+              }
+            ]
+          },
+          "BAR.SYNC": {
+            "static_count": 11,
+            "examples": [
+              {
+                "address": "0x1d60",
+                "opcode": "BAR.SYNC.DEFER_BLOCKING",
+                "operands": "0x0",
+                "sass": "/*1d60*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;"
+              },
+              {
+                "address": "0x29d0",
+                "opcode": "BAR.SYNC.DEFER_BLOCKING",
+                "operands": "0x0",
+                "sass": "/*29d0*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;"
+              },
+              {
+                "address": "0x2ab0",
+                "opcode": "BAR.SYNC.DEFER_BLOCKING",
+                "operands": "0x0",
+                "sass": "/*2ab0*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;"
+              }
+            ]
+          }
+        },
+        "counts_are_static_not_dynamic": true
+      },
+      "interpretation": "Global-to-shared copy uses LDGSTS.E.BYPASS.LTC128B.128, LDGDEPBAR commit and DEPBAR.LE waits, matching three-stage MmaMultistage cp.async; register staging of the operand vectors is bypassed."
+    },
+    {
+      "variant": 7,
+      "stages": 3,
+      "dtype": "fp16",
+      "mangled_entry": "_ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock13MmaMultistageINS1_9GemmShapeILi32ELi64ELi64EEENS_9transform11threadblock28PredicatedTileAccessIteratorINS_11MatrixShapeILi32ELi64EEENS_6half_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi64ELi32EEELi64ENSH_ILi8ELi4EEELi8EEENS_5ArrayISD_Li8ELb0EEELb0ENSE_9NoPermuteEEENS9_25RegularTileAccessIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi64EEELi0ESK_Li16EEELNS_4arch14CacheOperation4KindE1ENSA_INSB_ILi64ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi64EEELi64ESJ_Li8EEESM_Lb0ESN_EENSP_ISW_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0ESY_Li16EEELSV_1EfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi64EEESD_SR_SD_S11_fSF_NS14_17MmaTensorOpPolicyINST_3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NST_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1G_Li1EEELi3ELNS1_23SharedMemoryClearOptionE0EbEENS_8epilogue11threadblock8EpilogueIS7_S1F_Li1ENS1L_22PredicatedTileIteratorINS1L_26OutputTileOptimalThreadMapINS1L_15OutputTileShapeILi64ELi8ELi1ELi1ELi1EEENS1P_ILi1ELi4ELi1ELi1ELi4EEELi64ELi4ELi32EEEfLb0ESN_Lb0EEENS1K_4warp24FragmentIteratorTensorOpIS16_S19_fNSL_IfLi4ELb1EEESF_EENS1U_20TileIteratorTensorOpIS16_S19_fSF_EENS1L_18SharedLoadIteratorINS1S_18CompactedThreadMapEfLi16EEENS1K_6thread17LinearCombinationIfLi4EffLNS23_9ScaleType4KindE2ELNS_15FloatRoundStyleE2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE",
+      "target": "sm_90a",
+      "cta_shape": [
+        32,
+        64,
+        64
+      ],
+      "warp_shape": [
+        32,
+        32,
+        64
+      ],
+      "instruction_shape": [
+        16,
+        8,
+        16
+      ],
+      "threads": 64,
+      "batch_count": 7,
+      "accumulator_dtype": "fp32",
+      "output_dtype": "fp32",
+      "pipeline": "MmaMultistage",
+      "resources": {
+        "registers_per_thread": 128,
+        "stack_bytes": 0,
+        "local_memory_bytes": 0,
+        "cuobjdump_shared_field_bytes": 1024,
+        "dynamic_shared_launch_bytes_derived_from_source": 36864,
+        "static_plus_dynamic_shared_bytes_inferred": 37888,
+        "raw_cuobjdump_resource_line": "REG:128 STACK:0 SHARED:1024 LOCAL:0 CONSTANT[0]:896 TEXTURE:0 SURFACE:0 SAMPLER:0",
+        "ptxas_stack_frame_bytes": 0,
+        "ptxas_spill_store_bytes": 0,
+        "ptxas_spill_load_bytes": 0,
+        "resource_source": {
+          "path": ".scratch/small_resources_iter19.txt",
+          "line": 143
+        },
+        "ptxas_source": {
+          "path": "trajectory/20261013_145706_iter-19/output.txt",
+          "line": 91
+        }
+      },
+      "sass": {
+        "source_path": ".scratch/small_sass_iter19.txt",
+        "function_header_line": 53369,
+        "static_instruction_count": 841,
+        "opcode_histogram": {
+          "BAR.SYNC.DEFER_BLOCKING": 11,
+          "BRA": 10,
+          "CS2R": 16,
+          "DEPBAR.LE": 3,
+          "EXIT": 3,
+          "FMUL": 32,
+          "HMMA.16816.F32": 32,
+          "IADD3": 67,
+          "IADD3.X": 22,
+          "IMAD": 34,
+          "IMAD.IADD": 33,
+          "IMAD.MOV.U32": 12,
+          "IMAD.SHL.U32": 30,
+          "IMAD.U32": 2,
+          "IMAD.WIDE": 1,
+          "IMAD.WIDE.U32": 9,
+          "IMAD.X": 30,
+          "ISETP.GE.AND": 7,
+          "ISETP.GE.OR": 1,
+          "ISETP.GT.AND": 1,
+          "ISETP.LE.AND": 2,
+          "ISETP.LT.AND": 21,
+          "ISETP.NE.AND": 8,
+          "ISETP.NE.AND.EX": 4,
+          "ISETP.NE.U32.AND": 22,
+          "LD.E": 1,
+          "LDC": 7,
+          "LDC.64": 9,
+          "LDG.E": 1,
+          "LDG.E.64": 1,
+          "LDGDEPBAR": 5,
+          "LDGSTS.E.BYPASS.LTC128B.128": 36,
+          "LDS.128": 8,
+          "LDSM.16.M88.4": 10,
+          "LDSM.16.MT88.4": 10,
+          "LEA": 11,
+          "LEA.HI": 19,
+          "LEA.HI.SX32": 2,
+          "LEA.HI.X": 3,
+          "LOP3.LUT": 90,
+          "MOV": 2,
+          "NOP": 11,
+          "P2R": 4,
+          "PLOP3.LUT": 1,
+          "R2UR": 1,
+          "S2R": 3,
+          "S2UR": 2,
+          "SEL": 27,
+          "SHF.L.U32": 2,
+          "SHF.L.U64.HI": 2,
+          "SHF.R.S32.HI": 26,
+          "SHF.R.U32.HI": 21,
+          "SHFL.IDX": 1,
+          "STG.E.128": 8,
+          "STS.64": 16,
+          "UIADD3": 8,
+          "UIADD3.X": 2,
+          "UIMAD": 1,
+          "UISETP.NE.AND": 1,
+          "UISETP.NE.U32.AND": 1,
+          "ULDC": 11,
+          "ULDC.64": 18,
+          "ULEA": 2,
+          "ULEA.HI": 1,
+          "ULOP3.LUT": 3,
+          "UMOV": 6,
+          "UPRMT": 1,
+          "USHF.L.U32": 6,
+          "USHF.L.U64.HI": 1,
+          "USHF.R.S32.HI": 3,
+          "VIADD": 22,
+          "VIMNMX": 1
+        },
+        "mechanism_samples": {
+          "LDGSTS": {
+            "static_count": 36,
+            "examples": [
+              {
+                "address": "0x1170",
+                "opcode": "LDGSTS.E.BYPASS.LTC128B.128",
+                "operands": "[R88], desc[UR16][R12.64], P6",
+                "sass": "/*1170*/                   LDGSTS.E.BYPASS.LTC128B.128 [R88], desc[UR16][R12.64], P6 ;"
+              },
+              {
+                "address": "0x11c0",
+                "opcode": "LDGSTS.E.BYPASS.LTC128B.128",
+                "operands": "[R86+0x600], desc[UR16][R20.64], P5",
+                "sass": "/*11c0*/                   LDGSTS.E.BYPASS.LTC128B.128 [R86+0x600], desc[UR16][R20.64], P5 ;"
+              },
+              {
+                "address": "0x1230",
+                "opcode": "LDGSTS.E.BYPASS.LTC128B.128",
+                "operands": "[R88+0xc00], desc[UR16][R18.64], P2",
+                "sass": "/*1230*/                   LDGSTS.E.BYPASS.LTC128B.128 [R88+0xc00], desc[UR16][R18.64], P2 ;"
+              }
+            ]
+          },
+          "LDG.E.LTC128B.128": {
+            "static_count": 0,
+            "examples": []
+          },
+          "STS.128": {
+            "static_count": 0,
+            "examples": []
+          },
+          "LDGDEPBAR": {
+            "static_count": 5,
+            "examples": [
+              {
+                "address": "0x1600",
+                "opcode": "LDGDEPBAR",
+                "operands": "",
+                "sass": "/*1600*/                   LDGDEPBAR ;"
+              },
+              {
+                "address": "0x1bb0",
+                "opcode": "LDGDEPBAR",
+                "operands": "",
+                "sass": "/*1bb0*/                   LDGDEPBAR ;"
+              },
+              {
+                "address": "0x28d0",
+                "opcode": "LDGDEPBAR",
+                "operands": "",
+                "sass": "/*28d0*/                   LDGDEPBAR ;"
+              }
+            ]
+          },
+          "DEPBAR": {
+            "static_count": 3,
+            "examples": [
+              {
+                "address": "0x1ce0",
+                "opcode": "DEPBAR.LE",
+                "operands": "SB0, 0x1",
+                "sass": "/*1ce0*/                   DEPBAR.LE SB0, 0x1 ;"
+              },
+              {
+                "address": "0x29c0",
+                "opcode": "DEPBAR.LE",
+                "operands": "SB0, 0x1",
+                "sass": "/*29c0*/                   DEPBAR.LE SB0, 0x1 ;"
+              },
+              {
+                "address": "0x2aa0",
+                "opcode": "DEPBAR.LE",
+                "operands": "SB0, 0x0",
+                "sass": "/*2aa0*/                   DEPBAR.LE SB0, 0x0 ;"
+              }
+            ]
+          },
+          "LDSM": {
+            "static_count": 20,
+            "examples": [
+              {
+                "address": "0x1e50",
+                "opcode": "LDSM.16.M88.4",
+                "operands": "R36, [R3]",
+                "sass": "/*1e50*/                   LDSM.16.M88.4 R36, [R3] ;"
+              },
+              {
+                "address": "0x1e60",
+                "opcode": "LDSM.16.M88.4",
+                "operands": "R48, [R48+0x1800]",
+                "sass": "/*1e60*/                   LDSM.16.M88.4 R48, [R48+0x1800] ;"
+              },
+              {
+                "address": "0x1e70",
+                "opcode": "LDSM.16.MT88.4",
+                "operands": "R40, [R2+UR6]",
+                "sass": "/*1e70*/                   LDSM.16.MT88.4 R40, [R2+UR6] ;"
+              }
+            ]
+          },
+          "HMMA": {
+            "static_count": 32,
+            "examples": [
+              {
+                "address": "0x2010",
+                "opcode": "HMMA.16816.F32",
+                "operands": "R4, R36, R40, R4",
+                "sass": "/*2010*/                   HMMA.16816.F32 R4, R36, R40, R4 ;"
+              },
+              {
+                "address": "0x2060",
+                "opcode": "HMMA.16816.F32",
+                "operands": "R8, R36, R42, R8",
+                "sass": "/*2060*/                   HMMA.16816.F32 R8, R36, R42, R8 ;"
+              },
+              {
+                "address": "0x20b0",
+                "opcode": "HMMA.16816.F32",
+                "operands": "R12, R36, R44, R12",
+                "sass": "/*20b0*/                   HMMA.16816.F32 R12, R36, R44, R12 ;"
+              }
+            ]
+          },
+          "BAR.SYNC": {
+            "static_count": 11,
+            "examples": [
+              {
+                "address": "0x1d60",
+                "opcode": "BAR.SYNC.DEFER_BLOCKING",
+                "operands": "0x0",
+                "sass": "/*1d60*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;"
+              },
+              {
+                "address": "0x29d0",
+                "opcode": "BAR.SYNC.DEFER_BLOCKING",
+                "operands": "0x0",
+                "sass": "/*29d0*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;"
+              },
+              {
+                "address": "0x2ab0",
+                "opcode": "BAR.SYNC.DEFER_BLOCKING",
+                "operands": "0x0",
+                "sass": "/*2ab0*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;"
+              }
+            ]
+          }
+        },
+        "counts_are_static_not_dynamic": true
+      },
+      "interpretation": "Global-to-shared copy uses LDGSTS.E.BYPASS.LTC128B.128, LDGDEPBAR commit and DEPBAR.LE waits, matching three-stage MmaMultistage cp.async; register staging of the operand vectors is bypassed."
+    },
+    {
+      "variant": 8,
+      "stages": 2,
+      "dtype": "bf16",
+      "mangled_entry": "_ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock12MmaPipelinedINS1_9GemmShapeILi32ELi64ELi64EEENS_9transform11threadblock22PredicatedTileIteratorINS_11MatrixShapeILi32ELi64EEENS_10bfloat16_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi64ELi32EEELi64ENSH_ILi8ELi4EEELi8EEELi8ELb0ENSE_9NoPermuteEEENS9_19RegularTileIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi64EEELi0ESK_Li16EEENSA_INSB_ILi64ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi64EEELi64ESJ_Li8EEELi8ELb0ESL_EENSN_ISR_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0EST_Li16EEEfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi64EEESD_SP_SD_SW_fSF_NSZ_17MmaTensorOpPolicyINS_4arch3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NS13_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1C_Li1EEENS_21NumericArrayConverterISD_SD_Li32ELNS_15FloatRoundStyleE2ENS8_6thread14UnaryTransform8IdentityEEENS1E_ISD_SD_Li64ELS1F_2ES1I_EEbEENS_8epilogue11threadblock8EpilogueIS7_S1B_Li1ENS1N_22PredicatedTileIteratorINS1N_26OutputTileOptimalThreadMapINS1N_15OutputTileShapeILi64ELi8ELi1ELi1ELi1EEENS1R_ILi1ELi4ELi1ELi1ELi4EEELi64ELi4ELi32EEEfLb0ESL_Lb0EEENS1M_4warp24FragmentIteratorTensorOpIS11_S15_fNS_5ArrayIfLi4ELb1EEESF_EENS1W_20TileIteratorTensorOpIS11_S15_fSF_EENS1N_18SharedLoadIteratorINS1U_18CompactedThreadMapEfLi16EEENS1M_6thread17LinearCombinationIfLi4EffLNS26_9ScaleType4KindE2ELS1F_2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE",
+      "target": "sm_90a",
+      "cta_shape": [
+        32,
+        64,
+        64
+      ],
+      "warp_shape": [
+        32,
+        32,
+        64
+      ],
+      "instruction_shape": [
+        16,
+        8,
+        16
+      ],
+      "threads": 64,
+      "batch_count": 7,
+      "accumulator_dtype": "fp32",
+      "output_dtype": "fp32",
+      "pipeline": "MmaPipelined",
+      "resources": {
+        "registers_per_thread": 164,
+        "stack_bytes": 0,
+        "local_memory_bytes": 0,
+        "cuobjdump_shared_field_bytes": 1024,
+        "dynamic_shared_launch_bytes_derived_from_source": 24576,
+        "static_plus_dynamic_shared_bytes_inferred": 25600,
+        "raw_cuobjdump_resource_line": "REG:164 STACK:0 SHARED:1024 LOCAL:0 CONSTANT[0]:896 TEXTURE:0 SURFACE:0 SAMPLER:0",
+        "ptxas_stack_frame_bytes": 0,
+        "ptxas_spill_store_bytes": 0,
+        "ptxas_spill_load_bytes": 0,
+        "resource_source": {
+          "path": ".scratch/small_resources_iter19.txt",
+          "line": 145
+        },
+        "ptxas_source": {
+          "path": "trajectory/20261013_145706_iter-19/output.txt",
+          "line": 95
+        }
+      },
+      "sass": {
+        "source_path": ".scratch/small_sass_iter19.txt",
+        "function_header_line": 55086,
+        "static_instruction_count": 800,
+        "opcode_histogram": {
+          "BAR.SYNC.DEFER_BLOCKING": 10,
+          "BRA": 10,
+          "CS2R": 64,
+          "EXIT": 3,
+          "FMUL": 32,
+          "HMMA.16816.F32.BF16": 32,
+          "IADD3": 53,
+          "IADD3.X": 20,
+          "IMAD": 31,
+          "IMAD.IADD": 34,
+          "IMAD.MOV.U32": 6,
+          "IMAD.SHL.U32": 16,
+          "IMAD.U32": 1,
+          "IMAD.WIDE": 1,
+          "IMAD.WIDE.U32": 9,
+          "IMAD.X": 20,
+          "ISETP.GE.AND": 12,
+          "ISETP.GE.OR": 1,
+          "ISETP.GT.AND": 3,
+          "ISETP.LE.AND": 2,
+          "ISETP.LT.AND": 21,
+          "ISETP.NE.AND": 1,
+          "ISETP.NE.AND.EX": 4,
+          "ISETP.NE.U32.AND": 14,
+          "LD.E": 1,
+          "LDC": 8,
+          "LDC.64": 9,
+          "LDG.E": 1,
+          "LDG.E.64": 1,
+          "LDG.E.LTC128B.128": 24,
+          "LDS.128": 8,
+          "LDSM.16.M88.4": 10,
+          "LDSM.16.MT88.4": 10,
+          "LEA": 12,
+          "LEA.HI": 21,
+          "LEA.HI.SX32": 3,
+          "LEA.HI.X": 3,
+          "LOP3.LUT": 65,
+          "MOV": 2,
+          "NOP": 10,
+          "PLOP3.LUT": 1,
+          "R2UR": 1,
+          "S2R": 5,
+          "S2UR": 4,
+          "SEL": 17,
+          "SHF.L.U32": 3,
+          "SHF.L.U64.HI": 2,
+          "SHF.R.S32.HI": 29,
+          "SHF.R.U32.HI": 13,
+          "SHFL.IDX": 1,
+          "STG.E.128": 8,
+          "STS.128": 24,
+          "STS.64": 16,
+          "UIADD3": 6,
+          "UIADD3.X": 2,
+          "UIMAD": 1,
+          "UISETP.NE.AND": 1,
+          "UISETP.NE.U32.AND": 1,
+          "ULDC": 12,
+          "ULDC.64": 16,
+          "ULEA": 2,
+          "ULEA.HI": 1,
+          "ULOP3.LUT": 4,
+          "UMOV": 10,
+          "UPRMT": 3,
+          "USHF.L.U32": 5,
+          "USHF.L.U64.HI": 1,
+          "USHF.R.S32.HI": 3,
+          "VIADD": 19,
+          "VIMNMX": 1
+        },
+        "mechanism_samples": {
+          "LDGSTS": {
+            "static_count": 0,
+            "examples": []
+          },
+          "LDG.E.LTC128B.128": {
+            "static_count": 24,
+            "examples": [
+              {
+                "address": "0x1060",
+                "opcode": "LDG.E.LTC128B.128",
+                "operands": "R48, desc[UR24][R12.64]",
+                "sass": "/*1060*/               @P5 LDG.E.LTC128B.128 R48, desc[UR24][R12.64] ;"
+              },
+              {
+                "address": "0x10c0",
+                "opcode": "LDG.E.LTC128B.128",
+                "operands": "R44, desc[UR24][R14.64]",
+                "sass": "/*10c0*/               @P3 LDG.E.LTC128B.128 R44, desc[UR24][R14.64] ;"
+              },
+              {
+                "address": "0x1100",
+                "opcode": "LDG.E.LTC128B.128",
+                "operands": "R40, desc[UR24][R6.64]",
+                "sass": "/*1100*/               @P1 LDG.E.LTC128B.128 R40, desc[UR24][R6.64] ;"
+              }
+            ]
+          },
+          "STS.128": {
+            "static_count": 24,
+            "examples": [
+              {
+                "address": "0x18d0",
+                "opcode": "STS.128",
+                "operands": "[R131], R48",
+                "sass": "/*18d0*/                   STS.128 [R131], R48 ;"
+              },
+              {
+                "address": "0x18e0",
+                "opcode": "STS.128",
+                "operands": "[R130], R44",
+                "sass": "/*18e0*/                   STS.128 [R130], R44 ;"
+              },
+              {
+                "address": "0x18f0",
+                "opcode": "STS.128",
+                "operands": "[R131+0x800], R40",
+                "sass": "/*18f0*/                   STS.128 [R131+0x800], R40 ;"
+              }
+            ]
+          },
+          "LDGDEPBAR": {
+            "static_count": 0,
+            "examples": []
+          },
+          "DEPBAR": {
+            "static_count": 0,
+            "examples": []
+          },
+          "LDSM": {
+            "static_count": 20,
+            "examples": [
+              {
+                "address": "0x1ae0",
+                "opcode": "LDSM.16.M88.4",
+                "operands": "R36, [R36]",
+                "sass": "/*1ae0*/                   LDSM.16.M88.4 R36, [R36] ;"
+              },
+              {
+                "address": "0x1af0",
+                "opcode": "LDSM.16.M88.4",
+                "operands": "R48, [R2+0x1000]",
+                "sass": "/*1af0*/                   LDSM.16.M88.4 R48, [R2+0x1000] ;"
+              },
+              {
+                "address": "0x1b10",
+                "opcode": "LDSM.16.MT88.4",
+                "operands": "R40, [R68+UR5]",
+                "sass": "/*1b10*/                   LDSM.16.MT88.4 R40, [R68+UR5] ;"
+              }
+            ]
+          },
+          "HMMA": {
+            "static_count": 32,
+            "examples": [
+              {
+                "address": "0x1c60",
+                "opcode": "HMMA.16816.F32.BF16",
+                "operands": "R4, R36, R40, R4",
+                "sass": "/*1c60*/                   HMMA.16816.F32.BF16 R4, R36, R40, R4 ;"
+              },
+              {
+                "address": "0x1cc0",
+                "opcode": "HMMA.16816.F32.BF16",
+                "operands": "R8, R36, R42, R8",
+                "sass": "/*1cc0*/                   HMMA.16816.F32.BF16 R8, R36, R42, R8 ;"
+              },
+              {
+                "address": "0x1d20",
+                "opcode": "HMMA.16816.F32.BF16",
+                "operands": "R12, R36, R44, R12",
+                "sass": "/*1d20*/                   HMMA.16816.F32.BF16 R12, R36, R44, R12 ;"
+              }
+            ]
+          },
+          "BAR.SYNC": {
+            "static_count": 10,
+            "examples": [
+              {
+                "address": "0x19c0",
+                "opcode": "BAR.SYNC.DEFER_BLOCKING",
+                "operands": "0x0",
+                "sass": "/*19c0*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;"
+              },
+              {
+                "address": "0x2740",
+                "opcode": "BAR.SYNC.DEFER_BLOCKING",
+                "operands": "0x0",
+                "sass": "/*2740*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;"
+              },
+              {
+                "address": "0x2910",
+                "opcode": "BAR.SYNC.DEFER_BLOCKING",
+                "operands": "0x0",
+                "sass": "/*2910*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;"
+              }
+            ]
+          }
+        },
+        "counts_are_static_not_dynamic": true
+      },
+      "interpretation": "Global vectors are read into registers by LDG.E.LTC128B.128 then explicitly written to shared by STS.128. No LDGSTS/LDGDEPBAR/DEPBAR in this entry. The two-stage path is register global-load MmaPipelined, not a shallower cp.async instance."
+    },
+    {
+      "variant": 8,
+      "stages": 2,
+      "dtype": "fp16",
+      "mangled_entry": "_ZN7cutlass6KernelINS_4gemm6kernel11GemmBatchedINS1_11threadblock12MmaPipelinedINS1_9GemmShapeILi32ELi64ELi64EEENS_9transform11threadblock22PredicatedTileIteratorINS_11MatrixShapeILi32ELi64EEENS_6half_tENS_6layout8RowMajorELi1ENS8_29PitchLinearWarpRakedThreadMapINS_16PitchLinearShapeILi64ELi32EEELi64ENSH_ILi8ELi4EEELi8EEELi8ELb0ENSE_9NoPermuteEEENS9_19RegularTileIteratorISC_SD_NSE_37RowMajorTensorOpMultiplicandCrosswiseILi16ELi64EEELi0ESK_Li16EEENSA_INSB_ILi64ELi64EEESD_SF_Li0ENSG_INSH_ILi64ELi64EEELi64ESJ_Li8EEELi8ELb0ESL_EENSN_ISR_SD_NSE_37RowMajorTensorOpMultiplicandCongruousILi16ELi64EEELi0EST_Li16EEEfSF_NS4_9MmaPolicyINS1_4warp11MmaTensorOpINS6_ILi32ELi32ELi64EEESD_SP_SD_SW_fSF_NSZ_17MmaTensorOpPolicyINS_4arch3MmaINS6_ILi16ELi8ELi16EEELi32ESD_SF_SD_NSE_11ColumnMajorEfSF_NS13_13OpMultiplyAddEEENSB_ILi1ELi1EEEEELi1ELb0EbEENSB_ILi0ELi0EEES1C_Li1EEENS_21NumericArrayConverterISD_SD_Li32ELNS_15FloatRoundStyleE2ENS8_6thread14UnaryTransform8IdentityEEENS1E_ISD_SD_Li64ELS1F_2ES1I_EEbEENS_8epilogue11threadblock8EpilogueIS7_S1B_Li1ENS1N_22PredicatedTileIteratorINS1N_26OutputTileOptimalThreadMapINS1N_15OutputTileShapeILi64ELi8ELi1ELi1ELi1EEENS1R_ILi1ELi4ELi1ELi1ELi4EEELi64ELi4ELi32EEEfLb0ESL_Lb0EEENS1M_4warp24FragmentIteratorTensorOpIS11_S15_fNS_5ArrayIfLi4ELb1EEESF_EENS1W_20TileIteratorTensorOpIS11_S15_fSF_EENS1N_18SharedLoadIteratorINS1U_18CompactedThreadMapEfLi16EEENS1M_6thread17LinearCombinationIfLi4EffLNS26_9ScaleType4KindE2ELS1F_2EfEENSB_ILi0ELi8EEELi2ELi1EEENS4_37GemmBatchedIdentityThreadblockSwizzleEEEEEvNT_6ParamsE",
+      "target": "sm_90a",
+      "cta_shape": [
+        32,
+        64,
+        64
+      ],
+      "warp_shape": [
+        32,
+        32,
+        64
+      ],
+      "instruction_shape": [
+        16,
+        8,
+        16
+      ],
+      "threads": 64,
+      "batch_count": 7,
+      "accumulator_dtype": "fp32",
+      "output_dtype": "fp32",
+      "pipeline": "MmaPipelined",
+      "resources": {
+        "registers_per_thread": 164,
+        "stack_bytes": 0,
+        "local_memory_bytes": 0,
+        "cuobjdump_shared_field_bytes": 1024,
+        "dynamic_shared_launch_bytes_derived_from_source": 24576,
+        "static_plus_dynamic_shared_bytes_inferred": 25600,
+        "raw_cuobjdump_resource_line": "REG:164 STACK:0 SHARED:1024 LOCAL:0 CONSTANT[0]:896 TEXTURE:0 SURFACE:0 SAMPLER:0",
+        "ptxas_stack_frame_bytes": 0,
+        "ptxas_spill_store_bytes": 0,
+        "ptxas_spill_load_bytes": 0,
+        "resource_source": {
+          "path": ".scratch/small_resources_iter19.txt",
+          "line": 141
+        },
+        "ptxas_source": {
+          "path": "trajectory/20261013_145706_iter-19/output.txt",
+          "line": 87
+        }
+      },
+      "sass": {
+        "source_path": ".scratch/small_sass_iter19.txt",
+        "function_header_line": 51750,
+        "static_instruction_count": 800,
+        "opcode_histogram": {
+          "BAR.SYNC.DEFER_BLOCKING": 10,
+          "BRA": 10,
+          "CS2R": 64,
+          "EXIT": 3,
+          "FMUL": 32,
+          "HMMA.16816.F32": 32,
+          "IADD3": 53,
+          "IADD3.X": 20,
+          "IMAD": 31,
+          "IMAD.IADD": 34,
+          "IMAD.MOV.U32": 6,
+          "IMAD.SHL.U32": 16,
+          "IMAD.U32": 1,
+          "IMAD.WIDE": 1,
+          "IMAD.WIDE.U32": 9,
+          "IMAD.X": 20,
+          "ISETP.GE.AND": 12,
+          "ISETP.GE.OR": 1,
+          "ISETP.GT.AND": 3,
+          "ISETP.LE.AND": 2,
+          "ISETP.LT.AND": 21,
+          "ISETP.NE.AND": 1,
+          "ISETP.NE.AND.EX": 4,
+          "ISETP.NE.U32.AND": 14,
+          "LD.E": 1,
+          "LDC": 8,
+          "LDC.64": 9,
+          "LDG.E": 1,
+          "LDG.E.64": 1,
+          "LDG.E.LTC128B.128": 24,
+          "LDS.128": 8,
+          "LDSM.16.M88.4": 10,
+          "LDSM.16.MT88.4": 10,
+          "LEA": 12,
+          "LEA.HI": 21,
+          "LEA.HI.SX32": 3,
+          "LEA.HI.X": 3,
+          "LOP3.LUT": 65,
+          "MOV": 2,
+          "NOP": 10,
+          "PLOP3.LUT": 1,
+          "R2UR": 1,
+          "S2R": 5,
+          "S2UR": 4,
+          "SEL": 17,
+          "SHF.L.U32": 3,
+          "SHF.L.U64.HI": 2,
+          "SHF.R.S32.HI": 29,
+          "SHF.R.U32.HI": 13,
+          "SHFL.IDX": 1,
+          "STG.E.128": 8,
+          "STS.128": 24,
+          "STS.64": 16,
+          "UIADD3": 6,
+          "UIADD3.X": 2,
+          "UIMAD": 1,
+          "UISETP.NE.AND": 1,
+          "UISETP.NE.U32.AND": 1,
+          "ULDC": 12,
+          "ULDC.64": 16,
+          "ULEA": 2,
+          "ULEA.HI": 1,
+          "ULOP3.LUT": 4,
+          "UMOV": 10,
+          "UPRMT": 3,
+          "USHF.L.U32": 5,
+          "USHF.L.U64.HI": 1,
+          "USHF.R.S32.HI": 3,
+          "VIADD": 19,
+          "VIMNMX": 1
+        },
+        "mechanism_samples": {
+          "LDGSTS": {
+            "static_count": 0,
+            "examples": []
+          },
+          "LDG.E.LTC128B.128": {
+            "static_count": 24,
+            "examples": [
+              {
+                "address": "0x1060",
+                "opcode": "LDG.E.LTC128B.128",
+                "operands": "R48, desc[UR24][R12.64]",
+                "sass": "/*1060*/               @P5 LDG.E.LTC128B.128 R48, desc[UR24][R12.64] ;"
+              },
+              {
+                "address": "0x10c0",
+                "opcode": "LDG.E.LTC128B.128",
+                "operands": "R44, desc[UR24][R14.64]",
+                "sass": "/*10c0*/               @P3 LDG.E.LTC128B.128 R44, desc[UR24][R14.64] ;"
+              },
+              {
+                "address": "0x1100",
+                "opcode": "LDG.E.LTC128B.128",
+                "operands": "R40, desc[UR24][R6.64]",
+                "sass": "/*1100*/               @P1 LDG.E.LTC128B.128 R40, desc[UR24][R6.64] ;"
+              }
+            ]
+          },
+          "STS.128": {
+            "static_count": 24,
+            "examples": [
+              {
+                "address": "0x18d0",
+                "opcode": "STS.128",
+                "operands": "[R131], R48",
+                "sass": "/*18d0*/                   STS.128 [R131], R48 ;"
+              },
+              {
+                "address": "0x18e0",
+                "opcode": "STS.128",
+                "operands": "[R130], R44",
+                "sass": "/*18e0*/                   STS.128 [R130], R44 ;"
+              },
+              {
+                "address": "0x18f0",
+                "opcode": "STS.128",
+                "operands": "[R131+0x800], R40",
+                "sass": "/*18f0*/                   STS.128 [R131+0x800], R40 ;"
+              }
+            ]
+          },
+          "LDGDEPBAR": {
+            "static_count": 0,
+            "examples": []
+          },
+          "DEPBAR": {
+            "static_count": 0,
+            "examples": []
+          },
+          "LDSM": {
+            "static_count": 20,
+            "examples": [
+              {
+                "address": "0x1ae0",
+                "opcode": "LDSM.16.M88.4",
+                "operands": "R36, [R36]",
+                "sass": "/*1ae0*/                   LDSM.16.M88.4 R36, [R36] ;"
+              },
+              {
+                "address": "0x1af0",
+                "opcode": "LDSM.16.M88.4",
+                "operands": "R48, [R2+0x1000]",
+                "sass": "/*1af0*/                   LDSM.16.M88.4 R48, [R2+0x1000] ;"
+              },
+              {
+                "address": "0x1b10",
+                "opcode": "LDSM.16.MT88.4",
+                "operands": "R40, [R68+UR5]",
+                "sass": "/*1b10*/                   LDSM.16.MT88.4 R40, [R68+UR5] ;"
+              }
+            ]
+          },
+          "HMMA": {
+            "static_count": 32,
+            "examples": [
+              {
+                "address": "0x1c60",
+                "opcode": "HMMA.16816.F32",
+                "operands": "R4, R36, R40, R4",
+                "sass": "/*1c60*/                   HMMA.16816.F32 R4, R36, R40, R4 ;"
+              },
+              {
+                "address": "0x1cc0",
+                "opcode": "HMMA.16816.F32",
+                "operands": "R8, R36, R42, R8",
+                "sass": "/*1cc0*/                   HMMA.16816.F32 R8, R36, R42, R8 ;"
+              },
+              {
+                "address": "0x1d20",
+                "opcode": "HMMA.16816.F32",
+                "operands": "R12, R36, R44, R12",
+                "sass": "/*1d20*/                   HMMA.16816.F32 R12, R36, R44, R12 ;"
+              }
+            ]
+          },
+          "BAR.SYNC": {
+            "static_count": 10,
+            "examples": [
+              {
+                "address": "0x19c0",
+                "opcode": "BAR.SYNC.DEFER_BLOCKING",
+                "operands": "0x0",
+                "sass": "/*19c0*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;"
+              },
+              {
+                "address": "0x2740",
+                "opcode": "BAR.SYNC.DEFER_BLOCKING",
+                "operands": "0x0",
+                "sass": "/*2740*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;"
+              },
+              {
+                "address": "0x2910",
+                "opcode": "BAR.SYNC.DEFER_BLOCKING",
+                "operands": "0x0",
+                "sass": "/*2910*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;"
+              }
+            ]
+          }
+        },
+        "counts_are_static_not_dynamic": true
+      },
+      "interpretation": "Global vectors are read into registers by LDG.E.LTC128B.128 then explicitly written to shared by STS.128. No LDGSTS/LDGDEPBAR/DEPBAR in this entry. The two-stage path is register global-load MmaPipelined, not a shallower cp.async instance."
+    }
+  ],
+  "shared_memory_accounting": {
+    "cuobjdump_shared_field_note": "The four entries each report SHARED:1024 in the archived resource dump. This binary field does not include the runtime-selected extern dynamic shared allocation.",
+    "dynamic_launch_note": "Pinned cutlass::Kernel uses extern __shared__ SharedStorageBase; GemmBatched::run passes sizeof(GemmKernel::SharedStorage). Source row/row cores have zero MmaPolicy padding; mainloop storage is two-byte inputs times (32*64 + 64*64) times stages, and dominates the smaller epilogue union. Dynamic sizes36KiB/24KiB are source/header derivations, not runtime occupancy or cudaFuncGetAttributes measurements.",
+    "primary_sources": [
+      {
+        "path": "third_party/cutlass/include/cutlass/device_kernel.h",
+        "line": 64
+      },
+      {
+        "path": "third_party/cutlass/include/cutlass/gemm/device/gemm_batched.h",
+        "line": 416
+      },
+      {
+        "path": "third_party/cutlass/include/cutlass/gemm/kernel/gemm_batched.h",
+        "line": 128
+      },
+      {
+        "path": "third_party/cutlass/include/cutlass/gemm/threadblock/mma_base.h",
+        "line": 148
+      },
+      {
+        "path": "third_party/cutlass/include/cutlass/gemm/threadblock/default_mma_core_sm75.h",
+        "line": 502
+      },
+      {
+        "path": "third_party/cutlass/include/cutlass/gemm/threadblock/default_mma_core_sm80.h",
+        "line": 1785
+      }
+    ]
+  },
+  "pipeline_interpretation": {
+    "h7": "Stages3 selects MmaMultistage/PredicatedTileAccessIterator/cp.async global-to-shared path.",
+    "h8": "Stages2 selects MmaPipelined/PredicatedTileIterator, with register fragments loaded globally then stored to shared; warp-K64 gives4 K16 groups and avoids known unsupported2-group loop.",
+    "not_a_pure_stage_count_ablation": true,
+    "changed_together": [
+      "pipeline family",
+      "global-memory transfer method",
+      "global input register staging",
+      "shared-memory depth",
+      "register allocation",
+      "prologue,wait and drain structure"
+    ],
+    "unchanged": [
+      "CTA32x64 output ownership",
+      "warp32x32 shape with warpK64",
+      "no split-K partition",
+      "7 compact batches in one leaf launch",
+      "FP16/BF16 input with FP32 accumulator and output",
+      "source-free OnlyAlphaScaling leaf epilogue",
+      "external pack and fixed FP32 U combine"
+    ],
+    "static_count_limit": "Static counts include prologue/mainloop/drain/epilogue code. They do not establish dynamic instruction counts, throughput, occupancy, memory stalls, or the latency contribution of leaf versus pack/combine."
+  },
+  "timing": {
+    "datasets": [
+      {
+        "path": "trajectory/20261013_145706_iter-19/results.csv",
+        "sha256": "c802f1af9828c04b5aca175eef78e54f66ace56191b96281c73ec4d40d7a8fa4",
+        "variant": 7,
+        "row_count": 18,
+        "numerical_pass_rows": 0,
+        "nonfinite_rows": 0,
+        "rows": [
+          {
+            "shape": [
+              128,
+              128,
+              128
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 9.91199985147,
+            "solution_p10_us": 9.88735988736,
+            "solution_p90_us": 9.97151985765,
+            "solution_cv": 0.00410874638002,
+            "dense_event_us": 4.20319996774,
+            "dense_cv": 0.0156463435094,
+            "reported_speedup": 0.42405165766,
+            "solution_workspace_bytes": 360448,
+            "solution_ef": 0.00605215821303,
+            "gate_limit": 0.00100028838501,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              128,
+              128,
+              128
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 10.3600002825,
+            "solution_p10_us": 10.3395199776,
+            "solution_p90_us": 10.4000000656,
+            "solution_cv": 0.0026166142102,
+            "dense_event_us": 4.12800014019,
+            "dense_cv": 0.0122229394247,
+            "reported_speedup": 0.398455601121,
+            "solution_workspace_bytes": 360448,
+            "solution_ef": 0.000744324700865,
+            "gate_limit": 0.000100546932244,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              256,
+              256,
+              256
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 10.9392002225,
+            "solution_p10_us": 10.9180800617,
+            "solution_p90_us": 10.9456001222,
+            "solution_cv": 0.00120530055518,
+            "dense_event_us": 5.292800068859999,
+            "dense_cv": 0.00394502951928,
+            "reported_speedup": 0.483837937071,
+            "solution_workspace_bytes": 1966080,
+            "solution_ef": 0.00597913706249,
+            "gate_limit": 0.00100055952052,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              256,
+              256,
+              256
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 10.9535999596,
+            "solution_p10_us": 10.9030400217,
+            "solution_p90_us": 11.0854399204,
+            "solution_cv": 0.0076137642921,
+            "dense_event_us": 4.80640009046,
+            "dense_cv": 0.00456844057621,
+            "reported_speedup": 0.438796387323,
+            "solution_workspace_bytes": 1966080,
+            "solution_ef": 0.000737164856682,
+            "gate_limit": 0.000101013577662,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              512,
+              512,
+              512
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 11.751999706000001,
+            "solution_p10_us": 11.6905598342,
+            "solution_p90_us": 11.858559846899999,
+            "solution_cv": 0.00701047795382,
+            "dense_event_us": 6.220800057050001,
+            "dense_cv": 0.00358333105663,
+            "reported_speedup": 0.529339704958,
+            "solution_workspace_bytes": 12058624,
+            "solution_ef": 0.00598238461014,
+            "gate_limit": 0.00100117345784,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              512,
+              512,
+              512
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 11.680000275400001,
+            "solution_p10_us": 11.5715198219,
+            "solution_p90_us": 11.7734399438,
+            "solution_cv": 0.00784941995726,
+            "dense_event_us": 6.1264000833,
+            "dense_cv": 0.00567036133627,
+            "reported_speedup": 0.524520542711,
+            "solution_workspace_bytes": 7864320,
+            "solution_ef": 0.000753206857909,
+            "gate_limit": 0.000101925941157,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              1024,
+              1024,
+              1024
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 22.4575996399,
+            "solution_p10_us": 22.386559545999997,
+            "solution_p90_us": 22.5168001652,
+            "solution_cv": 0.00269924306827,
+            "dense_event_us": 12.9168003798,
+            "dense_cv": 0.00268055108628,
+            "reported_speedup": 0.575163890481,
+            "solution_workspace_bytes": 48234496,
+            "solution_ef": 0.00600975092785,
+            "gate_limit": 0.00100255569724,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              1024,
+              1024,
+              1024
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 22.424000501600002,
+            "solution_p10_us": 22.350719869099997,
+            "solution_p90_us": 22.4969601631,
+            "solution_cv": 0.00299323213223,
+            "dense_event_us": 10.2208003402,
+            "dense_cv": 0.00290105174356,
+            "reported_speedup": 0.455797364945,
+            "solution_workspace_bytes": 48234496,
+            "solution_ef": 0.000751819326939,
+            "gate_limit": 0.000103745541295,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              2048,
+              2048,
+              2048
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 98.6591994762,
+            "solution_p10_us": 98.4703993797,
+            "solution_p90_us": 99.1587221622,
+            "solution_cv": 0.00356441788049,
+            "dense_event_us": 32.2304010391,
+            "dense_cv": 0.0155987590376,
+            "reported_speedup": 0.326684193772,
+            "solution_workspace_bytes": 58721280,
+            "solution_ef": 0.00602393091422,
+            "gate_limit": 0.00100557006784,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              2048,
+              2048,
+              2048
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 99.2991983891,
+            "solution_p10_us": 98.86496067050001,
+            "solution_p90_us": 99.81920003890001,
+            "solution_cv": 0.00427714116346,
+            "dense_event_us": 32.507199049,
+            "dense_cv": 0.00673179029108,
+            "reported_speedup": 0.327366177939,
+            "solution_workspace_bytes": 92274688,
+            "solution_ef": 0.00075220162356,
+            "gate_limit": 0.000107367248671,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              3072,
+              3072,
+              3072
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 281.87360763500004,
+            "solution_p10_us": 281.221113205,
+            "solution_p90_us": 282.619199753,
+            "solution_cv": 0.00237897029257,
+            "dense_event_us": 85.6368005276,
+            "dense_cv": 0.00083938430273,
+            "reported_speedup": 0.303812766459,
+            "solution_workspace_bytes": 132122880,
+            "solution_ef": 0.0060182409995,
+            "gate_limit": 0.00100877688424,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              3072,
+              3072,
+              3072
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 284.143996239,
+            "solution_p10_us": 282.287688255,
+            "solution_p90_us": 289.35711860699996,
+            "solution_cv": 0.013391250679,
+            "dense_event_us": 90.1664018631,
+            "dense_cv": 0.0228243236738,
+            "reported_speedup": 0.317326436795,
+            "solution_workspace_bytes": 283115520,
+            "solution_ef": 0.000752812357912,
+            "gate_limit": 0.000111001680376,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              4096,
+              4096,
+              4096
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 617.203187943,
+            "solution_p10_us": 615.397453308,
+            "solution_p90_us": 624.486732483,
+            "solution_cv": 0.006672931476,
+            "dense_event_us": 204.153609276,
+            "dense_cv": 0.00601564739758,
+            "reported_speedup": 0.330772123774,
+            "solution_workspace_bytes": 234885120,
+            "solution_ef": 0.00602272325234,
+            "gate_limit": 0.00101207001828,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              4096,
+              4096,
+              4096
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 645.467185974,
+            "solution_p10_us": 602.114562988,
+            "solution_p90_us": 685.845117569,
+            "solution_cv": 0.0575923832146,
+            "dense_event_us": 207.790398598,
+            "dense_cv": 0.0112764052672,
+            "reported_speedup": 0.321922482061,
+            "solution_workspace_bytes": 369098752,
+            "solution_ef": 0.000753132541415,
+            "gate_limit": 0.000114626024442,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              1024,
+              512,
+              1024
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 17.472000420100002,
+            "solution_p10_us": 17.4291196465,
+            "solution_p90_us": 17.5862401724,
+            "solution_cv": 0.0046292141356,
+            "dense_event_us": 11.4431999624,
+            "dense_cv": 0.0011509170571,
+            "reported_speedup": 0.654945037044,
+            "solution_workspace_bytes": 25952256,
+            "solution_ef": 0.00599042321269,
+            "gate_limit": 0.00100255228328,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              1024,
+              512,
+              1024
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 16.5519997478,
+            "solution_p10_us": 16.5087997913,
+            "solution_p90_us": 16.5689599514,
+            "solution_cv": 0.00164427645854,
+            "dense_event_us": 10.3759996593,
+            "dense_cv": 0.00389347735336,
+            "reported_speedup": 0.626872874422,
+            "solution_workspace_bytes": 25952256,
+            "solution_ef": 0.000749332745815,
+            "gate_limit": 0.000103742130999,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              512,
+              1024,
+              1024
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 16.436800360699998,
+            "solution_p10_us": 16.4172801375,
+            "solution_p90_us": 16.4531198144,
+            "solution_cv": 0.000962525682457,
+            "dense_event_us": 9.01279971004,
+            "dense_cv": 0.00219171610107,
+            "reported_speedup": 0.548330545621,
+            "solution_workspace_bytes": 25952256,
+            "solution_ef": 0.00601884687231,
+            "gate_limit": 0.00100255979226,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              512,
+              1024,
+              1024
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 16.443200409400003,
+            "solution_p10_us": 16.3952001929,
+            "solution_p90_us": 16.4822396636,
+            "solution_cv": 0.00236676262785,
+            "dense_event_us": 9.440000355239999,
+            "dense_cv": 0.00120494166695,
+            "reported_speedup": 0.57409750658,
+            "solution_workspace_bytes": 25952256,
+            "solution_ef": 0.000751510131859,
+            "gate_limit": 0.00010374806206,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          }
+        ]
+      },
+      {
+        "path": "results/small_iter19_h8_screen.csv",
+        "sha256": "e51d523531a951d6a3dfcf11e9a73e8e868be1c976db37df91b4d685417338fa",
+        "variant": 8,
+        "row_count": 18,
+        "numerical_pass_rows": 0,
+        "nonfinite_rows": 0,
+        "rows": [
+          {
+            "shape": [
+              128,
+              128,
+              128
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 10.2431997657,
+            "solution_p10_us": 10.2009598911,
+            "solution_p90_us": 10.3945598006,
+            "solution_cv": 0.0102987463494,
+            "dense_event_us": 5.680000036949999,
+            "dense_cv": 0.0298601000586,
+            "reported_speedup": 0.554514230601,
+            "solution_workspace_bytes": 360448,
+            "solution_ef": 0.00605215821303,
+            "gate_limit": 0.00100028838501,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              128,
+              128,
+              128
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 10.6976002455,
+            "solution_p10_us": 10.6300801039,
+            "solution_p90_us": 11.1219199002,
+            "solution_cv": 0.0210396126044,
+            "dense_event_us": 5.49920015037,
+            "dense_cv": 0.0157063338011,
+            "reported_speedup": 0.514059230499,
+            "solution_workspace_bytes": 360448,
+            "solution_ef": 0.000744324700865,
+            "gate_limit": 0.000100546932244,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              256,
+              256,
+              256
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 11.3888002932,
+            "solution_p10_us": 11.2694399059,
+            "solution_p90_us": 11.425279974899999,
+            "solution_cv": 0.00685944838544,
+            "dense_event_us": 5.84160014987,
+            "dense_cv": 0.0280061788126,
+            "reported_speedup": 0.512924978881,
+            "solution_workspace_bytes": 1966080,
+            "solution_ef": 0.00597913706249,
+            "gate_limit": 0.00100055952052,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              256,
+              256,
+              256
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 11.438400298400001,
+            "solution_p10_us": 11.334399879,
+            "solution_p90_us": 11.532479822600001,
+            "solution_cv": 0.0077601571454,
+            "dense_event_us": 5.66399991512,
+            "dense_cv": 0.0144550317093,
+            "reported_speedup": 0.495174129894,
+            "solution_workspace_bytes": 1966080,
+            "solution_ef": 0.000737164856682,
+            "gate_limit": 0.000101013577662,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              512,
+              512,
+              512
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 12.8895998001,
+            "solution_p10_us": 12.767999768300001,
+            "solution_p90_us": 12.9209601879,
+            "solution_cv": 0.00625894427351,
+            "dense_event_us": 6.50560036302,
+            "dense_cv": 0.010350972938,
+            "reported_speedup": 0.504717017123,
+            "solution_workspace_bytes": 12058624,
+            "solution_ef": 0.00598238461014,
+            "gate_limit": 0.00100117345784,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              512,
+              512,
+              512
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 12.822400033500001,
+            "solution_p10_us": 12.7030405402,
+            "solution_p90_us": 12.856640219700001,
+            "solution_cv": 0.00635708945089,
+            "dense_event_us": 6.37919977307,
+            "dense_cv": 0.0222092382715,
+            "reported_speedup": 0.497504348361,
+            "solution_workspace_bytes": 7864320,
+            "solution_ef": 0.000753206857909,
+            "gate_limit": 0.000101925941157,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              1024,
+              1024,
+              1024
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 29.153600335100002,
+            "solution_p10_us": 29.1161596775,
+            "solution_p90_us": 29.420799017,
+            "solution_cv": 0.00483356134077,
+            "dense_event_us": 13.433599472000001,
+            "dense_cv": 1.12885109376,
+            "reported_speedup": 0.4607869806,
+            "solution_workspace_bytes": 48234496,
+            "solution_ef": 0.00600975092785,
+            "gate_limit": 0.00100255569724,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              1024,
+              1024,
+              1024
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 29.254400730100002,
+            "solution_p10_us": 29.1683197021,
+            "solution_p90_us": 29.303360581400003,
+            "solution_cv": 0.00208718691796,
+            "dense_event_us": 10.4192003608,
+            "dense_cv": 0.00522717463783,
+            "reported_speedup": 0.356158393292,
+            "solution_workspace_bytes": 48234496,
+            "solution_ef": 0.000751819326939,
+            "gate_limit": 0.000103745541295,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              2048,
+              2048,
+              2048
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 136.828804016,
+            "solution_p10_us": 136.58495903000002,
+            "solution_p90_us": 137.479040623,
+            "solution_cv": 0.00298948558906,
+            "dense_event_us": 32.4400007725,
+            "dense_cv": 0.00497919945482,
+            "reported_speedup": 0.237084589065,
+            "solution_workspace_bytes": 58721280,
+            "solution_ef": 0.00602393091422,
+            "gate_limit": 0.00100557006784,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              2048,
+              2048,
+              2048
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 137.310397625,
+            "solution_p10_us": 136.52640342700002,
+            "solution_p90_us": 137.44800329199998,
+            "solution_cv": 0.00309495645437,
+            "dense_event_us": 32.8848004341,
+            "dense_cv": 0.00635824046894,
+            "reported_speedup": 0.239492427397,
+            "solution_workspace_bytes": 92274688,
+            "solution_ef": 0.00075220162356,
+            "gate_limit": 0.000107367248671,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              3072,
+              3072,
+              3072
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 384.035205841,
+            "solution_p10_us": 384.017915726,
+            "solution_p90_us": 386.579203606,
+            "solution_cv": 0.00324937611958,
+            "dense_event_us": 86.3408029079,
+            "dense_cv": 0.00351397016868,
+            "reported_speedup": 0.224825228507,
+            "solution_workspace_bytes": 132122880,
+            "solution_ef": 0.0060182409995,
+            "gate_limit": 0.00100877688424,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              3072,
+              3072,
+              3072
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 387.48960495,
+            "solution_p10_us": 386.649923325,
+            "solution_p90_us": 388.415360451,
+            "solution_cv": 0.00217793118127,
+            "dense_event_us": 89.8256003857,
+            "dense_cv": 0.00235369919586,
+            "reported_speedup": 0.231814219629,
+            "solution_workspace_bytes": 283115520,
+            "solution_ef": 0.000752812357912,
+            "gate_limit": 0.000111001680376,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              4096,
+              4096,
+              4096
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 863.26084137,
+            "solution_p10_us": 861.498241425,
+            "solution_p90_us": 864.377593994,
+            "solution_cv": 0.00151032612545,
+            "dense_event_us": 195.21280527099998,
+            "dense_cv": 0.000712382607078,
+            "reported_speedup": 0.226134206391,
+            "solution_workspace_bytes": 234885120,
+            "solution_ef": 0.00602272325234,
+            "gate_limit": 0.00101207001828,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              4096,
+              4096,
+              4096
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 912.248039246,
+            "solution_p10_us": 893.7504005430001,
+            "solution_p90_us": 943.30242157,
+            "solution_cv": 0.0240292800199,
+            "dense_event_us": 206.17120266,
+            "dense_cv": 0.00367691033542,
+            "reported_speedup": 0.226003448393,
+            "solution_workspace_bytes": 369098752,
+            "solution_ef": 0.000753132541415,
+            "gate_limit": 0.000114626024442,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              1024,
+              512,
+              1024
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 19.116799533400002,
+            "solution_p10_us": 19.043520093,
+            "solution_p90_us": 19.5571199059,
+            "solution_cv": 0.0144743537995,
+            "dense_event_us": 12.174399942199999,
+            "dense_cv": 0.0116763338662,
+            "reported_speedup": 0.636842998793,
+            "solution_workspace_bytes": 25952256,
+            "solution_ef": 0.00599042321269,
+            "gate_limit": 0.00100255228328,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              1024,
+              512,
+              1024
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 19.212800264400002,
+            "solution_p10_us": 19.1859200597,
+            "solution_p90_us": 19.2966395617,
+            "solution_cv": 0.00284923695387,
+            "dense_event_us": 11.4975996315,
+            "dense_cv": 0.0225186282342,
+            "reported_speedup": 0.59843434967,
+            "solution_workspace_bytes": 25952256,
+            "solution_ef": 0.000749332745815,
+            "gate_limit": 0.000103742130999,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              512,
+              1024,
+              1024
+            ],
+            "dtype": "bf16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 18.7343999743,
+            "solution_p10_us": 18.6531201005,
+            "solution_p90_us": 18.7484800816,
+            "solution_cv": 0.00278588639133,
+            "dense_event_us": 8.57599973679,
+            "dense_cv": 0.00579571728272,
+            "reported_speedup": 0.457767515828,
+            "solution_workspace_bytes": 25952256,
+            "solution_ef": 0.00601884687231,
+            "gate_limit": 0.00100255979226,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          },
+          {
+            "shape": [
+              512,
+              1024,
+              1024
+            ],
+            "dtype": "fp16",
+            "mode": "launch",
+            "cache": "warm_cache",
+            "rotate_inputs": 1,
+            "actual": "winograd_sm80_batched_k64",
+            "trials": 20,
+            "groups": 5,
+            "quantile_unit": "group_mean",
+            "solution_event_us": 18.9536005259,
+            "solution_p10_us": 18.9036798477,
+            "solution_p90_us": 18.956159651300002,
+            "solution_cv": 0.00131840874937,
+            "dense_event_us": 8.915200084450001,
+            "dense_cv": 0.00249152812401,
+            "reported_speedup": 0.470369736467,
+            "solution_workspace_bytes": 25952256,
+            "solution_ef": 0.000751510131859,
+            "gate_limit": 0.00010374806206,
+            "nonfinite": 0,
+            "numerical_pass": 0
+          }
+        ]
+      }
+    ],
+    "small_square_comparison": [
+      {
+        "shape": [
+          128,
+          128,
+          128
+        ],
+        "dtype": "bf16",
+        "h7_event_us": 9.91199985147,
+        "h8_event_us": 10.2431997657,
+        "h8_over_h7_time_ratio": 1.0334140354310923,
+        "h7_solution_cv": 0.00410874638002,
+        "h8_solution_cv": 0.0102987463494,
+        "h8_dense_cv": 0.0298601000586
+      },
+      {
+        "shape": [
+          128,
+          128,
+          128
+        ],
+        "dtype": "fp16",
+        "h7_event_us": 10.3600002825,
+        "h8_event_us": 10.6976002455,
+        "h8_over_h7_time_ratio": 1.0325868681268542,
+        "h7_solution_cv": 0.0026166142102,
+        "h8_solution_cv": 0.0210396126044,
+        "h8_dense_cv": 0.0157063338011
+      },
+      {
+        "shape": [
+          256,
+          256,
+          256
+        ],
+        "dtype": "bf16",
+        "h7_event_us": 10.9392002225,
+        "h8_event_us": 11.3888002932,
+        "h8_over_h7_time_ratio": 1.0410999032429493,
+        "h7_solution_cv": 0.00120530055518,
+        "h8_solution_cv": 0.00685944838544,
+        "h8_dense_cv": 0.0280061788126
+      },
+      {
+        "shape": [
+          256,
+          256,
+          256
+        ],
+        "dtype": "fp16",
+        "h7_event_us": 10.9535999596,
+        "h8_event_us": 11.438400298400001,
+        "h8_over_h7_time_ratio": 1.044259452653747,
+        "h7_solution_cv": 0.0076137642921,
+        "h8_solution_cv": 0.0077601571454,
+        "h8_dense_cv": 0.0144550317093
+      },
+      {
+        "shape": [
+          512,
+          512,
+          512
+        ],
+        "dtype": "bf16",
+        "h7_event_us": 11.751999706000001,
+        "h8_event_us": 12.8895998001,
+        "h8_over_h7_time_ratio": 1.0968005550169642,
+        "h7_solution_cv": 0.00701047795382,
+        "h8_solution_cv": 0.00625894427351,
+        "h8_dense_cv": 0.010350972938
+      },
+      {
+        "shape": [
+          512,
+          512,
+          512
+        ],
+        "dtype": "fp16",
+        "h7_event_us": 11.680000275400001,
+        "h8_event_us": 12.822400033500001,
+        "h8_over_h7_time_ratio": 1.0978081961612691,
+        "h7_solution_cv": 0.00784941995726,
+        "h8_solution_cv": 0.00635708945089,
+        "h8_dense_cv": 0.0222092382715
+      },
+      {
+        "shape": [
+          1024,
+          1024,
+          1024
+        ],
+        "dtype": "bf16",
+        "h7_event_us": 22.4575996399,
+        "h8_event_us": 29.153600335100002,
+        "h8_over_h7_time_ratio": 1.298161905215522,
+        "h7_solution_cv": 0.00269924306827,
+        "h8_solution_cv": 0.00483356134077,
+        "h8_dense_cv": 1.12885109376
+      },
+      {
+        "shape": [
+          1024,
+          1024,
+          1024
+        ],
+        "dtype": "fp16",
+        "h7_event_us": 22.424000501600002,
+        "h8_event_us": 29.254400730100002,
+        "h8_over_h7_time_ratio": 1.304602215292166,
+        "h7_solution_cv": 0.00299323213223,
+        "h8_solution_cv": 0.00208718691796,
+        "h8_dense_cv": 0.00522717463783
+      }
+    ],
+    "comparison_limit": "H7 and H8 were measured in separate benchmark invocations; these are descriptive event-time ratios, not a randomized paired H7-versus-H8 trial or a causal attribution. The full solution path is pack + one batched leaf + combine, so event times are not isolated leaf timings.",
+    "quantile_note": "CSV quantile_unit=group_mean with20 trials/group and5 groups.",
+    "same_recorded_numerical_metrics_between_variants": true,
+    "all_rows_fail_strict_numerical_certification": true,
+    "certified_speedup_claimed": false,
+    "noise_flags": [
+      {
+        "path": "results/small_iter19_h8_screen.csv",
+        "shape": [
+          1024,
+          1024,
+          1024
+        ],
+        "dtype": "bf16",
+        "field": "dense_cv",
+        "value": 1.12885109376,
+        "note": "Dense baseline CV exceeds1 in this H8 screen row; do not use its dense-relative ratio as a stable speedup claim."
+      }
+    ]
+  },
+  "validation": {
+    "correctness": {
+      "path": "results/correctness_iter19.txt",
+      "sha256": "bf9a1e3abe4c4e602b5769633832cca9a8b9fd88edf5ad3887bd33a667ef0ba9",
+      "line_count": 2074,
+      "total_case_count": 1108,
+      "total_explicit_pass_count": 101,
+      "variants": [
+        {
+          "variant": 7,
+          "case_count": 48,
+          "dtype_case_counts": {
+            "bf16": 24,
+            "fp16": 24
+          },
+          "actual_route_counts": {
+            "winograd_sm80_batched_k64": 28,
+            "dense_cublaslt": 20
+          },
+          "all_reported_case_metrics_zero": true,
+          "input_rebind_passes": [
+            {
+              "line": 1983,
+              "text": "PASS_POINTER_REBIND dtype=bf16 algorithm=hopper variant=7 aligned_then_element_aligned_then_aligned=1"
+            },
+            {
+              "line": 1989,
+              "text": "PASS_POINTER_REBIND dtype=bf16 algorithm=mega variant=7 aligned_then_element_aligned_then_aligned=1"
+            },
+            {
+              "line": 2005,
+              "text": "PASS_POINTER_REBIND dtype=fp16 algorithm=hopper variant=7 aligned_then_element_aligned_then_aligned=1"
+            },
+            {
+              "line": 2011,
+              "text": "PASS_POINTER_REBIND dtype=fp16 algorithm=mega variant=7 aligned_then_element_aligned_then_aligned=1"
+            }
+          ]
+        },
+        {
+          "variant": 8,
+          "case_count": 48,
+          "dtype_case_counts": {
+            "bf16": 24,
+            "fp16": 24
+          },
+          "actual_route_counts": {
+            "winograd_sm80_batched_k64": 28,
+            "dense_cublaslt": 20
+          },
+          "all_reported_case_metrics_zero": true,
+          "input_rebind_passes": [
+            {
+              "line": 1984,
+              "text": "PASS_POINTER_REBIND dtype=bf16 algorithm=hopper variant=8 aligned_then_element_aligned_then_aligned=1"
+            },
+            {
+              "line": 1990,
+              "text": "PASS_POINTER_REBIND dtype=bf16 algorithm=mega variant=8 aligned_then_element_aligned_then_aligned=1"
+            },
+            {
+              "line": 2006,
+              "text": "PASS_POINTER_REBIND dtype=fp16 algorithm=hopper variant=8 aligned_then_element_aligned_then_aligned=1"
+            },
+            {
+              "line": 2012,
+              "text": "PASS_POINTER_REBIND dtype=fp16 algorithm=mega variant=8 aligned_then_element_aligned_then_aligned=1"
+            }
+          ]
+        }
+      ],
+      "tail_coverage": [
+        {
+          "line": 701,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=bf16 variant=7 shape=80,112,16 leaf_k=8 alias=0 alpha=1 beta=0"
+        },
+        {
+          "line": 703,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=bf16 variant=7 shape=80,112,48 leaf_k=24 alias=0 alpha=1 beta=0"
+        },
+        {
+          "line": 705,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=bf16 variant=7 shape=80,112,144 leaf_k=72 alias=0 alpha=1 beta=0"
+        },
+        {
+          "line": 707,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=bf16 variant=7 shape=80,112,144 leaf_k=72 alias=1 alpha=0.5 beta=-0.25"
+        },
+        {
+          "line": 709,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=fp16 variant=7 shape=80,112,16 leaf_k=8 alias=0 alpha=1 beta=0"
+        },
+        {
+          "line": 711,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=fp16 variant=7 shape=80,112,48 leaf_k=24 alias=0 alpha=1 beta=0"
+        },
+        {
+          "line": 713,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=fp16 variant=7 shape=80,112,144 leaf_k=72 alias=0 alpha=1 beta=0"
+        },
+        {
+          "line": 715,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=fp16 variant=7 shape=80,112,144 leaf_k=72 alias=1 alpha=0.5 beta=-0.25"
+        },
+        {
+          "line": 717,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=bf16 variant=8 shape=80,112,16 leaf_k=8 alias=0 alpha=1 beta=0"
+        },
+        {
+          "line": 719,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=bf16 variant=8 shape=80,112,48 leaf_k=24 alias=0 alpha=1 beta=0"
+        },
+        {
+          "line": 721,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=bf16 variant=8 shape=80,112,144 leaf_k=72 alias=0 alpha=1 beta=0"
+        },
+        {
+          "line": 723,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=bf16 variant=8 shape=80,112,144 leaf_k=72 alias=1 alpha=0.5 beta=-0.25"
+        },
+        {
+          "line": 725,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=fp16 variant=8 shape=80,112,16 leaf_k=8 alias=0 alpha=1 beta=0"
+        },
+        {
+          "line": 727,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=fp16 variant=8 shape=80,112,48 leaf_k=24 alias=0 alpha=1 beta=0"
+        },
+        {
+          "line": 729,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=fp16 variant=8 shape=80,112,144 leaf_k=72 alias=0 alpha=1 beta=0"
+        },
+        {
+          "line": 731,
+          "text": "BEGIN_K64_BATCHED_TAIL dtype=fp16 variant=8 shape=80,112,144 leaf_k=72 alias=1 alpha=0.5 beta=-0.25"
+        }
+      ],
+      "total_pass": {
+        "line": 2073,
+        "text": "PASS structural DAG, fallback numerics, strides/transposes, alias, degenerate and rejection tests"
+      },
+      "strict_gate_disclaimer": {
+        "line": 2074,
+        "text": "Forced SW mixed-precision certification is a separate gate: use --strict-numerics or megafmm_bench"
+      },
+      "scope_limit": "These H7/H8 structural cases and sanitizer payloads use exactly representable integer-style inputs. They do not certify forced SW accuracy on the performance benchmark inputs. Existing MMA bitwise/cluster Graph/output-rebind PASS markers are not H7/H8-specific output or Graph evidence. Stride magnitudes and stage values are not printed in these log markers.",
+      "exit_status_independently_verified": false
+    },
+    "sanitizers": [
+      {
+        "path": "results/sanitizer_small_batch7_memcheck.txt",
+        "sha256": "aec22554dee7ad293712d88826a6f6d20713ddcc8b048be50060bad7e17512db",
+        "variant": 7,
+        "tool": "memcheck",
+        "line_count": 33,
+        "case_count": 14,
+        "dtype_case_counts": {
+          "bf16": 7,
+          "fp16": 7
+        },
+        "actual_route_counts": {
+          "winograd_sm80_batched_k64": 14
+        },
+        "tail_case_count": 8,
+        "all_case_metrics_zero": true,
+        "footer": {
+          "line": 33,
+          "text": "========= ERROR SUMMARY: 0 errors"
+        },
+        "pointer_rebind_pass_lines": [
+          30,
+          31
+        ],
+        "payload_total_pass_line": 32,
+        "exit_status_independently_verified": false
+      },
+      {
+        "path": "results/sanitizer_small_batch7_racecheck.txt",
+        "sha256": "4ec5fa75bba7e4f9054ae04967019d6ab57e688659d4651197108d6e4792d123",
+        "variant": 7,
+        "tool": "racecheck",
+        "line_count": 33,
+        "case_count": 14,
+        "dtype_case_counts": {
+          "bf16": 7,
+          "fp16": 7
+        },
+        "actual_route_counts": {
+          "winograd_sm80_batched_k64": 14
+        },
+        "tail_case_count": 8,
+        "all_case_metrics_zero": true,
+        "footer": {
+          "line": 33,
+          "text": "========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)"
+        },
+        "pointer_rebind_pass_lines": [
+          30,
+          31
+        ],
+        "payload_total_pass_line": 32,
+        "exit_status_independently_verified": false
+      },
+      {
+        "path": "results/sanitizer_small_batch7_synccheck.txt",
+        "sha256": "aec22554dee7ad293712d88826a6f6d20713ddcc8b048be50060bad7e17512db",
+        "variant": 7,
+        "tool": "synccheck",
+        "line_count": 33,
+        "case_count": 14,
+        "dtype_case_counts": {
+          "bf16": 7,
+          "fp16": 7
+        },
+        "actual_route_counts": {
+          "winograd_sm80_batched_k64": 14
+        },
+        "tail_case_count": 8,
+        "all_case_metrics_zero": true,
+        "footer": {
+          "line": 33,
+          "text": "========= ERROR SUMMARY: 0 errors"
+        },
+        "pointer_rebind_pass_lines": [
+          30,
+          31
+        ],
+        "payload_total_pass_line": 32,
+        "exit_status_independently_verified": false
+      },
+      {
+        "path": "results/sanitizer_small_batch8_memcheck.txt",
+        "sha256": "6667c8d58e18a3f775f1034687fccecffdb448056862151dd3887d5de0886146",
+        "variant": 8,
+        "tool": "memcheck",
+        "line_count": 33,
+        "case_count": 14,
+        "dtype_case_counts": {
+          "bf16": 7,
+          "fp16": 7
+        },
+        "actual_route_counts": {
+          "winograd_sm80_batched_k64": 14
+        },
+        "tail_case_count": 8,
+        "all_case_metrics_zero": true,
+        "footer": {
+          "line": 33,
+          "text": "========= ERROR SUMMARY: 0 errors"
+        },
+        "pointer_rebind_pass_lines": [
+          30,
+          31
+        ],
+        "payload_total_pass_line": 32,
+        "exit_status_independently_verified": false
+      },
+      {
+        "path": "results/sanitizer_small_batch8_racecheck.txt",
+        "sha256": "7976f5d3b5d12cece1e95b4dc0a03662907d841055c746e02ba95c4ddb585e62",
+        "variant": 8,
+        "tool": "racecheck",
+        "line_count": 33,
+        "case_count": 14,
+        "dtype_case_counts": {
+          "bf16": 7,
+          "fp16": 7
+        },
+        "actual_route_counts": {
+          "winograd_sm80_batched_k64": 14
+        },
+        "tail_case_count": 8,
+        "all_case_metrics_zero": true,
+        "footer": {
+          "line": 33,
+          "text": "========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)"
+        },
+        "pointer_rebind_pass_lines": [
+          30,
+          31
+        ],
+        "payload_total_pass_line": 32,
+        "exit_status_independently_verified": false
+      },
+      {
+        "path": "results/sanitizer_small_batch8_synccheck.txt",
+        "sha256": "6667c8d58e18a3f775f1034687fccecffdb448056862151dd3887d5de0886146",
+        "variant": 8,
+        "tool": "synccheck",
+        "line_count": 33,
+        "case_count": 14,
+        "dtype_case_counts": {
+          "bf16": 7,
+          "fp16": 7
+        },
+        "actual_route_counts": {
+          "winograd_sm80_batched_k64": 14
+        },
+        "tail_case_count": 8,
+        "all_case_metrics_zero": true,
+        "footer": {
+          "line": 33,
+          "text": "========= ERROR SUMMARY: 0 errors"
+        },
+        "pointer_rebind_pass_lines": [
+          30,
+          31
+        ],
+        "payload_total_pass_line": 32,
+        "exit_status_independently_verified": false
+      }
+    ],
+    "independent_log_review": "/root/review/identity_validation independently counted all cases, tail coverage, rebind markers and complete pass/error footers; no log diagnostic blocker found."
+  },
+  "findings": [
+    "H7 uses128 registers/thread and H8 uses164 for both dtypes; neither has stack/local memory or ptxas spills in the archived evidence.",
+    "H8 has fewer static instructions800 versus H7 841, but its larger register allocation and explicit LDG-to-register/STS staging distinguish it from the cp.async path. These facts alone do not establish an occupancy bottleneck.",
+    "On the recorded square128–1024 cases H8 event time is larger than H7 in both dtypes. No claim of a statistically paired win or kernel floor is made.",
+    "Structural correctness and all six sanitizer footers pass, while all18 benchmark cases per variant fail the independent strict numerical gate. Performance observations must retain that distinction."
+  ]
+}
