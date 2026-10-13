@@ -1,0 +1,2882 @@
+{
+  "schema_version": 1,
+  "iteration": 24,
+  "subject": "Mega20/21 direct native SM80 register operands preserving complete-P M1",
+  "measured_source_commit": "bb15c037009ab0441afe57d861454d0b74a57526",
+  "identity_authority": "Root supplied the full measured build commit; exact frozen test/archived kernel/Plan snapshots, binary hashes, and raw evidence hashes were independently checked without git.",
+  "review_scope": "CPU source/log/SASS/resource audit only. No GPU, build, benchmark, git, source, test, script, document, ITERATIONS, or historical evidence mutations were performed by this reviewer.",
+  "binary_identity": {
+    "build/megafmm_bench": {
+      "sha256": "a146d0b25a4d4403a28164dcab3ed60b8f76b71b05f47ec1559ce1d5ef8807e1",
+      "bytes": 9165560
+    },
+    "build/test_correctness": {
+      "sha256": "41efaa9304ba43fad312b298b5612100c6e1a306dfc35ee0470833e41925ea22",
+      "bytes": 9303536
+    }
+  },
+  "raw_input_artifacts": {
+    ".scratch/test_correctness_iter24.cu": {
+      "sha256": "c64bffbaa830dfc959efa7180cae9b266ab05ec8391377134378b2101d2d335d",
+      "bytes": 89346
+    },
+    ".scratch/binarysha_iter24.sha256": {
+      "sha256": "a0c4d6d4480dbc1e1463c586db3b2ee614ef597f04582a17ddad956dc492beda",
+      "bytes": 371
+    },
+    ".scratch/small_sass_iter24.txt": {
+      "sha256": "8b6f5c47a00e66c7d48bb5125718e0b1042d1640421df134c02e9b030693df50",
+      "bytes": 24978555
+    },
+    ".scratch/small_resources_iter24.txt": {
+      "sha256": "ac2c6549d48043c1379e3457ff90fdceceb18366c8c2858c7023d6c13a8dcb73",
+      "bytes": 45392
+    },
+    "trajectory/20261013_171152_iter-24/small_mma_direct_register.cu": {
+      "sha256": "f311210f0c6209aad60773050bd90ed6a32393ecd982eaddf859f3d556c90c55",
+      "bytes": 10284
+    },
+    "trajectory/20261013_171152_iter-24/plan.cpp": {
+      "sha256": "e24cb3ffac37ffb0129a616b3174bd88338201affbc84f9cccb336ae1c1387e0",
+      "bytes": 50189
+    },
+    "trajectory/20261013_171152_iter-24/small_mma_16x8_identity.cu": {
+      "sha256": "515e2bf5ffb278cff7b960a052abac2ff27136a98aa06530794893ed83a7ede1",
+      "bytes": 16346
+    },
+    "trajectory/20261013_171152_iter-24/small_mma_8x8_prefetch.cu": {
+      "sha256": "9efa2b3f47d680086a72775da682867f0e64b039abafb3bd6f3e5c7bd5143916",
+      "bytes": 17148
+    },
+    "trajectory/20261013_171152_iter-24/small_mma_16x8_prefetch.cu": {
+      "sha256": "9399cafb6644778a52d2a63527e6a5e7bdae8b89adc71a59533cee0057b4664d",
+      "bytes": 18000
+    },
+    "trajectory/20261013_171152_iter-24/results.csv": {
+      "sha256": "c374bbefa5f7ac84eb80d55ece3d392b9fa7aa8567c633a3488964d57a7c04ed",
+      "bytes": 14669
+    },
+    "trajectory/20261013_171152_iter-24/output.txt": {
+      "sha256": "146bb6f4de2b74b94f7f8002ae922e61b47853decc4ded1ff7fb1365311d9514",
+      "bytes": 116368
+    },
+    "results/small_direct21_launch_iter24.csv": {
+      "sha256": "d464e3b9d9188f31a92c167063945a113af72942091281579594fdb3590756bc",
+      "bytes": 14659
+    },
+    "results/small_direct21_launch_iter24.log": {
+      "sha256": "f79962cf64c4414bae8096f667c6f7406ae9f416ca5bff7b23e38748f8fbce28",
+      "bytes": 24917
+    },
+    "results/small_direct21_launch_iter24.exit": {
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "bytes": 2
+    },
+    "results/correctness_direct_iter24.txt": {
+      "sha256": "4753dd424ff78b11a517f5380803552e217b797ddc14c6a9e11323e12d3eb2b1",
+      "bytes": 427815
+    },
+    "results/correctness_direct_iter24.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "results/strict_direct_iter24.txt": {
+      "sha256": "100609fc32642c98d920af45f44fcc85f8c9eafc8eea0af611114aae82fbc083",
+      "bytes": 889395
+    },
+    "results/strict_direct_iter24.exit": {
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "bytes": 2
+    },
+    "third_party/cutlass/include/cute/atom/mma_traits_sm80.hpp": {
+      "sha256": "b4d4d81bfc2c23e614f9632a32a145660326cac9f49c7d2227fb58cfbc444f2a",
+      "bytes": 14088
+    },
+    "third_party/cutlass/include/cute/arch/mma_sm80.hpp": {
+      "sha256": "6c848a75412a8a9bc6ff2d1bd21538306d3b8d7ef44f244e15667be4d62ee5f0",
+      "bytes": 68808
+    },
+    "third_party/cutlass/include/cutlass/numeric_conversion.h": {
+      "sha256": "46e45a04b85d80e5bc035022cca2539aa35667ca8645a86e1e867fc6bef736e8",
+      "bytes": 131289
+    },
+    "results/small_owner_profile_iter23.json": {
+      "sha256": "489aeb512a5e40b941aa3565ec41d5c180149f8346d4ffef2e30670d7aa453da",
+      "bytes": 226674
+    },
+    "results/small_manifest.json": {
+      "sha256": "908a0dcbf02b0dc13e0eaead16e08e4a2644c1cedb72702c38a0f78eef58f904",
+      "bytes": 4059909
+    },
+    "results/SMALL_REPORT.md": {
+      "sha256": "3bb95c7affae89f1503e4da92af7b788f06ce6b92d3e2682c1da161b42a29a3f",
+      "bytes": 307303
+    },
+    "results/small_evidence_errata.md": {
+      "sha256": "0c1811beab13a0d36bf6696cb6dac9dab43344a0d0a1f226760491f35ff477c3",
+      "bytes": 1713
+    },
+    "results/sanitizer_direct20_memcheck_iter24.txt": {
+      "sha256": "4738771df1e3be2a560c69f823dd04d5782daf2eeb138c628cd55940fe9eb11a",
+      "bytes": 36621
+    },
+    "results/sanitizer_direct20_memcheck_iter24.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "results/sanitizer_direct20_racecheck_iter24.txt": {
+      "sha256": "e5300bcabc3a44c84f45c99246ea3ae3bb82f03c7ab79c91adf2f622d62768bc",
+      "bytes": 36659
+    },
+    "results/sanitizer_direct20_racecheck_iter24.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "results/sanitizer_direct20_synccheck_iter24.txt": {
+      "sha256": "4738771df1e3be2a560c69f823dd04d5782daf2eeb138c628cd55940fe9eb11a",
+      "bytes": 36621
+    },
+    "results/sanitizer_direct20_synccheck_iter24.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "results/sanitizer_direct21_memcheck_iter24.txt": {
+      "sha256": "960e2dea9765bf17d7c8eafa5a42a43b287fea2f7727e79caa4a8b03fc65b3e8",
+      "bytes": 36583
+    },
+    "results/sanitizer_direct21_memcheck_iter24.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "results/sanitizer_direct21_racecheck_iter24.txt": {
+      "sha256": "69403fc90eee25eeb01777da04960e6c83ca98bcabfcd5d41152b393fb5c7203",
+      "bytes": 36621
+    },
+    "results/sanitizer_direct21_racecheck_iter24.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "results/sanitizer_direct21_synccheck_iter24.txt": {
+      "sha256": "960e2dea9765bf17d7c8eafa5a42a43b287fea2f7727e79caa4a8b03fc65b3e8",
+      "bytes": 36583
+    },
+    "results/sanitizer_direct21_synccheck_iter24.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "results/small_final_lt0_launch.csv": {
+      "sha256": "eeed450895a643f6f3f9f6043c677270d45110811e9b5ed5ff411e1b39695b94",
+      "bytes": 43722
+    },
+    "results/small_final_lt1_launch.csv": {
+      "sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+      "bytes": 18741
+    },
+    "results/small_final_batch5_launch.csv": {
+      "sha256": "76aa21a3a332c6c2baf34171458ab10aeebba80b6871efb6b48ffc218f001816",
+      "bytes": 14727
+    },
+    "results/small_final_batch6_launch.csv": {
+      "sha256": "2cd44602e75b89a936a28d2446e0b83d5ccf6d4f65975b84abf7842dd7533cd4",
+      "bytes": 14721
+    },
+    "results/small_final_batch7_launch.csv": {
+      "sha256": "0f3d2ff17b5ad4d4ded76f6633c38bb7a0f641e0a815a46d9125af1a9ef11f9e",
+      "bytes": 14801
+    },
+    "results/small_final_batch8_launch.csv": {
+      "sha256": "0032ed251489b7d53abc91a94acbf97b42896d74ec3e244a4beda0fc51d5d8f2",
+      "bytes": 14798
+    },
+    "results/small_final_warp4_launch.csv": {
+      "sha256": "eb06d90720b5db4d65e22a4b6042e6acfe867bfcfd2473f160295a4f26b6f150",
+      "bytes": 14537
+    },
+    "results/small_final_packed7_launch.csv": {
+      "sha256": "c1c1c54c5ee103602432be4880740f00cbedce0b1f28a7e74389355a41a5fdf7",
+      "bytes": 14645
+    },
+    "results/small_final_fast8_launch.csv": {
+      "sha256": "f5cc2ac211e8c52973c49aeff6891d71872e2650158b010b6429deb727c46d26",
+      "bytes": 14636
+    },
+    "results/small_final_product9_launch.csv": {
+      "sha256": "ec4f3302c7b77da1c158893011f8dad2a4cfcc56a614f063cf908a37a1bcce51",
+      "bytes": 14617
+    },
+    "results/small_final_product10_launch.csv": {
+      "sha256": "2e5f3d34b86eebcb673c1205d3d8bce45115c3bbdf169de40a4bdbc455f62ca6",
+      "bytes": 14731
+    },
+    "results/small_final_narrow11_launch.csv": {
+      "sha256": "3d3f21c26c4ae4cbe531e42eb64a57a3e15789dc0a400746a90882f5a45fe1d4",
+      "bytes": 14646
+    },
+    "results/small_final_narrow12_launch.csv": {
+      "sha256": "e110c1085bbe2f0350fec88c0da66d10e703f541d754141125085e59fb36b3fd",
+      "bytes": 14721
+    },
+    "results/small_final_cluster13_launch.csv": {
+      "sha256": "f4d9a4a019c946693eae9f7c30150edae67c4205e6db7b4558773851720fb196",
+      "bytes": 14671
+    },
+    "results/small_final_epilogue14_launch.csv": {
+      "sha256": "1e846e252bd31a5cfffb04ea5a45c55fbb4fcf497e6e4a6e23e415af6d61ef6b",
+      "bytes": 14794
+    },
+    "results/small_final_coefficients15_launch.csv": {
+      "sha256": "79ed48782af8219ae7289fc3c2316afb79e3f3d9dae41fcb1152d7ce30a0eda8",
+      "bytes": 14798
+    },
+    "results/small_final_prefetch16_launch.csv": {
+      "sha256": "de6b1ec23c29f12a44accd29aabf447bf4c4cb8e9b6ac8688ed1ddb8c082613b",
+      "bytes": 14803
+    },
+    "results/small_final_pipeline17_launch.csv": {
+      "sha256": "73876dda4e22dc290ae7e5d41672ad7b56939b7a4e6f2199aa4776b873edc914",
+      "bytes": 14688
+    },
+    "results/small_final_stage18_launch.csv": {
+      "sha256": "f8df038d5ebb32b0a0c9e5ca0fedd8fec2c151bcb245ebaa545301c860cc33aa",
+      "bytes": 14549
+    },
+    "results/small_final_owner19_launch.csv": {
+      "sha256": "1484294afe70b81c144b5b0f0391e23ef13509002b6232a01181360aa77394d1",
+      "bytes": 14781
+    }
+  },
+  "source_contract": {
+    "kernel_snapshot": "trajectory/20261013_171152_iter-24/small_mma_direct_register.cu",
+    "plan_snapshot": "trajectory/20261013_171152_iter-24/plan.cpp",
+    "test_snapshot": ".scratch/test_correctness_iter24.cu",
+    "kernel_sha256": "f311210f0c6209aad60773050bd90ed6a32393ecd982eaddf859f3d556c90c55",
+    "plan_sha256": "e24cb3ffac37ffb0129a616b3174bd88338201affbc84f9cccb336ae1c1387e0",
+    "test_sha256": "c64bffbaa830dfc959efa7180cae9b266ab05ec8391377134378b2101d2d335d",
+    "native_atom": "SM80_16x8x16_F32{F16,BF16}{F16,BF16}F32_TN from pinned local CuTe headers",
+    "lane_fragment_mapping": {
+      "lane": "lane=4*g+t, g0..7,t0..3",
+      "A_packed_words": [
+        "(g,2t)/(g,2t+1)",
+        "(g+8,2t)/(g+8,2t+1)",
+        "(g,2t+8)/(g,2t+9)",
+        "(g+8,2t+8)/(g+8,2t+9)"
+      ],
+      "B_packed_words": [
+        "(2t,g)/(2t+1,g)",
+        "(2t+8,g)/(2t+9,g)"
+      ],
+      "C_slots": [
+        "(g,2t)",
+        "(g,2t+1)",
+        "(g+8,2t)",
+        "(g+8,2t+1)"
+      ],
+      "B_memory_rule": "Public B is row-major KN: each packed native B word reads two successive K rows at one N column using two U16 loads, not a contiguous adjacent-N load."
+    },
+    "variants": {
+      "20": "Logical16x8 owner, full four native C slots",
+      "21": "Logical8x8 owner on physical16x8 MMA, a1/a3 zero for all seven products and only v0/v1 emitted"
+    },
+    "arithmetic": "Explicit FP32 RN S/T dependency additions/subtractions; only final S1..4/T1..4 round once to BF16/FP16. Seven P accumulate across complete increasing K16 loop, then exact fixed U parentheses. Alpha1,beta+/-0 directly emit U with no C0 kernel argument.",
+    "input_output_guards": "BF16/FP16, row-major, finite alpha1/beta+/-0, positive M/N/K<=32768 all divisible32, lda/ldb>=physical widths and divisible8, ldd>=N and even, A/B16 aligned, D8 aligned, conservative int64 stride-span guards. Parent Plan retains certified-range and overlap/address validation.",
+    "dispatcher": "Each requested20/21 independently: direct->16->15->14->12->7 after current-pointer checks; unaligned A/B use public Dense fallback; no20/21 mutual or19 fallback.",
+    "policy_validation": "mega_variant outside0..21, including22, rejected before empty/scale return for all five Algorithm policies.",
+    "run_contract": "Current binding guards re-evaluated on every run; launch transforms fresh A/B in that call. Zero matrix/workspace allocation, no host synchronization, one warp CTA and zero shared launch. Setup/tune behavior belongs outside steady-state run.",
+    "source_review_limit": "Source and pinned fragment layout proof do not alone establish executed kernel identity or Tensor Core internal rounding; measured comparisons and sanitizers below supply separate evidence."
+  },
+  "static_compilation": {
+    "source_commit": "bb15c037009ab0441afe57d861454d0b74a57526",
+    "artifacts": {
+      ".scratch/small_sass_iter24.txt": {
+        "sha256": "8b6f5c47a00e66c7d48bb5125718e0b1042d1640421df134c02e9b030693df50",
+        "bytes": 24978555
+      },
+      ".scratch/small_resources_iter24.txt": {
+        "sha256": "ac2c6549d48043c1379e3457ff90fdceceb18366c8c2858c7023d6c13a8dcb73",
+        "bytes": 45392
+      }
+    },
+    "functions": [
+      {
+        "symbol": "_ZN7megafmm61_GLOBAL__N__4edff0c2_28_small_mma_direct_register_cu_29844c5813direct_kernelIN7cutlass6half_tELi16EEEvNS_7ProblemEPKT_S7_Pf",
+        "dtype": "fp16",
+        "owner_rows": 16,
+        "resource_line": "REG:128 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:624 TEXTURE:0 SURFACE:0 SAMPLER:0",
+        "static_total_including_padding": 472,
+        "static_selected_counts": {
+          "LDG.E.U16": 16,
+          "LDG.E": 16,
+          "HADD2.F32": 48,
+          "FADD": 76,
+          "PRMT": 6,
+          "F2FP.F16.F32.PACK_AB": 24,
+          "HMMA.16816.F32": 7,
+          "STG.E.64": 8
+        },
+        "loop_backedges": [
+          {
+            "address": "17e0",
+            "instruction": "@!P3 BRA 0x950 ;"
+          }
+        ],
+        "forbidden_ops": []
+      },
+      {
+        "symbol": "_ZN7megafmm61_GLOBAL__N__4edff0c2_28_small_mma_direct_register_cu_29844c5813direct_kernelIN7cutlass6half_tELi8EEEvNS_7ProblemEPKT_S7_Pf",
+        "dtype": "fp16",
+        "owner_rows": 8,
+        "resource_line": "REG:120 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:624 TEXTURE:0 SURFACE:0 SAMPLER:0",
+        "static_total_including_padding": 376,
+        "static_selected_counts": {
+          "LDG.E.U16": 16,
+          "LDG.E": 8,
+          "HADD2.F32": 32,
+          "PRMT": 6,
+          "FADD": 46,
+          "F2FP.F16.F32.PACK_AB": 16,
+          "HMMA.16816.F32": 7,
+          "STG.E.64": 4
+        },
+        "loop_backedges": [
+          {
+            "address": "13b0",
+            "instruction": "@!P0 BRA 0x7d0 ;"
+          }
+        ],
+        "forbidden_ops": []
+      },
+      {
+        "symbol": "_ZN7megafmm61_GLOBAL__N__4edff0c2_28_small_mma_direct_register_cu_29844c5813direct_kernelIN7cutlass10bfloat16_tELi16EEEvNS_7ProblemEPKT_S7_Pf",
+        "dtype": "bf16",
+        "owner_rows": 16,
+        "resource_line": "REG:128 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:624 TEXTURE:0 SURFACE:0 SAMPLER:0",
+        "static_total_including_padding": 480,
+        "static_selected_counts": {
+          "LDG.E.U16": 16,
+          "LDG.E": 16,
+          "FADD": 76,
+          "PRMT": 6,
+          "F2FP.BF16.F32.PACK_AB": 24,
+          "HMMA.16816.F32.BF16": 7,
+          "STG.E.64": 8
+        },
+        "loop_backedges": [
+          {
+            "address": "17f0",
+            "instruction": "@!P3 BRA 0x960 ;"
+          }
+        ],
+        "forbidden_ops": []
+      },
+      {
+        "symbol": "_ZN7megafmm61_GLOBAL__N__4edff0c2_28_small_mma_direct_register_cu_29844c5813direct_kernelIN7cutlass10bfloat16_tELi8EEEvNS_7ProblemEPKT_S7_Pf",
+        "dtype": "bf16",
+        "owner_rows": 8,
+        "resource_line": "REG:120 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:624 TEXTURE:0 SURFACE:0 SAMPLER:0",
+        "static_total_including_padding": 376,
+        "static_selected_counts": {
+          "LDG.E.U16": 16,
+          "LDG.E": 8,
+          "PRMT": 6,
+          "FADD": 46,
+          "F2FP.BF16.F32.PACK_AB": 16,
+          "HMMA.16816.F32.BF16": 7,
+          "STG.E.64": 4
+        },
+        "loop_backedges": [
+          {
+            "address": "13b0",
+            "instruction": "@!P0 BRA 0x7d0 ;"
+          }
+        ],
+        "forbidden_ops": []
+      }
+    ],
+    "comparisons": [
+      {
+        "symbol": "_ZN7megafmm59_GLOBAL__N__ed766fd4_26_small_mma_16x8_identity_cu_a00e88b423mma16x8_identity_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_Pf",
+        "dtype": "fp16",
+        "resource_line": "REG:96 STACK:0 SHARED:6400 LOCAL:0 CONSTANT[0]:624 TEXTURE:0 SURFACE:0 SAMPLER:0",
+        "static_total_including_padding": 440,
+        "static_HMMA": 7,
+        "static_input_load_modifiers": [
+          "LDG.E.128.CONSTANT",
+          "LDG.E.64.CONSTANT"
+        ],
+        "standalone_barrier_count": 0
+      },
+      {
+        "symbol": "_ZN7megafmm59_GLOBAL__N__ed766fd4_26_small_mma_16x8_identity_cu_a00e88b423mma16x8_identity_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_Pf",
+        "dtype": "bf16",
+        "resource_line": "REG:96 STACK:0 SHARED:6400 LOCAL:0 CONSTANT[0]:624 TEXTURE:0 SURFACE:0 SAMPLER:0",
+        "static_total_including_padding": 440,
+        "static_HMMA": 7,
+        "static_input_load_modifiers": [
+          "LDG.E.128.CONSTANT",
+          "LDG.E.64.CONSTANT"
+        ],
+        "standalone_barrier_count": 0
+      },
+      {
+        "symbol": "_ZN7megafmm58_GLOBAL__N__05c72f1f_25_small_mma_8x8_prefetch_cu_cc6dd20c22mma8x8_prefetch_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_Pf",
+        "dtype": "fp16",
+        "resource_line": "REG:96 STACK:0 SHARED:6400 LOCAL:0 CONSTANT[0]:624 TEXTURE:0 SURFACE:0 SAMPLER:0",
+        "static_total_including_padding": 440,
+        "static_HMMA": 7,
+        "static_input_load_modifiers": [
+          "LDG.E.64"
+        ],
+        "standalone_barrier_count": 0
+      },
+      {
+        "symbol": "_ZN7megafmm58_GLOBAL__N__05c72f1f_25_small_mma_8x8_prefetch_cu_cc6dd20c22mma8x8_prefetch_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_Pf",
+        "dtype": "bf16",
+        "resource_line": "REG:96 STACK:0 SHARED:6400 LOCAL:0 CONSTANT[0]:624 TEXTURE:0 SURFACE:0 SAMPLER:0",
+        "static_total_including_padding": 440,
+        "static_HMMA": 7,
+        "static_input_load_modifiers": [
+          "LDG.E.64"
+        ],
+        "standalone_barrier_count": 0
+      }
+    ],
+    "static_not_dynamic": true,
+    "independent_register_and_U_trace": {
+      "source_sha256": "f311210f0c6209aad60773050bd90ed6a32393ecd982eaddf859f3d556c90c55",
+      "sass_sha256": "8b6f5c47a00e66c7d48bb5125718e0b1042d1640421df134c02e9b030693df50",
+      "P_bases": [
+        4,
+        8,
+        12,
+        16,
+        20,
+        24,
+        28
+      ],
+      "initialized": "R4-R31 normal path CS2R SRZ, 28 FP32 words",
+      "loop": "7 unpredicated self-accum HMMA only writers; increment16; M16 UR17, M8 UR21; backedges M16 fp16 0x950 bf16 0x960, M8 both0x7d0",
+      "post_U": "symbolic FADD store trace exact parentheses C11=P1+P2;C12=((P1+P6)+P5)+P3;C21=((P1+P6)+P7)-P4;C22=((P1+P6)+P7)+P5;M16v0..v3,8stores,M8v0/v1,4stores",
+      "M8_zero": "Every HMMA a1/a3 last definition MOV RZ or IMAD.MOV RZ,RZ,RZ;v2/v3 absent from U/store",
+      "validation_limit": "Static code/control/data dependencies only; not dynamic kernel dispatch or GPU bits",
+      "barrier_caution": "Samebinary15/19 have no emitted BAR/WARPSYNC/MEMBAR. Direct deletes source syncwarp calls and actual STS/LDSM; cannot claim standalone barrier opcode deletion.",
+      "attribution_caution": "20 vs15 changes .CONSTANT readonly vector loads to plain scalar load/cache policy, granularity, register lifetime;21 vs19 also removes lookahead and retains M8 aggregate duplicate native MMA/B. REG128/120 vs96/96; no physical-floor/performance proof."
+    },
+    "normal_loop_arithmetic_counts": {
+      "owner16": {
+        "stage_FADD": 48,
+        "post_U_FADD": 28,
+        "total_FADD": 76,
+        "packed_final_conversions": 24,
+        "static_HMMA": 7,
+        "STG64": 8
+      },
+      "owner8": {
+        "stage_FADD": 32,
+        "post_U_FADD": 14,
+        "total_FADD": 46,
+        "packed_final_conversions": 16,
+        "static_HMMA": 7,
+        "STG64": 4
+      }
+    },
+    "load_packing": "Six PRMT selector0x5410 pack unchanged B11/B21/B22 pairs; B12 is only a DAG source and its intermediate packed-word formation can be optimized away. Compiler interleaves some current-stage loads/conversions with early HMMAs, so source NativeOperands does not prove all42 operand words simultaneously remain live.",
+    "resource_comparison": "Same measured binary identity15 and prefetch19 report REG96/SHARED6400/LOCAL0/STACK0. Direct20 reports REG128, direct21 REG120, both SHARED0/LOCAL0/STACK0. Register increase is observed; occupancy or latency mechanism is not established.",
+    "instruction_count_limit": "All opcode totals are static disassembly counts, including control flow, prologue/conditional paths and unreachable padding; they are not dynamic issue counts. Exact24 direct20/21 and prefetch16/19 have7 static HMMA each; owner16x16 cpasync17 has14. No conclusion of halved total work follows from7 versus14.",
+    "actual_barrier_limit": "No direct shared/LDSM/barrier/shuffle/local-memory instructions found. Samebinary15/19 likewise emit no standalone BAR/WARPSYNC/MEMBAR, so this is not evidence that standalone barrier instructions were removed.",
+    "attribution_limit": "Direct20 relative identity15 changes .CONSTANT vector input loads to ordinary scalar loads, load granularity, address/packing work, register lifetimes and shared operations. Direct21 relative prefetch19 additionally changes lookahead; no gain or loss is attributed exclusively to shared removal.",
+    "aggregate_work_limit": "M8 uses every physical16x8 MMA lane/C slot but emits only top8x8. Compared with M16 over equal logical output area, CTA count, native MMA and logical B work approximately double while A work approximately matches. Zero shared and fewer words per owner do not mean reduced full-problem work or measured DRAM bytes."
+  },
+  "validation": {
+    "default_correctness": {
+      "path": "results/correctness_direct_iter24.txt",
+      "sha256": "4753dd424ff78b11a517f5380803552e217b797ddc14c6a9e11323e12d3eb2b1",
+      "bytes": 427815,
+      "lines": 3202,
+      "exit_path": "results/correctness_direct_iter24.exit",
+      "exit_code": 0,
+      "CASE_count": 1458,
+      "PASS_count": 327,
+      "PASS_labels": {
+        "PASS_DIRECT_NATIVE_BITWISE": 144,
+        "PASS_DIRECT_REGISTER_GRAPH": 12,
+        "PASS_EPILOGUE_OUTPUT_REBIND": 68,
+        "PASS_MMA_BITWISE": 24,
+        "PASS_CLUSTER_GRAPH": 6,
+        "PASS_CPASYNC_GRAPH": 6,
+        "PASS_STAGE_M2_GRAPH": 6,
+        "PASS_8X8_PREFETCH_GRAPH": 6,
+        "PASS_POINTER_REBIND": 54,
+        "PASS": 1
+      },
+      "all_metrics_finite": true,
+      "nonfinite": 0,
+      "max_printed_eF": 9.04306e-08,
+      "direct_CASE_counts": {
+        "20": {
+          "megakernel_warp_mma_direct_16x8": 30,
+          "megakernel_warp_mma_16x8_epilogue": 6,
+          "megakernel_warp_mma_16x8_vec4": 8,
+          "megakernel_warp_mma_packed": 12,
+          "dense_cublaslt": 18
+        },
+        "21": {
+          "megakernel_warp_mma_direct_8x8": 30,
+          "megakernel_warp_mma_16x8_epilogue": 6,
+          "megakernel_warp_mma_16x8_vec4": 8,
+          "megakernel_warp_mma_packed": 12,
+          "dense_cublaslt": 18
+        }
+      },
+      "direct_CASE_metrics_all_zero": true,
+      "native_bitwise_unique_complete_144": true,
+      "M1_default_count": 24,
+      "M1_K128_includes20_21_excludes18": true,
+      "M1_record_lines": [
+        2956,
+        2958,
+        2960,
+        2962,
+        2964,
+        2966,
+        2968,
+        2970,
+        2972,
+        2974,
+        2976,
+        2978,
+        2980,
+        2982,
+        2984,
+        2986,
+        2988,
+        2990,
+        2992,
+        2994,
+        2996,
+        2998,
+        3000,
+        3002
+      ],
+      "last_two_lines": [
+        "PASS structural DAG, fallback numerics, strides/transposes, alias, degenerate and rejection tests",
+        "Forced SW mixed-precision certification is a separate gate: use --strict-numerics or megafmm_bench"
+      ],
+      "trailing_newline": true,
+      "direct_extension_log_references": {
+        "shortK": {
+          "20": "2516..2546",
+          "21": "2724..2754"
+        },
+        "native_bitwise_PASS": {
+          "20": "2548..2690",
+          "21": "2756..2898"
+        },
+        "Graph_PASS": {
+          "20": "2692..2702",
+          "21": "2900..2910"
+        },
+        "output_rebind_PASS": {
+          "20": "2704..2722",
+          "21": "2912..2930"
+        },
+        "input_rebind_PASS": [
+          3076,
+          3077,
+          3103,
+          3104
+        ]
+      },
+      "native_bitwise_source_matrix": {
+        "variants": [
+          20,
+          21
+        ],
+        "dtypes": [
+          "bf16",
+          "fp16"
+        ],
+        "MN": [
+          [
+            128,
+            128
+          ],
+          [
+            256,
+            256
+          ],
+          [
+            128,
+            256
+          ]
+        ],
+        "K": [
+          32,
+          64,
+          96
+        ],
+        "layouts_pad_shiftbytes_betaSign": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            16,
+            1
+          ],
+          [
+            8,
+            0,
+            1
+          ],
+          [
+            8,
+            16,
+            0
+          ]
+        ],
+        "total": 144,
+        "unique_and_complete": true,
+        "references": {
+          "20": 15,
+          "21": 19
+        },
+        "source_lines": "659..735"
+      }
+    },
+    "sanitizers": [
+      {
+        "path": "results/sanitizer_direct20_memcheck_iter24.txt",
+        "sha256": "4738771df1e3be2a560c69f823dd04d5782daf2eeb138c628cd55940fe9eb11a",
+        "bytes": 36621,
+        "lines": 269,
+        "variant": 20,
+        "tool": "memcheck",
+        "exit_path": "results/sanitizer_direct20_memcheck_iter24.exit",
+        "exit_code": 0,
+        "arguments": [
+          "--tool",
+          "memcheck",
+          "build/test_correctness",
+          "--smoke-candidates",
+          "--mega-only",
+          "--mega-variant",
+          "20"
+        ],
+        "argument_authority": "root execution task; exact application selection independently verified",
+        "environment_header": [
+          "SANITIZER_EXECUTABLE=/share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer",
+          "NVIDIA (R) Compute Sanitizer",
+          "Copyright (c) 2020-2025 NVIDIA Corporation",
+          "Version 2025.1.0.0 (build 35583870) (public-release)",
+          "========= COMPUTE-SANITIZER"
+        ],
+        "CASE_count": 42,
+        "CASE_logged_actual_counts": {
+          "megakernel_warp_mma_direct_16x8": 18,
+          "megakernel_warp_mma_16x8_epilogue": 8,
+          "megakernel_warp_mma_packed": 6,
+          "megakernel_warp_mma_16x8_vec4": 8,
+          "megakernel_warp_mma_16x8_prefetch": 2
+        },
+        "PASS_count": 91,
+        "PASS_labels": {
+          "PASS_EPILOGUE_OUTPUT_REBIND": 10,
+          "PASS_DIRECT_NATIVE_BITWISE": 72,
+          "PASS_DIRECT_REGISTER_GRAPH": 6,
+          "PASS_POINTER_REBIND": 2,
+          "PASS": 1
+        },
+        "nonfinite": 0,
+        "all_printed_metrics_zero": true,
+        "summary": "========= ERROR SUMMARY: 0 errors",
+        "summary_line": 269,
+        "no_other_tool_diagnostics": true,
+        "application_payload_lines": 263,
+        "application_payload_sha256": "606b236d5579d4d5871c4baea18d422f1af6df41373f4b81182e7656269aec59",
+        "same_variant_three_tools_application_payload_equal": true,
+        "named_direct_extension_payload_matches_full": true,
+        "trailing_newline": true,
+        "Graph_PASS_lines": [
+          255,
+          257,
+          259,
+          261,
+          263,
+          265
+        ],
+        "native_bitwise_PASS_line_range": [
+          111,
+          253
+        ],
+        "input_rebind_PASS_lines": [
+          266,
+          267
+        ],
+        "output_rebind_PASS_lines": [
+          59,
+          61,
+          63,
+          65,
+          67,
+          69,
+          71,
+          73,
+          75,
+          77
+        ]
+      },
+      {
+        "path": "results/sanitizer_direct20_racecheck_iter24.txt",
+        "sha256": "e5300bcabc3a44c84f45c99246ea3ae3bb82f03c7ab79c91adf2f622d62768bc",
+        "bytes": 36659,
+        "lines": 269,
+        "variant": 20,
+        "tool": "racecheck",
+        "exit_path": "results/sanitizer_direct20_racecheck_iter24.exit",
+        "exit_code": 0,
+        "arguments": [
+          "--tool",
+          "racecheck",
+          "build/test_correctness",
+          "--smoke-candidates",
+          "--mega-only",
+          "--mega-variant",
+          "20"
+        ],
+        "argument_authority": "root execution task; exact application selection independently verified",
+        "environment_header": [
+          "SANITIZER_EXECUTABLE=/share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer",
+          "NVIDIA (R) Compute Sanitizer",
+          "Copyright (c) 2020-2025 NVIDIA Corporation",
+          "Version 2025.1.0.0 (build 35583870) (public-release)",
+          "========= COMPUTE-SANITIZER"
+        ],
+        "CASE_count": 42,
+        "CASE_logged_actual_counts": {
+          "megakernel_warp_mma_direct_16x8": 18,
+          "megakernel_warp_mma_16x8_epilogue": 8,
+          "megakernel_warp_mma_packed": 6,
+          "megakernel_warp_mma_16x8_vec4": 8,
+          "megakernel_warp_mma_16x8_prefetch": 2
+        },
+        "PASS_count": 91,
+        "PASS_labels": {
+          "PASS_EPILOGUE_OUTPUT_REBIND": 10,
+          "PASS_DIRECT_NATIVE_BITWISE": 72,
+          "PASS_DIRECT_REGISTER_GRAPH": 6,
+          "PASS_POINTER_REBIND": 2,
+          "PASS": 1
+        },
+        "nonfinite": 0,
+        "all_printed_metrics_zero": true,
+        "summary": "========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)",
+        "summary_line": 269,
+        "no_other_tool_diagnostics": true,
+        "application_payload_lines": 263,
+        "application_payload_sha256": "606b236d5579d4d5871c4baea18d422f1af6df41373f4b81182e7656269aec59",
+        "same_variant_three_tools_application_payload_equal": true,
+        "named_direct_extension_payload_matches_full": true,
+        "trailing_newline": true,
+        "Graph_PASS_lines": [
+          255,
+          257,
+          259,
+          261,
+          263,
+          265
+        ],
+        "native_bitwise_PASS_line_range": [
+          111,
+          253
+        ],
+        "input_rebind_PASS_lines": [
+          266,
+          267
+        ],
+        "output_rebind_PASS_lines": [
+          59,
+          61,
+          63,
+          65,
+          67,
+          69,
+          71,
+          73,
+          75,
+          77
+        ]
+      },
+      {
+        "path": "results/sanitizer_direct20_synccheck_iter24.txt",
+        "sha256": "4738771df1e3be2a560c69f823dd04d5782daf2eeb138c628cd55940fe9eb11a",
+        "bytes": 36621,
+        "lines": 269,
+        "variant": 20,
+        "tool": "synccheck",
+        "exit_path": "results/sanitizer_direct20_synccheck_iter24.exit",
+        "exit_code": 0,
+        "arguments": [
+          "--tool",
+          "synccheck",
+          "build/test_correctness",
+          "--smoke-candidates",
+          "--mega-only",
+          "--mega-variant",
+          "20"
+        ],
+        "argument_authority": "root execution task; exact application selection independently verified",
+        "environment_header": [
+          "SANITIZER_EXECUTABLE=/share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer",
+          "NVIDIA (R) Compute Sanitizer",
+          "Copyright (c) 2020-2025 NVIDIA Corporation",
+          "Version 2025.1.0.0 (build 35583870) (public-release)",
+          "========= COMPUTE-SANITIZER"
+        ],
+        "CASE_count": 42,
+        "CASE_logged_actual_counts": {
+          "megakernel_warp_mma_direct_16x8": 18,
+          "megakernel_warp_mma_16x8_epilogue": 8,
+          "megakernel_warp_mma_packed": 6,
+          "megakernel_warp_mma_16x8_vec4": 8,
+          "megakernel_warp_mma_16x8_prefetch": 2
+        },
+        "PASS_count": 91,
+        "PASS_labels": {
+          "PASS_EPILOGUE_OUTPUT_REBIND": 10,
+          "PASS_DIRECT_NATIVE_BITWISE": 72,
+          "PASS_DIRECT_REGISTER_GRAPH": 6,
+          "PASS_POINTER_REBIND": 2,
+          "PASS": 1
+        },
+        "nonfinite": 0,
+        "all_printed_metrics_zero": true,
+        "summary": "========= ERROR SUMMARY: 0 errors",
+        "summary_line": 269,
+        "no_other_tool_diagnostics": true,
+        "application_payload_lines": 263,
+        "application_payload_sha256": "606b236d5579d4d5871c4baea18d422f1af6df41373f4b81182e7656269aec59",
+        "same_variant_three_tools_application_payload_equal": true,
+        "named_direct_extension_payload_matches_full": true,
+        "trailing_newline": true,
+        "Graph_PASS_lines": [
+          255,
+          257,
+          259,
+          261,
+          263,
+          265
+        ],
+        "native_bitwise_PASS_line_range": [
+          111,
+          253
+        ],
+        "input_rebind_PASS_lines": [
+          266,
+          267
+        ],
+        "output_rebind_PASS_lines": [
+          59,
+          61,
+          63,
+          65,
+          67,
+          69,
+          71,
+          73,
+          75,
+          77
+        ]
+      },
+      {
+        "path": "results/sanitizer_direct21_memcheck_iter24.txt",
+        "sha256": "960e2dea9765bf17d7c8eafa5a42a43b287fea2f7727e79caa4a8b03fc65b3e8",
+        "bytes": 36583,
+        "lines": 269,
+        "variant": 21,
+        "tool": "memcheck",
+        "exit_path": "results/sanitizer_direct21_memcheck_iter24.exit",
+        "exit_code": 0,
+        "arguments": [
+          "--tool",
+          "memcheck",
+          "build/test_correctness",
+          "--smoke-candidates",
+          "--mega-only",
+          "--mega-variant",
+          "21"
+        ],
+        "argument_authority": "root execution task; exact application selection independently verified",
+        "environment_header": [
+          "SANITIZER_EXECUTABLE=/share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer",
+          "NVIDIA (R) Compute Sanitizer",
+          "Copyright (c) 2020-2025 NVIDIA Corporation",
+          "Version 2025.1.0.0 (build 35583870) (public-release)",
+          "========= COMPUTE-SANITIZER"
+        ],
+        "CASE_count": 42,
+        "CASE_logged_actual_counts": {
+          "megakernel_warp_mma_direct_8x8": 18,
+          "megakernel_warp_mma_16x8_epilogue": 8,
+          "megakernel_warp_mma_packed": 6,
+          "megakernel_warp_mma_16x8_vec4": 8,
+          "megakernel_warp_mma_16x8_prefetch": 2
+        },
+        "PASS_count": 91,
+        "PASS_labels": {
+          "PASS_EPILOGUE_OUTPUT_REBIND": 10,
+          "PASS_DIRECT_NATIVE_BITWISE": 72,
+          "PASS_DIRECT_REGISTER_GRAPH": 6,
+          "PASS_POINTER_REBIND": 2,
+          "PASS": 1
+        },
+        "nonfinite": 0,
+        "all_printed_metrics_zero": true,
+        "summary": "========= ERROR SUMMARY: 0 errors",
+        "summary_line": 269,
+        "no_other_tool_diagnostics": true,
+        "application_payload_lines": 263,
+        "application_payload_sha256": "22fecb86356faf8c0d643e995064f93a999a2726cd16a691d1cd23319b8cb7ca",
+        "same_variant_three_tools_application_payload_equal": true,
+        "named_direct_extension_payload_matches_full": true,
+        "trailing_newline": true,
+        "Graph_PASS_lines": [
+          255,
+          257,
+          259,
+          261,
+          263,
+          265
+        ],
+        "native_bitwise_PASS_line_range": [
+          111,
+          253
+        ],
+        "input_rebind_PASS_lines": [
+          266,
+          267
+        ],
+        "output_rebind_PASS_lines": [
+          59,
+          61,
+          63,
+          65,
+          67,
+          69,
+          71,
+          73,
+          75,
+          77
+        ]
+      },
+      {
+        "path": "results/sanitizer_direct21_racecheck_iter24.txt",
+        "sha256": "69403fc90eee25eeb01777da04960e6c83ca98bcabfcd5d41152b393fb5c7203",
+        "bytes": 36621,
+        "lines": 269,
+        "variant": 21,
+        "tool": "racecheck",
+        "exit_path": "results/sanitizer_direct21_racecheck_iter24.exit",
+        "exit_code": 0,
+        "arguments": [
+          "--tool",
+          "racecheck",
+          "build/test_correctness",
+          "--smoke-candidates",
+          "--mega-only",
+          "--mega-variant",
+          "21"
+        ],
+        "argument_authority": "root execution task; exact application selection independently verified",
+        "environment_header": [
+          "SANITIZER_EXECUTABLE=/share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer",
+          "NVIDIA (R) Compute Sanitizer",
+          "Copyright (c) 2020-2025 NVIDIA Corporation",
+          "Version 2025.1.0.0 (build 35583870) (public-release)",
+          "========= COMPUTE-SANITIZER"
+        ],
+        "CASE_count": 42,
+        "CASE_logged_actual_counts": {
+          "megakernel_warp_mma_direct_8x8": 18,
+          "megakernel_warp_mma_16x8_epilogue": 8,
+          "megakernel_warp_mma_packed": 6,
+          "megakernel_warp_mma_16x8_vec4": 8,
+          "megakernel_warp_mma_16x8_prefetch": 2
+        },
+        "PASS_count": 91,
+        "PASS_labels": {
+          "PASS_EPILOGUE_OUTPUT_REBIND": 10,
+          "PASS_DIRECT_NATIVE_BITWISE": 72,
+          "PASS_DIRECT_REGISTER_GRAPH": 6,
+          "PASS_POINTER_REBIND": 2,
+          "PASS": 1
+        },
+        "nonfinite": 0,
+        "all_printed_metrics_zero": true,
+        "summary": "========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)",
+        "summary_line": 269,
+        "no_other_tool_diagnostics": true,
+        "application_payload_lines": 263,
+        "application_payload_sha256": "22fecb86356faf8c0d643e995064f93a999a2726cd16a691d1cd23319b8cb7ca",
+        "same_variant_three_tools_application_payload_equal": true,
+        "named_direct_extension_payload_matches_full": true,
+        "trailing_newline": true,
+        "Graph_PASS_lines": [
+          255,
+          257,
+          259,
+          261,
+          263,
+          265
+        ],
+        "native_bitwise_PASS_line_range": [
+          111,
+          253
+        ],
+        "input_rebind_PASS_lines": [
+          266,
+          267
+        ],
+        "output_rebind_PASS_lines": [
+          59,
+          61,
+          63,
+          65,
+          67,
+          69,
+          71,
+          73,
+          75,
+          77
+        ]
+      },
+      {
+        "path": "results/sanitizer_direct21_synccheck_iter24.txt",
+        "sha256": "960e2dea9765bf17d7c8eafa5a42a43b287fea2f7727e79caa4a8b03fc65b3e8",
+        "bytes": 36583,
+        "lines": 269,
+        "variant": 21,
+        "tool": "synccheck",
+        "exit_path": "results/sanitizer_direct21_synccheck_iter24.exit",
+        "exit_code": 0,
+        "arguments": [
+          "--tool",
+          "synccheck",
+          "build/test_correctness",
+          "--smoke-candidates",
+          "--mega-only",
+          "--mega-variant",
+          "21"
+        ],
+        "argument_authority": "root execution task; exact application selection independently verified",
+        "environment_header": [
+          "SANITIZER_EXECUTABLE=/share/app/cuda/cuda-12.8/compute-sanitizer/compute-sanitizer",
+          "NVIDIA (R) Compute Sanitizer",
+          "Copyright (c) 2020-2025 NVIDIA Corporation",
+          "Version 2025.1.0.0 (build 35583870) (public-release)",
+          "========= COMPUTE-SANITIZER"
+        ],
+        "CASE_count": 42,
+        "CASE_logged_actual_counts": {
+          "megakernel_warp_mma_direct_8x8": 18,
+          "megakernel_warp_mma_16x8_epilogue": 8,
+          "megakernel_warp_mma_packed": 6,
+          "megakernel_warp_mma_16x8_vec4": 8,
+          "megakernel_warp_mma_16x8_prefetch": 2
+        },
+        "PASS_count": 91,
+        "PASS_labels": {
+          "PASS_EPILOGUE_OUTPUT_REBIND": 10,
+          "PASS_DIRECT_NATIVE_BITWISE": 72,
+          "PASS_DIRECT_REGISTER_GRAPH": 6,
+          "PASS_POINTER_REBIND": 2,
+          "PASS": 1
+        },
+        "nonfinite": 0,
+        "all_printed_metrics_zero": true,
+        "summary": "========= ERROR SUMMARY: 0 errors",
+        "summary_line": 269,
+        "no_other_tool_diagnostics": true,
+        "application_payload_lines": 263,
+        "application_payload_sha256": "22fecb86356faf8c0d643e995064f93a999a2726cd16a691d1cd23319b8cb7ca",
+        "same_variant_three_tools_application_payload_equal": true,
+        "named_direct_extension_payload_matches_full": true,
+        "trailing_newline": true,
+        "Graph_PASS_lines": [
+          255,
+          257,
+          259,
+          261,
+          263,
+          265
+        ],
+        "native_bitwise_PASS_line_range": [
+          111,
+          253
+        ],
+        "input_rebind_PASS_lines": [
+          266,
+          267
+        ],
+        "output_rebind_PASS_lines": [
+          59,
+          61,
+          63,
+          65,
+          67,
+          69,
+          71,
+          73,
+          75,
+          77
+        ]
+      }
+    ],
+    "coverage": {
+      "short_K": "Per requested20/21:12 native CASE for both dtypes, parent32^2/128^2 and K32/64/96; two odd-D vec4 plus two active-beta epilogue fallback cases. K64 beta-0/nullC0/unused oddldc;K96 input/output strides+8.",
+      "random_native_bitwise": "144 complete unique comparisons:2variants*2dtypes*3MNshapes*3K*4layouts.20 vs15;21 vs19. Original random rounded A/B uploaded identically for each route; packed/padded stride and0/16-byte input phases. NaN logical-D sentinel, row padding and2 trailing floats checked; each selected sanitizer includes72 comparisons for its variant.",
+      "bitwise_route_identity_limit": "Fixtures assert preferred algorithm_name and lt_config none with known native-compatible bindings. CPU dispatcher proof predicts native execution; logs do not contain per-launch GPU kernel trace. Generic output-rebind PASS also lacks per-binding custom-kernel telemetry.",
+      "Graph": {
+        "configurations_default": 12,
+        "native_logged_configs_default": 8,
+        "packed_logged_configs_default": 4,
+        "replays_per_configuration": 3,
+        "native_replays_default": 24,
+        "packed_replays_default": 12,
+        "configurations_each_sanitizer": 6,
+        "native_configs_each_sanitizer": 4,
+        "packed_configs_each_sanitizer": 2,
+        "native_replays_each_sanitizer": 12,
+        "packed_replays_each_sanitizer": 6,
+        "actual_contract": "Identity alpha1 beta-0; capture passes null C0. A/B contents unchanged over three replays; D initial values refreshed before each replay, plain original-input FP64 AB and padding checked. Printed alias=1 refers to the allocation label, not active C0=D.",
+        "not_proved": "Changing A/B content between captured replays, active C0=D on the direct identity path, or a direct Graph bitwise comparison against15/19.",
+        "source_lines": "Frozen test783..847",
+        "historical_erratum": "results/small_evidence_errata.md"
+      },
+      "input_rebind": "4 default PASS for20/21 combined;2 each selected sanitizer. Same plan input offsets0,1,8,0; shift1 asserts actual Dense Lt metadata. Known-compatible others return no-Lt metadata; no per-launch GPU custom-name trace.",
+      "output_rebind": "10 PASS and30 run calls per variant in default and each selected sanitizer; general active alpha/beta plus2 identity modes per dtype, D/C offsets0,1,0. Identity mode2 still passes nullC0. Active alias is tested in the general-coefficient fallback.",
+      "selected_sanitizer_scope": "Each isolated --smoke-candidates --mega-only --mega-variant20/21 execution includes extended shortK/random-native-bitwise/Graph/input/output-rebind helpers. This is broader than source23 all-candidate374-case smoke scope, and does not run the generic24-configuration M1 suite.",
+      "generic_M1": "Default24 PASS_MMA_BITWISE include20/21 and exclude distinct-order M2 variant18; also exercise K128. Their compatible identity cases validate these routes, while unsupported coefficient/shape cases exercise fallbacks.",
+      "rejected_policy": "Frozen test checks {-1,22} Mega policies for all5 algorithms and ordinary/empty/alpha0/K0 cases."
+    }
+  },
+  "strict_numerics": {
+    "path": "results/strict_direct_iter24.txt",
+    "lines": 5542,
+    "exit_code": 2,
+    "CASE_count": 2478,
+    "PASS_count": 327,
+    "GATE_count": 990,
+    "DISTRIBUTION_count": 330,
+    "unique_gates_complete": true,
+    "all_distribution_stats_reconcile": true,
+    "requested_config_count": 33,
+    "actual_route_name_count": 25,
+    "passes": 594,
+    "failures": 396,
+    "finite_checks": 990,
+    "nonfinite": 0,
+    "printed_metric_consistency": {
+      "certain_fail": 396,
+      "certain_pass": 594
+    },
+    "structural_prefix_matches_default_application_payload": true,
+    "patterns": {
+      "uniform": {
+        "checks": 198,
+        "pass": 0,
+        "fail": 198,
+        "actual_routes": {
+          "winograd_lt_v1": 6,
+          "winograd_lt_batched": 6,
+          "winograd_hopper_v2": 30,
+          "winograd_sm80_batched": 12,
+          "winograd_sm80_batched_k64": 12,
+          "megakernel_m1": 12,
+          "megakernel_m3": 6,
+          "megakernel_m3_pipeline": 6,
+          "megakernel_warp_mma": 18,
+          "megakernel_warp_mma_packed": 6,
+          "megakernel_warp_mma_fast": 6,
+          "megakernel_product_warps": 6,
+          "megakernel_product_warps_fast": 6,
+          "megakernel_warp_mma_16x8": 6,
+          "megakernel_warp_mma_16x8_vec4": 6,
+          "megakernel_product_cluster": 6,
+          "megakernel_warp_mma_16x8_epilogue": 6,
+          "megakernel_warp_mma_16x8_identity": 6,
+          "megakernel_warp_mma_16x8_prefetch": 6,
+          "megakernel_warp_mma_cpasync": 6,
+          "megakernel_stage_m2": 6,
+          "megakernel_warp_mma_8x8_prefetch": 6,
+          "megakernel_warp_mma_direct_16x8": 6,
+          "megakernel_warp_mma_direct_8x8": 6
+        }
+      },
+      "positive": {
+        "checks": 198,
+        "pass": 198,
+        "fail": 0,
+        "actual_routes": {
+          "winograd_lt_v1": 6,
+          "winograd_lt_batched": 6,
+          "winograd_hopper_v2": 30,
+          "winograd_sm80_batched": 12,
+          "winograd_sm80_batched_k64": 12,
+          "megakernel_m1": 12,
+          "megakernel_m3": 6,
+          "megakernel_m3_pipeline": 6,
+          "megakernel_warp_mma": 18,
+          "megakernel_warp_mma_packed": 6,
+          "megakernel_warp_mma_fast": 6,
+          "megakernel_product_warps": 6,
+          "megakernel_product_warps_fast": 6,
+          "megakernel_warp_mma_16x8": 6,
+          "megakernel_warp_mma_16x8_vec4": 6,
+          "megakernel_product_cluster": 6,
+          "megakernel_warp_mma_16x8_epilogue": 6,
+          "megakernel_warp_mma_16x8_identity": 6,
+          "megakernel_warp_mma_16x8_prefetch": 6,
+          "megakernel_warp_mma_cpasync": 6,
+          "megakernel_stage_m2": 6,
+          "megakernel_warp_mma_8x8_prefetch": 6,
+          "megakernel_warp_mma_direct_16x8": 6,
+          "megakernel_warp_mma_direct_8x8": 6
+        }
+      },
+      "range": {
+        "checks": 198,
+        "pass": 0,
+        "fail": 198,
+        "actual_routes": {
+          "winograd_lt_v1": 6,
+          "winograd_lt_batched": 6,
+          "winograd_hopper_v2": 30,
+          "winograd_sm80_batched": 12,
+          "winograd_sm80_batched_k64": 12,
+          "megakernel_m1": 12,
+          "megakernel_m3": 6,
+          "megakernel_m3_pipeline": 6,
+          "megakernel_warp_mma": 18,
+          "megakernel_warp_mma_packed": 6,
+          "megakernel_warp_mma_fast": 6,
+          "megakernel_product_warps": 6,
+          "megakernel_product_warps_fast": 6,
+          "megakernel_warp_mma_16x8": 6,
+          "megakernel_warp_mma_16x8_vec4": 6,
+          "megakernel_product_cluster": 6,
+          "megakernel_warp_mma_16x8_epilogue": 6,
+          "megakernel_warp_mma_16x8_identity": 6,
+          "megakernel_warp_mma_16x8_prefetch": 6,
+          "megakernel_warp_mma_cpasync": 6,
+          "megakernel_stage_m2": 6,
+          "megakernel_warp_mma_8x8_prefetch": 6,
+          "megakernel_warp_mma_direct_16x8": 6,
+          "megakernel_warp_mma_direct_8x8": 6
+        }
+      },
+      "cancellation": {
+        "checks": 198,
+        "pass": 198,
+        "fail": 0,
+        "actual_routes": {
+          "winograd_lt_v1": 6,
+          "winograd_lt_batched": 6,
+          "winograd_hopper_v2": 30,
+          "winograd_sm80_batched": 12,
+          "winograd_sm80_batched_k64": 12,
+          "megakernel_m1": 12,
+          "megakernel_m3": 6,
+          "megakernel_m3_pipeline": 6,
+          "megakernel_warp_mma": 18,
+          "megakernel_warp_mma_packed": 6,
+          "megakernel_warp_mma_fast": 6,
+          "megakernel_product_warps": 6,
+          "megakernel_product_warps_fast": 6,
+          "megakernel_warp_mma_16x8": 6,
+          "megakernel_warp_mma_16x8_vec4": 6,
+          "megakernel_product_cluster": 6,
+          "megakernel_warp_mma_16x8_epilogue": 6,
+          "megakernel_warp_mma_16x8_identity": 6,
+          "megakernel_warp_mma_16x8_prefetch": 6,
+          "megakernel_warp_mma_cpasync": 6,
+          "megakernel_stage_m2": 6,
+          "megakernel_warp_mma_8x8_prefetch": 6,
+          "megakernel_warp_mma_direct_16x8": 6,
+          "megakernel_warp_mma_direct_8x8": 6
+        }
+      },
+      "fp16_upper_range": {
+        "checks": 198,
+        "pass": 198,
+        "fail": 0,
+        "actual_routes": {
+          "dense_cublaslt": 198
+        }
+      }
+    },
+    "new_routes": {
+      "20": {
+        "checks": 30,
+        "passes": 18,
+        "failures": 12,
+        "logged_actual_routes": {
+          "megakernel_warp_mma_direct_16x8": 24,
+          "dense_cublaslt": 6
+        }
+      },
+      "21": {
+        "checks": 30,
+        "passes": 18,
+        "failures": 12,
+        "logged_actual_routes": {
+          "megakernel_warp_mma_direct_8x8": 24,
+          "dense_cublaslt": 6
+        }
+      }
+    },
+    "new_route_distributions": [
+      {
+        "dtype": "bf16",
+        "algorithm": "mega",
+        "variant": "20",
+        "pattern": "uniform",
+        "trials": "3",
+        "failures": "3",
+        "nonfinite": "0",
+        "ef_min": "0.00596812",
+        "ef_median": "0.00597786",
+        "ef_max": "0.00613289",
+        "dense_ef_median": "1.89496e-07",
+        "gate_floor": "0.001",
+        "line": 3434
+      },
+      {
+        "dtype": "bf16",
+        "algorithm": "mega",
+        "variant": "21",
+        "pattern": "uniform",
+        "trials": "3",
+        "failures": "3",
+        "nonfinite": "0",
+        "ef_min": "0.00596812",
+        "ef_median": "0.00597786",
+        "ef_max": "0.00613289",
+        "dense_ef_median": "1.89496e-07",
+        "gate_floor": "0.001",
+        "line": 3435
+      },
+      {
+        "dtype": "bf16",
+        "algorithm": "mega",
+        "variant": "20",
+        "pattern": "positive",
+        "trials": "3",
+        "failures": "0",
+        "nonfinite": "0",
+        "ef_min": "0.000246296",
+        "ef_median": "0.000246534",
+        "ef_max": "0.000248414",
+        "dense_ef_median": "3.14847e-07",
+        "gate_floor": "0.001",
+        "line": 3668
+      },
+      {
+        "dtype": "bf16",
+        "algorithm": "mega",
+        "variant": "21",
+        "pattern": "positive",
+        "trials": "3",
+        "failures": "0",
+        "nonfinite": "0",
+        "ef_min": "0.000246296",
+        "ef_median": "0.000246534",
+        "ef_max": "0.000248414",
+        "dense_ef_median": "3.14847e-07",
+        "gate_floor": "0.001",
+        "line": 3669
+      },
+      {
+        "dtype": "bf16",
+        "algorithm": "mega",
+        "variant": "20",
+        "pattern": "range",
+        "trials": "3",
+        "failures": "3",
+        "nonfinite": "0",
+        "ef_min": "0.00596812",
+        "ef_median": "0.00597786",
+        "ef_max": "0.00613289",
+        "dense_ef_median": "1.89496e-07",
+        "gate_floor": "0.001",
+        "line": 3902
+      },
+      {
+        "dtype": "bf16",
+        "algorithm": "mega",
+        "variant": "21",
+        "pattern": "range",
+        "trials": "3",
+        "failures": "3",
+        "nonfinite": "0",
+        "ef_min": "0.00596812",
+        "ef_median": "0.00597786",
+        "ef_max": "0.00613289",
+        "dense_ef_median": "1.89496e-07",
+        "gate_floor": "0.001",
+        "line": 3903
+      },
+      {
+        "dtype": "bf16",
+        "algorithm": "mega",
+        "variant": "20",
+        "pattern": "cancellation",
+        "trials": "3",
+        "failures": "0",
+        "nonfinite": "0",
+        "ef_min": "0",
+        "ef_median": "0",
+        "ef_max": "0",
+        "dense_ef_median": "0",
+        "gate_floor": "0.001",
+        "line": 4136
+      },
+      {
+        "dtype": "bf16",
+        "algorithm": "mega",
+        "variant": "21",
+        "pattern": "cancellation",
+        "trials": "3",
+        "failures": "0",
+        "nonfinite": "0",
+        "ef_min": "0",
+        "ef_median": "0",
+        "ef_max": "0",
+        "dense_ef_median": "0",
+        "gate_floor": "0.001",
+        "line": 4137
+      },
+      {
+        "dtype": "bf16",
+        "algorithm": "mega",
+        "variant": "20",
+        "pattern": "fp16_upper_range",
+        "trials": "3",
+        "failures": "0",
+        "nonfinite": "0",
+        "ef_min": "0",
+        "ef_median": "0",
+        "ef_max": "0",
+        "dense_ef_median": "0",
+        "gate_floor": "0.001",
+        "line": 4370
+      },
+      {
+        "dtype": "bf16",
+        "algorithm": "mega",
+        "variant": "21",
+        "pattern": "fp16_upper_range",
+        "trials": "3",
+        "failures": "0",
+        "nonfinite": "0",
+        "ef_min": "0",
+        "ef_median": "0",
+        "ef_max": "0",
+        "dense_ef_median": "0",
+        "gate_floor": "0.001",
+        "line": 4371
+      },
+      {
+        "dtype": "fp16",
+        "algorithm": "mega",
+        "variant": "20",
+        "pattern": "uniform",
+        "trials": "3",
+        "failures": "3",
+        "nonfinite": "0",
+        "ef_min": "0.000749013",
+        "ef_median": "0.000749261",
+        "ef_max": "0.000756535",
+        "dense_ef_median": "3.40175e-07",
+        "gate_floor": "0.0001",
+        "line": 4604
+      },
+      {
+        "dtype": "fp16",
+        "algorithm": "mega",
+        "variant": "21",
+        "pattern": "uniform",
+        "trials": "3",
+        "failures": "3",
+        "nonfinite": "0",
+        "ef_min": "0.000749013",
+        "ef_median": "0.000749261",
+        "ef_max": "0.000756535",
+        "dense_ef_median": "3.40175e-07",
+        "gate_floor": "0.0001",
+        "line": 4605
+      },
+      {
+        "dtype": "fp16",
+        "algorithm": "mega",
+        "variant": "20",
+        "pattern": "positive",
+        "trials": "3",
+        "failures": "0",
+        "nonfinite": "0",
+        "ef_min": "2.89703e-05",
+        "ef_median": "2.93305e-05",
+        "ef_max": "3.01486e-05",
+        "dense_ef_median": "1.12404e-06",
+        "gate_floor": "0.0001",
+        "line": 4838
+      },
+      {
+        "dtype": "fp16",
+        "algorithm": "mega",
+        "variant": "21",
+        "pattern": "positive",
+        "trials": "3",
+        "failures": "0",
+        "nonfinite": "0",
+        "ef_min": "2.89703e-05",
+        "ef_median": "2.93305e-05",
+        "ef_max": "3.01486e-05",
+        "dense_ef_median": "1.12404e-06",
+        "gate_floor": "0.0001",
+        "line": 4839
+      },
+      {
+        "dtype": "fp16",
+        "algorithm": "mega",
+        "variant": "20",
+        "pattern": "range",
+        "trials": "3",
+        "failures": "3",
+        "nonfinite": "0",
+        "ef_min": "0.000749013",
+        "ef_median": "0.000749261",
+        "ef_max": "0.000756535",
+        "dense_ef_median": "3.40175e-07",
+        "gate_floor": "0.0001",
+        "line": 5072
+      },
+      {
+        "dtype": "fp16",
+        "algorithm": "mega",
+        "variant": "21",
+        "pattern": "range",
+        "trials": "3",
+        "failures": "3",
+        "nonfinite": "0",
+        "ef_min": "0.000749013",
+        "ef_median": "0.000749261",
+        "ef_max": "0.000756535",
+        "dense_ef_median": "3.40175e-07",
+        "gate_floor": "0.0001",
+        "line": 5073
+      },
+      {
+        "dtype": "fp16",
+        "algorithm": "mega",
+        "variant": "20",
+        "pattern": "cancellation",
+        "trials": "3",
+        "failures": "0",
+        "nonfinite": "0",
+        "ef_min": "0",
+        "ef_median": "0",
+        "ef_max": "0",
+        "dense_ef_median": "0",
+        "gate_floor": "0.0001",
+        "line": 5306
+      },
+      {
+        "dtype": "fp16",
+        "algorithm": "mega",
+        "variant": "21",
+        "pattern": "cancellation",
+        "trials": "3",
+        "failures": "0",
+        "nonfinite": "0",
+        "ef_min": "0",
+        "ef_median": "0",
+        "ef_max": "0",
+        "dense_ef_median": "0",
+        "gate_floor": "0.0001",
+        "line": 5307
+      },
+      {
+        "dtype": "fp16",
+        "algorithm": "mega",
+        "variant": "20",
+        "pattern": "fp16_upper_range",
+        "trials": "3",
+        "failures": "0",
+        "nonfinite": "0",
+        "ef_min": "0",
+        "ef_median": "0",
+        "ef_max": "0",
+        "dense_ef_median": "0",
+        "gate_floor": "0.0001",
+        "line": 5540
+      },
+      {
+        "dtype": "fp16",
+        "algorithm": "mega",
+        "variant": "21",
+        "pattern": "fp16_upper_range",
+        "trials": "3",
+        "failures": "0",
+        "nonfinite": "0",
+        "ef_min": "0",
+        "ef_median": "0",
+        "ef_max": "0",
+        "dense_ef_median": "0",
+        "gate_floor": "0.0001",
+        "line": 5541
+      }
+    ],
+    "all_case_nonfinite_zero": true,
+    "known_final_diagnostic": "srun: error: g08: task 0: Exited with exit code 2",
+    "quantization_note": "Printed metrics use six significant digits; interval checks reject certain contradictions and do not reconstruct raw unrounded values.",
+    "raw_new_gate_lines": {
+      "20": [
+        3266,
+        5506
+      ],
+      "21": [
+        3268,
+        5508
+      ]
+    }
+  },
+  "quick_screening": [
+    {
+      "variant": 20,
+      "csv_path": "trajectory/20261013_171152_iter-24/results.csv",
+      "log_path": "trajectory/20261013_171152_iter-24/output.txt",
+      "exit_path": null,
+      "exit_code": 2,
+      "exit_authority": "root task + terminal srun error in archived output",
+      "rows": [
+        {
+          "csv_line": 2,
+          "dtype": "bf16",
+          "shape": [
+            128,
+            128,
+            128
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 4.17760014534,
+          "candidate_event_us": 4.49599996209,
+          "same_row_Dense_over_candidate": 0.9291815348232365,
+          "solution_eF": "0.00605215821303",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100028838501",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_owner19_launch.csv",
+            "source_sha256": "1484294afe70b81c144b5b0f0391e23ef13509002b6232a01181360aa77394d1",
+            "csv_line": 2,
+            "actual": "megakernel_warp_mma_8x8_prefetch",
+            "variant": 19,
+            "event_us": 3.91456007957,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.8706761816230725
+        },
+        {
+          "csv_line": 3,
+          "dtype": "fp16",
+          "shape": [
+            128,
+            128,
+            128
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 4.06560003757,
+          "candidate_event_us": 4.66560013592,
+          "same_row_Dense_over_candidate": 0.8713991596213619,
+          "solution_eF": "0.000744324700865",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000100546932244",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_owner19_launch.csv",
+            "source_sha256": "1484294afe70b81c144b5b0f0391e23ef13509002b6232a01181360aa77394d1",
+            "csv_line": 3,
+            "actual": "megakernel_warp_mma_8x8_prefetch",
+            "variant": 19,
+            "event_us": 4.007680118080001,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.8589849111211358
+        },
+        {
+          "csv_line": 4,
+          "dtype": "bf16",
+          "shape": [
+            256,
+            256,
+            256
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 5.29440008104,
+          "candidate_event_us": 7.05439969897,
+          "same_row_Dense_over_candidate": 0.7505103633145461,
+          "solution_eF": "0.00597913706249",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100055952052",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_product10_launch.csv",
+            "source_sha256": "2e5f3d34b86eebcb673c1205d3d8bce45115c3bbdf169de40a4bdbc455f62ca6",
+            "csv_line": 4,
+            "actual": "megakernel_product_warps_fast",
+            "variant": 10,
+            "event_us": 6.20288014412,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.8792924144949812
+        },
+        {
+          "csv_line": 5,
+          "dtype": "fp16",
+          "shape": [
+            256,
+            256,
+            256
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 4.84800003469,
+          "candidate_event_us": 7.0656001567799995,
+          "same_row_Dense_over_candidate": 0.6861412940326042,
+          "solution_eF": "0.000737164856682",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000101013577662",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_product10_launch.csv",
+            "source_sha256": "2e5f3d34b86eebcb673c1205d3d8bce45115c3bbdf169de40a4bdbc455f62ca6",
+            "csv_line": 5,
+            "actual": "megakernel_product_warps_fast",
+            "variant": 10,
+            "event_us": 6.25919997692,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.8858695422941255
+        },
+        {
+          "csv_line": 6,
+          "dtype": "bf16",
+          "shape": [
+            512,
+            512,
+            512
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 6.14079982042,
+          "candidate_event_us": 12.244799733199999,
+          "same_row_Dense_over_candidate": 0.5015026749494409,
+          "solution_eF": "0.00598238461014",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100117345784",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_prefetch16_launch.csv",
+            "source_sha256": "de6b1ec23c29f12a44accd29aabf447bf4c4cb8e9b6ac8688ed1ddb8c082613b",
+            "csv_line": 6,
+            "actual": "megakernel_warp_mma_16x8_prefetch",
+            "variant": 16,
+            "event_us": 10.829440355300001,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.8844113902441003
+        },
+        {
+          "csv_line": 7,
+          "dtype": "fp16",
+          "shape": [
+            512,
+            512,
+            512
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 6.08640015125,
+          "candidate_event_us": 12.256000191,
+          "same_row_Dense_over_candidate": 0.4966057487270155,
+          "solution_eF": "0.000753206857909",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000101925941157",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_prefetch16_launch.csv",
+            "source_sha256": "de6b1ec23c29f12a44accd29aabf447bf4c4cb8e9b6ac8688ed1ddb8c082613b",
+            "csv_line": 7,
+            "actual": "megakernel_warp_mma_16x8_prefetch",
+            "variant": 16,
+            "event_us": 11.0608005524,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.9024804487619317
+        },
+        {
+          "csv_line": 8,
+          "dtype": "bf16",
+          "shape": [
+            1024,
+            1024,
+            1024
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 12.8831997514,
+          "candidate_event_us": 59.2944025993,
+          "same_row_Dense_over_candidate": 0.21727514211522037,
+          "solution_eF": "0.00600975092785",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100255569724",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 8,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 19.6431994438,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.3312825255453691
+        },
+        {
+          "csv_line": 9,
+          "dtype": "fp16",
+          "shape": [
+            1024,
+            1024,
+            1024
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 10.1503998041,
+          "candidate_event_us": 59.2303991318,
+          "same_row_Dense_over_candidate": 0.17137145710453922,
+          "solution_eF": "0.000751819326939",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000103745541295",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 9,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 19.3497598171,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.326686297926893
+        },
+        {
+          "csv_line": 10,
+          "dtype": "bf16",
+          "shape": [
+            2048,
+            2048,
+            2048
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 31.315198540700003,
+          "candidate_event_us": 438.91839981100003,
+          "same_row_Dense_over_candidate": 0.07134628795280501,
+          "solution_eF": "0.00602393091422",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100557006784",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 10,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 73.09184074400001,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.16652717401565675
+        },
+        {
+          "csv_line": 11,
+          "dtype": "fp16",
+          "shape": [
+            2048,
+            2048,
+            2048
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 32.5856000185,
+          "candidate_event_us": 445.529603958,
+          "same_row_Dense_over_candidate": 0.07313902315135906,
+          "solution_eF": "0.00075220162356",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000107367248671",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 11,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 69.1123199463,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.15512396781789434
+        },
+        {
+          "csv_line": 12,
+          "dtype": "bf16",
+          "shape": [
+            3072,
+            3072,
+            3072
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 86.39519810680001,
+          "candidate_event_us": 1497.85919189,
+          "same_row_Dense_over_candidate": 0.05767911868790983,
+          "solution_eF": "0.0060182409995",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100877688424",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 12,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 177.940483093,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.11879653578683491
+        },
+        {
+          "csv_line": 13,
+          "dtype": "fp16",
+          "shape": [
+            3072,
+            3072,
+            3072
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 89.0111982822,
+          "candidate_event_us": 1494.30084229,
+          "same_row_Dense_over_candidate": 0.05956712046403675,
+          "solution_eF": "0.000752812357912",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000111001680376",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 13,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 163.928966522,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.10970278666963784
+        },
+        {
+          "csv_line": 14,
+          "dtype": "bf16",
+          "shape": [
+            4096,
+            4096,
+            4096
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 195.075201988,
+          "candidate_event_us": 3453.95851135,
+          "same_row_Dense_over_candidate": 0.05647873341470847,
+          "solution_eF": "0.00602272325234",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00101207001828",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt0_launch.csv",
+            "source_sha256": "eeed450895a643f6f3f9f6043c677270d45110811e9b5ed5ff411e1b39695b94",
+            "csv_line": 14,
+            "actual": "winograd_lt_v1",
+            "variant": 0,
+            "event_us": 349.106864929,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.10107442338459055
+        },
+        {
+          "csv_line": 15,
+          "dtype": "fp16",
+          "shape": [
+            4096,
+            4096,
+            4096
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 206.100797653,
+          "candidate_event_us": 3486.92016602,
+          "same_row_Dense_over_candidate": 0.059106830050613166,
+          "solution_eF": "0.000753132541415",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000114626024442",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 15,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 330.001602173,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.0946398502004325
+        },
+        {
+          "csv_line": 16,
+          "dtype": "bf16",
+          "shape": [
+            1024,
+            512,
+            1024
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 9.169600158929999,
+          "candidate_event_us": 30.9424012899,
+          "same_row_Dense_over_candidate": 0.2963441677657731,
+          "solution_eF": "0.00599042321269",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100255228328",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 16,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 16.0294401646,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.5180412474914226
+        },
+        {
+          "csv_line": 17,
+          "dtype": "fp16",
+          "shape": [
+            1024,
+            512,
+            1024
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 9.232000261549999,
+          "candidate_event_us": 31.1760008335,
+          "same_row_Dense_over_candidate": 0.29612522500415783,
+          "solution_eF": "0.000749332745815",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000103742130999",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 17,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 15.3084802628,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.49103412411865077
+        },
+        {
+          "csv_line": 18,
+          "dtype": "bf16",
+          "shape": [
+            512,
+            1024,
+            1024
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 8.04800018668,
+          "candidate_event_us": 30.929601192499998,
+          "same_row_Dense_over_candidate": 0.26020381370554263,
+          "solution_eF": "0.00601884687231",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100255979226",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 18,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 15.0889599323,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.4878485124457041
+        },
+        {
+          "csv_line": 19,
+          "dtype": "fp16",
+          "shape": [
+            512,
+            1024,
+            1024
+          ],
+          "actual": "megakernel_warp_mma_direct_16x8",
+          "variant": 20,
+          "dense_event_us": 8.345600217580001,
+          "candidate_event_us": 31.0896009207,
+          "same_row_Dense_over_candidate": 0.2684370326549722,
+          "solution_eF": "0.000751510131859",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.00010374806206",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 19,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 14.9827194214,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.4819206093901399
+        }
+      ],
+      "row_count": 18,
+      "column_count": 51,
+      "nonfinite": 0,
+      "numerical_pass_rows": 0,
+      "failed_rows": 18,
+      "CHECK_count": 18,
+      "TIME_count": 180,
+      "TUNE_count": 36,
+      "device_lines": [
+        "DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592"
+      ],
+      "all_9shape_2dtype_complete": true,
+      "all_logged_metric_and_group_median_checks_consistent": true,
+      "measured_protocol": {
+        "warmup": 20,
+        "warmup_authority": "root iteration24 record; CSV does not encode warmup",
+        "calls_per_group": 20,
+        "groups": 5,
+        "fresh_correctness_trials": 1,
+        "mode": "launch",
+        "cache": "warm_cache",
+        "rotate_inputs": 1,
+        "quantile_unit": "group_mean"
+      },
+      "primary_128_256_512_1024_improvement_3percent": false,
+      "limits": [
+        "Diagnostic screen20/5/1; not final100/5/3 acceptance.",
+        "source23 minimum selected from historical full100/5/3 measurements; unlocked clocks and different call counts prevent causal improvement attribution.",
+        "Same-row Dense ratio uses this row only, distinct from historical source23 own-latency comparison.",
+        "No final Graph timing or isolated GPU kernel timing measured for these new routes in this evidence."
+      ]
+    },
+    {
+      "variant": 21,
+      "csv_path": "results/small_direct21_launch_iter24.csv",
+      "log_path": "results/small_direct21_launch_iter24.log",
+      "exit_path": "results/small_direct21_launch_iter24.exit",
+      "exit_code": 2,
+      "exit_authority": "recorded .exit",
+      "rows": [
+        {
+          "csv_line": 2,
+          "dtype": "bf16",
+          "shape": [
+            128,
+            128,
+            128
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 4.171200096610001,
+          "candidate_event_us": 4.63679991663,
+          "same_row_Dense_over_candidate": 0.8995859583351625,
+          "solution_eF": "0.00605215821303",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100028838501",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_owner19_launch.csv",
+            "source_sha256": "1484294afe70b81c144b5b0f0391e23ef13509002b6232a01181360aa77394d1",
+            "csv_line": 2,
+            "actual": "megakernel_warp_mma_8x8_prefetch",
+            "variant": 19,
+            "event_us": 3.91456007957,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.8442374374469624
+        },
+        {
+          "csv_line": 3,
+          "dtype": "fp16",
+          "shape": [
+            128,
+            128,
+            128
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 4.08639982343,
+          "candidate_event_us": 4.85600009561,
+          "same_row_Dense_over_candidate": 0.8415155978115102,
+          "solution_eF": "0.000744324700865",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000100546932244",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_owner19_launch.csv",
+            "source_sha256": "1484294afe70b81c144b5b0f0391e23ef13509002b6232a01181360aa77394d1",
+            "csv_line": 3,
+            "actual": "megakernel_warp_mma_8x8_prefetch",
+            "variant": 19,
+            "event_us": 4.007680118080001,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.8253047856615753
+        },
+        {
+          "csv_line": 4,
+          "dtype": "bf16",
+          "shape": [
+            256,
+            256,
+            256
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 5.30560016632,
+          "candidate_event_us": 7.86719992757,
+          "same_row_Dense_over_candidate": 0.6743949836239613,
+          "solution_eF": "0.00597913706249",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100055952052",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_product10_launch.csv",
+            "source_sha256": "2e5f3d34b86eebcb673c1205d3d8bce45115c3bbdf169de40a4bdbc455f62ca6",
+            "csv_line": 4,
+            "actual": "megakernel_product_warps_fast",
+            "variant": 10,
+            "event_us": 6.20288014412,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.7884482663752425
+        },
+        {
+          "csv_line": 5,
+          "dtype": "fp16",
+          "shape": [
+            256,
+            256,
+            256
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 4.83519993722,
+          "candidate_event_us": 8.044800162320001,
+          "same_row_Dense_over_candidate": 0.6010341885019056,
+          "solution_eF": "0.000737164856682",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000101013577662",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_product10_launch.csv",
+            "source_sha256": "2e5f3d34b86eebcb673c1205d3d8bce45115c3bbdf169de40a4bdbc455f62ca6",
+            "csv_line": 5,
+            "actual": "megakernel_product_warps_fast",
+            "variant": 10,
+            "event_us": 6.25919997692,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.7780429408596944
+        },
+        {
+          "csv_line": 6,
+          "dtype": "bf16",
+          "shape": [
+            512,
+            512,
+            512
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 6.15679994226,
+          "candidate_event_us": 14.9519994855,
+          "same_row_Dense_over_candidate": 0.4117710108424415,
+          "solution_eF": "0.00598238461014",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100117345784",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_prefetch16_launch.csv",
+            "source_sha256": "de6b1ec23c29f12a44accd29aabf447bf4c4cb8e9b6ac8688ed1ddb8c082613b",
+            "csv_line": 6,
+            "actual": "megakernel_warp_mma_16x8_prefetch",
+            "variant": 16,
+            "event_us": 10.829440355300001,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.7242804125162033
+        },
+        {
+          "csv_line": 7,
+          "dtype": "fp16",
+          "shape": [
+            512,
+            512,
+            512
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 6.10879994929,
+          "candidate_event_us": 15.2848005295,
+          "same_row_Dense_over_candidate": 0.3996650095302115,
+          "solution_eF": "0.000753206857909",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000101925941157",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_prefetch16_launch.csv",
+            "source_sha256": "de6b1ec23c29f12a44accd29aabf447bf4c4cb8e9b6ac8688ed1ddb8c082613b",
+            "csv_line": 7,
+            "actual": "megakernel_warp_mma_16x8_prefetch",
+            "variant": 16,
+            "event_us": 11.0608005524,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.7236470329496556
+        },
+        {
+          "csv_line": 8,
+          "dtype": "bf16",
+          "shape": [
+            1024,
+            1024,
+            1024
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 12.950399518,
+          "candidate_event_us": 82.6272010803,
+          "same_row_Dense_over_candidate": 0.15673288394961302,
+          "solution_eF": "0.00600975092785",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100255569724",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 8,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 19.6431994438,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.23773284326441183
+        },
+        {
+          "csv_line": 9,
+          "dtype": "fp16",
+          "shape": [
+            1024,
+            1024,
+            1024
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 10.201600194,
+          "candidate_event_us": 82.0303976536,
+          "same_row_Dense_over_candidate": 0.12436365647134336,
+          "solution_eF": "0.000751819326939",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000103745541295",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 9,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 19.3497598171,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.23588523730935265
+        },
+        {
+          "csv_line": 10,
+          "dtype": "bf16",
+          "shape": [
+            2048,
+            2048,
+            2048
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 31.3760012388,
+          "candidate_event_us": 588.4880065919999,
+          "same_row_Dense_over_candidate": 0.05331629682735922,
+          "solution_eF": "0.00602393091422",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100557006784",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 10,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 73.09184074400001,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.12420277036278624
+        },
+        {
+          "csv_line": 11,
+          "dtype": "fp16",
+          "shape": [
+            2048,
+            2048,
+            2048
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 32.6223999262,
+          "candidate_event_us": 597.846412659,
+          "same_row_Dense_over_candidate": 0.05456652283168786,
+          "solution_eF": "0.00075220162356",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000107367248671",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 11,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 69.1123199463,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.11560213205748603
+        },
+        {
+          "csv_line": 12,
+          "dtype": "bf16",
+          "shape": [
+            3072,
+            3072,
+            3072
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 86.33440136910001,
+          "candidate_event_us": 1950.53768158,
+          "same_row_Dense_over_candidate": 0.044261847481544825,
+          "solution_eF": "0.0060182409995",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100877688424",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 12,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 177.940483093,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.09122637556474292
+        },
+        {
+          "csv_line": 13,
+          "dtype": "fp16",
+          "shape": [
+            3072,
+            3072,
+            3072
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 89.0287995338,
+          "candidate_event_us": 1970.67832947,
+          "same_row_Dense_over_candidate": 0.04517672833888809,
+          "solution_eF": "0.000752812357912",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000111001680376",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 13,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 163.928966522,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.08318403063075623
+        },
+        {
+          "csv_line": 14,
+          "dtype": "bf16",
+          "shape": [
+            4096,
+            4096,
+            4096
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 195.304000378,
+          "candidate_event_us": 4646.01745605,
+          "same_row_Dense_over_candidate": 0.04203686323297752,
+          "solution_eF": "0.00602272325234",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00101207001828",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt0_launch.csv",
+            "source_sha256": "eeed450895a643f6f3f9f6043c677270d45110811e9b5ed5ff411e1b39695b94",
+            "csv_line": 14,
+            "actual": "winograd_lt_v1",
+            "variant": 0,
+            "event_us": 349.106864929,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.07514110057300717
+        },
+        {
+          "csv_line": 15,
+          "dtype": "fp16",
+          "shape": [
+            4096,
+            4096,
+            4096
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 206.62560463,
+          "candidate_event_us": 4666.66412354,
+          "same_row_Dense_over_candidate": 0.04427693940682828,
+          "solution_eF": "0.000753132541415",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000114626024442",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 15,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 330.001602173,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.0707146675734336
+        },
+        {
+          "csv_line": 16,
+          "dtype": "bf16",
+          "shape": [
+            1024,
+            512,
+            1024
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 9.225600212809999,
+          "candidate_event_us": 40.7184004784,
+          "same_row_Dense_over_candidate": 0.22657079120050228,
+          "solution_eF": "0.00599042321269",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100255228328",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 16,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 16.0294401646,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.3936657623155698
+        },
+        {
+          "csv_line": 17,
+          "dtype": "fp16",
+          "shape": [
+            1024,
+            512,
+            1024
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 9.31520015001,
+          "candidate_event_us": 40.7727986574,
+          "same_row_Dense_over_candidate": 0.22846604738326814,
+          "solution_eF": "0.000749332745815",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.000103742130999",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 17,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 15.3084802628,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.37545816737850074
+        },
+        {
+          "csv_line": 18,
+          "dtype": "bf16",
+          "shape": [
+            512,
+            1024,
+            1024
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 8.32000002265,
+          "candidate_event_us": 44.8352009058,
+          "same_row_Dense_over_candidate": 0.1855684786632394,
+          "solution_eF": "0.00601884687231",
+          "gate_floor": "0.001",
+          "gate_limit": "0.00100255979226",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 18,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 15.0889599323,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.3365427081279801
+        },
+        {
+          "csv_line": 19,
+          "dtype": "fp16",
+          "shape": [
+            512,
+            1024,
+            1024
+          ],
+          "actual": "megakernel_warp_mma_direct_8x8",
+          "variant": 21,
+          "dense_event_us": 8.59040021896,
+          "candidate_event_us": 44.673600792900004,
+          "same_row_Dense_over_candidate": 0.19229254115386363,
+          "solution_eF": "0.000751510131859",
+          "gate_floor": "0.0001",
+          "gate_limit": "0.00010374806206",
+          "numerical_pass": 0,
+          "nonfinite": 0,
+          "historical_source23_observed_minimum": {
+            "source_path": "results/small_final_lt1_launch.csv",
+            "source_sha256": "0996b3b6231ea9310a3d4f5e0a47aec3168b526b0280a7f8e5b9aa930ad71b34",
+            "csv_line": 19,
+            "actual": "winograd_lt_batched",
+            "variant": 1,
+            "event_us": 14.9827194214,
+            "calls_per_group": 100,
+            "groups": 5,
+            "correct_trials": 3
+          },
+          "historical_min_over_candidate": 0.3353819516554665
+        }
+      ],
+      "row_count": 18,
+      "column_count": 51,
+      "nonfinite": 0,
+      "numerical_pass_rows": 0,
+      "failed_rows": 18,
+      "CHECK_count": 18,
+      "TIME_count": 180,
+      "TUNE_count": 36,
+      "device_lines": [
+        "DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592"
+      ],
+      "all_9shape_2dtype_complete": true,
+      "all_logged_metric_and_group_median_checks_consistent": true,
+      "measured_protocol": {
+        "warmup": 20,
+        "warmup_authority": "root iteration24 record; CSV does not encode warmup",
+        "calls_per_group": 20,
+        "groups": 5,
+        "fresh_correctness_trials": 1,
+        "mode": "launch",
+        "cache": "warm_cache",
+        "rotate_inputs": 1,
+        "quantile_unit": "group_mean"
+      },
+      "primary_128_256_512_1024_improvement_3percent": false,
+      "limits": [
+        "Diagnostic screen20/5/1; not final100/5/3 acceptance.",
+        "source23 minimum selected from historical full100/5/3 measurements; unlocked clocks and different call counts prevent causal improvement attribution.",
+        "Same-row Dense ratio uses this row only, distinct from historical source23 own-latency comparison.",
+        "No final Graph timing or isolated GPU kernel timing measured for these new routes in this evidence."
+      ]
+    }
+  ],
+  "historical_source23_boundary": {
+    "source_commit": "ea4dc50c57b08b4dee98c23c024a01bb94f836db",
+    "frozen_manifest": "results/small_manifest.json",
+    "selection": "Minimum candidate solution_event_ms across source23 launch datasets, deterministic source path/CSV line/actual/variant ties, matched dtype/shape/mode/cache/input count/working set.",
+    "protocol_difference": "source23 primary snapshot100calls/5groups/3fresh;24 screens20calls/5groups/1fresh. Historical selected minima and unlocked clocks are descriptive comparators, not paired causal estimates or acceptance.",
+    "unchanged_files": [
+      "results/small_owner_profile_iter23.json",
+      "results/small_manifest.json",
+      "results/SMALL_REPORT.md"
+    ],
+    "Graph_erratum": "Old profile retained byte-for-byte and interpreted with results/small_evidence_errata.md."
+  },
+  "conclusion": {
+    "structural_and_native_bitwise": "PASS for measured tests",
+    "six_selected_sanitizers": "PASS zero errors/hazards/warnings",
+    "fixed_numerical_certification": "FAIL;990 total gates594pass396fail,20/21 each18pass12fail;allfinite/nonfinite0",
+    "screening": "Both18-row diagnostic screens fail unchanged numerical gates; neither improves frozen23 primary128/256/512/1024 observed own-min by3percent.",
+    "Auto": "Remains Dense; experimental forced routes retained.",
+    "stop_rationale": "No physical-floor or exhaustive-search claim. These resource and screen observations do not rule out coalesced register loads, operand routing or other later optimizations."
+  },
+  "generated_utc": "2026-10-13T09:44:04.514770+00:00",
+  "publication_validation": {
+    "input_hashes_rechecked": 57,
+    "binary_hashes_rechecked": 2,
+    "atomic_replace": true,
+    "historical23_artifacts_preserved": true
+  }
+}

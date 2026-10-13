@@ -14,10 +14,12 @@ WGMMA/Sm80 batched leaves，以及 M1/M2/M3、warp/product/cluster megakernel。
 
 用户已要求持续优化，并优先处理小矩阵。本快照记录 iteration23 的完整复测，
 不表示优化停止、达到物理延迟下限或整份 PLAN 已完成。直接寄存器传递 operand
-等方向仍是可继续验证的候选，scratch 原型尚未计入本快照的测量或认证。
+已在 iteration24 作为 Mega20/21 加入并完成诊断验证，未更新本快照的最优包络。
+后续连续向量加载与寄存器重排方向仍在推进。
 
 证据在 [小矩阵报告](results/SMALL_REPORT.md)、[small manifest](results/small_manifest.json)
-和 [ITERATIONS.md](ITERATIONS.md)。预声明九形状为 128/256/512/1024/2048/3072/4096
+和 [ITERATIONS.md](ITERATIONS.md)；历史 profile 中的 Graph 覆盖描述以
+[验证证据勘误](results/small_evidence_errata.md)为准。预声明九形状为 128/256/512/1024/2048/3072/4096
 方阵，以及 `(1024,512,1024)`、`(512,1024,1024)`；元组顺序为 M,N,K。
 两种 dtype、20 个请求配置各自 launch/Graph，共 **40 datasets、720 行**，全部
 是已检查的实际 SW，全部未通过固定数值门限；nonfinite、unchecked、Dense fallback
@@ -90,6 +92,18 @@ SW CV为0.23%，没有形成≥1.05×及固定精度同时成立的验收证据�
 也可能不同。原始actual-route比较只匹配家族，不要求variant相同，缺失或多重
 匹配显示N/A。此前0.90×来自 [iteration12 BF16 128历史行](trajectory/20261013_135104_iter-12/results.csv)
 的4.1776µs 调优cuBLASLt普通GEMM／4.6416µs SW，即Dense/SW≈0.900，属于当轮诊断结果。
+
+Iteration24 的直接 native-register 对照保留完整七个 M1 乘积及固定 U 顺序。
+同一二进制的 quick20warm/20calls/5groups/1fresh 记录中，BF16/FP16 128 launch：
+Mega20 为4.4960/4.6656µs，Mega21 为4.6368/4.8560µs；均未改善先前最低观测SW耗时。
+这些快筛结果和上述 full 快照使用不同采样规模，不能作为独立收益验收。
+新 kernel 无 shared/LDSM 或 local spill，但寄存器增为128/120；更多标量输入加载与
+失去 lookahead 共同影响执行，不能归因为单一机制。完整结构测试 exit0，两个新
+variant 分别通过 standalone CUDA12.8 memcheck/racecheck/synccheck 定向检查。
+严格数值33请求配置共990检查，594通过、396失败、nonfinite零，Auto仍为Dense。
+原始24轮证据与覆盖限制另存，不改写源23的完整报告、manifest或profile。
+详见 [第24轮独立审计](results/small_direct_profile_iter24.json) 和
+[Mega21原始诊断数据](results/small_direct21_launch_iter24.csv)。
 
 ## 构建、验证与复现
 
