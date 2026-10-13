@@ -199,6 +199,16 @@ void launch_wgmma_pipeline(const Problem& p, const void* A, const void* B,
                            const float* C0, float* D, cudaStream_t stream,
                            int configuration=0);
 
+// Vector producer wait1 consumer, native configs0/1 map to32/33.
+// Read/retire states delay bank reuse; final wait0 before any generic P access.
+bool wgmma_wait1_can_implement(const Problem& p, int configuration=0);
+bool wgmma_wait1_full_tiles(const Problem& p, const void* A, const void* B,
+                           int configuration=0);
+void prepare_wgmma_wait1(const Problem& p, int configuration=0);
+void launch_wgmma_wait1(const Problem& p, const void* A, const void* B,
+                       const float* C0, float* D, cudaStream_t stream,
+                       int configuration=0);
+
 // TMA raw aliases into two final banks, native-only configs0/1 map to30/31.
 // Every native host run encodes current A/B then launches one kernel.
 bool wgmma_tma_alias_can_implement(const Problem& p, int configuration=0);

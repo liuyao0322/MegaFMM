@@ -70,3 +70,9 @@
      The skill's own protocol (iteration steps, stall handling, ncu fallback,
      stopping rules) lives in SKILL.md — do not duplicate it here.
 -->
+
+## Current experimental direction (iteration32)
+
+- Isolate vector producer consumer scheduling: native Mega32/33 retain source30 BM64 BN16/32 BK32 two-bank256thread producer128/consumer128; read/retire states allow two committed WGMMA groups, wait1 releases only the old operand bank, final wait0 drains before genericP/U. No TMA or dual-consumer axis combined. Preserve all27 old CUDA TUs and source23–31 evidence bytes.
+- Re-prove compiled perCTAowned register pool, allocation direction, fullroleCFG implicit widths, accumulator initialization and no genericP spill/reload/read while latest group is inflight before firstlaunch. CPU/API wait1 proof is not a GPU/resource/performance certificate.
+- Samebinary full1024 new32/33 plus retained29, TMA31 and Lt1 mandatory regardless quick signal; both dtypes/modes20warm100calls5groups3fresh32LtCandidates8GiB. Keep original FP64 gates, fresh transforms, explicit alphaRNbetaFMA, currentbinding/overlap, AutoDense and failedgates visible. Rank ownMegalatency versus29, not slowerDense denominator.

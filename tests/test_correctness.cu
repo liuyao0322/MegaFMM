@@ -129,6 +129,12 @@ void check_packed_metadata(const megafmm::Problem& p,int variant) {
           "packed input metadata is not seven compact row-major A/B/P slots");
 }
 const char* warp_mma_name(int variant,const megafmm::Problem& p) {
+  if(variant==32 || variant==33) {
+    if(p.lda%8!=0 || p.ldb%8!=0)return "dense_cublaslt";
+    return p.m%128==0 && p.n%(variant==32 ? 32:64)==0 && p.k%64==0 ?
+           (variant==32 ? "megakernel_wgmma_wait1_64x16":"megakernel_wgmma_wait1_64x32"):
+           "megakernel_warp_mma_packed";
+  }
   if(variant==30 || variant==31) {
     if(p.lda%8!=0 || p.ldb%8!=0)return "dense_cublaslt";
     return p.m%128==0 && p.n%(variant==30 ? 32:64)==0 && p.k%64==0 &&
@@ -382,9 +388,10 @@ template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorit
     }
   }
   if(algorithm==megafmm::Algorithm::Megakernel &&
-     (variant==28 || variant==29 || variant==30 || variant==31) && expected_route &&
+     (variant==28 || variant==29 || variant==30 || variant==31 || variant==32 || variant==33) && expected_route &&
      (std::string(expected_route).find("megakernel_wgmma_pipeline")==0 ||
-      std::string(expected_route).find("megakernel_wgmma_tma_alias")==0) &&
+      std::string(expected_route).find("megakernel_wgmma_tma_alias")==0 ||
+      std::string(expected_route).find("megakernel_wgmma_wait1")==0) &&
      (pattern==Pattern::Integers || pattern==Pattern::OwnerRows)) {
     stage_reference=m1_integer_reference(p,a,b);
     for(int i=0;i<p.m;++i)for(int j=0;j<p.n;++j) {
@@ -414,6 +421,7 @@ template<class T> Metrics run_case(megafmm::Problem p,megafmm::Algorithm algorit
                         std::string(expected_route).find("megakernel_cooperative")==0 ||
                         std::string(expected_route).find("megakernel_wgmma_pipeline")==0 ||
                         std::string(expected_route).find("megakernel_wgmma_tma_alias")==0 ||
+                        std::string(expected_route).find("megakernel_wgmma_wait1")==0 ||
                         std::string(expected_route).find("megakernel_product_warps")==0 ||
                         std::string(expected_route)=="megakernel_product_cluster" ||
                         std::string(expected_route)=="megakernel_stage_m2"))
@@ -1197,33 +1205,40 @@ void wgmma_pipeline_policy_suite(int variant) {
   for(int scenario=0;scenario<4;++scenario) {
     auto p=problem(128,128,128,megafmm::DType::BF16);
     if(scenario==1)p.m=0;if(scenario==2)p.alpha=0;if(scenario==3)p.k=0;
-    megafmm::Policy invalid;invalid.algorithm=algorithm;invalid.mega_variant=32;invalid.certified_range=true;
+    megafmm::Policy invalid;invalid.algorithm=algorithm;invalid.mega_variant=34;invalid.certified_range=true;
     bool rejected=false;try {auto plan=megafmm::create_plan(p,invalid);}catch(const std::exception&) {rejected=true;}
-    require(rejected,"invalid Mega32 accepted before normal/empty/alpha0/K0 dispatch");
+    require(rejected,"invalid Mega34 accepted before normal/empty/alpha0/K0 dispatch");
   }
   megafmm::Policy automatic;automatic.algorithm=megafmm::Algorithm::Auto;
   automatic.mega_variant=variant;automatic.certified_range=true;
   auto p=problem(128,128,128,megafmm::DType::BF16);
   require(megafmm::create_plan(p,automatic)->algorithm_name()=="dense_cublaslt","pipeline candidate enabled uncertified Auto SW");
   std::cout << "PASS_WGMMA_PIPELINE_POLICY variant=" << variant
-            << " invalid32_cases=20 validate_before_empty_scale=1 auto_dense=1\n";
+            << " invalid34_cases=20 validate_before_empty_scale=1 auto_dense=1\n";
 }
-template<class T> void wgmma_tma_alias_suite(megafmm::DType dtype,int variant) {
-  require(variant==30 || variant==31,"TMA alias suite needs Mega30/31");
+const char* wgmma_scheduled_family(int variant) {
+  return variant>=32 ? "WAIT1":"TMA_ALIAS";
+}
+template<class T> void wgmma_scheduled_suite(megafmm::DType dtype,int variant) {
+  require(variant==30 || variant==31 || variant==32 || variant==33,"scheduled WGMMA suite needs Mega30..33");
   auto exact=[dtype,variant](megafmm::Problem p,Pattern pattern,bool alias=false,bool certified=true) {
     const char* route=certified ? warp_mma_name(variant,p):"dense_cublaslt";
-    std::cout << "BEGIN_WGMMA_TMA_ALIAS dtype=" << megafmm::dtype_name(dtype)
+    std::cout << "BEGIN_WGMMA_" << wgmma_scheduled_family(variant) << " dtype=" << megafmm::dtype_name(dtype)
               << " variant=" << variant << " shape=" << p.m << ',' << p.n << ',' << p.k
               << " alpha=" << p.alpha << " beta=" << p.beta << " alias=" << alias
               << " null_c0=" << (p.beta==0.0f) << " expected=" << route << std::endl;
     auto e=run_case<T>(p,megafmm::Algorithm::Megakernel,pattern,alias,certified,
                        1234567,variant,false,0,route);
-    require(e.nonfinite==0 && e.maxabs==0,"TMA alias native/packed/Dense integer output incorrect");
+    require(e.nonfinite==0 && e.maxabs==0,"scheduled WGMMA native/packed/Dense integer output incorrect");
   };
-  // Parent K64/128/192/256 gives 1/2/3/4 stages: prime, drain, bank reuse and
-  // phase wrap are all observable with distinct K16 owner contributions.
-  for(int k:{64,128,192,256})
-    exact(problem(128,variant==30 ? 32:64,k,dtype),Pattern::OwnerRows);
+  // Parent K64/128/192/256 gives 1/2/3/4 stages. WAIT1 also exercises
+  // K1024/1088/2048/2112 (16/17/32/33 stages), including long prime/drain
+  // and repeated bank phase wraps. Long cases use bounded random integers:
+  // OwnerRows grows its K16 coefficients past the BF16 exact-integer range.
+  for(int k:(variant>=32 ? std::vector<int>{64,128,192,256,1024,1088,2048,2112}:
+                                      std::vector<int>{64,128,192,256}))
+    exact(problem(128,(variant==30 || variant==32) ? 32:64,k,dtype),
+          k<=256 ? Pattern::OwnerRows:Pattern::Integers);
   exact(problem(256,128,64,dtype),Pattern::Integers);
   auto padded=problem(128,256,128,dtype);padded.alpha=.5f;padded.beta=-.25f;
   padded.lda+=8;padded.ldb+=8;padded.ldc+=1;padded.ldd+=1;
@@ -1233,19 +1248,20 @@ template<class T> void wgmma_tma_alias_suite(megafmm::DType dtype,int variant) {
   auto tail=problem(80,112,48,dtype);tail.alpha=.5f;tail.beta=-.25f;
   exact(tail,Pattern::Integers,true);
   exact(problem(128,64,32,dtype),Pattern::Integers);
-  if(variant==31)exact(problem(128,32,64,dtype),Pattern::Integers);
+  if(variant==31 || variant==33)exact(problem(128,32,64,dtype),Pattern::Integers);
   auto odd_stride=problem(128,128,128,dtype);odd_stride.lda+=1;
   exact(odd_stride,Pattern::Integers);
   exact(problem(128,128,128,dtype),Pattern::Integers,false,false);
 }
-template<class T> void wgmma_tma_alias_native_bitwise_suite(megafmm::DType dtype,int variant) {
+template<class T> void wgmma_scheduled_native_bitwise_suite(megafmm::DType dtype,int variant) {
   // Each candidate is compared only with the corresponding same-atom vector
-  // pipeline: TMA30 N16 vs Mega28 N16, and TMA31 N32 vs Mega29 N32. These
+  // pipeline: TMA30/WAIT1_32 N16 vs Mega28, and TMA31/WAIT1_33 N32 vs Mega29. These
   // compare raw U and final D; no separately observable seven-P slots are claimed.
-  require(variant==30 || variant==31,"TMA alias bits needs Mega30/31");
-  const int reference_variant=variant-2;
-  for(auto mn:{std::pair<int,int>{128,variant==30 ? 32:64},std::pair<int,int>{128,256},std::pair<int,int>{256,256}})
-  for(int k:{64,128,192}) {
+  require(variant==30 || variant==31 || variant==32 || variant==33,"scheduled WGMMA bits needs Mega30..33");
+  const int reference_variant=variant>=32 ? variant-4:variant-2;
+  for(auto mn:{std::pair<int,int>{128,(variant==30 || variant==32) ? 32:64},std::pair<int,int>{128,256},std::pair<int,int>{256,256}})
+  for(int k:(variant>=32 ? std::vector<int>{64,128,192,256,1024,1088,2048,2112}:
+                                      std::vector<int>{64,128,192})) {
     auto p=problem(mn.first,mn.second,k,dtype);
     const bool alias=k==128;
     const int input_shift=k==192 ? 8:0,output_shift=k==192 ? 1:0;
@@ -1274,7 +1290,7 @@ template<class T> void wgmma_tma_alias_native_bitwise_suite(megafmm::DType dtype
     const T* left=da.as<T>()+input_shift,*right=db.as<T>()+input_shift;
     float* source=dc.as<float>()+output_shift;
     float* output=alias ? source:dd.as<float>()+output_shift;
-    std::cout << "BEGIN_WGMMA_TMA_ALIAS_NATIVE_BITWISE dtype=" << megafmm::dtype_name(dtype)
+    std::cout << "BEGIN_WGMMA_" << wgmma_scheduled_family(variant) << "_NATIVE_BITWISE dtype=" << megafmm::dtype_name(dtype)
               << " variant=" << variant << " reference_variant=" << reference_variant << " shape=" << p.m << ',' << p.n << ',' << p.k
               << " alpha=" << p.alpha << " beta=" << p.beta << " alias=" << alias
               << " null_c0=" << (p.beta==0.0f) << " input_shift_bytes=" << input_shift*sizeof(T)
@@ -1292,22 +1308,22 @@ template<class T> void wgmma_tma_alias_native_bitwise_suite(megafmm::DType dtype
       policy.certified_range=true;policy.mega_variant=current;policy.workspace_limit=0;
       auto plan=megafmm::create_plan(current_problem,policy);
       require(plan->algorithm_name()==warp_mma_name(current,current_problem),
-              "TMA alias bits selected another route");
-      require(plan->workspace_bytes()==0,"TMA alias bits unexpectedly requires workspace");
+              "scheduled WGMMA bits selected another route");
+      require(plan->workspace_bytes()==0,"scheduled WGMMA bits unexpectedly requires workspace");
       check(cudaMemcpy(da.data,a_storage.data(),a_storage.size()*sizeof(T),cudaMemcpyHostToDevice));
       check(cudaMemcpy(db.data,b_storage.data(),b_storage.size()*sizeof(T),cudaMemcpyHostToDevice));
       check(cudaMemcpy(source,c.data(),c.size()*sizeof(float),cudaMemcpyHostToDevice));
       if(stage!=2 || !alias)check(cudaMemcpy(current_output,initial.data(),initial.size()*sizeof(float),cudaMemcpyHostToDevice));
       require(plan->lt_algorithm_config(left,right,current_problem.beta==0.0f ? nullptr:source,current_output,nullptr)=="none",
-              "TMA alias bits metadata unexpectedly uses Dense");
+              "scheduled WGMMA bits metadata unexpectedly uses Dense");
       megafmm::run(*plan,left,right,current_problem.beta==0.0f ? nullptr:source,current_output,nullptr);
       check(cudaDeviceSynchronize());
       check(cudaMemcpy(actual.data(),current_output,actual.size()*sizeof(float),cudaMemcpyDeviceToHost));
       for(int i=0;i<p.m;++i) {
-        for(int j=0;j<p.n;++j)require(std::isfinite(actual[size_t(i)*p.ldd+j]),"TMA alias bits returned nonfinite/unwritten output");
-        for(int j=int(p.n);j<p.ldd;++j)require(actual[size_t(i)*p.ldd+j]==initial[size_t(i)*p.ldd+j],"TMA alias bits overwrote D padding");
+        for(int j=0;j<p.n;++j)require(std::isfinite(actual[size_t(i)*p.ldd+j]),"scheduled WGMMA bits returned nonfinite/unwritten output");
+        for(int j=int(p.n);j<p.ldd;++j)require(actual[size_t(i)*p.ldd+j]==initial[size_t(i)*p.ldd+j],"scheduled WGMMA bits overwrote D padding");
       }
-      for(size_t at=output_count;at<actual.size();++at)require(actual[at]==initial[at],"TMA alias bits overwrote trailing D guard");
+      for(size_t at=output_count;at<actual.size();++at)require(actual[at]==initial[at],"scheduled WGMMA bits overwrote trailing D guard");
       if(stage==0)baseline=actual;
       else for(int i=0;i<p.m;++i)for(int j=0;j<p.n;++j) {
         const size_t at=size_t(i)*p.ldd+j;
@@ -1322,19 +1338,19 @@ template<class T> void wgmma_tma_alias_native_bitwise_suite(megafmm::DType dtype
         std::memcpy(&expected_bits,&expected,sizeof(expected_bits));
         std::memcpy(&actual_bits,&actual[at],sizeof(actual_bits));
         if(expected_bits!=actual_bits) {
-          std::cerr << "WGMMA_TMA_ALIAS_BIT_MISMATCH dtype=" << megafmm::dtype_name(dtype)
+          std::cerr << "WGMMA_" << wgmma_scheduled_family(variant) << "_BIT_MISMATCH dtype=" << megafmm::dtype_name(dtype)
                     << " variant=" << variant << " reference_variant=" << reference_variant << " phase=" << (stage==1 ? "raw_u":"contract_epilogue")
                     << " shape=" << p.m << ',' << p.n << ',' << p.k
                     << " row=" << i << " col=" << j << " byte_index=" << at*sizeof(float)
                     << " expected_bits=0x" << std::hex << expected_bits << " actual_bits=0x" << actual_bits << std::dec
                     << " raw_u=" << baseline[at] << " alpha=" << p.alpha << " beta=" << p.beta
                     << " c0=" << c[size_t(i)*p.ldc+j] << '\n';
-          throw std::runtime_error(stage==1 ? "TMA alias raw U bits differ from matching vector-pipeline WGMMA atom":
-                                   "TMA alias output bits differ from specified host RN-multiply/FMA oracle");
+          throw std::runtime_error(stage==1 ? "scheduled WGMMA raw U bits differ from matching vector-pipeline WGMMA atom":
+                                   "scheduled WGMMA output bits differ from specified host RN-multiply/FMA oracle");
         }
       }
     }
-    std::cout << "PASS_WGMMA_TMA_ALIAS_NATIVE_BITWISE dtype=" << megafmm::dtype_name(dtype)
+    std::cout << "PASS_WGMMA_" << wgmma_scheduled_family(variant) << "_NATIVE_BITWISE dtype=" << megafmm::dtype_name(dtype)
               << " variant=" << variant << " reference_variant=" << reference_variant << " shape=" << p.m << ',' << p.n << ',' << p.k
               << " alpha=" << p.alpha << " beta=" << p.beta << " alias=" << alias
               << " null_c0=" << (p.beta==0.0f)
@@ -1342,7 +1358,7 @@ template<class T> void wgmma_tma_alias_native_bitwise_suite(megafmm::DType dtype
               << " raw_u_bits=1 explicit_host_epilogue=1 padding_guard=1\n";
   }
 }
-template<class T> void wgmma_tma_alias_input_rebind_suite(megafmm::DType dtype,int variant) {
+template<class T> void wgmma_scheduled_input_rebind_suite(megafmm::DType dtype,int variant) {
   auto p=problem(128,128,128,dtype);
   std::vector<T> a(size_t(p.m)*p.lda),b(size_t(p.k)*p.ldb);
   std::vector<float> initial(size_t(p.m)*p.ldd+2,-777.0f),actual(initial.size());
@@ -1352,7 +1368,7 @@ template<class T> void wgmma_tma_alias_input_rebind_suite(megafmm::DType dtype,i
   policy.certified_range=true;policy.mega_variant=variant;policy.workspace_limit=0;
   auto plan=megafmm::create_plan(p,policy);
   require(plan->algorithm_name()==warp_mma_name(variant,p) && plan->workspace_bytes()==0,
-          "TMA alias rebind plan is not a native zero-workspace route");
+          "scheduled WGMMA rebind plan is not a native zero-workspace route");
   struct Binding {int a_buffer,b_buffer,a_shift,b_shift;};
   const std::vector<Binding> bindings={{0,0,0,0},{1,0,0,0},{0,1,0,0},{1,1,0,0},
                                       {0,0,8,8},{1,1,8,8},{0,0,1,0},{0,1,0,1},
@@ -1361,8 +1377,8 @@ template<class T> void wgmma_tma_alias_input_rebind_suite(megafmm::DType dtype,i
     const auto binding=bindings[phase];
     T* left=(binding.a_buffer ? da1:da0).template as<T>()+binding.a_shift;
     T* right=(binding.b_buffer ? db1:db0).template as<T>()+binding.b_shift;
-    // Different data as well as different allocations/16B address phases make
-    // a cached A map, cached B map or cached pair independently observable.
+    // Fresh data at independent A/B allocations and 16B address phases
+    // independently exercise both current input pointers and aligned recovery.
     for(int i=0;i<p.m;++i)for(int l=0;l<p.k;++l)
       a[size_t(i)*p.lda+l]=round_value<T>(float((i+3*l+int(phase))%5-2));
     for(int l=0;l<p.k;++l)for(int j=0;j<p.n;++j)
@@ -1378,20 +1394,22 @@ template<class T> void wgmma_tma_alias_input_rebind_suite(megafmm::DType dtype,i
     for(int i=0;i<p.m;++i)for(int j=0;j<p.n;++j) {
       double expected=0;
       for(int l=0;l<p.k;++l)expected+=double_value(a[size_t(i)*p.lda+l])*double_value(b[size_t(l)*p.ldb+j]);
-      require(double(actual[size_t(i)*p.ldd+j])==expected,"TMA alias current-pointer map rebind output incorrect");
+      require(double(actual[size_t(i)*p.ldd+j])==expected,"scheduled WGMMA current-pointer map rebind output incorrect");
     }
     for(size_t at=size_t(p.m)*p.ldd;at<actual.size();++at)
-      require(actual[at]==initial[at],"TMA alias rebind overwrote trailing D sentinel");
+      require(actual[at]==initial[at],"scheduled WGMMA rebind overwrote trailing D sentinel");
   }
-  std::cout << "PASS_WGMMA_TMA_ALIAS_INPUT_REBIND dtype=" << megafmm::dtype_name(dtype)
+  std::cout << "PASS_WGMMA_" << wgmma_scheduled_family(variant) << "_INPUT_REBIND dtype=" << megafmm::dtype_name(dtype)
             << " variant=" << variant << " bindings=10 native_bindings=7 dense_bindings=3"
             << " independent_A_B_allocations=1 aligned16_phase=1 fresh_AB_each_binding=1"
             << " element_only_A_B_both_dense=1 aligned_recovery=1 trailing_guard=1\n";
 }
-template<class T> void wgmma_tma_alias_graph_suite(megafmm::DType dtype,int variant) {
-  for(int scenario=0;scenario<3;++scenario) {
-    auto p=scenario==0 ? problem(128,variant==30 ? 32:64,64,dtype):
-           scenario==1 ? problem(128,256,192,dtype):problem(80,112,48,dtype);
+template<class T> void wgmma_scheduled_graph_suite(megafmm::DType dtype,int variant) {
+  for(int scenario=0;scenario<(variant>=32 ? 5:3);++scenario) {
+    auto p=scenario==0 ? problem(128,(variant==30 || variant==32) ? 32:64,64,dtype):
+           scenario==1 ? problem(128,256,192,dtype):
+           scenario==2 ? problem(80,112,48,dtype):
+           problem(128,(variant==32 ? 32:64),scenario==3 ? 1088:2112,dtype);
     p.lda+=8;p.ldb+=8;p.ldc+=1;p.ldd+=1;
     const bool active_beta=scenario!=0;
     if(active_beta) {p.alpha=.5f;p.beta=-.25f;} else p.beta=-0.0f;
@@ -1407,8 +1425,8 @@ template<class T> void wgmma_tma_alias_graph_suite(megafmm::DType dtype,int vari
     policy.certified_range=true;policy.mega_variant=variant;policy.workspace_limit=0;
     auto plan=megafmm::create_plan(p,policy);
     require(plan->algorithm_name()==warp_mma_name(variant,p) && plan->workspace_bytes()==0,
-            "TMA alias graph route/workspace incorrect");
-    std::cout << "BEGIN_WGMMA_TMA_ALIAS_GRAPH dtype=" << megafmm::dtype_name(dtype)
+            "scheduled WGMMA graph route/workspace incorrect");
+    std::cout << "BEGIN_WGMMA_" << wgmma_scheduled_family(variant) << "_GRAPH dtype=" << megafmm::dtype_name(dtype)
               << " variant=" << variant << " shape=" << p.m << ',' << p.n << ',' << p.k
               << " actual=" << plan->algorithm_name() << " alias=" << active_beta
               << " null_c0=" << !active_beta << " input_shift_bytes=" << input_shift*sizeof(T)
@@ -1419,10 +1437,10 @@ template<class T> void wgmma_tma_alias_graph_suite(megafmm::DType dtype,int vari
     megafmm::run(*plan,left,right,active_beta ? output:nullptr,output,nullptr,stream.value);
     check(cudaStreamEndCapture(stream.value,&graph.value));
     size_t nodes=0;check(cudaGraphGetNodes(graph.value,nullptr,&nodes));
-    require(nodes==1,"TMA alias full invocation did not capture exactly one kernel node");
+    require(nodes==1,"scheduled WGMMA full invocation did not capture exactly one kernel node");
     cudaGraphNode_t node=nullptr;size_t one=1;check(cudaGraphGetNodes(graph.value,&node,&one));
     cudaGraphNodeType type;check(cudaGraphNodeGetType(node,&type));
-    require(type==cudaGraphNodeTypeKernel,"TMA alias captured node is not a kernel");
+    require(type==cudaGraphNodeTypeKernel,"scheduled WGMMA captured node is not a kernel");
     check(cudaGraphInstantiate(&graph.executable,graph.value,0));
     for(int replay=0;replay<3;++replay) {
       for(int i=0;i<p.m;++i)for(int l=0;l<p.k;++l)a[size_t(i)*p.lda+l]=round_value<T>(float(int(rng()%5)-2));
@@ -1430,7 +1448,7 @@ template<class T> void wgmma_tma_alias_graph_suite(megafmm::DType dtype,int vari
       std::fill(reference_ab.begin(),reference_ab.end(),0.0);
       for(int i=0;i<p.m;++i)for(int j=0;j<p.n;++j)for(int l=0;l<p.k;++l)
         reference_ab[size_t(i)*p.n+j]+=double_value(a[size_t(i)*p.lda+l])*double_value(b[size_t(l)*p.ldb+j]);
-      if(scenario<2)require(m1_integer_reference(p,a,b)==reference_ab,"TMA alias graph independent complete-P DAG differs from fresh AB");
+      if(scenario!=2)require(m1_integer_reference(p,a,b)==reference_ab,"scheduled WGMMA graph independent complete-P DAG differs from fresh AB");
       for(int i=0;i<p.m;++i)for(int j=0;j<p.n;++j)c[size_t(i)*p.ldc+j]=float((i+j+3*replay)%9-4)/4.0f;
       // Refresh original rounded inputs at captured addresses, and restore the
       // immutable C0 snapshot before replay. Capture never precomputes S/T.
@@ -1441,27 +1459,27 @@ template<class T> void wgmma_tma_alias_graph_suite(megafmm::DType dtype,int vari
       check(cudaMemcpy(actual.data(),output,actual.size()*sizeof(float),cudaMemcpyDeviceToHost));
       for(int i=0;i<p.m;++i)for(int j=0;j<p.n;++j)
         require(double(actual[size_t(i)*p.ldd+j])==double(p.alpha)*reference_ab[size_t(i)*p.n+j]+double(p.beta)*c[size_t(i)*p.ldc+j],
-                "TMA alias graph output differs from fresh original-input FP64 AB");
+                "scheduled WGMMA graph output differs from fresh original-input FP64 AB");
       for(int i=0;i<p.m;++i)for(int j=int(p.n);j<p.ldd;++j)
-        require(actual[size_t(i)*p.ldd+j]==-777.0f,"TMA alias graph overwrote output padding");
+        require(actual[size_t(i)*p.ldd+j]==-777.0f,"scheduled WGMMA graph overwrote output padding");
       for(size_t at=size_t(p.m)*p.ldd;at<actual.size();++at)
-        require(actual[at]==-777.0f,"TMA alias graph overwrote trailing D sentinel");
+        require(actual[at]==-777.0f,"scheduled WGMMA graph overwrote trailing D sentinel");
     }
-    std::cout << "PASS_WGMMA_TMA_ALIAS_GRAPH dtype=" << megafmm::dtype_name(dtype)
+    std::cout << "PASS_WGMMA_" << wgmma_scheduled_family(variant) << "_GRAPH dtype=" << megafmm::dtype_name(dtype)
               << " variant=" << variant << " shape=" << p.m << ',' << p.n << ',' << p.k
               << " actual=" << plan->algorithm_name() << " alias=" << active_beta
               << " null_c0=" << !active_beta << " refresh_ab=1 fixed_capture_AB_addresses=1 replays=3 kernel_nodes=1\n";
   }
 }
-void wgmma_tma_alias_policy_suite(int variant) {
+void wgmma_scheduled_policy_suite(int variant) {
   for(auto algorithm:{megafmm::Algorithm::Auto,megafmm::Algorithm::Dense,megafmm::Algorithm::WinogradLt,
                       megafmm::Algorithm::WinogradHopper,megafmm::Algorithm::Megakernel})
   for(int scenario=0;scenario<4;++scenario) {
     auto p=problem(128,128,128,megafmm::DType::BF16);
     if(scenario==1)p.m=0;if(scenario==2)p.alpha=0;if(scenario==3)p.k=0;
-    megafmm::Policy invalid;invalid.algorithm=algorithm;invalid.mega_variant=32;invalid.certified_range=true;
+    megafmm::Policy invalid;invalid.algorithm=algorithm;invalid.mega_variant=34;invalid.certified_range=true;
     bool rejected=false;try {auto plan=megafmm::create_plan(p,invalid);}catch(const std::exception&) {rejected=true;}
-    require(rejected,"invalid Mega32 accepted before normal/empty/alpha0/K0 dispatch");
+    require(rejected,"invalid Mega34 accepted before normal/empty/alpha0/K0 dispatch");
   }
   for(auto dtype:{megafmm::DType::BF16,megafmm::DType::FP16}) {
     megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::Megakernel;
@@ -1470,7 +1488,7 @@ void wgmma_tma_alias_policy_suite(int variant) {
       auto p=problem(zero_dim==0 ? 0:9,zero_dim==1 ? 0:11,17,dtype);
       auto plan=megafmm::create_plan(p,policy);
       require(plan->workspace_bytes()==0 && plan->lt_algorithm_config(nullptr,nullptr,nullptr,nullptr,nullptr)=="none",
-              "TMA alias empty plan unexpectedly requires inputs/workspace");
+              "scheduled WGMMA empty plan unexpectedly requires inputs/workspace");
       megafmm::run(*plan,nullptr,nullptr,nullptr,nullptr,nullptr);
     }
     for(bool alpha_zero:{false,true})for(float beta:{0.0f,.5f}) {
@@ -1483,18 +1501,44 @@ void wgmma_tma_alias_policy_suite(int variant) {
       auto plan=megafmm::create_plan(p,policy);
       require(plan->workspace_bytes()==0 &&
               plan->lt_algorithm_config(nullptr,nullptr,beta==0 ? nullptr:dc.as<float>(),dd.as<float>(),nullptr)=="none",
-              "TMA alias scale plan unexpectedly requires maps/workspace");
+              "scheduled WGMMA scale plan unexpectedly requires maps/workspace");
       megafmm::run(*plan,nullptr,nullptr,beta==0 ? nullptr:dc.as<float>(),dd.as<float>(),nullptr);
       check(cudaDeviceSynchronize());
       check(cudaMemcpy(actual.data(),dd.data,actual.size()*sizeof(float),cudaMemcpyDeviceToHost));
-      for(size_t at=0;at<c.size();++at)require(actual[at]==beta*c[at],"TMA alias degenerate beta*C0 output incorrect");
+      for(size_t at=0;at<c.size();++at)require(actual[at]==beta*c[at],"scheduled WGMMA degenerate beta*C0 output incorrect");
     }
     auto p=problem(128,128,128,dtype);policy.algorithm=megafmm::Algorithm::Auto;
-    require(megafmm::create_plan(p,policy)->algorithm_name()=="dense_cublaslt","TMA alias candidate enabled uncertified Auto SW");
+    require(megafmm::create_plan(p,policy)->algorithm_name()=="dense_cublaslt","scheduled WGMMA candidate enabled uncertified Auto SW");
   }
-  std::cout << "PASS_WGMMA_TMA_ALIAS_POLICY variant=" << variant
-            << " invalid32_cases=20 validate_before_empty_scale=1 empty_cases=4 scale_cases=8 auto_dense_dtypes=2\n";
+  std::cout << "PASS_WGMMA_" << wgmma_scheduled_family(variant) << "_POLICY variant=" << variant
+            << " invalid34_cases=20 validate_before_empty_scale=1 empty_cases=4 scale_cases=8 auto_dense_dtypes=2\n";
 }
+template<class T> void wgmma_tma_alias_suite(megafmm::DType dtype,int variant) {
+  wgmma_scheduled_suite<T>(dtype,variant);
+}
+template<class T> void wgmma_tma_alias_native_bitwise_suite(megafmm::DType dtype,int variant) {
+  wgmma_scheduled_native_bitwise_suite<T>(dtype,variant);
+}
+template<class T> void wgmma_tma_alias_input_rebind_suite(megafmm::DType dtype,int variant) {
+  wgmma_scheduled_input_rebind_suite<T>(dtype,variant);
+}
+template<class T> void wgmma_tma_alias_graph_suite(megafmm::DType dtype,int variant) {
+  wgmma_scheduled_graph_suite<T>(dtype,variant);
+}
+void wgmma_tma_alias_policy_suite(int variant) {wgmma_scheduled_policy_suite(variant);}
+template<class T> void wgmma_wait1_suite(megafmm::DType dtype,int variant) {
+  wgmma_scheduled_suite<T>(dtype,variant);
+}
+template<class T> void wgmma_wait1_native_bitwise_suite(megafmm::DType dtype,int variant) {
+  wgmma_scheduled_native_bitwise_suite<T>(dtype,variant);
+}
+template<class T> void wgmma_wait1_input_rebind_suite(megafmm::DType dtype,int variant) {
+  wgmma_scheduled_input_rebind_suite<T>(dtype,variant);
+}
+template<class T> void wgmma_wait1_graph_suite(megafmm::DType dtype,int variant) {
+  wgmma_scheduled_graph_suite<T>(dtype,variant);
+}
+void wgmma_wait1_policy_suite(int variant) {wgmma_scheduled_policy_suite(variant);}
 template<class T> void fused_input_product_slots(megafmm::DType dtype,int variant) {
   auto p=problem(64,variant==9 ? 64:128,64,dtype);
   p.lda+=8;p.ldb+=8;
@@ -2303,7 +2347,7 @@ template<class T> void cluster_graph_suite(megafmm::DType dtype,int variant=13) 
 }
 template<class T> void epilogue_output_rebind_suite(megafmm::DType dtype,int variant=14) {
   for(bool identity:{false,true}) {
-  if(identity && variant!=15 && variant!=16 && variant!=19 && variant!=20 && variant!=21 && variant!=22 && variant!=23 && variant!=24 && variant!=25 && variant!=26 && variant!=27 && variant!=28 && variant!=29 && variant!=30 && variant!=31)continue;
+  if(identity && variant!=15 && variant!=16 && variant!=19 && variant!=20 && variant!=21 && variant!=22 && variant!=23 && variant!=24 && variant!=25 && variant!=26 && variant!=27 && variant!=28 && variant!=29 && variant!=30 && variant!=31 && variant!=32 && variant!=33)continue;
   auto p=problem(128,128,128,dtype);
   if(!identity) {p.alpha=.5f;p.beta=-.25f;}
   std::mt19937 rng(776655u);
@@ -2450,7 +2494,7 @@ void batched_policy_rejection_suite(bool lt_only=false) {
   for(auto algorithm:{megafmm::Algorithm::Auto,megafmm::Algorithm::Dense,megafmm::Algorithm::WinogradLt,
                       megafmm::Algorithm::WinogradHopper,megafmm::Algorithm::Megakernel})
   for(int scenario=0;scenario<4;++scenario) for(int family=0;family<3;++family)
-  for(int variant:{-1,family==0 ? 2:family==1 ? 13:32}) {
+  for(int variant:{-1,family==0 ? 2:family==1 ? 13:34}) {
     if(lt_only && family!=0)continue;
     megafmm::Policy policy;policy.algorithm=algorithm;policy.certified_range=true;
     if(family==0)policy.lt_variant=variant;
@@ -2559,7 +2603,7 @@ void rejection_suite() {
   } catch(const std::exception&) { overlap_rejected=true; }
   require(overlap_rejected,"runtime pointer range overflow accepted");
 }
-template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false,bool pipeline_only=false,bool tma_only=false) {
+template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false,bool pipeline_only=false,bool tma_only=false,bool wait1_only=false) {
   bool pass=true;double floor=dtype==megafmm::DType::BF16 ? 1e-3:1e-4;
   struct Candidate { megafmm::Algorithm algorithm;int variant; };
   std::vector<Candidate> candidates={{megafmm::Algorithm::WinogradLt,0},{megafmm::Algorithm::WinogradLt,1}};
@@ -2575,9 +2619,12 @@ template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false
   candidates.push_back({megafmm::Algorithm::Megakernel,29});
   candidates.push_back({megafmm::Algorithm::Megakernel,30});
   candidates.push_back({megafmm::Algorithm::Megakernel,31});
+  candidates.push_back({megafmm::Algorithm::Megakernel,32});
+  candidates.push_back({megafmm::Algorithm::Megakernel,33});
   if(k128_only)candidates={{megafmm::Algorithm::Megakernel,24},{megafmm::Algorithm::Megakernel,25}};
   if(pipeline_only)candidates={{megafmm::Algorithm::Megakernel,28},{megafmm::Algorithm::Megakernel,29}};
   if(tma_only)candidates={{megafmm::Algorithm::Megakernel,30},{megafmm::Algorithm::Megakernel,31}};
+  if(wait1_only)candidates={{megafmm::Algorithm::Megakernel,32},{megafmm::Algorithm::Megakernel,33}};
   for(auto pat:{Pattern::Uniform,Pattern::Positive,Pattern::Range,Pattern::Cancellation,Pattern::HighHalf}) {
     std::vector<std::vector<double>> ef(candidates.size());
     std::vector<double> dense_ef;
@@ -2588,7 +2635,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false
       // 256 cubed gives variant 3 complete output tiles and therefore exercises
       // its new beta=0 fast kernel rather than only its general fallback.
       auto p=problem(256,256,k128_only ? 128:256,dtype);uint32_t seed=1234567+trial*918273;
-      auto dense=run_case<T>(p,megafmm::Algorithm::Dense,pat,false,certified,seed,0,!k128_only && !pipeline_only && !tma_only);
+      auto dense=run_case<T>(p,megafmm::Algorithm::Dense,pat,false,certified,seed,0,!k128_only && !pipeline_only && !tma_only && !wait1_only);
       dense_ef.push_back(dense.ef);
       for(size_t candidate=0;candidate<candidates.size();++candidate) {
         const auto algo=candidates[candidate].algorithm;
@@ -2599,7 +2646,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false
         const bool fused=algo==megafmm::Algorithm::WinogradHopper && variant>=9;
         const char* expected_route=fused ?
             (certified ? batched_name(algo,variant):"dense_cublaslt"):
-            (k128_only || (algo==megafmm::Algorithm::Megakernel && (variant==26 || variant==27 || variant==28 || variant==29 || variant==30 || variant==31))) ?
+            (k128_only || (algo==megafmm::Algorithm::Megakernel && (variant==26 || variant==27 || variant==28 || variant==29 || variant==30 || variant==31 || variant==32 || variant==33))) ?
             (certified ? warp_mma_name(variant,p):"dense_cublaslt"):nullptr;
         auto sw=run_case<T>(p,algo,pat,false,certified,seed,variant,false,size_t(8)<<30,expected_route);
         bool finite=dense.nonfinite==0 && sw.nonfinite==0;
@@ -2638,13 +2685,14 @@ template<class T> bool strict_numerics(megafmm::DType dtype,bool k128_only=false
 int main(int argc,char** argv) {
   try {
     std::cout << std::unitbuf;std::cerr << std::unitbuf;
-    const std::string usage="usage: test_correctness [--strict-numerics | --strict-pipeline-only | --strict-tma-only] [--smoke-batched | --smoke-candidates [--mega-only] [--mega-variant 0..31 | --hopper-variant 0..12]]";
-    bool numeric=false,pipeline_numeric_only=false,tma_numeric_only=false,candidates_only=false,mega_only=false,batched_only=false;
+    const std::string usage="usage: test_correctness [--strict-numerics | --strict-pipeline-only | --strict-tma-only | --strict-wait1-only] [--smoke-batched | --smoke-candidates [--mega-only] [--mega-variant 0..33 | --hopper-variant 0..12]]";
+    bool numeric=false,pipeline_numeric_only=false,tma_numeric_only=false,wait1_numeric_only=false,candidates_only=false,mega_only=false,batched_only=false;
     int hopper_filter=-1,mega_filter=-1;
     for(int i=1;i<argc;++i) {
       if(std::string(argv[i])=="--strict-numerics")numeric=true;
       else if(std::string(argv[i])=="--strict-pipeline-only")pipeline_numeric_only=true;
       else if(std::string(argv[i])=="--strict-tma-only")tma_numeric_only=true;
+      else if(std::string(argv[i])=="--strict-wait1-only")wait1_numeric_only=true;
       else if(std::string(argv[i])=="--smoke-batched")batched_only=true;
       else if(std::string(argv[i])=="--smoke-candidates")candidates_only=true;
       else if(std::string(argv[i])=="--mega-only")mega_only=true;
@@ -2652,7 +2700,7 @@ int main(int argc,char** argv) {
         require(i+1<argc,usage);
         std::string value=argv[++i];size_t consumed=0;
         mega_filter=std::stoi(value,&consumed);
-        require(consumed==value.size() && mega_filter>=0 && mega_filter<=31,usage);
+        require(consumed==value.size() && mega_filter>=0 && mega_filter<=33,usage);
       }
       else if(std::string(argv[i])=="--hopper-variant") {
         require(i+1<argc,usage);
@@ -2666,10 +2714,17 @@ int main(int argc,char** argv) {
     require(!mega_only || hopper_filter<0,"--mega-only and --hopper-variant cannot be combined; "+usage);
     require(mega_filter<0 || hopper_filter<0,"--mega-variant and --hopper-variant cannot be combined; "+usage);
     require(!batched_only || !candidates_only,"--smoke-batched and --smoke-candidates cannot be combined; "+usage);
-    require(!pipeline_numeric_only || (!numeric && !tma_numeric_only && !candidates_only && !batched_only),
+    require(!pipeline_numeric_only || (!numeric && !tma_numeric_only && !wait1_numeric_only && !candidates_only && !batched_only),
             "--strict-pipeline-only is a separate numerical scope; "+usage);
-    require(!tma_numeric_only || (!numeric && !pipeline_numeric_only && !candidates_only && !batched_only),
+    require(!tma_numeric_only || (!numeric && !pipeline_numeric_only && !wait1_numeric_only && !candidates_only && !batched_only),
             "--strict-tma-only is a separate numerical scope; "+usage);
+    require(!wait1_numeric_only || (!numeric && !pipeline_numeric_only && !tma_numeric_only && !candidates_only && !batched_only),
+            "--strict-wait1-only is a separate numerical scope; "+usage);
+    if(wait1_numeric_only) {
+      bool bf16_pass=strict_numerics<__nv_bfloat16>(megafmm::DType::BF16,false,false,false,true);
+      bool fp16_pass=strict_numerics<__half>(megafmm::DType::FP16,false,false,false,true);
+      return bf16_pass && fp16_pass ? 0:2;
+    }
     if(tma_numeric_only) {
       bool bf16_pass=strict_numerics<__nv_bfloat16>(megafmm::DType::BF16,false,false,true);
       bool fp16_pass=strict_numerics<__half>(megafmm::DType::FP16,false,false,true);
@@ -2690,6 +2745,21 @@ int main(int argc,char** argv) {
       return 0;
     }
     if(candidates_only) {
+      if(mega_filter==32 || mega_filter==33) {
+        wgmma_wait1_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);
+        wgmma_wait1_suite<__half>(megafmm::DType::FP16,mega_filter);
+        wgmma_wait1_native_bitwise_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);
+        wgmma_wait1_native_bitwise_suite<__half>(megafmm::DType::FP16,mega_filter);
+        wgmma_wait1_input_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);
+        wgmma_wait1_input_rebind_suite<__half>(megafmm::DType::FP16,mega_filter);
+        epilogue_output_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);
+        epilogue_output_rebind_suite<__half>(megafmm::DType::FP16,mega_filter);
+        wgmma_wait1_graph_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);
+        wgmma_wait1_graph_suite<__half>(megafmm::DType::FP16,mega_filter);
+        wgmma_wait1_policy_suite(mega_filter);
+        std::cout << "PASS selected WGMMA WAIT1 integer DAG, phase wraps, sameatom raw U, host epilogue, current inputs, scalar outputs, Graph and policy tests\n";
+        return 0;
+      }
       if(mega_filter==30 || mega_filter==31) {
         wgmma_tma_alias_suite<__nv_bfloat16>(megafmm::DType::BF16,mega_filter);
         wgmma_tma_alias_suite<__half>(megafmm::DType::FP16,mega_filter);
@@ -2999,6 +3069,19 @@ int main(int argc,char** argv) {
       wgmma_tma_alias_graph_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
       wgmma_tma_alias_graph_suite<__half>(megafmm::DType::FP16,variant);
       wgmma_tma_alias_policy_suite(variant);
+    }
+    for(int variant:{32,33}) {
+      wgmma_wait1_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      wgmma_wait1_suite<__half>(megafmm::DType::FP16,variant);
+      wgmma_wait1_native_bitwise_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      wgmma_wait1_native_bitwise_suite<__half>(megafmm::DType::FP16,variant);
+      wgmma_wait1_input_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      wgmma_wait1_input_rebind_suite<__half>(megafmm::DType::FP16,variant);
+      epilogue_output_rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      epilogue_output_rebind_suite<__half>(megafmm::DType::FP16,variant);
+      wgmma_wait1_graph_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      wgmma_wait1_graph_suite<__half>(megafmm::DType::FP16,variant);
+      wgmma_wait1_policy_suite(variant);
     }
     stage_m2_suite<__nv_bfloat16>(megafmm::DType::BF16);
     stage_m2_suite<__half>(megafmm::DType::FP16);

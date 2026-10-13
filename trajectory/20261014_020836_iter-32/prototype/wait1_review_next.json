@@ -1,0 +1,402 @@
+{
+  "status": "PASS_CPU_PINNED_API_SOURCE_ONLY",
+  "reviewer": "/root/design1024",
+  "date": "2026-10-14",
+  "scope": "Future iteration32 vector-producer wait1 prototype only; not merged into iteration31 TMA.",
+  "files_sha256": {
+    "solution/megakernel_wgmma_pipeline.cu": "3243483e1e84e1fc2785c38904eba6b565b0c8f72876d1664e4c88881b4f4fde",
+    ".scratch/megakernel_wgmma_wait1.cu": "80e4ee8f6df3ba738ef10101b9224c701abbb517de993a7ea7d1d710bbd8ae91",
+    ".scratch/megakernel_wgmma_wait1.md": "206ccea3a888b7b6bfd76fa250166e385ade246f9d1b4de8281ac556dc0d105e",
+    ".scratch/wgmma_wait1_next.md": "c041c3cec675dc8e3dc75fd98c42feff8a7206eec63535f3d2c73e5310b3403b",
+    ".scratch/wgmma_wait1_state_model.py": "f2ddcefde43fc7fc5193d74a39e447df9bfb2a64b95c87e8972dd9f73fbc4df6",
+    ".scratch/tma_two_consumer_next.md": "7d6b3838a2f7ae33f7892305c8571a97a6ffc94a488126db6509372caa9af736"
+  },
+  "authorization": "Read-only formal/prototype review and CPU Python only. Sole writes: .scratch/wait1_review_next.json and .scratch/wait1_review_next.md. No compilation, CUDA, GPU, build, git, formal-file mutation.",
+  "unchanged_normalized_blocks": [
+    "layout_and_vector_helpers",
+    "kernel_init_producer_and_tail",
+    "quotas_fragments_and_clear",
+    "descriptors_and_issue_fences",
+    "seven_gemm_calls",
+    "U_alpha_beta_C0_D_epilogue",
+    "host_native_API"
+  ],
+  "changed_device_path": "Consumer scheduling only: separate read/retire states, software pending, oldest-group wait1/release, final wait0/drain. Name/comments/error-string changes are separate.",
+  "pinned_evidence": [
+    {
+      "path": "third_party/cutlass/include/cutlass/gemm/collective/sm90_mma_tma_gmma_ss_warpspecialized.hpp",
+      "lines": [
+        262,
+        475,
+        478,
+        498,
+        538,
+        542,
+        545,
+        546,
+        549,
+        552,
+        553,
+        564,
+        569,
+        572
+      ],
+      "claim": "SS K_PIPE_MMAS=1 uses independent read/release states, prologue unreleased, subsequent commit plus wait1 before oldest release, tail wait0 before final release."
+    },
+    {
+      "url": "https://docs.nvidia.com/cuda/archive/12.4.0/parallel-thread-execution/index.html",
+      "sections": [
+        "9.7.14.7.1",
+        "9.7.14.7.2",
+        "9.7.14.7.3"
+      ],
+      "claim": "Same-shape asynchronous accumulator accesses have default ordering. wait1 proves completion of all groups older than the most recent one; generic accumulator access needs a covering wait. Same-warpgroup uniform aligned instructions required."
+    },
+    {
+      "path": "third_party/cutlass/include/cute/arch/mma_sm90_gmma.hpp",
+      "lines": [
+        45,
+        59,
+        72,
+        83,
+        94
+      ],
+      "claim": "arrive emits hardware WGMMA fence; commit/wait are volatile memory-clobber asm; operand fences are empty +f/+r compiler constraints, not generic GPU reads."
+    },
+    {
+      "path": "third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp",
+      "lines": [
+        44,
+        2033,
+        2076
+      ],
+      "claim": "Tensor operand fences recurse over register fragments; BM64 BN16/32 BF16/FP16 selected SS atom has K16 and scaleOut One."
+    },
+    {
+      "path": "third_party/cutlass/include/cute/algorithm/gemm.hpp",
+      "lines": [
+        79,
+        413
+      ],
+      "claim": "Three-operand gemm routes D and C to the same P tensor; K expansion is ascending. BK32 yields two K16 ops/P, fourteen same-shape WGMMAs/group."
+    },
+    {
+      "path": "third_party/cutlass/include/cutlass/pipeline/sm90_pipeline.hpp",
+      "lines": [
+        830,
+        891,
+        935,
+        966,
+        1035
+      ],
+      "claim": "PipelineAsync2 full/empty counts128/128, same all-thread init/CTA barrier, release arrives once/thread, producer_tail independently acquires next two empty phases."
+    }
+  ],
+  "author_model_independent_rerun": {
+    "model_sha256": "f2ddcefde43fc7fc5193d74a39e447df9bfb2a64b95c87e8972dd9f73fbc4df6",
+    "stage_counts": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "states": 1570,
+    "transitions": 2302,
+    "randomized_sequences": 416,
+    "randomized_actions": 114464,
+    "random_stage_counts": [
+      0,
+      1,
+      2,
+      3,
+      7,
+      8,
+      15,
+      16,
+      17,
+      32,
+      33,
+      64,
+      512
+    ],
+    "out_of_order_completion_allowed": true,
+    "producer_tail_explicit": true,
+    "mutation_witnesses": [
+      "release_first_after_wait1_is_unsafe",
+      "release_latest_is_unsafe",
+      "generic_U_after_tail_wait1_is_unsafe"
+    ]
+  },
+  "independent_model": {
+    "implementation": "Separate inline stdlib BFS, not importing author model. Nine-tuple state (produced, committed, retired, producer_tail_acquires, consumer_mode, bank_owners, completed_flags, empty_phase_bits, full_phase_bits). Empty/full bits are explicitly toggled by release/publication and separately checked against counts; wait1+oldest collective release collapsed into one event. Arbitrary completion events for both groups; final wait0 is a separate event before tail release. Producer tail may acquire unused/freed banks before consumer drain.",
+    "invariants": [
+      "retired <= committed <= produced <= stages",
+      "at most two bank owners and two committed unreleased groups",
+      "exact owner IDs in [retired, produced)",
+      "no reuse before completed oldest release flips empty phase",
+      "full phase flips exactly once on producer publication; empty phase on consumer collective release",
+      "consumer read and producer acquire each check own bank parity",
+      "wait1 only with exactly two unretired groups and completed oldest, independent of latest completion",
+      "final wait0 waits every unretired group before tail release and generic-access boundary",
+      "producer_tail has exactly two independent phase-valid acquire events",
+      "only consumer_done plus producer_tail_acquires==2 can be a terminal state"
+    ],
+    "exhaustive_rows": [
+      {
+        "stages": 0,
+        "states": 6,
+        "transitions": 7,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 0,
+        "early_producer_tail_states": 2
+      },
+      {
+        "stages": 1,
+        "states": 12,
+        "transitions": 15,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 0,
+        "early_producer_tail_states": 4
+      },
+      {
+        "stages": 2,
+        "states": 20,
+        "transitions": 27,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 1,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 3,
+        "states": 28,
+        "transitions": 39,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 2,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 4,
+        "states": 36,
+        "transitions": 51,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 3,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 5,
+        "states": 44,
+        "transitions": 63,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 4,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 6,
+        "states": 52,
+        "transitions": 75,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 5,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 7,
+        "states": 60,
+        "transitions": 87,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 6,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 8,
+        "states": 68,
+        "transitions": 99,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 7,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 9,
+        "states": 76,
+        "transitions": 111,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 8,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 10,
+        "states": 84,
+        "transitions": 123,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 9,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 11,
+        "states": 92,
+        "transitions": 135,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 10,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 12,
+        "states": 100,
+        "transitions": 147,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 11,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 13,
+        "states": 108,
+        "transitions": 159,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 12,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 14,
+        "states": 116,
+        "transitions": 171,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 13,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 15,
+        "states": 124,
+        "transitions": 183,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 14,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 16,
+        "states": 132,
+        "transitions": 195,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 15,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 17,
+        "states": 140,
+        "transitions": 207,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 16,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 32,
+        "states": 260,
+        "transitions": 387,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 31,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 33,
+        "states": 268,
+        "transitions": 399,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 32,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 64,
+        "states": 516,
+        "transitions": 771,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 63,
+        "early_producer_tail_states": 3
+      },
+      {
+        "stages": 512,
+        "states": 4100,
+        "transitions": 6147,
+        "terminal_states": 1,
+        "out_of_order_completion_states": 511,
+        "early_producer_tail_states": 3
+      }
+    ],
+    "states": 6442,
+    "transitions": 9598,
+    "no_nonterminal_deadlocks": true,
+    "one_fully_drained_terminal_per_stage_count": true,
+    "limitations": "Collective128-thread arrival and one group containing all fourteen operations are source-derived aggregate events. This model deliberately overapproximates completion order; it is not a physical execution-order, compiler, mbarrier or GPU liveness certificate."
+  },
+  "source_protocol_findings": [
+    "Each group uses a single read bank for all seven P; no empty commits and no group spans banks.",
+    "First commit stays owned; later commit makes pending2, wait1 covers older only, then retire128 arrivals frees exactly that bank.",
+    "pending is unreleased committed-group count, not actual incomplete-group count; at most2 briefly and1 after retire.",
+    "At loop exit only final group remains owned for nonzero stages; unconditional wait0 before drain and operand fences makes first generic U access safe.",
+    "No source clear/copy/scale/debug/generic P read in the issue loop; operand fences are only compiler constraints.",
+    "Original vector producer, original S/T RN and one cast, complete chronological seven-P K, fixed U RN/alphaRN/betaFMA and active C0 all-four-read-before-store remain unchanged.",
+    "Host metadata/current AB guards remain identical; native helper only. Future Plan owns complete span/overlap/alias/hardware/degenerate validation and truthful fallback."
+  ],
+  "resource_hard_pending_gates": {
+    "producer_quota": 64,
+    "consumer_quota_BN16": 96,
+    "consumer_quota_BN32": 160,
+    "minimum_CTA_owned_pool_BN16": 20480,
+    "minimum_CTA_owned_pool_BN32": 28672,
+    "initial_quota_without_extra_reservation_BN16": [
+      80,
+      96
+    ],
+    "initial_quota_without_extra_reservation_BN32": [
+      112,
+      160
+    ],
+    "checks": [
+      "actual per-CTA owned pool/granularity and legal setmaxnreg inc/dec direction",
+      "producer role SASS and calls/implicit-wide operands within64",
+      "consumer role SASS and calls/implicit-wide operands within96/160",
+      "no generic accumulator materialization or spill/reload while group active",
+      "both dtypes and both tiles actual template instantiation; bounded vector sentinels retained",
+      "new GPU raw P/U/output comparison and original independent numerical gates",
+      "sanitizer/current AB/fresh contents/C0==D/beta0 and Graph/tail cases",
+      "complete ordinary and Graph timing against source30 and independently tuned cuBLAS"
+    ],
+    "not_inherited": [
+      "formal30 initial/role quota/SASS/spill evidence",
+      "formal31 TMA resource or performance results"
+    ]
+  },
+  "known_sentinel_boundary": "Inherited flagged Layout(coord) edge check is a bounded sentinel; flagged byte-swizzle placeholder operator is not a full physical-address proof. No operand layout changes occur here; prior physical-pointer geometry/source30 evidence is separate. New actual template compile remains pending.",
+  "hybrid_doc_narrow_review": {
+    "sha256": "7d6b3838a2f7ae33f7892305c8571a97a6ffc94a488126db6509372caa9af736",
+    "status": "PASS_CPU_DOCUMENT_SCOPE_ONLY",
+    "findings": [
+      "SW64 direct N16 child raw start+16g elements and parent K8/P strides correct;114688 active address geometry CPU only",
+      "standard parent SW32 needs36 total copies; naive12 copy compact half-box mismatches parent K8 stride",
+      "splitcompact SW32 uses12 copies with changed physical layout and matched single/dual controls",
+      "full128/empty256 and CTA minimum role pool32768, uniforminitial88, possible single-CTA limit documented",
+      "actual SW64 child templates/descriptors/GPU and resource/performance gates remain pending; not merged31"
+    ]
+  },
+  "not_certified": [
+    "CUDA/template compilation",
+    "ptxas resource counts or owned-quota legality",
+    "role SASS or absence of compiler accumulator accesses",
+    "GPU correctness, numerical pass, raw P/U bitwise equality",
+    "Graph legality or sanitizer",
+    "hardware liveness or performance",
+    "speedup vs cuBLAS",
+    "Auto eligibility"
+  ]
+}

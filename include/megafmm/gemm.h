@@ -63,6 +63,9 @@ struct Policy {
   // 30/31=TMA raw aliases in final banks64x16/64x32, one launch; two
   // current-pointer tensor-map encodes occur in each run/capture, not setup.
   // Same packed7/Dense fallbacks; no global S/T/P or native workspace.
+  // 32/33=vector producer64x16/64x32 with two WGMMA groups in flight,
+  // wait1 retires only the old bank; tail wait0 precedes fixed U. One launch.
+  // Original precision and packed7/Dense guards; no native matrix workspace.
   int mega_variant=0;
 };
 class Plan {

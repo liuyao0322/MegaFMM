@@ -1456,3 +1456,34 @@ Same frozen source `20363e90a7a936e80f471fede0e16b96855ca11f` / bench SHA `9e3b6
 New31 beats new30, but retained29 remains faster in all four combinations. Multi-launchLt1 remains the observed allSW control winner (ordinary19.373120/19.501120µs; Graph17.002881/17.225280µs), distinct from trueMegakernel target. Ordinary includes two actual currentpointer tensor-map encodes per complete hostloop invocation then one kernel; batchwall/call includes submission and batchsync, not independent synchronized singlecall wall or isolated encode time. Graph captures fixed descriptor bindings and freshly recomputes all input transforms each replay; no host encode on replay.
 
 DefaultGPU2126CASE933PASS, selected30/31 22/24CASE38PASS, CPU DAG3+stage6 PASS, new36 sameatom rawU/host specifiedepilogue groups and40currentbindingchecks PASS, new12Graph36fresh one-node replays PASS. New strict60=36PASS24FAIL/NF0 (48native12Dense rangefallback); six targeted CUDA12.8SAN exit0,0errors/0racehazards/warnings, mem2 leak0. Structure/bitwise checks do not replace original numerical certification. Final report/profile/raw evidence and independent compiled/data audits are archived; original26 CUDA/source23–30 bytes retained. TMA31 performance status is regression against retained29, not an improvement. No floor, exhausted-direction, isolated traffic or encode causal claim.
+
+### Iter 32 — Overlap two committed WGMMA groups with vector producer
+
+- **Hypothesis:** Retain identical vector producer/tile/whole-sevenP; consumer wait1 retires the old bank while latest group remains in flight, reducing per-stage forced wait0.
+- **Changes:** Native Mega32/33 BM64 BN16/32 BK32 PipelineAsync2 with separate read/retire states and final wait0 before genericP/U. Original singlecast RN S/T, complete7P/fixedU, alphaRN betaFMA, public binding/overlap guards, packed7/Dense fallback and AutoDense retained. All27 prior CUDA files unchanged. Independent new compiled quota/inflight-P gate passed before firstlaunch.
+- **Bench:** Compiled=True; quick18rows20warm20calls5groups1fresh; original numerical failures retained; no certification.
+
+| M,N,K | dtype | route | mode | Dense µs | complete SW µs | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_wgmma_wait1_64x16 v32 | launch | 9.920000 | 7.444800 | 1.332474 | FAIL |
+| 128,128,128 | fp16 | megakernel_wgmma_wait1_64x16 v32 | launch | 9.848000 | 7.142400 | 1.378808 | FAIL |
+| 256,256,256 | bf16 | megakernel_wgmma_wait1_64x16 v32 | launch | 9.880000 | 9.448000 | 1.045724 | FAIL |
+| 256,256,256 | fp16 | megakernel_wgmma_wait1_64x16 v32 | launch | 9.945600 | 9.593600 | 1.036691 | FAIL |
+| 512,512,512 | bf16 | megakernel_wgmma_wait1_64x16 v32 | launch | 10.232000 | 15.291201 | 0.669143 | FAIL |
+| 512,512,512 | fp16 | megakernel_wgmma_wait1_64x16 v32 | launch | 9.982400 | 15.288000 | 0.652957 | FAIL |
+| 1024,1024,1024 | bf16 | megakernel_wgmma_wait1_64x16 v32 | launch | 17.435201 | 33.344001 | 0.522889 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_wait1_64x16 v32 | launch | 10.657600 | 33.230400 | 0.320718 | FAIL |
+| 2048,2048,2048 | bf16 | megakernel_wgmma_wait1_64x16 v32 | launch | 31.747201 | 233.159995 | 0.136161 | FAIL |
+| 2048,2048,2048 | fp16 | megakernel_wgmma_wait1_64x16 v32 | launch | 33.081600 | 240.659189 | 0.137462 | FAIL |
+| 3072,3072,3072 | bf16 | megakernel_wgmma_wait1_64x16 v32 | launch | 87.896001 | 897.497559 | 0.097935 | FAIL |
+| 3072,3072,3072 | fp16 | megakernel_wgmma_wait1_64x16 v32 | launch | 89.897603 | 880.039978 | 0.102152 | FAIL |
+| 4096,4096,4096 | bf16 | megakernel_wgmma_wait1_64x16 v32 | launch | 195.787203 | 2204.065514 | 0.088830 | FAIL |
+| 4096,4096,4096 | fp16 | megakernel_wgmma_wait1_64x16 v32 | launch | 205.377603 | 2227.649689 | 0.092195 | FAIL |
+| 1024,512,1024 | bf16 | megakernel_wgmma_wait1_64x16 v32 | launch | 9.512000 | 25.703999 | 0.370059 | FAIL |
+| 1024,512,1024 | fp16 | megakernel_wgmma_wait1_64x16 v32 | launch | 9.553600 | 25.889599 | 0.369013 | FAIL |
+| 512,1024,1024 | bf16 | megakernel_wgmma_wait1_64x16 v32 | launch | 8.272000 | 25.681600 | 0.322098 | FAIL |
+| 512,1024,1024 | fp16 | megakernel_wgmma_wait1_64x16 v32 | launch | 8.585600 | 25.705600 | 0.333997 | FAIL |
+
+- **Analysis:** Quick signal only. Rank new own latency against frozen29 samebinary, not Dense denominator. Default/targeted structural checks remain separate from original numerical gate.
+- **Next:** Mandatory full1024 20rows new32/33 retained29/TMA31/Lt1 bothdtype ordinary/Graph20warm100calls5groups3fresh, unchanged newstrict60 and six serial CUDA12.8 sanitizers; independent static/data audit and full evidence closure.
+- **Archive:** trajectory/20261014_020836_iter-32/
