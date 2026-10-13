@@ -49,6 +49,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 10 | Specialize complete small tiles and packed final conversions | 0.3431 | 0.399807 | improved |
 
+| 11 | Parallelize seven complete products across warps and fix epilogue rounding | 0.2446 | 1.033407 | regression |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -413,3 +415,35 @@ experiments have not been silently marked complete in PLAN.
 - **Analysis:** Quick predeclared 20 calls x 5 groups x 1 fresh correctness trial, H100, ordinary launch, variant 8. Matched geometric gain vs iteration 9 variant 4 = 1.181938x; bf16 128^3 5.277 us Dense/SW=0.797453010639; fp16 128^3 5.403 us Dense/SW=0.763103342123; bf16 256^3 8.198 us Dense/SW=0.670374735566; fp16 256^3 8.190 us Dense/SW=0.594061349577; bf16 512^3 13.720 us Dense/SW=0.449329453166; fp16 512^3 13.912 us Dense/SW=0.443243251928; bf16 1024^3 41.330 us Dense/SW=0.311176490651; fp16 1024^3 41.168 us Dense/SW=0.249086666856. All 18 numerical gates fail with finite output (exit 2); frozen thresholds unchanged. Paired conversion is an ablation because iteration 9 SASS already contains packed conversion instructions. Structural GPU/sanitizer validation follows this closure.
 - **Next:** Validate variants 7/8 and compare packed ablation; integrate product-parallel M1 variant 9 with seven complete products.
 - **Archive:** trajectory/20261013_133924_iter-10/
+
+### Iter 11 — Parallelize seven complete products across warps and fix epilogue rounding
+
+- **Hypothesis:** Seven product warps reduce56live FP32 accumulators per lane to8 and expose latency hiding while retaining complete-P then U semantics.
+- **Changes:** Add Mega9 product-parallel M1; 224threads,14KiBshared,0workspace; explicit alpha RN followed by beta FMA for Mega4-8; strengthen common exact/bitwise route tests.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=1.033407 ms; mean speedup=0.2446x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | megakernel_product_warps v9 | launch | 0.004181 | 0.005942 | 0.7036 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | megakernel_product_warps v9 | launch | 0.004170 | 0.006107 | 0.6827 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | megakernel_product_warps v9 | launch | 0.005322 | 0.008578 | 0.6204 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | megakernel_product_warps v9 | launch | 0.004883 | 0.008669 | 0.5633 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | megakernel_product_warps v9 | launch | 0.006160 | 0.018938 | 0.3253 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | megakernel_product_warps v9 | launch | 0.006144 | 0.018922 | 0.3247 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | megakernel_product_warps v9 | launch | 0.013122 | 0.097243 | 0.1349 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | megakernel_product_warps v9 | launch | 0.010192 | 0.096216 | 0.1059 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | megakernel_product_warps v9 | launch | 0.032205 | 0.721770 | 0.0446 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | megakernel_product_warps v9 | launch | 0.032342 | 0.732958 | 0.0441 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | megakernel_product_warps v9 | launch | 0.086350 | 2.487458 | 0.0347 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | megakernel_product_warps v9 | launch | 0.089195 | 2.497160 | 0.0357 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | megakernel_product_warps v9 | launch | 0.195328 | 5.819426 | 0.0336 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | megakernel_product_warps v9 | launch | 0.206648 | 5.882320 | 0.0351 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | megakernel_product_warps v9 | launch | 0.009173 | 0.048568 | 0.1889 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | megakernel_product_warps v9 | launch | 0.009506 | 0.050253 | 0.1892 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | megakernel_product_warps v9 | launch | 0.008269 | 0.050178 | 0.1648 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | megakernel_product_warps v9 | launch | 0.008629 | 0.050626 | 0.1704 | 0.00075151 | 0 |
+
+- **Analysis:** Predeclared quick20/5/1 launch signal. Primary128..1024 geometric gain vs best single-warp fast8 iter10=0.715546x. bf16 128^3 5.942us Dense/SW=0.704x; fp16 128^3 6.107us Dense/SW=0.683x; bf16 256^3 8.578us Dense/SW=0.620x; fp16 256^3 8.669us Dense/SW=0.563x; bf16 512^3 18.938us Dense/SW=0.325x; fp16 512^3 18.922us Dense/SW=0.325x; bf16 1024^3 97.243us Dense/SW=0.135x; fp16 1024^3 96.216us Dense/SW=0.106x. Product warps have66registers/thread,14KiBshared,0spill; reduced live accumulators do not offset repeated selective loads, warp branching and CTA combination. All18numeric gatesfail,0nonfinite. Prior iter10 GPU smoke7/8 and six sanitizerchecks PASS, but fresh dyadic default bitwise test fails beta nonzero due to compiler alpha/beta FMA contraction; this iter makes old4..8 alpha __fmul_rn then beta fmaf explicit like9/combine; original bitwise test retained.
+- **Next:** Validate bitwise regression and product9; benchmark complete-tile product10, then narrower16x8owners.
+- **Archive:** trajectory/20261013_134640_iter-11/

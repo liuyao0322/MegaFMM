@@ -31,4 +31,10 @@ void prepare_packed_mma(const Problem& p, int variant=7);
 void launch_packed_mma(const Problem& p, const void* A, const void* B,
                        const float* C0, float* D, cudaStream_t stream,
                        int variant=7);
+// Product-parallel M1: seven product warps retain complete P tiles, then fixed U.
+bool small_product_can_implement(const Problem& p, int variant=9);
+void prepare_small_product(const Problem& p, int variant=9);
+void launch_small_product(const Problem& p, const void* A, const void* B,
+                          const float* C0, float* D, cudaStream_t stream,
+                          int variant=9);
 }

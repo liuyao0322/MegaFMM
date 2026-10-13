@@ -10,7 +10,8 @@ if(NOT EXISTS "${CUTLASS_ROOT}/include/cutlass/cutlass.h")
 endif()
 add_library(megafmm STATIC solution/plan.cpp solution/pack_winograd.cu
   solution/combine_fp32.cu solution/gemm_hopper.cu solution/gemm_batched.cu
-  solution/megakernel_hopper.cu solution/small_mma.cu solution/small_mma_fast.cu)
+  solution/megakernel_hopper.cu solution/small_mma.cu solution/small_mma_fast.cu
+  solution/small_product_mma.cu)
 target_include_directories(megafmm PUBLIC include PRIVATE solution "${CUTLASS_ROOT}/include" "${CUTLASS_ROOT}/tools/util/include")
 target_link_libraries(megafmm PUBLIC CUDA::cudart CUDA::cublasLt CUDA::cublas CUDA::cuda_driver)
 target_compile_options(megafmm PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_90a,code=sm_90a;--expt-relaxed-constexpr;--expt-extended-lambda;-lineinfo;-Xptxas=-v>)

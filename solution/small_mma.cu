@@ -258,15 +258,15 @@ void small_mma_kernel(Problem p, const Element* __restrict__ A,
       const float u5 = u4 + p3(i);
       const float u6 = u3 - p4(i);
       const float u7 = u3 + p5(i);
-      float d11 = p.alpha * u1;
-      float d12 = p.alpha * u5;
-      float d21 = p.alpha * u6;
-      float d22 = p.alpha * u7;
+      float d11 = __fmul_rn(p.alpha,u1);
+      float d12 = __fmul_rn(p.alpha,u5);
+      float d21 = __fmul_rn(p.alpha,u6);
+      float d22 = __fmul_rn(p.alpha,u7);
       if (p.beta != 0.0f) {
-        d11 += p.beta * C0[row*p.ldc + col];
-        d12 += p.beta * C0[row*p.ldc + col + nh];
-        d21 += p.beta * C0[(row+mh)*p.ldc + col];
-        d22 += p.beta * C0[(row+mh)*p.ldc + col + nh];
+        d11 = fmaf(p.beta,C0[row*p.ldc + col],d11);
+        d12 = fmaf(p.beta,C0[row*p.ldc + col + nh],d12);
+        d21 = fmaf(p.beta,C0[(row+mh)*p.ldc + col],d21);
+        d22 = fmaf(p.beta,C0[(row+mh)*p.ldc + col + nh],d22);
       }
       D[row*p.ldd + col] = d11;
       D[row*p.ldd + col + nh] = d12;
