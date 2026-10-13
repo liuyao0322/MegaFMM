@@ -413,10 +413,14 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     detail::pack_winograd_batched_inputs(p, A, B, base + plan.s_offset,
                                        base + plan.t_offset, stream);
     cuda_check(cudaPeekAtLastError(), "launch uniform Winograd operand packing");
-    if (plan.small_batched)
-      launch_small_batched_gemm(plan.leaf_problems[0], left, right, products,
-                                stream, plan.policy.hopper_variant - 5);
-    else
+    if (plan.small_batched) {
+      if (plan.policy.hopper_variant >= 7)
+        launch_small_batched_k64(plan.leaf_problems[0], left, right, products,
+                                 stream, plan.policy.hopper_variant);
+      else
+        launch_small_batched_gemm(plan.leaf_problems[0], left, right, products,
+                                  stream, plan.policy.hopper_variant - 5);
+    } else
       lt_check(execute_lt(plan.handle, *plan.batched,
           bound_candidate(*plan.batched, left, right, nullptr, products),
           left, right, nullptr, products, scratch, stream), "run batched Winograd products");
@@ -455,7 +459,9 @@ std::string Plan::algorithm_name() const {
   if (impl_->scale) return "degenerate_scale";
   switch (impl_->algorithm) {
     case Algorithm::WinogradLt: return impl_->batched ? "winograd_lt_batched" : "winograd_lt_v1";
-    case Algorithm::WinogradHopper: return impl_->small_batched ? "winograd_sm80_batched" : "winograd_hopper_v2";
+    case Algorithm::WinogradHopper:
+      return impl_->small_batched ? (impl_->policy.hopper_variant >= 7
+        ? "winograd_sm80_batched_k64" : "winograd_sm80_batched") : "winograd_hopper_v2";
     case Algorithm::Megakernel:
       if (impl_->policy.mega_variant == 16) {
         if (mma16x8_prefetch_can_implement(impl_->problem, 16))
@@ -525,8 +531,8 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     throw std::invalid_argument("heuristic_candidates must be between 1 and 128");
   if (policy.lt_variant < 0 || policy.lt_variant > 1)
     throw std::invalid_argument("lt_variant must be 0 (views) or 1 (uniform batched operands)");
-  if (policy.hopper_variant < 0 || policy.hopper_variant > 6)
-    throw std::invalid_argument("hopper_variant must be between 0 and 6");
+  if (policy.hopper_variant < 0 || policy.hopper_variant > 8)
+    throw std::invalid_argument("hopper_variant must be between 0 and 8");
   if (policy.mega_variant < 0 || policy.mega_variant > 16)
     throw std::invalid_argument("mega_variant must be between 0 and 16");
   if (policy.algorithm < Algorithm::Auto || policy.algorithm > Algorithm::Megakernel)
@@ -581,8 +587,9 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
       leaf.ldc = leaf.ldd = leaf.n;
       impl->leaf_problems[i] = leaf;
       if (desired == Algorithm::WinogradHopper) {
-        const bool supported = small_batched ? small_batched_can_implement(leaf, policy.hopper_variant - 5)
-                                             : hopper_can_implement(leaf, policy.hopper_variant);
+        const bool supported = !small_batched ? hopper_can_implement(leaf, policy.hopper_variant)
+          : policy.hopper_variant >= 7 ? small_batched_k64_can_implement(leaf, policy.hopper_variant)
+                                     : small_batched_can_implement(leaf, policy.hopper_variant - 5);
         if (!supported) desired = Algorithm::Dense;
       }
     }
@@ -632,7 +639,10 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     bool backend_available = true;
     if (desired == Algorithm::WinogradHopper && policy.hopper_variant >= 5) {
       impl->small_batched = true;
-      scratch = std::max(scratch, small_batched_workspace_bytes(impl->leaf_problems[0], policy.hopper_variant - 5));
+      const size_t leaf_scratch = policy.hopper_variant >= 7
+        ? small_batched_k64_workspace_bytes(impl->leaf_problems[0], policy.hopper_variant)
+        : small_batched_workspace_bytes(impl->leaf_problems[0], policy.hopper_variant - 5);
+      scratch = std::max(scratch, leaf_scratch);
     } else if (desired == Algorithm::WinogradLt && policy.lt_variant == 1) {
       const auto& leaf = impl->leaf_problems[0];
       const int64_t a_stride = leaf.m * leaf.k;

@@ -1,0 +1,19 @@
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+Capture range started in the application.
+Capture range ended in the application.
+Generating '/tmp/nsys-report-d064.qdstrm'
+[1/1] [0%                          ] small_prefetch16_iter18.nsys-rep[1/1] [0%                          ] small_prefetch16_iter18.nsys-rep[1/1] [===========50%              ] small_prefetch16_iter18.nsys-rep[1/1] [========================99% ] small_prefetch16_iter18.nsys-rep[1/1] [========================100%] small_prefetch16_iter18.nsys-rep[1/1] [========================100%] small_prefetch16_iter18.nsys-rep
+PROFILE 128,128,128 bf16 megakernel_warp_mma_16x8_prefetch workspace=0
+Generated:
+    /share/home/liuyao/workspace/MegaFMM/.scratch/small_prefetch16_iter18.nsys-rep
+Generating SQLite file .scratch/small_prefetch16_iter18.sqlite from .scratch/small_prefetch16_iter18.nsys-rep
+Processing [.scratch/small_prefetch16_iter18.sqlite] with [/share/app/cuda/cuda-12.4/nsight-systems-2023.4.4/host-linux-x64/reports/cuda_gpu_kern_sum.py]... 
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+100.0,3392,1,3392.0,3392.0,3392,3392,0.0,"void megafmm::<unnamed>::mma16x8_prefetch_kernel<cutlass::bfloat16_t>(megafmm::Problem, const T1 *, const T1 *, float *)"
+
+Processing [.scratch/small_prefetch16_iter18.sqlite] with [/share/app/cuda/cuda-12.4/nsight-systems-2023.4.4/host-linux-x64/reports/cuda_api_sum.py]... 
+Time (%),Total Time (ns),Num Calls,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+48.7,74266,1,74266.0,74266.0,74266,74266,0.0,cudaLaunchKernel
+46.3,70509,1,70509.0,70509.0,70509,70509,0.0,cudaStreamSynchronize
+5.0,7674,1,7674.0,7674.0,7674,7674,0.0,cuProfilerStart
+

@@ -12,6 +12,13 @@ size_t small_batched_workspace_bytes(const Problem& leaf, int tile_variant=0);
 void launch_small_batched_gemm(const Problem& leaf, const void* A7,
                               const void* B7, float* P, cudaStream_t stream,
                               int tile_variant=0);
+// CTA32x64x64: 7=three-stage Multistage, 8=two-stage Pipelined.
+// The two schedules also use different global-load paths in pinned CUTLASS.
+bool small_batched_k64_can_implement(const Problem& leaf, int variant=7);
+size_t small_batched_k64_workspace_bytes(const Problem& leaf, int variant=7);
+void launch_small_batched_k64(const Problem& leaf, const void* A7,
+                             const void* B7, float* P, cudaStream_t stream,
+                             int variant=7);
 bool megakernel_can_implement(const Problem& p, int variant=0);
 // One-time launch configuration; called during planning, never in steady-state run.
 void prepare_megakernel(const Problem& p, int variant=0);

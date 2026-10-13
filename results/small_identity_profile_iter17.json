@@ -1,0 +1,965 @@
+{
+  "schema_version": 1,
+  "iteration": 17,
+  "kind": "CPU-only audit of archived SASS/resource and validation logs; static counts are not dynamic performance",
+  "generated_utc": "2026-10-13T06:55:42.199557+00:00",
+  "inputs": [
+    {
+      "path": ".scratch/small_sass_iter16.txt",
+      "bytes": 22241138,
+      "sha256": "c5c9cb61b79dd5426ea4d43a06a6bfa1a97197c8fee45adefe36153c149d7164"
+    },
+    {
+      "path": ".scratch/small_resources_iter16.txt",
+      "bytes": 33942,
+      "sha256": "4f8a83c6add99fb20bcb4e7585b5c572545d74292d1810ea837fc0f45db08a6c"
+    },
+    {
+      "path": ".scratch/small_sass_iter17.txt",
+      "bytes": 22442587,
+      "sha256": "d40a6cffd21ea556a8de7b70e27b096da4f684e27938c7eb1d4719999787d90b"
+    },
+    {
+      "path": ".scratch/small_resources_iter17.txt",
+      "bytes": 34657,
+      "sha256": "80a89c05e2585cecad7e4e2697e62c95da322eee04e9b77dd421f9e4b15e9e66"
+    },
+    {
+      "path": "results/correctness_iter17.txt",
+      "bytes": 224355,
+      "sha256": "4c016f4602248bdd5a79e08737b151d0e650c22d100cb2d54789614b850896eb"
+    },
+    {
+      "path": "results/sanitizer_small_identity15_memcheck.txt",
+      "bytes": 8193,
+      "sha256": "ee86ebe3f27951cb8286b0115df07d4ba5962c77f0c5c05efc39a55442275d0f"
+    },
+    {
+      "path": "results/sanitizer_small_identity15_racecheck.txt",
+      "bytes": 8354,
+      "sha256": "5118e2ecf7951828dd6d3bec7cd7d6238008310c223ed006316d9f51abb09486"
+    },
+    {
+      "path": "results/sanitizer_small_identity15_synccheck.txt",
+      "bytes": 8316,
+      "sha256": "e9aac3a5d3b6c74e8f4853e56eae30032ec9b734dda307a9aadd56b719b53b81"
+    },
+    {
+      "path": "results/small_reassessment_iter16.json",
+      "bytes": 4112,
+      "sha256": "8ec656416129930ee527f25978bfcc7bba4388b024aefcd5973a5d9ff34b055a"
+    }
+  ],
+  "missing_requested_prior_artifact": {
+    "path": "results/small_sass_iter16.json",
+    "exists": false,
+    "handling": "Reconstructed comparison from archived iter16 raw SASS/resources; existing small_reassessment_iter16.json recorded separately."
+  },
+  "iter16_existing_metadata": {
+    "source_commit": "405376f",
+    "binary_sha256": "e193b6a3cf44f010a3ff2d378e9555aac683aef6896fcfc0d2d600a98b05bd9f",
+    "kind": "Static SASS counts, not dynamic utilization or bandwidth"
+  },
+  "iter17_binary_identity_note": "This audit does not hash the current binary because root has advanced to iteration18. Archived SASS/resources and logs are individually content-addressed.",
+  "source_read_at_audit": [
+    {
+      "path": "solution/small_mma_16x8_identity.cu",
+      "bytes": 16346,
+      "sha256": "515e2bf5ffb278cff7b960a052abac2ff27136a98aa06530794893ed83a7ede1"
+    },
+    {
+      "path": "solution/small_mma_16x8_epilogue.cu",
+      "bytes": 17343,
+      "sha256": "f7d9dc73db3122e9059685697cb2fed52bfdf029514168a268ade778047bf08c"
+    }
+  ],
+  "parser_contract": "One record for every offset-bearing instruction line, including @!UPT predicate-false UIADD3, NOP padding and terminal self-BRA. Opcode counts include both runtime beta branches. Scheduling/encoding lines are excluded. No unrecognized instruction lines in selected functions.",
+  "parser_difference_from_prior_583_count": "The complete parser includes one @!UPT UIADD3 per function that older P-digit-only parsers omitted: Mega14 584 rather than583; Mega15 440 rather than439. This is counting coverage, not changed generated code.",
+  "targets": [
+    {
+      "iteration": 16,
+      "variant": 14,
+      "dtype": "fp16",
+      "symbol": "_ZN7megafmm59_GLOBAL__N__1544403b_26_small_mma_16x8_epilogue_cu_7290ae8e23mma16x8_epilogue_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf",
+      "resource_usage": {
+        "REG": 94,
+        "STACK": 0,
+        "SHARED": 6400,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 5376,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "static_instruction_count_including_padding_and_predicate_false": 584,
+      "always_false_uniform_instruction_count": 1,
+      "opcode_counts": {
+        "BRA": 5,
+        "CS2R": 28,
+        "EXIT": 2,
+        "F2FP.F16.F32.PACK_AB": 24,
+        "FADD": 90,
+        "FFMA": 16,
+        "FMUL": 24,
+        "FSETP.NEU.AND": 1,
+        "HADD2.F32": 48,
+        "HMMA.16816.F32": 7,
+        "IADD3": 36,
+        "IADD3.X": 20,
+        "IMAD": 32,
+        "IMAD.IADD": 4,
+        "IMAD.SHL.U32": 6,
+        "IMAD.WIDE": 2,
+        "IMAD.WIDE.U32": 17,
+        "ISETP.GT.AND": 1,
+        "ISETP.LE.AND": 1,
+        "LDC": 3,
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64": 8,
+        "LDG.E.64.CONSTANT": 4,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.2": 7,
+        "LEA": 26,
+        "LEA.HI": 3,
+        "LEA.HI.X": 16,
+        "LOP3.LUT": 26,
+        "MOV": 4,
+        "NOP": 13,
+        "S2R": 4,
+        "S2UR": 2,
+        "SHF.L.U32": 3,
+        "SHF.L.U64.HI": 4,
+        "SHF.R.S32.HI": 15,
+        "SHF.R.U32.HI": 9,
+        "SHF.R.U64": 1,
+        "STG.E.64": 16,
+        "STS.128": 7,
+        "STS.64": 7,
+        "UIADD3": 3,
+        "UIADD3.X": 1,
+        "ULDC": 1,
+        "ULDC.64": 11,
+        "ULEA.HI": 1,
+        "UMOV": 2,
+        "UPRMT": 1,
+        "USHF.L.U32": 2,
+        "USHF.L.U64.HI": 1,
+        "USHF.R.S32.HI": 1,
+        "VIADD": 7
+      },
+      "global_load_counts": {
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64": 8,
+        "LDG.E.64.CONSTANT": 4
+      },
+      "global_store_counts": {
+        "STG.E.64": 16
+      },
+      "local_load_store_instruction_count": 0,
+      "parsed_instruction_sha256": "088b8776b66f60c06c7558e75e0495e045932fcb074cc0bef494e22c7870e929",
+      "control_instructions": [
+        {
+          "offset": 256,
+          "predicate": "@P0",
+          "opcode": "BRA",
+          "operands": "0x200"
+        },
+        {
+          "offset": 496,
+          "predicate": null,
+          "opcode": "BRA",
+          "operands": "0x1560"
+        },
+        {
+          "offset": 5456,
+          "predicate": "@!P3",
+          "opcode": "BRA",
+          "operands": "0x920"
+        },
+        {
+          "offset": 5728,
+          "predicate": null,
+          "opcode": "FSETP.NEU.AND",
+          "operands": "P0, PT, RZ, UR13, PT"
+        },
+        {
+          "offset": 6224,
+          "predicate": "@P0",
+          "opcode": "BRA",
+          "operands": "0x1c40"
+        },
+        {
+          "offset": 7216,
+          "predicate": null,
+          "opcode": "EXIT",
+          "operands": ""
+        },
+        {
+          "offset": 9136,
+          "predicate": null,
+          "opcode": "EXIT",
+          "operands": ""
+        },
+        {
+          "offset": 9152,
+          "predicate": null,
+          "opcode": "BRA",
+          "operands": "0x23c0"
+        }
+      ]
+    },
+    {
+      "iteration": 16,
+      "variant": 14,
+      "dtype": "bf16",
+      "symbol": "_ZN7megafmm59_GLOBAL__N__1544403b_26_small_mma_16x8_epilogue_cu_7290ae8e23mma16x8_epilogue_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf",
+      "resource_usage": {
+        "REG": 94,
+        "STACK": 0,
+        "SHARED": 6400,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 5376,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "static_instruction_count_including_padding_and_predicate_false": 584,
+      "always_false_uniform_instruction_count": 1,
+      "opcode_counts": {
+        "BRA": 5,
+        "CS2R": 28,
+        "EXIT": 2,
+        "F2FP.BF16.F32.PACK_AB": 24,
+        "FADD": 90,
+        "FFMA": 16,
+        "FMUL": 24,
+        "FSETP.NEU.AND": 1,
+        "HMMA.16816.F32.BF16": 7,
+        "IADD3": 35,
+        "IADD3.X": 19,
+        "IMAD": 32,
+        "IMAD.IADD": 5,
+        "IMAD.MOV.U32": 3,
+        "IMAD.SHL.U32": 6,
+        "IMAD.U32": 16,
+        "IMAD.WIDE": 2,
+        "IMAD.WIDE.U32": 17,
+        "IMAD.X": 1,
+        "ISETP.GT.AND": 1,
+        "ISETP.LE.AND": 1,
+        "LDC": 3,
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64": 8,
+        "LDG.E.64.CONSTANT": 4,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.2": 7,
+        "LEA": 26,
+        "LEA.HI": 3,
+        "LEA.HI.X": 16,
+        "LOP3.LUT": 50,
+        "MOV": 1,
+        "NOP": 13,
+        "S2R": 4,
+        "S2UR": 2,
+        "SHF.L.U32": 11,
+        "SHF.L.U64.HI": 4,
+        "SHF.R.S32.HI": 15,
+        "SHF.R.U32.HI": 9,
+        "SHF.R.U64": 1,
+        "STG.E.64": 16,
+        "STS.128": 7,
+        "STS.64": 7,
+        "UIADD3": 3,
+        "UIADD3.X": 1,
+        "ULDC": 1,
+        "ULDC.64": 11,
+        "ULEA.HI": 1,
+        "UMOV": 2,
+        "UPRMT": 1,
+        "USHF.L.U32": 2,
+        "USHF.L.U64.HI": 1,
+        "USHF.R.S32.HI": 1,
+        "VIADD": 7
+      },
+      "global_load_counts": {
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64": 8,
+        "LDG.E.64.CONSTANT": 4
+      },
+      "global_store_counts": {
+        "STG.E.64": 16
+      },
+      "local_load_store_instruction_count": 0,
+      "parsed_instruction_sha256": "131c59eada728681273aaf257db0e7781eb5369f698ece2c486a5282c4ab1b0a",
+      "control_instructions": [
+        {
+          "offset": 256,
+          "predicate": "@P0",
+          "opcode": "BRA",
+          "operands": "0x200"
+        },
+        {
+          "offset": 496,
+          "predicate": null,
+          "opcode": "BRA",
+          "operands": "0x1560"
+        },
+        {
+          "offset": 5456,
+          "predicate": "@!P3",
+          "opcode": "BRA",
+          "operands": "0x920"
+        },
+        {
+          "offset": 5728,
+          "predicate": null,
+          "opcode": "FSETP.NEU.AND",
+          "operands": "P0, PT, RZ, UR13, PT"
+        },
+        {
+          "offset": 6224,
+          "predicate": "@P0",
+          "opcode": "BRA",
+          "operands": "0x1c40"
+        },
+        {
+          "offset": 7216,
+          "predicate": null,
+          "opcode": "EXIT",
+          "operands": ""
+        },
+        {
+          "offset": 9136,
+          "predicate": null,
+          "opcode": "EXIT",
+          "operands": ""
+        },
+        {
+          "offset": 9152,
+          "predicate": null,
+          "opcode": "BRA",
+          "operands": "0x23c0"
+        }
+      ]
+    },
+    {
+      "iteration": 17,
+      "variant": 14,
+      "dtype": "fp16",
+      "symbol": "_ZN7megafmm59_GLOBAL__N__1544403b_26_small_mma_16x8_epilogue_cu_7290ae8e23mma16x8_epilogue_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf",
+      "resource_usage": {
+        "REG": 94,
+        "STACK": 0,
+        "SHARED": 6400,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 5376,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "static_instruction_count_including_padding_and_predicate_false": 584,
+      "always_false_uniform_instruction_count": 1,
+      "opcode_counts": {
+        "BRA": 5,
+        "CS2R": 28,
+        "EXIT": 2,
+        "F2FP.F16.F32.PACK_AB": 24,
+        "FADD": 90,
+        "FFMA": 16,
+        "FMUL": 24,
+        "FSETP.NEU.AND": 1,
+        "HADD2.F32": 48,
+        "HMMA.16816.F32": 7,
+        "IADD3": 36,
+        "IADD3.X": 20,
+        "IMAD": 32,
+        "IMAD.IADD": 4,
+        "IMAD.SHL.U32": 6,
+        "IMAD.WIDE": 2,
+        "IMAD.WIDE.U32": 17,
+        "ISETP.GT.AND": 1,
+        "ISETP.LE.AND": 1,
+        "LDC": 3,
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64": 8,
+        "LDG.E.64.CONSTANT": 4,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.2": 7,
+        "LEA": 26,
+        "LEA.HI": 3,
+        "LEA.HI.X": 16,
+        "LOP3.LUT": 26,
+        "MOV": 4,
+        "NOP": 13,
+        "S2R": 4,
+        "S2UR": 2,
+        "SHF.L.U32": 3,
+        "SHF.L.U64.HI": 4,
+        "SHF.R.S32.HI": 15,
+        "SHF.R.U32.HI": 9,
+        "SHF.R.U64": 1,
+        "STG.E.64": 16,
+        "STS.128": 7,
+        "STS.64": 7,
+        "UIADD3": 3,
+        "UIADD3.X": 1,
+        "ULDC": 1,
+        "ULDC.64": 11,
+        "ULEA.HI": 1,
+        "UMOV": 2,
+        "UPRMT": 1,
+        "USHF.L.U32": 2,
+        "USHF.L.U64.HI": 1,
+        "USHF.R.S32.HI": 1,
+        "VIADD": 7
+      },
+      "global_load_counts": {
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64": 8,
+        "LDG.E.64.CONSTANT": 4
+      },
+      "global_store_counts": {
+        "STG.E.64": 16
+      },
+      "local_load_store_instruction_count": 0,
+      "parsed_instruction_sha256": "088b8776b66f60c06c7558e75e0495e045932fcb074cc0bef494e22c7870e929",
+      "control_instructions": [
+        {
+          "offset": 256,
+          "predicate": "@P0",
+          "opcode": "BRA",
+          "operands": "0x200"
+        },
+        {
+          "offset": 496,
+          "predicate": null,
+          "opcode": "BRA",
+          "operands": "0x1560"
+        },
+        {
+          "offset": 5456,
+          "predicate": "@!P3",
+          "opcode": "BRA",
+          "operands": "0x920"
+        },
+        {
+          "offset": 5728,
+          "predicate": null,
+          "opcode": "FSETP.NEU.AND",
+          "operands": "P0, PT, RZ, UR13, PT"
+        },
+        {
+          "offset": 6224,
+          "predicate": "@P0",
+          "opcode": "BRA",
+          "operands": "0x1c40"
+        },
+        {
+          "offset": 7216,
+          "predicate": null,
+          "opcode": "EXIT",
+          "operands": ""
+        },
+        {
+          "offset": 9136,
+          "predicate": null,
+          "opcode": "EXIT",
+          "operands": ""
+        },
+        {
+          "offset": 9152,
+          "predicate": null,
+          "opcode": "BRA",
+          "operands": "0x23c0"
+        }
+      ]
+    },
+    {
+      "iteration": 17,
+      "variant": 14,
+      "dtype": "bf16",
+      "symbol": "_ZN7megafmm59_GLOBAL__N__1544403b_26_small_mma_16x8_epilogue_cu_7290ae8e23mma16x8_epilogue_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf",
+      "resource_usage": {
+        "REG": 94,
+        "STACK": 0,
+        "SHARED": 6400,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 5376,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "static_instruction_count_including_padding_and_predicate_false": 584,
+      "always_false_uniform_instruction_count": 1,
+      "opcode_counts": {
+        "BRA": 5,
+        "CS2R": 28,
+        "EXIT": 2,
+        "F2FP.BF16.F32.PACK_AB": 24,
+        "FADD": 90,
+        "FFMA": 16,
+        "FMUL": 24,
+        "FSETP.NEU.AND": 1,
+        "HMMA.16816.F32.BF16": 7,
+        "IADD3": 35,
+        "IADD3.X": 19,
+        "IMAD": 32,
+        "IMAD.IADD": 5,
+        "IMAD.MOV.U32": 3,
+        "IMAD.SHL.U32": 6,
+        "IMAD.U32": 16,
+        "IMAD.WIDE": 2,
+        "IMAD.WIDE.U32": 17,
+        "IMAD.X": 1,
+        "ISETP.GT.AND": 1,
+        "ISETP.LE.AND": 1,
+        "LDC": 3,
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64": 8,
+        "LDG.E.64.CONSTANT": 4,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.2": 7,
+        "LEA": 26,
+        "LEA.HI": 3,
+        "LEA.HI.X": 16,
+        "LOP3.LUT": 50,
+        "MOV": 1,
+        "NOP": 13,
+        "S2R": 4,
+        "S2UR": 2,
+        "SHF.L.U32": 11,
+        "SHF.L.U64.HI": 4,
+        "SHF.R.S32.HI": 15,
+        "SHF.R.U32.HI": 9,
+        "SHF.R.U64": 1,
+        "STG.E.64": 16,
+        "STS.128": 7,
+        "STS.64": 7,
+        "UIADD3": 3,
+        "UIADD3.X": 1,
+        "ULDC": 1,
+        "ULDC.64": 11,
+        "ULEA.HI": 1,
+        "UMOV": 2,
+        "UPRMT": 1,
+        "USHF.L.U32": 2,
+        "USHF.L.U64.HI": 1,
+        "USHF.R.S32.HI": 1,
+        "VIADD": 7
+      },
+      "global_load_counts": {
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64": 8,
+        "LDG.E.64.CONSTANT": 4
+      },
+      "global_store_counts": {
+        "STG.E.64": 16
+      },
+      "local_load_store_instruction_count": 0,
+      "parsed_instruction_sha256": "131c59eada728681273aaf257db0e7781eb5369f698ece2c486a5282c4ab1b0a",
+      "control_instructions": [
+        {
+          "offset": 256,
+          "predicate": "@P0",
+          "opcode": "BRA",
+          "operands": "0x200"
+        },
+        {
+          "offset": 496,
+          "predicate": null,
+          "opcode": "BRA",
+          "operands": "0x1560"
+        },
+        {
+          "offset": 5456,
+          "predicate": "@!P3",
+          "opcode": "BRA",
+          "operands": "0x920"
+        },
+        {
+          "offset": 5728,
+          "predicate": null,
+          "opcode": "FSETP.NEU.AND",
+          "operands": "P0, PT, RZ, UR13, PT"
+        },
+        {
+          "offset": 6224,
+          "predicate": "@P0",
+          "opcode": "BRA",
+          "operands": "0x1c40"
+        },
+        {
+          "offset": 7216,
+          "predicate": null,
+          "opcode": "EXIT",
+          "operands": ""
+        },
+        {
+          "offset": 9136,
+          "predicate": null,
+          "opcode": "EXIT",
+          "operands": ""
+        },
+        {
+          "offset": 9152,
+          "predicate": null,
+          "opcode": "BRA",
+          "operands": "0x23c0"
+        }
+      ]
+    },
+    {
+      "iteration": 17,
+      "variant": 15,
+      "dtype": "fp16",
+      "symbol": "_ZN7megafmm59_GLOBAL__N__ed766fd4_26_small_mma_16x8_identity_cu_a00e88b423mma16x8_identity_kernelIN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_Pf",
+      "resource_usage": {
+        "REG": 96,
+        "STACK": 0,
+        "SHARED": 6400,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 5376,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "static_instruction_count_including_padding_and_predicate_false": 440,
+      "always_false_uniform_instruction_count": 1,
+      "opcode_counts": {
+        "BRA": 4,
+        "CS2R": 28,
+        "EXIT": 1,
+        "F2FP.F16.F32.PACK_AB": 24,
+        "FADD": 76,
+        "HADD2.F32": 48,
+        "HMMA.16816.F32": 7,
+        "IADD3": 16,
+        "IADD3.X": 8,
+        "IMAD": 20,
+        "IMAD.IADD": 4,
+        "IMAD.SHL.U32": 6,
+        "IMAD.WIDE": 6,
+        "IMAD.WIDE.U32": 11,
+        "ISETP.GT.AND": 1,
+        "ISETP.LE.AND": 1,
+        "LDC": 4,
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64.CONSTANT": 4,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.2": 7,
+        "LEA": 18,
+        "LEA.HI": 4,
+        "LEA.HI.SX32": 1,
+        "LEA.HI.X": 8,
+        "LOP3.LUT": 26,
+        "MOV": 4,
+        "NOP": 15,
+        "S2R": 5,
+        "S2UR": 1,
+        "SHF.L.U32": 2,
+        "SHF.L.U64.HI": 2,
+        "SHF.R.S32.HI": 13,
+        "SHF.R.U32.HI": 9,
+        "SHF.R.U64": 1,
+        "STG.E.64": 8,
+        "STS.128": 7,
+        "STS.64": 7,
+        "UIADD3": 3,
+        "UIADD3.X": 1,
+        "ULDC.64": 7,
+        "UMOV": 2,
+        "UPRMT": 1,
+        "USHF.L.U32": 1,
+        "USHF.L.U64.HI": 1,
+        "VIADD": 6
+      },
+      "global_load_counts": {
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64.CONSTANT": 4
+      },
+      "global_store_counts": {
+        "STG.E.64": 8
+      },
+      "local_load_store_instruction_count": 0,
+      "parsed_instruction_sha256": "421b7f7ba2b951276ddde6ec7f059f9dbca7c921363ad6e95319300dd4fdf979",
+      "control_instructions": [
+        {
+          "offset": 240,
+          "predicate": "@P0",
+          "opcode": "BRA",
+          "operands": "0x1f0"
+        },
+        {
+          "offset": 480,
+          "predicate": null,
+          "opcode": "BRA",
+          "operands": "0x1550"
+        },
+        {
+          "offset": 5440,
+          "predicate": "@!P3",
+          "opcode": "BRA",
+          "operands": "0x910"
+        },
+        {
+          "offset": 6800,
+          "predicate": null,
+          "opcode": "EXIT",
+          "operands": ""
+        },
+        {
+          "offset": 6816,
+          "predicate": null,
+          "opcode": "BRA",
+          "operands": "0x1aa0"
+        }
+      ]
+    },
+    {
+      "iteration": 17,
+      "variant": 15,
+      "dtype": "bf16",
+      "symbol": "_ZN7megafmm59_GLOBAL__N__ed766fd4_26_small_mma_16x8_identity_cu_a00e88b423mma16x8_identity_kernelIN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_Pf",
+      "resource_usage": {
+        "REG": 96,
+        "STACK": 0,
+        "SHARED": 6400,
+        "LOCAL": 0
+      },
+      "source_declared_operand_shared_bytes": 5376,
+      "compiled_shared_beyond_source_operand_buffer_bytes": 1024,
+      "static_instruction_count_including_padding_and_predicate_false": 440,
+      "always_false_uniform_instruction_count": 1,
+      "opcode_counts": {
+        "BRA": 4,
+        "CS2R": 28,
+        "EXIT": 1,
+        "F2FP.BF16.F32.PACK_AB": 24,
+        "FADD": 76,
+        "HMMA.16816.F32.BF16": 7,
+        "IADD3": 16,
+        "IADD3.X": 7,
+        "IMAD": 20,
+        "IMAD.IADD": 4,
+        "IMAD.MOV.U32": 3,
+        "IMAD.SHL.U32": 6,
+        "IMAD.U32": 17,
+        "IMAD.WIDE": 6,
+        "IMAD.WIDE.U32": 11,
+        "IMAD.X": 1,
+        "ISETP.GT.AND": 1,
+        "ISETP.LE.AND": 1,
+        "LDC": 4,
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64.CONSTANT": 4,
+        "LDSM.16.M88.4": 7,
+        "LDSM.16.MT88.2": 7,
+        "LEA": 18,
+        "LEA.HI": 4,
+        "LEA.HI.SX32": 1,
+        "LEA.HI.X": 8,
+        "LOP3.LUT": 50,
+        "MOV": 1,
+        "NOP": 15,
+        "S2R": 5,
+        "S2UR": 1,
+        "SHF.L.U32": 9,
+        "SHF.L.U64.HI": 2,
+        "SHF.R.S32.HI": 13,
+        "SHF.R.U32.HI": 9,
+        "SHF.R.U64": 1,
+        "STG.E.64": 8,
+        "STS.128": 7,
+        "STS.64": 7,
+        "UIADD3": 3,
+        "UIADD3.X": 1,
+        "ULDC.64": 7,
+        "UMOV": 2,
+        "UPRMT": 1,
+        "USHF.L.U32": 1,
+        "USHF.L.U64.HI": 1,
+        "VIADD": 6
+      },
+      "global_load_counts": {
+        "LDG.E.128.CONSTANT": 4,
+        "LDG.E.64.CONSTANT": 4
+      },
+      "global_store_counts": {
+        "STG.E.64": 8
+      },
+      "local_load_store_instruction_count": 0,
+      "parsed_instruction_sha256": "a0aae6b575b5a4e1df0407d5bf1164073278d953de3dc0dc51c1c342f49bd15e",
+      "control_instructions": [
+        {
+          "offset": 240,
+          "predicate": "@P0",
+          "opcode": "BRA",
+          "operands": "0x1f0"
+        },
+        {
+          "offset": 480,
+          "predicate": null,
+          "opcode": "BRA",
+          "operands": "0x1550"
+        },
+        {
+          "offset": 5440,
+          "predicate": "@!P3",
+          "opcode": "BRA",
+          "operands": "0x910"
+        },
+        {
+          "offset": 6800,
+          "predicate": null,
+          "opcode": "EXIT",
+          "operands": ""
+        },
+        {
+          "offset": 6816,
+          "predicate": null,
+          "opcode": "BRA",
+          "operands": "0x1aa0"
+        }
+      ]
+    }
+  ],
+  "findings": [
+    "Mega14 parsed instructions and REG/STACK/SHARED/LOCAL are identical between iter16 and iter17 for both dtypes.",
+    "Mega15 uses96 registers versus Mega14 94; compiled static shared6400 bytes, stack0 and local0 for both. No LDL/STL in either SASS. Nominal source operand shared buffer5376 bytes; the extra1024 compiled bytes are recorded without attributing an unverified cause.",
+    "Mega15 has no FMUL, FFMA, floating beta comparison, C0 argument or C0 global load/address path. FullTiles identity specialization executes direct U stores.",
+    "Mega14 static FMUL24 includes16 on its beta0 execution path; identity removes those16 dynamic alpha multiplies. Mega14 already skips C0 loads when beta0, so matched beta0 traffic is not reduced by removing its unreachable C0 branch.",
+    "Mega14 static STG.E.64 count16 includes8 in each beta branch; Mega15 count8 is one path. Both execute8 float2 stores per lane on the matched beta0 path. Static stores/loads are not evidence of halved dynamic traffic.",
+    "Both retain four LDG.E.128.CONSTANT A loads and four LDG.E.64.CONSTANT B loads per K16,7 HMMA,7 A LDSM.x4 and7 B transposed LDSM.x2,24 packed RN converters,7 STS.128 and7 STS.64. No cache modifier change is observed from14 to15.",
+    "Mega15 static584-to440 reduction is144 instructions, including eliminated beta branch code and duplicated output/address work. Seven-P accumulation and the fixed seven-U DAG remain; no dynamic speedup or occupancy claim follows from static counts."
+  ],
+  "validation": [
+    {
+      "path": "results/correctness_iter17.txt",
+      "lines": 1706,
+      "complete_terminal_newline": true,
+      "case_count": 936,
+      "case_count_by_dtype": {
+        "bf16": 468,
+        "fp16": 468
+      },
+      "explicit_pass_marker_count": 85,
+      "mega15_case_count": 58,
+      "mega15_actual_route_counts": {
+        "megakernel_warp_mma_16x8_identity": 18,
+        "megakernel_warp_mma_16x8_epilogue": 4,
+        "megakernel_warp_mma_16x8_vec4": 6,
+        "megakernel_warp_mma_packed": 12,
+        "dense_cublaslt": 18
+      },
+      "all_case_metrics_finite": true,
+      "all_case_nonfinite_zero": true,
+      "mega15_case_metrics_all_exact_zero": true,
+      "footer": [
+        "PASS structural DAG, fallback numerics, strides/transposes, alias, degenerate and rejection tests",
+        "Forced SW mixed-precision certification is a separate gate: use --strict-numerics or megafmm_bench"
+      ],
+      "observed_process_exit_code": null,
+      "process_exit_note": "No captured exit-status file was read; PASS/footer evidence is reported."
+    },
+    {
+      "path": "results/sanitizer_small_identity15_memcheck.txt",
+      "lines": 75,
+      "complete_terminal_newline": true,
+      "case_count": 26,
+      "case_count_by_dtype": {
+        "bf16": 13,
+        "fp16": 13
+      },
+      "explicit_pass_marker_count": 11,
+      "mega15_case_count": 26,
+      "mega15_actual_route_counts": {
+        "megakernel_warp_mma_16x8_identity": 8,
+        "megakernel_warp_mma_16x8_epilogue": 6,
+        "megakernel_warp_mma_packed": 6,
+        "megakernel_warp_mma_16x8_vec4": 6
+      },
+      "all_case_metrics_finite": true,
+      "all_case_nonfinite_zero": true,
+      "mega15_case_metrics_all_exact_zero": true,
+      "footer": [
+        "PASS selected candidate kernel paths, beta0, alpha/beta alias and rectangular fallback",
+        "========= ERROR SUMMARY: 0 errors"
+      ],
+      "observed_process_exit_code": null,
+      "process_exit_note": "No captured exit-status file was read; PASS/footer evidence is reported."
+    },
+    {
+      "path": "results/sanitizer_small_identity15_racecheck.txt",
+      "lines": 77,
+      "complete_terminal_newline": true,
+      "case_count": 26,
+      "case_count_by_dtype": {
+        "bf16": 13,
+        "fp16": 13
+      },
+      "explicit_pass_marker_count": 11,
+      "mega15_case_count": 26,
+      "mega15_actual_route_counts": {
+        "megakernel_warp_mma_16x8_identity": 8,
+        "megakernel_warp_mma_16x8_epilogue": 6,
+        "megakernel_warp_mma_packed": 6,
+        "megakernel_warp_mma_16x8_vec4": 6
+      },
+      "all_case_metrics_finite": true,
+      "all_case_nonfinite_zero": true,
+      "mega15_case_metrics_all_exact_zero": true,
+      "footer": [
+        "PASS selected candidate kernel paths, beta0, alpha/beta alias and rectangular fallback",
+        "========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)"
+      ],
+      "observed_process_exit_code": null,
+      "process_exit_note": "No captured exit-status file was read; PASS/footer evidence is reported."
+    },
+    {
+      "path": "results/sanitizer_small_identity15_synccheck.txt",
+      "lines": 77,
+      "complete_terminal_newline": true,
+      "case_count": 26,
+      "case_count_by_dtype": {
+        "bf16": 13,
+        "fp16": 13
+      },
+      "explicit_pass_marker_count": 11,
+      "mega15_case_count": 26,
+      "mega15_actual_route_counts": {
+        "megakernel_warp_mma_16x8_identity": 8,
+        "megakernel_warp_mma_16x8_epilogue": 6,
+        "megakernel_warp_mma_packed": 6,
+        "megakernel_warp_mma_16x8_vec4": 6
+      },
+      "all_case_metrics_finite": true,
+      "all_case_nonfinite_zero": true,
+      "mega15_case_metrics_all_exact_zero": true,
+      "footer": [
+        "PASS selected candidate kernel paths, beta0, alpha/beta alias and rectangular fallback",
+        "========= ERROR SUMMARY: 0 errors"
+      ],
+      "observed_process_exit_code": null,
+      "process_exit_note": "No captured exit-status file was read; PASS/footer evidence is reported."
+    }
+  ],
+  "validation_details": {
+    "structural_pass_markers": {
+      "mma_bitwise": 24,
+      "cluster_graph": 6,
+      "input_pointer_rebind": 38,
+      "output_epilogue_rebind": 16,
+      "structural_summary": 1
+    },
+    "begin_warp_mma_expected_actual_checks": 518,
+    "expected_actual_mismatches": 0,
+    "mega15_cases_per_dtype": 29,
+    "mega15_case_metrics_maximum": 0,
+    "all_structural_cases_maximum_reported_eF": 9.04306e-08,
+    "sanitizer_payload_identical_ignoring_banner_scheduler_summary": true,
+    "sanitizer_output_rebind_pass_count_each": 10,
+    "memcheck_observed_errors": 0,
+    "racecheck_observed_hazards": 0,
+    "racecheck_observed_errors": 0,
+    "racecheck_observed_warnings": 0,
+    "synccheck_observed_errors": 0
+  },
+  "validation_limits": [
+    "Structural and sanitizer logs do not certify the frozen mixed-precision gate. Correctness footer explicitly separates --strict-numerics or benchmark certification; iter17 quick screening already records all18 numerical gates failing.",
+    "Mega15 structural/sanitizer CASE data are exact structural inputs; no uniform/range/upper-range numerical stress claim is inferred.",
+    "Graph PASS markers are cluster/warps routes, not identity15-specific Graph replay verification.",
+    "Input pointer rebinding is covered in ordinary correctness log, while sanitizer payload reports output rebinding only.",
+    "The selected logs do not record full commands, tool versions, device or source/binary hashes. File hashes bind the inspected evidence but do not supply missing execution metadata.",
+    "Static SASS instruction counts and register totals do not measure dynamic issue counts, utilization, bandwidth, GPU latency, occupancy, or a physical performance floor."
+  ]
+}

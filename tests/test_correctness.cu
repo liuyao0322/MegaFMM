@@ -1,4 +1,5 @@
 #include "megafmm/gemm.h"
+#include "megafmm/kernels.h"
 #include <cuda_bf16.h>
 #include <cuda_fp16.h>
 #include <algorithm>
@@ -68,6 +69,10 @@ std::string algorithm_name(megafmm::Algorithm algorithm) {
     case megafmm::Algorithm::WinogradLt:return "lt";case megafmm::Algorithm::WinogradHopper:return "hopper";
     case megafmm::Algorithm::Megakernel:return "mega";
   } return "unknown";
+}
+const char* batched_name(megafmm::Algorithm algorithm,int variant) {
+  if(algorithm==megafmm::Algorithm::WinogradLt)return "winograd_lt_batched";
+  return variant>=7 ? "winograd_sm80_batched_k64":"winograd_sm80_batched";
 }
 const char* warp_mma_name(int variant,const megafmm::Problem& p) {
   if(variant==14 || variant==15 || variant==16) {
@@ -266,13 +271,14 @@ template<class T> void structural_suite(megafmm::DType dtype) {
 template<class T> void batched_suite(megafmm::DType dtype,bool lt_only=false) {
   for(auto candidate:{std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradLt,1},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,5},
-                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,6}}) {
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,6},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,7},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,8}}) {
   const auto algorithm=candidate.first;const int variant=candidate.second;
   if(lt_only && algorithm!=megafmm::Algorithm::WinogradLt)continue;
   auto exact=[dtype,algorithm,variant](megafmm::Problem p,Pattern pattern,bool alias=false,bool certified=true,
                     bool expect_batched=true,size_t workspace_limit=size_t(8)<<30,bool do_tune=false) {
-    const char* route=!expect_batched ? "dense_cublaslt":
-                     algorithm==megafmm::Algorithm::WinogradLt ? "winograd_lt_batched":"winograd_sm80_batched";
+    const char* route=!expect_batched ? "dense_cublaslt":batched_name(algorithm,variant);
     std::cout << "BEGIN_BATCHED dtype=" << megafmm::dtype_name(dtype)
               << " algorithm=" << algorithm_name(algorithm) << " variant=" << variant
               << " pattern=" << pattern_name(pattern) << " shape=" << p.m << ',' << p.n << ',' << p.k
@@ -312,6 +318,30 @@ template<class T> void batched_suite(megafmm::DType dtype,bool lt_only=false) {
   exact(p,Pattern::Integers,false,true,false);
   p=problem(128,128,128,dtype);p.trans_b=true;
   exact(p,Pattern::Integers,false,true,false);
+  }
+}
+template<class T> void k64_batched_tail_suite(megafmm::DType dtype,int variant) {
+  require(variant==7 || variant==8,"K64 tail suite needs Hopper7/8");
+  for(int scenario=0;scenario<4;++scenario) {
+    const int parent_k=scenario==0 ? 16:scenario==1 ? 48:144;
+    auto p=problem(80,112,parent_k,dtype);
+    const bool alias=scenario==3;
+    if(alias) {
+      p.lda+=8;p.ldb+=8;p.ldc+=8;p.ldd+=8;
+      p.alpha=.5f;p.beta=-.25f;
+    }
+    auto leaf=problem(p.m/2,p.n/2,p.k/2,dtype);
+    require(megafmm::small_batched_k64_can_implement(leaf,variant),"K64 leaf tail rejected");
+    require(megafmm::small_batched_k64_workspace_bytes(leaf,variant)==0,
+            "K64 leaf unexpectedly requires workspace");
+    // Parent uniform A/B/P slots still require caller-owned workspace.
+    std::cout << "BEGIN_K64_BATCHED_TAIL dtype=" << megafmm::dtype_name(dtype)
+              << " variant=" << variant << " shape=" << p.m << ',' << p.n << ',' << p.k
+              << " leaf_k=" << leaf.k << " alias=" << alias
+              << " alpha=" << p.alpha << " beta=" << p.beta << std::endl;
+    auto e=run_case<T>(p,megafmm::Algorithm::WinogradHopper,Pattern::Integers,alias,true,
+                       1234567,variant,alias,size_t(8)<<30,batched_name(megafmm::Algorithm::WinogradHopper,variant));
+    require(e.nonfinite==0 && e.maxabs==0,"K64 batched partial K/M/N or alias/tune output incorrect");
   }
 }
 template<class T> void warp_mma_suite(megafmm::DType dtype) {
@@ -550,7 +580,7 @@ template<class T> void epilogue_output_rebind_suite(megafmm::DType dtype,int var
   }
   }
 }
-template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false) {
+template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false,int hopper_filter=-1) {
   // Reuse a tuned plan with changed addresses: an aligned preferred SW route must
   // safely choose Dense when the new input views have only element alignment.
   auto p=problem(256,256,256,dtype);
@@ -567,6 +597,8 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,0},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,5},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,6},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,7},
+                     std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,8},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,3},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,4},
                      std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::Megakernel,5},
@@ -585,13 +617,13 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
     bool is_batched=(algo==megafmm::Algorithm::WinogradLt && variant==1) ||
                     (algo==megafmm::Algorithm::WinogradHopper && variant>=5);
     if(batched_only && !(algo==megafmm::Algorithm::WinogradLt && variant==1))continue;
+    if(hopper_filter>=0 && (algo!=megafmm::Algorithm::WinogradHopper || variant!=hopper_filter))continue;
     megafmm::Policy policy;policy.algorithm=algo;policy.certified_range=true;
     if(algo==megafmm::Algorithm::WinogradLt)policy.lt_variant=variant;
     if(algo==megafmm::Algorithm::WinogradHopper)policy.hopper_variant=variant;
     if(algo==megafmm::Algorithm::Megakernel)policy.mega_variant=variant;
     auto plan=megafmm::create_plan(p,policy);Buffer workspace(plan->workspace_bytes());
-    if(is_batched)require(plan->algorithm_name()==(algo==megafmm::Algorithm::WinogradLt ?
-                         "winograd_lt_batched":"winograd_sm80_batched"),"batched rebind test selected Dense");
+    if(is_batched)require(plan->algorithm_name()==batched_name(algo,variant),"batched rebind test selected Dense");
     if(algo==megafmm::Algorithm::Megakernel && variant>=4) {
       require(plan->algorithm_name()==warp_mma_name(variant,p),"warp MMA rebind test selected another route");
       require(plan->workspace_bytes()==0,"warp MMA rebind unexpectedly requires workspace");
@@ -618,7 +650,7 @@ template<class T> void rebind_suite(megafmm::DType dtype,bool batched_only=false
 void batched_policy_rejection_suite(bool lt_only=false) {
   for(auto algorithm:{megafmm::Algorithm::Auto,megafmm::Algorithm::Dense,megafmm::Algorithm::WinogradLt,
                       megafmm::Algorithm::WinogradHopper,megafmm::Algorithm::Megakernel})
-  for(bool empty:{false,true}) for(int family=0;family<3;++family) for(int variant:{-1,family==0 ? 2:family==1 ? 7:17}) {
+  for(bool empty:{false,true}) for(int family=0;family<3;++family) for(int variant:{-1,family==0 ? 2:family==1 ? 9:17}) {
     if(lt_only && family!=0)continue;
     megafmm::Policy policy;policy.algorithm=algorithm;policy.certified_range=true;
     if(family==0)policy.lt_variant=variant;
@@ -714,7 +746,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype) {
   bool pass=true;double floor=dtype==megafmm::DType::BF16 ? 1e-3:1e-4;
   struct Candidate { megafmm::Algorithm algorithm;int variant; };
   std::vector<Candidate> candidates={{megafmm::Algorithm::WinogradLt,0},{megafmm::Algorithm::WinogradLt,1}};
-  for(int variant=0;variant<=6;++variant)candidates.push_back({megafmm::Algorithm::WinogradHopper,variant});
+  for(int variant=0;variant<=8;++variant)candidates.push_back({megafmm::Algorithm::WinogradHopper,variant});
   for(int variant=0;variant<=16;++variant)candidates.push_back({megafmm::Algorithm::Megakernel,variant});
   for(auto pat:{Pattern::Uniform,Pattern::Positive,Pattern::Range,Pattern::Cancellation,Pattern::HighHalf}) {
     std::vector<std::vector<double>> ef(candidates.size());
@@ -768,7 +800,7 @@ template<class T> bool strict_numerics(megafmm::DType dtype) {
 int main(int argc,char** argv) {
   try {
     std::cout << std::unitbuf;std::cerr << std::unitbuf;
-    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-batched | --smoke-candidates [--mega-only] [--mega-variant 0..16 | --hopper-variant 0..6]]";
+    const std::string usage="usage: test_correctness [--strict-numerics] [--smoke-batched | --smoke-candidates [--mega-only] [--mega-variant 0..16 | --hopper-variant 0..8]]";
     bool numeric=false, candidates_only=false,mega_only=false,batched_only=false;
     int hopper_filter=-1,mega_filter=-1;
     for(int i=1;i<argc;++i) {
@@ -786,7 +818,7 @@ int main(int argc,char** argv) {
         require(i+1<argc,usage);
         std::string value=argv[++i];size_t consumed=0;
         hopper_filter=std::stoi(value,&consumed);
-        require(consumed==value.size() && hopper_filter>=0 && hopper_filter<=6,usage);
+        require(consumed==value.size() && hopper_filter>=0 && hopper_filter<=8,usage);
       } else throw std::runtime_error(usage);
     }
     require((!mega_only && hopper_filter<0 && mega_filter<0) || candidates_only,
@@ -829,7 +861,9 @@ int main(int argc,char** argv) {
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,3},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,4},
                            std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,5},
-                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,6}}) {
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,6},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,7},
+                           std::pair<megafmm::Algorithm,int>{megafmm::Algorithm::WinogradHopper,8}}) {
           if(mega_only && candidate.first!=megafmm::Algorithm::Megakernel)continue;
           if(hopper_filter>=0 && (candidate.first!=megafmm::Algorithm::WinogradHopper ||
                                   candidate.second!=hopper_filter))continue;
@@ -873,7 +907,7 @@ int main(int argc,char** argv) {
                     "supported candidate unexpectedly fell back to Dense");
             const char* route=warp_mma ? warp_mma_name(candidate.second,p):
                               candidate.first==megafmm::Algorithm::WinogradHopper && candidate.second>=5 ?
-                                "winograd_sm80_batched":nullptr;
+                                batched_name(candidate.first,candidate.second):nullptr;
             auto e=run_case<T>(p,candidate.first,Pattern::Integers,alias,true,1234567,candidate.second,
                                true,size_t(8)<<30,route);
             require(e.nonfinite==0 && e.maxabs==0,"candidate beta0/alias/rectangular/partial CTA smoke failed");
@@ -894,6 +928,12 @@ int main(int argc,char** argv) {
         prefetch_short_k_suite<__nv_bfloat16>(megafmm::DType::BF16);
         prefetch_short_k_suite<__half>(megafmm::DType::FP16);
       }
+      if(hopper_filter==7 || hopper_filter==8) {
+        k64_batched_tail_suite<__nv_bfloat16>(megafmm::DType::BF16,hopper_filter);
+        k64_batched_tail_suite<__half>(megafmm::DType::FP16,hopper_filter);
+        rebind_suite<__nv_bfloat16>(megafmm::DType::BF16,false,hopper_filter);
+        rebind_suite<__half>(megafmm::DType::FP16,false,hopper_filter);
+      }
       std::cout << "PASS selected candidate kernel paths, beta0, alpha/beta alias and rectangular fallback\n";
       return 0;
     }
@@ -901,6 +941,10 @@ int main(int argc,char** argv) {
     structural_suite<__half>(megafmm::DType::FP16);
     batched_suite<__nv_bfloat16>(megafmm::DType::BF16);
     batched_suite<__half>(megafmm::DType::FP16);
+    for(int variant:{7,8}) {
+      k64_batched_tail_suite<__nv_bfloat16>(megafmm::DType::BF16,variant);
+      k64_batched_tail_suite<__half>(megafmm::DType::FP16,variant);
+    }
     warp_mma_suite<__nv_bfloat16>(megafmm::DType::BF16);
     warp_mma_suite<__half>(megafmm::DType::FP16);
     prefetch_short_k_suite<__nv_bfloat16>(megafmm::DType::BF16);

@@ -10,6 +10,7 @@ if(NOT EXISTS "${CUTLASS_ROOT}/include/cutlass/cutlass.h")
 endif()
 add_library(megafmm STATIC solution/plan.cpp solution/pack_winograd.cu
   solution/combine_fp32.cu solution/gemm_hopper.cu solution/gemm_batched.cu
+  solution/gemm_batched_k64.cu
   solution/megakernel_hopper.cu solution/small_mma.cu solution/small_mma_fast.cu
   solution/small_product_mma.cu solution/small_product_mma_fast.cu
   solution/small_mma_16x8.cu solution/small_mma_16x8_vec4.cu

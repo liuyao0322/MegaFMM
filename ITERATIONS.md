@@ -65,6 +65,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 18 | Prefetch next raw K16 tile into registers | 0.3553 | 0.675800 | promising-screen-numerical-fail |
 
+| 19 | Compact seven-batch BK64 pipeline controls | 0.4534 | 0.122446 | screen-numerical-fail |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -719,3 +721,45 @@ Iter17 post-closure primary comparison (quick signal, mixed historical full prot
 - **Analysis:** Quick20/5/1 screening completed18 finite rows, all frozen numerical gates fail, exit2. Initial128BF grouping is4.13–4.26us versus historical4.64us best, a promising screening signal requiring same-binary full confirmation; compiler uses120registers without spills. This variant can also change default inlinePTX global cache policy relative to readonly compiler loads, so actual SASS issue order and cache modifiers must be inspected before attributing gains purely to scheduling.
 - **Next:** Validate16 structural/bitwise/short-K with three standaloneCUDA12.8sanitizers and SASS, then separately test compact BK64 seven-batch H7/H8.
 - **Archive:** trajectory/20261013_144926_iter-18/
+
+Iter18 post-closure primary comparison (quick20/5/1, mixed historical protocols, not acceptance): bf16 128^3 4.126us Dense/SW=1.019x priorbest/SW=1.125x; fp16 128^3 4.339us Dense/SW=0.951x priorbest/SW=1.102x; bf16 256^3 6.346us Dense/SW=0.833x priorbest/SW=1.007x; fp16 256^3 6.504us Dense/SW=0.742x priorbest/SW=0.985x; bf16 512^3 10.994us Dense/SW=0.562x priorbest/SW=1.080x; fp16 512^3 11.086us Dense/SW=0.554x priorbest/SW=1.065x; bf16 1024^3 65.475us Dense/SW=0.197x priorbest/SW=0.303x; fp16 1024^3 65.357us Dense/SW=0.156x priorbest/SW=0.300x. 128 both dtypes and512 both dtypes improve the prior observed latency by more than3%;256 within noise/no3% gain,1024 remains slower thanLt1. Full same-binary launch/Graph repeats and actual loading/cache-policy inspection required.
+
+### Iter17 post-closure identity15 validation and static SASS evidence
+
+CPU-only audit of archived iter16/17 SASS/resources and iter17 logs is saved in [results/small_identity_profile_iter17.json](results/small_identity_profile_iter17.json). The requested small_sass_iter16.json was absent; the comparison uses the existing raw iter16 SASS/resources and records small_reassessment_iter16.json metadata. Mega14 parsed instructions/resources are unchanged across16→17 for BF16 and FP16. Mega15 has96 registers versus14's94; both report6400 bytes compiled static shared, zero STACK/LOCAL, and no LDL/STL. Source declares5376 bytes of operand shared; the additional1024 compiled bytes are recorded without assigning an unverified cause.
+
+The complete instruction parser includes one always-false @!UPT UIADD3 omitted by the older parser, giving584 static instructions for14 and440 for15 (older counts583/439); this is a parser difference, not a code change. Identity15 has zero FMUL/FFMA/beta comparison/C0 load path. It preserves four LDG.E.128.CONSTANT A loads, four LDG.E.64.CONSTANT B loads, seven HMMA, seven A LDSM.x4, seven B transposed LDSM.x2 and24 packed RN converters per K16; cache modifiers remain the same. It writes eight STG.E.64 float2 vectors per lane. Mega14's static16 stores include two alternative beta paths, each executing eight; beta0 already skipped its C0 loads. Thus the specialization removes sixteen executed alpha multiplies and beta branch/address code, without evidence of halving matched beta0 memory traffic. The static144-instruction reduction does not establish dynamic speedup, occupancy or a physical floor.
+
+correctness_iter17.txt has936 finite CASE rows (468/dtype),85 explicit PASS markers,518 expected/actual route checks with zero mismatches, and58 Mega15 CASE rows across identity/epilogue/vec4/packed/Dense fallbacks with all four reported error metrics and nonfinite equal zero. Bitwise tests cover both dtypes, general coefficients/alias and identity; signed-zero and input/output rebinding are covered. Each identity15 sanitizer has26 exact structural CASE rows plus ten output-rebind PASS markers: memcheck0 errors, racecheck0 errors/0 warnings, synccheck0 errors. The audit observed complete PASS/summary footers, not independent exit-status files. These tests do not certify the frozen mixed-precision gate or identity15-specific Graph replay; quick17's18 gate failures remain unchanged. No GPU/build/benchmark/git action or source/script edit was performed for this evidence audit.
+
+### Iter 19 — Compact seven-batch BK64 pipeline controls
+
+- **Hypothesis:** A narrow32x64 BK64 leaf CTA can increase small-problem coverage while pipelining four instructionK16groups.
+- **Changes:** Added Hopper7 three-stage MmaMultistage cp.async and Hopper8 two-stage MmaPipelined register-double-buffer controls, compact seven-batch layout, zero leaf scratch, unchanged parent pack/product/combine, partialK8/24/72 and alignment/alias/tune tests; retained5/6.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.122446 ms; mean speedup=0.4534x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 128,128,128 | bf16 | winograd_sm80_batched_k64 v7 | launch | 0.004203 | 0.009912 | 0.4241 | 0.00605216 | 0 |
+| 128,128,128 | fp16 | winograd_sm80_batched_k64 v7 | launch | 0.004128 | 0.010360 | 0.3985 | 0.000744325 | 0 |
+| 256,256,256 | bf16 | winograd_sm80_batched_k64 v7 | launch | 0.005293 | 0.010939 | 0.4838 | 0.00597914 | 0 |
+| 256,256,256 | fp16 | winograd_sm80_batched_k64 v7 | launch | 0.004806 | 0.010954 | 0.4388 | 0.000737165 | 0 |
+| 512,512,512 | bf16 | winograd_sm80_batched_k64 v7 | launch | 0.006221 | 0.011752 | 0.5293 | 0.00598238 | 0 |
+| 512,512,512 | fp16 | winograd_sm80_batched_k64 v7 | launch | 0.006126 | 0.011680 | 0.5245 | 0.000753207 | 0 |
+| 1024,1024,1024 | bf16 | winograd_sm80_batched_k64 v7 | launch | 0.012917 | 0.022458 | 0.5752 | 0.00600975 | 0 |
+| 1024,1024,1024 | fp16 | winograd_sm80_batched_k64 v7 | launch | 0.010221 | 0.022424 | 0.4558 | 0.000751819 | 0 |
+| 2048,2048,2048 | bf16 | winograd_sm80_batched_k64 v7 | launch | 0.032230 | 0.098659 | 0.3267 | 0.00602393 | 0 |
+| 2048,2048,2048 | fp16 | winograd_sm80_batched_k64 v7 | launch | 0.032507 | 0.099299 | 0.3274 | 0.000752202 | 0 |
+| 3072,3072,3072 | bf16 | winograd_sm80_batched_k64 v7 | launch | 0.085637 | 0.281874 | 0.3038 | 0.00601824 | 0 |
+| 3072,3072,3072 | fp16 | winograd_sm80_batched_k64 v7 | launch | 0.090166 | 0.284144 | 0.3173 | 0.000752812 | 0 |
+| 4096,4096,4096 | bf16 | winograd_sm80_batched_k64 v7 | launch | 0.204154 | 0.617203 | 0.3308 | 0.00602272 | 0 |
+| 4096,4096,4096 | fp16 | winograd_sm80_batched_k64 v7 | launch | 0.207790 | 0.645467 | 0.3219 | 0.000753133 | 0 |
+| 1024,512,1024 | bf16 | winograd_sm80_batched_k64 v7 | launch | 0.011443 | 0.017472 | 0.6549 | 0.00599042 | 0 |
+| 1024,512,1024 | fp16 | winograd_sm80_batched_k64 v7 | launch | 0.010376 | 0.016552 | 0.6269 | 0.000749333 | 0 |
+| 512,1024,1024 | bf16 | winograd_sm80_batched_k64 v7 | launch | 0.009013 | 0.016437 | 0.5483 | 0.00601885 | 0 |
+| 512,1024,1024 | fp16 | winograd_sm80_batched_k64 v7 | launch | 0.009440 | 0.016443 | 0.5741 | 0.00075151 | 0 |
+
+- **Analysis:** H7 quick20/5/1 completed18 finite rows, all frozen numerical gates fail, exit2. H7/H8 compare both pipeline implementation and global-load path, not a pure stage-count ablation. Parent owns A/B/P workspace; zero workspace applies only to leaf helpers. Per-shape prior-envelope comparison and H8 same-binary screening follow closure.
+- **Next:** Screen H8 using unchanged binary, validate both routes with full structural tests and three standaloneCUDA12.8sanitizers, then test raw cp.async two-bank Mega17.
+- **Archive:** trajectory/20261013_145706_iter-19/
