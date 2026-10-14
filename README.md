@@ -1,11 +1,14 @@
 # MegaFMM
 
 H100 上 Strassen–Winograd 矩阵乘法的研究工程。2026-10-14 按用户要求移除旧
-SW 架构，准备重新设计统一 buffer 与 TMA、CUDA Core、Tensor Core 分工。
+SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的首版。
 
-**当前只实现调优 cuBLASLt Dense 基线，尚无新的 SW kernel，也没有已认证的 SW
-winner。** `Auto` 和 `Dense` 都执行普通 GEMM。旧报告中的 Mega45 等路线已从
-当前源码和公共 API 删除，其数据仅代表历史版本。
+**当前实现调优 cuBLASLt Dense 基线，以及仅支持 1024³ 的实验性 SW 首版。**
+新 SW 在本次测试输入上通过原精度门限，但明显慢于 Dense，不能作为性能 winner。
+`Auto` 和 `Dense` 都执行普通 GEMM；`SWPipeline` / `--algorithm sw` 显式执行新内核。
+旧 Mega45 等路线已从当前源码和公共 API 删除。
+
+[首版实现、精度与性能报告](trajectory/20261014_183039_validation-graph-1024/REPORT.md)
 
 ## 当前目录
 
@@ -13,6 +16,7 @@ winner。** `Auto` 和 `Dense` 都执行普通 GEMM。旧报告中的 Mega45 等
 solution/
   plan.cpp             Dense 规划、cuBLASLt 调优、指针检查和执行
   scale_output.cu      alpha=0 或 K=0 时的 FP32 输出处理
+  sw_pipeline.cu       1024³ 统一 shared buffer、warp 分工与高低部分操作数
   internal.h           内部声明
 include/megafmm/gemm.h  Problem、Policy、Plan 和 run/tune 接口
 bench/benchmark.cu     普通 launch/Graph 计时和原始输入的 FP64 参考检查
@@ -35,7 +39,7 @@ trajectory/            历史逐轮源码快照和运行输出
 - 精度未通过的方案只能记录为诊断结果，不能称作合格 winner 或进入 Auto。
 
 原 `PLAN.md` 的数值合同和数学公式继续作为参考；其中旧架构、路线与覆盖描述属于
-历史设计。新 buffer 布局、warp 分工和数值表示尚未实现或验证。
+历史设计。新 buffer 布局、warp 分工和数值表示已实现，验证范围仅为本次 1024³ 测试集合。
 
 ## 构建与验证
 
@@ -44,10 +48,12 @@ trajectory/            历史逐轮源码快照和运行输出
 
 ```bash
 bash scripts/build.sh
-bash scripts/check.sh
+bash scripts/on_gpu.sh ctest --test-dir build -R 'sw_1024_correctness|exact_winograd_dag' --output-on-failure
 ```
 
-当前构建不依赖 CUTLASS。已缓存的 `third_party/cutlass/` 不参与编译。
+新 SW 使用 CUTLASS 3.5.1 的 CuTe 布局、WGMMA/TMA 和 barrier 头文件。
+默认位置为 `third_party/cutlass/`，也可在 CMake 配置时设置 `MEGAFMM_CUTLASS_DIR`。
+构建脚本强制重新编译并记录源码 SHA256，避免共享文件系统时间戳缓存沿用旧对象。
 
 保留的 Dense GPU 测试检查原始量化输入的 FP64 参考、两种 dtype、矩形、转置、
 stride、指针元素对齐、alpha/beta、原位调优、fresh-input Graph 重放和 API 拒绝。
@@ -58,7 +64,7 @@ stride、指针元素对齐、alpha/beta、原位调优、fresh-input Graph 重�
 
 ```bash
 bash scripts/on_gpu.sh ./build/megafmm_bench \
-  --algorithm dense --shapes '128,128,128;1024,1024,1024' \
+  --algorithm dense --shapes '1024,1024,1024' \
   --dtype both --trials 100 --warmup 20 --groups 5 --correct-trials 3 \
   --output results/dense_baseline.csv
 ```
@@ -66,8 +72,20 @@ bash scripts/on_gpu.sh ./build/megafmm_bench \
 加 `--graph` 测量 CUDA Graph。当前比较双方都是独立调优的 Dense，输出的
 `speedup` 仅反映重复测量差异，不代表 SW 加速。
 
-`scripts/bench.sh <label>` 继续保留 AKO 的源码快照逻辑；正式迭代仍须记录
-`ITERATIONS.md` 和对应 Git 版本。本次架构清理不属于性能优化迭代。
+首版 SW 只测 1024：
+
+```bash
+MEGAFMM_ALGORITHM=sw bash scripts/bench.sh <label>
+MEGAFMM_ALGORITHM=sw MEGAFMM_GRAPH=1 bash scripts/bench.sh <label>
+bash scripts/on_gpu.sh ./build/test_sw1024
+```
+
+`test_sw1024` 仅执行 1024³，检查两种 dtype、六类输入、每类三轮新输入以及同一
+Graph 的新输入重放。SW 仅支持非转置、连续布局、alpha=1、beta=0；不满足条件时
+强制 SW 抛错，不静默退回 Dense。Auto 始终保留 Dense。
+
+`scripts/bench.sh <label>` 保留 AKO 的源码快照逻辑；正式迭代记录 `ITERATIONS.md`
+和对应 Git 版本。首版完成比较后停止，不自动展开后续优化。
 
 ## 历史与清理记录
 

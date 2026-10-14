@@ -1,6 +1,7 @@
 > **2026-10-14 架构重置：** 旧 SW 实现和变体接口已删除，当前只保留调优
-> cuBLASLt Dense 基线。本文的数学公式与固定数值门限继续作为参考；旧实现、
-> 调度和覆盖描述属于历史记录。新统一 buffer/warp 分工尚待重新设计与验证。
+> cuBLASLt Dense 基线，并新增仅支持1024³的统一buffer实验首版，见README中的实测报告。
+> 本文的数学公式与固定数值门限继续作为参考；旧实现、
+> 调度和覆盖描述属于历史记录。新首版通过本次测试数值门限，但性能慢于Dense，Auto不变。
 > 当前工程状态见 [README.md](README.md)，当前指令见 [HINTS.md](HINTS.md)。
 
 # MegaFMM：面向 H100 的高性能 Strassen–Winograd 实现计划

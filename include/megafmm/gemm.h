@@ -31,7 +31,7 @@ class Plan {
   Plan& operator=(const Plan&)=delete;
   size_t workspace_bytes() const;
   std::string algorithm_name() const;
-  // CPU-only metadata for the bound Dense operator. No GPU
+  // CPU-only metadata for Dense or the experimental SW configuration. No GPU
   // work or synchronization; call outside capture and steady-state timing.
   std::string lt_algorithm_config(const void* A, const void* B, const float* C0,
                                  float* D, void* workspace) const;

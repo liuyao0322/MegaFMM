@@ -1,5 +1,10 @@
 # Iteration Log
 
+> 当前状态（2026-10-14）：旧SW实现已移除。新的统一buffer高低部分首版只测1024³，
+> 本次72次压力集与12次性能配套检查通过原数值门限；性能慢于Dense约32–40倍，
+> Auto保留Dense，无SW加速winner。iter49沿用旧二进制，不是布局修改的有效证据。
+> 完整报告：trajectory/20261014_183039_validation-graph-1024/REPORT.md。
+
 <!--
 Per-iteration template (copy when adding a new iter entry under "## Iterations"):
 
@@ -2067,3 +2072,18 @@ the first complete benchmark of the interleaved implementation.
 - **Analysis:** Full 1024 launch benchmark completed with exit 0: both dtype rows passed all three fresh original-input FP64 gates. Includes all seven products, transforms, correction terms and output combination. No speedup or general-domain certification inferred before detailed inspection.
 - **Next:** Validate 1024 stress inputs, same-graph fresh-input replay and memory/synchronization correctness; collect Graph performance and write first-version comparison.
 - **Archive:** trajectory/20261014_182746_iter-50/
+
+#### Iter50 first-version validation closure
+
+Same kernel SHA256 2d05f792b1d60c2a49c3f98335a18a854d78d6306f4d5a2afdc1dd9164e127c0.
+Only1024 BF16/FP16. Full launch+Graph:4rows/12fresh checks, all numerical pass.
+Stress:6patterns×2dtype×3fresh×2modes=72pass/0fail/0nonfinite, SAME graph replay
+across fresh input contents. CTest sw_1024_correctness and exact_winograd_dag pass;
+old multisize GPU tests not run. Memcheck whole quick process exit0/errors0;
+racecheck and synccheck filtered to sw_unified_v1 exit0, hazards/errors/warnings0.
+Earlier unfiltered racecheck interrupted without diagnostics is not a pass.
+Launch Dense/SW BF16=12.133/390.256us, FP16=9.733/368.811us; Graph BF16=
+11.032/387.515us, FP16=9.252/366.750us. This is32–40x slower, not an acceleration
+winner; Auto remains Dense. User requested first version/comparison, so no further
+optimization loop. Report/raw logs/source bindings in
+trajectory/20261014_183039_validation-graph-1024/REPORT.md and validation.json.

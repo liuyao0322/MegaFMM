@@ -9,7 +9,8 @@ the user's requests in this conversation:
 - Delete old code; redesign the SW architecture next. All old SW implementations,
   including Mega45 and Mega53, are removed. Do not silently restore them.
 - Investigate a unified intermediate buffer and separate TMA, Tensor Core and
-  CUDA Core warp roles. This is a proposed design, not a validated implementation.
+  CUDA Core warp roles. Current implementation and its measured scope are recorded
+  in README and the first-version report.
 - Numerical acceptance is a prerequisite for declaring a winner. Report numerical
   failures prominently; performance-only rankings do not establish a valid solution.
 - First validate the new numerical representation and complete original-input
@@ -17,7 +18,9 @@ the user's requests in this conversation:
 
 ## Preserved baseline and contracts
 
-- Current runtime exposes only Auto and Dense, both ordinary tuned cuBLASLt GEMM.
+- Auto and Dense remain ordinary tuned cuBLASLt GEMM. Experimental SWPipeline is
+  explicitly forced and supports only contiguous non-transposed 1024^3 / alpha=1 /
+  beta=0. Passing the measured numerical cases does not promote it to Auto.
 - A/B are BF16 or FP16; computation/accumulation and output are FP32.
 - The reference computes ordinary AB in FP64 from the same original rounded A/B;
   never transform reference inputs to make an SW candidate pass.
