@@ -249,6 +249,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 171 | Two resident CTA N16 with current asynchronous frontend | 0.0000 | 0.000000 | experiment |
 
+| 172 | N16 shared budget correction | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2306,3 +2308,17 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Compilation failed only at incorrect static sizeof assertion90368; actual aligned allocation should90240. No timing or correctness result, excluded. Revisits113 with modern async frontend and twice K block, not identical113.
 - **Next:** Correct static assertion90240 and measure unchanged candidate.
 - **Archive:** trajectory/20261015_032702_iter-171/
+
+### Iter 172 — N16 shared budget correction
+
+- **Hypothesis:** Correct static allocation then measure N16 two-resident-CTA candidate.
+- **Changes:** Correct sizeof assertion to90240bytes.
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Compile failed at MN SW64 atom minimum32 rows versus N16. No performance data; must use MN SW32 atom and matching TMA32B swizzle, as113.
+- **Next:** Correct B shared layout and tensor-map swizzle then run same candidate.
+- **Archive:** trajectory/20261015_032724_iter-172/
