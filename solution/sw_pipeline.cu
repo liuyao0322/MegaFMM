@@ -11,14 +11,14 @@
 namespace megafmm::detail {
 namespace {
 constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=704;
+constexpr int Plane=512*512,Threads=256;
 constexpr size_t WorkspaceBytes=size_t(8)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
   uint64_t ready[Stages],free[Stages];
-  uint64_t pack_ready,init_ready;
+
 };
 static_assert(sizeof(Shared<cute::half_t>)==196736,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
@@ -2350,90 +2350,10 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "}\n"
   : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(uint32_t(__cvta_generic_to_shared(s.free))), "r"(tid&31), "l"(out), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<0>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<0>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<1>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<1>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<2>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<2>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<3>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<3>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<4>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<4>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<5>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<5>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<6>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<6>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<7>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<7>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<8>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<8>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<9>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<9>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<10>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<10>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<11>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<11>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<12>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<12>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<13>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<13>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<14>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<14>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<15>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<15>{}))/64)*1024)), "n"(int32_t(GMMA::Major::MN)), "n"(int32_t(GMMA::Major::K)) : "memory");}
 }
-template<class T> __global__ __launch_bounds__(Threads,1)
-void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
-                         const __grid_constant__ CUtensorMap bmap,
-                         const __grid_constant__ CUtensorMap smap,
-                         const __grid_constant__ CUtensorMap tmap,
-                         const T* A,const T* B,T* packed,float* D){
-  using namespace cute;
-  extern __shared__ __align__(128) unsigned char buffer[];
-  auto& s=*reinterpret_cast<Shared<T>*>(buffer);
-  int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
-  // Invocation-local counters: S[row32][K256] count4; T[col64][K256] count8.
-  auto* counters=reinterpret_cast<uint32_t*>(packed+8*Plane);
-  if(tid==0){
-    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    Barrier::init(&s.pack_ready,512);
-    Barrier::init(&s.init_ready,1);
-    cutlass::arch::fence_barrier_init();
-  }
-  __syncthreads();
-  constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_32,Int<BK>>{});
-  if(tid==0){
-    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
-      int p=product_for_step(step);
-      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
-      if(sequence==4){
-        // Initialization is globally ordered by a separate coordinator warp,
-        // overlapped with raw P1/P2 and CUDA transformation, before any RED.
-        wait(&s.init_ready,0);
-        wait(&s.pack_ready,0);
-        auto* sf=counters+32*(2*blockIdx.x+blockIdx.y/4);
-        auto* tf=counters+32*(32+2*blockIdx.y+blockIdx.x/8);
-        // One GPU release fence orders transformed stores before both relaxed
-        // RMW publications; acquire observations retain each release pattern.
-        asm volatile("fence.acq_rel.gpu; red.relaxed.gpu.global.add.u32 [%0],1; red.relaxed.gpu.global.add.u32 [%1],1;" :: "l"(sf),"l"(tf) : "memory");
-      }
-      if(sequence==4 || sequence==5){
-        // Once acquired, the corresponding K-half remains immutable this call.
-        auto* sf=counters+32*(2*blockIdx.x+q);
-        auto* tf=counters+32*(32+2*blockIdx.y+q);
-        uint32_t v;
-        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];":"=r"(v):"l"(sf):"memory");}while(v!=4);
-        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];":"=r"(v):"l"(tf):"memory");}while(v!=8);
-      }
-      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
-      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
-      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
-      T* op=s.operand[slot];
-      // LHS is B_leaf^T, M-contiguous original B data.
-      if(blo){
-        int plane=p==3?3:p-4;
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
-      }else{
-        int col=p==2?512:0,row=p==1 || p==2?512:0;
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
-      }
-      // RHS is A_leaf^T, K-contiguous original A data.
-      if(alo){
-        int plane=p==2?3:p-4;
-        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
-      }else{
-        int col=p==1 || p==3?512:0,row=p==3?512:0;
-        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
-      }
-
-    }
-  }else if(tid==32){
-    // Every counter has one initializer. No counter can receive a publication
-    // until all initializers joined the per-invocation driver barrier.
-    if(blockIdx.y%4==0)counters[32*(2*blockIdx.x+blockIdx.y/4)]=0;
-    if(blockIdx.x%8==0)counters[32*(32+2*blockIdx.y+blockIdx.x/8)]=0;
-    auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
-    uint32_t increment=(blockIdx.x==0 && blockIdx.y==0)?0x80000000u-127u:1u;
-    uint32_t old,current;
-    asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;":"=r"(old):"l"(barrier),"r"(increment):"memory");
-    do{asm volatile("ld.acquire.gpu.u32 %0,[%1];":"=r"(current):"l"(barrier):"memory");}while(!((old^current)&0x80000000u));
-    arrive(&s.init_ready);
-  }else if((tid>=64 && tid<128) || tid>=256){
-    int worker=tid>=256 ? tid-192:tid-64;
-  // All CTAs cooperate in one input transformation per invocation, never across calls.
-  // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
-  // retain FP32 transforms and high rounding, omit residual generation.
-  for(int local=2*worker;local<Plane/(16*8);local+=2*512){
-    int i=(blockIdx.x*32+local/64)*512+blockIdx.y*64+local%64;
+template<class T> __global__ __launch_bounds__(512,1)
+void sw_transform_pdl(const T* A,const T* B,T* packed){
+  cudaTriggerProgrammaticLaunchCompletion();
+  for(int i=2*(blockIdx.x*512+threadIdx.x);i<Plane;i+=2*512*128){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -2460,8 +2380,54 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     #pragma unroll
     for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[2*j];
   }
-    asm volatile("fence.proxy.async.global;" ::: "memory");
-    arrive(&s.pack_ready);
+  asm volatile("fence.proxy.async.global;" ::: "memory");
+}
+template<class T> __global__ __launch_bounds__(Threads,1)
+void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
+                         const __grid_constant__ CUtensorMap bmap,
+                         const __grid_constant__ CUtensorMap smap,
+                         const __grid_constant__ CUtensorMap tmap,
+                         const T* A,const T* B,T* packed,float* D){
+  using namespace cute;
+  extern __shared__ __align__(128) unsigned char buffer[];
+  auto& s=*reinterpret_cast<Shared<T>*>(buffer);
+  int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
+  if(tid==0){
+    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+    cutlass::arch::fence_barrier_init();
+  }
+  __syncthreads();
+  constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_32,Int<BK>>{});
+  if(tid==0){
+    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
+      int p=product_for_step(step);
+      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
   }else if(tid>=128 && tid<256){
     tensor_chain(s,tid,m0,n0,D);
   }
@@ -2511,10 +2477,20 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
   CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
   encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
-  void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D};dim3 grid(16,8);
-  if(state.dtype==DType::BF16)
-    check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
-  else
-    check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::half_t>),grid,Threads,args,sizeof(Shared<cute::half_t>),stream),"SW cooperative launch");
+  cudaLaunchAttribute attribute{};
+  attribute.id=cudaLaunchAttributeProgrammaticStreamSerialization;
+  attribute.val.programmaticStreamSerializationAllowed=1;
+  cudaLaunchConfig_t config{};config.gridDim=dim3(16,8);config.blockDim=dim3(Threads);
+  config.dynamicSmemBytes=sizeof(Shared<cute::half_t>);config.stream=stream;
+  config.attrs=&attribute;config.numAttrs=1;
+  if(state.dtype==DType::BF16){
+    sw_transform_pdl<cute::bfloat16_t><<<128,512,0,stream>>>(static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace));
+    check(cudaPeekAtLastError(),"SW PDL transform launch");
+    check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::bfloat16_t>,a,b,s,t,static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace),D),"SW PDL compute launch");
+  }else{
+    sw_transform_pdl<cute::half_t><<<128,512,0,stream>>>(static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace));
+    check(cudaPeekAtLastError(),"SW PDL transform launch");
+    check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::half_t>,a,b,s,t,static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace),D),"SW PDL compute launch");
+  }
 }
 } // namespace megafmm::detail

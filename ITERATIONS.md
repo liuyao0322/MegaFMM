@@ -409,6 +409,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 251 | Pad scoped counters and amortize GPU release fence | 0.8874 | 0.012545 | experiment |
 
+| 252 | Two-kernel Programmatic Dependent Launch | 0.9042 | 0.012212 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3738,3 +3740,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 12.5082 us vs Dense12.2915 us; FP16 12.5818 us vs Dense9.96608 us. Improves249 modestly but far slower224; expected errors, original gatesFAIL. Fresh224/249/250 fullNCU: all64regs/local0, warp instructions1.700/1.731/1.708M;249 regression is not spilling or a large instruction expansion.
 - **Next:** Measure249 coordinator, pack and scoped waits with sparse role timestamps before abandoning or revising synchronization structure.
 - **Archive:** trajectory/20261015_054357_iter-251/
+
+### Iter 252 — Two-kernel Programmatic Dependent Launch
+
+- **Hypothesis:** Official Hopper grid dependency completion may replace software publication while allowing raw P1/P2 to overlap an independent transform kernel.
+- **Changes:** Primary128x512 transform triggers dependents at entry; secondary256-thread128CTA static compute launches with programmatic stream serialization and waits only at first transformed operand. Same caller stream and4MiB workspace; full two-kernel invocation is timed.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012212 ms; mean speedup=0.9042x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012324 | 0.012186 | 1.0114 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009756 | 0.012239 | 0.7971 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 12.1859 us vs Dense12.3245 us; FP16 12.2390 us vs Dense9.75552 us, worse than224. Expected original errors/gatesFAIL. Official opportunistic concurrency requires no mutual progress and both kernels finish even if serialized.249 sparse trace30exactchecks/3840rows: coordinator2.75-2.78us, TMAinitwait1.82-1.92us, packwait.032us, publication.83-.86us;64regs/stack0 both traced andbase, diagnostic regime only.
+- **Next:** Measure PDL Graph separately and profile producer/consumer overlap before judging launch cost or compute path.
+- **Archive:** trajectory/20261015_054702_iter-252/
