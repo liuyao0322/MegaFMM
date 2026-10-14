@@ -181,6 +181,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 137 | Bind static TMA address metadata during explicit tuning | 0.8984 | 0.012450 | experiment |
 
+| 138 | Combine asynchronous transform publication with four consumers | 0.9186 | 0.012177 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1696,3 +1698,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 131 independent72bitwise checks and memcheck/racecheck/synccheck all pass. Full137 benchmark archived; Graph expected largely unchanged because device work is identical.
 - **Next:** Validate bound and changed-pointer paths independently and compare full launch/Graph latency
 - **Archive:** trajectory/20261015_023111_iter-137/
+
+### Iter 138 — Combine asynchronous transform publication with four consumers
+
+- **Hypothesis:** Overlap original-input products and retain low consumer polling pressure simultaneously
+- **Changes:** From129 keep352 transform workers and TMA-leader driver-workspace barrier, but only128 CUDA consumers with16chunks and matching P-free count
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012177 ms; mean speedup=0.9186x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012357 | 0.012054 | 1.0252 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009988 | 0.012300 | 0.8121 | 0.000754626 | 0 |
+
+- **Analysis:** 137 address-metadata reuse has no material timing gain. Full138 benchmark archived; synchronization changes require independent stress before retention.
+- **Next:** Assess combined full-call gain and simplify consumer addresses to reduce register pressure
+- **Archive:** trajectory/20261015_023244_iter-138/

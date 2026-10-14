@@ -21,6 +21,7 @@ template<class T> struct alignas(128) Shared {
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
   float product[2][Elements];
   uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
+  uint64_t pack_ready;
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
@@ -76,13 +77,54 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
+    Barrier::init(&s.pack_ready,352);
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
+  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
+  if(tid==0){
+    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
+      int p=product_for_step(step);
+      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
+      if(sequence==4){
+        wait(&s.pack_ready,0);
+        // CUDA12.4 cooperative launch gives each invocation its own initialized
+        // driver workspace. Only TMA leaders join this publication barrier;
+        // the shared pack barrier has already acquired every CUDA writer.
+        auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
+        uint32_t increment=(blockIdx.x==0 && blockIdx.y==0) ? 0x80000000u-127u:1u;
+        uint32_t old,current;
+        asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;" : "=r"(old) : "l"(barrier),"r"(increment) : "memory");
+        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(!((old^current)&0x80000000u));
+      }
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      // Seven-product experiment: only publish high operands; no residual loads.
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      if(alo){
+        int plane=p==2 ? 6:2*(p-4);
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op,0,m0,k0/64,plane);
+      }else{
+        int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op,0,m0+row,(k0+col)/64);
+      }
+      if(blo){
+        int plane=p==3 ? 6:2*(p-4);
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+ASize,n0,k0,plane);
+      }else{
+        int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize,n0+col,k0+row);
+      }
+
+    }
+  }else if((tid>=32 && tid<128) || tid>=256){
+    int worker=tid>=256 ? tid-160:tid-32;
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
-  for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid);i<Plane;i+=2*gridDim.x*gridDim.y*Threads){
+  for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*352+worker);i<Plane;i+=2*gridDim.x*gridDim.y*352){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -109,38 +151,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     #pragma unroll
     for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(2*j*Plane+i)/2]=words[2*j];
   }
-  // Generic global stores become visible to TMA's async proxy before publication.
-  asm volatile("fence.proxy.async.global;" ::: "memory");
-  cooperative_groups::this_grid().sync();
-  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
-  if(tid==0){
-    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
-      int p=product_for_step(step);
-      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
-      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
-      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
-      // Seven-product experiment: only publish high operands; no residual loads.
-      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
-      T* op=s.operand[slot];
-      if(alo){
-        int plane=p==2 ? 6:2*(p-4);
-        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op,0,m0,k0/64,plane);
-      }else{
-        int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
-        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op,0,m0+row,(k0+col)/64);
-      }
-      if(blo){
-        int plane=p==3 ? 6:2*(p-4);
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+ASize,n0,k0,plane);
-      }else{
-        int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize,n0+col,k0+row);
-      }
-
-    }
-  }else if((tid>=32 && tid<128) || tid>=256){
-    int worker=tid>=256 ? tid-160:tid-32;
+    asm volatile("fence.proxy.async.global;" ::: "memory");
+    arrive(&s.pack_ready);
     if(worker<128){
     constexpr int Chunks=(Elements+127)/128;
     float first[Chunks],second[Chunks],current[Chunks];
@@ -226,21 +238,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map status "+std::to_string(int(result)));
 }
 } // namespace
-struct SWState{
-  DType dtype;
-  const void* bound_a=nullptr;
-  const void* bound_b=nullptr;
-  const void* bound_workspace=nullptr;
-  CUtensorMap maps[4]{};
-};
-void bind_sw_pipeline(SWState& state,const void* A,const void* B,void* workspace){
-  CUtensorMap maps[4]{};
-  encode(maps[0],A,state.dtype,true,false);encode(maps[1],B,state.dtype,false,false);
-  encode(maps[2],workspace,state.dtype,true,true);
-  encode(maps[3],static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
-  for(int i=0;i<4;++i)state.maps[i]=maps[i];
-  state.bound_a=A;state.bound_b=B;state.bound_workspace=workspace;
-}
+struct SWState{DType dtype;};
 std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   if(p.m!=1024 || p.n!=1024 || p.k!=1024 || p.trans_a || p.trans_b || p.lda!=1024 || p.ldb!=1024 || p.ldd!=1024 || p.alpha!=1 || p.beta!=0)
     throw std::invalid_argument("SW requires contiguous non-transposed1024^3 alpha1 beta0");
@@ -258,15 +256,9 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   return std::make_shared<SWState>(SWState{p.dtype});
 }
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
-  CUtensorMap fresh[4]{};
-  const CUtensorMap* maps=state.maps;
-  if(A!=state.bound_a || B!=state.bound_b || workspace!=state.bound_workspace){
-    encode(fresh[0],A,state.dtype,true,false);encode(fresh[1],B,state.dtype,false,false);
-    encode(fresh[2],workspace,state.dtype,true,true);
-    encode(fresh[3],static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
-    maps=fresh;
-  }
-  void* args[]={const_cast<CUtensorMap*>(maps),const_cast<CUtensorMap*>(maps+1),const_cast<CUtensorMap*>(maps+2),const_cast<CUtensorMap*>(maps+3),&A,&B,&workspace,&D};dim3 grid(16,8);
+  CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
+  encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
+  void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D};dim3 grid(16,8);
   if(state.dtype==DType::BF16)
     check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
   else
