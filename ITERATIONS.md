@@ -467,6 +467,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 280 | K128 one-group MMA lookahead | 1.0672 | 0.010343 | experiment |
 
+| 281 | Low32 GMMA descriptor arithmetic | 1.0564 | 0.010463 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4260,3 +4262,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 median10.39296us and FP16 10.29376us do not improve279 FP and regress BF. One BF40.7834us outlier retained in raw data. Original FP64 gates fail unchanged. No selection.
 - **Next:** Reduce descriptor calculation instruction count using known descriptor bit fields
 - **Archive:** trajectory/20261015_063800_iter-280/
+
+### Iter 281 — Low32 GMMA descriptor arithmetic
+
+- **Hypothesis:** Replacing 64-bit descriptor adds with low32 adds may remove repeated SASS constants
+- **Changes:** Split GMMA descriptors into low32 address plus fixed high32 metadata; update low32 for slots and K fragments while retaining seven-product math and synchronization
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010463 ms; mean speedup=1.0564x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012305 | 0.010557 | 1.1656 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009821 | 0.010369 | 0.9472 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.5568us and FP16 10.36864us show no gain versus266. Original FP64 gates fail unchanged. Need inspect generated SASS before claiming instruction reduction.
+- **Next:** Inspect SASS and test packed FP32-to-lowprecision pair conversion in primary transform
+- **Archive:** trajectory/20261015_063949_iter-281/
