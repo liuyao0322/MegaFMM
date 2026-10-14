@@ -55,6 +55,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 74 | Release operand slots with four warp leaders | 0.4706 | 0.023473 | passed |
 
+| 75 | Fit two cooperative CTAs per SM using BN16 | 0.3649 | 0.030256 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -467,3 +469,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Complete benchmark exited0, original gates passed. Two-inflight73 regressed to30us and is not retained.
 - **Next:** Inspect timings and test smaller tiles with two resident cooperative CTAs per SM.
 - **Archive:** trajectory/20261014_194632_iter-74/
+
+### Iter 75 — Fit two cooperative CTAs per SM using BN16
+
+- **Hypothesis:** Smaller P arena and N tile permit two independent Tensor warpgroups per SM to cover short WGMMA/TMA latencies.
+- **Changes:** BN16,BK128,256 threads,110720-byte shared,MN32 B layout,8-register fragments;256 cooperative CTAs with launch bounds256/2 and explicit resident-capacity check.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.030256 ms; mean speedup=0.3649x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x16x128 v0 | launch | 0.012161 | 0.030385 | 0.4002 | 7.32914e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x16x128 v0 | launch | 0.009926 | 0.030126 | 0.3295 | 2.11007e-06 | 1 |
+
+- **Analysis:** Original full benchmark exited0 and numerical gates passed. Resource capacity is checked at plan creation, not claimed as measured occupancy.
+- **Next:** Inspect latency and stress; reassess three recent non-improving directions if75 does not beat72 by3percent.
+- **Archive:** trajectory/20261014_194738_iter-75/
