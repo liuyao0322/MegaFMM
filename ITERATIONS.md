@@ -47,6 +47,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 70 | Measure BK256 with correct aligned shared budget | 0.3132 | 0.035336 | passed |
 
+| 71 | Increase CUDA recombination parallelism on BK128 | 0.3920 | 0.028272 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -384,3 +386,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Frozen full benchmark exited0 and numerical gates passed. No size other than1024 was executed.
 - **Next:** Select faster candidate, stress fresh inputs and Graph, and check sanitizer.
 - **Archive:** trajectory/20261014_193634_iter-70/
+
+### Iter 71 — Increase CUDA recombination parallelism on BK128
+
+- **Hypothesis:** More CUDA output workers reduce shared product consumption and Q accumulation latency without increasing the15-term Tensor work.
+- **Changes:** Restore68;512 threads with352 CUDA workers,128 WGMMA threads andone TMA warp, matched352 product-free arrivals; shared188544.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.028272 ms; mean speedup=0.3920x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x128 v0 | launch | 0.012267 | 0.028326 | 0.4330 | 7.17661e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x128 v0 | launch | 0.009905 | 0.028217 | 0.3510 | 8.25634e-07 | 1 |
+
+- **Analysis:** Full original benchmark exited0 with all numerical gates passing; BK256 single-buffer70 was slower than68 and is not selected.
+- **Next:** Validate best latency source with72 stress, Graph timing and memory checks.
+- **Archive:** trajectory/20261014_193739_iter-71/

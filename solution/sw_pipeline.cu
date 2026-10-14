@@ -10,16 +10,16 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=256,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=256;
+constexpr int BM=64,BN=32,BK=128,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int Plane=512*512,Threads=512;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
-  T operand[1][2*ASize+2*BSize];
+  T operand[2][2*ASize+2*BSize];
   float product[7][Elements];
   float output[4][Elements];
-  uint64_t ready[1],free[1],product_ready,product_free;
+  uint64_t ready[2],free[2],product_ready,product_free;
 };
 static_assert(sizeof(Shared<cute::half_t>)==188544,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
@@ -52,8 +52,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    for(int j=0;j<1;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],128);}
-    Barrier::init(&s.product_ready,128);Barrier::init(&s.product_free,96);
+    for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],128);}
+    Barrier::init(&s.product_ready,128);Barrier::init(&s.product_free,352);
     cutlass::arch::fence_barrier_init();
   }
   for(int i=tid;i<4*Elements;i+=Threads)(&s.output[0][0])[i]=0;
@@ -83,8 +83,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
     for(int q=0;q<512/BK;++q)for(int p=0;p<7;++p){
-      int sequence=q*7+p,slot=0,k0=q*BK;
-      if(sequence)wait(&s.free[slot],(sequence-1)%2);
+      int sequence=q*7+p,slot=sequence%2,k0=q*BK;
+      if(sequence>=2)wait(&s.free[slot],((sequence-2)/2)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       int bytes=2*(ASize+BSize)+(alo ? 2*ASize:0)+(blo ? 2*BSize:0);
       TxBarrier::arrive_and_expect_tx(&s.ready[slot],bytes);
@@ -109,11 +109,11 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+2*ASize,n0+col,k0+row);
       }
     }
-  }else if(tid>=32 && tid<128){
-    int worker=tid-32;
+  }else if((tid>=32 && tid<128) || tid>=256){
+    int worker=tid>=256 ? tid-160:tid-32;
     for(int q=0;q<512/BK;++q){
       wait(&s.product_ready,q%2);
-      for(int i=worker;i<Elements;i+=96){
+      for(int i=worker;i<Elements;i+=352){
         float p1=s.product[0][i],p2=s.product[1][i],p3=s.product[2][i],p4=s.product[3][i],p5=s.product[4][i],p6=s.product[5][i],p7=s.product[6][i];
         float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6),u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
         s.output[0][i]=__fadd_rn(s.output[0][i],u1);
@@ -123,17 +123,17 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
       arrive(&s.product_free);
     }
-    for(int i=worker;i<Elements;i+=96){
+    for(int i=worker;i<Elements;i+=352){
       int row=m0+i/BN,col=n0+i%BN;
       D[row*1024+col]=s.output[0][i];D[row*1024+col+512]=s.output[1][i];
       D[(row+512)*1024+col]=s.output[2][i];D[(row+512)*1024+col+512]=s.output[3][i];
     }
-  }else if(tid>=128){
+  }else if(tid>=128 && tid<256){
     for(int q=0;q<512/BK;++q){
       if(q)wait(&s.product_free,(q-1)%2);
       for(int p=0;p<7;++p){
-        int sequence=q*7+p,slot=0;
-        wait(&s.ready[slot],sequence%2);
+        int sequence=q*7+p,slot=sequence%2;
+        wait(&s.ready[slot],(sequence/2)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la),al=make_tensor(make_smem_ptr(op+ASize),la);
         auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb),bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
