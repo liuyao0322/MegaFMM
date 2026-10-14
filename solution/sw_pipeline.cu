@@ -10,7 +10,7 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=128,BN=64,BK=128,Stages=2,ASingle=64*BK,ASize=2*ASingle,BSize=BK*BN,Threads=512,Plane=512*512;
+constexpr int BM=128,BN=64,BK=128,Stages=2,ASingle=64*BK,ASize=2*ASingle,BSize=BK*BN,Threads=384,Plane=512*512;
 constexpr size_t PackedBytes=size_t(4)<<20,WorkspaceBytes=size_t(12)<<20;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -61,14 +61,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
  auto* counts=reinterpret_cast<uint32_t*>(reinterpret_cast<char*>(packed)+(size_t(11)<<20));
  if(tid==0){
   for(int j=0;j<Stages;++j){Barrier::init(&sh.ready[j],1);Barrier::init(&sh.free[j],8);}
-  Barrier::init(&sh.pack_ready,224);Barrier::init(&sh.global_ready,1);
+  Barrier::init(&sh.pack_ready,96);Barrier::init(&sh.global_ready,1);
   cutlass::arch::fence_barrier_init();
  }
  __syncthreads();
- if((tid>=32 && tid<128)||tid>=384){
-  int worker=tid>=384 ? tid-288:tid-32;
+ if(tid>=32 && tid<128){
+  int worker=tid-32;
   if(p==0 && worker==0)counts[tile]=0;
-  for(int i=2*(cta*224+worker);i<Plane;i+=2*224*224){
+  for(int i=2*(cta*96+worker);i<Plane;i+=2*224*96){
    int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);

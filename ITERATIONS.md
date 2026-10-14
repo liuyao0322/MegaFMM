@@ -279,6 +279,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 186 | One leaf product per CTA with fused last-CTA recombination | 0.3470 | 0.032147 | experiment |
 
+| 187 | 384 threads for parallel leaf register headroom | 0.3521 | 0.031880 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2574,3 +2576,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about32.0us FP16 about32.29us, much slower162 though original approximation errors retained/nonfinite0. Cannot infer source of regression without spill and instruction profiling. No numerical pass claimed.
 - **Next:** Profile register spills and instructions; compare forced min2 launch bound to a resource-compatible reduction in threads.
 - **Archive:** trajectory/20261015_034233_iter-186/
+
+### Iter 187 — 384 threads for parallel leaf register headroom
+
+- **Hypothesis:** Reducing512 to384threads raises register budget while preserving two-CTA residency and both TC groups.
+- **Changes:** Base186;96pack workers instead of224, full input transformation coverage retained with new global stride;384threads launch bound min2.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.031880 ms; mean speedup=0.3521x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.012459 | 0.031867 | 0.3910 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.009992 | 0.031893 | 0.3133 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 and FP16 about31.87/31.89us, essentially unchanged and much slower162. Expected original precision failures retained/nonfinite0. Removing register pressure alone does not rescue this direction; inspect actual spill counters before conclusions.
+- **Next:** Profile187 actual resources and phase tail; investigate last-CTA epilogue code-size overhead before rejecting coarse leaf parallelism.
+- **Archive:** trajectory/20261015_034338_iter-187/
