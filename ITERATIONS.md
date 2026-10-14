@@ -511,6 +511,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 302 | Reject warp-leader-only readiness polling | 1.0196 | 0.010872 | experiment |
 
+| 303 | Test direct release after collective WGMMA completion | 1.0779 | 0.010261 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4654,3 +4656,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.84992 us and FP16 10.89344 us, slower than selected282. Finite original errors retained, both original numerical gates fail. Branch/rendezvous overhead outweighs reduced active polling lanes; candidate not independently certified or selected.
 - **Next:** Reassess current profiles; test removing redundant warp rendezvous after collective WGMMA completion while preserving four release arrivals
 - **Archive:** trajectory/20261015_071035_iter-302/
+
+### Iter 303 — Test direct release after collective WGMMA completion
+
+- **Hypothesis:** WGMMA wait0 guarantees operand completion and four elected releases may not need a further warp rendezvous
+- **Changes:** Selected282 removes only postwait bar.warp.sync from all28 K128 completions; preserve wait0 and four-leader free arrivals
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010261 ms; mean speedup=1.0779x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012272 | 0.010317 | 1.1895 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009860 | 0.010204 | 0.9663 | 0.000754626 | 0 |
+
+- **Analysis:** FP16 median10.20448 us versus Dense9.86048 us; BF16 near10.317us. Possible tiny FP16 signal, not a proven gain over282 and not faster than Dense. Original errors finite and gates both fail. Synchronization modification requires independent stress and sanitizer checks before retention.
+- **Next:** Archive binary and compare282 versus303 with full ordinary and Graph ABBA, while checking collective release protocol independently
+- **Archive:** trajectory/20261015_071128_iter-303/
