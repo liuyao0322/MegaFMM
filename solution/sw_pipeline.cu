@@ -9,8 +9,8 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64, BN=32, BK=64, Elements=BM*BN;
-constexpr int ASize=BM*BK, BSize=BK*BN;
+constexpr int BM=64, BN=16, BK=64, Elements=BM*BN;
+constexpr int ASize=BM*BK, BSize=BK*BN, CRegs=BN/2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 
@@ -19,11 +19,10 @@ template<class T> struct alignas(128) Shared {
   T raw[1][4*ASize+4*BSize];
   T operand[2][2*ASize+2*BSize];
   float product[7][Elements];
-  float output[4][Elements];
   uint64_t raw_ready[2],raw_free[2],op_ready[2],op_free[2];
   uint64_t product_ready,product_free;
 };
-static_assert(sizeof(Shared<cute::half_t>)==188544, "recheck shared-memory budget");
+static_assert(sizeof(Shared<cute::half_t>)==110720, "recheck shared-memory budget");
 
 __device__ void wait(const uint64_t* b,int phase) {
   Barrier::wait(b,phase); asm volatile("" ::: "memory");
@@ -59,24 +58,23 @@ template<class T> __device__ float right_operand(Shared<T>& s,int bank,int p,int
 }
 
 template<class T,class TA,class TB>
-__device__ void mma_term(TA a,TB b,float (&d)[16]) {
+__device__ void mma_term(TA a,TB b,float (&d)[CRegs]) {
   using namespace cute;
   using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,
-      SM90_64x32x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
-      SM90_64x32x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>>;
+      SM90_64x16x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
+      SM90_64x16x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>>;
   #pragma unroll
   for(int kk=0;kk<BK/16;++kk) {
     auto at=local_tile(a,Shape<_64,_16>{},make_coord(0,kk));
-    auto bt=local_tile(b,Shape<_32,_16>{},make_coord(0,kk));
+    auto bt=local_tile(b,Shape<_16,_16>{},make_coord(0,kk));
     uint64_t da=GMMA::make_gmma_desc<GMMA::Major::K>(at);
     uint64_t db=GMMA::make_gmma_desc<GMMA::Major::MN>(bt);
-    Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],
-            d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15]);
+    Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7]);
   }
 }
 
 template<class T>
-__global__ __launch_bounds__(256,1)
+__global__ __launch_bounds__(256,2)
 void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
                    const __grid_constant__ CUtensorMap map_b,float* D) {
   using namespace cute;
@@ -87,7 +85,7 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
   // A is K-major; B is MN-major, matching coalesced row-major source loads.
   // Shared addresses are obtained from these exact layouts on both sides.
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW32_Atom<T>{},Shape<_16,Int<BK>>{});
   if(tid==0) {
     for(int j=0;j<2;++j) {
       Barrier::init(&s.raw_ready[j],1);
@@ -99,7 +97,6 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
     Barrier::init(&s.product_free,96);
     cutlass::arch::fence_barrier_init();
   }
-  for(int i=tid;i<4*Elements;i+=256) (&s.output[0][0])[i]=0;
   __syncthreads();
 
   if(tid==0) {
@@ -118,6 +115,8 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
     }
   } else if(tid>=32 && tid<128) {
     int worker=tid-32;
+    constexpr int Chunks=(Elements+95)/96;
+    float q11[Chunks]={},q12[Chunks]={},q21[Chunks]={},q22[Chunks]={};
     for(int q=0;q<512/BK;++q) {
       int bank=0;
       wait(&s.raw_ready[bank],q%2);
@@ -130,39 +129,45 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
         auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb);
         auto bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
         for(int i=worker;i<ASize;i+=96) {
-          float v=left_operand(s,bank,p,i);T hi=T(v);
-          ah(i/BK,i%BK)=hi;
-          if(p==2 || p>=4)al(i/BK,i%BK)=T(__fsub_rn(v,float(hi)));
+          float v=left_operand(s,bank,p,i);T hi=T(v),lo=T(__fsub_rn(v,float(hi)));
+          ah(i/BK,i%BK)=hi;al(i/BK,i%BK)=lo;
         }
         for(int i=worker;i<BSize;i+=96) {
-          float v=right_operand(s,bank,p,i);T hi=T(v);
-          bh(i%BN,i/BN)=hi;
-          if(p==3 || p>=4)bl(i%BN,i/BN)=T(__fsub_rn(v,float(hi)));
+          float v=right_operand(s,bank,p,i);T hi=T(v),lo=T(__fsub_rn(v,float(hi)));
+          bh(i%BN,i/BN)=hi;bl(i%BN,i/BN)=lo;
         }
         asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
         arrive(&s.op_ready[slot]);
       }
       arrive(&s.raw_free[bank]);
       wait(&s.product_ready,q%2);
-      for(int i=worker;i<Elements;i+=96) {
+      #pragma unroll
+      for(int chunk=0;chunk<Chunks;++chunk) {
+        int i=worker+chunk*96;
+        if(i<Elements) {
         float p1=s.product[0][i],p2=s.product[1][i],p3=s.product[2][i];
         float p4=s.product[3][i],p5=s.product[4][i],p6=s.product[5][i],p7=s.product[6][i];
         float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6);
         float u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
-        s.output[0][i]=__fadd_rn(s.output[0][i],u1);
-        s.output[1][i]=__fadd_rn(s.output[1][i],__fadd_rn(u4,p3));
-        s.output[2][i]=__fadd_rn(s.output[2][i],__fsub_rn(u3,p4));
-        s.output[3][i]=__fadd_rn(s.output[3][i],__fadd_rn(u3,p5));
+        q11[chunk]=__fadd_rn(q11[chunk],u1);
+        q12[chunk]=__fadd_rn(q12[chunk],__fadd_rn(u4,p3));
+        q21[chunk]=__fadd_rn(q21[chunk],__fsub_rn(u3,p4));
+        q22[chunk]=__fadd_rn(q22[chunk],__fadd_rn(u3,p5));
       }
+        }
       arrive(&s.product_free);
     }
-    for(int i=worker;i<Elements;i+=96) {
+    #pragma unroll
+    for(int chunk=0;chunk<Chunks;++chunk) {
+      int i=worker+chunk*96;
+      if(i<Elements) {
       int row=m0+i/BN,col=n0+i%BN;
-      D[row*1024+col]=s.output[0][i];
-      D[row*1024+col+512]=s.output[1][i];
-      D[(row+512)*1024+col]=s.output[2][i];
-      D[(row+512)*1024+col+512]=s.output[3][i];
+      D[row*1024+col]=q11[chunk];
+      D[row*1024+col+512]=q12[chunk];
+      D[(row+512)*1024+col]=q21[chunk];
+      D[(row+512)*1024+col+512]=q22[chunk];
     }
+      }
   } else if(tid>=128) {
     for(int q=0;q<512/BK;++q) {
       if(q)wait(&s.product_free,(q-1)%2);
@@ -174,7 +179,7 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
         auto al=make_tensor(make_smem_ptr(op+ASize),la);
         auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb);
         auto bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
-        float acc[16]={};
+        float acc[CRegs]={};
         warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
         if(p==2 || p>=4)mma_term<T>(al,bh,acc);
@@ -182,8 +187,8 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
         warpgroup_commit_batch();
         warpgroup_wait<0>();
         #pragma unroll
-        for(int j=0;j<16;++j) {
-          int mn=GMMA::CLayout_64x32{}(tid-128,j);
+        for(int j=0;j<CRegs;++j) {
+          int mn=GMMA::CLayout_64x16{}(tid-128,j);
           s.product[p][(mn%64)*BN+mn/64]=acc[j];
         }
         arrive(&s.op_free[slot]);

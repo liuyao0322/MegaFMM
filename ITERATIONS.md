@@ -25,6 +25,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 59 | Skip preparation of unused residual planes | 0.0317 | 0.349697 | measured |
 
+| 60 | Enable two-CTA capacity with BN16 and register output | 0.0338 | 0.319083 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -180,3 +182,27 @@ work/handshake tradeoff rather than continuing the unsuccessful layout-only path
 - **Analysis:** Full launch exited0; no numerical approximation was removed. Record all rows and compare complete-call own latency to56.
 - **Next:** Assess gain; explore BN16 with register outputs to enable two CTA capacity per SM.
 - **Archive:** trajectory/20261014_191357_iter-59/
+
+#### Reassessment after non-improving57–59
+Register Q alone did not improve both dtypes; BK128 with one operand slot regressed,
+showing the larger batch does not compensate for lost operand-stage overlap here.
+Skipping unused lows introduced uniform control and regressed. Best remains56.
+No new ncu probe. Next distinct axis is residency capacity: BN16 plus register Q
+reduces shared to approximately108KiB, allowing two CTA capacity on H100; actual
+performance and compiler resources must verify whether it helps, not assume it.
+
+### Iter 60 — Enable two-CTA capacity with BN16 and register output
+
+- **Hypothesis:** BN16 reduces shared sufficiently for two resident CTA capacity, potentially hiding producer-consumer stage latency.
+- **Changes:** From57, BN16/BK64, eight accumulator registers per WGMMA thread, MN32 B layout, shared110720 bytes, launch bounds256/2. Same original numerical gate and15 leaf terms.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.319083 ms; mean speedup=0.0338x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_unified_v1_hilo_64x16x64 v0 | launch | 0.011884 | 0.323156 | 0.0368 | 7.15726e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_unified_v1_hilo_64x16x64 v0 | launch | 0.009708 | 0.315010 | 0.0308 | 4.79212e-07 | 1 |
+
+- **Analysis:** Complete launch benchmark exited0; do not infer measured occupancy from capacity. Use latency and resources for assessment.
+- **Next:** Inspect performance and resource use; instrument stage clocks if low occupancy or producer waits remain ambiguous.
+- **Archive:** trajectory/20261014_191528_iter-60/

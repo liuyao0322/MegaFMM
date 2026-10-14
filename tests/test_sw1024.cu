@@ -69,7 +69,7 @@ template<class T>int validate(megafmm::DType dtype,bool quick){
   megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::SWPipeline;
   if(quick)policy.heuristic_candidates=1; // Sanitizer scope, never used for performance.
   auto sw=megafmm::create_plan(p,policy);
-  require(sw->algorithm_name().find("sw_unified_v1_hilo_64x32x")==0,"not native SW");
+  require(sw->algorithm_name().find("sw_unified_v1_hilo_")==0,"not native SW");
   require(sw->workspace_bytes()==0,"SW should not allocate global intermediates");
   policy.algorithm=megafmm::Algorithm::Auto;auto dense=megafmm::create_plan(p,policy);
   require(dense->algorithm_name()=="dense_cublaslt","Auto was incorrectly promoted");
