@@ -465,6 +465,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 279 | PDL K128 eight-stage operands | 1.0776 | 0.010282 | experiment |
 
+| 280 | K128 one-group MMA lookahead | 1.0672 | 0.010343 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4242,3 +4244,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 median 10.26944 us and FP16 10.29472 us modestly improve single-run signal versus selected266 but do not meet FP16 Dense9.872us. Original FP64 gates fail unchanged. Requires paired comparison and independent validation before selection.
 - **Next:** Reassess profiles and try paired K128 retirement to reduce redundant completion waits
 - **Archive:** trajectory/20261015_063646_iter-279/
+
+### Iter 280 — K128 one-group MMA lookahead
+
+- **Hypothesis:** Retiring the previous group after issuing the next group may overlap completion with next operand readiness
+- **Changes:** Keep one asynchronous WGMMA group pending within each four-block leaf; wait1 retires previous slot and final wait0 retires the last; remove redundant same-accumulator fences
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010343 ms; mean speedup=1.0672x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012296 | 0.010393 | 1.1831 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009793 | 0.010294 | 0.9513 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 median10.39296us and FP16 10.29376us do not improve279 FP and regress BF. One BF40.7834us outlier retained in raw data. Original FP64 gates fail unchanged. No selection.
+- **Next:** Reduce descriptor calculation instruction count using known descriptor bit fields
+- **Archive:** trajectory/20261015_063800_iter-280/
