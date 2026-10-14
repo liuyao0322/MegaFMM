@@ -349,6 +349,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 221 | Fully constant validated shared descriptor start fields | 0.9964 | 0.011215 | experiment |
 
+| 222 | Preload both input batches before CUDA transforms | 0.9953 | 0.011195 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3202,3 +3204,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Finite expected approximate errors and both original gates FAIL. BF16 11.1811us FP16 11.2483us slower than218.220 paired11.0174/11.3430us versus21810.9882/11.1394us; low32 lowered instruction count but raised64to80regs and moreR2UR, so not adopted. No stable FP16Dense win.
 - **Next:** Reassess source-specific static-chain supply and transform latency, then test early input-word preloading instead of further descriptor arithmetic changes
 - **Archive:** trajectory/20261015_045038_iter-221/
+
+### Iter 222 — Preload both input batches before CUDA transforms
+
+- **Hypothesis:** Overlap second-iteration global loads with first transform instead of serial load/transform/store loops
+- **Changes:** From218 preload up to two batches of8input words per608CUDAworker, register dependency fence, then original FP32 transforms and stores
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011195 ms; mean speedup=0.9953x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012344 | 0.011141 | 1.1079 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009929 | 0.011248 | 0.8828 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 11.1414us FP16 11.2480us slower than218; expected approximate errors finite and original gates FAIL. Fresh218 sparse diagnostic: startup and first transformed operand dominate ready waits; TMA leader packwait~.8us and global publication~1.34-1.41us in10-node single-input Graph diagnostic. These intervals overlap and differ from standard100call rotating-input benchmark; not a speedup result.
+- **Next:** Test hierarchical cluster-local publication so fewer TMA leaders contend on invocation-global counter, preserving all per-call input transforms
+- **Archive:** trajectory/20261015_045519_iter-222/
