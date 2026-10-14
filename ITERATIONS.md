@@ -155,6 +155,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 124 | Distributed wide leaf GEMMs and global product recombination | 0.0000 | 0.000000 | experiment |
 
+| 125 | Bound registers for two-block distributed leaf residency | 0.7146 | 0.015646 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1464,3 +1466,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Benchmark attempt archived; original gates unchanged. Inspect any build/runtime failure before interpreting performance.
 - **Next:** Debug distributed architecture and compare complete-call latency after correctness checks
 - **Archive:** trajectory/20261015_020828_iter-124/
+
+### Iter 125 — Bound registers for two-block distributed leaf residency
+
+- **Hypothesis:** Two-block launch bounds permit224-CTA cooperative grid
+- **Changes:** Set minimum two blocks per SM in launch bounds;124 compiled but rejected at setup because168regs allowed onlyoneblock
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.015646 ms; mean speedup=0.7146x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_distributed_64x128x64 v0 | launch | 0.012387 | 0.015708 | 0.7886 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_distributed_64x128x64 v0 | launch | 0.009983 | 0.015584 | 0.6406 | 0.000754626 | 0 |
+
+- **Analysis:** Full125 benchmark archived with unchanged accuracy gate; inspect potential spills and output validity before performance conclusions.
+- **Next:** Tune thread count to preserve two-block residency without spilling if required
+- **Archive:** trajectory/20261015_020916_iter-125/

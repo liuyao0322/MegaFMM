@@ -60,7 +60,7 @@ __device__ void mma_term(TA a,TB b,float (&d)[64]) {
   }
 }
 
-template<class T> __global__ __launch_bounds__(Threads,1)
+template<class T> __global__ __launch_bounds__(Threads,2)
 void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
                          const __grid_constant__ CUtensorMap bmap,
                          const __grid_constant__ CUtensorMap smap,
