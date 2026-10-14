@@ -1,0 +1,134 @@
+{
+  "scope": "Independent CPU address/ownership and resource arithmetic only",
+  "primary": {
+    "geometry": [
+      64,
+      32,
+      32
+    ],
+    "proposed_threads": 384,
+    "proposed_role_quotas": [
+      40,
+      88,
+      104
+    ],
+    "assumed_initial_registers": 80,
+    "CTA_owned_registers_arithmetic": 30720,
+    "role_registers_arithmetic": 29696,
+    "unused_CTA_pool_arithmetic": 1024,
+    "two_CTA_owned_registers_arithmetic": 61440,
+    "final_A_bytes_per_bank": 28672,
+    "final_B_bytes_per_bank": 14336,
+    "operand_bank_bytes": 43008,
+    "two_bank_payload_bytes": 86016,
+    "raw_transaction_bytes_per_bank": 24576,
+    "tail_P_bytes": 57344,
+    "shared_size_align1024_plus48_arithmetic_only": 87040,
+    "grid_CTAs_at_square1024": 128,
+    "pair_task_counts": {
+      "A_stage0": {
+        "pair_tasks": 1024,
+        "tasks_per_consumer": 4,
+        "swizzle_bits": 2
+      },
+      "B_stage0": {
+        "pair_tasks": 512,
+        "tasks_per_consumer": 2,
+        "swizzle_bits": 2
+      },
+      "A_stage1": {
+        "pair_tasks": 1024,
+        "tasks_per_consumer": 4,
+        "swizzle_bits": 2
+      },
+      "B_stage1": {
+        "pair_tasks": 512,
+        "tasks_per_consumer": 2,
+        "swizzle_bits": 2
+      }
+    },
+    "unique_final_32bit_words": 21504,
+    "unique_raw_32bit_words": 12288,
+    "unique_final_16bit_elements": 43008,
+    "assertion_checks_including_all_vector8_lanes": 64512,
+    "all_first4_raw_aliases_owned_by_their_final_writer": true,
+    "all_final_elements_dense_without_padding_or_cross_bank_overlap": true,
+    "all_pair2_words_aligned_and_contiguous": true,
+    "all_aligned_vector8_ranges_aligned_and_contiguous": true,
+    "CuTe_instantiation_checked": false,
+    "TMA_hardware_layout_checked": false,
+    "compiled_role_GPR_checked": false,
+    "actual_initial_pool_checked": false,
+    "actual_shared_size_checked": false,
+    "measured_residency": null,
+    "performance_measured": false,
+    "numerical_model_run": false,
+    "original_precision_certified": false
+  },
+  "BN16_sibling": {
+    "geometry": [
+      64,
+      16,
+      32
+    ],
+    "proposed_threads": 384,
+    "proposed_role_quotas": [
+      40,
+      64,
+      72
+    ],
+    "assumed_initial_registers": 64,
+    "CTA_owned_registers_arithmetic": 24576,
+    "role_registers_arithmetic": 22528,
+    "unused_CTA_pool_arithmetic": 2048,
+    "two_CTA_owned_registers_arithmetic": 49152,
+    "final_A_bytes_per_bank": 28672,
+    "final_B_bytes_per_bank": 7168,
+    "operand_bank_bytes": 35840,
+    "two_bank_payload_bytes": 71680,
+    "raw_transaction_bytes_per_bank": 20480,
+    "tail_P_bytes": 28672,
+    "shared_size_align1024_plus48_arithmetic_only": 72704,
+    "grid_CTAs_at_square1024": 256,
+    "pair_task_counts": {
+      "A_stage0": {
+        "pair_tasks": 1024,
+        "tasks_per_consumer": 4,
+        "swizzle_bits": 2
+      },
+      "B_stage0": {
+        "pair_tasks": 256,
+        "tasks_per_consumer": 1,
+        "swizzle_bits": 1
+      },
+      "A_stage1": {
+        "pair_tasks": 1024,
+        "tasks_per_consumer": 4,
+        "swizzle_bits": 2
+      },
+      "B_stage1": {
+        "pair_tasks": 256,
+        "tasks_per_consumer": 1,
+        "swizzle_bits": 1
+      }
+    },
+    "unique_final_32bit_words": 17920,
+    "unique_raw_32bit_words": 10240,
+    "unique_final_16bit_elements": 35840,
+    "assertion_checks_including_all_vector8_lanes": 53760,
+    "all_first4_raw_aliases_owned_by_their_final_writer": true,
+    "all_final_elements_dense_without_padding_or_cross_bank_overlap": true,
+    "all_pair2_words_aligned_and_contiguous": true,
+    "all_aligned_vector8_ranges_aligned_and_contiguous": true,
+    "CuTe_instantiation_checked": false,
+    "TMA_hardware_layout_checked": false,
+    "compiled_role_GPR_checked": false,
+    "actual_initial_pool_checked": false,
+    "actual_shared_size_checked": false,
+    "measured_residency": null,
+    "performance_measured": false,
+    "numerical_model_run": false,
+    "original_precision_certified": false
+  },
+  "future_state": "frozen_cpu_only_no_formal_implementation_or_registration"
+}

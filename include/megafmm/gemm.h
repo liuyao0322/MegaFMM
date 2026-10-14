@@ -84,6 +84,7 @@ struct Policy {
   // 47=BN64 BK64 RS-A rawA4 TMA/finalB7 SIMT; native parentM/N/K multiples128.
   // 48=BN16 BK64 RS-A rawA4 TMA/finalB7 SIMT; parentM/K%128, parentN%32.
   // 49=BN16 BK64 selectiveA TMA minCTAs2 hypothesis; fresh role quotas40/88/112.
+  // 50=BN16 BK64 two consecutive K16 inputs/window, two wait0 windows; fresh q40/96/96/min2.
   int mega_variant=0;
 };
 class Plan {

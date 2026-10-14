@@ -1,0 +1,1855 @@
+{
+  "schema": "megafmm.iter46.bn16-k32-window.fresh-independent-compiled-launch-gate.v1",
+  "status": "PASS_COMPILED_CAN_LAUNCH_50",
+  "reviewer": "/root/pipeline_review30",
+  "compiled_gate_inherited_from_iteration45": false,
+  "compiled_gate_inherited_from_parent49_or_any_prior": false,
+  "allowed_native_launch_variants": [
+    50
+  ],
+  "scope": "Fresh current50 source7/bin2, both complete instruction streams, actual effective I/quota/ownedpool, all3role CFG and grown definite writes, 2 physical K32 windows with pendingA/P exclusion, firstPzero, TMA publication/tail/ABI/guards. No GPU correctness, originalFP64, performance, dynamic residency, stalls or traffic claim.",
+  "frozen_bindings": {
+    "CMakeLists.txt": "5777e6fe199870956956ab145001a28688d748cdea0826010f5642bd14a15726",
+    "bench/benchmark.cu": "c9887dc64d32ece616e5dd91da922fedfe005c25ec46456d2fa661acd3d3ce8e",
+    "include/megafmm/gemm.h": "1a21759750b7d42ab1cebb0110538c488b66a3b461c581e7ada403fff33e4e5c",
+    "include/megafmm/kernels.h": "794ee3be062337dfc78fed181492575717efc8d0fc6296fa247143852ce3e3e8",
+    "solution/plan.cpp": "5033ead947fa3aee27cd05e0516218bd1e85a14fc25103fcf991b03ddef85557",
+    "tests/test_correctness.cu": "678bd0d6f731693e8841548b266f83a6b2a45304afee0831612185cb29ec84c8",
+    "solution/megakernel_wgmma_psplit_tma_bn16_k32_window.cu": "973f5e48af06b0fd939bf84b1b55e80319753f6515d0794b1f2b0d52fa9b1a9c",
+    "build/megafmm_bench": "bb5db71f30e0cf9c177939b42b768c992accbf457ed75a3a1abdbf3155021ce8",
+    "build/test_correctness": "020636b81e3a6d3bca04e8eccb1a105b60144c97be6d263aede31a699eb8dfa1",
+    "results/psplit_tma_bn16_k32_window_initial_frozen_identity_iter46.json": "070f7a13a5c276bfa4f63a2523518f4dd4d640cf5343ceef4ddbeb8551cb7710",
+    "results/psplit_tma_bn16_k32_window_final_link_identity_iter46.json": "3f178e6e6f2cf5789f26ce46734a167d3b097b0af4e189dbb134a78ac73bd03d",
+    "results/psplit_tma_bn16_k32_window_final_object_sass_iter46.txt": "aaf15873675322346fb4ba45025b7d64075ca682f972543c356b084a0a756c76",
+    "results/psplit_tma_bn16_k32_window_final_object_resources_iter46.txt": "853d6ebd9b34cc51ef01f25362bb1384933c063d2a3dcd0e09353ef534933e43",
+    "results/psplit_tma_bn16_k32_window_final_object_elf_iter46.txt": "461cfa4f42dfa4803ebacad78b589fc49d1e6260034bc3019d897a26da26eb2f",
+    "results/psplit_tma_bn16_k32_window_final_megakernel_wgmma_psplit_tma_bn16_k32_window_iter46.ptx": "94332796f6f5f0a10a929332e4480816e2b9ca4ccde80d84af07d48652949646",
+    "results/psplit_tma_bn16_k32_window_final_megakernel_wgmma_psplit_tma_bn16_k32_window_iter46.cubin": "bb4b1a07e9c057f985b095f86f16ad0b5b1cbe2c8ccd7fe0ee2cd217c984dffc",
+    "results/small_psplit_tma_bn16_k32_window_final_sass_iter46.txt": "7b426e2a13516036311e06299193adc771d13ffadfe48cbeb3e945635aabe2f9",
+    "results/psplit_tma_bn16_k32_window_final_test_sass_iter46.txt": "7b426e2a13516036311e06299193adc771d13ffadfe48cbeb3e945635aabe2f9",
+    "results/psplit_tma_bn16_k32_window_final_host_objdump_iter46.txt": "8806834dbadb11e4bdaee0746060f1928271440153fa277fdb2dc210a8cfdbc2",
+    "results/psplit_tma_bn16_k32_window_function_occupancy_probe_iter46.txt": "1772e6e3b6d87ec3f019208e42f50a2ce4421ac0d4e4505aed29579c7d8aaf7e",
+    "results/psplit_tma_bn16_k32_window_function_occupancy_probe_iter46.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/psplit_tma_bn16_k32_window_device_resource_probe_iter46.txt": "0e73d217612dddb40ba13914a9082148f548e07e6c5f6f95799cc5342dd7b18b",
+    "results/psplit_tma_bn16_k32_window_initial_build_iter46.txt": "f240aa31a07c441ec241ba82e391b827b89e96bb4fbe08f25e8b11dee7bbf017",
+    "results/psplit_tma_bn16_k32_window_initial_build_iter46.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/psplit_tma_bn16_k32_window_source_delta_iter46.json": "0967346efdff41a043ac7ca06f6845e4c430686a1ae6b3a263f2d41e8ca2e9ad",
+    "results/psplit_tma_bn16_k32_window_integration_delta_iter46.json": "5014378b1422d8337e45e80cba97b3464307d6fbe974d738122fd414d4a6380c",
+    ".scratch/psplit_tma_bn16_min2_two_atom_review_cfg_iter46.py": "802c2a20285a752b1df40618a3654e156f40e3b91043b67f975a98047fbd1fa4",
+    ".scratch/psplit_tma_bn16_min2_two_atom_review_init_cfg_iter46.py": "e2e4ff5c31cabb617a9a1a279faa7506e149572a48b0b1476c1122522fb7ecc2",
+    ".scratch/psplit_tma_bn16_min2_two_atom_review_grow_cfg_iter46.py": "ca0daa1d414c7fe400c6b55e81d9bdda67c666f0fe74a1dbec5a1a4006a200ef",
+    ".scratch/psplit_tma_bn16_k32_window_test_source_delta_iter46.json": "84e3f5f6919136129393daf31b3c65d77e109666c6bc045e7e86bad38742c89d"
+  },
+  "instances": [
+    {
+      "variant": 50,
+      "dtype": "fp16",
+      "function": "_ZN7megafmm79_GLOBAL__N__6ed7d2d8_46_megakernel_wgmma_psplit_tma_bn16_k32_window_cu_536ac81941winograd_wgmma_psplit_tma_bn16_k32_windowIN7cutlass6half_tELi16EEEvNS_7ProblemENS0_17TmaBN16DescriptorEPKT_PKfPf",
+      "status": "PASS_FRESH_ALL_NECESSARY_COMPILED_GATES",
+      "bm": 64,
+      "bn": 16,
+      "bk": 64,
+      "threads": 384,
+      "stages": 2,
+      "min_CTAs_launch_bounds": 2,
+      "k16_atoms_per_stage": 4,
+      "parent_1024_stage_count": 8,
+      "static_instruction_count": 2384,
+      "canonical_pc_predicate_instruction_sha256": "a72d6f2d6aba459d9f85d9babf6372f2b3b7f1f3827c0367c181c00691bd9ab5",
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "actual_reported_registers": 80,
+      "effective_initial_registers_per_thread": 80,
+      "effective_initial_evidence": "Current feeding ELF EIATTR_REGCOUNT80/MAXREG0x50, current ptxas80 and actual Driver80; rounded resource capacity alone is not the proof.",
+      "producer_quota": 40,
+      "wg0_quota": 96,
+      "wg1_quota": 96,
+      "consumer_quotas": [
+        96,
+        96
+      ],
+      "initial_owned_CTA_pool_registers": 30720,
+      "requested_role_pool_registers": 29696,
+      "initial_owned_cta_register_pool": 30720,
+      "required_role_register_pool": 29696,
+      "two_initial_CTA_pools_registers_arithmetic_only": 61440,
+      "two_requested_role_pools_registers_arithmetic_only": 59392,
+      "setmaxnreg_direction_legal": true,
+      "setmaxnreg_actual_pcs": {
+        "producer_DEC40": "0x70b0",
+        "WG0_INC96": "0x3320",
+        "WG1_INC96": "0x3c0"
+      },
+      "consumer_successful_INC_fallthrough_pcs": {
+        "WG0": "0x3360",
+        "WG1": "0x400"
+      },
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 599,
+          "possibly_executed_instruction_count": 598,
+          "abstract_state_count": 848,
+          "gpr_highest_including_implicit": 37,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x8cc0",
+              "instruction": "IMAD.WIDE.U32 R36, R27.reuse, UR16, R30",
+              "highest": 37
+            },
+            {
+              "pc": "0x8d30",
+              "instruction": "IADD3 R33, R37, R33, RZ",
+              "highest": 37
+            },
+            {
+              "pc": "0x8cc0",
+              "instruction": "IMAD.WIDE.U32 R36, R27.reuse, UR16, R30",
+              "highest": 37
+            },
+            {
+              "pc": "0x8d30",
+              "instruction": "IADD3 R33, R37, R33, RZ",
+              "highest": 37
+            },
+            {
+              "pc": "0x7df0",
+              "instruction": "HADD2.F32 R37, -RZ, R22.H1_H1",
+              "highest": 37
+            },
+            {
+              "pc": "0x7f60",
+              "instruction": "FADD R6, -R6, R37",
+              "highest": 37
+            },
+            {
+              "pc": "0x7fa0",
+              "instruction": "FADD R14, R37, -R18",
+              "highest": 37
+            },
+            {
+              "pc": "0x80d0",
+              "instruction": "HADD2.F32 R37, -RZ, R9.H0_H0",
+              "highest": 37
+            },
+            {
+              "pc": "0x8120",
+              "instruction": "FADD R34, R28, -R37",
+              "highest": 37
+            }
+          ],
+          "pending_RS_A_and_P_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 1241,
+          "possibly_executed_instruction_count": 1217,
+          "abstract_state_count": 1293,
+          "gpr_highest_including_implicit": 91,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x3870",
+              "instruction": "LEA.HI R91, R5.reuse, R6.reuse, RZ, 0x2",
+              "highest": 91
+            },
+            {
+              "pc": "0x3890",
+              "instruction": "SHF.R.S32.HI R4, RZ, 0x2, R91.reuse",
+              "highest": 91
+            },
+            {
+              "pc": "0x38a0",
+              "instruction": "SHF.R.S32.HI R5, RZ, 0x1f, R91",
+              "highest": 91
+            },
+            {
+              "pc": "0x38b0",
+              "instruction": "LOP3.LUT R91, R91, 0x7ffffffc, RZ, 0xc0, !PT",
+              "highest": 91
+            },
+            {
+              "pc": "0x38e0",
+              "instruction": "IMAD.IADD R91, R6, 0x1, -R91",
+              "highest": 91
+            },
+            {
+              "pc": "0x3910",
+              "instruction": "IMAD.SHL.U32 R91, R91, 0x2, RZ",
+              "highest": 91
+            },
+            {
+              "pc": "0x3930",
+              "instruction": "VIADD R15, R91, 0x20",
+              "highest": 91
+            },
+            {
+              "pc": "0x3950",
+              "instruction": "IMAD R4, R18.reuse, 0x40, R91",
+              "highest": 91
+            },
+            {
+              "pc": "0x3970",
+              "instruction": "IADD3 R69, R91, UR19, R22",
+              "highest": 91
+            },
+            {
+              "pc": "0x4390",
+              "instruction": "IADD3 R61, R22, 0x3000, R91",
+              "highest": 91
+            },
+            {
+              "pc": "0x43f0",
+              "instruction": "IADD3 R78, R22, 0x2000, R91",
+              "highest": 91
+            },
+            {
+              "pc": "0x4490",
+              "instruction": "IADD3 R65, R22.reuse, 0x1000, R91.reuse",
+              "highest": 91
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x55e0",
+              "last_issue_pc": "0x57e0",
+              "covered_wait0_pc": "0x5a40",
+              "MMA_count": 6,
+              "A_packed_register_count": 24,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71
+              ],
+              "P_register_count": 24,
+              "P_registers": [
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_atom_window_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all physical A words and whole P words in this K16 atom window, first MMA through corresponding wait0, including future-issued A; two windows per stage, role CFG includes all loopbacks/wait stubs/common U."
+            },
+            {
+              "first_issue_pc": "0x6810",
+              "last_issue_pc": "0x68f0",
+              "covered_wait0_pc": "0x6920",
+              "MMA_count": 6,
+              "A_packed_register_count": 24,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71
+              ],
+              "P_register_count": 24,
+              "P_registers": [
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_atom_window_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all physical A words and whole P words in this K16 atom window, first MMA through corresponding wait0, including future-issued A; two windows per stage, role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 1132,
+          "possibly_executed_instruction_count": 1127,
+          "abstract_state_count": 1184,
+          "gpr_highest_including_implicit": 88,
+          "highest_instruction_examples": [
+            {
+              "pc": "0xff0",
+              "instruction": "VIADD R88, R14, -UR20",
+              "highest": 88
+            },
+            {
+              "pc": "0x1070",
+              "instruction": "LDS R88, [R88]",
+              "highest": 88
+            },
+            {
+              "pc": "0x1940",
+              "instruction": "HADD2.F32 R9, -RZ, R88.H0_H0",
+              "highest": 88
+            },
+            {
+              "pc": "0x19a0",
+              "instruction": "HADD2.F32 R88, -RZ, R88.H1_H1",
+              "highest": 88
+            },
+            {
+              "pc": "0x19f0",
+              "instruction": "FADD R79, -R88, R83",
+              "highest": 88
+            },
+            {
+              "pc": "0x1a30",
+              "instruction": "FADD R75, R88, -R75",
+              "highest": 88
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x1cb0",
+              "last_issue_pc": "0x1ef0",
+              "covered_wait0_pc": "0x2010",
+              "MMA_count": 8,
+              "A_packed_register_count": 32,
+              "A_registers": [
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "P_register_count": 32,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_atom_window_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all physical A words and whole P words in this K16 atom window, first MMA through corresponding wait0, including future-issued A; two windows per stage, role CFG includes all loopbacks/wait stubs/common U."
+            },
+            {
+              "first_issue_pc": "0x3160",
+              "last_issue_pc": "0x3290",
+              "covered_wait0_pc": "0x32a0",
+              "MMA_count": 8,
+              "A_packed_register_count": 32,
+              "A_registers": [
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "P_register_count": 32,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_atom_window_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all physical A words and whole P words in this K16 atom window, first MMA through corresponding wait0, including future-issued A; two windows per stage, role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        }
+      ],
+      "producer_gpr_highest_including_implicit": 37,
+      "wg0_gpr_highest_including_implicit": 91,
+      "wg1_gpr_highest_including_implicit": 88,
+      "consumer_gpr_highest_including_implicit": 91,
+      "first_MMA_accumulator_zero_and_preINC_CFG": [
+        {
+          "role": "producer",
+          "abstract_states": 2065,
+          "first_accumulator_zero_definition_missing_count": 0,
+          "missing_first_zero": [],
+          "P_first_issue_fragments": [],
+          "high_register_access_before_successful_INC_count": 0,
+          "pre_INC_accesses": []
+        },
+        {
+          "role": "WG0",
+          "abstract_states": 2482,
+          "first_accumulator_zero_definition_missing_count": 0,
+          "missing_first_zero": [],
+          "P_first_issue_fragments": [
+            {
+              "pc": "0x55e0",
+              "base_register": 48
+            },
+            {
+              "pc": "0x55f0",
+              "base_register": 40
+            },
+            {
+              "pc": "0x5600",
+              "base_register": 32
+            }
+          ],
+          "high_register_access_before_successful_INC_count": 0,
+          "pre_INC_accesses": []
+        },
+        {
+          "role": "WG1",
+          "abstract_states": 2279,
+          "first_accumulator_zero_definition_missing_count": 0,
+          "missing_first_zero": [],
+          "P_first_issue_fragments": [
+            {
+              "pc": "0x1cb0",
+              "base_register": 48
+            },
+            {
+              "pc": "0x1cc0",
+              "base_register": 40
+            },
+            {
+              "pc": "0x1cd0",
+              "base_register": 32
+            },
+            {
+              "pc": "0x1ce0",
+              "base_register": 24
+            }
+          ],
+          "high_register_access_before_successful_INC_count": 0,
+          "pre_INC_accesses": []
+        }
+      ],
+      "grown_register_definite_write_CFG": [
+        {
+          "role": "producer",
+          "abstract_states": 848,
+          "grown_registers_actually_accessed": [],
+          "grown_register_read_before_definition_count": 0,
+          "read_before_definition": [],
+          "pre_INC_grow_access_count": 0,
+          "pre_INC_accesses": [],
+          "first_definitions": []
+        },
+        {
+          "role": "WG0",
+          "abstract_states": 2116,
+          "grown_registers_actually_accessed": [
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91
+          ],
+          "grown_register_read_before_definition_count": 0,
+          "read_before_definition": [],
+          "pre_INC_grow_access_count": 0,
+          "pre_INC_accesses": [],
+          "first_definitions": [
+            {
+              "pc": "0x3870",
+              "register": 91,
+              "instruction": "LEA.HI R91, R5.reuse, R6.reuse, RZ, 0x2"
+            },
+            {
+              "pc": "0x3cf0",
+              "register": 80,
+              "instruction": "HADD2.F32 R80, -RZ, R77.H0_H0"
+            },
+            {
+              "pc": "0x3ea0",
+              "register": 81,
+              "instruction": "HADD2.F32 R81, -RZ, R69.H0_H0"
+            },
+            {
+              "pc": "0x4080",
+              "register": 89,
+              "instruction": "HADD2.F32 R89, -RZ, R62.H0_H0"
+            },
+            {
+              "pc": "0x4650",
+              "register": 85,
+              "instruction": "HADD2.F32 R85, -RZ, R31.H0_H0"
+            },
+            {
+              "pc": "0x4950",
+              "register": 90,
+              "instruction": "HADD2.F32 R90, -RZ, R61.H0_H0"
+            },
+            {
+              "pc": "0x4bb0",
+              "register": 84,
+              "instruction": "HADD2.F32 R84, -RZ, R59.H1_H1"
+            },
+            {
+              "pc": "0x4d00",
+              "register": 86,
+              "instruction": "HADD2.F32 R86, -RZ, R57.H0_H0"
+            },
+            {
+              "pc": "0x4d70",
+              "register": 88,
+              "instruction": "HADD2.F32 R88, -RZ, R63.H0_H0"
+            },
+            {
+              "pc": "0x4e90",
+              "register": 82,
+              "instruction": "LOP3.LUT R82, R23, 0x380, RZ, 0xc0, !PT"
+            },
+            {
+              "pc": "0x5090",
+              "register": 87,
+              "instruction": "FADD R87, R72, -R77"
+            },
+            {
+              "pc": "0x5360",
+              "register": 83,
+              "instruction": "HADD2.F32 R83, -RZ, R23.H0_H0"
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "abstract_states": 1854,
+          "grown_registers_actually_accessed": [
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88
+          ],
+          "grown_register_read_before_definition_count": 0,
+          "read_before_definition": [],
+          "pre_INC_grow_access_count": 0,
+          "pre_INC_accesses": [],
+          "first_definitions": [
+            {
+              "pc": "0x990",
+              "register": 86,
+              "instruction": "IADD3 R86, R4.reuse, 0x3008, R7.reuse"
+            },
+            {
+              "pc": "0x9c0",
+              "register": 84,
+              "instruction": "IADD3 R84, R4, 0x3000, R7"
+            },
+            {
+              "pc": "0xd50",
+              "register": 85,
+              "instruction": "IADD3 R85, R5, 0x3000, R8"
+            },
+            {
+              "pc": "0xff0",
+              "register": 88,
+              "instruction": "VIADD R88, R14, -UR20"
+            },
+            {
+              "pc": "0x10d0",
+              "register": 87,
+              "instruction": "IADD3 R87, R5, 0x3008, R8"
+            },
+            {
+              "pc": "0x1410",
+              "register": 80,
+              "instruction": "F2FP.F16.F32.PACK_AB R80, R23, R22"
+            },
+            {
+              "pc": "0x14d0",
+              "register": 82,
+              "instruction": "FADD R82, R74, R17"
+            },
+            {
+              "pc": "0x1810",
+              "register": 81,
+              "instruction": "FADD R81, R73, R20"
+            },
+            {
+              "pc": "0x1970",
+              "register": 83,
+              "instruction": "FADD R83, R75, R12"
+            }
+          ]
+        }
+      ],
+      "consumer_grown_registers_actually_accessed": {
+        "WG0": [
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91
+        ],
+        "WG1": [
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88
+        ]
+      },
+      "all_P_clear_after_successful_INC": false,
+      "legal_initial_owned_preINC_zero_present": true,
+      "initialization_gate": {
+        "all_P_clear_after_INC": false,
+        "legal_initial_owned_preINC_zero": true,
+        "common_preINC_P_registers": [
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55
+        ],
+        "scope": "Actual commonzeros are below initial80, legal owned access; all grown words first used after successful INC and definite writes. First MMA accumulators all zero. No prior49 initialization premise inherited."
+      },
+      "stack_bytes": 0,
+      "local_bytes": 0,
+      "spill_store_bytes": 0,
+      "spill_load_bytes": 0,
+      "new_C7512_warning": false,
+      "HGMMA_implicit_RS_A_words": 4,
+      "HGMMA_implicit_accumulator_words": 8,
+      "physical_windows": {
+        "windows_per_stage_per_WG": 2,
+        "K16_atoms_per_window": 2,
+        "WG0_HGMMA_per_window": 6,
+        "WG1_HGMMA_per_window": 8,
+        "WG0_A_packed_words_per_window": 24,
+        "WG1_A_packed_words_per_window": 32,
+        "WG0_whole_P_words": 24,
+        "WG1_whole_P_words": 32,
+        "source_whole_stage_A48_64": false,
+        "all_role_windows_generic_pending_A_or_P_access_count": 0,
+        "scope": "Both distinct K16 A fragments survive through matching wait0 and post-fences; original perP atom order0,1,2,3. One release after both windows."
+      },
+      "dynamic_shared_bytes": 95232,
+      "actual_driver_static_shared_bytes": 0,
+      "resource_tool_shared_bytes": 1024,
+      "resource_tool_shared_accounting_is_not_driver_static": true,
+      "host_optin_and_launch_size_bytes": 95232,
+      "extern_shared_alignment_bytes": 1024,
+      "operand_bank_bytes": 47104,
+      "all_banks_operand_bytes": 94208,
+      "A_bytes_per_bank": 32768,
+      "B_bytes_per_bank": 14336,
+      "barriers_offset_bytes": 94208,
+      "raw_done_offset_bytes": 94240,
+      "typed_tail_bytes": 28672,
+      "typed_tail_bank0_only": true,
+      "both_banks_drained_before_typed_tail": true,
+      "raw_TMA_boxes": 4,
+      "raw_TMA_transaction_bytes": 32768,
+      "raw_TMA_phase": "state.phase XOR1, actual82a0",
+      "B_descriptor": {
+        "actual_prefix": "0xc000001000000000",
+        "start_address_mask": "0x3fc0",
+        "canonical_leading_bytes": 0,
+        "leading0_degenerate_unused_Nouter1": true,
+        "stride_bytes": 256
+      },
+      "CTA_collective_epochs": {
+        "initial_bar0": "0x290",
+        "consumer_drain_bar6_count384": "0x69a0",
+        "producer_drain_bar6_count384": "0x84f0",
+        "shared_tail_last_STS": "0x7080",
+        "common_publish_bar0": "0x8520",
+        "three_collective_events": true,
+        "bar6_non_aligned": true
+      },
+      "TMA_and_SIMT_publication": {
+        "TX32768_setup_pc": "0x73d0",
+        "TX_expect_pc": "0x7410",
+        "four_TMA_pcs": [
+          "0x7490",
+          "0x7590",
+          "0x7680",
+          "0x7770"
+        ],
+        "final_B_STS_pc": "0x8250",
+        "all128_proxy_fence_pc": "0x8290",
+        "all128_raw_wait_pc": "0x82d0",
+        "full_arrival_after_raw_wait_pc": "0x8300",
+        "producer_both_bank_tail_wait_pcs": [
+          "0x8430",
+          "0x84d0"
+        ],
+        "WG0_last_wait0_before_release": [
+          "0x6920",
+          "0x6930"
+        ],
+        "WG1_last_wait0_before_release": [
+          "0x32a0",
+          "0x32b0"
+        ]
+      },
+      "current_A_grid_constant_parameter": {
+        "bytes": 128,
+        "alignment_bytes": 64,
+        "byvalue_kernel_constant": true,
+        "current_map_encoded_once_inside_each_native_ordinary_run_or_capture": true,
+        "graph_replay_fresh_content_at_captured_fixed_addresses": true
+      },
+      "active_C0_alias": {
+        "beta0_skips_C0": true,
+        "beta_branch_pc": "0x8610",
+        "C0_load_pcs": [
+          "0x8db0",
+          "0x8df0",
+          "0x8e30",
+          "0x8e90"
+        ],
+        "first_active_D_store_pc": "0x9070",
+        "four_C0_loads_before_any_active_D_store": true,
+        "alpha_RN_then_beta_FMA": true
+      },
+      "function_attributes": {
+        "max_threads_per_block": 384,
+        "static_shared_bytes": 0,
+        "local_bytes": 0,
+        "registers_per_thread": 80,
+        "max_dynamic_shared_bytes_before_optin": 49152,
+        "max_dynamic_shared_bytes_after_optin": 95232
+      },
+      "occupancy_API_predicted_active_CTAs_per_SM": 2,
+      "measured_residency": null
+    },
+    {
+      "variant": 50,
+      "dtype": "bf16",
+      "function": "_ZN7megafmm79_GLOBAL__N__6ed7d2d8_46_megakernel_wgmma_psplit_tma_bn16_k32_window_cu_536ac81941winograd_wgmma_psplit_tma_bn16_k32_windowIN7cutlass10bfloat16_tELi16EEEvNS_7ProblemENS0_17TmaBN16DescriptorEPKT_PKfPf",
+      "status": "PASS_FRESH_ALL_NECESSARY_COMPILED_GATES",
+      "bm": 64,
+      "bn": 16,
+      "bk": 64,
+      "threads": 384,
+      "stages": 2,
+      "min_CTAs_launch_bounds": 2,
+      "k16_atoms_per_stage": 4,
+      "parent_1024_stage_count": 8,
+      "static_instruction_count": 2384,
+      "canonical_pc_predicate_instruction_sha256": "a639186fd46edf2334150f3b5cd20bbc8aabc60e9396fe03f9d5374a4be90fda",
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "actual_reported_registers": 80,
+      "effective_initial_registers_per_thread": 80,
+      "effective_initial_evidence": "Current feeding ELF EIATTR_REGCOUNT80/MAXREG0x50, current ptxas80 and actual Driver80; rounded resource capacity alone is not the proof.",
+      "producer_quota": 40,
+      "wg0_quota": 96,
+      "wg1_quota": 96,
+      "consumer_quotas": [
+        96,
+        96
+      ],
+      "initial_owned_CTA_pool_registers": 30720,
+      "requested_role_pool_registers": 29696,
+      "initial_owned_cta_register_pool": 30720,
+      "required_role_register_pool": 29696,
+      "two_initial_CTA_pools_registers_arithmetic_only": 61440,
+      "two_requested_role_pools_registers_arithmetic_only": 59392,
+      "setmaxnreg_direction_legal": true,
+      "setmaxnreg_actual_pcs": {
+        "producer_DEC40": "0x70b0",
+        "WG0_INC96": "0x3320",
+        "WG1_INC96": "0x3c0"
+      },
+      "consumer_successful_INC_fallthrough_pcs": {
+        "WG0": "0x3360",
+        "WG1": "0x400"
+      },
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 599,
+          "possibly_executed_instruction_count": 598,
+          "abstract_state_count": 848,
+          "gpr_highest_including_implicit": 37,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x8cc0",
+              "instruction": "IMAD.WIDE.U32 R36, R27.reuse, UR16, R30",
+              "highest": 37
+            },
+            {
+              "pc": "0x8d30",
+              "instruction": "IADD3 R33, R37, R33, RZ",
+              "highest": 37
+            },
+            {
+              "pc": "0x8cc0",
+              "instruction": "IMAD.WIDE.U32 R36, R27.reuse, UR16, R30",
+              "highest": 37
+            },
+            {
+              "pc": "0x8d30",
+              "instruction": "IADD3 R33, R37, R33, RZ",
+              "highest": 37
+            },
+            {
+              "pc": "0x7df0",
+              "instruction": "LOP3.LUT R37, R22, 0xffff0000, RZ, 0xc0, !PT",
+              "highest": 37
+            },
+            {
+              "pc": "0x7f60",
+              "instruction": "FADD R6, -R6, R37",
+              "highest": 37
+            },
+            {
+              "pc": "0x7fa0",
+              "instruction": "FADD R14, R37, -R18",
+              "highest": 37
+            },
+            {
+              "pc": "0x8090",
+              "instruction": "IMAD.U32 R37, R9.reuse, 0x10000, RZ",
+              "highest": 37
+            },
+            {
+              "pc": "0x80e0",
+              "instruction": "FADD R34, R28, -R37",
+              "highest": 37
+            }
+          ],
+          "pending_RS_A_and_P_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 1241,
+          "possibly_executed_instruction_count": 1217,
+          "abstract_state_count": 1293,
+          "gpr_highest_including_implicit": 91,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x3870",
+              "instruction": "LEA.HI R91, R5.reuse, R6.reuse, RZ, 0x2",
+              "highest": 91
+            },
+            {
+              "pc": "0x3890",
+              "instruction": "SHF.R.S32.HI R4, RZ, 0x2, R91.reuse",
+              "highest": 91
+            },
+            {
+              "pc": "0x38a0",
+              "instruction": "SHF.R.S32.HI R5, RZ, 0x1f, R91",
+              "highest": 91
+            },
+            {
+              "pc": "0x38b0",
+              "instruction": "LOP3.LUT R91, R91, 0x7ffffffc, RZ, 0xc0, !PT",
+              "highest": 91
+            },
+            {
+              "pc": "0x38e0",
+              "instruction": "IMAD.IADD R91, R6, 0x1, -R91",
+              "highest": 91
+            },
+            {
+              "pc": "0x3910",
+              "instruction": "IMAD.SHL.U32 R91, R91, 0x2, RZ",
+              "highest": 91
+            },
+            {
+              "pc": "0x3930",
+              "instruction": "VIADD R15, R91, 0x20",
+              "highest": 91
+            },
+            {
+              "pc": "0x3950",
+              "instruction": "IMAD R4, R18.reuse, 0x40, R91",
+              "highest": 91
+            },
+            {
+              "pc": "0x3970",
+              "instruction": "IADD3 R69, R91, UR19, R22",
+              "highest": 91
+            },
+            {
+              "pc": "0x4370",
+              "instruction": "IADD3 R61, R22, 0x3000, R91",
+              "highest": 91
+            },
+            {
+              "pc": "0x43d0",
+              "instruction": "IADD3 R78, R22, 0x2000, R91",
+              "highest": 91
+            },
+            {
+              "pc": "0x4470",
+              "instruction": "IADD3 R65, R22.reuse, 0x1000, R91.reuse",
+              "highest": 91
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x5530",
+              "last_issue_pc": "0x5740",
+              "covered_wait0_pc": "0x59d0",
+              "MMA_count": 6,
+              "A_packed_register_count": 24,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71
+              ],
+              "P_register_count": 24,
+              "P_registers": [
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_atom_window_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all physical A words and whole P words in this K16 atom window, first MMA through corresponding wait0, including future-issued A; two windows per stage, role CFG includes all loopbacks/wait stubs/common U."
+            },
+            {
+              "first_issue_pc": "0x6810",
+              "last_issue_pc": "0x68f0",
+              "covered_wait0_pc": "0x6920",
+              "MMA_count": 6,
+              "A_packed_register_count": 24,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71
+              ],
+              "P_register_count": 24,
+              "P_registers": [
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_atom_window_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all physical A words and whole P words in this K16 atom window, first MMA through corresponding wait0, including future-issued A; two windows per stage, role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 1132,
+          "possibly_executed_instruction_count": 1127,
+          "abstract_state_count": 1184,
+          "gpr_highest_including_implicit": 88,
+          "highest_instruction_examples": [
+            {
+              "pc": "0xfc0",
+              "instruction": "VIADD R88, R14, -UR20",
+              "highest": 88
+            },
+            {
+              "pc": "0x1010",
+              "instruction": "LDS R88, [R88]",
+              "highest": 88
+            },
+            {
+              "pc": "0x1910",
+              "instruction": "IMAD.U32 R9, R88, 0x10000, RZ",
+              "highest": 88
+            },
+            {
+              "pc": "0x1980",
+              "instruction": "LOP3.LUT R88, R88, 0xffff0000, RZ, 0xc0, !PT",
+              "highest": 88
+            },
+            {
+              "pc": "0x19d0",
+              "instruction": "FADD R79, -R88, R83",
+              "highest": 88
+            },
+            {
+              "pc": "0x1ac0",
+              "instruction": "FADD R75, R88, -R75",
+              "highest": 88
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x1cb0",
+              "last_issue_pc": "0x1ef0",
+              "covered_wait0_pc": "0x2010",
+              "MMA_count": 8,
+              "A_packed_register_count": 32,
+              "A_registers": [
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "P_register_count": 32,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_atom_window_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all physical A words and whole P words in this K16 atom window, first MMA through corresponding wait0, including future-issued A; two windows per stage, role CFG includes all loopbacks/wait stubs/common U."
+            },
+            {
+              "first_issue_pc": "0x3160",
+              "last_issue_pc": "0x3290",
+              "covered_wait0_pc": "0x32a0",
+              "MMA_count": 8,
+              "A_packed_register_count": 32,
+              "A_registers": [
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87
+              ],
+              "P_register_count": 32,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_atom_window_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all physical A words and whole P words in this K16 atom window, first MMA through corresponding wait0, including future-issued A; two windows per stage, role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        }
+      ],
+      "producer_gpr_highest_including_implicit": 37,
+      "wg0_gpr_highest_including_implicit": 91,
+      "wg1_gpr_highest_including_implicit": 88,
+      "consumer_gpr_highest_including_implicit": 91,
+      "first_MMA_accumulator_zero_and_preINC_CFG": [
+        {
+          "role": "producer",
+          "abstract_states": 2065,
+          "first_accumulator_zero_definition_missing_count": 0,
+          "missing_first_zero": [],
+          "P_first_issue_fragments": [],
+          "high_register_access_before_successful_INC_count": 0,
+          "pre_INC_accesses": []
+        },
+        {
+          "role": "WG0",
+          "abstract_states": 2482,
+          "first_accumulator_zero_definition_missing_count": 0,
+          "missing_first_zero": [],
+          "P_first_issue_fragments": [
+            {
+              "pc": "0x5530",
+              "base_register": 48
+            },
+            {
+              "pc": "0x5540",
+              "base_register": 40
+            },
+            {
+              "pc": "0x5550",
+              "base_register": 32
+            }
+          ],
+          "high_register_access_before_successful_INC_count": 0,
+          "pre_INC_accesses": []
+        },
+        {
+          "role": "WG1",
+          "abstract_states": 2279,
+          "first_accumulator_zero_definition_missing_count": 0,
+          "missing_first_zero": [],
+          "P_first_issue_fragments": [
+            {
+              "pc": "0x1cb0",
+              "base_register": 48
+            },
+            {
+              "pc": "0x1cc0",
+              "base_register": 40
+            },
+            {
+              "pc": "0x1cd0",
+              "base_register": 32
+            },
+            {
+              "pc": "0x1ce0",
+              "base_register": 24
+            }
+          ],
+          "high_register_access_before_successful_INC_count": 0,
+          "pre_INC_accesses": []
+        }
+      ],
+      "grown_register_definite_write_CFG": [
+        {
+          "role": "producer",
+          "abstract_states": 848,
+          "grown_registers_actually_accessed": [],
+          "grown_register_read_before_definition_count": 0,
+          "read_before_definition": [],
+          "pre_INC_grow_access_count": 0,
+          "pre_INC_accesses": [],
+          "first_definitions": []
+        },
+        {
+          "role": "WG0",
+          "abstract_states": 2115,
+          "grown_registers_actually_accessed": [
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91
+          ],
+          "grown_register_read_before_definition_count": 0,
+          "read_before_definition": [],
+          "pre_INC_grow_access_count": 0,
+          "pre_INC_accesses": [],
+          "first_definitions": [
+            {
+              "pc": "0x3870",
+              "register": 91,
+              "instruction": "LEA.HI R91, R5.reuse, R6.reuse, RZ, 0x2"
+            },
+            {
+              "pc": "0x3cf0",
+              "register": 80,
+              "instruction": "IMAD.U32 R80, R77, 0x10000, RZ"
+            },
+            {
+              "pc": "0x3e90",
+              "register": 81,
+              "instruction": "IMAD.U32 R81, R69, 0x10000, RZ"
+            },
+            {
+              "pc": "0x4070",
+              "register": 89,
+              "instruction": "IMAD.U32 R89, R62, 0x10000, RZ"
+            },
+            {
+              "pc": "0x4630",
+              "register": 85,
+              "instruction": "IMAD.U32 R85, R31, 0x10000, RZ"
+            },
+            {
+              "pc": "0x4920",
+              "register": 90,
+              "instruction": "IMAD.U32 R90, R61, 0x10000, RZ"
+            },
+            {
+              "pc": "0x4d20",
+              "register": 88,
+              "instruction": "IMAD.U32 R88, R63.reuse, 0x10000, RZ"
+            },
+            {
+              "pc": "0x4f30",
+              "register": 82,
+              "instruction": "LOP3.LUT R82, R23, 0x380, RZ, 0xc0, !PT"
+            },
+            {
+              "pc": "0x5030",
+              "register": 86,
+              "instruction": "IMAD.U32 R86, R57, 0x10000, RZ"
+            },
+            {
+              "pc": "0x5050",
+              "register": 87,
+              "instruction": "FADD R87, R72, -R77"
+            },
+            {
+              "pc": "0x50f0",
+              "register": 84,
+              "instruction": "LOP3.LUT R84, R59, 0xffff0000, RZ, 0xc0, !PT"
+            },
+            {
+              "pc": "0x5350",
+              "register": 83,
+              "instruction": "IMAD.U32 R83, R23.reuse, 0x10000, RZ"
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "abstract_states": 1856,
+          "grown_registers_actually_accessed": [
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88
+          ],
+          "grown_register_read_before_definition_count": 0,
+          "read_before_definition": [],
+          "pre_INC_grow_access_count": 0,
+          "pre_INC_accesses": [],
+          "first_definitions": [
+            {
+              "pc": "0x990",
+              "register": 86,
+              "instruction": "IADD3 R86, R4.reuse, 0x3008, R7.reuse"
+            },
+            {
+              "pc": "0x9c0",
+              "register": 84,
+              "instruction": "IADD3 R84, R4, 0x3000, R7"
+            },
+            {
+              "pc": "0xd40",
+              "register": 85,
+              "instruction": "IADD3 R85, R5, 0x3000, R8"
+            },
+            {
+              "pc": "0xfc0",
+              "register": 88,
+              "instruction": "VIADD R88, R14, -UR20"
+            },
+            {
+              "pc": "0x1060",
+              "register": 87,
+              "instruction": "IADD3 R87, R5, 0x3008, R8"
+            },
+            {
+              "pc": "0x1430",
+              "register": 80,
+              "instruction": "F2FP.BF16.F32.PACK_AB R80, R23, R22"
+            },
+            {
+              "pc": "0x1520",
+              "register": 82,
+              "instruction": "FADD R82, R74, R17"
+            },
+            {
+              "pc": "0x17e0",
+              "register": 81,
+              "instruction": "FADD R81, R73, R20"
+            },
+            {
+              "pc": "0x1990",
+              "register": 83,
+              "instruction": "FADD R83, R75, R12"
+            }
+          ]
+        }
+      ],
+      "consumer_grown_registers_actually_accessed": {
+        "WG0": [
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91
+        ],
+        "WG1": [
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88
+        ]
+      },
+      "all_P_clear_after_successful_INC": false,
+      "legal_initial_owned_preINC_zero_present": true,
+      "initialization_gate": {
+        "all_P_clear_after_INC": false,
+        "legal_initial_owned_preINC_zero": true,
+        "common_preINC_P_registers": [
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55
+        ],
+        "scope": "Actual commonzeros are below initial80, legal owned access; all grown words first used after successful INC and definite writes. First MMA accumulators all zero. No prior49 initialization premise inherited."
+      },
+      "stack_bytes": 0,
+      "local_bytes": 0,
+      "spill_store_bytes": 0,
+      "spill_load_bytes": 0,
+      "new_C7512_warning": false,
+      "HGMMA_implicit_RS_A_words": 4,
+      "HGMMA_implicit_accumulator_words": 8,
+      "physical_windows": {
+        "windows_per_stage_per_WG": 2,
+        "K16_atoms_per_window": 2,
+        "WG0_HGMMA_per_window": 6,
+        "WG1_HGMMA_per_window": 8,
+        "WG0_A_packed_words_per_window": 24,
+        "WG1_A_packed_words_per_window": 32,
+        "WG0_whole_P_words": 24,
+        "WG1_whole_P_words": 32,
+        "source_whole_stage_A48_64": false,
+        "all_role_windows_generic_pending_A_or_P_access_count": 0,
+        "scope": "Both distinct K16 A fragments survive through matching wait0 and post-fences; original perP atom order0,1,2,3. One release after both windows."
+      },
+      "dynamic_shared_bytes": 95232,
+      "actual_driver_static_shared_bytes": 0,
+      "resource_tool_shared_bytes": 1024,
+      "resource_tool_shared_accounting_is_not_driver_static": true,
+      "host_optin_and_launch_size_bytes": 95232,
+      "extern_shared_alignment_bytes": 1024,
+      "operand_bank_bytes": 47104,
+      "all_banks_operand_bytes": 94208,
+      "A_bytes_per_bank": 32768,
+      "B_bytes_per_bank": 14336,
+      "barriers_offset_bytes": 94208,
+      "raw_done_offset_bytes": 94240,
+      "typed_tail_bytes": 28672,
+      "typed_tail_bank0_only": true,
+      "both_banks_drained_before_typed_tail": true,
+      "raw_TMA_boxes": 4,
+      "raw_TMA_transaction_bytes": 32768,
+      "raw_TMA_phase": "state.phase XOR1, actual82a0",
+      "B_descriptor": {
+        "actual_prefix": "0xc000001000000000",
+        "start_address_mask": "0x3fc0",
+        "canonical_leading_bytes": 0,
+        "leading0_degenerate_unused_Nouter1": true,
+        "stride_bytes": 256
+      },
+      "CTA_collective_epochs": {
+        "initial_bar0": "0x290",
+        "consumer_drain_bar6_count384": "0x69a0",
+        "producer_drain_bar6_count384": "0x84f0",
+        "shared_tail_last_STS": "0x7080",
+        "common_publish_bar0": "0x8520",
+        "three_collective_events": true,
+        "bar6_non_aligned": true
+      },
+      "TMA_and_SIMT_publication": {
+        "TX32768_setup_pc": "0x73d0",
+        "TX_expect_pc": "0x7410",
+        "four_TMA_pcs": [
+          "0x7490",
+          "0x7590",
+          "0x7680",
+          "0x7770"
+        ],
+        "final_B_STS_pc": "0x8250",
+        "all128_proxy_fence_pc": "0x8290",
+        "all128_raw_wait_pc": "0x82d0",
+        "full_arrival_after_raw_wait_pc": "0x8300",
+        "producer_both_bank_tail_wait_pcs": [
+          "0x8430",
+          "0x84d0"
+        ],
+        "WG0_last_wait0_before_release": [
+          "0x6920",
+          "0x6930"
+        ],
+        "WG1_last_wait0_before_release": [
+          "0x32a0",
+          "0x32b0"
+        ]
+      },
+      "current_A_grid_constant_parameter": {
+        "bytes": 128,
+        "alignment_bytes": 64,
+        "byvalue_kernel_constant": true,
+        "current_map_encoded_once_inside_each_native_ordinary_run_or_capture": true,
+        "graph_replay_fresh_content_at_captured_fixed_addresses": true
+      },
+      "active_C0_alias": {
+        "beta0_skips_C0": true,
+        "beta_branch_pc": "0x8610",
+        "C0_load_pcs": [
+          "0x8db0",
+          "0x8df0",
+          "0x8e30",
+          "0x8e90"
+        ],
+        "first_active_D_store_pc": "0x9070",
+        "four_C0_loads_before_any_active_D_store": true,
+        "alpha_RN_then_beta_FMA": true
+      },
+      "function_attributes": {
+        "max_threads_per_block": 384,
+        "static_shared_bytes": 0,
+        "local_bytes": 0,
+        "registers_per_thread": 80,
+        "max_dynamic_shared_bytes_before_optin": 49152,
+        "max_dynamic_shared_bytes_after_optin": 95232
+      },
+      "occupancy_API_predicted_active_CTAs_per_SM": 2,
+      "measured_residency": null
+    }
+  ],
+  "disabled_instances": [],
+  "initial_failed_revision": null,
+  "source_API_tests_review": {
+    "source_and_RN_body_inverse_exact_parent49_archive": true,
+    "new_numeric_ARLayout_64x32_rank3_V8_M1_K2": true,
+    "pinned_rank2_A_B_rank3_P_gemm_dispatch4": true,
+    "perP_ascending_K16_order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "source7_integration_delta_inverse_exact": true,
+    "tests_source_complete_31op_inverse_exact_parent49": true,
+    "max50_invalid51_before_degenerate": true,
+    "disabled37_before_degenerate": true,
+    "current_AB16_and_native_MK128_N32_Aonly_lda_less_2pow39": true,
+    "truthful_P7_Dense_fallback_before_encode": true,
+    "original_FP64_floors_unchanged": true,
+    "new_rawU_reference": "CROSSATOM BN16 current50 vs BN32 native45 at common parentN64+, strictbits plus specifiedhostRNalpha/FMA",
+    "strict_only30_and_full1950_are_code_scope_not_execution": true,
+    "AutoDense_unchanged": true
+  },
+  "original_FP64_gate": {
+    "certified": false,
+    "actual_execution_in_this_static_review": null,
+    "floors_changed": false
+  },
+  "limitations": [
+    "Initial compiled-only certificate excludes later GPU validation/timing.",
+    "Actual common initial-owned P zeros precede INC; afterINC flag is false.",
+    "Complete initial build contains old disabled37 C7512, none for current50; clock-skew warning preserved.",
+    "Driver static0 is distinct from resource-toolSHARED1024 accounting. OccupancyAPI2 is a static prediction; measuredresidency null.",
+    "Both H10/H12 supplemental8 and mandatory20 actual timing/precision scope must be reviewed later separately."
+  ],
+  "issues": []
+}

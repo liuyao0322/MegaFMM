@@ -1925,3 +1925,18 @@ Evidence: results/1024_MEGAKERNEL_PSPLIT_TMA_BN16_REPORT.md; small_psplit_tma_bn
 - Actual default CASE/PASS/BEGIN 2982/2974/5488 and selected49 60/140/204 each exit0. Strict original30 gates 18PASS/12FAIL/nonfinite0; three serial CUDA12.8 sanitizers exit0 with zero reported errors/hazards/leaks within their tested scopes. Full1920 numerical source domain was not executed; structural/cross-atom bit fixtures do not certify original FP64 precision.
 - Plan/onceidentity were created after quick source Git65a2292 and before full timing. SourceGit binds seven executed sources; later prestatusGit binds the SHA-pinned plan/identity. No hindsight identity append or timing rerun. Auto remains Dense, precision_certified=false and goal_complete=false; no automatic iteration46/public50. Full report: results/1024_MEGAKERNEL_PSPLIT_TMA_BN16_MIN2_REPORT.md.
 - Separate ROOT CPU-only precision future:30 frozen files,27cases/111schemes; mixed BF16-to-FP16 reduced error on7/7 random cases but bounded exact finite cancellation still fails BF16 gate≈0.001 with mixed eF9.7169 and hi+lo15 omitting lo*lo eF0.06917. Large/tiny stress includes nonfinite/eF1. Original failed CPU helper exit1 retained. No CUDA/GPU/performance/precision-policy change or certification follows from that proxy evidence; results/psplit_tma_bn16_min2_precision_future_evidence_iter45.json.
+
+### Iter46 — paired K16 inputs, two K32 windows on BN16 TMA
+
+- **Hypothesis:** Retain two successive K16 A atoms until one matching wait0, reducing four input windows in49 to two in50. Geometry64x16x64,2banks/384threads,40/96/96/minCTA2. More live A may increase register pressure; no speed or measured residency is inferred from the source constraint.
+- **Changes:** ONLY50 new TU. Each product retains ascending atom0..3, original FP32RN operand DAG and one final Element cast, wholeK seven FP32P, fixedU and RNalpha/betaFMA. Original guards/floors/AutoDense/37earlyblock/zero globalmatrixworkspace unchanged. Fresh two-dtype machine/ABI/link/init/pending review and occupancy attributes are bound independently before launch; original instance fields remain authoritative.
+- **Bench:** AKO quick20warm/20calls/5groups/1fresh. All original numerical FAILs and exits retained; full timing follows regardlessquick3%.
+
+| M,N,K | dtype | route | mode | Dense us | complete SW us | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | megakernel_wgmma_psplit_tma_bn16_k32_window_64x16 v50 | launch | 13.094400 | 26.059201 | 0.502487 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_psplit_tma_bn16_k32_window_64x16 v50 | launch | 10.384000 | 25.609601 | 0.405473 | FAIL |
+
+- **Analysis:** Whole-call own latency evaluates the input-window schedule. Static occupancy API is a prediction, not measured residency or causal stall proof; numerical certification remains the original independent gate. Ordinary50 includes current-A encode.
+- **Next:** After this quick Git checkpoint, freeze mandatorysamebinary20 (50/49/45/39/Lt1) and separate supplemental8 originalH10 single-P input fusion/two launches andH12 S/T once/three launches before anyfull timing. All28 use20warm100calls5groups3fresh/rotate1/32Lt8GiB. Once-complete identity first-creation includes bothplanSHA; sourceGit proves7 executed sources, laterprestatus Git binds plans/identity. Strict30/serialSAN3/coverage/independent audits follow; no automatic47.
+- **Archive:** trajectory/20261014_094446_iter-46/
