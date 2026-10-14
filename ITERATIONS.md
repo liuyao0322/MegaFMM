@@ -391,6 +391,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 242 | Two Tensor Core groups share full-K LHS | 0.7760 | 0.014393 | experiment |
 
+| 243 | Dual N16 consumers retain 128 CTA grid | 0.8965 | 0.012460 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3576,3 +3578,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Full benchmark BF16 14.3373 us vs Dense 12.3274 us; FP16 14.4480 us vs Dense 10.0016 us. Numerically matches expected uncompensated errors, original FP64 gates fail both. Larger per-CTA transform and half-SM grid outweigh reuse; no speed gain.
 - **Next:** Inspect resource use and phase critical path before changing dual-group geometry.
 - **Archive:** trajectory/20261015_053004_iter-242/
+
+### Iter 243 — Dual N16 consumers retain 128 CTA grid
+
+- **Hypothesis:** Two independent N16 warp groups may hide completion waits without halving active SM coverage.
+- **Changes:** Retain 64x32 CTA and four BK256 slots; split RHS into two N16 descriptor views, eight warp-leader releases and 480 pack workers; private eight-element accumulators per group.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012460 ms; mean speedup=0.8965x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012292 | 0.012360 | 0.9945 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010028 | 0.012560 | 0.7984 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 12.3600 us vs Dense 12.2925 us; FP16 12.5597 us vs Dense 10.0278 us. Original errors unchanged, gates fail. Better than dual N32 242 but still substantially slower than 224. Profile242 confirms 64 registers and zero local sectors: its regression is not spilling.
+- **Next:** Reject dual-group variants and reassess frontend publication and supply dependencies.
+- **Archive:** trajectory/20261015_053135_iter-243/
