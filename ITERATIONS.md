@@ -449,6 +449,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 271 | Per-primary tile flags with fenced PDL initialization | 0.6587 | 0.016816 | experiment |
 
+| 272 | Batch tile observations with one acquire fence | 0.8719 | 0.012622 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4098,3 +4100,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通BF16 16.83648us、FP16 16.79456us，明显退化；FP有45us单组离群，中位仍慢。原三fresh错误值一致、门槛FAIL，但未独立验证新协议，不保留。24个顺序acquire观察可能自身昂贵，需控制实验区分，不直接归因全部prefixfence。
 - **Next:** 批量并行读取12flags后单次acquire fence，保持相同初始化/发布，以区分串行观察成本。
 - **Archive:** trajectory/20261015_062622_iter-271/
+
+### Iter 272 — Batch tile observations with one acquire fence
+
+- **Hypothesis:** 271的24次顺序acquire引入串行等待，12独立relaxed观察后单acquire fence可降低自身观察成本。
+- **Changes:** 保持271全部初始化/发布及数据分块，只用内联PTX并行发出每K半12flag读，全部为1后fence.acq_rel.gpu。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012622 ms; mean speedup=0.8719x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012222 | 0.012756 | 0.9582 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009812 | 0.012489 | 0.7856 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通BF16 12.75584us、FP16 12.48896us，比271明显改善但仍慢于266约10.5/10.37us。Dense12.22208/9.81152us，原门槛FAIL。显示串行观察确实昂贵，但不能把剩余全部归于初始化或producer，需对照。未独立验收，不保留。
+- **Next:** 对照仅增加primary前缀初始化fence而保持全primary依赖等待，以区分prefix与tile观察开销。
+- **Archive:** trajectory/20261015_062726_iter-272/

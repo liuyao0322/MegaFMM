@@ -2419,14 +2419,41 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       // Per-tile acquire observes this invocation's release publication.
       if(sequence==4 || sequence==5){
         auto flags=reinterpret_cast<const uint32_t*>(reinterpret_cast<const char*>(packed)+WorkspaceBytes);
-        auto await_tile=[&](int tile){
-          uint32_t ready;
-          do{asm volatile("ld.global.acquire.gpu.u32 %0,[%1];":"=r"(ready):"l"(flags+tile*32):"memory");}while(!ready);
-        };
-        // Each primary produces all eight S/T planes for its32x64 input tile.
-        // First transformed leaf q0/q1 covers every transformed region later used.
-        for(int j=0;j<8;++j)await_tile((k0/32+j)*8+m0/64);
-        for(int j=0;j<4;++j)await_tile((n0/32)*8+k0/64+j);
+        // Issue independent relaxed observations together, then acquire every
+        // producer release with a single GPU-scope acquire fence.
+        auto lhs=flags+((k0/32)*8+m0/64)*32;
+        auto rhs=flags+((n0/32)*8+k0/64)*32;
+        asm volatile(
+          "{ .reg .b32 v<12>,all; .reg .pred ready;\n"
+          "POLL_TILES:\n"
+          "ld.relaxed.gpu.global.u32 v0,[%0+0];\n"
+          "ld.relaxed.gpu.global.u32 v1,[%0+1024];\n"
+          "ld.relaxed.gpu.global.u32 v2,[%0+2048];\n"
+          "ld.relaxed.gpu.global.u32 v3,[%0+3072];\n"
+          "ld.relaxed.gpu.global.u32 v4,[%0+4096];\n"
+          "ld.relaxed.gpu.global.u32 v5,[%0+5120];\n"
+          "ld.relaxed.gpu.global.u32 v6,[%0+6144];\n"
+          "ld.relaxed.gpu.global.u32 v7,[%0+7168];\n"
+          "ld.relaxed.gpu.global.u32 v8,[%1+0];\n"
+          "ld.relaxed.gpu.global.u32 v9,[%1+128];\n"
+          "ld.relaxed.gpu.global.u32 v10,[%1+256];\n"
+          "ld.relaxed.gpu.global.u32 v11,[%1+384];\n"
+          "and.b32 all,v0,v1;\n"
+          "and.b32 all,all,v2;\n"
+          "and.b32 all,all,v3;\n"
+          "and.b32 all,all,v4;\n"
+          "and.b32 all,all,v5;\n"
+          "and.b32 all,all,v6;\n"
+          "and.b32 all,all,v7;\n"
+          "and.b32 all,all,v8;\n"
+          "and.b32 all,all,v9;\n"
+          "and.b32 all,all,v10;\n"
+          "and.b32 all,all,v11;\n"
+          "setp.ne.u32 ready,all,0;\n"
+          "@!ready bra POLL_TILES;\n"
+          "fence.acq_rel.gpu;\n"
+          "}\n"
+          : : "l"(lhs),"l"(rhs) : "memory");
       }
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
