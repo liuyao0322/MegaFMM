@@ -457,6 +457,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 275 | XOR compute CTA coordinates | 0.8128 | 0.013633 | experiment |
 
+| 276 | RHS-first TMA ordering | 1.0543 | 0.010523 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4170,3 +4172,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通BF16 13.5664us、FP16 13.69888us，大幅退化。原三组fresh eF与基线一致、原门槛FAIL；映射对性能非常敏感，不能把此前低Tensor活跃率直接归结为算力不足。未做新计数器不能确定是L2 locality、代码生成还是别的变化；不保留。
 - **Next:** 保持原CTA映射，测试RHS先于LHS发射的TMA顺序，检验供数指令顺序敏感性。
 - **Archive:** trajectory/20261015_063056_iter-275/
+
+### Iter 276 — RHS-first TMA ordering
+
+- **Hypothesis:** 较小RHS先发射可能减少第一次数据就绪等待，保持CTA地址映射以隔离TMA顺序。
+- **Changes:** 266基础仅交换每K块RHS/LHS的两条TMA生产代码顺序，不改变slot、预取深度或算术。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010523 ms; mean speedup=1.0543x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012369 | 0.010491 | 1.1790 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009812 | 0.010555 | 0.9296 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通BF16 10.49120us、FP16 10.55456us，FP明显慢于26610.365us，不保留。Dense12.36928/9.81152us，原门槛仍FAIL。274至276无3percent改善，已启动266/275全NCU控制对比，接下来重读计数器并复核历史宽IO在新独立primary上的适用性。
+- **Next:** 根据对照NCU区分275编译资源与缓存行为；在PDL独立primary上测试64bit四元素IO，保持其余266不变。
+- **Archive:** trajectory/20261015_063222_iter-276/

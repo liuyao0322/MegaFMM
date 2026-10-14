@@ -2391,7 +2391,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   using namespace cute;
   extern __shared__ __align__(128) unsigned char buffer[];
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
-  int tid=threadIdx.x,m0=(blockIdx.y^(blockIdx.x&7))*BM,n0=blockIdx.x*BN;
+  int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==32){
     asm volatile("prefetch.tensormap [%0]; prefetch.tensormap [%1]; prefetch.tensormap [%2]; prefetch.tensormap [%3];" :: "l"(&amap),"l"(&bmap),"l"(&smap),"l"(&tmap) : "memory");
   }
@@ -2413,14 +2413,6 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
       T* op=s.operand[slot];
-      // LHS is B_leaf^T, M-contiguous original B data.
-      if(blo){
-        int plane=p==3?3:p-4;
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
-      }else{
-        int col=p==2?512:0,row=p==1 || p==2?512:0;
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
-      }
       // RHS is A_leaf^T, K-contiguous original A data.
       if(alo){
         int plane=p==2?3:p-4;
@@ -2428,6 +2420,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }else{
         int col=p==1 || p==3?512:0,row=p==3?512:0;
         SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
       }
 
     }
