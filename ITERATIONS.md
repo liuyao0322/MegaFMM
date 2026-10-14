@@ -317,6 +317,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 205 | Static PTX ping-pong overlap of register recombination | 0.9457 | 0.011756 | experiment |
 
+| 206 | Asymmetric A4 B5 independent operand prefetch | 0.9275 | 0.011979 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2908,3 +2910,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 11.613 us and FP16 11.899 us versus Dense12.247/9.957 us. Finite unchanged approximate errors; original gates fail. Slower than204 and162; inspect resources before deciding whether overlap or spills caused regression.
 - **Next:** Check205 resource use and NCU local traffic; adjust block size only if register pressure warrants it
 - **Archive:** trajectory/20261015_041034_iter-205/
+
+### Iter 206 — Asymmetric A4 B5 independent operand prefetch
+
+- **Hypothesis:** Extra B slot and independent TMA producers reduce narrow B supply head-of-line blocking using reclaimed P space
+- **Changes:** Base204 static TC PTX; separateA4/B5 ready/free rings, two TMA leaders, local publication handoff;800threads608pack;213248Bshared
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011979 ms; mean speedup=0.9275x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012289 | 0.011853 | 1.0367 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009905 | 0.012105 | 0.8182 | 0.000754626 | 0 |
+
+- **Analysis:** Finite unchanged approximate errors and original gates fail. BF16 11.853 us and FP16 12.105 us versus Dense12.289/9.905 us. Slower than162 and204. Fresh205NCU74regs,zero spill,1.895Minstructions but no full-call gain: lower instruction count alone does not establish latency improvement.
+- **Next:** Try asymmetric A5 B3 to distinguish A versus B prefetch sensitivity on this direct-register architecture
+- **Archive:** trajectory/20261015_041305_iter-206/
