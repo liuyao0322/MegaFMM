@@ -107,6 +107,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 100 | Four compact operand stages | 0.8573 | 0.013169 | experiment |
 
+| 101 | K128 with six operand prefetch stages | 0.9326 | 0.013673 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1008,3 +1010,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Seven main products and original gates unchanged. Deeper buffering may add address/phase overhead; full-call comparisons decide retention.
 - **Next:** Reassess98-100 using paired timings, generated code and fresh diagnostics before K-block changes
 - **Archive:** trajectory/20261015_012528_iter-100/
+
+### Iter 101 — K128 with six operand prefetch stages
+
+- **Hypothesis:** Smaller K chunks and six prefetched tiles may trade shorter individual completion waits for better data readiness
+- **Changes:** BK128,Stages6,shared163968; preserve math order and immediate per-tile retirement
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013673 ms; mean speedup=0.9326x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012305 | 0.013526 | 0.9097 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.013205 | 0.013820 | 0.9555 | 0.000754626 | 0 |
+
+- **Analysis:** Both dtype full benchmarks completed; original accuracy failures remain expected. More K stages also increase synchronization frequency.
+- **Next:** Compare withK256/4stages; testK512 with split B TMA to reduce completion frequency
+- **Archive:** trajectory/20261015_012641_iter-101/
