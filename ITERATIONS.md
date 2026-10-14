@@ -533,6 +533,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 313 | Restore validated282 after cluster and local-transform exploration | 1.0835 | 0.010270 | experiment |
 
+| 314 | PDL global split4plus3 initial build | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4848,3 +4850,17 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.29344us versus Dense12.46912us; FP16 10.24576us versus9.79072us, still needs.45504us or4.44percent SW reduction. BF16 solution group3 wall36.984us retained; event10.25536us. Both original numerical gates remainFAIL;AutoDense. No target completion or physical-floor claim.
 - **Next:** Archive292-313 evidence; continue PDL global split4/3 with rank1 precomputation and per-warp release/acquire U flags
 - **Archive:** trajectory/20261015_072357_iter-313/
+
+### Iter 314 — PDL global split4plus3 initial build
+
+- **Hypothesis:** Rank1 precomputes all three leaves while rank0 computes four, avoiding the two-leaf tail and cluster overhead
+- **Changes:** N64 BK128 seven-slot ordinary128CTA pair, global vec4 U exchange with per-warp release/acquire flags initialized by primary dependency,6299648Bworkspace
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Compile failed: generated u2/u3 register array names end in digits and do not match u20 references. No valid timing or correctness results. The earlier explicit scalar naming fix must also cover these temporary vectors.
+- **Next:** Declare U temporary scalar registers explicitly and rerun same architecture
+- **Archive:** trajectory/20261015_072627_iter-314/
