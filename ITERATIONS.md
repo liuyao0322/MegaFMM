@@ -253,6 +253,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 173 | Measure corrected N16 asynchronous two-CTA pipeline | 0.6760 | 0.016503 | experiment |
 
+| 174 | Short barrier suspension hint | 0.9717 | 0.011429 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2340,3 +2342,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about16.41us FP16 about16.60us, slower than162 despite correct baseline errors/nonfinite0. Smaller N doubles global CTA supply traffic and publication participation; no occupancy-based win. Config string still stale162geometry, actual source is N16 and shared90240.
 - **Next:** Restore162; test shortened barrier suspension hint.
 - **Archive:** trajectory/20261015_032756_iter-173/
+
+### Iter 174 — Short barrier suspension hint
+
+- **Hypothesis:** A256ns try_wait suspension hint may reduce wakeup latency on short operand-slot dependencies.
+- **Changes:** Restore162 and use inline PTX parity try_wait with256ns hint, same phase semantics and memory clobber.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011429 ms; mean speedup=0.9717x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012218 | 0.011366 | 1.0750 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009980 | 0.011492 | 0.8684 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about11.37us FP16 about11.49us, small single-run variation versus162, no3percent improvement. Expected original precision failures remain. Does not prove wakeup latency changed.
+- **Next:** Archive binary and restore162; single warpgroup leader releases operands after full WGMMA wait0.
+- **Archive:** trajectory/20261015_032840_iter-174/
