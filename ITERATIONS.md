@@ -441,6 +441,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 267 | First raw TMA before CTA initialization rendezvous | 1.0465 | 0.010598 | experiment |
 
+| 268 | Compact160-thread compute CTA | 1.0493 | 0.010540 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4026,3 +4028,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通BF16 10.60832 us、FP16 10.58688 us，未超过254，不保留；Dense12.29888/9.88448us，有FP单组Dense16.57us及wall离群，不能作收益证据。原三组eF保持一致、原门槛FAIL。
 - **Next:** 将独立TMA warp移动至warp4、TC置于warpgroup0，测试160线程CTA，移除当前三个仅参与启动的闲置warp。
 - **Archive:** trajectory/20261015_061749_iter-267/
+
+### Iter 268 — Compact160-thread compute CTA
+
+- **Hypothesis:** 把TC放到warpgroup0、TMA放到warp4，可移除原256线程中的三个启动后闲置warp。
+- **Changes:** 254基础TC线程0至127，TMA及初始化线程128，CTA160线程；四消费者warp leader、shared布局、原算术及PDL不变。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010540 ms; mean speedup=1.0493x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012316 | 0.010624 | 1.1593 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009820 | 0.010455 | 0.9392 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通BF16 10.6240 us、FP16 10.45536 us，未超过254；Dense12.31616/9.82016us，精度仍FAIL，暂不保留。只缩小CTA并未带来可确认收益。
+- **Next:** 对266的descriptor预取潜在小收益做独立完整ABBA比较，然后恢复实际最优源码并更新验证检查点。
+- **Archive:** trajectory/20261015_061847_iter-268/
