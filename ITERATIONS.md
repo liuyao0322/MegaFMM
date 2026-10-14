@@ -273,6 +273,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 183 | Independent A and B TMA producer warps | 0.9600 | 0.011568 | experiment |
 
+| 184 | Role-specific initialization and pack named barriers | 0.9564 | 0.011607 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2520,3 +2522,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about11.53us FP16 about11.60us, slower162. Expected precision errors retained and nonfinite0. Separate producer warps do not improve full-call latency.
 - **Next:** Restore162; allow pack warps to start before initial CTA synchronization, using explicit role-specific named barriers.
 - **Archive:** trajectory/20261015_033818_iter-183/
+
+### Iter 184 — Role-specific initialization and pack named barriers
+
+- **Hypothesis:** Allow pack warps to compute immediately while only TMA and TC wait for shared barrier initialization.
+- **Changes:** Restore162; initial named barrier1 has160TMA/TC threads; warp0 and608pack threads rendezvous named barrier2 count640 before global transform publication; no pack mbarrier arrivals, TC rawP1/P2 overlap preserved.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011607 ms; mean speedup=0.9564x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012258 | 0.011641 | 1.0529 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009950 | 0.011573 | 0.8598 | 0.000754626 | 0 |
+
+- **Analysis:** FP16 about11.57us, no gain162; expected original numerical errors and nonfinite0. Stronger role-specific ordering is valid conceptually but offers no complete-call benefit; reject.
+- **Next:** Inspect earlier vector consumer experiments and test only materially distinct mapping; otherwise return to operand map policy.
+- **Archive:** trajectory/20261015_033924_iter-184/
