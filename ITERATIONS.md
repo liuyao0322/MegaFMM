@@ -287,6 +287,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 190 | Direct atomic leaf recombination | 0.3647 | 0.030709 | experiment |
 
+| 191 | TMA tensor reduction of shared leaf tiles | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2646,3 +2648,17 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about30.01us FP16 about31.41us, worse189 and162. Expected original gate failures remain with eF near.0060152/.000754626 and nonfinite0. Atomic contribution route rejected; no numerical certification.
 - **Next:** Restore189 and test bulk TMA tensor reduction if hardware-supported, otherwise return162 for independent direction.
 - **Archive:** trajectory/20261015_034919_iter-190/
+
+### Iter 191 — TMA tensor reduction of shared leaf tiles
+
+- **Hypothesis:** Bulk tensor reduce-add replaces scalar atomics while avoiding last-CTA serialized recombination.
+- **Changes:** Base190; shared two64x32FP32 reduction tiles, SW128 address permutation, fifth current-output tensor map, perWG TMAreduce contributions and full bulk completion waits. Nondeterministic sum order remains explicit.
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Runtime failed with misaligned address during explicit tuning. Reduction buffer follows48bytes of barriers and lacks128B alignment required by swizzled TMA output. No valid timings or correctness results; exclude candidate.
+- **Next:** Align reduction array128bytes and correct static shared budget114944; rerun.
+- **Archive:** trajectory/20261015_035040_iter-191/

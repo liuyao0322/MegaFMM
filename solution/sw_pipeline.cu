@@ -17,9 +17,10 @@ using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared{
   T operand[Stages][ASize+BSize];
   uint64_t ready[Stages],free[Stages],pack_ready,global_ready;
+  float reduction[2][64*32];
   uint32_t last;
 };
-static_assert(sizeof(Shared<cute::half_t>)==98432,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==114816,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 template<class T,class TA,class TB>
@@ -51,7 +52,7 @@ __device__ void mma_term(TA a,TB b,float (&d)[32]) {
 template<class T> __global__ __launch_bounds__(Threads,2)
 void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
  const __grid_constant__ CUtensorMap bmap,const __grid_constant__ CUtensorMap smap,
- const __grid_constant__ CUtensorMap tmap,const T* A,const T* B,T* packed,float* D){
+ const __grid_constant__ CUtensorMap tmap,const __grid_constant__ CUtensorMap dmap,const T* A,const T* B,T* packed,float* D){
  using namespace cute;
  extern __shared__ __align__(128) unsigned char buffer[];
  auto& sh=*reinterpret_cast<Shared<T>*>(buffer);
@@ -153,15 +154,25 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
    __syncwarp();if((tid&31)==0)arrive(&sh.free[slot]);
   }
   wait(&sh.global_ready,0);
-  // Concurrent leaf contributions: FP32 reduction order is intentionally nondeterministic.
+  // TMA tensor reduce-add; leaf accumulation order across CTAs is nondeterministic.
   #pragma unroll
-  for(int j=0;j<32;++j){
-   int mn=GMMA::CLayout_64x64{}(lane,j),row=m0+wg*64+mn%64,col=n0+mn/64;
-   float* out=D+row*1024+col;float value=acc[j];
-   if(p==0 || p==1)atomicAdd(out,value);
-   if(p==0 || p==2 || p==4 || p==5)atomicAdd(out+512,value);
-   if(p==0 || p==3 || p==5 || p==6)atomicAdd(out+512*1024,p==3 ? -value:value);
-   if(p==0 || p==4 || p==5 || p==6)atomicAdd(out+512*1024+512,value);
+  for(int half=0;half<2;++half){
+   #pragma unroll
+   for(int j=0;j<16;++j){
+    int mn=GMMA::CLayout_64x64{}(lane,half*16+j),row=mn%64,col=mn/64-half*32;
+    sh.reduction[wg][row*32+(col^((row&7)<<2))]=p==3 ? -acc[half*16+j]:acc[half*16+j];
+   }
+   asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
+   asm volatile("bar.sync 3,256;" ::: "memory");
+   if(tid==128 || tid==256){
+    int x=n0+half*32,y=m0+wg*64;
+    if(p==0 || p==1)SM90_TMA_REDUCE_ADD_2D::copy(&dmap,sh.reduction[wg],x,y);
+    if(p==0 || p==2 || p==4 || p==5)SM90_TMA_REDUCE_ADD_2D::copy(&dmap,sh.reduction[wg],x+512,y);
+    if(p==0 || p==3 || p==5 || p==6)SM90_TMA_REDUCE_ADD_2D::copy(&dmap,sh.reduction[wg],x,y+512);
+    if(p==0 || p==4 || p==5 || p==6)SM90_TMA_REDUCE_ADD_2D::copy(&dmap,sh.reduction[wg],x+512,y+512);
+    asm volatile("cp.async.bulk.commit_group; cp.async.bulk.wait_group 0;" ::: "memory");
+   }
+   asm volatile("bar.sync 3,256;" ::: "memory");
   }
  }
 }
@@ -209,7 +220,11 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
   CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
   encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+PackedBytes/2,state.dtype,false,true);
-  void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D};dim3 grid(8,4,7);
+  CUtensorMap outmap{};
+  uint64_t dims[2]={1024,1024},strides[1]={4096};uint32_t box[2]={32,64},steps[2]={1,1};
+  auto status=cuTensorMapEncodeTiled(&outmap,CU_TENSOR_MAP_DATA_TYPE_FLOAT32,2,D,dims,strides,box,steps,CU_TENSOR_MAP_INTERLEAVE_NONE,CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+  if(status!=CUDA_SUCCESS)throw std::runtime_error("SW output map status "+std::to_string(int(status)));
+  void* args[]={&a,&b,&s,&t,&outmap,&A,&B,&workspace,&D};dim3 grid(8,4,7);
   if(state.dtype==DType::BF16)
     check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
   else
