@@ -553,6 +553,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 323 | Balanced raw-leaf ownership in dual tensor warpgroups | 1.0324 | 0.010574 | experiment |
 
+| 324 | Three Tensor Core groups with shared U2 and U3 chain | 0.9703 | 0.011230 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5024,3 +5026,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal benchmark completed; finite unchanged approximate output is not numerical acceptance. Use archived CSV for precise timing.322 larger K blocks were rejected: BF16 11.30592 and FP16 11.66112 us, despite the lower handshake count.
 - **Next:** Inspect323 result and test three tensor groups with3+2+2 leaf ownership and CTA-local exchange if the balanced two-group route still does not beat selected282
 - **Archive:** trajectory/20261015_073921_iter-323/
+
+### Iter 324 — Three Tensor Core groups with shared U2 and U3 chain
+
+- **Hypothesis:** Three-plus-two-plus-two leaf ownership can shorten per-group serial issue while keeping intermediate exchange local to the CTA
+- **Changes:** Keep282 PDL primary; compute512threads, three independent K128 operand pipelines with3/2/3 slots; groups P1P2P6, P7P4, P5P3; first group publishesU2, second publishesU3 andC21, third writesC22/C12;128-arrival CTA barriers
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011230 ms; mean speedup=0.9703x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012131 | 0.011334 | 1.0703 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009684 | 0.011126 | 0.8703 | 0.000754626 | 0 |
+
+- **Analysis:** Formal benchmark completed and archived; no adoption or synchronization certification is implied.323 raw-balanced dual-group variant was rejected at BF16/FP16 10.60896/10.53824 us, with finite unchanged approximate errors and both original gates failing.
+- **Next:** Inspect324 numerical and timing results, profile current critical waits if finite, then reassess slot distribution or source of remaining supply serialization
+- **Archive:** trajectory/20261015_074035_iter-324/

@@ -1,0 +1,73 @@
+a21b2bb07f1c42cdcdfebee9bb2b6d2c236b4dedb8a2485162469d3786d9965d  solution/internal.h
+0b2d1f108cb4a283479550ca7ee3c4e9ef3a235cf2a118d44dbeffb189104cec  solution/plan.cpp
+32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708  solution/scale_output.cu
+dd72fe4bff62df5adaf556e4d6d878d5134572222892b2ef932f4f3bf48f95a2  solution/sw_pipeline.cu
+d5564b71d399c934229c8dc2089c5dd8de7e942957845a9cf23977353186e475  include/megafmm/gemm.h
+0964fc49fdbd02945515ff2d8f6bb834c6a4c937fb4cfad396b1be313634ae4e  bench/benchmark.cu
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 20%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 20%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 30%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(13): warning #177-D: variable "megafmm::detail::<unnamed>::Elements" was declared but never referenced
+  constexpr int BM=64,BN=32,BK=128,Stages=8,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+                                                                    ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(27): warning #177-D: function "megafmm::detail::<unnamed>::arrive" was declared but never referenced
+            void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
+                 ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(29): warning #177-D: function "megafmm::detail::<unnamed>::product_index" was declared but never referenced
+                            int product_index(int row,int col){
+                                ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(36): warning #177-D: function "megafmm::detail::<unnamed>::product_for_step" was declared but never referenced
+            constexpr int product_for_step(int step){
+                          ^
+
+[ 40%] Linking CXX static library libmegafmm.a
+[ 40%] Built target megafmm
+[ 50%] Building CUDA object CMakeFiles/megafmm_bench.dir/bench/benchmark.cu.o
+[ 60%] Building CUDA object CMakeFiles/test_sw1024.dir/tests/test_sw1024.cu.o
+[ 70%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+[ 80%] Linking CXX executable test_sw1024
+[ 80%] Built target test_sw1024
+[ 90%] Linking CXX executable test_correctness
+[ 90%] Built target test_correctness
+[100%] Linking CXX executable megafmm_bench
+[100%] Built target megafmm_bench
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=dense config=dense:id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=10;bound_candidate=4/16;tuned_candidate=4;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.012890;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=sw_pdl_three_tensor_warpgroups_split3plus2plus2;tile=64x32;bk=128;slots=3_2_3;smem=213248;threads=512;primary=128x512;groups=P1P2P6_P7P4_P5P3;u_exchange_chain=group0_U2_group1_U3_group2_C22C12;u_exchange=shared_vec4;publication=cta_mbarrier128;workspace=4194304;leaf_terms=7;residual_correction=off;alpha=1;beta=0
+CHECK 1024,1024,1024 bf16 trial=0 dense_eF=8.51899e-07 solution_eF=0.00600975 gate=0.00100256 pass=0
+CHECK 1024,1024,1024 bf16 trial=1 dense_eF=8.52266e-07 solution_eF=0.0060152 gate=0.00100256 pass=0
+CHECK 1024,1024,1024 bf16 trial=2 dense_eF=8.50027e-07 solution_eF=0.00601153 gate=0.00100255 pass=0
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.0113261 wall_ms=0.0114141
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0121286 wall_ms=0.0122026
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.012104 wall_ms=0.0121749
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.0113606 wall_ms=0.011434
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.0113344 wall_ms=0.0114075
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.0121587 wall_ms=0.0122333
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.0113469 wall_ms=0.0114231
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.0121722 wall_ms=0.012246
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.0121309 wall_ms=0.0122025
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.0113322 wall_ms=0.0114036
+TUNE shape=1024,1024,1024 dtype=fp16 case=dense config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010035;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=sw_pdl_three_tensor_warpgroups_split3plus2plus2;tile=64x32;bk=128;slots=3_2_3;smem=213248;threads=512;primary=128x512;groups=P1P2P6_P7P4_P5P3;u_exchange_chain=group0_U2_group1_U3_group2_C22C12;u_exchange=shared_vec4;publication=cta_mbarrier128;workspace=4194304;leaf_terms=7;residual_correction=off;alpha=1;beta=0
+CHECK 1024,1024,1024 fp16 trial=0 dense_eF=1.24851e-06 solution_eF=0.000751819 gate=0.000103746 pass=0
+CHECK 1024,1024,1024 fp16 trial=1 dense_eF=1.25092e-06 solution_eF=0.000753235 gate=0.000103753 pass=0
+CHECK 1024,1024,1024 fp16 trial=2 dense_eF=1.24799e-06 solution_eF=0.000754626 gate=0.000103744 pass=0
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.0110906 wall_ms=0.0111688
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.0096832 wall_ms=0.00975751
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.00969184 wall_ms=0.00976281
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.011129 wall_ms=0.0112015
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.011097 wall_ms=0.0111686
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.00968384 wall_ms=0.00976308
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.0111264 wall_ms=0.0111988
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.00969728 wall_ms=0.00976826
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.00967968 wall_ms=0.0097508
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.0111354 wall_ms=0.0112109
+srun: error: g08: task 0: Exited with exit code 2

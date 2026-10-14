@@ -364,7 +364,7 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
-  if (impl_->sw) return "sw_pdl_dual_tensor_warpgroup_split4plus3;tile=64x32;bk=128;slots=4per_group;smem=221440;threads=384;primary=128x512;rank0=P1P6P7P4;rank1=P2P5P3;dependency=after_one_raw_leaf_each;rank1=all3leaves_before_wait;u_exchange=shared_vec4;publication=cta_mbarrier128;workspace=4194304;leaf_terms=7;residual_correction=off;alpha=1;beta=0";
+  if (impl_->sw) return "sw_pdl_three_tensor_warpgroups_split3plus2plus2;tile=64x32;bk=128;slots=3_2_3;smem=213248;threads=512;primary=128x512;groups=P1P2P6_P7P4_P5P3;u_exchange_chain=group0_U2_group1_U3_group2_C22C12;u_exchange=shared_vec4;publication=cta_mbarrier128;workspace=4194304;leaf_terms=7;residual_correction=off;alpha=1;beta=0";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }
