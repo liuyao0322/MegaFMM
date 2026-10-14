@@ -68,8 +68,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
                          const __grid_constant__ CUtensorMap bmap,
                          const __grid_constant__ CUtensorMap smap,
                          const __grid_constant__ CUtensorMap tmap,
-                         const T* __restrict__ A,const T* __restrict__ B,
-                         T* __restrict__ packed,float* __restrict__ D){
+                         const T* A,const T* B,T* packed,float* D){
   using namespace cute;
   extern __shared__ __align__(128) unsigned char buffer[];
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
@@ -197,12 +196,24 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb),bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
         warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
+        if(q==1){
+          // Keep q0 in flight while q1 becomes ready and issues its high term.
+          // Once only the newest group may remain, q0's operand slot is safe
+          // for the TMA producer to refill for the next product.
+          warpgroup_commit_batch();
+          warpgroup_wait<1>();
+          __syncwarp();
+          if((tid&31)==0)arrive(&s.free[0]);
+        }
         if(p>=2)wait(&s.low_ready[slot],(sequence/2)%2);
         if(p==2 || p>=4)mma_term<T>(al,bh,acc);
         if(p==3 || p>=4)mma_term<T>(ah,bl,acc);
-        warpgroup_commit_batch();warpgroup_wait<0>();
-        __syncwarp();
-        if((tid&31)==0)arrive(&s.free[slot]);
+        if(q==0 || p>=2)warpgroup_commit_batch();
+        if(q==1){
+          warpgroup_wait<0>();
+          __syncwarp();
+          if((tid&31)==0)arrive(&s.free[1]);
+        }
       }
       if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
       #pragma unroll

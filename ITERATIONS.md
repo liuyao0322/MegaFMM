@@ -93,6 +93,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 93 | Expose the existing no-write-alias binding contract to NVCC | 0.5835 | 0.019041 | passed |
 
+| 94 | Overlap the two K-block WGMMA groups with proven slot retirement | 0.9225 | 0.020434 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -840,3 +842,23 @@ Three candidates did not establish a >=3percent full-call gain over87. Five/eigh
 - **Analysis:** Full1024 cubed BF16/FP16 benchmark completed; evaluate generated code and complete-call measurements rather than assuming a benefit
 - **Next:** Compare against92 and87; inspect whether load ordering changes before trying explicit transform software pipelining
 - **Archive:** trajectory/20261014_224418_iter-93/
+
+### Reassessment after iter91–93
+
+No >=3percent all-mode gain over87 is established. Four-element64bit IO regresses despite fewer memory instructions;32bit pairs remain the better transform candidate. Higher-rank A maps reduce TMA instructions110->44/CTA but only slightly reduce total operand waits (~2.34us). Sparse profiling shows most second-K high-ready checks already short (~64ns), so prioritizing their TMA commands is not justified. TMA instead waits~6.6us total for free slots; CUDA consumers wait~6.8us for P, while TC product-free waits~0.384us. Current wait0 tail is~0.99us, larger than before descriptor improvements. Consulted NVIDIA CUTLASS multistage GMMA implementation for outstanding-group retirement and buffer release. Next test two-group K overlap with retirement of slot0 only after wait_group1 proves its reads complete; preserve arithmetic order and do not release slot1 before wait_group0.
+
+### Iter 94 — Overlap the two K-block WGMMA groups with proven slot retirement
+
+- **Hypothesis:** Deferring q0 full wait until q1 high issue can overlap outstanding tensor work and operand readiness while preserving safe reuse
+- **Changes:** Start from92; commit q0 without draining, commit q1 high then wait_group1 and release slot0; issue corrections, wait_group0 and release slot1
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.020434 ms; mean speedup=0.9225x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.027670 | 0.020368 | 1.3585 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009972 | 0.020500 | 0.4864 | 2.37136e-06 | 1 |
+
+- **Analysis:** Full1024 cubed BF16/FP16 benchmark completed; numerical gates and independent sanitizer validation determine correctness, and full-call comparison determines retention
+- **Next:** Compare against92 and87, inspect WGMMA waits and TMA free-slot effects; keep the fastest independently validated candidate
+- **Archive:** trajectory/20261014_224630_iter-94/
