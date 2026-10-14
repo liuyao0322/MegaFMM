@@ -2353,15 +2353,15 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
 template<class T> __global__ __launch_bounds__(512,1)
 void sw_transform_pdl(const T* A,const T* B,T* packed){
   cudaTriggerProgrammaticLaunchCompletion();
-  for(int i=2*(blockIdx.x*512+threadIdx.x);i<Plane;i+=2*512*128){
+  for(int i=4*(blockIdx.x*512+threadIdx.x);i<Plane;i+=4*512*128){
     int row=i/512,col=i%512,at=row*1024+col;
-    auto av=reinterpret_cast<const uint32_t*>(A);
-    auto bv=reinterpret_cast<const uint32_t*>(B);
-    uint32_t abits[4]={av[at/2],av[(at+512)/2],av[(at+512*1024)/2],av[(at+512*1024+512)/2]};
-    uint32_t bbits[4]={bv[at/2],bv[(at+512)/2],bv[(at+512*1024)/2],bv[(at+512*1024+512)/2]};
-    uint32_t words[16]={};
+    auto av=reinterpret_cast<const uint64_t*>(A);
+    auto bv=reinterpret_cast<const uint64_t*>(B);
+    uint64_t abits[4]={av[at/4],av[(at+512)/4],av[(at+512*1024)/4],av[(at+512*1024+512)/4]};
+    uint64_t bbits[4]={bv[at/4],bv[(at+512)/4],bv[(at+512*1024)/4],bv[(at+512*1024+512)/4]};
+    uint64_t words[16]={};
     #pragma unroll
-    for(int lane=0;lane<2;++lane){
+    for(int lane=0;lane<4;++lane){
       float a11=float(T::bitcast(uint16_t(abits[0]>>(16*lane)))),a12=float(T::bitcast(uint16_t(abits[1]>>(16*lane))));
       float a21=float(T::bitcast(uint16_t(abits[2]>>(16*lane)))),a22=float(T::bitcast(uint16_t(abits[3]>>(16*lane))));
       float b11=float(T::bitcast(uint16_t(bbits[0]>>(16*lane)))),b12=float(T::bitcast(uint16_t(bbits[1]>>(16*lane))));
@@ -2373,12 +2373,12 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
       #pragma unroll
       for(int j=0;j<4;++j){
         T sh=T(sv[j]),th=T(tv[j]);
-        words[2*j]|=uint32_t(sh.raw())<<(16*lane);
-        words[8+2*j]|=uint32_t(th.raw())<<(16*lane);
+        words[2*j]|=uint64_t(sh.raw())<<(16*lane);
+        words[8+2*j]|=uint64_t(th.raw())<<(16*lane);
       }
     }
     #pragma unroll
-    for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[2*j];
+    for(int j=0;j<8;++j)reinterpret_cast<uint64_t*>(packed)[(j*Plane+i)/4]=words[2*j];
   }
   asm volatile("fence.proxy.async.global;" ::: "memory");
 }
@@ -2413,14 +2413,6 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
       T* op=s.operand[slot];
-      // RHS is A_leaf^T, K-contiguous original A data.
-      if(alo){
-        int plane=p==2?3:p-4;
-        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
-      }else{
-        int col=p==1 || p==3?512:0,row=p==3?512:0;
-        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
-      }
       // LHS is B_leaf^T, M-contiguous original B data.
       if(blo){
         int plane=p==3?3:p-4;
@@ -2428,6 +2420,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }else{
         int col=p==2?512:0,row=p==1 || p==2?512:0;
         SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
       }
 
     }

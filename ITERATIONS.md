@@ -459,6 +459,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 276 | RHS-first TMA ordering | 1.0543 | 0.010523 | experiment |
 
+| 277 | 64bit primary transform IO | 0.9989 | 0.011068 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4188,3 +4190,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通BF16 10.49120us、FP16 10.55456us，FP明显慢于26610.365us，不保留。Dense12.36928/9.81152us，原门槛仍FAIL。274至276无3percent改善，已启动266/275全NCU控制对比，接下来重读计数器并复核历史宽IO在新独立primary上的适用性。
 - **Next:** 根据对照NCU区分275编译资源与缓存行为；在PDL独立primary上测试64bit四元素IO，保持其余266不变。
 - **Archive:** trajectory/20261015_063222_iter-276/
+
+### Iter 277 — 64bit primary transform IO
+
+- **Hypothesis:** Wider primary transform IO may reduce load/store instruction overhead under the separate PDL architecture
+- **Changes:** Use aligned uint64 loads and stores for four values per primary worker iteration, preserving per-element FP32 transforms and secondary kernel
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011068 ms; mean speedup=0.9989x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012320 | 0.011156 | 1.1044 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009810 | 0.010980 | 0.8935 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 median 11.1562 us and FP16 10.9798 us regress versus selected 266; original FP64 accuracy gates fail unchanged. Reject wider primary IO.
+- **Next:** Inspect the completed mapping comparison NCU and test a different occupancy configuration
+- **Archive:** trajectory/20261015_063325_iter-277/
