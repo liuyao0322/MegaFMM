@@ -365,6 +365,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 229 | 64ns publication polling backoff | 1.0059 | 0.011070 | experiment |
 
+| 230 | Two private transposed accumulators with interleaved K and wait1 | 0.9964 | 0.011326 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3344,3 +3346,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Rejected BF10.9782 FP11.1616us, no improvement over224. Both frozen FP64 gatesFAIL. BF first-group wall-time outlier33.6us does not alter event ranking; do not treat as win. Fresh NCU221 constant descriptors lower instructions to1.468M but full-call gain absent;2241.700M, both64regs0local.
 - **Next:** Test two independent private accumulators interleaving leaf K chunks with wait1 on transposed geometry; preserve K and recombination order
 - **Archive:** trajectory/20261015_050645_iter-229/
+
+### Iter 230 — Two private transposed accumulators with interleaved K and wait1
+
+- **Hypothesis:** Independent products overlap WGMMA completion while slots retire immediately after proven completion
+- **Changes:** From224 pair leaves with q0/q0/q1/q1 issue;16+16 accumulator registers; wait1 retires previous sequence and recombines completed leaves in original order; final drain0
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011326 ms; mean speedup=0.9964x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012575 | 0.011220 | 1.1208 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009969 | 0.011432 | 0.8720 | 0.000754626 | 0 |
+
+- **Analysis:** BF11.2195 FP11.4323us, slower224. Expected eF unchanged and both original gatesFAIL. No performance win; need inspect actual register/spill and completion behavior before further pipeline tuning.
+- **Next:** Profile230 versus224; continue frontend supply analysis and avoid assuming asynchronous depth helps
+- **Archive:** trajectory/20261015_050758_iter-230/
