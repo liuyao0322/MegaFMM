@@ -898,3 +898,13 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full1024 cubed BF16/FP16 restore benchmark completed. Gains over87 remain small (~1-2percent ordinary launch); do not certify a >=3percent universal win or Dense speedup.
 - **Next:** Run final independent stress/sanitizers, freeze best source and archive all profiling plus rejected candidates
 - **Archive:** trajectory/20261014_225150_iter-96/
+
+### Final validation — retain iter92 as iter96
+
+- Verbatim restore already committed in iter96; final labeled full benchmark passed original FP64 gates, both dtypes, nonfinite=0.
+- 72 independent stress checks, quick memcheck/racecheck/synccheck and 3 DAG tests passed.
+- Explored six distinct directions in88–95; retain32bit input IO + combined A TMA. No physical-floor claim. Ordinary-call gains are small (~1–2%), not a universal >=3% win and not faster than Dense.
+- Complete comparison and profiling evidence: trajectory/20261014_validation-iter96-supply/REPORT.md.
+
+| bf16 | 18.96224 | 12.26752 | 7.39458724362e-06 | 0.00100255679669 | PASS |
+| fp16 | 18.95360 | 9.94816 | 2.37135524364e-06 | 0.000103752760587 | PASS |

@@ -129,3 +129,8 @@ the user's requests in this conversation:
 
 - User explicitly requested continued profiling and optimization. Continue from validated iter87, keeping1024^3 BF16/FP16, original-input FP64 gates, full-call timing and Auto=Dense until acceptance.
 - Re-profile the current critical path before new candidates; investigate consumer polling/warp allocation and remaining producer waits with one change per iteration. Preserve failed candidates and validate retained synchronization changes independently.
+
+- Iter88–96 completed the latest profiling round. Current96 is verbatim92(bf34e5a):32bit paired input transform + combined A TMA; regs79, shared213120, no spill. ActualTMA110->44/CTA; predicated-on counts required. Consumer reductions,64bit IO,restrict,two-group delayed retirement,descriptor prefetch rejected.
+- Four paired campaigns vs87: launchBF16~1.3–1.7% lower,FP16~0.8–1.5%; Graph smaller and one FP16 slight regression. Still slower than tuned Dense; Auto=Dense.
+- Critical new diagnostic:92->94 wait0~.992->.544us but operandwait2.336->4.192/4.352us, production11.552->12.896/12.832us. Deferring slot0 release harms refill overlap; lowering explicit WGMMA waits alone is not a performance criterion.
+- Final96 originalFP64 gates,72stress,all3quick sanitizers and3DAG tests passed. Full evidence trajectory/20261014_validation-iter96-supply/REPORT.md. No physical-floor or exhausted-space claim; this round ends with six tested optimization directions and best source retained.
