@@ -141,6 +141,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 117 | Register recombination and vector output from Tensor Core warpgroup | 0.4363 | 0.025648 | experiment |
 
+| 118 | Fence accumulator operands for register recombination | 0.4359 | 0.025522 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1340,3 +1342,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Complete SW benchmark archived, original FP64 gates unchanged. Validate bitwise behavior and register resources before retaining.
 - **Next:** Assess direct recombination and tune issue and front-end for this architecture
 - **Archive:** trajectory/20261015_015635_iter-117/
+
+### Iter 118 — Fence accumulator operands for register recombination
+
+- **Hypothesis:** Explicit compiler operand fences prevent ptxas C7515 serialization seen in117
+- **Changes:** Apply warpgroup_fence_operand to all accumulator registers before WGMMA fence and after wait0
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.025522 ms; mean speedup=0.4359x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012343 | 0.025493 | 0.4842 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009906 | 0.025551 | 0.3877 | 0.000754626 | 0 |
+
+- **Analysis:** 117 emitted C7515 and ran25.5us; complete118 SW benchmark archived with unchanged FP64 gates. Inspect warning elimination and timing after commit.
+- **Next:** Validate corrected compiler scheduling and compare with100
+- **Archive:** trajectory/20261015_015739_iter-118/

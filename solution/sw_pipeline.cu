@@ -148,9 +148,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
+        #pragma unroll
+        for(int j=0;j<16;++j)warpgroup_fence_operand(acc[j]);
         warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
         warpgroup_commit_batch();warpgroup_wait<0>();
+        #pragma unroll
+        for(int j=0;j<16;++j)warpgroup_fence_operand(acc[j]);
         __syncwarp();
         if((tid&31)==0)arrive(&s.free[slot]);
       }
