@@ -137,6 +137,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 115 | More CUDA transform workers in overlapping pipeline | 0.8033 | 0.013890 | experiment |
 
+| 116 | Continuous two-accumulator WGMMA pipeline across product boundaries | 0.6124 | 0.018222 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1304,3 +1306,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full SW measurements recorded, unchanged original accuracy gates;114 uses53regs and zero spills so resource headroom permits this experiment.
 - **Next:** Compare complete-call latency and reprofile if no gain
 - **Archive:** trajectory/20261015_015248_iter-115/
+
+### Iter 116 — Continuous two-accumulator WGMMA pipeline across product boundaries
+
+- **Hypothesis:** Keep one WGMMA group pending across leaf boundaries rather than draining after each P
+- **Changes:** Two register accumulator sets; issue next product before publishing previous product; wait1 retires immediately previous operand slot, final wait0 drains last product
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.018222 ms; mean speedup=0.6124x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012303 | 0.018166 | 0.6773 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010009 | 0.018278 | 0.5476 | 0.000754626 | 0 |
+
+- **Analysis:** Full SW benchmark archived with unchanged FP64 gates; independent synchronization validation required if retained.
+- **Next:** Compare performance and error with100, then consider direct register recombination
+- **Archive:** trajectory/20261015_015523_iter-116/
