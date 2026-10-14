@@ -43,6 +43,8 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
  auto b=make_tensor(make_smem_ptr(s.operand[0]+ASize),lb);
  auto da_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(tiled_divide(a,Shape<_64,_16>{}));
  auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(tiled_divide(b,Shape<_32,_16>{}));
+ uint32_t joint_free;
+ asm volatile("mapa.shared::cluster.u32 %0,%1,0;":"=r"(joint_free):"r"(uint32_t(__cvta_generic_to_shared(s.free))));
  int mn=GMMA::CLayout_64x32{}(tid-128,0);
  float* out=D+(n0+mn/64)*1024+m0+mn%64;
  if constexpr(std::is_same_v<T,bfloat16_t>){asm volatile(
@@ -110,7 +112,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,0;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,8;\n"
   "WAIT_0_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],0,0x989680;\n"
@@ -170,7 +172,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "mov.f32 first0,d0;\n"
   "mov.f32 first1,d1;\n"
   "mov.f32 first2,d2;\n"
@@ -246,7 +248,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,16;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,24;\n"
   "WAIT_1_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],0,0x989680;\n"
@@ -306,7 +308,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,24;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.rn.f32 x,first0,d0;\n"
   "add.u64 dst,%5,%38;\n"
   "st.global.f32 [dst],x;\n"
@@ -414,7 +416,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,0;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,8;\n"
   "WAIT_2_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],1,0x989680;\n"
@@ -474,7 +476,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.rn.f32 first0,first0,d0;\n"
   "add.rn.f32 first1,first1,d1;\n"
   "add.rn.f32 first2,first2,d2;\n"
@@ -550,7 +552,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,16;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,24;\n"
   "WAIT_3_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],1,0x989680;\n"
@@ -610,7 +612,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,24;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.rn.f32 second0,first0,d0;\n"
   "add.rn.f32 second1,first1,d1;\n"
   "add.rn.f32 second2,first2,d2;\n"
@@ -686,7 +688,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,0;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,8;\n"
   "WAIT_4_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],0,0x989680;\n"
@@ -746,7 +748,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.rn.f32 x,second0,d0;\n"
   "add.rn.f32 first0,first0,d0;\n"
   "add.u64 dst,%5,%38;\n"
@@ -886,7 +888,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,16;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,24;\n"
   "WAIT_5_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],0,0x989680;\n"
@@ -946,7 +948,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,24;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.rn.f32 x,first0,d0;\n"
   "add.u64 dst,%5,%38;\n"
   "add.u64 dst,dst,2048;\n"
@@ -1070,7 +1072,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,0;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,8;\n"
   "WAIT_6_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],1,0x989680;\n"
@@ -1130,7 +1132,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "sub.rn.f32 x,second0,d0;\n"
   "add.u64 dst,%5,%38;\n"
   "add.u64 dst,dst,2097152;\n"
@@ -1196,7 +1198,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "add.u64 dst,dst,2097152;\n"
   "st.global.f32 [dst],x;\n"
   "}\n"
-  : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(uint32_t(__cvta_generic_to_shared(s.free))), "r"(tid&31), "l"(out), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<0>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<0>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<1>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<1>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<2>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<2>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<3>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<3>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<4>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<4>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<5>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<5>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<6>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<6>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<7>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<7>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<8>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<8>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<9>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<9>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<10>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<10>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<11>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<11>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<12>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<12>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<13>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<13>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<14>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<14>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<15>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<15>{}))/64)*1024)), "n"(int32_t(GMMA::Major::MN)), "n"(int32_t(GMMA::Major::K)) : "memory");}
+  : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(joint_free), "r"(tid&31), "l"(out), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<0>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<0>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<1>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<1>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<2>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<2>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<3>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<3>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<4>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<4>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<5>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<5>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<6>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<6>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<7>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<7>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<8>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<8>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<9>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<9>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<10>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<10>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<11>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<11>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<12>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<12>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<13>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<13>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<14>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<14>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<15>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<15>{}))/64)*1024)), "n"(int32_t(GMMA::Major::MN)), "n"(int32_t(GMMA::Major::K)) : "memory");}
  else{asm volatile(
   "{ .reg .pred p,noacc,leader,done; .reg .b64 ba,bb,da,db,dst;\n"
   ".reg .b32 rb,fb; .reg .f32 d<16>,first<16>,second<16>,x;\n"
@@ -1262,7 +1264,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,0;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,8;\n"
   "WAIT_0_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],0,0x989680;\n"
@@ -1322,7 +1324,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "mov.f32 first0,d0;\n"
   "mov.f32 first1,d1;\n"
   "mov.f32 first2,d2;\n"
@@ -1398,7 +1400,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,16;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,24;\n"
   "WAIT_1_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],0,0x989680;\n"
@@ -1458,7 +1460,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,24;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.rn.f32 x,first0,d0;\n"
   "add.u64 dst,%5,%38;\n"
   "st.global.f32 [dst],x;\n"
@@ -1566,7 +1568,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,0;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,8;\n"
   "WAIT_2_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],1,0x989680;\n"
@@ -1626,7 +1628,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.rn.f32 first0,first0,d0;\n"
   "add.rn.f32 first1,first1,d1;\n"
   "add.rn.f32 first2,first2,d2;\n"
@@ -1702,7 +1704,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,16;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,24;\n"
   "WAIT_3_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],1,0x989680;\n"
@@ -1762,7 +1764,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,24;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.rn.f32 second0,first0,d0;\n"
   "add.rn.f32 second1,first1,d1;\n"
   "add.rn.f32 second2,first2,d2;\n"
@@ -1838,7 +1840,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,0;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,8;\n"
   "WAIT_4_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],0,0x989680;\n"
@@ -1898,7 +1900,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.rn.f32 x,second0,d0;\n"
   "add.rn.f32 first0,first0,d0;\n"
   "add.u64 dst,%5,%38;\n"
@@ -2038,7 +2040,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,16;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,24;\n"
   "WAIT_5_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],0,0x989680;\n"
@@ -2098,7 +2100,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,24;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.rn.f32 x,first0,d0;\n"
   "add.u64 dst,%5,%38;\n"
   "add.u64 dst,dst,2048;\n"
@@ -2222,7 +2224,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,0;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "add.u32 rb,%2,8;\n"
   "WAIT_6_1:\n"
   "mbarrier.try_wait.parity.shared::cta.b64 done,[rb],1,0x989680;\n"
@@ -2282,7 +2284,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "wgmma.wait_group.sync.aligned 0;\n"
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
-  "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "@leader mbarrier.arrive.release.cluster.shared::cluster.b64 _,[fb];\n"
   "sub.rn.f32 x,second0,d0;\n"
   "add.u64 dst,%5,%38;\n"
   "add.u64 dst,dst,2097152;\n"
@@ -2348,12 +2350,12 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "add.u64 dst,dst,2097152;\n"
   "st.global.f32 [dst],x;\n"
   "}\n"
-  : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(uint32_t(__cvta_generic_to_shared(s.free))), "r"(tid&31), "l"(out), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<0>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<0>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<1>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<1>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<2>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<2>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<3>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<3>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<4>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<4>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<5>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<5>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<6>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<6>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<7>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<7>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<8>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<8>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<9>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<9>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<10>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<10>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<11>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<11>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<12>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<12>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<13>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<13>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<14>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<14>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<15>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<15>{}))/64)*1024)), "n"(int32_t(GMMA::Major::MN)), "n"(int32_t(GMMA::Major::K)) : "memory");}
+  : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(joint_free), "r"(tid&31), "l"(out), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<0>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<0>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<1>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<1>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<2>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<2>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<3>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<3>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<4>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<4>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<5>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<5>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<6>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<6>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<7>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<7>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<8>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<8>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<9>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<9>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<10>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<10>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<11>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<11>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<12>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<12>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<13>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<13>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<14>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<14>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<15>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<15>{}))/64)*1024)), "n"(int32_t(GMMA::Major::MN)), "n"(int32_t(GMMA::Major::K)) : "memory");}
 }
 template<class T> __global__ __launch_bounds__(512,1)
 void sw_transform_pdl(const T* A,const T* B,T* packed){
   cudaTriggerProgrammaticLaunchCompletion();
-  for(int i=2*(blockIdx.x*512+threadIdx.x);i<Plane;i+=2*512*64){
+  for(int i=2*(blockIdx.x*512+threadIdx.x);i<Plane;i+=2*512*128){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -2392,11 +2394,12 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   extern __shared__ __align__(128) unsigned char buffer[];
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
+  int rank=blockIdx.x&1;
   if(tid==0){
-    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],2);Barrier::init(&s.free[j],rank==0?8:1);}
     cutlass::arch::fence_barrier_init();
   }
-  __syncthreads();
+  cooperative_groups::this_cluster().sync();
   constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
@@ -2406,17 +2409,28 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       // Raw P1/P2 can run while the primary transforms S/T. This wait
       // guarantees completion and visibility even if no overlap is scheduled.
       if(sequence==4)cudaGridDependencySynchronize();
-      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      if(sequence>=Stages){
+        wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+        // Rank0 observes both sets of four consumer warp arrivals; it then
+        // grants rank1 permission to reuse the same slot.
+        if(rank==0)Barrier::arrive(&s.free[slot],1,1);
+      }
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
-      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*BSize);
       T* op=s.operand[slot];
+      // One LHS load feeds both adjacent N tiles. Two arrivals prevent a
+      // multicast completion from retiring a slot before the peer issues RHS.
+      if(rank==0){
+        TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*ASize);
+        TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*ASize,1,1);
       // LHS is B_leaf^T, M-contiguous original B data.
       if(blo){
         int plane=p==3?3:p-4;
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+        SM90_TMA_LOAD_MULTICAST_3D::copy(&tmap,&s.ready[slot],3,op,m0,k0,plane);
       }else{
         int col=p==2?512:0,row=p==1 || p==2?512:0;
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+        SM90_TMA_LOAD_MULTICAST_2D::copy(&bmap,&s.ready[slot],3,op,m0+col,k0+row);
+      }
       }
       // RHS is A_leaf^T, K-contiguous original A data.
       if(alo){
@@ -2431,7 +2445,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }else if(tid>=128 && tid<256){
     tensor_chain(s,tid,m0,n0,D);
   }
-  // CTA shared storage survives until all role threads return.
+  // No remote access may outlive the CTA owning the shared barrier.
+  cooperative_groups::this_cluster().sync();
 }
 void check(cudaError_t e,const char* where){if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));}
 void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transformed){
@@ -2484,18 +2499,20 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
   CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
   encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
-  cudaLaunchAttribute attribute{};
-  attribute.id=cudaLaunchAttributeProgrammaticStreamSerialization;
-  attribute.val.programmaticStreamSerializationAllowed=1;
+  cudaLaunchAttribute attribute[2]{};
+  attribute[0].id=cudaLaunchAttributeProgrammaticStreamSerialization;
+  attribute[0].val.programmaticStreamSerializationAllowed=1;
   cudaLaunchConfig_t config{};config.gridDim=dim3(16,8);config.blockDim=dim3(Threads);
   config.dynamicSmemBytes=sizeof(Shared<cute::half_t>);config.stream=stream;
-  config.attrs=&attribute;config.numAttrs=1;
+  attribute[1].id=cudaLaunchAttributeClusterDimension;
+  attribute[1].val.clusterDim={2,1,1};
+  config.attrs=attribute;config.numAttrs=2;
   if(state.dtype==DType::BF16){
-    sw_transform_pdl<cute::bfloat16_t><<<64,512,0,stream>>>(static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace));
+    sw_transform_pdl<cute::bfloat16_t><<<128,512,0,stream>>>(static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace));
     check(cudaPeekAtLastError(),"SW PDL transform launch");
     check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::bfloat16_t>,a,b,s,t,static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace),D),"SW PDL compute launch");
   }else{
-    sw_transform_pdl<cute::half_t><<<64,512,0,stream>>>(static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace));
+    sw_transform_pdl<cute::half_t><<<128,512,0,stream>>>(static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace));
     check(cudaPeekAtLastError(),"SW PDL transform launch");
     check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::half_t>,a,b,s,t,static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace),D),"SW PDL compute launch");
   }

@@ -427,6 +427,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 260 | PDL transform 64x512 | 0.9205 | 0.011968 | experiment |
 
+| 261 | PDL cluster2 LHS multicast with joint free | 0.5862 | 0.018991 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3900,3 +3902,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通调用 BF16 12.04832 us、FP16 11.88704 us，比254明显变慢；Dense12.2256/9.8224 us，精度门槛仍 FAIL。减少变换并行度没有收益，不保留。258至260连续无3percent收益，已重读254全NCU与SASS等待样本、历史失败方向，并查询PTX与CUTLASS远程事务barrier和TMA multicast支持，下一步转向减少重复operand供数。
 - **Next:** 测试新的cluster双CTA multicast协议，以共同free计数替代每个K块cluster全量同步；保留原算术及128CTA并行度。
 - **Archive:** trajectory/20261015_061016_iter-260/
+
+### Iter 261 — PDL cluster2 LHS multicast with joint free
+
+- **Hypothesis:** 相邻N32 CTA共享相同LHS，用multicast减少重复TMA；共同8个warp leader释放slot，避免每块cluster同步。
+- **Changes:** 254基础新增cluster2，ready计数2分别接收LHS multicast与本CTA RHS；rank0 free接收两CTA的8个释放后向rank1转发reuse许可，初末cluster同步保证DSM生命周期。算术与128CTA网格保持。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.018991 ms; mean speedup=0.5862x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012392 | 0.019019 | 0.6516 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009876 | 0.018963 | 0.5208 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通调用BF16 19.01856 us、FP16 18.96288 us，明显退化，不保留。原始三组新输入错误值与七乘法基线一致，精度门槛仍FAIL；这些不构成独立同步验收。新的batchtrace254 60批轮换双输入、120个最终输出逐位一致，普通批次TC可早于各pack lane0末时间约0.256us启动，Graph约0.544us，单次调用不重叠结论不能推广到批次。trace64vsbase60寄存器，10调用诊断不作为正式性能。
+- **Next:** 回到254，测试在PDL前端下两个K块的提交等待节奏，保留及时释放。
+- **Archive:** trajectory/20261015_061151_iter-261/
