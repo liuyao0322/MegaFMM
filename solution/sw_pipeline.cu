@@ -10,7 +10,7 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=512,Stages=2,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
 constexpr int Plane=512*512,Threads=512;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
@@ -132,12 +132,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
       if(blo){
         int plane=p==3 ? 6:2*(p-4);
-        for(int kb=0;kb<BK;kb+=256)
-          SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+ASize+kb*BN,n0,k0+kb,plane);
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+ASize,n0,k0,plane);
       }else{
         int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
-        for(int kb=0;kb<BK;kb+=256)
-          SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize+kb*BN,n0+col,k0+row+kb);
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize,n0+col,k0+row);
       }
 
     }
@@ -177,7 +175,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int step=0;step<7;++step){
       int p=product_for_step(step);
       float acc[16]={};
-      // K512 completes each P with one group; two slots prefetch the next P.
+      // Four compact operand slots keep prefetch ahead; retire each K tile promptly.
       #pragma unroll
       for(int q=0;q<512/BK;++q){
         int sequence=step*(512/BK)+q,slot=sequence%Stages;
@@ -187,9 +185,17 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
         warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
-        warpgroup_commit_batch();warpgroup_wait<0>();
-        __syncwarp();
-        if((tid&31)==0)arrive(&s.free[slot]);
+        warpgroup_commit_batch();
+        if constexpr(512/BK==2){
+          if(q==1){
+            warpgroup_wait<1>();
+            __syncwarp();
+            if((tid&31)==0)arrive(&s.free[(sequence-1)%Stages]);
+            warpgroup_wait<0>();
+            __syncwarp();
+            if((tid&31)==0)arrive(&s.free[slot]);
+          }
+        }
       }
       if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
       #pragma unroll
@@ -219,7 +225,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   }
   uint64_t dims[3]={transformed ? 512ULL:1024ULL,transformed ? 512ULL:1024ULL,8};
   uint64_t strides[2]={dims[0]*2,dims[0]*dims[1]*2};
-  uint32_t box[3]={uint32_t(is_a ? 64:BN),uint32_t(is_a ? BM:(BK>256 ? 256:BK)),1},element_strides[3]={1,1,1};
+  uint32_t box[3]={uint32_t(is_a ? 64:BN),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};
   auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
       transformed ? 3:2,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
       is_a ? CU_TENSOR_MAP_SWIZZLE_128B:CU_TENSOR_MAP_SWIZZLE_64B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);

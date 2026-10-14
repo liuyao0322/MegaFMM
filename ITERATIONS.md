@@ -111,6 +111,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 102 | K512 one completion group per product | 0.8022 | 0.013924 | experiment |
 
+| 103 | Two outstanding WGMMA groups on four-stage operand ring | 0.8453 | 0.013214 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1044,3 +1046,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full benchmark completed with original expected no-compensation accuracy failures. Reduced synchronization may be offset by longer individual MMA groups or TMA latency.
 - **Next:** Compare K128/K256/K512 variants then optimize front-end transform and grid synchronization
 - **Archive:** trajectory/20261015_012733_iter-102/
+
+### Iter 103 — Two outstanding WGMMA groups on four-stage operand ring
+
+- **Hypothesis:** With four prefetched slots, defer q0 completion until q1 commit and release q0 at wait1 to overlap arithmetic without starving TMA
+- **Changes:** Basedon100; q0commit only,q1commit wait1 releaseprevious then wait0 releasecurrent; no accumulator reorder
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013214 ms; mean speedup=0.8453x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012321 | 0.013181 | 0.9347 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010013 | 0.013246 | 0.7560 | 0.000754626 | 0 |
+
+- **Analysis:** Original no-compensation precision gates remain unchanged and fail as expected; compare complete-call performance and validate ring safety independently.
+- **Next:** Select issue rhythm by paired timings, then test transform vector width and separate-transform launch
+- **Archive:** trajectory/20261015_012836_iter-103/
