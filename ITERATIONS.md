@@ -429,6 +429,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 261 | PDL cluster2 LHS multicast with joint free | 0.5862 | 0.018991 | experiment |
 
+| 262 | PDL two-K groups wait1 then wait0 | 1.0130 | 0.010896 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3918,3 +3920,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通调用BF16 19.01856 us、FP16 18.96288 us，明显退化，不保留。原始三组新输入错误值与七乘法基线一致，精度门槛仍FAIL；这些不构成独立同步验收。新的batchtrace254 60批轮换双输入、120个最终输出逐位一致，普通批次TC可早于各pack lane0末时间约0.256us启动，Graph约0.544us，单次调用不重叠结论不能推广到批次。trace64vsbase60寄存器，10调用诊断不作为正式性能。
 - **Next:** 回到254，测试在PDL前端下两个K块的提交等待节奏，保留及时释放。
 - **Archive:** trajectory/20261015_061151_iter-261/
+
+### Iter 262 — PDL two-K groups wait1 then wait0
+
+- **Hypothesis:** PDL更早提供变换数据后，两个K块连续提交可能覆盖WGMMA等待。
+- **Changes:** 在254上每叶q0不立即等待，q1提交后wait1释放q0、wait0释放q1；不改变累加顺序，移除q1冗余寄存器fence。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010896 ms; mean speedup=1.0130x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012278 | 0.010956 | 1.1206 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009811 | 0.010836 | 0.9053 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通调用 BF16 10.95648 us、FP16 10.83648 us，慢于254，Dense12.27808/9.81056 us。再次说明延后slot释放不能只凭wait0减少判断收益。原精度门槛FAIL，错误与七乘法基线一致，不保留。检查254 transform SASS发现已自动生成8条F2FP打包转换，不能虚构转换合并优化空间。
+- **Next:** 测试仅primary CTA单线程触发PDL，减少所有warps重复触发；然后重新审视当前关键路径。
+- **Archive:** trajectory/20261015_061300_iter-262/
