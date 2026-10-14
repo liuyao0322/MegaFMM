@@ -10,9 +10,10 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int BM=64,BN=64,BK=256,Stages=2,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
 constexpr int Plane=512*512,Threads=768;
-constexpr size_t WorkspaceBytes=size_t(8)*Plane*2;
+constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
+constexpr size_t PackedBytes=size_t(8)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
@@ -21,6 +22,7 @@ template<class T> struct alignas(128) Shared {
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
   float product[2][Elements];
   uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
+  float state[3][Elements];
   uint64_t pack_ready;
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
@@ -33,23 +35,23 @@ __device__ __forceinline__ int product_index(int row,int col){
   return row*BN+(col^((row&1)|((row&6)<<2)));
 }
 
-// Zero-based P IDs. Producer and consumers advance barriers by step, not P ID.
-__device__ constexpr int product_for_step(int step){
-  return step<2 ? step:step==2 ? 5:step==3 ? 6:step==4 ? 4:step==5 ? 2:3;
+// Each two-CTA cluster owns one64x64 quadrant tile.
+__device__ int product_for_step(int step,int rank){
+  return rank==0 ? (step<2 ? step:step==2 ? 5:6) : (step==0 ? 4:step==1 ? 2:3);
 }
 
 template<class T,class TA,class TB>
-__device__ void mma_term(TA a,TB b,float (&d)[16]) {
+__device__ void mma_term(TA a,TB b,float (&d)[32]) {
   using namespace cute;
   using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,
-      SM90_64x32x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
-      SM90_64x32x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>>;
+      SM90_64x64x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
+      SM90_64x64x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>>;
   // Build the canonical descriptor once; CuTe preserves the swizzled K offsets
   // in descriptor units instead of rebuilding address bitfields for each MMA.
   auto da_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(
       tiled_divide(a,Shape<_64,_16>{}));
   auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(
-      tiled_divide(b,Shape<_32,_16>{}));
+      tiled_divide(b,Shape<_64,_16>{}));
   auto da_base=da_tiles(0,0,0);
   auto db_base=db_tiles(0,0,0);
   #pragma unroll
@@ -60,7 +62,7 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
     auto da=da_base,db=db_base;
     da.reg32_[0]+=uint32_t(da_tiles.layout()(0,0,kk));
     db.reg32_[0]+=uint32_t(db_tiles.layout()(0,0,kk));
-    Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15]);
+    Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15],d[16],d[17],d[18],d[19],d[20],d[21],d[22],d[23],d[24],d[25],d[26],d[27],d[28],d[29],d[30],d[31]);
   }
 }
 
@@ -73,30 +75,28 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   using namespace cute;
   extern __shared__ __align__(128) unsigned char buffer[];
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
-  int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
+  int tid=threadIdx.x,rank=blockIdx.x&1,m0=blockIdx.y*BM,n0=(blockIdx.x/2)*BN;
+  int products=rank==0 ? 4:3;
   if(tid==0){
-    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],1);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
+    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],256);}
     Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   if(tid==0){
-    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
-      int p=product_for_step(step);
+    for(int step=0;step<products;++step)for(int q=0;q<512/BK;++q){
+      int p=product_for_step(step,rank);
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
-      if(sequence==4){
+      if(sequence==(rank==0 ? 4:0)){
         wait(&s.pack_ready,0);
-        // CUDA12.4 cooperative launch gives each invocation its own initialized
-        // driver workspace. Only TMA leaders join this publication barrier;
-        // the shared pack barrier has already acquired every CUDA writer.
         auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
-        uint32_t increment=(blockIdx.x==0 && blockIdx.y==0) ? 0x80000000u-127u:1u;
+        uint32_t increment=(blockIdx.x==0&&blockIdx.y==0)?0x80000000u-127u:1u;
         uint32_t old,current;
-        asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;" : "=r"(old) : "l"(barrier),"r"(increment) : "memory");
-        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(!((old^current)&0x80000000u));
+        asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;":"=r"(old):"l"(barrier),"r"(increment):"memory");
+        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];":"=r"(current):"l"(barrier):"memory");}while(!((old^current)&0x80000000u));
       }
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
@@ -117,15 +117,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
         SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize,n0+col,k0+row);
       }
-
     }
-  }else if((tid>=32 && tid<128) || tid>=256){
+  }else if((tid>=32 && tid<128)||tid>=256){
     int worker=tid>=256 ? tid-160:tid-32;
-  // All CTAs cooperate in one input transformation per invocation, never across calls.
-  // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
-  // retain FP32 transforms and high rounding, omit residual generation.
-  for(int local=2*worker;local<Plane/(16*8);local+=2*608){
-    int i=(blockIdx.y*gridDim.x+blockIdx.x)*(Plane/(16*8))+local;
+    int tile=blockIdx.y*8+blockIdx.x/2;
+    auto* flags=reinterpret_cast<uint32_t*>(reinterpret_cast<char*>(packed)+(size_t(6)<<20));
+    if(rank==1 && worker<256)flags[tile*256+worker]=0;
+  for(int local=2*worker;local<2048;local+=2*608){
+    int i=(blockIdx.y*gridDim.x+blockIdx.x)*2048+local;
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -152,42 +151,56 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     #pragma unroll
     for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[2*j];
   }
+
     asm volatile("fence.proxy.async.global;" ::: "memory");
     arrive(&s.pack_ready);
-    if(worker<128){
-    constexpr int Chunks=16;
-    unsigned row=unsigned(worker)/BN,col=unsigned(worker)%BN;
-    int base_even=product_index(row,col),base_odd=product_index(row+4,col)-128;
-    float* out=D+(m0+row)*1024+n0+col;
-    float first[Chunks],second[Chunks],current[Chunks];
-    #pragma unroll
-    for(int step=0;step<7;++step){
-      wait(&s.product_ready[step%2],(step/2)%2);
-      #pragma unroll
-      for(int j=0;j<Chunks;++j){
-        int idx=((j&1) ? base_odd:base_even)+j*128;
-        current[j]=s.product[step%2][idx];
+    if(worker<256){
+      constexpr int Chunks=16;
+      unsigned row=unsigned(worker)/BN,col=unsigned(worker)%BN;
+      int base_even=product_index(row,col),base_odd=product_index(row+4,col)-256;
+      float* out=D+(m0+row)*1024+n0+col;
+      float first[Chunks],second[Chunks],current[Chunks];
+      for(int step=0;step<products;++step){
+        wait(&s.product_ready[step%2],(step/2)%2);
+        #pragma unroll
+        for(int j=0;j<Chunks;++j){
+          int idx=((j&1)?base_odd:base_even)+j*256;
+          current[j]=s.product[step%2][idx];
+        }
+        arrive(&s.product_free[step%2]);
+        #pragma unroll
+        for(int j=0;j<Chunks;++j){
+          if(rank==0){
+            if(step==0)first[j]=current[j];
+            else if(step==1)out[j*4096]=__fadd_rn(first[j],current[j]);
+            else if(step==2)first[j]=__fadd_rn(first[j],current[j]);
+            else second[j]=__fadd_rn(first[j],current[j]);
+          }else s.state[step][worker+j*256]=current[j];
+        }
       }
-      arrive(&s.product_free[step%2]);
-      #pragma unroll
-      for(int j=0;j<Chunks;++j){
-        if(step==0)first[j]=current[j];
-        else if(step==1)out[j*4096]=__fadd_rn(first[j],current[j]);
-        else if(step==2)first[j]=__fadd_rn(first[j],current[j]);
-        else if(step==3)second[j]=__fadd_rn(first[j],current[j]);
-        else if(step==4){
-          out[j*4096+512*1024+512]=__fadd_rn(second[j],current[j]);
-          first[j]=__fadd_rn(first[j],current[j]);
-        }else if(step==5)out[j*4096+512]=__fadd_rn(first[j],current[j]);
-        else out[j*4096+512*1024]=__fsub_rn(second[j],current[j]);
+      float* u2buf=reinterpret_cast<float*>(reinterpret_cast<char*>(packed)+PackedBytes)+tile*Elements;
+      float* u3buf=u2buf+Plane;
+      auto* flag=flags+tile*256+worker;
+      if(rank==0){
+        #pragma unroll
+        for(int j=0;j<Chunks;++j){u2buf[worker+j*256]=first[j];u3buf[worker+j*256]=second[j];}
+        asm volatile("st.release.gpu.u32 [%0],1;" :: "l"(flag) : "memory");
+      }else{
+        uint32_t ready;
+        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(ready) : "l"(flag) : "memory");}while(!ready);
+        #pragma unroll
+        for(int j=0;j<Chunks;++j){
+          float u2=u2buf[worker+j*256],u3=u3buf[worker+j*256];
+          float p5=s.state[0][worker+j*256],p3=s.state[1][worker+j*256],p4=s.state[2][worker+j*256];
+          out[j*4096+512]=__fadd_rn(__fadd_rn(u2,p5),p3);
+          out[j*4096+512*1024+512]=__fadd_rn(u3,p5);
+          out[j*4096+512*1024]=__fsub_rn(u3,p4);
+        }
       }
-    }
     }
   }else if(tid>=128 && tid<256){
-    for(int step=0;step<7;++step){
-      int p=product_for_step(step);
-      float acc[16]={};
-      // Four compact operand slots keep prefetch ahead; retire each K tile promptly.
+    for(int step=0;step<products;++step){
+      float acc[32]={};
       #pragma unroll
       for(int q=0;q<512/BK;++q){
         int sequence=step*(512/BK)+q,slot=sequence%Stages;
@@ -195,22 +208,19 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
-        warpgroup_arrive();
-        mma_term<T>(ah,bh,acc);
+        warpgroup_arrive();mma_term<T>(ah,bh,acc);
         warpgroup_commit_batch();warpgroup_wait<0>();
-        __syncwarp();
-        if(tid==128)arrive(&s.free[slot]);
+        __syncwarp();if((tid&31)==0)arrive(&s.free[slot]);
       }
       if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
       #pragma unroll
-      for(int j=0;j<16;++j){
-        int mn=GMMA::CLayout_64x32{}(tid-128,j);
+      for(int j=0;j<32;++j){
+        int mn=GMMA::CLayout_64x64{}(tid-128,j);
         s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
       }
       arrive(&s.product_ready[step%2]);
     }
   }
-  // CTA shared storage survives until all role threads return.
 }
 void check(cudaError_t e,const char* where){if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));}
 void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transformed){
@@ -232,7 +242,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   uint32_t box[3]={uint32_t(is_a ? 64:BN),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};
   auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
       transformed ? 3:2,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
-      is_a ? CU_TENSOR_MAP_SWIZZLE_128B:CU_TENSOR_MAP_SWIZZLE_64B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+      is_a ? CU_TENSOR_MAP_SWIZZLE_128B:CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
   if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map status "+std::to_string(int(result)));
 }
 } // namespace
@@ -255,7 +265,7 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
 }
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
   CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
-  encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
+  encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+PackedBytes/2,state.dtype,false,true);
   void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D};dim3 grid(16,8);
   if(state.dtype==DType::BF16)
     check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
