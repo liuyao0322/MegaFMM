@@ -351,6 +351,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 222 | Preload both input batches before CUDA transforms | 0.9953 | 0.011195 | experiment |
 
+| 223 | Cluster-local hierarchical input publication | 0.8046 | 0.013892 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3220,3 +3222,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 11.1414us FP16 11.2480us slower than218; expected approximate errors finite and original gates FAIL. Fresh218 sparse diagnostic: startup and first transformed operand dominate ready waits; TMA leader packwait~.8us and global publication~1.34-1.41us in10-node single-input Graph diagnostic. These intervals overlap and differ from standard100call rotating-input benchmark; not a speedup result.
 - **Next:** Test hierarchical cluster-local publication so fewer TMA leaders contend on invocation-global counter, preserving all per-call input transforms
 - **Archive:** trajectory/20261015_045519_iter-222/
+
+### Iter 223 — Cluster-local hierarchical input publication
+
+- **Hypothesis:** Two-CTA local aggregation reduces global publication contention from128 to64 leaders
+- **Changes:** Start from218; cluster2 launch and initial cluster sync; explicit release/acquire cluster mbarriers aggregate pack completion and broadcast global completion; unchanged196736B shared and numerical order
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013892 ms; mean speedup=0.8046x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012329 | 0.013768 | 0.8955 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010004 | 0.014016 | 0.7138 | 0.000754626 | 0 |
+
+- **Analysis:** Rejected: BF13.7677us FP14.0160us versus218 approximately11.0/11.1us. Original expected eF unchanged and both frozen gates FAIL. Cluster launch/synchronization cost exceeds possible counter savings; no speedup claim.
+- **Next:** Restore218 architecture; test512 transform workers to reduce launch footprint and eliminate partial third warp-batch work
+- **Archive:** trajectory/20261015_045900_iter-223/

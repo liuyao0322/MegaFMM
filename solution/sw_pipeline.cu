@@ -18,11 +18,21 @@ using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
   uint64_t ready[Stages],free[Stages];
-  uint64_t pack_ready;
+  uint64_t pack_ready,cluster_ready,cluster_done;
 };
 static_assert(sizeof(Shared<cute::half_t>)==196736,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
+
+// Explicit cluster scope carries acquired global transform writes across CTAs.
+__device__ void cluster_arrive(const uint64_t* ptr,int rank){
+ uint32_t addr=cute::cast_smem_ptr_to_uint(ptr);
+ asm volatile("{ .reg .b32 remote; mapa.shared::cluster.u32 remote,%0,%1; mbarrier.arrive.release.cluster.shared::cluster.b64 _,[remote]; }" :: "r"(addr),"r"(rank):"memory");
+}
+__device__ void cluster_wait(const uint64_t* ptr){
+ uint32_t addr=cute::cast_smem_ptr_to_uint(ptr);
+ asm volatile("{ .reg .pred done; AGAIN: mbarrier.try_wait.parity.acquire.cluster.shared::cta.b64 done,[%0],0; @!done bra AGAIN; }" :: "r"(addr):"memory");
+}
 
 __device__ __forceinline__ int product_index(int row,int col){
   // Fragment lanes vary column bits 1,2 and row bits 0,1,2.
@@ -2363,9 +2373,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     Barrier::init(&s.pack_ready,608);
+    Barrier::init(&s.cluster_ready,2);Barrier::init(&s.cluster_done,1);
     cutlass::arch::fence_barrier_init();
   }
-  __syncthreads();
+  cooperative_groups::this_cluster().sync();
   constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
@@ -2374,14 +2385,22 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
       if(sequence==4){
         wait(&s.pack_ready,0);
+        int rank=blockIdx.x&1;
+        cluster_arrive(&s.cluster_ready,0);
+        if(rank==0){
+        cluster_wait(&s.cluster_ready);
         // CUDA12.4 cooperative launch gives each invocation its own initialized
         // driver workspace. Only TMA leaders join this publication barrier;
         // the shared pack barrier has already acquired every CUDA writer.
         auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
-        uint32_t increment=(blockIdx.x==0 && blockIdx.y==0) ? 0x80000000u-127u:1u;
+        uint32_t increment=(blockIdx.x==0 && blockIdx.y==0) ? 0x80000000u-63u:1u;
         uint32_t old,current;
         asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;" : "=r"(old) : "l"(barrier),"r"(increment) : "memory");
         do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(!((old^current)&0x80000000u));
+        cluster_arrive(&s.cluster_done,0);
+        cluster_arrive(&s.cluster_done,1);
+        }
+        cluster_wait(&s.cluster_done);
       }
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
@@ -2410,27 +2429,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
-  uint32_t ap[2][4]={},bp[2][4]={};
-  #pragma unroll
-  for(int batch=0;batch<2;++batch){
-    int local=2*worker+batch*1216;
-    if(local<2048){
-      int i=(blockIdx.y*gridDim.x+blockIdx.x)*2048+local;
-      int at=(i/512)*1024+i%512;
-      auto av=reinterpret_cast<const uint32_t*>(A);
-      auto bv=reinterpret_cast<const uint32_t*>(B);
-      ap[batch][0]=av[at/2];ap[batch][1]=av[(at+512)/2];ap[batch][2]=av[(at+512*1024)/2];ap[batch][3]=av[(at+512*1024+512)/2];
-      bp[batch][0]=bv[at/2];bp[batch][1]=bv[(at+512)/2];bp[batch][2]=bv[(at+512*1024)/2];bp[batch][3]=bv[(at+512*1024+512)/2];
-    }
-  }
-  asm volatile("" : : "r"(ap[0][0]),"r"(ap[0][1]),"r"(ap[0][2]),"r"(ap[0][3]),"r"(ap[1][0]),"r"(ap[1][1]),"r"(ap[1][2]),"r"(ap[1][3]),"r"(bp[0][0]),"r"(bp[0][1]),"r"(bp[0][2]),"r"(bp[0][3]),"r"(bp[1][0]),"r"(bp[1][1]),"r"(bp[1][2]),"r"(bp[1][3]) : "memory");
-  #pragma unroll
-  for(int batch=0;batch<2;++batch){
-    int local=2*worker+batch*1216;
-    if(local<2048){
-      int i=(blockIdx.y*gridDim.x+blockIdx.x)*2048+local;
-      uint32_t abits[4]={ap[batch][0],ap[batch][1],ap[batch][2],ap[batch][3]};
-      uint32_t bbits[4]={bp[batch][0],bp[batch][1],bp[batch][2],bp[batch][3]};
+  for(int local=2*worker;local<Plane/(16*8);local+=2*608){
+    int i=(blockIdx.y*gridDim.x+blockIdx.x)*(Plane/(16*8))+local;
+    int row=i/512,col=i%512,at=row*1024+col;
+    auto av=reinterpret_cast<const uint32_t*>(A);
+    auto bv=reinterpret_cast<const uint32_t*>(B);
+    uint32_t abits[4]={av[at/2],av[(at+512)/2],av[(at+512*1024)/2],av[(at+512*1024+512)/2]};
+    uint32_t bbits[4]={bv[at/2],bv[(at+512)/2],bv[(at+512*1024)/2],bv[(at+512*1024+512)/2]};
     uint32_t words[16]={};
     #pragma unroll
     for(int lane=0;lane<2;++lane){
@@ -2451,7 +2456,6 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     }
     #pragma unroll
     for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[2*j];
-    }
   }
     asm volatile("fence.proxy.async.global;" ::: "memory");
     arrive(&s.pack_ready);
@@ -2501,13 +2505,23 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   if(blocks*prop.multiProcessorCount<128)throw std::invalid_argument("SW cooperative grid requires128 resident CTA capacity");
   return std::make_shared<SWState>(SWState{p.dtype});
 }
+template<class T> cudaLaunchConfig_t launch_config(cudaStream_t stream,cudaLaunchAttribute (&attrs)[2]){
+  attrs[0].id=cudaLaunchAttributeCooperative;attrs[0].val.cooperative=1;
+  attrs[1].id=cudaLaunchAttributeClusterDimension;attrs[1].val.clusterDim={2,1,1};
+  cudaLaunchConfig_t config{};config.gridDim=dim3(16,8);config.blockDim=Threads;
+  config.dynamicSmemBytes=sizeof(Shared<T>);config.stream=stream;config.attrs=attrs;config.numAttrs=2;
+  return config;
+}
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
   CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
   encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
-  void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D};dim3 grid(16,8);
-  if(state.dtype==DType::BF16)
-    check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
-  else
-    check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::half_t>),grid,Threads,args,sizeof(Shared<cute::half_t>),stream),"SW cooperative launch");
+  cudaLaunchAttribute attrs[2]{};
+  if(state.dtype==DType::BF16){
+    auto config=launch_config<cute::bfloat16_t>(stream,attrs);
+    check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::bfloat16_t>,a,b,s,t,static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace),D),"SW cluster launch");
+  }else{
+    auto config=launch_config<cute::half_t>(stream,attrs);
+    check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::half_t>,a,b,s,t,static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace),D),"SW cluster launch");
+  }
 }
 } // namespace megafmm::detail
