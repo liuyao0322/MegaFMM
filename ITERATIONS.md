@@ -215,6 +215,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 154 | Trade transform warps for local-fusion register capacity | 0.4319 | 0.025897 | experiment |
 
+| 155 | Compact uncompensated operand planes into4MiB workspace | 0.9687 | 0.011534 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2002,3 +2004,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Baseline seven-product errors preserved, gates FAIL. Launch26.67/25.12us regresses despite anticipated register capacity relief.153 NCU showed168regs,96B stack with STL/LDL and~6.4M instructions,8.3percent Tensor; inspect154 generated code to establish actual spill response.
 - **Next:** Return to validated fast architecture; reassess measured bottlenecks rather than persist slower local fusion
 - **Archive:** trajectory/20261015_030106_iter-154/
+
+### Iter 155 — Compact uncompensated operand planes into4MiB workspace
+
+- **Hypothesis:** Remove obsolete residual-plane gaps to improve transformed-input locality
+- **Changes:** From140 map S/T to four contiguous high planes each, halve caller workspace8MiB to4MiB, preserve FP32 transforms and full shared pipeline
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011534 ms; mean speedup=0.9687x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012334 | 0.011446 | 1.0776 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009993 | 0.011622 | 0.8599 | 0.000754626 | 0 |
+
+- **Analysis:** Fresh baseline errors preserved and original gates FAIL. Launch11.446/11.622us is flat versus140; workspace reduction useful but no performance claim pending paired validation.
+- **Next:** Test packed two-result dtype conversion and inspect emitted conversion instructions
+- **Archive:** trajectory/20261015_030308_iter-155/
