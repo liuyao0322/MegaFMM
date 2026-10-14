@@ -173,13 +173,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
     }
   }else if(tid>=128 && tid<256){
-    auto execute=[&](int step,auto slot_base){
+    for(int step=0;step<7;++step){
       int p=product_for_step(step);
       float acc[16]={};
       // Four compact operand slots keep prefetch ahead; retire each K tile promptly.
       #pragma unroll
       for(int q=0;q<512/BK;++q){
-        int sequence=step*(512/BK)+q,slot=decltype(slot_base)::value+q;
+        int sequence=step*(512/BK)+q,slot=sequence%Stages;
         wait(&s.ready[slot],(sequence/Stages)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
@@ -197,11 +197,6 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
       }
       arrive(&s.product_ready[step%2]);
-    };
-    #pragma unroll 1
-    for(int pair=0;pair<4;++pair){
-      execute(2*pair,Int<0>{});
-      if(pair<3)execute(2*pair+1,Int<2>{});
     }
   }
   __syncthreads();

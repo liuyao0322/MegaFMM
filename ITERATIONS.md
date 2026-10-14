@@ -151,6 +151,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 122 | Include driver-reserved shared region in descriptor bases | 0.4609 | 0.024365 | experiment |
 
+| 123 | Uniform descriptors with compact single-product loop | 0.8408 | 0.013301 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1430,3 +1432,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Diagnostic shows actual start0x40 versus supplied0; attributes static0 reserved1024. Complete122 benchmark archived with original FP64 gates unchanged.
 - **Next:** Check corrected errors and instruction savings, then consider wider distributed leaf tiles
 - **Archive:** trajectory/20261015_020448_iter-122/
+
+### Iter 123 — Uniform descriptors with compact single-product loop
+
+- **Hypothesis:** Remove paired-body register pressure and stack traffic introduced by121/122
+- **Changes:** Restore iter100 TC loop topology while loading per-slot descriptors from grid-constant parameters; corrected driver reservation retained
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013301 ms; mean speedup=0.8408x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012333 | 0.013209 | 0.9337 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010016 | 0.013393 | 0.7478 | 0.000754626 | 0 |
+
+- **Analysis:** 122 numerical error restored to baseline but128regs and552B stack with STL/LDL explain regression; full123 benchmark archived.
+- **Next:** Assess compact descriptor path, then widen and distribute leaf GEMM tiles
+- **Archive:** trajectory/20261015_020626_iter-123/
