@@ -493,6 +493,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 293 | One completion group per K128 leaf | 1.0618 | 0.010404 | experiment |
 
+| 294 | Two K128 blocks per completion group | 1.0675 | 0.010335 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4494,3 +4496,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.46528us FP16 10.34272us regress versus282. Original FP64 gates unchanged FAIL and finite expected errors. Holding slots until full-leaf completion does not improve full call; rejected without independent certification.
 - **Next:** Try two K128 blocks per completion group to retain earlier slot release
 - **Archive:** trajectory/20261015_065621_iter-293/
+
+### Iter 294 — Two K128 blocks per completion group
+
+- **Hypothesis:** Paired completion reduces waits while releasing slots earlier than full-leaf batching
+- **Changes:** On282 issue two K128 blocks per commit/wait0; fence on even K blocks and immediately release each completed pair
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010335 ms; mean speedup=1.0675x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012237 | 0.010366 | 1.1806 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009835 | 0.010304 | 0.9544 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.36576us FP16 10.30432us regress versus282. Original FP64 gates FAIL unchanged, finite expected errors. Reject batching; no independent certification.
+- **Next:** Reassess full282 NCU and use a different memory layout direction
+- **Archive:** trajectory/20261015_065709_iter-294/
