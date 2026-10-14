@@ -545,6 +545,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 319 | K64 sixteen-slot transformed-product pipeline | 0.6481 | 0.016822 | experiment |
 
+| 320 | Rolling five-product WGMMA retirement | 0.9720 | 0.011263 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4952,3 +4954,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Full formal benchmark completed; use archived results.csv for latency and numerical verdict. This tests a deeper prefetch window with more block handshakes and does not by itself establish a retained gain. Original FP64 gate requirements remain unchanged.
 - **Next:** Inspect formal results and test rolling wait4 retirement from K128317 to release the oldest slot promptly while keeping four independent transformed groups in flight
 - **Archive:** trajectory/20261015_073447_iter-319/
+
+### Iter 320 — Rolling five-product WGMMA retirement
+
+- **Hypothesis:** Keeping four independent transformed WGMMA groups outstanding while immediately releasing the oldest slot avoids the supply penalty of draining five groups together
+- **Changes:** Start from317 K128 eight slots; after the fifth transformed commit use wait_group4 and release the oldest slot after warp synchronization, then drain and release the final four at the end
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011263 ms; mean speedup=0.9720x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012255 | 0.011281 | 1.0863 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009645 | 0.011245 | 0.8577 | 0.000754626 | 0 |
+
+- **Analysis:** Formal benchmark completed; latency and original FP64 numerical verdict are recorded in the archived CSV. No adoption or independent synchronization certification is implied. Previous319 K64 deeper prefetch was rejected: BF16 16.93184 and FP16 16.71264 us with finite unchanged approximate errors.
+- **Next:** Inspect rolling-retirement timing and generated instructions; consider current-PDL dual tensor warpgroup product ownership only after reviewing old197/198 and shared-exchange lifetime
+- **Archive:** trajectory/20261015_073525_iter-320/
