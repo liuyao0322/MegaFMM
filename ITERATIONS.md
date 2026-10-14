@@ -479,6 +479,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 286 | Two independent operand TMA producers | 1.0587 | 0.010420 | experiment |
 
+| 287 | PDL K192 with K128 tail | 0.9402 | 0.011846 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4368,3 +4370,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** FP16 median10.38944us versus282 paired10.2384us regresses. Both original FP64 gates fail unchanged; finite expected errors. No independent certification and no selection.
 - **Next:** Inspect current282 sparse phase diagnostic and test a short first-block-only prefetch
 - **Archive:** trajectory/20261015_064702_iter-286/
+
+### Iter 287 — PDL K192 with K128 tail
+
+- **Hypothesis:** Three blocks per leaf can balance first-block latency and TMA/MMA wait overhead
+- **Changes:** Use K192 five-slot184448B operands, three slices192+192+128; tail only executes eight MMA instructions; retain282 primary conversion and original accumulation order
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011846 ms; mean speedup=0.9402x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012303 | 0.011589 | 1.0616 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009911 | 0.012103 | 0.8189 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 11.5888us FP16 12.10304us regress severely versus282. Original FP64 gates fail unchanged and no nonfinite; no independent certification.
+- **Next:** Investigate primary launch trigger and cache policy; retain validated282 as current best
+- **Archive:** trajectory/20261015_064916_iter-287/
