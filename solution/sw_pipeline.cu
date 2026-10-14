@@ -80,16 +80,15 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
-  if(tid<32 || (tid>=128 && tid<256))asm volatile("bar.sync 1,160;" ::: "memory");
+  __syncthreads();
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
-  if(tid<32){
+  if(tid==0){
     for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step);
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
       if(sequence==4){
-        asm volatile("bar.sync 2,640;" ::: "memory");
-        if(tid==0){
+        wait(&s.pack_ready,0);
         // CUDA12.4 cooperative launch gives each invocation its own initialized
         // driver workspace. Only TMA leaders join this publication barrier;
         // the shared pack barrier has already acquired every CUDA writer.
@@ -98,9 +97,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         uint32_t old,current;
         asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;" : "=r"(old) : "l"(barrier),"r"(increment) : "memory");
         do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(!((old^current)&0x80000000u));
-        }
       }
-      if(tid==0){
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       // Seven-product experiment: only publish high operands; no residual loads.
@@ -120,7 +117,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
         SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize,n0+col,k0+row);
       }
-      }
+
     }
   }else if((tid>=32 && tid<128) || tid>=256){
     int worker=tid>=256 ? tid-160:tid-32;
@@ -156,7 +153,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[2*j];
   }
     asm volatile("fence.proxy.async.global;" ::: "memory");
-    asm volatile("bar.sync 2,640;" ::: "memory");
+    arrive(&s.pack_ready);
     if(worker<128){
     constexpr int Chunks=16;
     unsigned row=unsigned(worker)/BN,col=unsigned(worker)%BN;
@@ -226,7 +223,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
     uint32_t box[4]={64,BM,BK/64,1},element_strides[4]={1,1,1,1};
     auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
         transformed ? 4:3,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
-        CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+        CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_L2_256B,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
     if(result!=CUDA_SUCCESS)throw std::runtime_error("SW A tensor map status "+std::to_string(int(result)));
     return;
   }
@@ -235,7 +232,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   uint32_t box[3]={uint32_t(is_a ? 64:BN),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};
   auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
       transformed ? 3:2,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
-      is_a ? CU_TENSOR_MAP_SWIZZLE_128B:CU_TENSOR_MAP_SWIZZLE_64B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+      is_a ? CU_TENSOR_MAP_SWIZZLE_128B:CU_TENSOR_MAP_SWIZZLE_64B,CU_TENSOR_MAP_L2_PROMOTION_L2_256B,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
   if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map status "+std::to_string(int(result)));
 }
 } // namespace
