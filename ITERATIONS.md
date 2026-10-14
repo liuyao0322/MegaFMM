@@ -341,6 +341,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 217 | True N16 WGMMA with two resident CTAs per SM | 0.7991 | 0.013925 | experiment |
 
+| 218 | Static reversed-operand TC chain and register recombination | 1.0023 | 0.011096 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3130,3 +3132,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Expected finite seven-product errors, original gates FAIL. BF16 13.7904us FP16 14.0602us slower than215 and162. Increased residency does not compensate repeated input traffic and finer-grained production.
 - **Next:** Return215 and reduce issue and supply overhead with a full static single-TC chain on reversed geometry
 - **Archive:** trajectory/20261015_044211_iter-217/
+
+### Iter 218 — Static reversed-operand TC chain and register recombination
+
+- **Hypothesis:** Eliminate P shared exchange and consume first MMA as accumulator initialization on reversed operand geometry
+- **Changes:** From215 remove P buffers and consumers; full static PTX with private first/second fragments, exact recombination order and scalar transposed output; first MMA scaleD0; shared196736B
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011096 ms; mean speedup=1.0023x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012235 | 0.011051 | 1.1071 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009999 | 0.011140 | 0.8976 | 0.000754626 | 0 |
+
+- **Analysis:** Fresh BF16 11.0512us FP16 11.1402us versus Dense12.2346/9.99904us. Expected seven-product errors and no nonfinite, both original gates FAIL. Promising small improvement versus215 and~3percentFP16 over162; requires paired timing, bitwise and sanitizer validation. Reassessment used215 full NCU and NVIDIA PTX documentation; no floor claim.
+- **Next:** Independently validate218, profile source-specific critical path, and test compiler metadata prefetch or shorter instruction lifetime
+- **Archive:** trajectory/20261015_044338_iter-218/
