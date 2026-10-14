@@ -315,6 +315,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 204 | Static complete TC PTX chain with register recombination | 0.9752 | 0.011472 | experiment |
 
+| 205 | Static PTX ping-pong overlap of register recombination | 0.9457 | 0.011756 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2890,3 +2892,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 11.316 us and FP16 11.627 us versus Dense12.340/9.998 us. Much faster than203 but no established improvement over162; both original gates fail with finite expected errors. Bitwise and synchronization validation pending if retained.
 - **Next:** Overlap next product first-K WGMMA with prior product register recombination using two private accumulator sets and wait1 retirement
 - **Archive:** trajectory/20261015_040915_iter-204/
+
+### Iter 205 — Static PTX ping-pong overlap of register recombination
+
+- **Hypothesis:** Overlap previous P recombination with first-K WGMMA of next P using two private accumulators and one pending group
+- **Changes:** Alternating d/e accumulator sets, wait1 retire previous stage promptly after next issue; finalwait0; all seven products and exact recombination statically scheduled
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011756 ms; mean speedup=0.9457x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012247 | 0.011613 | 1.0546 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009957 | 0.011899 | 0.8369 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 11.613 us and FP16 11.899 us versus Dense12.247/9.957 us. Finite unchanged approximate errors; original gates fail. Slower than204 and162; inspect resources before deciding whether overlap or spills caused regression.
+- **Next:** Check205 resource use and NCU local traffic; adjust block size only if register pressure warrants it
+- **Archive:** trajectory/20261015_041034_iter-205/
