@@ -377,6 +377,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 235 | Linear vector128 last-CTA split-K merge | 0.5249 | 0.021156 | experiment |
 
+| 236 | 384-worker last-CTA vector merge | 0.7005 | 0.015848 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3452,3 +3454,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF21.3578 FP20.9546us, about half234 but still nearly twice224. Expected approximate errors retained; original FP64 gatesFAIL.234 minimalNCU126regs0local,1.618Minstructions confirms no spill explanation. Need stage timing to isolate remaining macro-design cost.
 - **Next:** Instrument235 TC phases outside solution, verify traced output against untraced235, and distinguish supply from final merge cost
 - **Archive:** trajectory/20261015_051554_iter-235/
+
+### Iter 236 — 384-worker last-CTA vector merge
+
+- **Hypothesis:** Retired pack workers join TC threads to reduce split-K epilogue latency
+- **Changes:** From235 add local merge-ready barrier, keep pack workers resident, distribute final float4 merge across384threads; same two partial-C buffers and per-tile counters
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.015848 ms; mean speedup=0.7005x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012268 | 0.015874 | 0.7729 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009939 | 0.015821 | 0.6282 | 0.000754625 | 0 |
+
+- **Analysis:** BF15.8742 FP15.8208us; improves23521us but still slower22411us. Original gatesFAIL and expected approximate errors unchanged.235 sparse trace30bitexact checks: TCchain7.78us,fence.90,counter.64,merge7.82; traced/untraced126regs0stack; diagnostic timings are not standard full-call wins.
+- **Next:** Remove partial readback with direct FP32 atomic accumulation of two K partial outputs, per-call Dzero before publication; preserve explicit failure reporting
+- **Archive:** trajectory/20261015_051844_iter-236/
