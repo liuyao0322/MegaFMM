@@ -16,12 +16,12 @@ constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
-  T operand[2][2*ASize+2*BSize];
+  T operand[11*(ASize+BSize)];
   float product[7][Elements];
   float output[4][Elements];
-  uint64_t ready[2],free[2],product_ready,product_free;
+  uint64_t ready,free,product_ready,product_free;
 };
-static_assert(sizeof(Shared<cute::half_t>)==139392,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==225408,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -52,7 +52,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],128);}
+    Barrier::init(&s.ready,1);Barrier::init(&s.free,128);
     Barrier::init(&s.product_ready,128);Barrier::init(&s.product_free,96);
     cutlass::arch::fence_barrier_init();
   }
@@ -82,28 +82,19 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
-    for(int q=0;q<512/BK;++q)for(int p=0;p<7;++p){
-      int sequence=q*7+p,slot=sequence%2,k0=q*BK;
-      if(sequence>=2)wait(&s.free[slot],((sequence-2)/2)%2);
-      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
-      int bytes=2*(ASize+BSize)+(alo ? 2*ASize:0)+(blo ? 2*BSize:0);
-      TxBarrier::arrive_and_expect_tx(&s.ready[slot],bytes);
-      T* op=s.operand[slot];
-      if(alo){
-        int plane=p==2 ? 6:2*(p-4);
-        SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op,k0,m0,plane);
-        SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op+ASize,k0,m0,plane+1);
-      }else{
-        int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
-        SM90_TMA_LOAD_2D::copy(&amap,&s.ready[slot],0,op,k0+col,m0+row);
+    for(int q=0;q<512/BK;++q){
+      if(q)wait(&s.free,(q-1)%2);
+      int k0=q*BK;
+      TxBarrier::arrive_and_expect_tx(&s.ready,2*11*(ASize+BSize));
+      for(int j=0;j<3;++j){
+        int arow=j==2 ? 512:0,acol=j>=1 ? 512:0;
+        int brow=j>=1 ? 512:0,bcol=j==2 ? 512:0;
+        SM90_TMA_LOAD_2D::copy(&amap,&s.ready,0,s.operand+j*ASize,k0+acol,m0+arow);
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready,0,s.operand+11*ASize+j*BSize,n0+bcol,k0+brow);
       }
-      if(blo){
-        int plane=p==3 ? 6:2*(p-4);
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+2*ASize,n0,k0,plane);
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+2*ASize+BSize,n0,k0,plane+1);
-      }else{
-        int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+2*ASize,n0+col,k0+row);
+      for(int j=0;j<8;++j){
+        SM90_TMA_LOAD_3D::copy(&smap,&s.ready,0,s.operand+(3+j)*ASize,k0,m0,j);
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready,0,s.operand+11*ASize+(3+j)*BSize,n0,k0,j);
       }
     }
   }else if(tid>=32 && tid<128){
@@ -128,12 +119,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }else if(tid>=128){
     for(int q=0;q<512/BK;++q){
       if(q)wait(&s.product_free,(q-1)%2);
+      wait(&s.ready,q%2);
       for(int p=0;p<7;++p){
-        int sequence=q*7+p,slot=sequence%2;
-        wait(&s.ready[slot],(sequence/2)%2);
-        T* op=s.operand[slot];
-        auto ah=make_tensor(make_smem_ptr(op),la),al=make_tensor(make_smem_ptr(op+ASize),la);
-        auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb),bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
+        int ai=p==0 ? 0:p==1 ? 1:p==2 ? 9:p==3 ? 2:3+2*(p-4);
+        int bi=p==0 ? 0:p==1 ? 1:p==2 ? 2:p==3 ? 9:3+2*(p-4);
+        auto ah=make_tensor(make_smem_ptr(s.operand+ai*ASize),la);
+        auto al=make_tensor(make_smem_ptr(s.operand+(ai+1)*ASize),la);
+        auto bh=make_tensor(make_smem_ptr(s.operand+11*ASize+bi*BSize),lb);
+        auto bl=make_tensor(make_smem_ptr(s.operand+11*ASize+(bi+1)*BSize),lb);
         float acc[16]={};warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
         if(p==2 || p>=4)mma_term<T>(al,bh,acc);
@@ -141,8 +134,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         warpgroup_commit_batch();warpgroup_wait<0>();
         #pragma unroll
         for(int j=0;j<16;++j){int mn=GMMA::CLayout_64x32{}(tid-128,j);s.product[p][(mn%64)*BN+mn/64]=acc[j];}
-        arrive(&s.free[slot]);
       }
+      arrive(&s.free);
       arrive(&s.product_ready);
     }
   }

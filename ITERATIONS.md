@@ -35,6 +35,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 64 | Correct original A22 coordinates in cooperative pipeline | 0.2517 | 0.044002 | passed |
 
+| 65 | Batch all leaf operands per K slice | 0.2471 | 0.044803 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -278,3 +280,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Complete frozen benchmark exited0; all original numerical gates passed. Inspect measured timings and stress before accepting.
 - **Next:** Validate72 stress cases and graph execution; assess complete latency against Dense.
 - **Archive:** trajectory/20261014_192807_iter-64/
+
+### Iter 65 — Batch all leaf operands per K slice
+
+- **Hypothesis:** Eight shared operand publications instead of56 can reduce serial TMA and barrier cost.
+- **Changes:** 225408-byte shared arena retains11 A and11 B planes per K slice, reusing originals and transforms across7 products; one ready/free pair per slice.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.044803 ms; mean speedup=0.2471x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x64 v0 | launch | 0.012284 | 0.044964 | 0.2732 | 7.15726e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x64 v0 | launch | 0.009862 | 0.044642 | 0.2209 | 4.79212e-07 | 1 |
+
+- **Analysis:** Full unchanged benchmark exited0. All numerical gates passed; compare actual complete invocation timings.
+- **Next:** Inspect latency and validate faster shared-buffer arrangement.
+- **Archive:** trajectory/20261014_192948_iter-65/
