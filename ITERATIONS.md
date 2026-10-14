@@ -473,6 +473,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 283 | Early raw tensor-data prefetch | 0.8701 | 0.012721 | experiment |
 
+| 284 | Ninth K128 operand slot | 1.0628 | 0.010358 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4314,3 +4316,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 12.71328us FP16 12.728us regress severely versus279. Extra raw prefetch rejects; original FP64 gates FAIL unchanged. Dense BF43.997us outlier preserved. No claim that increased cache hit alone improves TMA latency.
 - **Next:** Test ninth K128 shared operand slot without extra data prefetch
 - **Archive:** trajectory/20261015_064227_iter-283/
+
+### Iter 284 — Ninth K128 operand slot
+
+- **Hypothesis:** A ninth slot allows the first transformed block before retiring a raw slot
+- **Changes:** Use nine K128 slots,221440B shared and regenerate static slot/parity scheduling; retain279 primary transform
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010358 ms; mean speedup=1.0628x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012229 | 0.010399 | 1.1760 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009797 | 0.010316 | 0.9497 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.39936us and FP16 10.31616us are slower than279; reject extra slot. Original FP64 gates FAIL unchanged, finite expected errors.
+- **Next:** Test a non-specialized single warpgroup TMA/MMA schedule
+- **Archive:** trajectory/20261015_064407_iter-284/
