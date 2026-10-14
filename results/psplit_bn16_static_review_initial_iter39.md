@@ -1,9 +1,0 @@
-Iteration39 fresh compiled gate: PASS_COMPILED_CAN_LAUNCH_42_43.
-
-Raw42 revision1 a17b7f8f and SS43 94277131 are bound to 8 actual source hashes, bench149bf628/test4a45e6aa, pregate33d78652 and all four complete object/bench/test instruction streams. Raw42 actual role maxima44/93/93 and SS43 58/55/55 include implicit widths, waitstubs, loopbacks and commonU. Uniform initial80 owns30720 register words: raw48/96/96 requires30720; SS64/80/80 requires28672. All quota directions, accumulator initialization and high-register writes after allocation pass; entire-stage RS A and all P have no generic access before covered wait0. All four instances have STACK/LOCAL/spill0.
-
-Actual sizeof/host optin/launch are47232 bytes(raw) and71808 bytes(SS), align128. DriverAPI static_shared_bytes is0; ELF/resource-tool SHARED1024 is separately preserved accounting. OccupancyAPI predicts2CTA/SM, with measured residency left null. Both banks retire before nonaligned barrier6,count384 and every tail store; publishbar0 precedes fixedU. Raw tail28672 spans bank0(23552)+bank1(5120); SS tail fits bank0 but still drains both banks. Active four C0 loads precede every D store; beta0/null reads no C0.
-
-The first raw42 source ec97630b remains at results/psplit_bn16_initial_megakernel_wgmma_psplit_rsa_bn16_iter39.cu and had STACK16/spill12+12, with no GPU launch. Revision1 reconstructs the two-bank consumer index/phase from unchanged int64 k_base; pinned consumer APIs do not use count. This current fresh gate does not rewrite the first failure. The historical diagnostic logical source_path is not the current a17b formal source.
-
-This is a CPU compiled launch gate, not GPU validation, timing or original FP64 precision certification. New fixtures call raw42 versus enabledSS43 as sameN16; SS43 versus SS36 is explicitly crossatom N16/N32, without tolerance relaxation. Auto remainsDense and optimization goal remains active.

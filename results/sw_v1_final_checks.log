@@ -1,0 +1,67 @@
+[ 66%] Built target megafmm
+[ 83%] Building CUDA object CMakeFiles/test_sw1024.dir/tests/test_sw1024.cu.o
+[100%] Linking CXX executable test_sw1024
+[100%] Built target test_sw1024
+Internal ctest changing into directory: /share/home/liuyao/workspace/MegaFMM/build
+Test project /share/home/liuyao/workspace/MegaFMM/build
+    Start 2: sw_1024_correctness
+1/2 Test #2: sw_1024_correctness ..............   Passed    3.05 sec
+    Start 3: exact_winograd_dag
+2/2 Test #3: exact_winograd_dag ...............   Passed    0.33 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   3.41 sec
+
+Fatbin elf code:
+================
+arch = sm_90a
+code version = [1,7]
+host = linux
+compile_size = 64bit
+
+Resource usage:
+ Common:
+  GLOBAL:0
+ Function _ZN41_GLOBAL__N__44c22393_12_benchmark_cu_main9to_doubleI6__halfEEvPKT_Pdl:
+  REG:14 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:552 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN41_GLOBAL__N__44c22393_12_benchmark_cu_main10fill_inputI6__halfEEvPT_lm:
+  REG:12 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:552 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN41_GLOBAL__N__44c22393_12_benchmark_cu_main9to_doubleI13__nv_bfloat16EEvPKT_Pdl:
+  REG:14 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:552 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN41_GLOBAL__N__44c22393_12_benchmark_cu_main10fill_inputI13__nv_bfloat16EEvPT_lm:
+  REG:12 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:552 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN41_GLOBAL__N__44c22393_12_benchmark_cu_main13norm_partialsEPKdlPd:
+  REG:32 STACK:0 SHARED:3072 LOCAL:0 CONSTANT[0]:552 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN41_GLOBAL__N__44c22393_12_benchmark_cu_main14error_partialsEPKfPKdlddPNS_7PartialE:
+  REG:53 STACK:0 SHARED:13312 LOCAL:0 CONSTANT[0]:576 TEXTURE:0 SURFACE:0 SAMPLER:0
+
+Fatbin elf code:
+================
+arch = sm_90a
+code version = [1,7]
+host = linux
+compile_size = 64bit
+
+Resource usage:
+ Common:
+  GLOBAL:0
+ Function _ZN7megafmm6detail48_GLOBAL__N__1c8c4272_15_scale_output_cu_6a330e2912scale_kernelILb1EEEvPKfPfllllf:
+  REG:22 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:580 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN7megafmm6detail48_GLOBAL__N__1c8c4272_15_scale_output_cu_6a330e2912scale_kernelILb0EEEvPKfPfllllf:
+  REG:22 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:580 TEXTURE:0 SURFACE:0 SAMPLER:0
+
+Fatbin elf code:
+================
+arch = sm_90a
+code version = [1,7]
+host = linux
+compile_size = 64bit
+
+Resource usage:
+ Common:
+  GLOBAL:2 CONSTANT[4]:16
+ Function _ZN7megafmm6detail47_GLOBAL__N__06583737_14_sw_pipeline_cu_e594aa0013sw_unified_v1IN7cutlass6half_tEEEv14CUtensorMap_stS5_Pf:
+  REG:61 STACK:0 SHARED:1024 LOCAL:0 CONSTANT[2]:12 CONSTANT[0]:840 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN7megafmm6detail47_GLOBAL__N__06583737_14_sw_pipeline_cu_e594aa0013sw_unified_v1IN7cutlass10bfloat16_tEEEv14CUtensorMap_stS5_Pf:
+  REG:62 STACK:0 SHARED:1024 LOCAL:0 CONSTANT[2]:24 CONSTANT[0]:840 TEXTURE:0 SURFACE:0 SAMPLER:0
