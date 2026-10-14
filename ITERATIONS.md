@@ -517,6 +517,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 305 | Exclude stale candidate after local generator failure | 1.0675 | 0.010344 | experiment |
 
+| 306 | CTA-local shared transform first build | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4708,3 +4710,17 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** NOT evidence for local transform architecture. Source hash equals304 and configuration confirms old asymmetric K groups; retain raw repeated timings only for provenance, exclude from ranking new architecture. BF16 10.36960us FP16 10.31904us, original gates fail.
 - **Next:** Correct generator variable shadowing and use shell fail-fast before new formal run; profile unchanged304 as reassessment
 - **Archive:** trajectory/20261015_071603_iter-305/
+
+### Iter 306 — CTA-local shared transform first build
+
+- **Hypothesis:** K-major seven persistent accumulator groups remove global S/T transforms and publication
+- **Changes:** New one-kernel384-thread CTA, eight CUDA transform warps and four TC warps,172160Bshared, raw TMA quadrants and in-place S1/T1 plus six extra planes,112FP32accumulators
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Compile failure: one auto declaration combines different CuTe A and B tensor types. No timing or correctness result valid. Proxy fences and local barrier accounting are implemented but not validated.
+- **Next:** Split CuTe auto declarations and rerun the same architecture
+- **Archive:** trajectory/20261015_071702_iter-306/
