@@ -405,6 +405,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 249 | Early initialization coordinator and scoped S/T readiness | 0.8610 | 0.012911 | experiment |
 
+| 250 | Isolate32x64 transform ownership from scoped publication | 1.0249 | 0.011021 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3702,3 +3704,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 12.7936 us vs Dense12.2806 us; FP16 13.0278 us vs Dense9.92832 us. Fresh expected original errors/nonfinite0 preserved, gatesFAIL. Worse than224; scoped synchronization plus changed transform locality is not a win. No independent certification claimed.
 - **Next:** Isolate two-dimensional transform locality from publication protocol, then profile dependency wait costs before retaining any change.
 - **Archive:** trajectory/20261015_054027_iter-249/
+
+### Iter 250 — Isolate32x64 transform ownership from scoped publication
+
+- **Hypothesis:** A control with original publication distinguishes249 synchronization overhead from changed input locality.
+- **Changes:** Exact224 geometry and global input-ready barrier; only change per-CTA transform ownership from4x512 linear chunk to32x64 chunk.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011021 ms; mean speedup=1.0249x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012504 | 0.010905 | 1.1466 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010059 | 0.011136 | 0.9032 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.9053 us vs Dense12.5037 us; FP16 11.1363 us vs Dense10.0589 us. Original expected errors and both gate failures unchanged. Geometry alone is broadly flat, so249 approximately2us regression requires profiling publication overhead; no retained winner yet.
+- **Next:** Profile224/249/250 together to inspect resource and synchronization changes, then test scoped linear-transform counter groups.
+- **Archive:** trajectory/20261015_054124_iter-250/
