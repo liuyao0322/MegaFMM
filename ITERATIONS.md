@@ -475,6 +475,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 284 | Ninth K128 operand slot | 1.0628 | 0.010358 | experiment |
 
+| 285 | Single warpgroup elected-thread TMA refill | 0.9954 | 0.011109 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4332,3 +4334,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.39936us and FP16 10.31616us are slower than279; reject extra slot. Original FP64 gates FAIL unchanged, finite expected errors.
 - **Next:** Test a non-specialized single warpgroup TMA/MMA schedule
 - **Archive:** trajectory/20261015_064407_iter-284/
+
+### Iter 285 — Single warpgroup elected-thread TMA refill
+
+- **Hypothesis:** Combining TMA producer and consumer warpgroup removes free-slot cross-warp handoff
+- **Changes:** Use128-thread compute CTA, preload four raw K256 blocks, wait primary before chain, then inline PTX elected-thread TMA refill after wait0 and128-thread barrier; preserve all leaf arithmetic
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011109 ms; mean speedup=0.9954x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012265 | 0.011117 | 1.1032 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009853 | 0.011101 | 0.8876 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 11.11744us and FP16 11.10144us regress versus selected266 and candidate282. Finite expected original errors; FP64 gates FAIL. Rejected, no independent certification of this experimental refill protocol.
+- **Next:** Reassess current critical-path evidence and test separate parallel TMA producers on K128
+- **Archive:** trajectory/20261015_064536_iter-285/
