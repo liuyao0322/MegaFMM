@@ -38,8 +38,8 @@ __device__ constexpr int product_for_step(int step){
   return step<2 ? step:step==2 ? 5:step==3 ? 6:step==4 ? 4:step==5 ? 2:3;
 }
 
-template<class T,class TA,class TB>
-__device__ void mma_term(TA a,TB b,float (&d)[16]) {
+template<class T,int Slot,class TA,class TB>
+__device__ __forceinline__ void mma_term(TA a,TB b,float (&d)[16]) {
   using namespace cute;
   using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,
       SM90_64x32x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
@@ -52,114 +52,18 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
       tiled_divide(b,Shape<_32,_16>{}));
   auto da_base=da_tiles(0,0,0);
   auto db_base=db_tiles(0,0,0);
-  if constexpr(std::is_same_v<T,bfloat16_t>){
-    asm volatile(
-      "{ .reg .pred p; .reg .b64 da,db; .reg .b32 al,ah,bl,bh,at,bt; mov.b64 {al,ah},%16; mov.b64 {bl,bh},%17; setp.ne.b32 p,1,0;\n"
-      "add.u32 at, al, %18; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %19; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %20; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %21; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %22; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %23; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %24; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %25; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %26; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %27; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %28; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %29; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %30; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %31; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %32; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %33; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %34; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %35; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %36; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %37; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %38; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %39; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %40; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %41; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %42; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %43; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %44; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %45; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %46; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %47; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %48; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %49; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.bf16.bf16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "}\n"
-      : "+f"(d[0]), "+f"(d[1]), "+f"(d[2]), "+f"(d[3]), "+f"(d[4]), "+f"(d[5]), "+f"(d[6]), "+f"(d[7]), "+f"(d[8]), "+f"(d[9]), "+f"(d[10]), "+f"(d[11]), "+f"(d[12]), "+f"(d[13]), "+f"(d[14]), "+f"(d[15])
-      : "l"(uint64_t(da_base)), "l"(uint64_t(db_base)), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(int32_t(GMMA::Major::K)), "n"(int32_t(GMMA::Major::MN)));
-  }else{
-    asm volatile(
-      "{ .reg .pred p; .reg .b64 da,db; .reg .b32 al,ah,bl,bh,at,bt; mov.b64 {al,ah},%16; mov.b64 {bl,bh},%17; setp.ne.b32 p,1,0;\n"
-      "add.u32 at, al, %18; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %19; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %20; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %21; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %22; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %23; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %24; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %25; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %26; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %27; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %28; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %29; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %30; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %31; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %32; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %33; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %34; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %35; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %36; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %37; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %38; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %39; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %40; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %41; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %42; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %43; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %44; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %45; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %46; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %47; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "add.u32 at, al, %48; mov.b64 da,{at,ah};\n"
-      "add.u32 bt, bl, %49; mov.b64 db,{bt,bh};\n"
-      "wgmma.mma_async.sync.aligned.m64n32k16.f32.f16.f16 {%0, %1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15}, da, db, p, 1, 1, %50, %51;\n"
-      "}\n"
-      : "+f"(d[0]), "+f"(d[1]), "+f"(d[2]), "+f"(d[3]), "+f"(d[4]), "+f"(d[5]), "+f"(d[6]), "+f"(d[7]), "+f"(d[8]), "+f"(d[9]), "+f"(d[10]), "+f"(d[11]), "+f"(d[12]), "+f"(d[13]), "+f"(d[14]), "+f"(d[15])
-      : "l"(uint64_t(da_base)), "l"(uint64_t(db_base)), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(int32_t(GMMA::Major::K)), "n"(int32_t(GMMA::Major::MN)));
+  constexpr uint32_t start=64+Slot*((ASize+BSize)*sizeof(T)/16);
+  da_base.reg32_[0]=(da_base.reg32_[0]&~0x3fffu)|start;
+  db_base.reg32_[0]=(db_base.reg32_[0]&~0x3fffu)|(start+ASize*sizeof(T)/16);
+  #pragma unroll
+  for(int kk=0;kk<BK/16;++kk){
+    // All operands fit below 256 KiB of shared memory. K offsets cannot carry
+    // out of the 14-bit start-address field (16-byte units), so keep the high
+    // descriptor word invariant rather than generating a 64-bit add/carry.
+    auto da=da_base,db=db_base;
+    da.reg32_[0]+=uint32_t(da_tiles.layout()(0,0,kk));
+    db.reg32_[0]+=uint32_t(db_tiles.layout()(0,0,kk));
+    Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15]);
   }
 }
 
@@ -295,7 +199,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
         warpgroup_arrive();
-        mma_term<T>(ah,bh,acc);
+        // Slot is uniform across all four WGMMA warps; one accumulator array.
+        switch(slot){
+          case 0: mma_term<T,0>(ah,bh,acc);break;
+          case 1: mma_term<T,1>(ah,bh,acc);break;
+          case 2: mma_term<T,2>(ah,bh,acc);break;
+          default: mma_term<T,3>(ah,bh,acc);break;
+        }
         warpgroup_commit_batch();warpgroup_wait<0>();
         __syncwarp();
         if((tid&31)==0)arrive(&s.free[slot]);
@@ -341,6 +251,11 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
     throw std::invalid_argument("SW requires contiguous non-transposed1024^3 alpha1 beta0");
   int device;cudaDeviceProp prop{};check(cudaGetDevice(&device),"SW device");check(cudaGetDeviceProperties(&prop,device),"SW properties");
   if(prop.major!=9 || prop.minor!=0 || !prop.cooperativeLaunch)throw std::invalid_argument("SW needs cooperative Hopper launch");
+  cudaFuncAttributes attr{};
+  if(p.dtype==DType::BF16)check(cudaFuncGetAttributes(&attr,sw_cooperative_hilo<cute::bfloat16_t>),"SW attributes");
+  else check(cudaFuncGetAttributes(&attr,sw_cooperative_hilo<cute::half_t>),"SW attributes");
+  if(attr.sharedSizeBytes!=0 || prop.reservedSharedMemPerBlock!=1024)
+    throw std::invalid_argument("SW fixed descriptors require static shared0 and reserved shared1024bytes");
   int blocks=0;
   if(p.dtype==DType::BF16){
     check(cudaFuncSetAttribute(sw_cooperative_hilo<cute::bfloat16_t>,cudaFuncAttributeMaxDynamicSharedMemorySize,sizeof(Shared<cute::bfloat16_t>)),"SW shared opt-in");
