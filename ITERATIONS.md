@@ -105,6 +105,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 99 | Three compact operand stages with immediate retirement | 0.8297 | 0.013506 | experiment |
 
+| 100 | Four compact operand stages | 0.8573 | 0.013169 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -990,3 +992,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Original FP64gate expected FAIL in this no-compensation experiment; compare exact output and full-call timing against97/98.
 - **Next:** Test fourth stage and compare contemporaneous complete invocations
 - **Archive:** trajectory/20261015_012441_iter-99/
+
+### Iter 100 — Four compact operand stages
+
+- **Hypothesis:** Use recovered low-part space for four high-only prefetch stages without delaying slot release
+- **Changes:** Stages4,BK256,213120shared; producer free phases and TC ready phases follow four-stage ring
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013169 ms; mean speedup=0.8573x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012515 | 0.013119 | 0.9539 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010055 | 0.013219 | 0.7607 | 0.000754626 | 0 |
+
+- **Analysis:** Seven main products and original gates unchanged. Deeper buffering may add address/phase overhead; full-call comparisons decide retention.
+- **Next:** Reassess98-100 using paired timings, generated code and fresh diagnostics before K-block changes
+- **Archive:** trajectory/20261015_012528_iter-100/
