@@ -107,7 +107,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
     }
     #pragma unroll
-    for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(2*j*Plane+i)/4]=words[2*j];
+    for(int j=0;j<8;++j)reinterpret_cast<uint64_t*>(packed)[(2*j*Plane+i)/4]=words[2*j];
   }
   // Generic global stores become visible to TMA's async proxy before publication.
   asm volatile("fence.proxy.async.global;" ::: "memory");
