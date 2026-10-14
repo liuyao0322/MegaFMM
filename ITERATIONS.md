@@ -261,6 +261,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 177 | Three operand slots in global split-product pair | 0.7400 | 0.014998 | experiment |
 
+| 178 | Hide global pair exchange behind fourth consumer product | 0.6285 | 0.017677 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2412,3 +2414,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about14.84us and FP16 about15.15us, still far slower162; expected baseline errors retained and nonfinite0. No win from current deeper pair pipeline.
 - **Next:** Move P2 to the output-consuming CTA so U2/U3 producer finishes three products and exchange may overlap consumers fourth product.
 - **Archive:** trajectory/20261015_033152_iter-177/
+
+### Iter 178 — Hide global pair exchange behind fourth consumer product
+
+- **Hypothesis:** Move P2 to receiving CTA so sender publishes P1/U2/U3 after only three products while receiver computes four.
+- **Changes:** Base177; rank0 P1/P6/P7,rank1 P2/P5/P3/P4; addP1 plane at4MiB,shiftU2/U3 and flags7MiB; both leaders publish transform barrier atsequence2; exact FP32 recombination order preserved.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.017677 ms; mean speedup=0.6285x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cluster_64x64x256 v0 | launch | 0.012326 | 0.017665 | 0.6978 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cluster_64x64x256 v0 | launch | 0.009894 | 0.017690 | 0.5593 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about17.67us FP16 about17.69us, regresses177 and far slower162. Expected numerical errors/nonfinite0 retained. Splitting early raw products reduces overlap available before global transformed-input publication, and extra exchange does not help.
+- **Next:** Re-profile178 supply issue and local spill counters; restore162 before next independent direction.
+- **Archive:** trajectory/20261015_033239_iter-178/

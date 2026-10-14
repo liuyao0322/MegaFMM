@@ -364,7 +364,7 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
-  if (impl_->sw) return "sw_global_pair;cluster=none;roles=1tma+4tc+8consumer;smem=213120;bk=256;stages=3;product_slots=1;products=4plus3;exchange=global_U2_U3_per_consumer_release_acquire;local_partial=registers;st=compact_balanced_async608;publication=tma_leader_driver_workspace_cuda12.4;leaf_terms=7;residual_correction=off;workspace=8388608;alpha=1;beta=0";
+  if (impl_->sw) return "sw_global_pair;cluster=none;roles=1tma+4tc+8consumer;smem=213120;bk=256;stages=3;product_slots=1;products=3plus4;order=P1_P6_P7__P2_P5_P3_P4;exchange=global_P1_U2_U3_per_consumer_release_acquire;local_partial=registers;st=compact_balanced_async608;publication=tma_leader_driver_workspace_cuda12.4;leaf_terms=7;residual_correction=off;workspace=8388608;alpha=1;beta=0";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }

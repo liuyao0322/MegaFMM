@@ -36,7 +36,7 @@ __device__ __forceinline__ int product_index(int row,int col){
 
 // Each two-CTA cluster owns one64x64 quadrant tile.
 __device__ int product_for_step(int step,int rank){
-  return rank==0 ? (step<2 ? step:step==2 ? 5:6) : (step==0 ? 4:step==1 ? 2:3);
+  return rank==0 ? (step==0 ? 0:step==1 ? 5:6) : (step==0 ? 1:step==1 ? 4:step==2 ? 2:3);
 }
 
 template<class T,class TA,class TB>
@@ -75,7 +75,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   extern __shared__ __align__(128) unsigned char buffer[];
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,rank=blockIdx.x&1,m0=blockIdx.y*BM,n0=(blockIdx.x/2)*BN;
-  int products=rank==0 ? 4:3;
+  int products=rank==0 ? 3:4;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<1;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],256);}
@@ -89,7 +89,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int step=0;step<products;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step,rank);
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
-      if(sequence==(rank==0 ? 4:0)){
+      if(sequence==2){
         wait(&s.pack_ready,0);
         auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
         uint32_t increment=(blockIdx.x==0&&blockIdx.y==0)?0x80000000u-127u:1u;
@@ -120,7 +120,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }else if((tid>=32 && tid<128)||tid>=256){
     int worker=tid>=256 ? tid-160:tid-32;
     int tile=blockIdx.y*8+blockIdx.x/2;
-    auto* flags=reinterpret_cast<uint32_t*>(reinterpret_cast<char*>(packed)+(size_t(6)<<20));
+    auto* flags=reinterpret_cast<uint32_t*>(reinterpret_cast<char*>(packed)+(size_t(7)<<20));
     if(rank==1 && worker<256)flags[tile*256+worker]=0;
   for(int local=2*worker;local<2048;local+=2*608){
     int i=(blockIdx.y*gridDim.x+blockIdx.x)*2048+local;
@@ -170,17 +170,21 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         #pragma unroll
         for(int j=0;j<Chunks;++j){
           if(rank==0){
-            if(step==0)first[j]=current[j];
-            else if(step==1)out[j*4096]=__fadd_rn(first[j],current[j]);
-            else if(step==2)first[j]=__fadd_rn(first[j],current[j]);
+            if(step==0){
+              first[j]=current[j];
+              auto* p1buf=reinterpret_cast<float*>(reinterpret_cast<char*>(packed)+PackedBytes)+tile*Elements;
+              p1buf[worker+j*256]=current[j];
+            }else if(step==1)first[j]=__fadd_rn(first[j],current[j]);
             else second[j]=__fadd_rn(first[j],current[j]);
           }else{
-            if(step==0)first[j]=current[j];
-            else if(step==1)second[j]=current[j];
+            if(step==0)out[j*4096]=current[j];
+            else if(step==1)first[j]=current[j];
+            else if(step==2)second[j]=current[j];
           }
         }
       }
-      float* u2buf=reinterpret_cast<float*>(reinterpret_cast<char*>(packed)+PackedBytes)+tile*Elements;
+      float* p1buf=reinterpret_cast<float*>(reinterpret_cast<char*>(packed)+PackedBytes)+tile*Elements;
+      float* u2buf=p1buf+Plane;
       float* u3buf=u2buf+Plane;
       auto* flag=flags+tile*256+worker;
       if(rank==0){
@@ -192,6 +196,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(ready) : "l"(flag) : "memory");}while(!ready);
         #pragma unroll
         for(int j=0;j<Chunks;++j){
+          out[j*4096]=__fadd_rn(p1buf[worker+j*256],out[j*4096]);
           float u2=u2buf[worker+j*256],u3=u3buf[worker+j*256];
           float p5=first[j],p3=second[j],p4=current[j];
           out[j*4096+512]=__fadd_rn(__fadd_rn(u2,p5),p3);
