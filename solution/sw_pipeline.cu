@@ -17,14 +17,20 @@ using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
   T operand[2][2*ASize+2*BSize];
-  // Native WGMMA fragment order: [accumulator element][128 TC threads].
-  // Each warp stores/loads 32 consecutive floats, one per shared-memory bank.
+  // Row-major P with an XOR permutation inside each 32-float row.
+  // Both WGMMA fragment stores and row-major consumer loads use every bank once.
   float product[2][Elements];
   uint64_t ready[2],free[2],product_ready[2],product_free[2];
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
+
+__device__ __forceinline__ int product_index(int row,int col){
+  // Fragment lanes vary column bits 1,2 and row bits 0,1,2.
+  // XOR the latter into column bits 0,3,4, the three remaining bank bits.
+  return row*BN+(col^((row&1)|((row&6)<<2)));
+}
 
 template<class T,class TA,class TB>
 __device__ void mma_term(TA a,TB b,float (&d)[16]) {
@@ -119,7 +125,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       #pragma unroll
       for(int j=0;j<Chunks;++j){
         int i=worker+j*352;
-        if(i<Elements)values[p][j]=s.product[p%2][i];
+        if(i<Elements)values[p][j]=s.product[p%2][product_index(i/BN,i%BN)];
       }
       arrive(&s.product_free[p%2]);
     }
@@ -129,8 +135,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       if(i<Elements){
         float p1=values[0][j],p2=values[1][j],p3=values[2][j],p4=values[3][j],p5=values[4][j],p6=values[5][j],p7=values[6][j];
         float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6),u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
-        int mn=GMMA::CLayout_64x32{}(i%128,i/128);
-        int row=m0+mn%64,col=n0+mn/64;
+        int row=m0+i/BN,col=n0+i%BN;
         D[row*1024+col]=u1;D[row*1024+col+512]=__fadd_rn(u4,p3);
         D[(row+512)*1024+col]=__fsub_rn(u3,p4);D[(row+512)*1024+col+512]=__fadd_rn(u3,p5);
       }
@@ -154,7 +159,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
       if(p>=2)wait(&s.product_free[p%2],((p-2)/2)%2);
       #pragma unroll
-      for(int j=0;j<16;++j)s.product[p%2][j*128+tid-128]=acc[j];
+      for(int j=0;j<16;++j){
+        int mn=GMMA::CLayout_64x32{}(tid-128,j);
+        s.product[p%2][product_index(mn%64,mn/64)]=acc[j];
+      }
       arrive(&s.product_ready[p%2]);
     }
   }
