@@ -223,6 +223,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 158 | Two-accumulator interleaved K issue with explicit retirement | 0.6338 | 0.017603 | experiment |
 
+| 159 | Reduce CTA threads for dual-accumulator register capacity | 0.8036 | 0.013897 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2074,3 +2076,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Baseline errors preserved and original gates FAIL. No C7515 compiler warning, but launch17.65/17.57us is slower than155 and140. Inspect generated spills before treating independent-accumulator approach exhausted.
 - **Next:** Check resource usage and then target remaining best-kernel wait/descriptor overhead
 - **Archive:** trajectory/20261015_030630_iter-158/
+
+### Iter 159 — Reduce CTA threads for dual-accumulator register capacity
+
+- **Hypothesis:** 512threads allow more registers than80-register768thread dual-accumulator implementation
+- **Changes:** From158 use512threads and352 balanced pack workers, preserving interleaved leaf issue and retirement
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013897 ms; mean speedup=0.8036x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012329 | 0.013709 | 0.8993 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009970 | 0.014085 | 0.7078 | 0.000754626 | 0 |
+
+- **Analysis:** Baseline approximation errors preserved, gates FAIL. Launch13.71/14.09us improves15817.65/17.57 but remains slower than140.158 resource80regs STACK264B shows actual local spill traffic despite LOCAL0 field.
+- **Next:** Test warp-level MMA alternative for small N32 tile, then compare retained low-overhead candidate
+- **Archive:** trajectory/20261015_030754_iter-159/
