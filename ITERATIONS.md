@@ -65,6 +65,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 79 | Four operand slots with a single WGMMA wait per P | 0.4464 | 0.024899 | passed |
 
+| 80 | Store and consume P in native WGMMA fragment order | 0.4634 | 0.024033 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -566,3 +568,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - Occupancy24.93percent limited independently by shared and register capacity; Dense lower occupancy still runs faster. Original performance measurements remain authoritative; NCU durations are diagnostic.
 - Initial lock failure resolved with documented private TMPDIR after checking no concurrent ncu process. Initial NCU-retuned Dense picked the wrong comparison config and was excluded; fixed ids39/21 captured successfully.
 - Details: trajectory/20261014_ncu_iter76/REPORT.md. Optimization remains paused by user.
+
+### Iter 80 — Store and consume P in native WGMMA fragment order
+
+- **Hypothesis:** Consecutive TC lanes writing consecutive floats remove the measured eight-way P shared-store conflict.
+- **Changes:** Use profiled iter76 BK256 baseline; store P at fragment_element*128+tc_thread; CUDA workers consume physical order and map output through CLayout_64x32. Arithmetic and barriers match iter76.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.024033 ms; mean speedup=0.4634x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012250 | 0.023930 | 0.5119 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010013 | 0.024135 | 0.4149 | 2.37136e-06 | 1 |
+
+- **Analysis:** Standard 1024-only BF16 and FP16 benchmark completed; frozen original-input numerical gate checked by harness. NCU shared-conflict verification and independent stress checks follow this commit.
+- **Next:** Confirm P store wavefronts and both shared load/store conflicts with NCU; run fresh-input stress and sanitizers.
+- **Archive:** trajectory/20261014_202938_iter-80/
