@@ -385,6 +385,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 239 | Shared final-C handoff generator escaping failure | 0.0000 | 0.000000 | failed |
 
+| 240 | Bank-swizzled final-C shared handoff and512 float4 copy workers | 0.9984 | 0.011118 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3522,3 +3524,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Build FAILED: generated add.u32 shared-base operand used escaped literal percent56 instead of inline-asm input56. No239 timings or numerical evidence. All2048 lane/j XOR decomposition identities checked by generator.
 - **Next:** Fix the shared-base placeholder escape and benchmark as240
 - **Archive:** trajectory/20261015_052422_iter-239/
+
+### Iter 240 — Bank-swizzled final-C shared handoff and512 float4 copy workers
+
+- **Hypothesis:** Offload global output stores from TC threads while copy workers overlap subsequent leaves
+- **Changes:** Correct239 placeholder; four8KiB output quadrants in shared, one4-arrival barrier per quadrant, bank-XOR stores and float4 copies; same224 numerical operation order;229504B shared
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011118 ms; mean speedup=0.9984x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012246 | 0.011034 | 1.1099 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009935 | 0.011203 | 0.8869 | 0.000754626 | 0 |
+
+- **Analysis:** BF11.0339 FP11.2026us, slower22410.93/11.10us. Expected original errors unchanged, both original gatesFAIL. Extra final-C storage may affect input-side L1; test smaller streaming payload before deciding design.
+- **Next:** Use two final-C slots with warp-aggregated free publication to reclaim16KiB shared without blocking operand retirement
+- **Archive:** trajectory/20261015_052510_iter-240/
