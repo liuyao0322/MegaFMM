@@ -497,6 +497,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 295 | Single release leader on K128 pipeline | 1.0720 | 0.010335 | experiment |
 
+| 296 | Pad transformed workspace plane placement | 1.0728 | 0.010257 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4530,3 +4532,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.37184us FP16 10.29728us do not improve282. Original gatesFAIL unchanged; finite errors. Similar old175 was flat on older K256 architecture; current K128 retest also rejects. No independent certification.
 - **Next:** Test workspace placement padding as a distinct memory request layout direction
 - **Archive:** trajectory/20261015_065920_iter-295/
+
+### Iter 296 — Pad transformed workspace plane placement
+
+- **Hypothesis:** Changing power-of-two inter-plane placement might improve simultaneous TMA request distribution
+- **Changes:** On282 add256bytes padding per S/T plane,4196352B workspace, adjust primary store indices and both transformed tensor-map plane strides consistently
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010257 ms; mean speedup=1.0728x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012254 | 0.010279 | 1.1921 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009758 | 0.010234 | 0.9535 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.27904us FP16 10.23424us are effectively flat versus282; same expected errors and unchanged original FP64 gates FAIL. Padding does not establish an L2 partition benefit. Not selected or independently certified.
+- **Next:** Test current primary thread scheduling, then investigate materially different DSM split-product design
+- **Archive:** trajectory/20261015_070028_iter-296/
