@@ -477,6 +477,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 285 | Single warpgroup elected-thread TMA refill | 0.9954 | 0.011109 | experiment |
 
+| 286 | Two independent operand TMA producers | 1.0587 | 0.010420 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4350,3 +4352,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 11.11744us and FP16 11.10144us regress versus selected266 and candidate282. Finite expected original errors; FP64 gates FAIL. Rejected, no independent certification of this experimental refill protocol.
 - **Next:** Reassess current critical-path evidence and test separate parallel TMA producers on K128
 - **Archive:** trajectory/20261015_064536_iter-285/
+
+### Iter 286 — Two independent operand TMA producers
+
+- **Hypothesis:** Separate LHS and RHS producer warps may overlap issue latency better than serial issuing
+- **Changes:** On282 split producers between tid0 and tid32, ready arrival count2 and per-producer expected transaction bytes, shared consumer release count4 unchanged; each producer waits primary before transformed operands
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010420 ms; mean speedup=1.0587x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012179 | 0.010450 | 1.1654 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009890 | 0.010389 | 0.9519 | 0.000754626 | 0 |
+
+- **Analysis:** FP16 median10.38944us versus282 paired10.2384us regresses. Both original FP64 gates fail unchanged; finite expected errors. No independent certification and no selection.
+- **Next:** Inspect current282 sparse phase diagnostic and test a short first-block-only prefetch
+- **Archive:** trajectory/20261015_064702_iter-286/
