@@ -2392,12 +2392,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   extern __shared__ __align__(128) unsigned char buffer[];
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
-  if(tid==32){
-    asm volatile("prefetch.tensormap [%0]; prefetch.tensormap [%1]; prefetch.tensormap [%2]; prefetch.tensormap [%3];" :: "l"(&amap),"l"(&bmap),"l"(&smap),"l"(&tmap) : "memory");
-  }
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     cutlass::arch::fence_barrier_init();
+    // The producer owns initialization; publish the first raw tile before the
+    // CTA rendezvous. Consumers only inspect its barrier after the rendezvous.
+    TxBarrier::arrive_and_expect_tx(&s.ready[0],2*(ASize+BSize));
+    SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[0],0,s.operand[0],m0,0);
+    SM90_TMA_LOAD_3D::copy(&amap,&s.ready[0],0,s.operand[0]+ASize,0,n0,0);
   }
   __syncthreads();
   constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
@@ -2406,6 +2408,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step);
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
+      if(sequence==0)continue;
       // Raw P1/P2 can run while the primary transforms S/T. This wait
       // guarantees completion and visibility even if no overlap is scheduled.
       if(sequence==4)cudaGridDependencySynchronize();
