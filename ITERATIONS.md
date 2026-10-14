@@ -211,6 +211,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 152 | Position-independent shared swizzle indexing | 0.5016 | 0.022383 | experiment |
 
+| 153 | Correct local P3 P4 accumulator ownership | 0.4981 | 0.022374 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1966,3 +1968,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** INVALID errors unchanged~1.58, so layout correction did not address numerical cause. Timing23.04/21.72us excluded. Investigate raw product accuracy and per-quadrant mismatches before more performance changes.
 - **Next:** Independent raw-product diagnostic without changing production benchmark contract
 - **Archive:** trajectory/20261015_025838_iter-152/
+
+### Iter 153 — Correct local P3 P4 accumulator ownership
+
+- **Hypothesis:** Quadrant-specific diagnostic isolates swapped off-diagonal leaf IDs
+- **Changes:** From152 assign A22*T4 to P4 and S4*B22 to P3, preserving original recombination order
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.022374 ms; mean speedup=0.4981x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_local_transform_64x32x128 v0 | launch | 0.012336 | 0.022937 | 0.5378 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_local_transform_64x32x128 v0 | launch | 0.009997 | 0.021812 | 0.4584 | 0.000754626 | 0 |
+
+- **Analysis:** Fresh original-reference errors now match seven-product baseline exactly; both gates still FAIL. Debug152 D11 D22 bitwise exact and only off-diagonals wrong. Correct153 launch~22.96/21.81us slower than140; need generated-code and local-memory analysis before discarding local fusion.
+- **Next:** Inspect call-stack, spills and shared traffic in correct local-transform kernel
+- **Archive:** trajectory/20261015_025958_iter-153/

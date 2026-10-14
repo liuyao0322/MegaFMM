@@ -141,8 +141,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       for(int p=0;p<7;++p)for(int j=0;j<16;++j)warpgroup_fence_operand(acc[p][j]);
       __syncwarp();if((tid&31)==0)arrive(&s.transform_request);
       wait(&s.transform_ready,q%2);
-      issue_leaf<T>(s.extra_a,b+3*BSize,la,lb,acc[2]);
-      issue_leaf<T>(a+3*ASize,s.extra_b,la,lb,acc[3]);
+      issue_leaf<T>(s.extra_a,b+3*BSize,la,lb,acc[3]);
+      issue_leaf<T>(a+3*ASize,s.extra_b,la,lb,acc[2]);
       issue_leaf<T>(a,b,la,lb,acc[4]);
       issue_leaf<T>(a+ASize,b+BSize,la,lb,acc[5]);
       issue_leaf<T>(a+2*ASize,b+2*BSize,la,lb,acc[6]);
