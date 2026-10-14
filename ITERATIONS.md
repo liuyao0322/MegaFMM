@@ -527,6 +527,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 310 | Linear physical shared offsets for local elementwise transforms | 0.6702 | 0.016567 | experiment |
 
+| 311 | Exclude incorrect K64 local double-buffer candidate | 0.7216 | 0.015338 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4794,3 +4796,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 16.73024 us FP16 16.40288 us, improves309 but remains slower than selected282 and Dense. Original approximate errors unchanged, both original gates fail. Shared-index simplification helps, but one-slot transform and tensor phases remain serialized.
 - **Next:** Test K64 double-buffer local transforms and tensor stages within same shared budget
 - **Archive:** trajectory/20261015_072029_iter-310/
+
+### Iter 311 — Exclude incorrect K64 local double-buffer candidate
+
+- **Hypothesis:** Halving K permits two local operand stages within the same shared budget and overlap of transforms with tensor work
+- **Changes:** BK64 two172160Bshared stages, eight static K phases, per-stage raw/pack/free barriers, producer advances while TC uses prior slot
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.015338 ms; mean speedup=0.7216x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012263 | 0.015509 | 0.7907 | 1.00188e+36 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009896 | 0.015167 | 0.6525 | 1876.35 | 0 |
+
+- **Analysis:** INVALID output: BF16 errors up to1e36 and FP16 around1e3 versus expected.006/.00075; exclude all timing from valid ranking. Compiler phase unused warning indicates raw ready wait may have retained old q modulo2 rather than per-slot phase. No speedup or correctness claim.
+- **Next:** Inspect generated raw wait and stage descriptor offsets; correct phase before evaluating design and reprofile
+- **Archive:** trajectory/20261015_072133_iter-311/
