@@ -83,6 +83,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 88 | Reduce P consumers to five warps while preserving input parallelism | 0.5520 | 0.020125 | passed |
 
+| 89 | Use eight evenly packed P-consumer warps | 0.5673 | 0.019577 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -746,3 +748,19 @@ Original-input FP64 gates, independent72-check stress and final quick memcheck/r
 - **Analysis:** Full 1024 cubed BF16/FP16 benchmark completed; inspect performance and resource changes next
 - **Next:** Compare complete-call latency against87 and check whether recombination or register pressure becomes limiting
 - **Archive:** trajectory/20261014_222749_iter-88/
+
+### Iter 89 — Use eight evenly packed P-consumer warps
+
+- **Hypothesis:** 256 consumer threads divide2048 exactly and keep row-XOR offsets regular across chunks, avoiding tails and reducing address work
+- **Changes:** Increase Consumers160->256 while preserving512 transform threads, unchanged TC/TMA paths and original arithmetic
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.019577 ms; mean speedup=0.5673x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012241 | 0.019487 | 0.6282 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009958 | 0.019666 | 0.5064 | 2.37136e-06 | 1 |
+
+- **Analysis:** Full 1024 cubed BF16/FP16 benchmark completed; compare against87 and the five-warp failed-performance candidate88
+- **Next:** Retain only with complete-call improvement; next investigate vectorized input transformation based on the measured4us phase
+- **Archive:** trajectory/20261014_223048_iter-89/
