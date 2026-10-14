@@ -543,6 +543,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 318 | K64 sixteen-slot five-product pipeline build attempt | 0.0000 | 0.000000 | experiment |
 
+| 319 | K64 sixteen-slot transformed-product pipeline | 0.6481 | 0.016822 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4934,3 +4936,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Build failed; no runtime or precision result is valid for this candidate. Diagnose the archived compiler errors before another formal iteration. Iter317 NCU independently reports 106 registers, zero local sectors, 1.328M instructions and long-scoreboard/issue ratio 2.56, versus selected282 approximately 1.1; fewer barrier stalls did not improve latency.
 - **Next:** Read compiler diagnostics and fix K64 static operand indices or layout constraints, then benchmark as a new iteration
 - **Archive:** trajectory/20261015_073407_iter-318/
+
+### Iter 319 — K64 sixteen-slot transformed-product pipeline
+
+- **Hypothesis:** Sixteen K64 operand slots can hold three five-product groups and reduce transformed supply gaps
+- **Changes:** Fix K64 inline-assembly output operand base from22 to14; retain eight raw K blocks per P1/P2 and five persistent transformed products over eight K blocks
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.016822 ms; mean speedup=0.6481x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012282 | 0.016932 | 0.7254 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009541 | 0.016713 | 0.5709 | 0.000754626 | 0 |
+
+- **Analysis:** Full formal benchmark completed; use archived results.csv for latency and numerical verdict. This tests a deeper prefetch window with more block handshakes and does not by itself establish a retained gain. Original FP64 gate requirements remain unchanged.
+- **Next:** Inspect formal results and test rolling wait4 retirement from K128317 to release the oldest slot promptly while keeping four independent transformed groups in flight
+- **Archive:** trajectory/20261015_073447_iter-319/
