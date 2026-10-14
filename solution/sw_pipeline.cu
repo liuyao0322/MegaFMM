@@ -32,15 +32,6 @@ __device__ void wait(const uint64_t* b,int phase) {
 __device__ void arrive(const uint64_t* b) {
   asm volatile("" ::: "memory"); Barrier::arrive(b);
 }
-// One release/acquire per warp, with warp synchronization carrying all lane writes.
-__device__ void warp_arrive(const uint64_t* b) {
-  __syncwarp();
-  if((threadIdx.x%32)==0)arrive(b);
-}
-__device__ void warp_wait(const uint64_t* b,int phase) {
-  if((threadIdx.x%32)==0)wait(b,phase);
-  __syncwarp();asm volatile("" ::: "memory");
-}
 __device__ void workers_sync() { asm volatile("bar.sync 1, 96;" ::: "memory"); }
 
 template<class T> __device__ float left_operand(Shared<T>& s,int bank,int p,int i) {
@@ -86,19 +77,19 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x;
   int m0=blockIdx.y*BM,n0=blockIdx.x*BN;
-  // Canonical interleaved layout avoids incompatible K-subtile swizzle origins.
+  // Each K=16 subtile has an independently aligned 32-byte swizzle origin.
   // Shared addresses are obtained from these exact layouts on both sides.
-  constexpr auto la=tile_to_shape(GMMA::Layout_K_INTER_Atom<T>{},Shape<_64,_32>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_K_INTER_Atom<T>{},Shape<_32,_32>{});
+  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW32_Atom<T>{},Shape<_64,_32>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW32_Atom<T>{},Shape<_32,_32>{});
   if(tid==0) {
     for(int j=0;j<2;++j) {
       Barrier::init(&s.raw_ready[j],1);
-      Barrier::init(&s.raw_free[j],3);
-      Barrier::init(&s.op_ready[j],3);
-      Barrier::init(&s.op_free[j],4);
+      Barrier::init(&s.raw_free[j],96);
+      Barrier::init(&s.op_ready[j],96);
+      Barrier::init(&s.op_free[j],128);
     }
-    Barrier::init(&s.product_ready,4);
-    Barrier::init(&s.product_free,3);
+    Barrier::init(&s.product_ready,128);
+    Barrier::init(&s.product_free,96);
     cutlass::arch::fence_barrier_init();
   }
   for(int i=tid;i<4*Elements;i+=256) (&s.output[0][0])[i]=0;
@@ -122,7 +113,7 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
     int worker=tid-32;
     for(int q=0;q<16;++q) {
       int bank=q%2;
-      warp_wait(&s.raw_ready[bank],(q/2)%2);
+      wait(&s.raw_ready[bank],(q/2)%2);
       for(int i=worker;i<ASize;i+=96) {
         float a11=float(s.raw[bank][i]),a12=float(s.raw[bank][ASize+i]);
         float a21=float(s.raw[bank][2*ASize+i]),a22=float(s.raw[bank][3*ASize+i]);
@@ -142,7 +133,7 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
       workers_sync();
       for(int p=0;p<7;++p) {
         int sequence=q*7+p,slot=sequence%2;
-        if(sequence>=2)warp_wait(&s.op_free[slot],((sequence-2)/2)%2);
+        if(sequence>=2)wait(&s.op_free[slot],((sequence-2)/2)%2);
         T* op=s.operand[slot];
         for(int i=worker;i<ASize;i+=96) {
           float v=left_operand(s,bank,p,i);T hi=T(v),lo=T(__fsub_rn(v,float(hi)));
@@ -155,10 +146,10 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
           op[2*ASize+offset]=hi;op[2*ASize+BSize+offset]=lo;
         }
         asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
-        warp_arrive(&s.op_ready[slot]);
+        arrive(&s.op_ready[slot]);
       }
-      warp_arrive(&s.raw_free[bank]);
-      warp_wait(&s.product_ready,q%2);
+      arrive(&s.raw_free[bank]);
+      wait(&s.product_ready,q%2);
       for(int i=worker;i<Elements;i+=96) {
         float p1=s.product[0][i],p2=s.product[1][i],p3=s.product[2][i];
         float p4=s.product[3][i],p5=s.product[4][i],p6=s.product[5][i],p7=s.product[6][i];
@@ -169,7 +160,7 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
         s.output[2][i]=__fadd_rn(s.output[2][i],__fsub_rn(u3,p4));
         s.output[3][i]=__fadd_rn(s.output[3][i],__fadd_rn(u3,p5));
       }
-      warp_arrive(&s.product_free);
+      arrive(&s.product_free);
     }
     for(int i=worker;i<Elements;i+=96) {
       int row=m0+i/BN,col=n0+i%BN;
@@ -180,10 +171,10 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
     }
   } else if(tid>=128) {
     for(int q=0;q<16;++q) {
-      if(q)warp_wait(&s.product_free,(q-1)%2);
+      if(q)wait(&s.product_free,(q-1)%2);
       for(int p=0;p<7;++p) {
         int sequence=q*7+p,slot=sequence%2;
-        warp_wait(&s.op_ready[slot],(sequence/2)%2);
+        wait(&s.op_ready[slot],(sequence/2)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto al=make_tensor(make_smem_ptr(op+ASize),la);
@@ -201,9 +192,9 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
           int mn=GMMA::CLayout_64x32{}(tid-128,j);
           s.product[p][(mn%64)*BN+mn/64]=acc[j];
         }
-        warp_arrive(&s.op_free[slot]);
+        arrive(&s.op_free[slot]);
       }
-      warp_arrive(&s.product_ready);
+      arrive(&s.product_ready);
     }
   }
   __syncthreads();
