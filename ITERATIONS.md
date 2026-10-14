@@ -347,6 +347,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 220 | Low32-only static GMMA descriptor updates | 1.1052 | 0.011238 | experiment |
 
+| 221 | Fully constant validated shared descriptor start fields | 0.9964 | 0.011215 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3184,3 +3186,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 11.0483us is flat versus218. FP16 Dense groups vary12.8291 to10.0912us while SW11.40-11.50us: reported median speedup is misleading under this unstable capture and is NOT a Dense win. Expected finite errors, both original accuracy gates FAIL. Need SASS verification and fresh stable paired timing.
 - **Next:** Inspect actual lowering and GPU state; reject unstable speedup evidence, then compare220 versus218 with current tuned Dense
 - **Archive:** trajectory/20261015_044812_iter-220/
+
+### Iter 221 — Fully constant validated shared descriptor start fields
+
+- **Hypothesis:** Constant shared starts let ptxas fold slot/K descriptor additions rather than moving low32 values through lane registers
+- **Changes:** From218 replace only CuTe start fields with queried validated1024B driver reservation; host checks static shared0 and reserved1024; keep metadata from canonical CuTe layout
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011215 ms; mean speedup=0.9964x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012350 | 0.011181 | 1.1046 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009992 | 0.011248 | 0.8883 | 0.000754626 | 0 |
+
+- **Analysis:** Finite expected approximate errors and both original gates FAIL. BF16 11.1811us FP16 11.2483us slower than218.220 paired11.0174/11.3430us versus21810.9882/11.1394us; low32 lowered instruction count but raised64to80regs and moreR2UR, so not adopted. No stable FP16Dense win.
+- **Next:** Reassess source-specific static-chain supply and transform latency, then test early input-word preloading instead of further descriptor arithmetic changes
+- **Archive:** trajectory/20261015_045038_iter-221/
