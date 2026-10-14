@@ -207,6 +207,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 150 | Multicast A across adjacent output CTAs | 0.7559 | 0.014813 | experiment |
 
+| 151 | Local shared transforms and seven persistent register accumulators | 0.4998 | 0.022367 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1930,3 +1932,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Numerical baseline errors reproduced and original gates FAIL. Full launch14.67/14.95us regresses from140, cluster coordination overwhelms saved A reads. No bandwidth-floor claim: best140 L2 throughput~50percent.
 - **Next:** Re-profile best kernel and inspect remaining launch/role completion limits
 - **Archive:** trajectory/20261015_025403_iter-150/
+
+### Iter 151 — Local shared transforms and seven persistent register accumulators
+
+- **Hypothesis:** Eliminate global S T publication and product shared exchange while halving raw input traffic
+- **Changes:** Four raw quadrants in two K128 shared slots plus A22 B22 backup;224 CUDA workers transform shared in place; TC keeps seven accumulator tiles and issues two then five groups; single ordinary launch
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.022367 ms; mean speedup=0.4998x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_local_transform_64x32x128 v0 | launch | 0.012443 | 0.022893 | 0.5435 | 1.58558 | 0 |
+| 1024,1024,1024 | fp16 | sw_local_transform_64x32x128 v0 | launch | 0.009959 | 0.021841 | 0.4560 | 1.58553 | 0 |
+
+- **Analysis:** INVALID numerical eF~1.58 for both dtypes, timing22.90/21.84us is not valid performance evidence. No C7515 warnings observed. Must diagnose local transform or accumulator layout before evaluating direction.
+- **Next:** Check shared vector layout and in-place transform race with independent product validation
+- **Archive:** trajectory/20261015_025705_iter-151/
