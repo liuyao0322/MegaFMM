@@ -355,6 +355,34 @@ template<class T> __device__ __forceinline__ void mma_product(Shared<T>& s,int s
  }
 }
 
+template<int Step> __device__ __forceinline__ void recombine_fragment(int tid,int m0,int n0,float* D,float (&first)[16],float (&second)[16],float (&acc)[16]){
+ using namespace cute;
+      #pragma unroll
+      for(int j=0;j<8;++j){
+        int v=2*j;
+        int mn=GMMA::CLayout_64x32{}(tid-128,v);
+        int at=(m0+mn%64)*1024+n0+mn/64;
+        float2 out;
+        #pragma unroll
+        for(int lane=0;lane<2;++lane){
+          int i=v+lane;
+          float value=0;
+          if(Step==0)first[i]=acc[i];
+          else if(Step==1)value=__fadd_rn(first[i],acc[i]);
+          else if(Step==2)first[i]=__fadd_rn(first[i],acc[i]);
+          else if(Step==3)second[i]=__fadd_rn(first[i],acc[i]);
+          else if(Step==4){value=__fadd_rn(second[i],acc[i]);first[i]=__fadd_rn(first[i],acc[i]);}
+          else if(Step==5)value=__fadd_rn(first[i],acc[i]);
+          else value=__fsub_rn(second[i],acc[i]);
+          if(lane==0)out.x=value;else out.y=value;
+        }
+        if(Step==1)*reinterpret_cast<float2*>(D+at)=out;
+        else if(Step==4)*reinterpret_cast<float2*>(D+at+512*1024+512)=out;
+        else if(Step==5)*reinterpret_cast<float2*>(D+at+512)=out;
+        else if(Step==6)*reinterpret_cast<float2*>(D+at+512*1024)=out;
+      }
+}
+
 template<class T> __global__ __launch_bounds__(Threads,1)
 void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
                          const __grid_constant__ CUtensorMap bmap,
@@ -450,30 +478,16 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int step=0;step<7;++step){
       float acc[16];
       mma_product(s,step,acc);
-      #pragma unroll
-      for(int j=0;j<8;++j){
-        int v=2*j;
-        int mn=GMMA::CLayout_64x32{}(tid-128,v);
-        int at=(m0+mn%64)*1024+n0+mn/64;
-        float2 out;
-        #pragma unroll
-        for(int lane=0;lane<2;++lane){
-          int i=v+lane;
-          float value=0;
-          if(step==0)first[i]=acc[i];
-          else if(step==1)value=__fadd_rn(first[i],acc[i]);
-          else if(step==2)first[i]=__fadd_rn(first[i],acc[i]);
-          else if(step==3)second[i]=__fadd_rn(first[i],acc[i]);
-          else if(step==4){value=__fadd_rn(second[i],acc[i]);first[i]=__fadd_rn(first[i],acc[i]);}
-          else if(step==5)value=__fadd_rn(first[i],acc[i]);
-          else value=__fsub_rn(second[i],acc[i]);
-          if(lane==0)out.x=value;else out.y=value;
-        }
-        if(step==1)*reinterpret_cast<float2*>(D+at)=out;
-        else if(step==4)*reinterpret_cast<float2*>(D+at+512*1024+512)=out;
-        else if(step==5)*reinterpret_cast<float2*>(D+at+512)=out;
-        else if(step==6)*reinterpret_cast<float2*>(D+at+512*1024)=out;
+      switch(step){
+       case 0:recombine_fragment<0>(tid,m0,n0,D,first,second,acc);break;
+       case 1:recombine_fragment<1>(tid,m0,n0,D,first,second,acc);break;
+       case 2:recombine_fragment<2>(tid,m0,n0,D,first,second,acc);break;
+       case 3:recombine_fragment<3>(tid,m0,n0,D,first,second,acc);break;
+       case 4:recombine_fragment<4>(tid,m0,n0,D,first,second,acc);break;
+       case 5:recombine_fragment<5>(tid,m0,n0,D,first,second,acc);break;
+       case 6:recombine_fragment<6>(tid,m0,n0,D,first,second,acc);break;
       }
+
     }
   }
   // CTA shared storage survives until all role threads return.

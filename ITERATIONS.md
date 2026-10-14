@@ -311,6 +311,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 202 | TC register recombination with private PTX product accumulators | 0.5977 | 0.018628 | experiment |
 
+| 203 | Hoist register recombination dispatch out of fragment loop | 0.8443 | 0.013143 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2854,3 +2856,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Build emits no C7515 warning, finite expected numerical errors; both original gates fail. BF16 18.522 us and FP16 18.733 us versus Dense12.263/9.990 us; slower than162. Need inspect resource/spill/issue before attributing cause.
 - **Next:** Inspect202 SASS and NCU, then specialize static product lifetimes or reject direct register path
 - **Archive:** trajectory/20261015_040634_iter-202/
+
+### Iter 203 — Hoist register recombination dispatch out of fragment loop
+
+- **Hypothesis:** One uniform product switch removes repeated per-fragment control flow without unrolling the MMA product loop
+- **Changes:** Template-specialized recombination per step, dispatched once after private PTX product completion; same768threads,608pack workers and196736Bshared
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013143 ms; mean speedup=0.8443x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012184 | 0.013095 | 0.9304 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009999 | 0.013190 | 0.7581 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 13.095 us and FP16 13.190 us versus Dense12.184/9.999 us, much better than202 but slower than162. Finite unchanged approximate errors, gates fail. Full202NCU80regs,8Bstack,~6144local-load/~2048local-store sectors and3.638Minstructions; large branch/reconvergence instruction counts. Cluster201 NCU LaunchFailed: exclude nan counters.
+- **Next:** Test a single complete TC PTX block with static leaf schedule and direct register recombination to remove remaining product dispatch and alias state
+- **Archive:** trajectory/20261015_040754_iter-203/
