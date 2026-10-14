@@ -12,6 +12,7 @@ namespace megafmm::detail {
 namespace {
 constexpr int BM=64,BN=32,BK=256,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
 constexpr int Plane=512*512,Threads=512;
+constexpr int Consumers=160;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -75,7 +76,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.low_ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
+    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],Consumers);}
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -140,16 +141,16 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         SM90_TMA_LOAD_3D::copy(&tmap,&s.low_ready[slot],0,op+2*ASize+BSize,n0,k0,plane+1);
       }
     }
-  }else if((tid>=32 && tid<128) || tid>=256){
+  }else if((tid>=32 && tid<128) || (tid>=256 && tid<Consumers+160)){
     int worker=tid>=256 ? tid-160:tid-32;
-    constexpr int Chunks=(Elements+351)/352;
+    constexpr int Chunks=(Elements+Consumers-1)/Consumers;
     float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
     for(int step=0;step<7;++step){
       wait(&s.product_ready[step%2],(step/2)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*352;
+        int i=worker+j*Consumers;
         if(i<Elements)current[j]=s.product[step%2][product_index(i/BN,i%BN)];
       }
       // Release shared P immediately after reading; arithmetic/global stores can
@@ -157,7 +158,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       arrive(&s.product_free[step%2]);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*352;
+        int i=worker+j*Consumers;
         if(i<Elements){
           int at=(m0+i/BN)*1024+n0+i%BN;
           if(step==0)first[j]=current[j]; // P1

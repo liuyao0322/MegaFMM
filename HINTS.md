@@ -124,3 +124,8 @@ the user's requests in this conversation:
 - NCU current R2UR178944/dtype (82.03% below85), real64x32WGMMA245760 unchanged; dynamic instructions4673556/4681806, registers79, local/stack0, oneCTA/SM; allP instructions1-way0excess. Staged barriers also changed code generation; do not attribute the entire gain only to TMA overlap.
 - TC cumulative operand wait (high+low)2.95->2.368us versus86; issue~6.8us, explicitwait0~0.96us, TCloop11.744us. These diagnostic medians have unlocked-clock and trace perturbation limits; issue includes asynchronous execution overlap.
 - Original FP64 gates,72-check stress and quick memcheck/racecheck/synccheck all pass. Formal SW19.316/19.283us versus Dense12.303/9.949us, still slower. Auto remains Dense. Final evidence: trajectory/20261014_validation-iter87-staged-ready/REPORT.md; bounded approved experiments complete, indefinite goal remains paused.
+
+## Latest request: continue profiling and optimization from iter87
+
+- User explicitly requested continued profiling and optimization. Continue from validated iter87, keeping1024^3 BF16/FP16, original-input FP64 gates, full-call timing and Auto=Dense until acceptance.
+- Re-profile the current critical path before new candidates; investigate consumer polling/warp allocation and remaining producer waits with one change per iteration. Preserve failed candidates and validate retained synchronization changes independently.

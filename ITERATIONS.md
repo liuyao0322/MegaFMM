@@ -81,6 +81,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 87 | Publish high operands before residual operands | 0.5764 | 0.019300 | passed |
 
+| 88 | Reduce P consumers to five warps while preserving input parallelism | 0.5520 | 0.020125 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -728,3 +730,19 @@ Current iter85 passes original-input FP64 gates, independent72-check launch/Grap
 
 Retain iter87 (c9380c3). Fixed slots cut R2UR995968->487424/dtype; staged readiness further changes generated-code reuse to178944. RealWGMMA245760/dtype unchanged. Three-version A/B/C/C/B/A comparison against85: launch6.32%BF16/6.76%FP16 lower; Graph7.43%/8.74% lower. Against86: launch5.61%/5.79%, Graph4.74%/5.02% lower. Operand cumulative waits(high+low)~2.95->2.37us; TCloop~12.4->11.74us. Do not attribute all gains to TMA overlap because generated descriptor instructions changed too.
 Original-input FP64 gates, independent72-check stress and final quick memcheck/racecheck/synccheck pass. Formal SW19.316/19.283us versus tunedDense12.303/9.949us; Auto remains Dense. Registers79,local/stack0,shared213120,allPSTS/LDS1-way0excess. Scope1024^3 only. [Final iter87 report](trajectory/20261014_validation-iter87-staged-ready/REPORT.md), [iter86 report](trajectory/20261014_validation-iter86-fixed-slots/REPORT.md). The two approved experiments are complete.
+
+### Iter 88 — Reduce P consumers to five warps while preserving input parallelism
+
+- **Hypothesis:** The producer reaches its final barrier without waiting for recombination; fewer polling consumer warps may reduce scheduling pressure
+- **Changes:** Use160 P-consumer threads and adjust chunk distribution/free-barrier arrivals; keep512 input-transform threads and unchanged TC/TMA roles
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.020125 ms; mean speedup=0.5520x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012262 | 0.020168 | 0.6080 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009960 | 0.020081 | 0.4960 | 2.37136e-06 | 1 |
+
+- **Analysis:** Full 1024 cubed BF16/FP16 benchmark completed; inspect performance and resource changes next
+- **Next:** Compare complete-call latency against87 and check whether recombination or register pressure becomes limiting
+- **Archive:** trajectory/20261014_222749_iter-88/
