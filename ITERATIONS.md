@@ -345,6 +345,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 219 | Nine K128 operand slots after eliminating shared P | 0.9559 | 0.011650 | experiment |
 
+| 220 | Low32-only static GMMA descriptor updates | 1.1052 | 0.011238 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3166,3 +3168,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 11.5850us FP16 11.7142us slower than218. Finite expected seven-product errors and original gates FAIL.218 independent72checks,all3sanitizers,256two-stream launches pass; paired launch21811.01584/11.11312us beats16211.34032/11.51552us, while still slower than FP16Dense.
 - **Next:** Return218 geometry and test low32-only static descriptor updates identified from full SASS evidence
 - **Archive:** trajectory/20261015_044727_iter-219/
+
+### Iter 220 — Low32-only static GMMA descriptor updates
+
+- **Hypothesis:** Avoid high-word carry and zero-immediate materialization in218 static descriptor chain
+- **Changes:** Split canonical descriptors into low/high words; add slot and K offsets only to low32; preserve high metadata and all arithmetic
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011238 ms; mean speedup=1.1052x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012442 | 0.011048 | 1.1261 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012391 | 0.011427 | 1.0843 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 11.0483us is flat versus218. FP16 Dense groups vary12.8291 to10.0912us while SW11.40-11.50us: reported median speedup is misleading under this unstable capture and is NOT a Dense win. Expected finite errors, both original accuracy gates FAIL. Need SASS verification and fresh stable paired timing.
+- **Next:** Inspect actual lowering and GPU state; reject unstable speedup evidence, then compare220 versus218 with current tuned Dense
+- **Archive:** trajectory/20261015_044812_iter-220/
