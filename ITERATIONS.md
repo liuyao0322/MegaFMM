@@ -325,6 +325,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 209 | Local in-place transforms with FP32 partial leaves | 0.5431 | 0.020465 | experiment |
 
+| 210 | Move C21 store before final P5 update | 0.5475 | 0.020332 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2986,3 +2988,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Build succeeds but numerical error about0.865 for both dtypes, far above expected seven-product error. This is an implementation error, not the accepted approximation. All20us timings excluded from performance comparison pending correction.
 - **Next:** Diagnose quadrant-specific failure and shared live-range ordering, correct before judging the architecture
 - **Archive:** trajectory/20261015_042205_iter-209/
+
+### Iter 210 — Move C21 store before final P5 update
+
+- **Hypothesis:** Write C21 while u3 is live to avoid incorrect final register reuse observed in iteration209 SASS
+- **Changes:** Local shared transforms with seven partial products; write C21 immediately after P7 and before P5 changes u4
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.020332 ms; mean speedup=0.5475x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012324 | 0.020487 | 0.6016 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009956 | 0.020177 | 0.4934 | 0.000754626 | 0 |
+
+- **Analysis:** Benchmark completed; numerical validity and performance will be reviewed from archived results. This candidate is not selected until the expected seven-product error and independent comparison are confirmed.
+- **Next:** Inspect numerical results, independently compare all quadrants, then profile or reject the local-transform architecture
+- **Archive:** trajectory/20261015_042831_iter-210/
