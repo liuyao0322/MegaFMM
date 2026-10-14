@@ -505,6 +505,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 299 | Reject clustered N64 split4plus3 leaf chain | 0.6895 | 0.015960 | experiment |
 
+| 300 | Reject first-K128-only raw prefetch | 1.0598 | 0.010406 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4600,3 +4602,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 16.02176 us and FP16 15.89792 us versus Dense12.16608/9.85024 us, much slower than selected282. Finite original errors unchanged and both original gates fail. Cluster scheduling, barrier, DSM and resources need profiling before another split variant; no speed win.
 - **Next:** Profile cluster resources and return to noncluster supply latency with only first-block input prefetch
 - **Archive:** trajectory/20261015_070759_iter-299/
+
+### Iter 300 — Reject first-K128-only raw prefetch
+
+- **Hypothesis:** Two first-block prefetch requests avoid the excessive initialization delay of iteration283 full raw prefetch
+- **Changes:** Selected282 plus warp1 prefetch of P1 first B and A block only before CTA initialization barrier
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010406 ms; mean speedup=1.0598x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012276 | 0.010447 | 1.1751 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009788 | 0.010364 | 0.9444 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.44672 us and FP16 10.36448 us versus Dense12.27616/9.78848 us; no improvement over282. All original errors unchanged and both gates fail. Raw Dense BF16 group2 35.0896us outlier retained. Cluster299 NCU shows124regs versus60 but zero local sectors; lower dynamic instructions did not reduce time, so no cluster speed claim.
+- **Next:** Review history and current profiles; investigate primary geometry and reduced-stage supply separately
+- **Archive:** trajectory/20261015_070850_iter-300/
