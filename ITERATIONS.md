@@ -173,6 +173,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 133 | Pair-preserving swizzle for64-bit P exchange | 0.8902 | 0.012504 | experiment |
 
+| 134 | Warp-leader product barrier publication and release | 0.8916 | 0.012520 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1624,3 +1626,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 132 vectorization with scalar swizzle was slightly slower; full133 benchmark archived, original FP64 gates unchanged. Need NCU excessive-wavefront verification.
 - **Next:** Assess bank metrics and complete-call comparison, then tune consumer count or architecture
 - **Archive:** trajectory/20261015_022317_iter-133/
+
+### Iter 134 — Warp-leader product barrier publication and release
+
+- **Hypothesis:** Reduce product barrier atomic arrivals128->4 while warp synchronization preserves store/load ordering
+- **Changes:** From scalar131 use four-arrival P-ready/P-free barriers; sync each participating warp before its lane0 arrives; operand slots unchanged
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012520 ms; mean speedup=0.8916x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012348 | 0.012476 | 0.9897 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009971 | 0.012565 | 0.7935 | 0.000754626 | 0 |
+
+- **Analysis:** 133 vector swizzle preserves errors but no gain; full134 benchmark archived. New synchronization requires stress/sanitizers and fresh launch/Graph checks before retention.
+- **Next:** Compare complete-call timings and verify shared publication ordering
+- **Archive:** trajectory/20261015_022513_iter-134/

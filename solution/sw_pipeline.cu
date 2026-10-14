@@ -29,11 +29,8 @@ __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier:
 __device__ __forceinline__ int product_index(int row,int col){
   // Fragment lanes vary column bits 1,2 and row bits 0,1,2.
   // XOR the latter into column bits 0,3,4, the three remaining bank bits.
-  return row*BN+(col^((row&3)<<3));
+  return row*BN+(col^((row&1)|((row&6)<<2)));
 }
-
-__device__ __forceinline__ float2 add2(float2 a,float2 b){return make_float2(__fadd_rn(a.x,b.x),__fadd_rn(a.y,b.y));}
-__device__ __forceinline__ float2 sub2(float2 a,float2 b){return make_float2(__fsub_rn(a.x,b.x),__fsub_rn(a.y,b.y));}
 
 // Zero-based P IDs. Producer and consumers advance barriers by step, not P ID.
 __device__ constexpr int product_for_step(int step){
@@ -78,7 +75,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
+    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],4);Barrier::init(&s.product_free[j],4);}
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -145,36 +142,34 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }else if((tid>=32 && tid<128) || tid>=256){
     int worker=tid>=256 ? tid-160:tid-32;
     if(worker<128){
-    constexpr int Chunks=(Elements+255)/256;
-    float2 first[Chunks],second[Chunks],current[Chunks];
+    constexpr int Chunks=(Elements+127)/128;
+    float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
     for(int step=0;step<7;++step){
       wait(&s.product_ready[step%2],(step/2)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=2*(worker+j*128);
-        if(i<Elements){
-          int row=i/BN,col=i%BN;
-          float2 v=*reinterpret_cast<const float2*>(&s.product[step%2][product_index(row,col)&~1]);
-          current[j]=v;
-        }
+        int i=worker+j*128;
+        if(i<Elements)current[j]=s.product[step%2][product_index(i/BN,i%BN)];
       }
-      arrive(&s.product_free[step%2]);
+      // Release shared P immediately after reading; arithmetic/global stores can
+      // overlap the Tensor warpgroup's reuse of this slot two steps later.
+      __syncwarp();
+      if((tid&31)==0)arrive(&s.product_free[step%2]);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=2*(worker+j*128);
+        int i=worker+j*128;
         if(i<Elements){
           int at=(m0+i/BN)*1024+n0+i%BN;
-          float2 v=current[j];
-          if(step==0)first[j]=v;
-          else if(step==1)*reinterpret_cast<float2*>(D+at)=add2(first[j],v);
-          else if(step==2)first[j]=add2(first[j],v);
-          else if(step==3)second[j]=add2(first[j],v);
+          if(step==0)first[j]=current[j]; // P1
+          else if(step==1)D[at]=__fadd_rn(first[j],current[j]); // U1
+          else if(step==2)first[j]=__fadd_rn(first[j],current[j]); // U2
+          else if(step==3)second[j]=__fadd_rn(first[j],current[j]); // U3
           else if(step==4){
-            *reinterpret_cast<float2*>(D+at+512*1024+512)=add2(second[j],v);
-            first[j]=add2(first[j],v);
-          }else if(step==5)*reinterpret_cast<float2*>(D+at+512)=add2(first[j],v);
-          else *reinterpret_cast<float2*>(D+at+512*1024)=sub2(second[j],v);
+            D[at+512*1024+512]=__fadd_rn(second[j],current[j]); // D22
+            first[j]=__fadd_rn(first[j],current[j]); // U4
+          }else if(step==5)D[at+512]=__fadd_rn(first[j],current[j]); // D12
+          else D[at+512*1024]=__fsub_rn(second[j],current[j]); // D21
         }
       }
     }
@@ -199,12 +194,12 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
       if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
       #pragma unroll
-      for(int j=0;j<8;++j){
-        int mn=GMMA::CLayout_64x32{}(tid-128,2*j),row=mn%64,col=mn/64;
-        float2 v=make_float2(acc[2*j],acc[2*j+1]);
-        *reinterpret_cast<float2*>(&s.product[step%2][product_index(row,col)&~1])=v;
+      for(int j=0;j<16;++j){
+        int mn=GMMA::CLayout_64x32{}(tid-128,j);
+        s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
       }
-      arrive(&s.product_ready[step%2]);
+      __syncwarp();
+      if((tid&31)==0)arrive(&s.product_ready[step%2]);
     }
   }
   __syncthreads();
