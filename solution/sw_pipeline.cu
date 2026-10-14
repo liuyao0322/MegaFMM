@@ -2695,7 +2695,7 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
     auto bv=reinterpret_cast<const uint32_t*>(B);
     uint32_t abits[4]={av[at/2],av[(at+512)/2],av[(at+512*1024)/2],av[(at+512*1024+512)/2]};
     uint32_t bbits[4]={bv[at/2],bv[(at+512)/2],bv[(at+512*1024)/2],bv[(at+512*1024+512)/2]};
-    float values[8][2];
+    uint32_t words[16]={};
     #pragma unroll
     for(int lane=0;lane<2;++lane){
       float a11=float(T::bitcast(uint16_t(abits[0]>>(16*lane)))),a12=float(T::bitcast(uint16_t(abits[1]>>(16*lane))));
@@ -2708,18 +2708,13 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
       float tv[4]={t1,t2,__fsub_rn(b22,b12),__fsub_rn(t2,b21)};
       #pragma unroll
       for(int j=0;j<4;++j){
-        values[j][lane]=sv[j];
-        values[4+j][lane]=tv[j];
+        T sh=T(sv[j]),th=T(tv[j]);
+        words[2*j]|=uint32_t(sh.raw())<<(16*lane);
+        words[8+2*j]|=uint32_t(th.raw())<<(16*lane);
       }
     }
     #pragma unroll
-    for(int j=0;j<8;++j){
-      uint32_t word;
-      if constexpr(std::is_same_v<T,cute::bfloat16_t>)
-        asm("cvt.rn.bf16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
-      else asm("cvt.rn.f16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
-      reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=word;
-    }
+    for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[2*j];
   }
   asm volatile("fence.proxy.async.global;" ::: "memory");
 }
@@ -2735,6 +2730,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==32){
     asm volatile("prefetch.tensormap [%0]; prefetch.tensormap [%1]; prefetch.tensormap [%2]; prefetch.tensormap [%3];" :: "l"(&amap),"l"(&bmap),"l"(&smap),"l"(&tmap) : "memory");
+    // The raw operands are ready before the primary starts; prefetch data
+    // while the other warp initializes the shared barrier state.
+    for(int p=0;p<2;++p)for(int q=0;q<4;++q){
+      int k0=q*BK;
+      SM90_TMA_LOAD_2D::PREFETCH::copy(&bmap,m0,k0+(p==1?512:0));
+      SM90_TMA_LOAD_3D::PREFETCH::copy(&amap,0,n0,(k0+(p==1?512:0))/64);
+    }
   }
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}

@@ -471,6 +471,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 282 | Packed pair final conversion in primary | 1.0744 | 0.010272 | experiment |
 
+| 283 | Early raw tensor-data prefetch | 0.8701 | 0.012721 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4296,3 +4298,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.32576us and FP16 10.21888us; FP single-run signal improves slightly versus279 but BF regresses. Original FP64 gates unchanged FAIL, no nonfinite. Needs paired comparison and bitwise/sanitizer verification.
 - **Next:** Reassess current counters and test ninth K128 operand slot
 - **Archive:** trajectory/20261015_064102_iter-282/
+
+### Iter 283 — Early raw tensor-data prefetch
+
+- **Hypothesis:** Prefetch raw P1/P2 operands during shared barrier initialization to hide first-block latency
+- **Changes:** Add warp1 TMA L2 tensor prefetches for all eight raw K128 blocks before the initial CTA barrier, retaining descriptor prefetch
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012721 ms; mean speedup=0.8701x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012283 | 0.012713 | 0.9661 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009852 | 0.012728 | 0.7741 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 12.71328us FP16 12.728us regress severely versus279. Extra raw prefetch rejects; original FP64 gates FAIL unchanged. Dense BF43.997us outlier preserved. No claim that increased cache hit alone improves TMA latency.
+- **Next:** Test ninth K128 shared operand slot without extra data prefetch
+- **Archive:** trajectory/20261015_064227_iter-283/
