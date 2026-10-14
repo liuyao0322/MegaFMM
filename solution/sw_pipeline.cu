@@ -2352,7 +2352,6 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
 }
 template<class T> __global__ __launch_bounds__(512,1)
 void sw_transform_pdl(const T* A,const T* B,T* packed){
-  cudaTriggerProgrammaticLaunchCompletion();
   for(int i=2*(blockIdx.x*512+threadIdx.x);i<Plane;i+=2*512*128){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
@@ -2403,9 +2402,6 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step);
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
-      // Raw P1/P2 can run while the primary transforms S/T. This wait
-      // guarantees completion and visibility even if no overlap is scheduled.
-      if(sequence==4)cudaGridDependencySynchronize();
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
@@ -2484,12 +2480,8 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
   CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
   encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
-  cudaLaunchAttribute attribute{};
-  attribute.id=cudaLaunchAttributeProgrammaticStreamSerialization;
-  attribute.val.programmaticStreamSerializationAllowed=1;
   cudaLaunchConfig_t config{};config.gridDim=dim3(16,8);config.blockDim=dim3(Threads);
   config.dynamicSmemBytes=sizeof(Shared<cute::half_t>);config.stream=stream;
-  config.attrs=&attribute;config.numAttrs=1;
   if(state.dtype==DType::BF16){
     sw_transform_pdl<cute::bfloat16_t><<<128,512,0,stream>>>(static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace));
     check(cudaPeekAtLastError(),"SW PDL transform launch");

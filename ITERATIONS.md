@@ -415,6 +415,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 254 | Align producer and compute shared carveout for PDL | 1.0581 | 0.010463 | experiment |
 
+| 255 | Ordinary stream-order control for aligned PDL kernels | 0.8524 | 0.013080 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3792,3 +3794,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 about10.51us vs Dense12.38us; FP16 median10.37568us vs Dense9.79584us. Substantial improvement over25212.2us and selected22411.09FP, though FP still about0.58us short. Original precision gates remainFAIL with expected errors. Nsys252 single-call traces show transform.927/.895us followed by compute10.368/10.688us with1ns gap and no overlap; changed cache preference is a source-supported hypothesis, actual254 overlap still to verify.
 - **Next:** Profile254 actual overlap, measure Graph and pair against224; validate bitwise, sanitizers and concurrent streams before selecting.
 - **Archive:** trajectory/20261015_054917_iter-254/
+
+### Iter 255 — Ordinary stream-order control for aligned PDL kernels
+
+- **Hypothesis:** If PDL concurrency is absent in the observed trace, removing PDL may retain carveout benefit with simpler stream completion.
+- **Changes:** From254 remove primary trigger, secondary grid dependency wait and programmatic stream launch attribute; preserve both kernels,100percent shared preference and arithmetic.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013080 ms; mean speedup=0.8524x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012292 | 0.012938 | 0.9501 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009980 | 0.013222 | 0.7548 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 12.9376 us vs Dense12.2915 us; FP16 13.2218 us vs Dense9.97952 us. Much slower254; PDL remains essential to measured gain even though Nsys254 sample traces show no temporal overlap. Cannot infer actual PDL behavior solely from older Nsight2023.4 activity durations.254 now passed72bitwise162,allthree quicksanitizers including both kernels,256two-stream/Graph launches; paired224vs254 ordinary10.960->10.526BF and11.101->10.443FP, Graph10.560->10.091BF and10.842->10.103FP. Original FP64gatesFAIL.
+- **Next:** Retain254 as validated best; test N64 consumer geometry now transform work is decoupled from compute CTA count.
+- **Archive:** trajectory/20261015_055219_iter-255/
