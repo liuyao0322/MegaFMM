@@ -195,6 +195,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 144 | Statically validated GMMA start fields and partial product unrolling | 0.9607 | 0.011595 | experiment |
 
+| 145 | K512 two-slot asynchronous input publication | 0.8824 | 0.012664 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1822,3 +1824,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 143 eight-slot K128 wait1 regressed~12.01/12.17us; full144 benchmark archived, original gates unchanged. Numerical and SASS validation needed before retention.
 - **Next:** Inspect timing, errors and generated uniform descriptor instructions
 - **Archive:** trajectory/20261015_024310_iter-144/
+
+### Iter 145 — K512 two-slot asynchronous input publication
+
+- **Hypothesis:** Halving K-stage waits with asynchronous packing can reduce leaf critical path
+- **Changes:** From140 K512 and two compact slots; two B TMA256 transfers; publish transformed operands before sequence2
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012664 ms; mean speedup=0.8824x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012338 | 0.012660 | 0.9746 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010011 | 0.012669 | 0.7902 | 0.000754626 | 0 |
+
+- **Analysis:** Numerically matches seven-product baseline, both original gates fail as expected. Launch12.66/12.67us regresses versus14011.42/11.58us; longer stages dominate saved waits.
+- **Next:** Explore clustered wider tiles to reduce seven-product instruction and exchange overhead
+- **Archive:** trajectory/20261015_024706_iter-145/
