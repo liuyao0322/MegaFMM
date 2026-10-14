@@ -77,6 +77,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 85 | Keep upper GMMA descriptor fields invariant | 0.5382 | 0.020929 | passed |
 
+| 86 | Expose fixed operand slot addresses to GMMA lowering | 0.5448 | 0.020372 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -687,3 +689,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 ### Iter83–85 independent validation
 
 Current iter85 passes original-input FP64 gates, independent72-check launch/Graph stress and quick memcheck/racecheck/synccheck. Iter84 build failure is retained and fixed in85. Paired full-call launch improves3.04% BF16/2.13% FP16 versus82; Graph3.47%/1.59%. Versus83, FP16Graph regresses1.20%; gains are small and mode dependent. WGMMA prepare/issue median8.608us->7.776/7.744us; R2UR unchanged, P remains1-way0excess. Dense remains faster and Auto remains Dense. Full evidence: [iter85 report](trajectory/20261014_validation-iter85-descriptors/REPORT.md), [iter83 report](trajectory/20261014_validation-iter83-descriptors/REPORT.md).
+
+### Iter 86 — Expose fixed operand slot addresses to GMMA lowering
+
+- **Hypothesis:** Unrolling the two K blocks exposes static slot offsets and permits descriptor constant folding or uniform reuse
+- **Changes:** Explicitly unroll only the TC two-slot K-block loop; preserve arithmetic and all barriers
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.020372 ms; mean speedup=0.5448x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012261 | 0.020378 | 0.6017 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009938 | 0.020367 | 0.4880 | 2.37136e-06 | 1 |
+
+- **Analysis:** Full 1024 cubed BF16/FP16 benchmark completed; inspect SASS and paired complete-call measurements next
+- **Next:** Measure whether actual R2UR and descriptor preparation decrease before advancing to staged readiness
+- **Archive:** trajectory/20261014_220736_iter-86/

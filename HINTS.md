@@ -112,3 +112,8 @@ the user's requests in this conversation:
 - Against rebuilt iter82, A/B/B/A full-call launch BF16/FP16=21.300/21.311->20.653/20.858us (3.04%/2.13% lower); Graph20.843/20.644->20.120/20.316us (3.47%/1.59%). Against iter83, launch improves1.03%/0.70%, BF16Graph improves0.89%, FP16Graph regresses1.20%; do not claim universal best.
 - PerCTA issue interval8.608/8.608->7.776/7.744us, ready~2.4us, explicitwait0~0.352us. NCU dynamic instructions6119946/6144374->5395148/5419281; R2UR remains995968/dtype. BF16 IMAD.X319488(iter83)->3072(iter85). Registers110,local/stack0,shared213120; allP STS/LDS1-way0excess. No residency increase.
 - Formal launch SW20.847/21.012us vs Dense12.506/10.012us, still slower; Auto remains Dense. Evidence: trajectory/20261014_validation-iter85-descriptors/REPORT.md. This completes the narrow optimization request; indefinite goal remains paused.
+
+## Fixed-slot issue and staged operand readiness — user approved next steps
+
+- User explicitly agreed to the proposed order: first specialize fixed operand slots and descriptor reuse, then try high/low operand staged readiness if the first direction is insufficient. This is a bounded follow-up, not resumption of the paused indefinite goal.
+- Inspect generated SASS before claiming R2UR savings; retain changes only on complete-call comparisons with original FP64 gates. Keep1024^3 BF16/FP16, all arithmetic order, warp roles and P layout. Revalidate independent launch/Graph stress and sanitizers for any retained synchronization change.

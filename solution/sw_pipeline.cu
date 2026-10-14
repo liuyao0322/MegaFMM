@@ -167,6 +167,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int step=0;step<7;++step){
       int p=product_for_step(step);
       float acc[16]={};
+      // Two fixed slots: expose their shared addresses to descriptor lowering.
+      #pragma unroll
       for(int q=0;q<512/BK;++q){
         int sequence=step*(512/BK)+q,slot=sequence%2;
         wait(&s.ready[slot],(sequence/2)%2);
