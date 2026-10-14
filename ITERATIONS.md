@@ -455,6 +455,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 274 | N40 compromise with104 compute CTAs | 1.0531 | 0.010549 | experiment |
 
+| 275 | XOR compute CTA coordinates | 0.8128 | 0.013633 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4152,3 +4154,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通 BF16 10.61152us、FP16 10.4864us，慢于26610.509/10.365us；原三fresh错误一致但未独立边缘验收，原门槛FAIL，不保留。
 - **Next:** 保持N32和128CTA，改变二维CTA映射以分散同时LHS请求，检验首块供数的地址分布敏感性。
 - **Archive:** trajectory/20261015_062952_iter-274/
+
+### Iter 275 — XOR compute CTA coordinates
+
+- **Hypothesis:** 分散相邻CTA同时请求的LHS地址，可能缓解首块供数地址热点。
+- **Changes:** 266基础仅把m tile映射改成block_y XOR block_x低3位；对每个n仍完整双射覆盖8个m tiles，其余配置不变。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013633 ms; mean speedup=0.8128x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012313 | 0.013566 | 0.9076 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009837 | 0.013699 | 0.7181 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通BF16 13.5664us、FP16 13.69888us，大幅退化。原三组fresh eF与基线一致、原门槛FAIL；映射对性能非常敏感，不能把此前低Tensor活跃率直接归结为算力不足。未做新计数器不能确定是L2 locality、代码生成还是别的变化；不保留。
+- **Next:** 保持原CTA映射，测试RHS先于LHS发射的TMA顺序，检验供数指令顺序敏感性。
+- **Archive:** trajectory/20261015_063056_iter-275/
