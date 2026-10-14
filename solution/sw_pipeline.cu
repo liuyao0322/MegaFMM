@@ -2686,10 +2686,10 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
   "}\n"
   : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(uint32_t(__cvta_generic_to_shared(s.free))), "r"(tid&31), "l"(out), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<0>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<0>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<1>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<1>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<2>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<2>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<3>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<3>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<4>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<4>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<5>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<5>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<6>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<6>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<7>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<7>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<8>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<8>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<9>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<9>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<10>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<10>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<11>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<11>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<12>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<12>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<13>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<13>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<14>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<14>{}))/64)*1024)), "n"(4*(int(GMMA::CLayout_64x32{}(0,Int<15>{}))%64+(int(GMMA::CLayout_64x32{}(0,Int<15>{}))/64)*1024)), "n"(int32_t(GMMA::Major::MN)), "n"(int32_t(GMMA::Major::K)) : "memory");}
 }
-template<class T> __global__ __launch_bounds__(1024,1)
+template<class T> __global__ __launch_bounds__(512,1)
 void sw_transform_pdl(const T* A,const T* B,T* packed){
   cudaTriggerProgrammaticLaunchCompletion();
-  for(int i=2*(blockIdx.x*1024+threadIdx.x);i<Plane;i+=2*1024*64){
+  for(int i=2*(blockIdx.x*512+threadIdx.x);i<Plane;i+=2*512*128){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -2788,7 +2788,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
     uint32_t box[4]={64,BN,BK/64,1},element_strides[4]={1,1,1,1};
     auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
         transformed ? 4:3,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
-        CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+        CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_L2_256B,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
     if(result!=CUDA_SUCCESS)throw std::runtime_error("SW A tensor map status "+std::to_string(int(result)));
     return;
   }
@@ -2797,7 +2797,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   uint32_t box[3]={uint32_t(BM),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};
   auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
       transformed ? 3:2,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
-      CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+      CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_L2_256B,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
   if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map status "+std::to_string(int(result)));
 }
 } // namespace
@@ -2835,11 +2835,11 @@ void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,v
   config.dynamicSmemBytes=sizeof(Shared<cute::half_t>);config.stream=stream;
   config.attrs=&attribute;config.numAttrs=1;
   if(state.dtype==DType::BF16){
-    sw_transform_pdl<cute::bfloat16_t><<<64,1024,0,stream>>>(static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace));
+    sw_transform_pdl<cute::bfloat16_t><<<128,512,0,stream>>>(static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace));
     check(cudaPeekAtLastError(),"SW PDL transform launch");
     check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::bfloat16_t>,a,b,s,t,static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace),D),"SW PDL compute launch");
   }else{
-    sw_transform_pdl<cute::half_t><<<64,1024,0,stream>>>(static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace));
+    sw_transform_pdl<cute::half_t><<<128,512,0,stream>>>(static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace));
     check(cudaPeekAtLastError(),"SW PDL transform launch");
     check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::half_t>,a,b,s,t,static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace),D),"SW PDL compute launch");
   }

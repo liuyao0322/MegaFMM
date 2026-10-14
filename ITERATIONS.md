@@ -559,6 +559,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 326 | 64x1024 PDL transform primary with unchanged worker count | 0.9715 | 0.011267 | experiment |
 
+| 327 | TMA 256-byte L2 promotion | 1.0747 | 0.010160 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5078,3 +5080,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal benchmark completed; use archived CSV for timing and numerical verdict.325128x1024 was rejected at BF16/FP16 10.80256/10.56736 us. Neither worker expansion nor prior dual/triple Tensor Core product partition has established a gain over282.
 - **Next:** Inspect326 then investigate current282 TMA L2 promotion or deeper rolling same-accumulator completion with explicit evidence; retain282 unless paired tests establish a gain
 - **Archive:** trajectory/20261015_074321_iter-326/
+
+### Iter 327 — TMA 256-byte L2 promotion
+
+- **Hypothesis:** Promoting TMA fetches to256-byte L2 granularity can improve adjacent tile reuse and reduce operand supply latency
+- **Changes:** Start selected282 and set all four current-pointer tensor maps to CU_TENSOR_MAP_L2_PROMOTION_L2_256B; preserve pipeline, transform, arithmetic and launch geometry
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010160 ms; mean speedup=1.0747x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012182 | 0.010188 | 1.1957 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009662 | 0.010132 | 0.9537 | 0.000754626 | 0 |
+
+- **Analysis:** Benchmark started before interruption and its live session was re-polled to terminal exit2 on continuation. Inspect archived CSV for full-call timing and unchanged original precision gates before selecting anything. No cached input data or reference modifications are introduced.
+- **Next:** Inspect327 result and compare to contemporaneous selected282; continue current supply-path optimization without claiming numerical acceptance
+- **Archive:** trajectory/20261015_074442_iter-327/
