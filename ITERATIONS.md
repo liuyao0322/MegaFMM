@@ -555,6 +555,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 324 | Three Tensor Core groups with shared U2 and U3 chain | 0.9703 | 0.011230 | experiment |
 
+| 325 | One transform pair per thread with128x1024 primary | 1.0228 | 0.010685 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5042,3 +5044,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal benchmark completed and archived; no adoption or synchronization certification is implied.323 raw-balanced dual-group variant was rejected at BF16/FP16 10.60896/10.53824 us, with finite unchanged approximate errors and both original gates failing.
 - **Next:** Inspect324 numerical and timing results, profile current critical waits if finite, then reassess slot distribution or source of remaining supply serialization
 - **Archive:** trajectory/20261015_074035_iter-324/
+
+### Iter 325 — One transform pair per thread with128x1024 primary
+
+- **Hypothesis:** Doubling threads within each primary CTA can reduce transform-loop work and expose earlier PDL readiness without doubling block announcements as301 did
+- **Changes:** Restore selected282; primary128CTAs1024threads, one paired element per thread; secondary kernel and arithmetic unchanged
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010685 ms; mean speedup=1.0228x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012264 | 0.010803 | 1.1353 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009620 | 0.010567 | 0.9103 | 0.000754626 | 0 |
+
+- **Analysis:** Formal benchmark completed; inspect archived CSV for latency and original gates.324 three Tensor Core groups were rejected at BF16/FP16 11.33440/11.12640 us. Full324 NCU64regs, zero local traffic,1.84Minst and long-scoreboard/issue6.1; more parallel groups increased polling/instruction work rather than improving complete latency.
+- **Next:** Inspect325 and test64x1024 primary with the same total workers as282 to distinguish CTA placement and trigger scheduling from worker-count changes
+- **Archive:** trajectory/20261015_074241_iter-325/
