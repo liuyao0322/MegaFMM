@@ -437,6 +437,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 265 | Static TMA producer under PDL | 1.0329 | 0.010662 | experiment |
 
+| 266 | Prefetch current tensor descriptors before init barrier | 1.0529 | 0.010434 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3990,3 +3992,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通BF16 10.6848 us、FP16 10.6400 us，慢于254，Dense12.23584/9.79552 us；原FP64门槛仍FAIL。静态化在新前端下仍无收益，不保留。
 - **Next:** 等当前254稀疏关键块trace完成后，根据首块ready和MMA区间选择新方向。
 - **Archive:** trajectory/20261015_061521_iter-265/
+
+### Iter 266 — Prefetch current tensor descriptors before init barrier
+
+- **Hypothesis:** 稀疏trace首块ready约1.024us，提前预取四个当前descriptor可能覆盖首次TMA元数据延迟。
+- **Changes:** 254基础在warp1的leader、CTA初始化barrier前发出四条prefetch.tensormap；数据TMA与算术顺序不变。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010434 ms; mean speedup=1.0529x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012235 | 0.010536 | 1.1613 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009758 | 0.010333 | 0.9444 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通BF16 10.53568 us、FP16 10.3328 us，FP较254约1percent潜在小收益，BF相近；Dense12.2352/9.7584us，未超过FP Dense。尚未成对独立确认，不宣称新winner。原门槛FAIL。264至266无3percent改进；当前254新稀疏trace72regs比base60高，stack0但未测local动态；120最终输出逐位一致。普通首raw块ready/issue/drain约1.024/.192/.128us，首变换块.256/.192/.096，尾块.128/.160/.096，仅诊断，不等同完整性能。
+- **Next:** 结合trace及PTX barrier初始化规则，尝试在首次CTA barrier前发出第一组raw TMA，覆盖部分初始化开销。
+- **Archive:** trajectory/20261015_061656_iter-266/
