@@ -1,0 +1,16 @@
+from pathlib import Path
+import subprocess
+s=Path('results/opt_goal/static218/generate.py').read_text()
+s=s.replace("s=subprocess.check_output(['git','show','1f1fb61:solution/sw_pipeline.cu'],text=True)","s=subprocess.check_output(['git','show','1f1fb61:solution/sw_pipeline.cu'],text=True)\ns=s.replace('BN=32','BN=64').replace('Stages=4','Stages=3').replace('Threads=768','Threads=1024').replace('grid(16,8)','grid(8,8)').replace('Plane/(16*8)','Plane/(8*8)').replace('pack_ready,608','pack_ready,736').replace('local+=2*608','local+=2*736').replace('80000000u-127u','80000000u-63u').replace('Count<128','Count<64').replace('s.free[j],4','s.free[j],8')")
+s=s.replace('slot=seq%4;phase=seq//4%2','slot=seq%3;phase=seq//3%2').replace('slot*3072','slot*4096')
+exec(compile(s,'dual242-generator','exec'))
+p=Path('solution/sw_pipeline.cu');s=p.read_text()
+s=s.replace('Layout_K_SW128_Atom<T>{},Shape<_32,Int<BK>>','Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>')
+s=s.replace('CLayout_64x32{}(tid-128,0)','CLayout_64x32{}((tid-128)%128,0)')
+s=s.replace('float* out=D+(n0+mn/64)','float* out=D+(n0+((tid-128)/128)*32+mn/64)')
+s=s.replace('uint64_t(db_tiles(0,0,0))','uint64_t(db_tiles(0,(tid-128)/128,0))')
+s=s.replace('|| tid>=256','|| tid>=384').replace('tid>=256 ? tid-160','tid>=384 ? tid-288').replace('tid<256','tid<384')
+s=s.replace('Count<128','Count<64')
+p.write_text(s)
+p=Path('solution/plan.cpp');s=p.read_text().replace('4wgmma+19pack_only','8wgmma+23pack_only').replace('operand_stages=4','operand_stages=3').replace('bk=256','bk=256;tile=64x64;compute_ctas=64;rhs_subtiles=2;shared_lhs=1');p.write_text(s)
+Path('solution/internal.h').write_text(subprocess.check_output(['git','show','62142fc:solution/internal.h'],text=True))

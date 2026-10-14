@@ -3,26 +3,29 @@
 H100 上 Strassen–Winograd 矩阵乘法的研究工程。2026-10-14 按用户要求移除旧
 SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的首版。
 
-**当前保留 iter162（d8e6261）的七乘法、无补偿实验内核。持续优化目标尚未完成。**
-迭代至208后原样恢复162，最新1024³同期交错普通调用：BF16/FP16 SW约 **11.325/11.520 μs**，
-调优 Dense约 **12.300/9.925 μs**。BF16加速比1.086×；FP16仍慢约16.1%，还需减少约1.596 μs。
-历史162配对Graph：SW约10.959/11.164 μs，Dense约11.263/9.505 μs；208未重测Graph。
+**当前保留 iter224（62142fc）的七乘法、无补偿实验内核。持续优化目标尚未完成。**
+迭代至248后原样恢复224，最新1024³同期交错普通调用：BF16/FP16 SW约 **10.978/11.090 μs**，
+调优 Dense约 **12.275/9.975 μs**。BF16加速比1.118×；FP16仍慢约11.17%，还需减少约1.115 μs（SW时间的10.05%）。
+单独Graph复测：SW约 **10.511/10.877 μs**，Dense约 **11.368/9.441 μs**；Graph不替代普通调用目标。
 
 **两种输入仍未通过原始精度门槛**：BF16 eF约0.0060152，FP16约0.000754626。
 `Auto` 和 `Dense` 继续普通调优 cuBLASLt GEMM；当前 SW 必须显式指定。
 
-[当前持续优化检查点（165–208，目标仍在进行）](trajectory/20261015_optimization-goal-checkpoint-208/REPORT.md)
+[当前持续优化检查点（209–248，目标仍在进行）](trajectory/20261015_optimization-goal-checkpoint-248/REPORT.md)
+
+[此前165–208检查点](trajectory/20261015_optimization-goal-checkpoint-208/REPORT.md)
 
 [此前性能配对与完整独立验证（109–162）](trajectory/20261015_optimization-goal-checkpoint/REPORT.md)
 
-当前实现使用4 MiB调用方 workspace、213120B动态 shared 和四个 BK256 operand slots。
-128个 CTA，每 CTA768线程：1个 TMA warp、19个 CUDA pack warps、4个 WGMMA warps；
-pack完成后只有4个CUDA warps继续消费 P。P1/P2 与输入变换重叠，slot及时释放，输出流式重组。
-发布屏障依赖 CUDA12.4 cooperative-groups 内部的每次调用独立 driver workspace；移植工具链时需复核。
-`run()`无分配、无host同步；每次为当前指针编码 tensor maps，无跨调用计算值缓存。
+当前实现使用4 MiB调用方 workspace、196736B动态 shared 和四个 BK256 operand slots。
+128个 CTA，每 CTA672线程：1个 TMA warp、16个 CUDA变换warps、4个 WGMMA warps。
+叶乘法按B转置乘A转置组织；Tensor Core私有寄存器保存中间结果并直接重组输出，移除P shared交换。
+P1/P2与输入变换重叠，每个K块完成后及时释放slot。
+发布屏障依赖CUDA12.4 cooperative-groups内部的每次调用独立driver workspace；移植工具链时需复核。
+`run()`无分配、无host同步；每次为当前指针编码tensor maps，无跨调用计算值缓存。
 
-与保留七乘法版97通过72项 fresh-input逐位检查、三种quick sanitizer，以及256次双stream/Graph重放检查。
-这些验证用于检查实现与同步正确性，**不代表通过原始FP64精度验收**。
+当前224与保留162通过72项fresh-input逐位检查、三种quick sanitizer，以及256次双stream/Graph重放检查。
+验证所用源码与当前solution逐字一致。这些检查验证实现与同步，**不代表通过原始FP64精度验收**。
 
 [历史四slot预取优化（iter100）](trajectory/20261015_validation-seven-prefetch/REPORT.md)
 
