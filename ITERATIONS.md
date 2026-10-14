@@ -401,6 +401,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 247 | Restore exact validated224 and refresh full launch comparison | 1.0088 | 0.011034 | experiment |
 
+| 248 | Refresh selected224 CUDA Graph comparison | 0.9747 | 0.010694 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3666,3 +3668,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.9776 us vs Dense12.2752 us, 1.1182x. FP16 11.0896 us vs Dense9.97504 us, 0.8995x, still needs1.11456us or10.05percent SW-time reduction. Both original numerical gates FAIL with unchanged errors. Selected224 has72bitwise162 checks, three quick sanitizers and256two-stream/Graph launches already passed. Goal active, not complete.
 - **Next:** Refresh Graph separately and consolidate209-248 evidence; continue profiling from selected224 without floor claim.
 - **Archive:** trajectory/20261015_053550_iter-247/
+
+### Iter 248 — Refresh selected224 CUDA Graph comparison
+
+- **Hypothesis:** Measure Graph independently without substituting Graph timings for ordinary full-call target.
+- **Changes:** Unchanged exact224 source; full20warmup five100-call groups three fresh correctness trials, Graph enabled for both solution and independently tuned Dense.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010694 ms; mean speedup=0.9747x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | graph | 0.011368 | 0.010511 | 1.0815 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | graph | 0.009441 | 0.010877 | 0.8679 | 0.000754626 | 0 |
+
+- **Analysis:** Graph BF16 10.51136 us vs Dense11.36832 us, 1.0815x; FP16 10.87744 us vs Dense9.44064 us, 0.8679x. Original FP64 gates FAIL both. Ordinary target remains unmet:247 FP16 11.0896 vs9.97504 us. No source change or completion claim.
+- **Next:** Archive validated224 checkpoint with fresh launch and Graph evidence, and continue dependency-aware frontend investigations.
+- **Archive:** trajectory/20261015_053636_iter-248/
