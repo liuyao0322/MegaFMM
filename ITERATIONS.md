@@ -525,6 +525,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 309 | Unroll local-transform K phases to restore async WGMMA | 0.6017 | 0.018484 | experiment |
 
+| 310 | Linear physical shared offsets for local elementwise transforms | 0.6702 | 0.016567 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4776,3 +4778,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** C7515 warning eliminated; BF16 improves24.54 to18.70528us and FP16 23.72 to18.26336us but remains much slower than282. Original errors finite and gates fail.308NCU138regs,zero local sectors,5.223M instructions; no spill-based explanation. Local transform/compute is serialized perK and duplicated transforms cost instructions.
 - **Next:** Use linear physical shared offsets for elementwise transforms; then test K64 double buffering to overlap local transform and tensor work
 - **Archive:** trajectory/20261015_071911_iter-309/
+
+### Iter 310 — Linear physical shared offsets for local elementwise transforms
+
+- **Hypothesis:** All quadrant planes share identical swizzles, so elementwise transforms need no inverse logical coordinate mapping
+- **Changes:** On309 iterate raw shared physical paired words directly for both A and B transformations, preserving transform arithmetic and shared layouts
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.016567 ms; mean speedup=0.6702x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012287 | 0.016730 | 0.7344 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009940 | 0.016403 | 0.6060 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 16.73024 us FP16 16.40288 us, improves309 but remains slower than selected282 and Dense. Original approximate errors unchanged, both original gates fail. Shared-index simplification helps, but one-slot transform and tensor phases remain serialized.
+- **Next:** Test K64 double-buffer local transforms and tensor stages within same shared budget
+- **Archive:** trajectory/20261015_072029_iter-310/

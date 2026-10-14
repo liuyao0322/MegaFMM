@@ -28,7 +28,7 @@ template<class T>__device__ __forceinline__ void transform(Shared<T>& s,int work
  constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
  constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_32,Int<BK>>{});
  for(int i=worker*2;i<BSize;i+=512){
-  int r=i/BK,k=i%BK,off=lb(r,k);
+  int off=i;
   uint32_t words[4];
   #pragma unroll
   for(int p=0;p<4;++p)words[p]=*reinterpret_cast<const uint32_t*>(s.a[p]+off);
@@ -44,7 +44,7 @@ template<class T>__device__ __forceinline__ void transform(Shared<T>& s,int work
   for(int p=0;p<4;++p)*reinterpret_cast<uint32_t*>(s.a[p==0?2:p+3]+off)=pair<T>(values[p][0],values[p][1]);
  }
  for(int i=worker*2;i<ASize;i+=512){
-  int r=i%BM,k=i/BM,off=la(r,k);
+  int off=i;
   uint32_t words[4];
   #pragma unroll
   for(int p=0;p<4;++p)words[p]=*reinterpret_cast<const uint32_t*>(s.b[p]+off);
