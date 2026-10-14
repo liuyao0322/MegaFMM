@@ -11,7 +11,7 @@
 namespace megafmm::detail {
 namespace {
 constexpr int BM=64,BN=32,BK=128,Stages=2,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=384;
+constexpr int Plane=512*512,Threads=320;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -53,7 +53,7 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
 template<class T,bool IsA,class Layout>
 __device__ __forceinline__ void transform_shared(T* raw,T* extra,Layout layout,int worker){
   constexpr int Size=IsA ? ASize:BSize;
-  for(int w=worker;w<Size/2;w+=224){
+  for(int w=worker;w<Size/2;w+=160){
     int row=IsA ? (2*w)/BK:(2*w)%BN;
     int col=IsA ? (2*w)%BK:(2*w)/BN;
     int idx=cute::as_position_independent_swizzle_layout(layout)(row,col);
@@ -101,7 +101,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    Barrier::init(&s.transform_request,4);Barrier::init(&s.transform_ready,224);
+    Barrier::init(&s.transform_request,4);Barrier::init(&s.transform_ready,160);
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();

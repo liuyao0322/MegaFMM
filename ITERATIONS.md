@@ -213,6 +213,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 153 | Correct local P3 P4 accumulator ownership | 0.4981 | 0.022374 | experiment |
 
+| 154 | Trade transform warps for local-fusion register capacity | 0.4319 | 0.025897 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1984,3 +1986,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Fresh original-reference errors now match seven-product baseline exactly; both gates still FAIL. Debug152 D11 D22 bitwise exact and only off-diagonals wrong. Correct153 launch~22.96/21.81us slower than140; need generated-code and local-memory analysis before discarding local fusion.
 - **Next:** Inspect call-stack, spills and shared traffic in correct local-transform kernel
 - **Archive:** trajectory/20261015_025958_iter-153/
+
+### Iter 154 — Trade transform warps for local-fusion register capacity
+
+- **Hypothesis:** Fewer total threads permits larger TC register allocation and fewer spills
+- **Changes:** From153 reduce384threads to320, transform workers224 to160; preserve all raw pipeline and arithmetic
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.025897 ms; mean speedup=0.4319x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_local_transform_64x32x128 v0 | launch | 0.012409 | 0.026673 | 0.4652 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_local_transform_64x32x128 v0 | launch | 0.010014 | 0.025121 | 0.3986 | 0.000754626 | 0 |
+
+- **Analysis:** Baseline seven-product errors preserved, gates FAIL. Launch26.67/25.12us regresses despite anticipated register capacity relief.153 NCU showed168regs,96B stack with STL/LDL and~6.4M instructions,8.3percent Tensor; inspect154 generated code to establish actual spill response.
+- **Next:** Return to validated fast architecture; reassess measured bottlenecks rather than persist slower local fusion
+- **Archive:** trajectory/20261015_030106_iter-154/
