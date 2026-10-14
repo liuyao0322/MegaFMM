@@ -113,6 +113,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 103 | Two outstanding WGMMA groups on four-stage operand ring | 0.8453 | 0.013214 | experiment |
 
+| 104 | Four-element64bit high-only transform IO | 0.8815 | 0.012677 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1062,3 +1064,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Original no-compensation precision gates remain unchanged and fail as expected; compare complete-call performance and validate ring safety independently.
 - **Next:** Select issue rhythm by paired timings, then test transform vector width and separate-transform launch
 - **Archive:** trajectory/20261015_012836_iter-103/
+
+### Iter 104 — Four-element64bit high-only transform IO
+
+- **Hypothesis:** One four-element transform iteration per thread may reduce loop/address overhead versus two packed-pair iterations
+- **Changes:** Basedon100; aligned64bit A/B reads and S/T stores,four independent scalar FP32 transforms with unchanged rounding
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012677 ms; mean speedup=0.8815x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012353 | 0.012644 | 0.9770 | 6.42534e+35 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009990 | 0.012710 | 0.7860 | 3.94678 | 0 |
+
+- **Analysis:** Bothdtype benchmarks finished; distinguish input-stage savings from potential register/codegen cost using diagnostics and full-call comparison.
+- **Next:** Reassess no-improvement candidates using updated profiling before separate-transform/grid experiment
+- **Archive:** trajectory/20261015_013006_iter-104/
