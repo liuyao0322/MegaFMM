@@ -361,6 +361,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 227 | True64x64 private transposed leaf with64 CTAs | 0.8177 | 0.013611 | experiment |
 
+| 228 | Full-K512 private transposed leaf with split256 LHS TMA | 0.9129 | 0.012248 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3308,3 +3310,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Rejected BF13.5581 FP13.6643us. Expected uncompensated errors retained, both original gatesFAIL. Tile coarsening loses too much parallelism/frontend throughput; no performance win.
 - **Next:** Return218 geometry and test full-K512 single retirement per leaf with split LHS TMA loads
 - **Archive:** trajectory/20261015_050315_iter-227/
+
+### Iter 228 — Full-K512 private transposed leaf with split256 LHS TMA
+
+- **Hypothesis:** One commit/wait per leaf reduces fourteen operand retirements to seven
+- **Changes:** From218 two BK512 slots; split B-transpose TMA into two256 boxes, full A map box;32 sequential MMA instructions preserve K accumulation order
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012248 ms; mean speedup=0.9129x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012434 | 0.012090 | 1.0285 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009893 | 0.012407 | 0.7974 | 0.000754626 | 0 |
+
+- **Analysis:** Rejected BF12.0899 FP12.4067us; expected eF unchanged, original gatesFAIL. Fewer retirements do not compensate longer full-leaf supply and reduced prefetch lookahead; current BK256 remains preferable.
+- **Next:** Reprofile descriptor constant specialization and investigate producer scheduling/input transformation critical path
+- **Archive:** trajectory/20261015_050424_iter-228/
