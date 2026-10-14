@@ -10,15 +10,15 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=256,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int BM=64,BN=32,BK=512,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
 constexpr int Plane=512*512,Threads=512;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
-  T operand[2][2*ASize+2*BSize];
+  T operand[1][2*ASize+2*BSize];
   float product[2][Elements];
-  uint64_t ready[2],free[2],product_ready[2],product_free[2];
+  uint64_t ready[1],free[1],product_ready[2],product_free[2];
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
@@ -51,7 +51,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+    for(int j=0;j<1;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
     cutlass::arch::fence_barrier_init();
   }
@@ -81,8 +81,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
     for(int p=0;p<7;++p)for(int q=0;q<512/BK;++q){
-      int sequence=p*(512/BK)+q,slot=sequence%2,k0=q*BK;
-      if(sequence>=2)wait(&s.free[slot],((sequence-2)/2)%2);
+      int sequence=p*(512/BK)+q,slot=0,k0=q*BK;
+      if(sequence)wait(&s.free[slot],(sequence-1)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       int bytes=2*(ASize+BSize)+(alo ? 2*ASize:0)+(blo ? 2*BSize:0);
       TxBarrier::arrive_and_expect_tx(&s.ready[slot],bytes);
@@ -100,11 +100,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
       if(blo){
         int plane=p==3 ? 6:2*(p-4);
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+2*ASize,n0,k0,plane);
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+2*ASize+BSize,n0,k0,plane+1);
+        for(int chunk=0;chunk<BK/256;++chunk){
+          SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+2*ASize+chunk*BN*256,n0,k0+chunk*256,plane);
+          SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+2*ASize+BSize+chunk*BN*256,n0,k0+chunk*256,plane+1);
+        }
       }else{
         int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+2*ASize,n0+col,k0+row);
+        for(int chunk=0;chunk<BK/256;++chunk)
+          SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+2*ASize+chunk*BN*256,n0+col,k0+row+chunk*256);
       }
     }
   }else if((tid>=32 && tid<128) || tid>=256){
@@ -136,8 +139,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int p=0;p<7;++p){
       float acc[16]={};
       for(int q=0;q<512/BK;++q){
-        int sequence=p*(512/BK)+q,slot=sequence%2;
-        wait(&s.ready[slot],(sequence/2)%2);
+        int sequence=p*(512/BK)+q,slot=0;
+        wait(&s.ready[slot],sequence%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la),al=make_tensor(make_smem_ptr(op+ASize),la);
         auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb),bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
@@ -162,7 +165,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   if(reinterpret_cast<uintptr_t>(ptr)%16)throw std::invalid_argument("SW TMA input must be16-byte aligned");
   uint64_t dims[3]={transformed ? 512ULL:1024ULL,transformed ? 512ULL:1024ULL,8};
   uint64_t strides[2]={dims[0]*2,dims[0]*dims[1]*2};
-  uint32_t box[3]={uint32_t(is_a ? 64:BN),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};
+  uint32_t box[3]={uint32_t(is_a ? 64:BN),uint32_t(is_a ? BM:256),1},element_strides[3]={1,1,1};
   auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
       transformed ? 3:2,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
       is_a ? CU_TENSOR_MAP_SWIZZLE_128B:CU_TENSOR_MAP_SWIZZLE_64B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);

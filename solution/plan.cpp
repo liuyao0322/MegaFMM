@@ -358,13 +358,13 @@ Plan& Plan::operator=(Plan&&) noexcept = default;
 size_t Plan::workspace_bytes() const { return impl_->bytes; }
 const Problem& Plan::problem() const { return impl_->problem; }
 std::string Plan::algorithm_name() const {
-  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw ? "sw_cooperative_hilo_64x32x256" : "dense_cublaslt";
+  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw ? "sw_cooperative_hilo_64x32x512" : "dense_cublaslt";
 }
 std::string Plan::lt_algorithm_config(const void* A, const void* B, const float* C0,
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
-  if (impl_->sw) return "sw_cooperative;warp_roles=1tma+11simt+4wgmma;smem=213120;workspace=8388608;st=global_once_fp32_hilo;recombine=full_k_register_P;product_slots=2;operand_release=warp_leader;leaf_terms=15;current_pointer_maps=4;alpha=1;beta=0";
+  if (impl_->sw) return "sw_cooperative;warp_roles=1tma+11simt+4wgmma;smem=213120;workspace=8388608;st=global_once_fp32_hilo;recombine=full_k_register_P;product_slots=2;operand_slots=1;operand_release=warp_leader;leaf_terms=15;current_pointer_maps=4;alpha=1;beta=0";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }

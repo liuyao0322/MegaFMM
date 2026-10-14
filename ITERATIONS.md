@@ -59,6 +59,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 76 | Stream complete products into CUDA registers and double BK | 0.5152 | 0.021564 | passed |
 
+| 77 | Load complete reduction operands before each leaf | 0.3903 | 0.028540 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -503,3 +505,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Full1024 benchmark exited0 and frozen numerical gates passed. Reviewed recent latency/stress and NVIDIA TMA box limits plus CUTLASS register/pipeline docs before changing direction.
 - **Next:** Check actual improvement, compiler spills and fresh-input stress; test full-K single-slot geometry if warranted.
 - **Archive:** trajectory/20261014_194938_iter-76/
+
+### Iter 77 — Load complete reduction operands before each leaf
+
+- **Hypothesis:** Full-K BK512 removes the remaining per-slice completion boundaries; compare single operand slot against overlapping BK256.
+- **Changes:** Single full-K operand arena with two P slots, A split64-column boxes, B split256-row boxes, seven product waits; same213120 shared and CUDA register U DAG.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.028540 ms; mean speedup=0.3903x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x512 v0 | launch | 0.012353 | 0.028465 | 0.4340 | 7.55609e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x512 v0 | launch | 0.009918 | 0.028615 | 0.3466 | 2.89265e-06 | 1 |
+
+- **Analysis:** Full original benchmark exited0 with all numerical gates passed;76 passed72 stress checks and had110 registers with zero local/stack.
+- **Next:** Inspect latency, then focus on lower-cost packed ST generation and mixed operand layouts.
+- **Archive:** trajectory/20261014_195039_iter-77/
