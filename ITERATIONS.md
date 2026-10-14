@@ -331,6 +331,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 212 | Repeated211 after candidate generator failed before source write | 0.9740 | 0.011536 | experiment |
 
+| 213 | Static dual-TC chains with float4 product exchange | 0.9535 | 0.011668 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3040,3 +3042,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** This is a repeat measurement of211, not evidence for dual static TC. BF16 11.4429us FP16 11.6291us with original errors and both gates FAIL. Preserve this attempt explicitly and fix generator before next benchmark.
 - **Next:** Correct generator escaping and use shell fail-fast before bench to ensure next candidate is generated
 - **Archive:** trajectory/20261015_043355_iter-212/
+
+### Iter 213 — Static dual-TC chains with float4 product exchange
+
+- **Hypothesis:** Independent static issue chains may overlap completion and reduce loop bookkeeping seen in198
+- **Changes:** 896threads,608 pack workers, two TC warpgroups owning alternating leaves; full inline PTX issue/waits and fragment-major float4 P exchange
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011668 ms; mean speedup=0.9535x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012234 | 0.011615 | 1.0533 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010005 | 0.011720 | 0.8537 | 0.000754626 | 0 |
+
+- **Analysis:** Finite original seven-product error reproduced and original gates FAIL. BF16 11.6154us FP16 11.7197us versus Dense12.2342/10.0051us; no improvement over selected162 or211. Reassessment used210 full NCU, prior198 metrics and NVIDIA Tilus two-consumer tutorial; no floor conclusion.
+- **Next:** Test four P slots to remove alternating-TC producer coupling through two-slot recombination exchange
+- **Archive:** trajectory/20261015_043447_iter-213/
