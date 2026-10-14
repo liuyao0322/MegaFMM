@@ -161,6 +161,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 127 | Direct vector operand producers without global S/T or grid barriers | 0.0000 | 0.000000 | experiment |
 
+| 128 | Correct direct-producer recombination extraction | 0.0941 | 0.118200 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1516,3 +1518,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full127 benchmark archived; check original error level and resource scheduling before interpreting latency.
 - **Next:** Profile operand generation versus tensor compute and compare two-kernel full-call overhead
 - **Archive:** trajectory/20261015_021256_iter-127/
+
+### Iter 128 — Correct direct-producer recombination extraction
+
+- **Hypothesis:** Direct shared operand generation may offset removal of global transform and cooperative barriers
+- **Changes:** Fix127 generator which copied transform/mainloop into recombination kernel; recombination now only reads seven global products and writes four output quadrants
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.118200 ms; mean speedup=0.0941x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_direct_64x128x64 v0 | launch | 0.012337 | 0.115803 | 0.1065 | 1.37006 | 0 |
+| 1024,1024,1024 | fp16 | sw_direct_64x128x64 v0 | launch | 0.009858 | 0.120598 | 0.0817 | 1.37005 | 0 |
+
+- **Analysis:** 127 failed compile and has no timings; full128 benchmark archived with original numerical gates unchanged.
+- **Next:** Assess full-call cost of direct producers and profile retained baseline if it regresses
+- **Archive:** trajectory/20261015_021356_iter-128/
