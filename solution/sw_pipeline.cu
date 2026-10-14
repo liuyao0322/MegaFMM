@@ -26,8 +26,7 @@ template<class T> struct alignas(128) Shared {
 static_assert(sizeof(Shared<cute::half_t>)==188544, "recheck shared-memory budget");
 
 __device__ void wait(const uint64_t* b,int phase) {
-  while(!Barrier::test_wait(b,phase,true)) {}
-  asm volatile("" ::: "memory");
+  Barrier::wait(b,phase); asm volatile("" ::: "memory");
 }
 __device__ void arrive(const uint64_t* b) {
   asm volatile("" ::: "memory"); Barrier::arrive(b);
@@ -63,14 +62,14 @@ template<class T,class TA,class TB>
 __device__ void mma_term(TA a,TB b,float (&d)[16]) {
   using namespace cute;
   using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,
-      SM90_64x32x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::K>,
-      SM90_64x32x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::K>>;
+      SM90_64x32x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
+      SM90_64x32x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>>;
   #pragma unroll
   for(int kk=0;kk<BK/16;++kk) {
     auto at=local_tile(a,Shape<_64,_16>{},make_coord(0,kk));
     auto bt=local_tile(b,Shape<_32,_16>{},make_coord(0,kk));
     uint64_t da=GMMA::make_gmma_desc<GMMA::Major::K>(at);
-    uint64_t db=GMMA::make_gmma_desc<GMMA::Major::K>(bt);
+    uint64_t db=GMMA::make_gmma_desc<GMMA::Major::MN>(bt);
     Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],
             d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15]);
   }
@@ -85,10 +84,10 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x;
   int m0=blockIdx.y*BM,n0=blockIdx.x*BN;
-  // Canonical interleaved layout avoids incompatible K-subtile swizzle origins.
+  // A is K-major; B is MN-major, matching coalesced row-major source loads.
   // Shared addresses are obtained from these exact layouts on both sides.
-  constexpr auto la=tile_to_shape(GMMA::Layout_K_INTER_Atom<T>{},Shape<_64,Int<BK>>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_K_INTER_Atom<T>{},Shape<_32,Int<BK>>{});
+  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0) {
     for(int j=0;j<2;++j) {
       Barrier::init(&s.raw_ready[j],1);
@@ -126,15 +125,17 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
         int sequence=q*7+p,slot=sequence%2;
         if(sequence>=2)wait(&s.op_free[slot],((sequence-2)/2)%2);
         T* op=s.operand[slot];
+        auto ah=make_tensor(make_smem_ptr(op),la);
+        auto al=make_tensor(make_smem_ptr(op+ASize),la);
+        auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb);
+        auto bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
         for(int i=worker;i<ASize;i+=96) {
           float v=left_operand(s,bank,p,i);T hi=T(v),lo=T(__fsub_rn(v,float(hi)));
-          int offset=la(i/BK,i%BK);
-          op[offset]=hi;op[ASize+offset]=lo;
+          ah(i/BK,i%BK)=hi;al(i/BK,i%BK)=lo;
         }
         for(int i=worker;i<BSize;i+=96) {
           float v=right_operand(s,bank,p,i);T hi=T(v),lo=T(__fsub_rn(v,float(hi)));
-          int offset=lb(i%BN,i/BN);
-          op[2*ASize+offset]=hi;op[2*ASize+BSize+offset]=lo;
+          bh(i%BN,i/BN)=hi;bl(i%BN,i/BN)=lo;
         }
         asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
         arrive(&s.op_ready[slot]);

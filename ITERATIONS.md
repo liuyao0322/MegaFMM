@@ -17,6 +17,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 55 | Poll barrier phase without suspend timer | 0.0319 | 0.346034 | measured |
 
+| 56 | Align right operand with natural row-major shared access | 0.0351 | 0.314660 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -108,3 +110,19 @@ work/handshake tradeoff rather than continuing the unsuccessful layout-only path
 - **Analysis:** Full original launch benchmark exited0; compare measured rows to54 before attributing any timing change.
 - **Next:** Validate improvement and stress; use larger compute batches or register output accumulation next.
 - **Archive:** trajectory/20261014_190704_iter-55/
+
+### Iter 56 — Align right operand with natural row-major shared access
+
+- **Hypothesis:** B K-major storage transposes contiguous source lanes into strided shared writes; MN-major B and swizzled A should improve physical access.
+- **Changes:** From best54: A K-major SW128, B MN-major SW64, matched typed CuTe stores/descriptors and WGMMA transpose mode. Same FP32 operations and high-low products.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.314660 ms; mean speedup=0.0351x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_unified_v1_hilo_64x32x64 v0 | launch | 0.012325 | 0.319603 | 0.0386 | 7.15726e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_unified_v1_hilo_64x32x64 v0 | launch | 0.009800 | 0.309717 | 0.0316 | 4.79212e-07 | 1 |
+
+- **Analysis:** Full 1024 launch benchmark exited0, all fresh original gates pass. Actual latencies below; layout cost attribution awaits measured comparison.
+- **Next:** Inspect measured runtime; retain best source and continue work batching/accumulator ownership improvements.
+- **Archive:** trajectory/20261014_190904_iter-56/
