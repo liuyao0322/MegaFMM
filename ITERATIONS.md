@@ -469,6 +469,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 281 | Low32 GMMA descriptor arithmetic | 1.0564 | 0.010463 | experiment |
 
+| 282 | Packed pair final conversion in primary | 1.0744 | 0.010272 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4278,3 +4280,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.5568us and FP16 10.36864us show no gain versus266. Original FP64 gates fail unchanged. Need inspect generated SASS before claiming instruction reduction.
 - **Next:** Inspect SASS and test packed FP32-to-lowprecision pair conversion in primary transform
 - **Archive:** trajectory/20261015_063949_iter-281/
+
+### Iter 282 — Packed pair final conversion in primary
+
+- **Hypothesis:** A single rounded pair conversion can remove separate scalar conversion and packing instructions
+- **Changes:** On279 compute original FP32 transforms and use cvt.rn.bf16x2.f32 or cvt.rn.f16x2.f32 for each stored pair
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010272 ms; mean speedup=1.0744x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012276 | 0.010326 | 1.1888 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009809 | 0.010219 | 0.9599 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.32576us and FP16 10.21888us; FP single-run signal improves slightly versus279 but BF regresses. Original FP64 gates unchanged FAIL, no nonfinite. Needs paired comparison and bitwise/sanitizer verification.
+- **Next:** Reassess current counters and test ninth K128 operand slot
+- **Archive:** trajectory/20261015_064102_iter-282/
