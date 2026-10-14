@@ -68,9 +68,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
  if((tid>=32 && tid<128)||(p>=2 && tid>=128 && tid<384)){
   int worker=tid-32;
   int global_worker=p<2 ? (p*32+tile)*96+worker : 2*32*96+((p-2)*32+tile)*352+worker;
-  if(p==0 && worker==0)counts[tile]=0;
+
   for(int i=2*global_worker;i<Plane;i+=2*62464){
    int row=i/512,col=i%512,at=row*1024+col;
+   reinterpret_cast<float2*>(D+at)[0]=make_float2(0,0);
+   reinterpret_cast<float2*>(D+at+512)[0]=make_float2(0,0);
+   reinterpret_cast<float2*>(D+at+512*1024)[0]=make_float2(0,0);
+   reinterpret_cast<float2*>(D+at+512*1024+512)[0]=make_float2(0,0);
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
     uint32_t abits[4]={av[at/2],av[(at+512)/2],av[(at+512*1024)/2],av[(at+512*1024+512)/2]};
@@ -149,44 +153,15 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
    __syncwarp();if((tid&31)==0)arrive(&sh.free[slot]);
   }
   wait(&sh.global_ready,0);
+  // Concurrent leaf contributions: FP32 reduction order is intentionally nondeterministic.
   #pragma unroll
-  for(int j=0;j<32;j+=2){
-   int mn=GMMA::CLayout_64x64{}(lane,j),row=mn%64,col=mn/64;
-   int index=(m0+wg*64+row)*512+n0+col;
-   reinterpret_cast<float2*>(products+p*Plane+index)[0]=make_float2(acc[j],acc[j+1]);
-  }
-  asm volatile("bar.sync 3,256;" ::: "memory");
-  if(tid==128){
-   uint32_t old;
-   asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],1;":"=r"(old):"l"(counts+tile):"memory");
-   sh.last=(old==6);
-  }
-  asm volatile("bar.sync 3,256;" ::: "memory");
-  if(sh.last){
-   #pragma unroll 1
-   for(int j=0;j<16;++j){
-    int worker=tid-128;
-    int row=m0+worker/32+8*j,col=n0+2*(worker%32);
-    int index=row*512+col;
-    float2 v[7];
-    #pragma unroll
-    for(int z=0;z<7;++z)v[z]=reinterpret_cast<const float2*>(products+z*Plane+index)[0];
-    float2 out[4];
-    #pragma unroll
-    for(int c=0;c<2;++c){
-     float a=c?v[0].y:v[0].x,b=c?v[1].y:v[1].x;
-     float p3=c?v[2].y:v[2].x,p4=c?v[3].y:v[3].x,p5=c?v[4].y:v[4].x;
-     float p6=c?v[5].y:v[5].x,p7=c?v[6].y:v[6].x;
-     float u2=__fadd_rn(a,p6),u3=__fadd_rn(u2,p7);
-     float x[4]={__fadd_rn(a,b),__fadd_rn(__fadd_rn(u2,p5),p3),__fsub_rn(u3,p4),__fadd_rn(u3,p5)};
-     #pragma unroll
-     for(int z=0;z<4;++z){if(c)out[z].y=x[z];else out[z].x=x[z];}
-    }
-    reinterpret_cast<float2*>(D+row*1024+col)[0]=out[0];
-    reinterpret_cast<float2*>(D+row*1024+col+512)[0]=out[1];
-    reinterpret_cast<float2*>(D+(row+512)*1024+col)[0]=out[2];
-    reinterpret_cast<float2*>(D+(row+512)*1024+col+512)[0]=out[3];
-   }
+  for(int j=0;j<32;++j){
+   int mn=GMMA::CLayout_64x64{}(lane,j),row=m0+wg*64+mn%64,col=n0+mn/64;
+   float* out=D+row*1024+col;float value=acc[j];
+   if(p==0 || p==1)atomicAdd(out,value);
+   if(p==0 || p==2 || p==4 || p==5)atomicAdd(out+512,value);
+   if(p==0 || p==3 || p==5 || p==6)atomicAdd(out+512*1024,p==3 ? -value:value);
+   if(p==0 || p==4 || p==5 || p==6)atomicAdd(out+512*1024+512,value);
   }
  }
 }

@@ -285,6 +285,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 189 | Reuse waiting TC warps for parallel-leaf input transformation | 0.5797 | 0.019352 | experiment |
 
+| 190 | Direct atomic leaf recombination | 0.3647 | 0.030709 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2628,3 +2630,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about19.17us FP16 about19.54us, improves188 but still much slower162. Original errors retained and nonfinite0. Trace187 allCTAstartspread0.224us, publication6.5us, so launch skew was not the main cause.
 - **Next:** Test direct atomic recombination to remove serialized last-CTA global reads; explicitly report changed FP32 summation order and unchanged original precision gates.
 - **Archive:** trajectory/20261015_034821_iter-189/
+
+### Iter 190 — Direct atomic leaf recombination
+
+- **Hypothesis:** Concurrent FP32 atomic contributions avoid serialized last-CTA reads of seven global product planes.
+- **Changes:** Base189; pack workers also initialize four D quadrants before publication; each leaf directly atomicAdds its Winograd contributions, P4 negated. FP32 summation order is now nondeterministic, not bitwise97-preserving. Gates unchanged.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.030709 ms; mean speedup=0.3647x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.012339 | 0.030011 | 0.4112 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.009998 | 0.031407 | 0.3183 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about30.01us FP16 about31.41us, worse189 and162. Expected original gate failures remain with eF near.0060152/.000754626 and nonfinite0. Atomic contribution route rejected; no numerical certification.
+- **Next:** Restore189 and test bulk TMA tensor reduction if hardware-supported, otherwise return162 for independent direction.
+- **Archive:** trajectory/20261015_034919_iter-190/
