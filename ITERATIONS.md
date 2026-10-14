@@ -421,6 +421,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 257 | Intermediate N48 PDL compute tiles with guarded edge | 1.0180 | 0.010852 | experiment |
 
+| 258 | PDL BK512 双槽测试 | 0.9620 | 0.011433 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3846,3 +3848,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.8685 us vs Dense12.3091 us; FP16 10.8352 us vs Dense9.78912 us. Better than N64 but slower25410.44FP. Original expected errors/nonfinite0 and both gate failures preserved. No independent edge-store certification claimed; not retained.
 - **Next:** Reassess254 full NCU and actual device timing; tune transform grid and compute prefetch independently instead of reducing active CTAs further.
 - **Archive:** trajectory/20261015_055503_iter-257/
+
+### Iter 258 — PDL BK512 双槽测试
+
+- **Hypothesis:** 在对齐 shared carveout 的 PDL 七乘法版本中，用 BK512 减少每个叶乘法的完成等待次数。
+- **Changes:** 保持 PDL 双 kernel 与 N32 分块，将 K 分块增至 512，使用两个 operand slot；每块 LHS 分为两次 K256 TMA，32 次 MMA 后等待。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011433 ms; mean speedup=0.9620x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012188 | 0.011417 | 1.0675 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009806 | 0.011450 | 0.8565 | 0.000754626 | 0 |
+
+- **Analysis:** 完整基准 FP16 中位数 11.4496 us，同期 Dense 9.80608 us；BF16 约 11.43 us。明显慢于已独立验证的 iter254。原 FP64 精度门槛仍失败，无非有限值，不保留此配置。
+- **Next:** 恢复并继续优化 iter254 的 PDL 架构，分析供数与等待节奏，缩小 FP16 相对 Dense 的差距。
+- **Archive:** trajectory/20261015_060644_iter-258/
