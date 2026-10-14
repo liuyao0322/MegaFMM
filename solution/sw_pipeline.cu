@@ -94,7 +94,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op,k0,m0,plane);
         SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op+ASize,k0,m0,plane+1);
       }else{
-        int col=p==1 ? 512:0,row=p==3 ? 512:0;
+        int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
         SM90_TMA_LOAD_2D::copy(&amap,&s.ready[slot],0,op,k0+col,m0+row);
       }
       if(blo){

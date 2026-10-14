@@ -33,6 +33,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 63 | Compute shared global transforms once within a cooperative invocation | 0.2507 | 0.044046 | failed |
 
+| 64 | Correct original A22 coordinates in cooperative pipeline | 0.2517 | 0.044002 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -260,3 +262,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Benchmark exited2; failed numerical rows are diagnostic and cannot be promoted. Full input-dependent packing and cooperative barrier are inside every timed invocation.
 - **Next:** Inspect correctness and map/layout consistency, then repair or restore the best62 source.
 - **Archive:** trajectory/20261014_192502_iter-63/
+
+### Iter 64 — Correct original A22 coordinates in cooperative pipeline
+
+- **Hypothesis:** P4 must use A22; the missing column offset caused unit relative error in63.
+- **Changes:** Correct p3 original A tensor-map column offset to512; retain once-per-invocation global high-low packing and complete-call timing.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.044002 ms; mean speedup=0.2517x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x64 v0 | launch | 0.012275 | 0.044221 | 0.2776 | 7.15726e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x64 v0 | launch | 0.009884 | 0.043783 | 0.2258 | 4.79212e-07 | 1 |
+
+- **Analysis:** Complete frozen benchmark exited0; all original numerical gates passed. Inspect measured timings and stress before accepting.
+- **Next:** Validate72 stress cases and graph execution; assess complete latency against Dense.
+- **Archive:** trajectory/20261014_192807_iter-64/
