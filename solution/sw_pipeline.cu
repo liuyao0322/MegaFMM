@@ -77,7 +77,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
-    Barrier::init(&s.pack_ready,19);
+    Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -153,8 +153,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[2*j];
   }
     asm volatile("fence.proxy.async.global;" ::: "memory");
-    __syncwarp();
-    if((tid&31)==0)arrive(&s.pack_ready);
+    arrive(&s.pack_ready);
     if(worker<128){
     constexpr int Chunks=16;
     unsigned row=unsigned(worker)/BN,col=unsigned(worker)%BN;
@@ -237,7 +236,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map status "+std::to_string(int(result)));
 }
 } // namespace
-struct SWState{DType dtype;};
+struct SWState{DType dtype; CUtensorMap amap,bmap,smap,tmap;};
 std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   if(p.m!=1024 || p.n!=1024 || p.k!=1024 || p.trans_a || p.trans_b || p.lda!=1024 || p.ldb!=1024 || p.ldd!=1024 || p.alpha!=1 || p.beta!=0)
     throw std::invalid_argument("SW requires contiguous non-transposed1024^3 alpha1 beta0");
@@ -252,11 +251,24 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
     check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&blocks,sw_cooperative_hilo<cute::half_t>,Threads,sizeof(Shared<cute::half_t>)),"SW occupancy capacity");
   }
   if(blocks*prop.multiProcessorCount<128)throw std::invalid_argument("SW cooperative grid requires128 resident CTA capacity");
-  return std::make_shared<SWState>(SWState{p.dtype});
+  auto state=std::make_shared<SWState>();
+  state->dtype=p.dtype;
+  // Immutable layout templates; every invocation replaces all four addresses.
+  encode(state->amap,nullptr,p.dtype,true,false);
+  encode(state->bmap,nullptr,p.dtype,false,false);
+  encode(state->smap,nullptr,p.dtype,true,true);
+  encode(state->tmap,nullptr,p.dtype,false,true);
+  return state;
 }
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
-  CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
-  encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
+  CUtensorMap a=state.amap,b=state.bmap,s=state.smap,t=state.tmap;
+  auto replace=[](CUtensorMap& map,const void* ptr){
+    if(reinterpret_cast<uintptr_t>(ptr)%16)throw std::invalid_argument("SW TMA input must be16-byte aligned");
+    auto result=cuTensorMapReplaceAddress(&map,const_cast<void*>(ptr));
+    if(result!=CUDA_SUCCESS)throw std::runtime_error("SW replace tensor address status "+std::to_string(int(result)));
+  };
+  replace(a,A);replace(b,B);replace(s,workspace);
+  replace(t,static_cast<char*>(workspace)+WorkspaceBytes/2);
   void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D};dim3 grid(16,8);
   if(state.dtype==DType::BF16)
     check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");

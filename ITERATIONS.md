@@ -245,6 +245,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 169 | Warp-aggregated pack publication | 0.9762 | 0.011403 | experiment |
 
+| 170 | Immutable tensor-map geometry templates | 0.9701 | 0.011466 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2272,3 +2274,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** FP16 about11.50us versus selected16211.54us, negligible single-run change. BF16 retains expected error; both original numerical gates fail and nonfinite0. Full validation required before adopting synchronization change.
 - **Next:** Archive binary for later paired comparison; investigate tensor-map host construction.
 - **Archive:** trajectory/20261015_032500_iter-169/
+
+### Iter 170 — Immutable tensor-map geometry templates
+
+- **Hypothesis:** Replacing only addresses instead of re-encoding fixed layouts reduces complete-call host overhead.
+- **Changes:** Restore162; plan stores four address-free geometry templates; each call copies descriptors and uses official cuTensorMapReplaceAddress with current pointers, preserving thread safety and alignment checks.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011466 ms; mean speedup=0.9701x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012300 | 0.011391 | 1.0798 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009929 | 0.011540 | 0.8604 | 0.000754626 | 0 |
+
+- **Analysis:** FP16 about11.54us, no meaningful gain versus162. Original FP64 gates still fail with unchanged expected errors and nonfinite0. Native driver API accepted null-address templates. No cached tensor values or cross-call compute state. Reference https://docs.nvidia.com/cuda/archive/12.4.0/cuda-driver-api/group__CUDA__TENSOR__MEMORY.html.
+- **Next:** Return to device supply latency; test short suspension hints in barrier wait.
+- **Archive:** trajectory/20261015_032550_iter-170/
