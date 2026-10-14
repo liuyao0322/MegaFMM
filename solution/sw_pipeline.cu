@@ -4,7 +4,6 @@
 #include <cute/tensor.hpp>
 #include <cute/atom/mma_traits_sm90_gmma.hpp>
 #include <cute/arch/copy_sm90_tma.hpp>
-#include <cute/arch/mma_sm80.hpp>
 #include <cutlass/arch/barrier.h>
 #include <stdexcept>
 #include <type_traits>
@@ -40,22 +39,28 @@ __device__ constexpr int product_for_step(int step){
 }
 
 template<class T,class TA,class TB>
-__device__ __forceinline__ void mma_term(TA a,TB b,float (&d)[16]){
+__device__ void mma_term(TA a,TB b,float (&d)[16]) {
   using namespace cute;
-  using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,SM80_16x8x16_F32BF16BF16F32_TN,SM80_16x8x16_F32F16F16F32_TN>;
-  int lane=threadIdx.x&31,warp=(threadIdx.x-128)/32;
-  #pragma unroll 1
-  for(int kk=0;kk<BK;kk+=16){
-    uint32_t ar[4];
-    uint32_t ap=cast_smem_ptr_to_uint(&a(warp*16+(lane%16),kk+(lane/16)*8));
-    asm volatile("ldmatrix.sync.aligned.m8n8.x4.shared.b16 {%0,%1,%2,%3},[%4];":"=r"(ar[0]),"=r"(ar[1]),"=r"(ar[2]),"=r"(ar[3]):"r"(ap):"memory");
-    #pragma unroll
-    for(int n=0;n<4;++n){
-      uint32_t br[2];
-      uint32_t bp=cast_smem_ptr_to_uint(&b(n*8,kk+(lane%16)));
-      asm volatile("ldmatrix.sync.aligned.m8n8.x2.trans.shared.b16 {%0,%1},[%2];":"=r"(br[0]),"=r"(br[1]):"r"(bp):"memory");
-      Op::fma(d[4*n],d[4*n+1],d[4*n+2],d[4*n+3],ar[0],ar[1],ar[2],ar[3],br[0],br[1],d[4*n],d[4*n+1],d[4*n+2],d[4*n+3]);
-    }
+  using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,
+      SM90_64x32x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
+      SM90_64x32x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>>;
+  // Build the canonical descriptor once; CuTe preserves the swizzled K offsets
+  // in descriptor units instead of rebuilding address bitfields for each MMA.
+  auto da_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(
+      tiled_divide(a,Shape<_64,_16>{}));
+  auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(
+      tiled_divide(b,Shape<_32,_16>{}));
+  auto da_base=da_tiles(0,0,0);
+  auto db_base=db_tiles(0,0,0);
+  #pragma unroll
+  for(int kk=0;kk<BK/16;++kk){
+    // All operands fit below 256 KiB of shared memory. K offsets cannot carry
+    // out of the 14-bit start-address field (16-byte units), so keep the high
+    // descriptor word invariant rather than generating a 64-bit add/carry.
+    auto da=da_base,db=db_base;
+    da.reg32_[0]+=uint32_t(da_tiles.layout()(0,0,kk));
+    db.reg32_[0]+=uint32_t(db_tiles.layout()(0,0,kk));
+    Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15]);
   }
 }
 
@@ -190,7 +195,9 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
+        warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
+        warpgroup_commit_batch();warpgroup_wait<0>();
         __syncwarp();
         if((tid&31)==0)arrive(&s.free[slot]);
       }
@@ -203,7 +210,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       arrive(&s.product_ready[step%2]);
     }
   }
-  __syncthreads();
+  // CTA shared storage survives until all role threads return.
 }
 void check(cudaError_t e,const char* where){if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));}
 void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transformed){

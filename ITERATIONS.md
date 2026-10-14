@@ -229,6 +229,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 161 | Bound warp-MMA K fragment lifetime | 0.3814 | 0.029243 | experiment |
 
+| 162 | Compact workspace with independent role returns | 0.9706 | 0.011437 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2128,3 +2130,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Baseline numerical errors preserved and gates FAIL. Launch29.27/29.22us remains far slower than WGMMA best.160 NCU~6.55M instructions,80regs STACK96B,Tensor9percent; instruction/operand loading path remains costly.
 - **Next:** Combine independently plausible workspace reduction and terminal-barrier removal, validate paired against140 before further optimization
 - **Archive:** trajectory/20261015_031038_iter-161/
+
+### Iter 162 — Compact workspace with independent role returns
+
+- **Hypothesis:** Keep four-plane operands while removing redundant final CTA barrier
+- **Changes:** From155 remove final syncthreads as149; retain initialization barrier, all TMA readiness and WGMMA completion, shared P consumption dependencies
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011437 ms; mean speedup=0.9706x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012238 | 0.011359 | 1.0774 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009948 | 0.011516 | 0.8639 | 0.000754626 | 0 |
+
+- **Analysis:** Baseline seven-product errors preserved and original gates FAIL. FP16 launch11.516us, still slower than Dense~9.95us. Requires full paired140comparison and72-check/sanitizer validation before retaining as checkpoint.
+- **Next:** Paired complete-call launch Graph comparison and independent fresh-input validation
+- **Archive:** trajectory/20261015_031116_iter-162/
