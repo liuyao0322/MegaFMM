@@ -299,6 +299,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 196 | Correct and measure N64 single-P pipeline | 0.7840 | 0.014195 | experiment |
 
+| 197 | Two tensor warpgroups with asynchronous480-worker pack | 0.9221 | 0.012164 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2750,3 +2752,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Finite expected approximate errors; original precision gates fail both. BF16 14.095 us and FP16 14.296 us versus Dense12.265/9.975 us. Wider tiles and64CTA grid lose to selected162. Reassessment used current162/187NCU and phase timing plus NVIDIA efficient GEMM/warp specialization documentation; no floor established.
 - **Next:** Return to128CTA N32 grid and test two tensor warpgroups with balanced asynchronous input transform
 - **Archive:** trajectory/20261015_035839_iter-196/
+
+### Iter 197 — Two tensor warpgroups with asynchronous480-worker pack
+
+- **Hypothesis:** Alternating seven products between independent tensor warpgroups overlaps issue and completion latency
+- **Changes:** Restore162; second TC warpgroup takes odd product steps; 480 pack workers and128 streaming consumers; original slots, operation order and publication
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012164 ms; mean speedup=0.9221x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012424 | 0.012081 | 1.0283 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009992 | 0.012247 | 0.8158 | 0.000754626 | 0 |
+
+- **Analysis:** Finite expected approximate output, gates fail. BF16 12.081 us and FP16 12.247 us versus Dense12.424/9.992 us; slower than selected162. Dual TC with480pack is not adopted.
+- **Next:** Increase block to896 threads to restore608 transform workers while retaining dual tensor warpgroups
+- **Archive:** trajectory/20261015_035937_iter-197/
