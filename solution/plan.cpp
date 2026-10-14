@@ -358,13 +358,13 @@ Plan& Plan::operator=(Plan&&) noexcept = default;
 size_t Plan::workspace_bytes() const { return impl_->bytes; }
 const Problem& Plan::problem() const { return impl_->problem; }
 std::string Plan::algorithm_name() const {
-  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw ? "sw_distributed_64x128x64" : "dense_cublaslt";
+  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw ? "sw_distributed_64x256x64" : "dense_cublaslt";
 }
 std::string Plan::lt_algorithm_config(const void* A, const void* B, const float* C0,
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
-  if (impl_->sw) return "sw_distributed;tile=64x128x64;threads=256;ctas=224;operand_stages=4;smem=98432;workspace=15728640;leaf_terms=7;residual_correction=off;st=global_once_fp32_high_only;products=global;recombine=after_grid_sync;alpha=1;beta=0";
+  if (impl_->sw) return "sw_distributed;tile=64x256x64;threads=256;ctas=112;operand_stages=3;smem=123008;workspace=15728640;leaf_terms=7;residual_correction=off;st=global_once_fp32_high_only;products=global;recombine=after_grid_sync;alpha=1;beta=0";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }

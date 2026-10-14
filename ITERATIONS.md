@@ -157,6 +157,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 125 | Bound registers for two-block distributed leaf residency | 0.7146 | 0.015646 | experiment |
 
+| 126 | N256 leaf tiles with one product per resident CTA | 0.6655 | 0.016752 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1482,3 +1484,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full125 benchmark archived with unchanged accuracy gate; inspect potential spills and output validity before performance conclusions.
 - **Next:** Tune thread count to preserve two-block residency without spilling if required
 - **Archive:** trajectory/20261015_020916_iter-125/
+
+### Iter 126 — N256 leaf tiles with one product per resident CTA
+
+- **Hypothesis:** 112 wide CTAs use all SMs while further reducing WGMMA issue and operand duplication
+- **Changes:** 64x256x64, three operand slots,128 accumulator registers,256threads,112residentCTAs,shared123008B; global products and second grid recombination
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.016752 ms; mean speedup=0.6655x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_distributed_64x256x64 v0 | launch | 0.012246 | 0.016682 | 0.7341 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_distributed_64x256x64 v0 | launch | 0.010040 | 0.016822 | 0.5969 | 0.000754626 | 0 |
+
+- **Analysis:** 125 is numerically equivalent but15.7us and16B stack; complete126 benchmark archived with unchanged gates.
+- **Next:** Measure wide-tile critical phases and determine whether global synchronization costs dominate
+- **Archive:** trajectory/20261015_021021_iter-126/
