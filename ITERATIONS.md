@@ -139,6 +139,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 116 | Continuous two-accumulator WGMMA pipeline across product boundaries | 0.6124 | 0.018222 | experiment |
 
+| 117 | Register recombination and vector output from Tensor Core warpgroup | 0.4363 | 0.025648 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1322,3 +1324,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full SW benchmark archived with unchanged FP64 gates; independent synchronization validation required if retained.
 - **Next:** Compare performance and error with100, then consider direct register recombination
 - **Archive:** trajectory/20261015_015523_iter-116/
+
+### Iter 117 — Register recombination and vector output from Tensor Core warpgroup
+
+- **Hypothesis:** Eliminate shared product exchange and CUDA consumer polling by recombining register fragments directly
+- **Changes:** Remove P shared buffers and barriers; TC retains first/second fragments, preserves FP32 arithmetic order and writes adjacent output pairs as float2; shared196736B
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.025648 ms; mean speedup=0.4363x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012424 | 0.025748 | 0.4825 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009965 | 0.025547 | 0.3901 | 0.000754626 | 0 |
+
+- **Analysis:** Complete SW benchmark archived, original FP64 gates unchanged. Validate bitwise behavior and register resources before retaining.
+- **Next:** Assess direct recombination and tune issue and front-end for this architecture
+- **Archive:** trajectory/20261015_015635_iter-117/

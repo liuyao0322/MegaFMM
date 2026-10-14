@@ -17,12 +17,9 @@ using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
-  // Row-major P with an XOR permutation inside each 32-float row.
-  // Both WGMMA fragment stores and row-major consumer loads use every bank once.
-  float product[2][Elements];
-  uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
+  uint64_t ready[Stages],free[Stages];
 };
-static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==196736,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -75,7 +72,6 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -139,76 +135,50 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
 
     }
-  }else if((tid>=32 && tid<128) || tid>=256){
-    int worker=tid>=256 ? tid-160:tid-32;
-    constexpr int Chunks=(Elements+351)/352;
-    float first[Chunks],second[Chunks],current[Chunks];
-    #pragma unroll
-    for(int step=0;step<7;++step){
-      wait(&s.product_ready[step%2],(step/2)%2);
-      #pragma unroll
-      for(int j=0;j<Chunks;++j){
-        int i=worker+j*352;
-        if(i<Elements)current[j]=s.product[step%2][product_index(i/BN,i%BN)];
-      }
-      // Release shared P immediately after reading; arithmetic/global stores can
-      // overlap the Tensor warpgroup's reuse of this slot two steps later.
-      arrive(&s.product_free[step%2]);
-      #pragma unroll
-      for(int j=0;j<Chunks;++j){
-        int i=worker+j*352;
-        if(i<Elements){
-          int at=(m0+i/BN)*1024+n0+i%BN;
-          if(step==0)first[j]=current[j]; // P1
-          else if(step==1)D[at]=__fadd_rn(first[j],current[j]); // U1
-          else if(step==2)first[j]=__fadd_rn(first[j],current[j]); // U2
-          else if(step==3)second[j]=__fadd_rn(first[j],current[j]); // U3
-          else if(step==4){
-            D[at+512*1024+512]=__fadd_rn(second[j],current[j]); // D22
-            first[j]=__fadd_rn(first[j],current[j]); // U4
-          }else if(step==5)D[at+512]=__fadd_rn(first[j],current[j]); // D12
-          else D[at+512*1024]=__fsub_rn(second[j],current[j]); // D21
-        }
-      }
-    }
   }else if(tid>=128 && tid<256){
-    float even[16]={},odd[16]={};
-    auto publish=[&](int step,float (&acc)[16]){
-      if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
+    float first[16],second[16];
+    for(int step=0;step<7;++step){
+      int p=product_for_step(step);
+      float acc[16]={};
+      // Four compact operand slots keep prefetch ahead; retire each K tile promptly.
       #pragma unroll
-      for(int j=0;j<16;++j){
-        int mn=GMMA::CLayout_64x32{}(tid-128,j);
-        s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
-      }
-      arrive(&s.product_ready[step%2]);
-    };
-    auto issue=[&](int step,float (&acc)[16],float (&previous)[16]){
-      #pragma unroll
-      for(int j=0;j<16;++j)acc[j]=0;
-      #pragma unroll
-      for(int q=0;q<2;++q){
-        int sequence=step*2+q,slot=sequence%Stages;
+      for(int q=0;q<512/BK;++q){
+        int sequence=step*(512/BK)+q,slot=sequence%Stages;
         wait(&s.ready[slot],(sequence/Stages)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
-        warpgroup_arrive();mma_term<T>(ah,bh,acc);warpgroup_commit_batch();
-        if(sequence>0){
-          warpgroup_wait<1>();
-          __syncwarp();
-          if((tid&31)==0)arrive(&s.free[(sequence-1)%Stages]);
-        }
-        if(q==0 && step>0)publish(step-1,previous);
+        warpgroup_arrive();
+        mma_term<T>(ah,bh,acc);
+        warpgroup_commit_batch();warpgroup_wait<0>();
+        __syncwarp();
+        if((tid&31)==0)arrive(&s.free[slot]);
       }
-    };
-    #pragma unroll 1
-    for(int pair=0;pair<4;++pair){
-      issue(pair*2,even,odd);
-      if(pair<3)issue(pair*2+1,odd,even);
+      #pragma unroll
+      for(int j=0;j<8;++j){
+        int v=2*j;
+        int mn=GMMA::CLayout_64x32{}(tid-128,v);
+        int at=(m0+mn%64)*1024+n0+mn/64;
+        float2 out;
+        #pragma unroll
+        for(int lane=0;lane<2;++lane){
+          int i=v+lane;
+          float value=0;
+          if(step==0)first[i]=acc[i];
+          else if(step==1)value=__fadd_rn(first[i],acc[i]);
+          else if(step==2)first[i]=__fadd_rn(first[i],acc[i]);
+          else if(step==3)second[i]=__fadd_rn(first[i],acc[i]);
+          else if(step==4){value=__fadd_rn(second[i],acc[i]);first[i]=__fadd_rn(first[i],acc[i]);}
+          else if(step==5)value=__fadd_rn(first[i],acc[i]);
+          else value=__fsub_rn(second[i],acc[i]);
+          if(lane==0)out.x=value;else out.y=value;
+        }
+        if(step==1)*reinterpret_cast<float2*>(D+at)=out;
+        else if(step==4)*reinterpret_cast<float2*>(D+at+512*1024+512)=out;
+        else if(step==5)*reinterpret_cast<float2*>(D+at+512)=out;
+        else if(step==6)*reinterpret_cast<float2*>(D+at+512*1024)=out;
+      }
     }
-    warpgroup_wait<0>();__syncwarp();
-    if((tid&31)==0)arrive(&s.free[13%Stages]);
-    publish(6,even);
   }
   __syncthreads();
 }
