@@ -121,6 +121,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 107 | Use grid synchronization to order barrier initialization | 0.8478 | 0.013166 | experiment |
 
+| 108 | Specialize all seven TC product steps for fixed four-slot addresses | 0.7450 | 0.015039 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1140,3 +1142,25 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Original approximation gates unchanged; compare against100 and validate synchronization with independent bitwise checks plus sanitizers before retaining.
 - **Next:** Finish paired comparisons and select the best independently checked seven-product version
 - **Archive:** trajectory/20261015_013455_iter-107/
+
+### Reassessment after105–107
+
+- Corrected64bit transform105,split-transform106,andbarrier-removal107 provide no >=3% gain over100 in paired full calls.106 ordinarylaunch regresses~9-10%;107 is a mode-dependent noise-sized tradeoff.
+- Re-read best100NCU:dynamicwarp instructions~3.921M vs97~3.204M despite fasterruntime,regs53,no spill,Tensoractivity~14.1%,issueactive~38.5%. Thefour-stage ring changes descriptor/address lowering. Fresh cumulativeissue~3.65us is now larger thanready~1.45us.
+- NVIDIA Hopper/CUTLASS pipeline references already consulted this round. Next targeted direction: unroll seven TC product steps so all four operand slots are compile-time addresses, testing whether descriptor lowering can recover fixed-slot issue efficiency without losing deeper prefetch. Do not infer every issue interval is removable software overhead.
+
+### Iter 108 — Specialize all seven TC product steps for fixed four-slot addresses
+
+- **Hypothesis:** Outer product unrolling can reduce runtime slot-address and descriptor work while retaining deeper prefetch and prompt retirement
+- **Changes:** Basedon100; explicitly unrollTC step0..6 in addition to twoK chunks, preserve accumulation/recombination order and synchronization
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.015039 ms; mean speedup=0.7450x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012355 | 0.014948 | 0.8265 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010038 | 0.015130 | 0.6634 | 0.000754626 | 0 |
+
+- **Analysis:** Both original dtype gates remain FAIL by design of uncompensated route; numerical agreement with97 and independent synchronization checks determine implementation validity.
+- **Next:** Compare108with100/97,retain fastest validated source and complete final sanitizer/profiling evidence
+- **Archive:** trajectory/20261015_013630_iter-108/

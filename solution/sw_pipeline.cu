@@ -78,9 +78,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
     cutlass::arch::fence_barrier_init();
   }
-  // Barrier initialization is consumed only after the cooperative grid sync.
-  // That sync also orders initialization across this CTA, so no earlier CTA
-  // barrier is needed before the independent global input transformation.
+  __syncthreads();
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
@@ -174,6 +172,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
     }
   }else if(tid>=128 && tid<256){
+    // Specialize every product step so all four operand slot addresses are fixed.
+    #pragma unroll
     for(int step=0;step<7;++step){
       int p=product_for_step(step);
       float acc[16]={};
