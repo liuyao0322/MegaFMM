@@ -509,6 +509,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 301 | Reject doubled transform worker population | 1.0706 | 0.010312 | experiment |
 
+| 302 | Reject warp-leader-only readiness polling | 1.0196 | 0.010872 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4636,3 +4638,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.32128 us FP16 10.30368 us versus Dense12.25824/9.82400 us. No win over selected282. Expected finite approximate errors and both original gates fail. New primary geometry does not close FP16 gap.
 - **Next:** Test warp-leader readiness polling with explicit warp rendezvous
 - **Archive:** trajectory/20261015_070951_iter-301/
+
+### Iter 302 — Reject warp-leader-only readiness polling
+
+- **Hypothesis:** One readiness wait per warp followed by warp sync reduces shared barrier access pressure
+- **Changes:** On selected282 branch nonleaders past each K128 readiness loop and rendezvous with bar.warp.sync before WGMMA fence; unchanged four-leader slot release
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010872 ms; mean speedup=1.0196x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012274 | 0.010850 | 1.1312 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009892 | 0.010893 | 0.9081 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.84992 us and FP16 10.89344 us, slower than selected282. Finite original errors retained, both original numerical gates fail. Branch/rendezvous overhead outweighs reduced active polling lanes; candidate not independently certified or selected.
+- **Next:** Reassess current profiles; test removing redundant warp rendezvous after collective WGMMA completion while preserving four release arrivals
+- **Archive:** trajectory/20261015_071035_iter-302/
