@@ -397,6 +397,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 245 | Pair two K groups on one private accumulator | 0.9949 | 0.011214 | experiment |
 
+| 246 | One WGMMA group spans both K256 chunks | 0.9910 | 0.011265 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3630,3 +3632,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 11.1363 us vs Dense 12.2845 us; FP16 11.2925 us vs Dense 10.0131 us, no gain over224. Original numerical gates fail with expected errors. FP16 group4 wall time has a 22.5us host outlier; event remains11.35us and no win is claimed.
 - **Next:** Test one commit for both K chunks to distinguish group bookkeeping from delayed operand release.
 - **Archive:** trajectory/20261015_053408_iter-245/
+
+### Iter 246 — One WGMMA group spans both K256 chunks
+
+- **Hypothesis:** One commit and wait per full-K leaf removes group overhead while retaining tiled TMA supply.
+- **Changes:** From224 issue q0 and q1 on the same private accumulator before one commit and wait0; release both operand slots after completion, skip q1 register fence.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011265 ms; mean speedup=0.9910x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012315 | 0.011164 | 1.1031 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009989 | 0.011366 | 0.8789 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 11.1645 us vs Dense 12.3152 us; FP16 11.3661 us vs Dense 9.98912 us. Original gates fail both with unchanged errors. Does not beat immediate per-K retirement in224: holding slots longer offsets fewer waits.
+- **Next:** Restore exact validated224, refresh launch and Graph checkpoints, then continue critical-path redesign; no floor or completion claim.
+- **Archive:** trajectory/20261015_053501_iter-246/
