@@ -97,6 +97,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 48 | Unified-buffer SW v1 with TMA SIMT WGMMA roles and high-low operands | 0.0323 | 0.342927 | first-version-diagnostic |
 
+| 49 | Correct WGMMA operand layout using canonical interleave | 0.0323 | 0.343984 | layout-correction-diagnostic |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -2022,3 +2024,19 @@ Actual iteration47 validation terminal closure: defaultexit0 CASE/PASS/BEGIN3162
 - **Analysis:** First complete launch benchmark only at 1024, both dtypes, unchanged FP64 gate, 20 warmups / 100 calls / 5 groups / 3 fresh trials. Command returned exit 2; read the recorded per-dtype gate results before any correctness or performance conclusion. Historical results deletions predate this implementation and are not staged.
 - **Next:** Inspect numerical failures; repair implementation correctness before collecting final Graph comparison and focused 1024 validation.
 - **Archive:** trajectory/20261014_182329_iter-48/
+
+### Iter 49 — Correct WGMMA operand layout using canonical interleave
+
+- **Hypothesis:** The isolated WGMMA diagnostic fails with the initial swizzled K-subtiles and passes with canonical interleave; use matching physical write and descriptor layout.
+- **Changes:** Replace both shared operand layouts with CuTe Layout_K_INTER_Atom. No changes to numerical gate, high-low representation, CTA ownership or trial counts.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.343984 ms; mean speedup=0.0323x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_unified_v1_hilo_64x32x32 v0 | launch | 0.012426 | 0.355616 | 0.0349 | 1.3231 | 0 |
+| 1024,1024,1024 | fp16 | sw_unified_v1_hilo_64x32x32 v0 | launch | 0.009842 | 0.332353 | 0.0296 | 1.3231 | 0 |
+
+- **Analysis:** Full 1024 launch run returned exit 2. Numerical and latency results are recorded below and require inspection before further conclusions; the first failed swizzle diagnostic is retained.
+- **Next:** Inspect whether remaining failure is numerical or another implementation defect; validate fresh Graph replay after correctness is established.
+- **Archive:** trajectory/20261014_182643_iter-49/

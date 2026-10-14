@@ -77,8 +77,10 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x;
   int m0=blockIdx.y*BM,n0=blockIdx.x*BN;
-  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW64_Atom<T>{},Shape<_64,_32>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW64_Atom<T>{},Shape<_32,_32>{});
+  // Canonical interleaved layout avoids incompatible K-subtile swizzle origins.
+  // Shared addresses are obtained from these exact layouts on both sides.
+  constexpr auto la=tile_to_shape(GMMA::Layout_K_INTER_Atom<T>{},Shape<_64,_32>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_K_INTER_Atom<T>{},Shape<_32,_32>{});
   if(tid==0) {
     for(int j=0;j<2;++j) {
       Barrier::init(&s.raw_ready[j],1);
