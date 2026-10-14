@@ -501,6 +501,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 297 | Reject 256-thread primary packing | 0.9678 | 0.011419 | experiment |
 
+| 298 | DSM split4plus3 first build | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4566,3 +4568,17 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 median 11.47680 us and FP16 11.36192 us versus concurrent Dense 12.29536 us and 9.81888 us. Slower than selected iteration 282. Both original FP64 accuracy gates still fail; reject this experiment.
 - **Next:** Reassess profiling and investigate split leaf computation with thread block clusters and DSM
 - **Archive:** trajectory/20261015_070216_iter-297/
+
+### Iter 298 — DSM split4plus3 first build
+
+- **Hypothesis:** Two clustered CTAs with N64 WGMMA can shorten the seven-leaf serial chain
+- **Changes:** Separate four and three leaves across cluster peers, five K128 slots, vec4 DSM U exchange with cluster release/acquire and lifetime barriers
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Compile failure in generated dtype branches: separate Rank wrapper leaves an orphan else. No timing or correctness evidence.
+- **Next:** Correct generator branch structure and rerun unchanged architecture
+- **Archive:** trajectory/20261015_070738_iter-298/
