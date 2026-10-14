@@ -359,6 +359,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 226 | 64x64 private transposed tile generator compile failure | 0.0000 | 0.000000 | failed |
 
+| 227 | True64x64 private transposed leaf with64 CTAs | 0.8177 | 0.013611 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3290,3 +3292,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Build FAILED PTX vector size mismatch; no226 runtime or correctness evidence. results/current.csv may contain stale225 rows and must not be interpreted as226 measurements. An independent SASS read was accidentally batched after polling this failed benchmark; close now before correction.
 - **Next:** Correct generated WGMMA accumulator vector and rerun as227
 - **Archive:** trajectory/20261015_050243_iter-226/
+
+### Iter 227 — True64x64 private transposed leaf with64 CTAs
+
+- **Hypothesis:** Larger per-CTA output tile cuts redundant operand fetches and duplicate issue work
+- **Changes:** Correct226 vector generation to32 accumulator registers;512 total352 transform threads;64 compute CTAs; three BK256 operand slots; unchanged FP32 arithmetic order
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013611 ms; mean speedup=0.8177x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012276 | 0.013558 | 0.9054 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009974 | 0.013664 | 0.7299 | 0.000754626 | 0 |
+
+- **Analysis:** Rejected BF13.5581 FP13.6643us. Expected uncompensated errors retained, both original gatesFAIL. Tile coarsening loses too much parallelism/frontend throughput; no performance win.
+- **Next:** Return218 geometry and test full-K512 single retirement per leaf with split LHS TMA loads
+- **Archive:** trajectory/20261015_050315_iter-227/
