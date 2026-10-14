@@ -521,6 +521,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 307 | Local transform PTX register naming build failure | 0.0000 | 0.000000 | experiment |
 
+| 308 | Local shared transforms with seven persistent accumulators | 0.4620 | 0.024130 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4740,3 +4742,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** PTX assembly fails: register array names ending in digits p0<16> do not produce generated references p00 etc. No runtime or numerical evidence; build log retained.
 - **Next:** Use explicit112 scalar register declarations and rerun unchanged design
 - **Archive:** trajectory/20261015_071728_iter-307/
+
+### Iter 308 — Local shared transforms with seven persistent accumulators
+
+- **Hypothesis:** Remove global transform launch and traffic by reusing local raw quadrants across seven leaf products
+- **Changes:** Explicit112PTXaccumulator registers;384threads172160shared; four K128 phases local transform and seven GMMA groups per phase
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.024130 ms; mean speedup=0.4620x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012328 | 0.024542 | 0.5023 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009999 | 0.023717 | 0.4216 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 24.54208 us FP16 23.71744 us versus Dense12.32832/9.99872 us, severe regression. Original finite approximation errors retained and gates fail. Compiler emits C7515 WGMMA serialization for both dtypes; cannot assess intended asynchronous architecture before fixing generated code. No independent bitwise certification yet.
+- **Next:** Profile308 local sectors and SASS, then fully unroll K phases to remove loop-carried accumulator aliasing
+- **Archive:** trajectory/20261015_071801_iter-308/
