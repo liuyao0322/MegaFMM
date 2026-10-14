@@ -551,6 +551,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 322 | Dual Tensor Core groups with two K256 slots each | 0.9476 | 0.011484 | experiment |
 
+| 323 | Balanced raw-leaf ownership in dual tensor warpgroups | 1.0324 | 0.010574 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5006,3 +5008,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal benchmark completed; inspect archived CSV for timing and numerical results before adoption.321 was finite with unchanged original gate failures and BF16/FP16 10.60512/10.53824 us, slower than selected282. Full321 NCU72regs and zero local sectors,1.422Minst; sampled long-scoreboard stalls occur mainly on polling-loop branches and require phase attribution rather than a spill claim.
 - **Next:** Test balanced raw-leaf ownership so both tensor groups can start before the primary transforms finish: rank0 P1P6P7P4 and rank1 P2P5P3, shared P1/U2/U3 exchange
 - **Archive:** trajectory/20261015_073823_iter-322/
+
+### Iter 323 — Balanced raw-leaf ownership in dual tensor warpgroups
+
+- **Hypothesis:** Giving each tensor group a raw leaf before its first dependency wait can improve primary-transform overlap and balance the transformed tail
+- **Changes:** K128 four slots per group; rank0 P1P6P7P4, rank1 P2P5P3; three shared P1/U2/U3 planes and128-arrival CTA barriers; dependency wait after first raw leaf in each producer
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010574 ms; mean speedup=1.0324x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012193 | 0.010609 | 1.1493 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009647 | 0.010538 | 0.9154 | 0.000754626 | 0 |
+
+- **Analysis:** Formal benchmark completed; finite unchanged approximate output is not numerical acceptance. Use archived CSV for precise timing.322 larger K blocks were rejected: BF16 11.30592 and FP16 11.66112 us, despite the lower handshake count.
+- **Next:** Inspect323 result and test three tensor groups with3+2+2 leaf ownership and CTA-local exchange if the balanced two-group route still does not beat selected282
+- **Archive:** trajectory/20261015_073921_iter-323/
