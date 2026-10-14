@@ -1,0 +1,26 @@
+{
+  "schema": "megafmm.iter45.report-cpu-parser-first-failure.v1",
+  "actual_process_exit_code": 1,
+  "script_path": "results/psplit_tma_bn16_min2_data_report_generator_iter45.py",
+  "script_sha256": "a5f89330fd9b38adbc3f06c42866a5caf0a4c3592f3f328ea778a952ecf46b06",
+  "gate_path": "results/psplit_tma_bn16_min2_static_review_initial_iter45.json",
+  "gate_sha256": "0ba3555e28af756ebe0e359f0d2d4cd258c149b9f5182d3b9c9cd75b6746a050",
+  "error": "TypeError: can only concatenate str (not \"dict\") to str",
+  "trace_scope": "resource_chronology at report generator line21 directly concatenates original revision1_source_repair dictionary. First executed R returned actualexit1; no report output created. P actualexit0 already closed. Original R/GPU/source/bin/raw/compiled evidence unchanged.",
+  "command": [
+    "python3",
+    "results/psplit_tma_bn16_min2_data_report_generator_iter45.py",
+    "--plan",
+    "results/psplit_tma_bn16_min21024_plan_iter45.json",
+    "--identity",
+    "results/psplit_tma_bn16_min2_measured_identity_iter45.json",
+    "--profile",
+    "results/small_psplit_tma_bn16_min2_profile_iter45.json",
+    "--measurements",
+    "results/small_psplit_tma_bn16_min2_measurements_iter45.json",
+    "--measurement-generator",
+    "results/psplit_tma_bn16_min2_data_measurements_generator_iter45.py",
+    "--output",
+    "results/1024_MEGAKERNEL_PSPLIT_TMA_BN16_MIN2_REPORT.md"
+  ]
+}
