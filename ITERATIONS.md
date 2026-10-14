@@ -95,6 +95,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 94 | Overlap the two K-block WGMMA groups with proven slot retirement | 0.9225 | 0.020434 | passed |
 
+| 95 | Prefetch tensor-map descriptors during input transformation | 0.5804 | 0.019156 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -862,3 +864,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full1024 cubed BF16/FP16 benchmark completed; numerical gates and independent sanitizer validation determine correctness, and full-call comparison determines retention
 - **Next:** Compare against92 and87, inspect WGMMA waits and TMA free-slot effects; keep the fastest independently validated candidate
 - **Archive:** trajectory/20261014_224630_iter-94/
+
+### Iter 95 — Prefetch tensor-map descriptors during input transformation
+
+- **Hypothesis:** Four early descriptor prefetches may hide the first-stage descriptor startup within the independent transform phase
+- **Changes:** Restore92 and prefetch all four tensor maps with the TMA leader before input transformation and grid synchronization
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.019156 ms; mean speedup=0.5804x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012315 | 0.019031 | 0.6471 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009903 | 0.019280 | 0.5136 | 2.37136e-06 | 1 |
+
+- **Analysis:** Full1024 cubed BF16/FP16 benchmark completed; compare against92/87 to avoid attributing unlocked-clock variation to prefetch
+- **Next:** Retain only with full-call improvement; finalize the best validated source and archive rejected consumer/vector/pipeline candidates
+- **Archive:** trajectory/20261014_224940_iter-95/

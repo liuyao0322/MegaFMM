@@ -74,6 +74,9 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
+    // Hide tensor-map descriptor fetch behind the independent input transform.
+    prefetch_tma_descriptor(&amap);prefetch_tma_descriptor(&bmap);
+    prefetch_tma_descriptor(&smap);prefetch_tma_descriptor(&tmap);
     for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.low_ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
     cutlass::arch::fence_barrier_init();
@@ -196,24 +199,12 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb),bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
         warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
-        if(q==1){
-          // Keep q0 in flight while q1 becomes ready and issues its high term.
-          // Once only the newest group may remain, q0's operand slot is safe
-          // for the TMA producer to refill for the next product.
-          warpgroup_commit_batch();
-          warpgroup_wait<1>();
-          __syncwarp();
-          if((tid&31)==0)arrive(&s.free[0]);
-        }
         if(p>=2)wait(&s.low_ready[slot],(sequence/2)%2);
         if(p==2 || p>=4)mma_term<T>(al,bh,acc);
         if(p==3 || p>=4)mma_term<T>(ah,bl,acc);
-        if(q==0 || p>=2)warpgroup_commit_batch();
-        if(q==1){
-          warpgroup_wait<0>();
-          __syncwarp();
-          if((tid&31)==0)arrive(&s.free[1]);
-        }
+        warpgroup_commit_batch();warpgroup_wait<0>();
+        __syncwarp();
+        if((tid&31)==0)arrive(&s.free[slot]);
       }
       if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
       #pragma unroll
