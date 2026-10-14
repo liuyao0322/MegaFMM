@@ -71,6 +71,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 82 | Stream Winograd recombination and publish output early | 0.5180 | 0.021406 | passed |
 
+| 83 | Reuse canonical GMMA descriptors across K tiles | 0.5328 | 0.020759 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -631,3 +633,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - Main measured interval is prepare/issue, not the residual full wait. Operand waits are~7x residual wait0. Execution overlaps instruction issue, so prepare/issue is not all software overhead. This revises the earlier priority assumption.
 - Baseline SASS identical to production; diagnostic output bitwise equal on3fresh inputs; no spill/occupancy change; aggregate instrumentation event overhead averages0.53%/0.73%. Original-input gates pass on fresh formal Graph benchmark. Production code unchanged.
 - Full evidence and reproduction: trajectory/20261014_profile-production-chain/REPORT.md.
+
+### Iter 83 — Reuse canonical GMMA descriptors across K tiles
+
+- **Hypothesis:** CuTe descriptor iteration reduces repeated address-bitfield preparation in the dominant WGMMA issue interval
+- **Changes:** Construct A/B descriptor tensors once per matrix term and index K tiles with the official CuTe descriptor iterator; preserve all arithmetic and synchronization
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.020759 ms; mean speedup=0.5328x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012234 | 0.020741 | 0.5898 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009887 | 0.020777 | 0.4759 | 2.37136e-06 | 1 |
+
+- **Analysis:** Full 1024 cubed BF16/FP16 benchmark completed; recorded numerical gates and complete-call timings in this archive. Generated instruction and independent correctness validation follow.
+- **Next:** Inspect timings, generated instructions and independent stress validation before retaining the candidate
+- **Archive:** trajectory/20261014_215354_iter-83/

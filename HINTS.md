@@ -101,3 +101,8 @@ the user's requests in this conversation:
 - Producer-stage fractions are~64% prepare/issue,18% operand waits,2.7% explicit wait0; these are not whole-kernel percentages. CUDA consumers still wait for P. TMA also waits for free operand slots.
 - Baseline clone has identical2800 SASS instructions and operands to production for both dtypes. Trace output matches baseline bitwise on3fresh inputs; cumulative timing raises registers110->118 without spill or occupancy change; event-time perturbation~0.5–0.7% average.
 - Evidence: trajectory/20261014_profile-production-chain/REPORT.md, compressed raw traces, generated sources and reproduce scripts. Only1024^3 tested.
+
+## Descriptor issue optimization — latest narrow user request
+
+- User asked to optimize based on the preceding production-chain findings (prompt typo interpreted in that context). Optimize WGMMA preparation/issue first; this does not resume an indefinite optimization goal.
+- First candidate constructs base GMMA descriptors once per matrix term and uses CuTe descriptor iteration for K tiles. Preserve arithmetic, precision gates, warp roles and 1024^3-only BF16/FP16 validation. Measure complete invocations and verify generated instructions before claiming a gain.

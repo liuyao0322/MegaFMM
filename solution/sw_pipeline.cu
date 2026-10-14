@@ -43,12 +43,16 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
   using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,
       SM90_64x32x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
       SM90_64x32x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>>;
+  // Build the canonical descriptor once; CuTe preserves the swizzled K offsets
+  // in descriptor units instead of rebuilding address bitfields for each MMA.
+  auto da_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(
+      tiled_divide(a,Shape<_64,_16>{}));
+  auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(
+      tiled_divide(b,Shape<_32,_16>{}));
   #pragma unroll
   for(int kk=0;kk<BK/16;++kk){
-    auto at=local_tile(a,Shape<_64,_16>{},make_coord(0,kk));
-    auto bt=local_tile(b,Shape<_32,_16>{},make_coord(0,kk));
-    uint64_t da=GMMA::make_gmma_desc<GMMA::Major::K>(at);
-    uint64_t db=GMMA::make_gmma_desc<GMMA::Major::MN>(bt);
+    uint64_t da=da_tiles(0,0,kk);
+    uint64_t db=db_tiles(0,0,kk);
     Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15]);
   }
 }
