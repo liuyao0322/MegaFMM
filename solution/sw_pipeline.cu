@@ -10,7 +10,7 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=128,Stages=8,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
 constexpr int Plane=512*512,Threads=768;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
@@ -23,7 +23,7 @@ template<class T> struct alignas(128) Shared {
   uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
   uint64_t pack_ready;
 };
-static_assert(sizeof(Shared<cute::half_t>)==213248,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -39,7 +39,7 @@ __device__ constexpr int product_for_step(int step){
 }
 
 template<class T,class TA,class TB>
-__device__ void mma_term(TA a,TB b,float (&d)[16]) {
+__device__ void mma_term(TA a,TB b,int slot,float (&d)[16]) {
   using namespace cute;
   using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,
       SM90_64x32x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
@@ -52,6 +52,11 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
       tiled_divide(b,Shape<_32,_16>{}));
   auto da_base=da_tiles(0,0,0);
   auto db_base=db_tiles(0,0,0);
+  // Host setup verifies static shared0 + driver reservation1024B. Keep CuTe's
+  // canonical layout fields, replace only the start field with this known base.
+  uint32_t start=64+slot*((ASize+BSize)*sizeof(T)/16);
+  da_base.reg32_[0]=(da_base.reg32_[0]&~0x3fffu)|start;
+  db_base.reg32_[0]=(db_base.reg32_[0]&~0x3fffu)|(start+ASize*sizeof(T)/16);
   #pragma unroll
   for(int kk=0;kk<BK/16;++kk){
     // All operands fit below 256 KiB of shared memory. K offsets cannot carry
@@ -87,7 +92,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step);
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
-      if(sequence==2*(512/BK)){
+      if(sequence==4){
         wait(&s.pack_ready,0);
         // CUDA12.4 cooperative launch gives each invocation its own initialized
         // driver workspace. Only TMA leaders join this publication barrier;
@@ -184,6 +189,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     }
     }
   }else if(tid>=128 && tid<256){
+    #pragma unroll 2
     for(int step=0;step<7;++step){
       int p=product_for_step(step);
       float acc[16]={};
@@ -196,16 +202,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
         warpgroup_arrive();
-        mma_term<T>(ah,bh,acc);
-        warpgroup_commit_batch();
-        if(q>0){
-          warpgroup_wait<1>();__syncwarp();
-          if((tid&31)==0)arrive(&s.free[(sequence-1)%Stages]);
-        }
-        if(q==512/BK-1){
-          warpgroup_wait<0>();__syncwarp();
-          if((tid&31)==0)arrive(&s.free[slot]);
-        }
+        mma_term<T>(ah,bh,slot,acc);
+        warpgroup_commit_batch();warpgroup_wait<0>();
+        __syncwarp();
+        if((tid&31)==0)arrive(&s.free[slot]);
       }
       if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
       #pragma unroll
@@ -257,6 +257,11 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
     check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&blocks,sw_cooperative_hilo<cute::half_t>,Threads,sizeof(Shared<cute::half_t>)),"SW occupancy capacity");
   }
   if(blocks*prop.multiProcessorCount<128)throw std::invalid_argument("SW cooperative grid requires128 resident CTA capacity");
+  cudaFuncAttributes attr{};
+  if(p.dtype==DType::BF16)check(cudaFuncGetAttributes(&attr,sw_cooperative_hilo<cute::bfloat16_t>),"SW attributes");
+  else check(cudaFuncGetAttributes(&attr,sw_cooperative_hilo<cute::half_t>),"SW attributes");
+  if(attr.sharedSizeBytes!=0 || prop.reservedSharedMemPerBlock!=1024)
+    throw std::invalid_argument("SW specialized descriptor requires static shared0 and driver reservation1024B");
   return std::make_shared<SWState>(SWState{p.dtype});
 }
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
