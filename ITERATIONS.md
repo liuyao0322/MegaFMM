@@ -435,6 +435,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 264 | Immutable host TMA geometry templates | 1.0523 | 0.010483 | experiment |
 
+| 265 | Static TMA producer under PDL | 1.0329 | 0.010662 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3972,3 +3974,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通 BF16 10.50496 us、FP16 10.46112 us，与254稳定结果相近，未证明有收益；Dense12.29728/9.77152 us，原门槛FAIL。不以设备计算不变推断主机编码为瓶颈，暂不保留模板复杂性。
 - **Next:** 恢复254设备架构，尝试静态TMA生产链以减少运行时分支及地址计算。
 - **Archive:** trajectory/20261015_061436_iter-264/
+
+### Iter 265 — Static TMA producer under PDL
+
+- **Hypothesis:** PDL取消原publication链后，静态14块生产链或能减少供数分支与索引成本。
+- **Changes:** 254基础把七叶乘法各两个K块的TMA生产代码完全静态展开，原slot和phase、首次变换依赖等待不变。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010662 ms; mean speedup=1.0329x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012236 | 0.010685 | 1.1452 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009796 | 0.010640 | 0.9206 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通BF16 10.6848 us、FP16 10.6400 us，慢于254，Dense12.23584/9.79552 us；原FP64门槛仍FAIL。静态化在新前端下仍无收益，不保留。
+- **Next:** 等当前254稀疏关键块trace完成后，根据首块ready和MMA区间选择新方向。
+- **Archive:** trajectory/20261015_061521_iter-265/

@@ -2400,9 +2400,345 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
-    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
-      int p=product_for_step(step);
-      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
+    { constexpr int sequence=0,slot=0,k0=0,p=0;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=1,slot=1,k0=256,p=0;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=2,slot=2,k0=0,p=1;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=3,slot=3,k0=256,p=1;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=4,slot=0,k0=0,p=5;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=5,slot=1,k0=256,p=5;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=6,slot=2,k0=0,p=6;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=7,slot=3,k0=256,p=6;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=8,slot=0,k0=0,p=4;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=9,slot=1,k0=256,p=4;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=10,slot=2,k0=0,p=2;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=11,slot=3,k0=256,p=2;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=12,slot=0,k0=0,p=3;
+      // Raw P1/P2 can run while the primary transforms S/T. This wait
+      // guarantees completion and visibility even if no overlap is scheduled.
+      if(sequence==4)cudaGridDependencySynchronize();
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      // LHS is B_leaf^T, M-contiguous original B data.
+      if(blo){
+        int plane=p==3?3:p-4;
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+      }else{
+        int col=p==2?512:0,row=p==1 || p==2?512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+      }
+      // RHS is A_leaf^T, K-contiguous original A data.
+      if(alo){
+        int plane=p==2?3:p-4;
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+      }else{
+        int col=p==1 || p==3?512:0,row=p==3?512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+      }
+
+    }
+    { constexpr int sequence=13,slot=1,k0=256,p=3;
       // Raw P1/P2 can run while the primary transforms S/T. This wait
       // guarantees completion and visibility even if no overlap is scheduled.
       if(sequence==4)cudaGridDependencySynchronize();
@@ -2457,7 +2793,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map status "+std::to_string(int(result)));
 }
 } // namespace
-struct SWState{DType dtype;CUtensorMap maps[4];};
+struct SWState{DType dtype;};
 std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   if(p.m!=1024 || p.n!=1024 || p.k!=1024 || p.trans_a || p.trans_b || p.lda!=1024 || p.ldb!=1024 || p.ldd!=1024 || p.alpha!=1 || p.beta!=0)
     throw std::invalid_argument("SW requires contiguous non-transposed1024^3 alpha1 beta0");
@@ -2479,28 +2815,11 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
     check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&blocks,sw_cooperative_hilo<cute::half_t>,Threads,sizeof(Shared<cute::half_t>)),"SW occupancy capacity");
   }
   if(blocks*prop.multiProcessorCount<128)throw std::invalid_argument("SW cooperative grid requires128 resident CTA capacity");
-  auto state=std::make_shared<SWState>();state->dtype=p.dtype;
-  // Encode invariant tensor geometry once. Every invocation replaces all four
-  // addresses in private host copies, so plans remain safe across streams.
-  void* placeholder=nullptr;
-  check(cudaMalloc(&placeholder,16),"SW tensor template placeholder");
-  try{
-    encode(state->maps[0],placeholder,p.dtype,true,false);
-    encode(state->maps[1],placeholder,p.dtype,false,false);
-    encode(state->maps[2],placeholder,p.dtype,true,true);
-    encode(state->maps[3],placeholder,p.dtype,false,true);
-  }catch(...){cudaFree(placeholder);throw;}
-  check(cudaFree(placeholder),"SW tensor template placeholder free");
-  return state;
+  return std::make_shared<SWState>(SWState{p.dtype});
 }
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
-  CUtensorMap a=state.maps[0],b=state.maps[1],s=state.maps[2],t=state.maps[3];
-  auto bind=[](CUtensorMap& map,const void* pointer){
-    if(reinterpret_cast<uintptr_t>(pointer)%16)throw std::invalid_argument("SW TMA input must be16-byte aligned");
-    auto result=cuTensorMapReplaceAddress(&map,const_cast<void*>(pointer));
-    if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map replace status "+std::to_string(int(result)));
-  };
-  bind(a,A);bind(b,B);bind(s,workspace);bind(t,static_cast<char*>(workspace)+WorkspaceBytes/2);
+  CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
+  encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
   cudaLaunchAttribute attribute{};
   attribute.id=cudaLaunchAttributeProgrammaticStreamSerialization;
   attribute.val.programmaticStreamSerializationAllowed=1;
