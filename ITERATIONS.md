@@ -419,6 +419,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 256 | Decouple N64 compute geometry from PDL transform coverage | 0.9556 | 0.011594 | experiment |
 
+| 257 | Intermediate N48 PDL compute tiles with guarded edge | 1.0180 | 0.010852 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3828,3 +3830,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 11.5904 us vs Dense12.3098 us; FP16 11.5981 us vs Dense9.84896 us. Expected original errors and numerical failures preserved. Slower254 despite decoupled transform: half-SM compute geometry still loses. No independent candidate certification claimed.
 - **Next:** Inspect254 producer/consumer critical path; consider intermediate tile widths with guarded edge stores or packed transform grid tuning.
 - **Archive:** trajectory/20261015_055329_iter-256/
+
+### Iter 257 — Intermediate N48 PDL compute tiles with guarded edge
+
+- **Hypothesis:** 88CTAs retain more SM coverage than N64 while reducing repeated LHS traffic versus N32.
+- **Changes:** 64x48x256 private24-element accumulators, four operand slots229504shared,88computeCTAs, exact PTX row guards on final partial tile; unchanged128x512primary, PDL and aligned carveout.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010852 ms; mean speedup=1.0180x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012309 | 0.010868 | 1.1326 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009789 | 0.010835 | 0.9035 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.8685 us vs Dense12.3091 us; FP16 10.8352 us vs Dense9.78912 us. Better than N64 but slower25410.44FP. Original expected errors/nonfinite0 and both gate failures preserved. No independent edge-store certification claimed; not retained.
+- **Next:** Reassess254 full NCU and actual device timing; tune transform grid and compute prefetch independently instead of reducing active CTAs further.
+- **Archive:** trajectory/20261015_055503_iter-257/
