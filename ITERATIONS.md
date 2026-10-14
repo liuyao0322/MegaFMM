@@ -327,6 +327,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 210 | Move C21 store before final P5 update | 0.5475 | 0.020332 | experiment |
 
+| 211 | Float4 shared P exchange with matching fragment consumers | 0.9673 | 0.011506 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3004,3 +3006,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Benchmark completed; numerical validity and performance will be reviewed from archived results. This candidate is not selected until the expected seven-product error and independent comparison are confirmed.
 - **Next:** Inspect numerical results, independently compare all quadrants, then profile or reject the local-transform architecture
 - **Archive:** trajectory/20261015_042831_iter-210/
+
+### Iter 211 — Float4 shared P exchange with matching fragment consumers
+
+- **Hypothesis:** Matching tensor and CUDA fragment layouts eliminates scalar swizzled-index calculations and reduces P load/store instructions
+- **Changes:** From selected162 use fragment-major P storage, four float4 loads and stores per leaf, matching CLayout consumers and float2 output
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011506 ms; mean speedup=0.9673x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012276 | 0.011411 | 1.0758 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009963 | 0.011602 | 0.8587 | 0.000754626 | 0 |
+
+- **Analysis:** Original seven-product error reproduced, both original accuracy gates FAIL. Full-call BF16 11.4112us and FP16 11.6019us are not faster than selected162; no winner established. Plan diagnostic string still describes old P layout and will be corrected with next source.
+- **Next:** Inspect resource and instruction evidence; test static dual-TC issue with this compact shared exchange
+- **Archive:** trajectory/20261015_043255_iter-211/
