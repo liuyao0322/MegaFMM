@@ -367,6 +367,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 230 | Two private transposed accumulators with interleaved K and wait1 | 0.9964 | 0.011326 | experiment |
 
+| 231 | Fully static TMA producer sequence | 0.9849 | 0.011332 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3362,3 +3364,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF11.2195 FP11.4323us, slower224. Expected eF unchanged and both original gatesFAIL. No performance win; need inspect actual register/spill and completion behavior before further pipeline tuning.
 - **Next:** Profile230 versus224; continue frontend supply analysis and avoid assuming asynchronous depth helps
 - **Archive:** trajectory/20261015_050758_iter-230/
+
+### Iter 231 — Fully static TMA producer sequence
+
+- **Hypothesis:** Compile-time P IDs, slot phases and TMA coordinates reduce producer bookkeeping latency
+- **Changes:** From224 explicitly emit14 fixed producer blocks instead of nested step/q loop; unchanged TC PTX and mathematical operations
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011332 ms; mean speedup=0.9849x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012317 | 0.011260 | 1.0939 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009988 | 0.011403 | 0.8759 | 0.000754626 | 0 |
+
+- **Analysis:** Rejected BF11.2598 FP11.4032us, slower224; original approximate errors and frozen failures unchanged.230 minimalNCU80regs,0local,1.795Minstructions confirms interleaving regression is not a spill artifact.
+- **Next:** Investigate input transform instruction dependencies and stage publication without repeating static-producer tuning
+- **Archive:** trajectory/20261015_050930_iter-231/
