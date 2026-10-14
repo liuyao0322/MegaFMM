@@ -159,6 +159,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 126 | N256 leaf tiles with one product per resident CTA | 0.6655 | 0.016752 | experiment |
 
+| 127 | Direct vector operand producers without global S/T or grid barriers | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1500,3 +1502,17 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 125 is numerically equivalent but15.7us and16B stack; complete126 benchmark archived with unchanged gates.
 - **Next:** Measure wide-tile critical phases and determine whether global synchronization costs dominate
 - **Archive:** trajectory/20261015_021021_iter-126/
+
+### Iter 127 — Direct vector operand producers without global S/T or grid barriers
+
+- **Hypothesis:** Generate high operands directly into shared and trade duplicated transforms for removal of global pack and cooperative synchronization
+- **Changes:** Two ordinary kernels:128 CUDA producer threads and128 TC threads per leaf CTA,64x128x64 four slots, FP32 transforms with original rounding; second vector recombination kernel,8MiB workspace
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Full127 benchmark archived; check original error level and resource scheduling before interpreting latency.
+- **Next:** Profile operand generation versus tensor compute and compare two-kernel full-call overhead
+- **Archive:** trajectory/20261015_021256_iter-127/

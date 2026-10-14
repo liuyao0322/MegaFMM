@@ -1,0 +1,289 @@
+a21b2bb07f1c42cdcdfebee9bb2b6d2c236b4dedb8a2485162469d3786d9965d  solution/internal.h
+a8fac0a6a31e99e1c09f75f64ed1008eb2a3af0c04f5cc2940fe191cb2658a32  solution/plan.cpp
+32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708  solution/scale_output.cu
+0f3f2017a6751a1b0ed6e51d149960745b4d15d48da99738154401feec41bb6e  solution/sw_pipeline.cu
+d5564b71d399c934229c8dc2089c5dd8de7e942957845a9cf23977353186e475  include/megafmm/gemm.h
+0964fc49fdbd02945515ff2d8f6bb834c6a4c937fb4cfad396b1be313634ae4e  bench/benchmark.cu
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 10%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 30%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 30%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(147): error: identifier "A" is undefined
+      auto av=reinterpret_cast<const uint32_t*>(A);
+                                                ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(148): error: identifier "B" is undefined
+      auto bv=reinterpret_cast<const uint32_t*>(B);
+                                                ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(154): error: name followed by "::" must be a class or namespace name
+        float a11=float(T::bitcast(uint16_t(abits[0]>>(16*lane)))),a12=float(T::bitcast(uint16_t(abits[1]>>(16*lane))));
+                        ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(154): error: name followed by "::" must be a class or namespace name
+        float a11=float(T::bitcast(uint16_t(abits[0]>>(16*lane)))),a12=float(T::bitcast(uint16_t(abits[1]>>(16*lane))));
+                                                                             ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(155): error: name followed by "::" must be a class or namespace name
+        float a21=float(T::bitcast(uint16_t(abits[2]>>(16*lane)))),a22=float(T::bitcast(uint16_t(abits[3]>>(16*lane))));
+                        ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(155): error: name followed by "::" must be a class or namespace name
+        float a21=float(T::bitcast(uint16_t(abits[2]>>(16*lane)))),a22=float(T::bitcast(uint16_t(abits[3]>>(16*lane))));
+                                                                             ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(156): error: name followed by "::" must be a class or namespace name
+        float b11=float(T::bitcast(uint16_t(bbits[0]>>(16*lane)))),b12=float(T::bitcast(uint16_t(bbits[1]>>(16*lane))));
+                        ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(156): error: name followed by "::" must be a class or namespace name
+        float b11=float(T::bitcast(uint16_t(bbits[0]>>(16*lane)))),b12=float(T::bitcast(uint16_t(bbits[1]>>(16*lane))));
+                                                                             ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(157): error: name followed by "::" must be a class or namespace name
+        float b21=float(T::bitcast(uint16_t(bbits[2]>>(16*lane)))),b22=float(T::bitcast(uint16_t(bbits[3]>>(16*lane))));
+                        ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(157): error: name followed by "::" must be a class or namespace name
+        float b21=float(T::bitcast(uint16_t(bbits[2]>>(16*lane)))),b22=float(T::bitcast(uint16_t(bbits[3]>>(16*lane))));
+                                                                             ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(164): error: identifier "T" is undefined
+          T sh=T(sv[j]),th=T(tv[j]);
+          ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(164): error: expected a ";"
+          T sh=T(sv[j]),th=T(tv[j]);
+            ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(165): error: identifier "sh" is undefined
+          words[2*j]|=uint32_t(sh.raw())<<(16*lane);
+                               ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(166): error: identifier "th" is undefined
+          words[8+2*j]|=uint32_t(th.raw())<<(16*lane);
+                                 ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(170): error: identifier "packed" is undefined
+      for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(2*j*Plane+i)/2]=words[2*j];
+                                                      ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(175): error: name followed by "::" must be a class or namespace name
+    constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+                                    ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(175): error: expected an expression
+    constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+                                                                ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(175): error: identifier "Shape" is undefined
+    constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+                                                                   ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(175): error: identifier "_64" is undefined
+    constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+                                                                         ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(175): error: identifier "Int" is undefined
+    constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+                                                                             ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(175): error: expected an expression
+    constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+                                                                                     ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(175): error: identifier "tile_to_shape" is undefined
+    constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+                      ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(176): error: name followed by "::" must be a class or namespace name
+    constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_256,Int<BK>>{},Step<_2,_1>{});
+                                    ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(176): error: expected an expression
+    constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_256,Int<BK>>{},Step<_2,_1>{});
+                                                                 ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(176): error: identifier "_256" is undefined
+    constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_256,Int<BK>>{},Step<_2,_1>{});
+                                                                          ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(176): error: expected an expression
+    constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_256,Int<BK>>{},Step<_2,_1>{});
+                                                                                       ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(176): error: identifier "Step" is undefined
+    constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_256,Int<BK>>{},Step<_2,_1>{});
+                                                                                          ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(176): error: identifier "_2" is undefined
+    constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_256,Int<BK>>{},Step<_2,_1>{});
+                                                                                               ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(176): error: identifier "_1" is undefined
+    constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_256,Int<BK>>{},Step<_2,_1>{});
+                                                                                                  ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(176): error: expected an expression
+    constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_256,Int<BK>>{},Step<_2,_1>{});
+                                                                                                     ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(177): error: identifier "tid" is undefined
+    if(tid==0){
+       ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(180): error: identifier "s" is undefined
+        if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+                                  ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(181): error: identifier "p" is undefined
+        bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+                 ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(183): error: name followed by "::" must be a class or namespace name
+        TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+        ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(183): error: identifier "s" is undefined
+        TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+                                         ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(184): error: identifier "T" is undefined
+        T* op=s.operand[slot];
+        ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(184): error: identifier "op" is undefined
+        T* op=s.operand[slot];
+           ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(187): error: name followed by "::" must be a class or namespace name
+          SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op,0,m0,k0/64,plane);
+          ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(187): error: identifier "smap" is undefined
+          SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op,0,m0,k0/64,plane);
+                                  ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(187): error: identifier "m0" is undefined
+          SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op,0,m0,k0/64,plane);
+                                                             ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(190): error: name followed by "::" must be a class or namespace name
+          SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op,0,m0+row,(k0+col)/64);
+          ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(190): error: identifier "amap" is undefined
+          SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op,0,m0+row,(k0+col)/64);
+                                  ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(190): error: identifier "m0" is undefined
+          SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op,0,m0+row,(k0+col)/64);
+                                                             ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(194): error: name followed by "::" must be a class or namespace name
+          SM90_TMA_LOAD_4D::copy(&tmap,&s.ready[slot],0,op+ASize,0,k0,n0/64,plane);
+          ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(194): error: identifier "tmap" is undefined
+          SM90_TMA_LOAD_4D::copy(&tmap,&s.ready[slot],0,op+ASize,0,k0,n0/64,plane);
+                                  ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(194): error: identifier "n0" is undefined
+          SM90_TMA_LOAD_4D::copy(&tmap,&s.ready[slot],0,op+ASize,0,k0,n0/64,plane);
+                                                                      ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(197): error: name followed by "::" must be a class or namespace name
+          SM90_TMA_LOAD_3D::copy(&bmap,&s.ready[slot],0,op+ASize,0,k0+row,(n0+col)/64);
+          ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(197): error: identifier "bmap" is undefined
+          SM90_TMA_LOAD_3D::copy(&bmap,&s.ready[slot],0,op+ASize,0,k0+row,(n0+col)/64);
+                                  ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(197): error: identifier "n0" is undefined
+          SM90_TMA_LOAD_3D::copy(&bmap,&s.ready[slot],0,op+ASize,0,k0+row,(n0+col)/64);
+                                                                           ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(206): error: identifier "s" is undefined
+        wait(&s.ready[slot],(q/Stages)%2);
+              ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(207): error: identifier "T" is undefined
+        T* op=s.operand[slot];
+        ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(207): error: identifier "op" is undefined
+        T* op=s.operand[slot];
+           ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(208): error: identifier "make_smem_ptr" is undefined
+        auto ah=make_tensor(make_smem_ptr(op),la);
+                            ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(208): error: identifier "make_tensor" is undefined
+        auto ah=make_tensor(make_smem_ptr(op),la);
+                ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(211): error: identifier "warpgroup_fence_operand" is undefined
+        for(int j=0;j<128;++j)warpgroup_fence_operand(acc[j]);
+                              ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(212): error: identifier "warpgroup_arrive" is undefined
+        warpgroup_arrive();mma_term<T>(ah,bh,acc);warpgroup_commit_batch();warpgroup_wait<0>();
+        ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(212): error: identifier "warpgroup_commit_batch" is undefined
+        warpgroup_arrive();mma_term<T>(ah,bh,acc);warpgroup_commit_batch();warpgroup_wait<0>();
+                                                  ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(212): error: identifier "warpgroup_wait" is undefined
+        warpgroup_arrive();mma_term<T>(ah,bh,acc);warpgroup_commit_batch();warpgroup_wait<0>();
+                                                                           ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(212): error: expected an expression
+        warpgroup_arrive();mma_term<T>(ah,bh,acc);warpgroup_commit_batch();warpgroup_wait<0>();
+                                                                                             ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(214): error: identifier "warpgroup_fence_operand" is undefined
+        for(int j=0;j<128;++j)warpgroup_fence_operand(acc[j]);
+                              ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(217): error: identifier "packed" is undefined
+      float* products=reinterpret_cast<float*>(packed+16*Plane);
+                                               ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(220): error: name followed by "::" must be a class or namespace name
+        int mn=GMMA::CLayout_64x256{}(tid-128,2*j);
+               ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(220): error: expected a ";"
+        int mn=GMMA::CLayout_64x256{}(tid-128,2*j);
+                                   ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(221): error: identifier "p" is undefined
+        int at=p*Plane+(m0+mn%64)*512+n0+mn/64;
+               ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(221): error: identifier "m0" is undefined
+        int at=p*Plane+(m0+mn%64)*512+n0+mn/64;
+                        ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(221): error: identifier "n0" is undefined
+        int at=p*Plane+(m0+mn%64)*512+n0+mn/64;
+                                      ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(226): error: "products" has already been declared in the current scope
+    const float* products=reinterpret_cast<const float*>(packed+16*Plane);
+                 ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(226): error: identifier "packed" is undefined
+    const float* products=reinterpret_cast<const float*>(packed+16*Plane);
+                                                         ^
+
+68 errors detected in the compilation of "/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu".
+gmake[2]: *** [CMakeFiles/megafmm.dir/build.make:106: CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:89: CMakeFiles/megafmm.dir/all] Error 2
+gmake: *** [Makefile:101: all] Error 2
+srun: error: g08: task 0: Exited with exit code 2
