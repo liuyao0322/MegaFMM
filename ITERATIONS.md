@@ -503,6 +503,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 298 | DSM split4plus3 first build | 0.0000 | 0.000000 | experiment |
 
+| 299 | Reject clustered N64 split4plus3 leaf chain | 0.6895 | 0.015960 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4582,3 +4584,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Compile failure in generated dtype branches: separate Rank wrapper leaves an orphan else. No timing or correctness evidence.
 - **Next:** Correct generator branch structure and rerun unchanged architecture
 - **Archive:** trajectory/20261015_070738_iter-298/
+
+### Iter 299 — Reject clustered N64 split4plus3 leaf chain
+
+- **Hypothesis:** N64 WGMMA and two cooperating CTAs can shorten leaf dependency chains
+- **Changes:** Correct generated dtype branches; retain five K128 slots and vector DSM U exchange, cluster scoped release/acquire and lifetime barriers
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.015960 ms; mean speedup=0.6895x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012166 | 0.016022 | 0.7593 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009850 | 0.015898 | 0.6196 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 16.02176 us and FP16 15.89792 us versus Dense12.16608/9.85024 us, much slower than selected282. Finite original errors unchanged and both original gates fail. Cluster scheduling, barrier, DSM and resources need profiling before another split variant; no speed win.
+- **Next:** Profile cluster resources and return to noncluster supply latency with only first-block input prefetch
+- **Archive:** trajectory/20261015_070759_iter-299/
