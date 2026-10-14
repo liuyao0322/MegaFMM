@@ -44,7 +44,7 @@ __device__ __forceinline__ void mma_term(TA a,TB b,float (&d)[16]){
   using namespace cute;
   using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,SM80_16x8x16_F32BF16BF16F32_TN,SM80_16x8x16_F32F16F16F32_TN>;
   int lane=threadIdx.x&31,warp=(threadIdx.x-128)/32;
-  #pragma unroll
+  #pragma unroll 1
   for(int kk=0;kk<BK;kk+=16){
     uint32_t ar[4];
     uint32_t ap=cast_smem_ptr_to_uint(&a(warp*16+(lane%16),kk+(lane/16)*8));

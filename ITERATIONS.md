@@ -227,6 +227,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 160 | Warp-level MMA sync with LDSM operand fragments | 0.3821 | 0.030048 | experiment |
 
+| 161 | Bound warp-MMA K fragment lifetime | 0.3814 | 0.029243 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2110,3 +2112,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** All fresh errors match seven-product baseline, gates FAIL. Complete calls30.13/29.97us materially slower, and initial Dense BF16 groups varied12.4-13.8us; no performance win. Explicit operand loads and increased instructions negate scheduling benefit.
 - **Next:** Profile HMMA instruction and shared-bank behavior; retain best WGMMA source and continue targeted latency reductions
 - **Archive:** trajectory/20261015_030926_iter-160/
+
+### Iter 161 — Bound warp-MMA K fragment lifetime
+
+- **Hypothesis:** Avoid fully unrolled fragment-load scheduling and reduce instruction footprint/spills
+- **Changes:** From160 do not unroll K16 fragment loop; preserve all MMA order and warp mapping
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.029243 ms; mean speedup=0.3814x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012380 | 0.029266 | 0.4230 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009927 | 0.029219 | 0.3397 | 0.000754626 | 0 |
+
+- **Analysis:** Baseline numerical errors preserved and gates FAIL. Launch29.27/29.22us remains far slower than WGMMA best.160 NCU~6.55M instructions,80regs STACK96B,Tensor9percent; instruction/operand loading path remains costly.
+- **Next:** Combine independently plausible workspace reduction and terminal-barrier removal, validate paired against140 before further optimization
+- **Archive:** trajectory/20261015_031038_iter-161/
