@@ -4,6 +4,7 @@
 #include <cute/tensor.hpp>
 #include <cute/atom/mma_traits_sm90_gmma.hpp>
 #include <cute/arch/copy_sm90_tma.hpp>
+#include <cute/arch/mma_sm80.hpp>
 #include <cutlass/arch/barrier.h>
 #include <stdexcept>
 #include <type_traits>
@@ -11,7 +12,7 @@
 namespace megafmm::detail {
 namespace {
 constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=512;
+constexpr int Plane=512*512,Threads=768;
 constexpr size_t WorkspaceBytes=size_t(8)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -39,56 +40,23 @@ __device__ constexpr int product_for_step(int step){
 }
 
 template<class T,class TA,class TB>
-__device__ void mma_term(TA a,TB b,float (&d)[16]) {
+__device__ __forceinline__ void mma_term(TA a,TB b,float (&d)[16]){
   using namespace cute;
-  using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,
-      SM90_64x32x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
-      SM90_64x32x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>>;
-  // Build the canonical descriptor once; CuTe preserves the swizzled K offsets
-  // in descriptor units instead of rebuilding address bitfields for each MMA.
-  auto da_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(
-      tiled_divide(a,Shape<_64,_16>{}));
-  auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(
-      tiled_divide(b,Shape<_32,_16>{}));
-  auto da_base=da_tiles(0,0,0);
-  auto db_base=db_tiles(0,0,0);
+  using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,SM80_16x8x16_F32BF16BF16F32_TN,SM80_16x8x16_F32F16F16F32_TN>;
+  int lane=threadIdx.x&31,warp=(threadIdx.x-128)/32;
   #pragma unroll
-  for(int kk=0;kk<BK/16;++kk){
-    // All operands fit below 256 KiB of shared memory. K offsets cannot carry
-    // out of the 14-bit start-address field (16-byte units), so keep the high
-    // descriptor word invariant rather than generating a 64-bit add/carry.
-    auto da=da_base,db=db_base;
-    da.reg32_[0]+=uint32_t(da_tiles.layout()(0,0,kk));
-    db.reg32_[0]+=uint32_t(db_tiles.layout()(0,0,kk));
-    Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15]);
+  for(int kk=0;kk<BK;kk+=16){
+    uint32_t ar[4];
+    uint32_t ap=cast_smem_ptr_to_uint(&a(warp*16+(lane%16),kk+(lane/16)*8));
+    asm volatile("ldmatrix.sync.aligned.m8n8.x4.shared.b16 {%0,%1,%2,%3},[%4];":"=r"(ar[0]),"=r"(ar[1]),"=r"(ar[2]),"=r"(ar[3]):"r"(ap):"memory");
+    #pragma unroll
+    for(int n=0;n<4;++n){
+      uint32_t br[2];
+      uint32_t bp=cast_smem_ptr_to_uint(&b(n*8,kk+(lane%16)));
+      asm volatile("ldmatrix.sync.aligned.m8n8.x2.trans.shared.b16 {%0,%1},[%2];":"=r"(br[0]),"=r"(br[1]):"r"(bp):"memory");
+      Op::fma(d[4*n],d[4*n+1],d[4*n+2],d[4*n+3],ar[0],ar[1],ar[2],ar[3],br[0],br[1],d[4*n],d[4*n+1],d[4*n+2],d[4*n+3]);
+    }
   }
-}
-
-template<class T,int Slot>
-__device__ __forceinline__ void issue_fixed(Shared<T>& s,int phase,float (&acc)[16]){
-  using namespace cute;
-  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
-  wait(&s.ready[Slot],phase);
-  #pragma unroll
-  for(int j=0;j<16;++j)warpgroup_fence_operand(acc[j]);
-  warpgroup_arrive();
-  mma_term<T>(make_tensor(make_smem_ptr(s.operand[Slot]),la),make_tensor(make_smem_ptr(s.operand[Slot]+ASize),lb),acc);
-  warpgroup_commit_batch();
-}
-template<class T,int Slot>
-__device__ __forceinline__ void free_fixed(Shared<T>& s){
-  __syncwarp();if((threadIdx.x&31)==0)arrive(&s.free[Slot]);
-}
-template<class T,int Slot>
-__device__ __forceinline__ void publish_fixed(Shared<T>& s,int pair,float (&acc)[16]){
-  using namespace cute;
-  #pragma unroll
-  for(int j=0;j<16;++j)warpgroup_fence_operand(acc[j]);
-  if(pair>0)wait(&s.product_free[Slot],(pair-1)%2);
-  #pragma unroll
-  for(int j=0;j<16;++j){int mn=GMMA::CLayout_64x32{}(threadIdx.x-128,j);s.product[Slot][product_index(mn%64,mn/64)]=acc[j];}
-  arrive(&s.product_ready[Slot]);
 }
 
 template<class T> __global__ __launch_bounds__(Threads,1)
@@ -104,7 +72,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
-    Barrier::init(&s.pack_ready,352);
+    Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -151,7 +119,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
-  for(int local=2*worker;local<Plane/(16*8);local+=2*352){
+  for(int local=2*worker;local<Plane/(16*8);local+=2*608){
     int i=(blockIdx.y*gridDim.x+blockIdx.x)*(Plane/(16*8))+local;
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
@@ -211,26 +179,30 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     }
     }
   }else if(tid>=128 && tid<256){
-    #pragma unroll 1
-    for(int pair=0;pair<3;++pair){
-      float acc0[16]={},acc1[16]={};
-      issue_fixed<T,0>(s,pair%2,acc0);
-      issue_fixed<T,2>(s,pair%2,acc1);
-      warpgroup_wait<1>();free_fixed<T,0>(s);
-      issue_fixed<T,1>(s,pair%2,acc0);
-      warpgroup_wait<1>();free_fixed<T,2>(s);
-      issue_fixed<T,3>(s,pair%2,acc1);
-      warpgroup_wait<1>();free_fixed<T,1>(s);
-      publish_fixed<T,0>(s,pair,acc0);
-      warpgroup_wait<0>();free_fixed<T,3>(s);
-      publish_fixed<T,1>(s,pair,acc1);
+    for(int step=0;step<7;++step){
+      int p=product_for_step(step);
+      float acc[16]={};
+      // Four compact operand slots keep prefetch ahead; retire each K tile promptly.
+      #pragma unroll
+      for(int q=0;q<512/BK;++q){
+        int sequence=step*(512/BK)+q,slot=sequence%Stages;
+        wait(&s.ready[slot],(sequence/Stages)%2);
+        T* op=s.operand[slot];
+        auto ah=make_tensor(make_smem_ptr(op),la);
+        auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
+        mma_term<T>(ah,bh,acc);
+        __syncwarp();
+        if((tid&31)==0)arrive(&s.free[slot]);
+      }
+      if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
+      #pragma unroll
+      for(int j=0;j<16;++j){
+        int mn=GMMA::CLayout_64x32{}(tid-128,j);
+        s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
+      }
+      arrive(&s.product_ready[step%2]);
     }
-    float tail[16]={};
-    issue_fixed<T,0>(s,1,tail);warpgroup_wait<0>();free_fixed<T,0>(s);
-    issue_fixed<T,1>(s,1,tail);warpgroup_wait<0>();free_fixed<T,1>(s);
-    publish_fixed<T,0>(s,3,tail);
   }
-
   __syncthreads();
 }
 void check(cudaError_t e,const char* where){if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));}
