@@ -381,6 +381,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 237 | Direct atomic merge of two K partial outputs | 0.8257 | 0.013484 | experiment |
 
+| 238 | Ordered quadrant handoff between two K-partial CTAs | 0.2651 | 0.042061 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3488,3 +3490,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF about13.42 FP13.5488us, improves split-K merge variants but slower224. Approximate eF retained and original gatesFAIL. FP32 global atomic addition flushes subnormal inputs/results per NVIDIA PTX documentation, an extra semantic limitation; not retained as equivalent baseline.
 - **Next:** Explore ordered two-CTA direct output handoff to preserve raw-transform overlap and avoid Dzero/atomic FTZ, otherwise return validated218/224 architecture
 - **Archive:** trajectory/20261015_051956_iter-237/
+
+### Iter 238 — Ordered quadrant handoff between two K-partial CTAs
+
+- **Hypothesis:** Direct initial stores and ordered second-partial FP32 additions avoid partial buffers and Dzero
+- **Changes:** From234 use1024B per-invocation flags initialized by pack workers, output-ready publication after rawTMA overlap, firstK publishes each completed quadrant after TC barrier, secondK acquires and adds with normal FP32 operations
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.042061 ms; mean speedup=0.2651x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012336 | 0.041498 | 0.2973 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009928 | 0.042624 | 0.2329 | 0.000754625 | 0 |
+
+- **Analysis:** Rejected BF41.4982 FP42.6240us severe regression, finite expected approximate errors and both original gatesFAIL. No atomic FTZ, but scalar read/modify/write and cross-CTA waits are costly; profile actual local sectors before attributing entire cost to synchronization.
+- **Next:** Close split-K direction with resource profile, validate224 and restore proven best for checkpoint; goal remains active and FP16 still slowerDense
+- **Archive:** trajectory/20261015_052137_iter-238/

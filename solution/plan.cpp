@@ -364,7 +364,7 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
-  if (impl_->sw) return "sw_cooperative;warp_roles=1tma+4wgmma+11pack_only;smem=196736;operand_stages=3;bk=256;tile=64x64;compute_ctas=128;split_k=2;merge=atomic_two_partial_C;Dzero=per_call_before_publication;workspace=4194304;st=compact4planes_balanced_async_p1p2;publication=tma_leader_driver_workspace_barrier_cuda12.4;terminal_cta_barrier=off;recombine=private_static_ptx;accum_init=first_mma_overwrite;product_order=1_2_6_7_5_3_4;product_slots=0;product_layout=registers;leaf=Btrans_Atrans;lhs=MN128;rhs=K128;output=transposed_fragment;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;alpha=1;beta=0";
+  if (impl_->sw) return "sw_cooperative;warp_roles=1tma+4wgmma+11pack_only;smem=196736;operand_stages=3;bk=256;tile=64x64;compute_ctas=128;split_k=2;merge=ordered_quadrant_handoff;workspace=4195328;st=compact4planes_balanced_async_p1p2;publication=tma_leader_driver_workspace_barrier_cuda12.4;terminal_cta_barrier=off;recombine=private_static_ptx;accum_init=first_mma_overwrite;product_order=1_2_6_7_5_3_4;product_slots=0;product_layout=registers;leaf=Btrans_Atrans;lhs=MN128;rhs=K128;output=transposed_fragment;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;alpha=1;beta=0";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }
@@ -379,9 +379,9 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   impl->empty = !p.m || !p.n;
   impl->scale = !p.k || p.alpha == 0.0f;
   if (policy.algorithm==Algorithm::SWPipeline) {
-    if(policy.workspace_limit<(size_t(8)<<20))throw std::invalid_argument("SW needs8MiB workspace");
+    if(policy.workspace_limit<((size_t(4)<<20)+1024))throw std::invalid_argument("SW needs4MiB+1024B workspace");
     impl->sw=detail::make_sw_pipeline(p);
-    impl->bytes=size_t(4)<<20;
+    impl->bytes=(size_t(4)<<20)+1024;
   } else if (!impl->empty && !impl->scale) {
     lt_check(cublasLtCreate(&impl->handle), "create cuBLASLt handle");
     impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);
