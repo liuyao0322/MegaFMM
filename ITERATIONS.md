@@ -269,6 +269,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 181 | Template-constant descriptors via uniform slot dispatch | 0.9729 | 0.011454 | experiment |
 
+| 182 | Fence only before first K group | 0.9741 | 0.011436 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2484,3 +2486,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about11.37us FP16 about11.53us, flat162. Original FP64 failures and nonfinite0 retained. No claim of R2UR savings without SASS inspection.
 - **Next:** Inspect SASS and test avoiding redundant fence between two WGMMA K groups, preserving operand waits and release.
 - **Archive:** trajectory/20261015_033624_iter-181/
+
+### Iter 182 — Fence only before first K group
+
+- **Hypothesis:** Consecutive same-shape WGMMA accumulator accesses require no additional register fence between q0 and q1 when generic code does not access accumulators.
+- **Changes:** Restore162; retain warpgroup fence before q0 only, unchanged perK ready/wait0/free and output stores.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011436 ms; mean speedup=0.9741x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012285 | 0.011329 | 1.0844 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009970 | 0.011543 | 0.8638 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about11.33us FP16 about11.54us, no material improvement. Expected original FP64 failures retained. NVIDIA PTX permits same-shape consecutive WGMMA accumulator ordering without extra fence; reference https://docs.nvidia.com/cuda/pdf/ptx_isa_8.8.pdf.
+- **Next:** Try separate A and B TMA producer warps with shared per-slot transaction completion and explicit local publication handoff.
+- **Archive:** trajectory/20261015_033722_iter-182/

@@ -38,8 +38,8 @@ __device__ constexpr int product_for_step(int step){
   return step<2 ? step:step==2 ? 5:step==3 ? 6:step==4 ? 4:step==5 ? 2:3;
 }
 
-template<class T,int Slot,class TA,class TB>
-__device__ __forceinline__ void mma_term(TA a,TB b,float (&d)[16]) {
+template<class T,class TA,class TB>
+__device__ void mma_term(TA a,TB b,float (&d)[16]) {
   using namespace cute;
   using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,
       SM90_64x32x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
@@ -52,9 +52,6 @@ __device__ __forceinline__ void mma_term(TA a,TB b,float (&d)[16]) {
       tiled_divide(b,Shape<_32,_16>{}));
   auto da_base=da_tiles(0,0,0);
   auto db_base=db_tiles(0,0,0);
-  constexpr uint32_t start=64+Slot*((ASize+BSize)*sizeof(T)/16);
-  da_base.reg32_[0]=(da_base.reg32_[0]&~0x3fffu)|start;
-  db_base.reg32_[0]=(db_base.reg32_[0]&~0x3fffu)|(start+ASize*sizeof(T)/16);
   #pragma unroll
   for(int kk=0;kk<BK/16;++kk){
     // All operands fit below 256 KiB of shared memory. K offsets cannot carry
@@ -198,14 +195,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
-        warpgroup_arrive();
-        // Slot is uniform across all four WGMMA warps; one accumulator array.
-        switch(slot){
-          case 0: mma_term<T,0>(ah,bh,acc);break;
-          case 1: mma_term<T,1>(ah,bh,acc);break;
-          case 2: mma_term<T,2>(ah,bh,acc);break;
-          default: mma_term<T,3>(ah,bh,acc);break;
-        }
+        if(q==0)warpgroup_arrive();
+        mma_term<T>(ah,bh,acc);
         warpgroup_commit_batch();warpgroup_wait<0>();
         __syncwarp();
         if((tid&31)==0)arrive(&s.free[slot]);
@@ -251,11 +242,6 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
     throw std::invalid_argument("SW requires contiguous non-transposed1024^3 alpha1 beta0");
   int device;cudaDeviceProp prop{};check(cudaGetDevice(&device),"SW device");check(cudaGetDeviceProperties(&prop,device),"SW properties");
   if(prop.major!=9 || prop.minor!=0 || !prop.cooperativeLaunch)throw std::invalid_argument("SW needs cooperative Hopper launch");
-  cudaFuncAttributes attr{};
-  if(p.dtype==DType::BF16)check(cudaFuncGetAttributes(&attr,sw_cooperative_hilo<cute::bfloat16_t>),"SW attributes");
-  else check(cudaFuncGetAttributes(&attr,sw_cooperative_hilo<cute::half_t>),"SW attributes");
-  if(attr.sharedSizeBytes!=0 || prop.reservedSharedMemPerBlock!=1024)
-    throw std::invalid_argument("SW fixed descriptors require static shared0 and reserved shared1024bytes");
   int blocks=0;
   if(p.dtype==DType::BF16){
     check(cudaFuncSetAttribute(sw_cooperative_hilo<cute::bfloat16_t>,cudaFuncAttributeMaxDynamicSharedMemorySize,sizeof(Shared<cute::bfloat16_t>)),"SW shared opt-in");
