@@ -531,6 +531,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 312 | Reject corrected K64 local double buffering | 0.6999 | 0.015929 | experiment |
 
+| 313 | Restore validated282 after cluster and local-transform exploration | 1.0835 | 0.010270 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4830,3 +4832,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Original finite errors restored; both original accuracy gates remain FAIL as expected. BF16 about16.16us FP16 about15.70us still far slower than282, so local transform route is not selected.311 timings invalid. Removing global S/T traffic does not compensate duplicated SIMT transforms and local staging costs.
 - **Next:** Restore selected282 verbatim, refresh full benchmark, archive checkpoint, then investigate PDL global split4/3 with rank1 precomputation
 - **Archive:** trajectory/20261015_072306_iter-312/
+
+### Iter 313 — Restore validated282 after cluster and local-transform exploration
+
+- **Hypothesis:** Verbatim selected282 remains fastest independently validated complete ordinary invocation
+- **Changes:** git checkout1bdfb29 solution, unchanged selected source and arithmetic, fresh full ordinary benchmark
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010270 ms; mean speedup=1.0835x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012469 | 0.010293 | 1.2114 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009791 | 0.010246 | 0.9556 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.29344us versus Dense12.46912us; FP16 10.24576us versus9.79072us, still needs.45504us or4.44percent SW reduction. BF16 solution group3 wall36.984us retained; event10.25536us. Both original numerical gates remainFAIL;AutoDense. No target completion or physical-floor claim.
+- **Next:** Archive292-313 evidence; continue PDL global split4/3 with rank1 precomputation and per-warp release/acquire U flags
+- **Archive:** trajectory/20261015_072357_iter-313/
