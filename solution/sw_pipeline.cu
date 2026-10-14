@@ -19,11 +19,11 @@ template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
   // Row-major P with an XOR permutation inside each 32-float row.
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
-  float product[2][Elements];
-  uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
+  float product[4][Elements];
+  uint64_t ready[Stages],free[Stages],product_ready[4],product_free[4];
   uint64_t pack_ready;
 };
-static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==229632,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -195,7 +195,8 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
   "add.u32 sp,%4,6144;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,0;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "mov.f32 d0,0f00000000;\n"
   "mov.f32 d1,0f00000000;\n"
   "mov.f32 d2,0f00000000;\n"
@@ -332,18 +333,16 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
   "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
-  "PRODUCT_FREE_2:\n"
-  "mbarrier.try_wait.parity.shared::cta.b64 done,[%6],0,0x989680;\n"
-  "@!done bra PRODUCT_FREE_2;\n"
-  "add.u32 sp,%4,0;\n"
+  "add.u32 sp,%4,16384;\n"
   "st.shared.v4.f32 [sp],{d0,d1,d2,d3};\n"
-  "add.u32 sp,%4,2048;\n"
+  "add.u32 sp,%4,18432;\n"
   "st.shared.v4.f32 [sp],{d4,d5,d6,d7};\n"
-  "add.u32 sp,%4,4096;\n"
+  "add.u32 sp,%4,20480;\n"
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
-  "add.u32 sp,%4,6144;\n"
+  "add.u32 sp,%4,22528;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,16;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "mov.f32 d0,0f00000000;\n"
   "mov.f32 d1,0f00000000;\n"
   "mov.f32 d2,0f00000000;\n"
@@ -480,8 +479,9 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
   "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "add.u32 fb,%6,0;\n"
   "PRODUCT_FREE_4:\n"
-  "mbarrier.try_wait.parity.shared::cta.b64 done,[%6],1,0x989680;\n"
+  "mbarrier.try_wait.parity.shared::cta.b64 done,[fb],0,0x989680;\n"
   "@!done bra PRODUCT_FREE_4;\n"
   "add.u32 sp,%4,0;\n"
   "st.shared.v4.f32 [sp],{d0,d1,d2,d3};\n"
@@ -491,7 +491,8 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
   "add.u32 sp,%4,6144;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,0;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "mov.f32 d0,0f00000000;\n"
   "mov.f32 d1,0f00000000;\n"
   "mov.f32 d2,0f00000000;\n"
@@ -628,20 +629,22 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
   "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "add.u32 fb,%6,16;\n"
   "PRODUCT_FREE_6:\n"
-  "mbarrier.try_wait.parity.shared::cta.b64 done,[%6],0,0x989680;\n"
+  "mbarrier.try_wait.parity.shared::cta.b64 done,[fb],0,0x989680;\n"
   "@!done bra PRODUCT_FREE_6;\n"
-  "add.u32 sp,%4,0;\n"
+  "add.u32 sp,%4,16384;\n"
   "st.shared.v4.f32 [sp],{d0,d1,d2,d3};\n"
-  "add.u32 sp,%4,2048;\n"
+  "add.u32 sp,%4,18432;\n"
   "st.shared.v4.f32 [sp],{d4,d5,d6,d7};\n"
-  "add.u32 sp,%4,4096;\n"
+  "add.u32 sp,%4,20480;\n"
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
-  "add.u32 sp,%4,6144;\n"
+  "add.u32 sp,%4,22528;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,16;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "}\n"
-  : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(uint32_t(__cvta_generic_to_shared(s.free))), "r"(uint32_t(__cvta_generic_to_shared(s.product[Group]+((tid-128)%128)*4))), "r"(uint32_t(__cvta_generic_to_shared(s.product_ready+Group))), "r"(uint32_t(__cvta_generic_to_shared(s.product_free+Group))), "r"(tid&31), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(int32_t(GMMA::Major::K)), "n"(int32_t(GMMA::Major::MN)) : "memory");}
+  : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(uint32_t(__cvta_generic_to_shared(s.free))), "r"(uint32_t(__cvta_generic_to_shared(s.product[0]+((tid-128)%128)*4))), "r"(uint32_t(__cvta_generic_to_shared(s.product_ready))), "r"(uint32_t(__cvta_generic_to_shared(s.product_free))), "r"(tid&31), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(int32_t(GMMA::Major::K)), "n"(int32_t(GMMA::Major::MN)) : "memory");}
  else{asm volatile(
   "{ .reg .pred p,leader,done; .reg .b64 ba,bb,da,db; .reg .b32 rb,fb,sp; .reg .f32 d<16>;\n"
   "setp.ne.u32 p,1,0;\n"
@@ -790,7 +793,8 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
   "add.u32 sp,%4,6144;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,0;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "mov.f32 d0,0f00000000;\n"
   "mov.f32 d1,0f00000000;\n"
   "mov.f32 d2,0f00000000;\n"
@@ -927,18 +931,16 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
   "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
-  "PRODUCT_FREE_2:\n"
-  "mbarrier.try_wait.parity.shared::cta.b64 done,[%6],0,0x989680;\n"
-  "@!done bra PRODUCT_FREE_2;\n"
-  "add.u32 sp,%4,0;\n"
+  "add.u32 sp,%4,16384;\n"
   "st.shared.v4.f32 [sp],{d0,d1,d2,d3};\n"
-  "add.u32 sp,%4,2048;\n"
+  "add.u32 sp,%4,18432;\n"
   "st.shared.v4.f32 [sp],{d4,d5,d6,d7};\n"
-  "add.u32 sp,%4,4096;\n"
+  "add.u32 sp,%4,20480;\n"
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
-  "add.u32 sp,%4,6144;\n"
+  "add.u32 sp,%4,22528;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,16;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "mov.f32 d0,0f00000000;\n"
   "mov.f32 d1,0f00000000;\n"
   "mov.f32 d2,0f00000000;\n"
@@ -1075,8 +1077,9 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
   "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "add.u32 fb,%6,0;\n"
   "PRODUCT_FREE_4:\n"
-  "mbarrier.try_wait.parity.shared::cta.b64 done,[%6],1,0x989680;\n"
+  "mbarrier.try_wait.parity.shared::cta.b64 done,[fb],0,0x989680;\n"
   "@!done bra PRODUCT_FREE_4;\n"
   "add.u32 sp,%4,0;\n"
   "st.shared.v4.f32 [sp],{d0,d1,d2,d3};\n"
@@ -1086,7 +1089,8 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
   "add.u32 sp,%4,6144;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,0;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "mov.f32 d0,0f00000000;\n"
   "mov.f32 d1,0f00000000;\n"
   "mov.f32 d2,0f00000000;\n"
@@ -1223,20 +1227,22 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,8;\n"
   "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "add.u32 fb,%6,16;\n"
   "PRODUCT_FREE_6:\n"
-  "mbarrier.try_wait.parity.shared::cta.b64 done,[%6],0,0x989680;\n"
+  "mbarrier.try_wait.parity.shared::cta.b64 done,[fb],0,0x989680;\n"
   "@!done bra PRODUCT_FREE_6;\n"
-  "add.u32 sp,%4,0;\n"
+  "add.u32 sp,%4,16384;\n"
   "st.shared.v4.f32 [sp],{d0,d1,d2,d3};\n"
-  "add.u32 sp,%4,2048;\n"
+  "add.u32 sp,%4,18432;\n"
   "st.shared.v4.f32 [sp],{d4,d5,d6,d7};\n"
-  "add.u32 sp,%4,4096;\n"
+  "add.u32 sp,%4,20480;\n"
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
-  "add.u32 sp,%4,6144;\n"
+  "add.u32 sp,%4,22528;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,16;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "}\n"
-  : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(uint32_t(__cvta_generic_to_shared(s.free))), "r"(uint32_t(__cvta_generic_to_shared(s.product[Group]+((tid-128)%128)*4))), "r"(uint32_t(__cvta_generic_to_shared(s.product_ready+Group))), "r"(uint32_t(__cvta_generic_to_shared(s.product_free+Group))), "r"(tid&31), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(int32_t(GMMA::Major::K)), "n"(int32_t(GMMA::Major::MN)) : "memory");}
+  : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(uint32_t(__cvta_generic_to_shared(s.free))), "r"(uint32_t(__cvta_generic_to_shared(s.product[0]+((tid-128)%128)*4))), "r"(uint32_t(__cvta_generic_to_shared(s.product_ready))), "r"(uint32_t(__cvta_generic_to_shared(s.product_free))), "r"(tid&31), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(int32_t(GMMA::Major::K)), "n"(int32_t(GMMA::Major::MN)) : "memory");}
  }
  if constexpr(Group==1){
  if constexpr(std::is_same_v<T,bfloat16_t>){asm volatile(
@@ -1379,15 +1385,16 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,24;\n"
   "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
-  "add.u32 sp,%4,0;\n"
+  "add.u32 sp,%4,8192;\n"
   "st.shared.v4.f32 [sp],{d0,d1,d2,d3};\n"
-  "add.u32 sp,%4,2048;\n"
+  "add.u32 sp,%4,10240;\n"
   "st.shared.v4.f32 [sp],{d4,d5,d6,d7};\n"
-  "add.u32 sp,%4,4096;\n"
+  "add.u32 sp,%4,12288;\n"
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
-  "add.u32 sp,%4,6144;\n"
+  "add.u32 sp,%4,14336;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,8;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "mov.f32 d0,0f00000000;\n"
   "mov.f32 d1,0f00000000;\n"
   "mov.f32 d2,0f00000000;\n"
@@ -1524,18 +1531,16 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,24;\n"
   "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
-  "PRODUCT_FREE_3:\n"
-  "mbarrier.try_wait.parity.shared::cta.b64 done,[%6],0,0x989680;\n"
-  "@!done bra PRODUCT_FREE_3;\n"
-  "add.u32 sp,%4,0;\n"
+  "add.u32 sp,%4,24576;\n"
   "st.shared.v4.f32 [sp],{d0,d1,d2,d3};\n"
-  "add.u32 sp,%4,2048;\n"
+  "add.u32 sp,%4,26624;\n"
   "st.shared.v4.f32 [sp],{d4,d5,d6,d7};\n"
-  "add.u32 sp,%4,4096;\n"
+  "add.u32 sp,%4,28672;\n"
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
-  "add.u32 sp,%4,6144;\n"
+  "add.u32 sp,%4,30720;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,24;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "mov.f32 d0,0f00000000;\n"
   "mov.f32 d1,0f00000000;\n"
   "mov.f32 d2,0f00000000;\n"
@@ -1672,20 +1677,22 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,24;\n"
   "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "add.u32 fb,%6,8;\n"
   "PRODUCT_FREE_5:\n"
-  "mbarrier.try_wait.parity.shared::cta.b64 done,[%6],1,0x989680;\n"
+  "mbarrier.try_wait.parity.shared::cta.b64 done,[fb],0,0x989680;\n"
   "@!done bra PRODUCT_FREE_5;\n"
-  "add.u32 sp,%4,0;\n"
+  "add.u32 sp,%4,8192;\n"
   "st.shared.v4.f32 [sp],{d0,d1,d2,d3};\n"
-  "add.u32 sp,%4,2048;\n"
+  "add.u32 sp,%4,10240;\n"
   "st.shared.v4.f32 [sp],{d4,d5,d6,d7};\n"
-  "add.u32 sp,%4,4096;\n"
+  "add.u32 sp,%4,12288;\n"
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
-  "add.u32 sp,%4,6144;\n"
+  "add.u32 sp,%4,14336;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,8;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "}\n"
-  : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(uint32_t(__cvta_generic_to_shared(s.free))), "r"(uint32_t(__cvta_generic_to_shared(s.product[Group]+((tid-128)%128)*4))), "r"(uint32_t(__cvta_generic_to_shared(s.product_ready+Group))), "r"(uint32_t(__cvta_generic_to_shared(s.product_free+Group))), "r"(tid&31), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(int32_t(GMMA::Major::K)), "n"(int32_t(GMMA::Major::MN)) : "memory");}
+  : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(uint32_t(__cvta_generic_to_shared(s.free))), "r"(uint32_t(__cvta_generic_to_shared(s.product[0]+((tid-128)%128)*4))), "r"(uint32_t(__cvta_generic_to_shared(s.product_ready))), "r"(uint32_t(__cvta_generic_to_shared(s.product_free))), "r"(tid&31), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(int32_t(GMMA::Major::K)), "n"(int32_t(GMMA::Major::MN)) : "memory");}
  else{asm volatile(
   "{ .reg .pred p,leader,done; .reg .b64 ba,bb,da,db; .reg .b32 rb,fb,sp; .reg .f32 d<16>;\n"
   "setp.ne.u32 p,1,0;\n"
@@ -1826,15 +1833,16 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,24;\n"
   "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
-  "add.u32 sp,%4,0;\n"
+  "add.u32 sp,%4,8192;\n"
   "st.shared.v4.f32 [sp],{d0,d1,d2,d3};\n"
-  "add.u32 sp,%4,2048;\n"
+  "add.u32 sp,%4,10240;\n"
   "st.shared.v4.f32 [sp],{d4,d5,d6,d7};\n"
-  "add.u32 sp,%4,4096;\n"
+  "add.u32 sp,%4,12288;\n"
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
-  "add.u32 sp,%4,6144;\n"
+  "add.u32 sp,%4,14336;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,8;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "mov.f32 d0,0f00000000;\n"
   "mov.f32 d1,0f00000000;\n"
   "mov.f32 d2,0f00000000;\n"
@@ -1971,18 +1979,16 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,24;\n"
   "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
-  "PRODUCT_FREE_3:\n"
-  "mbarrier.try_wait.parity.shared::cta.b64 done,[%6],0,0x989680;\n"
-  "@!done bra PRODUCT_FREE_3;\n"
-  "add.u32 sp,%4,0;\n"
+  "add.u32 sp,%4,24576;\n"
   "st.shared.v4.f32 [sp],{d0,d1,d2,d3};\n"
-  "add.u32 sp,%4,2048;\n"
+  "add.u32 sp,%4,26624;\n"
   "st.shared.v4.f32 [sp],{d4,d5,d6,d7};\n"
-  "add.u32 sp,%4,4096;\n"
+  "add.u32 sp,%4,28672;\n"
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
-  "add.u32 sp,%4,6144;\n"
+  "add.u32 sp,%4,30720;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,24;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "mov.f32 d0,0f00000000;\n"
   "mov.f32 d1,0f00000000;\n"
   "mov.f32 d2,0f00000000;\n"
@@ -2119,20 +2125,22 @@ template<class T,int Group> __device__ __forceinline__ void tensor_chain(Shared<
   "bar.warp.sync 0xffffffff;\n"
   "add.u32 fb,%3,24;\n"
   "@leader mbarrier.arrive.shared::cta.b64 _,[fb];\n"
+  "add.u32 fb,%6,8;\n"
   "PRODUCT_FREE_5:\n"
-  "mbarrier.try_wait.parity.shared::cta.b64 done,[%6],1,0x989680;\n"
+  "mbarrier.try_wait.parity.shared::cta.b64 done,[fb],0,0x989680;\n"
   "@!done bra PRODUCT_FREE_5;\n"
-  "add.u32 sp,%4,0;\n"
+  "add.u32 sp,%4,8192;\n"
   "st.shared.v4.f32 [sp],{d0,d1,d2,d3};\n"
-  "add.u32 sp,%4,2048;\n"
+  "add.u32 sp,%4,10240;\n"
   "st.shared.v4.f32 [sp],{d4,d5,d6,d7};\n"
-  "add.u32 sp,%4,4096;\n"
+  "add.u32 sp,%4,12288;\n"
   "st.shared.v4.f32 [sp],{d8,d9,d10,d11};\n"
-  "add.u32 sp,%4,6144;\n"
+  "add.u32 sp,%4,14336;\n"
   "st.shared.v4.f32 [sp],{d12,d13,d14,d15};\n"
-  "mbarrier.arrive.shared::cta.b64 _,[%5];\n"
+  "add.u32 fb,%5,8;\n"
+  "mbarrier.arrive.shared::cta.b64 _,[fb];\n"
   "}\n"
-  : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(uint32_t(__cvta_generic_to_shared(s.free))), "r"(uint32_t(__cvta_generic_to_shared(s.product[Group]+((tid-128)%128)*4))), "r"(uint32_t(__cvta_generic_to_shared(s.product_ready+Group))), "r"(uint32_t(__cvta_generic_to_shared(s.product_free+Group))), "r"(tid&31), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(int32_t(GMMA::Major::K)), "n"(int32_t(GMMA::Major::MN)) : "memory");}
+  : : "l"(uint64_t(da_tiles(0,0,0))), "l"(uint64_t(db_tiles(0,0,0))), "r"(uint32_t(__cvta_generic_to_shared(s.ready))), "r"(uint32_t(__cvta_generic_to_shared(s.free))), "r"(uint32_t(__cvta_generic_to_shared(s.product[0]+((tid-128)%128)*4))), "r"(uint32_t(__cvta_generic_to_shared(s.product_ready))), "r"(uint32_t(__cvta_generic_to_shared(s.product_free))), "r"(tid&31), "n"(uint32_t(da_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<0>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<1>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<2>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<3>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<4>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<5>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<6>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<7>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<8>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<9>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<10>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<11>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<12>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<13>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<14>{}))), "n"(uint32_t(da_tiles.layout()(0,0,Int<15>{}))), "n"(uint32_t(db_tiles.layout()(0,0,Int<15>{}))), "n"(int32_t(GMMA::Major::K)), "n"(int32_t(GMMA::Major::MN)) : "memory");}
  }
 }
 template<class T> __global__ __launch_bounds__(Threads,1)
@@ -2147,7 +2155,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
+    for(int j=0;j<4;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
     Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
@@ -2232,13 +2240,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
     for(int step=0;step<7;++step){
-      wait(&s.product_ready[step%2],(step/2)%2);
+      wait(&s.product_ready[step%4],(step/4)%2);
       #pragma unroll
       for(int g=0;g<4;++g){
-        float4 v=*reinterpret_cast<const float4*>(s.product[step%2]+g*512+worker*4);
+        float4 v=*reinterpret_cast<const float4*>(s.product[step%4]+g*512+worker*4);
         current[4*g]=v.x;current[4*g+1]=v.y;current[4*g+2]=v.z;current[4*g+3]=v.w;
       }
-      arrive(&s.product_free[step%2]);
+      arrive(&s.product_free[step%4]);
       #pragma unroll
       for(int pair=0;pair<8;++pair){
         int mn=GMMA::CLayout_64x32{}(0,2*pair);

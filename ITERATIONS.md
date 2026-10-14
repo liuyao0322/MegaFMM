@@ -333,6 +333,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 213 | Static dual-TC chains with float4 product exchange | 0.9535 | 0.011668 | experiment |
 
+| 214 | Four product slots for static dual-TC pipeline | 0.9589 | 0.011574 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3058,3 +3060,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Finite original seven-product error reproduced and original gates FAIL. BF16 11.6154us FP16 11.7197us versus Dense12.2342/10.0051us; no improvement over selected162 or211. Reassessment used210 full NCU, prior198 metrics and NVIDIA Tilus two-consumer tutorial; no floor conclusion.
 - **Next:** Test four P slots to remove alternating-TC producer coupling through two-slot recombination exchange
 - **Archive:** trajectory/20261015_043447_iter-213/
+
+### Iter 214 — Four product slots for static dual-TC pipeline
+
+- **Hypothesis:** Additional P slots avoid coupling the two independent TC chains through two-slot consumer progress
+- **Changes:** From213 increase fragment-major P slots2 to4, shared229632B; static per-step barrier offsets and consumer phase progression
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011574 ms; mean speedup=0.9589x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012183 | 0.011503 | 1.0592 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010000 | 0.011646 | 0.8586 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 11.5027us FP16 11.6461us, finite expected errors and both original gates FAIL. Small recovery versus213 but still slower than selected162. More product slots do not resolve the FP16 gap.
+- **Next:** Profile compact dual-TC issue and return to a different operand-prefetch geometry rather than tuning P buffering further
+- **Archive:** trajectory/20261015_043542_iter-214/
