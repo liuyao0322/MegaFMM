@@ -373,6 +373,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 233 | Separate256 S and256 T transform workers | 0.9271 | 0.012037 | experiment |
 
+| 234 | Split-K2 true64x64 private leaves with last-CTA partial-C merge | 0.2696 | 0.041388 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3416,3 +3418,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Rejected BF11.9517 FP12.1232us, substantially slower224. Expected uncompensated errors unchanged, both original gatesFAIL. Shallower per-worker live state does not offset extra iterations and reduced parallelism per transform.
 - **Next:** Reassess current profiles and explore split-K tile parallelism as a new macro architecture rather than further transform microtuning
 - **Archive:** trajectory/20261015_051256_iter-233/
+
+### Iter 234 — Split-K2 true64x64 private leaves with last-CTA partial-C merge
+
+- **Hypothesis:** 128 CTAs with halfK per larger tile reduce operand traffic and per-CTA MMA issue
+- **Changes:** 512-thread128CTA3D grid, each computes sevenK256 partial leaves and partial recombination; invocation-initialized64counters select last CTA to merge two8MiB total partial buffers;12583168B workspace; FP32 sum grouping explicitly changes
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.041388 ms; mean speedup=0.2696x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012283 | 0.041247 | 0.2978 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010029 | 0.041529 | 0.2415 | 0.000754625 | 0 |
+
+- **Analysis:** BF41.2470 FP41.5286us severe regression. Finite errors approximately.0060152/.000754625, both original gatesFAIL. No split-K performance claim; inspect register spills and merge epilogue before rejecting architecture on timing alone.
+- **Next:** Profile234 resources and merge; simplify merge index/vectorization only if evidence identifies removable overhead
+- **Archive:** trajectory/20261015_051440_iter-234/
