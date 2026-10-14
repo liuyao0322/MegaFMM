@@ -171,6 +171,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 132 | Vectorized shared product exchange and output | 0.8942 | 0.012557 | experiment |
 
+| 133 | Pair-preserving swizzle for64-bit P exchange | 0.8902 | 0.012504 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1606,3 +1608,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 131 launch12.384/12.485us,130 paired12.321/12.526us with Graph11.934/12.091; full132 benchmark archived, original gates unchanged.
 - **Next:** Check numerical equivalence, latency and shared bank metrics if retained
 - **Archive:** trajectory/20261015_022158_iter-132/
+
+### Iter 133 — Pair-preserving swizzle for64-bit P exchange
+
+- **Hypothesis:** A float2-specific shared permutation avoids row-parity pair swap instructions
+- **Changes:** Map row low bits to column bits3/4 for64-bit accesses, keep adjacent fragment values in natural order, remove per-pair swaps
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012504 ms; mean speedup=0.8902x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012260 | 0.012428 | 0.9865 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009988 | 0.012580 | 0.7940 | 0.000754626 | 0 |
+
+- **Analysis:** 132 vectorization with scalar swizzle was slightly slower; full133 benchmark archived, original FP64 gates unchanged. Need NCU excessive-wavefront verification.
+- **Next:** Assess bank metrics and complete-call comparison, then tune consumer count or architecture
+- **Archive:** trajectory/20261015_022317_iter-133/

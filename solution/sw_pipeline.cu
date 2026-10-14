@@ -29,7 +29,7 @@ __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier:
 __device__ __forceinline__ int product_index(int row,int col){
   // Fragment lanes vary column bits 1,2 and row bits 0,1,2.
   // XOR the latter into column bits 0,3,4, the three remaining bank bits.
-  return row*BN+(col^((row&1)|((row&6)<<2)));
+  return row*BN+(col^((row&3)<<3));
 }
 
 __device__ __forceinline__ float2 add2(float2 a,float2 b){return make_float2(__fadd_rn(a.x,b.x),__fadd_rn(a.y,b.y));}
@@ -156,7 +156,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         if(i<Elements){
           int row=i/BN,col=i%BN;
           float2 v=*reinterpret_cast<const float2*>(&s.product[step%2][product_index(row,col)&~1]);
-          current[j]=(row&1) ? make_float2(v.y,v.x):v;
+          current[j]=v;
         }
       }
       arrive(&s.product_free[step%2]);
@@ -201,7 +201,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       #pragma unroll
       for(int j=0;j<8;++j){
         int mn=GMMA::CLayout_64x32{}(tid-128,2*j),row=mn%64,col=mn/64;
-        float2 v=(row&1) ? make_float2(acc[2*j+1],acc[2*j]):make_float2(acc[2*j],acc[2*j+1]);
+        float2 v=make_float2(acc[2*j],acc[2*j+1]);
         *reinterpret_cast<float2*>(&s.product[step%2][product_index(row,col)&~1])=v;
       }
       arrive(&s.product_ready[step%2]);
