@@ -1863,3 +1863,8 @@ Mandatory samebinary20 rows46/45/39/36/Lt1,20warm100calls5groups3fresh32Lt8GiB c
 - **Analysis:** Own complete SW latency ranks code changes; Dense timing variation and machine/fixture/SAN PASS do not certify original FP64 numerical accuracy.
 - **Next:** Mandatory samebinaryfull20 for47/45/39/36/Lt1,100calls5groups3fresh irrespectivequick3%, originalstrict30 andserialSAN3, coverage/profile/report/twoindependentfinal audits.
 - **Archive:** trajectory/20261014_081904_iter-43/
+
+
+#### Iter43 mandatory full1024 closure
+
+Mandatory samebinary20 rows47/45/39/36/Lt1,20warm100calls5groups3fresh32Lt8GiB completed. Own47 ordinaryBF25.9145593643/FP26.0444808006us vs45 17.6502394676/17.8268802166us: slower46.8227/46.0967%; Graph slower50.4893/48.4540%.45 remains fastest actually measured native. All five groups/200TIME/60CHECK originalFAIL/NF0 and10innerexit2 retained. DenseCV48.44% in47ordinaryBF and49.76% in39GraphFP are preserved, code ranking uses SW latency rather than Dense denominator. Strict30=18PASS12FAIL/NF0, SAN3 terminalexit0 with zero summaries, structuraldefault2862/2698 andselected60/140 pass; full1860 only unexecuted code domain. Fresh gate records actual initial-owned preINCcommonPzero acceptance truthfully; growth still follows successfulINC. All failed resource revisions archived without GPU launch. AutoDense/original precision goal remain active, no promotion/no physical cause/no ncu retry/no automatic next iteration.
