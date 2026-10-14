@@ -235,6 +235,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 164 | Choose P consumers from shorter transform workers | 0.9745 | 0.011466 | experiment |
 
+| 165 | Four independent TMA slot owners | 0.8825 | 0.012623 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2182,3 +2184,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Baseline errors preserved and gates FAIL. Launch11.366/11.567us remains flat versus162; early consumer arrival is not a measured improvement.
 - **Next:** Refresh cumulative phase diagnostics on162 and test statically specialized sequential product pairs
 - **Archive:** trajectory/20261015_031646_iter-164/
+
+### Iter 165 — Four independent TMA slot owners
+
+- **Hypothesis:** Issuing independent operand slots from four lanes reduces serial producer instruction and head-of-line overhead.
+- **Changes:** Restore162, distribute sequence modulo4 across tid0..3, each waits local pack and lane0 publishes grid with syncwarp0xf before transformed loads.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012623 ms; mean speedup=0.8825x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012291 | 0.012520 | 0.9817 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009969 | 0.012726 | 0.7833 | 0.000754626 | 0 |
+
+- **Analysis:** Full-call BF16 about12.52us and FP16 about12.73us regress versus16211.34/11.54us. Original FP64 gates still fail with expected baseline errors and nonfinite0. Divergent lane scheduling adds overhead; reject.
+- **Next:** Restore162 and try static two-product sequential helpers without dual live accumulators.
+- **Archive:** trajectory/20261015_032205_iter-165/

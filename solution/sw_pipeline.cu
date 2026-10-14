@@ -83,20 +83,25 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   __syncthreads();
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
-  if(tid==0){
-    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
+  if(tid<4){
+    // Each participating lane owns one operand slot and its barrier phases.
+    for(int sequence=tid;sequence<7*(512/BK);sequence+=Stages){
+      int step=sequence/(512/BK),q=sequence%(512/BK);
       int p=product_for_step(step);
-      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
-      if(sequence==4){
+      int slot=sequence%Stages,k0=q*BK;
+      if(sequence>=4 && sequence<8){
         wait(&s.pack_ready,0);
         // CUDA12.4 cooperative launch gives each invocation its own initialized
         // driver workspace. Only TMA leaders join this publication barrier;
         // the shared pack barrier has already acquired every CUDA writer.
+        if(tid==0){
         auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
         uint32_t increment=(blockIdx.x==0 && blockIdx.y==0) ? 0x80000000u-127u:1u;
         uint32_t old,current;
         asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;" : "=r"(old) : "l"(barrier),"r"(increment) : "memory");
-        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(!((old^current)&0x80000000u));
+        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory"); }while(!((old^current)&0x80000000u));
+        }
+        __syncwarp(0xFu);
       }
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
@@ -154,9 +159,9 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }
     asm volatile("fence.proxy.async.global;" ::: "memory");
     arrive(&s.pack_ready);
-    if(worker>=480){
+    if(worker<128){
     constexpr int Chunks=16;
-    unsigned row=unsigned(worker-480)/BN,col=unsigned(worker-480)%BN;
+    unsigned row=unsigned(worker)/BN,col=unsigned(worker)%BN;
     int base_even=product_index(row,col),base_odd=product_index(row+4,col)-128;
     float* out=D+(m0+row)*1024+n0+col;
     float first[Chunks],second[Chunks],current[Chunks];
