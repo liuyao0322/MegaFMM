@@ -26,7 +26,8 @@ template<class T> struct alignas(128) Shared {
 static_assert(sizeof(Shared<cute::half_t>)==188544, "recheck shared-memory budget");
 
 __device__ void wait(const uint64_t* b,int phase) {
-  Barrier::wait(b,phase); asm volatile("" ::: "memory");
+  while(!Barrier::test_wait(b,phase,true)) {}
+  asm volatile("" ::: "memory");
 }
 __device__ void arrive(const uint64_t* b) {
   asm volatile("" ::: "memory"); Barrier::arrive(b);

@@ -15,6 +15,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 54 | Process BK64 with on-demand FP32 transforms | 0.0330 | 0.335406 | measured |
 
+| 55 | Poll barrier phase without suspend timer | 0.0319 | 0.346034 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -90,3 +92,19 @@ work/handshake tradeoff rather than continuing the unsuccessful layout-only path
 - **Analysis:** Complete benchmark exited0. Both dtypes pass all three fresh original-input checks; timings below determine actual improvement. Transform operation count rises because shared ST reuse is removed.
 - **Next:** Inspect measured gain and validate stress; explore larger K slices if critical-path reduction is effective.
 - **Archive:** trajectory/20261014_190538_iter-54/
+
+### Iter 55 — Poll barrier phase without suspend timer
+
+- **Hypothesis:** Short producer/consumer stages may be limited by suspending try-wait wakeup latency; active acquire-phase checks preserve ordering.
+- **Changes:** Replace ClusterBarrier wait with repeated test_wait phase checks; keep layout, roles, transforms, tile and precision identical to iter54.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.346034 ms; mean speedup=0.0319x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_unified_v1_hilo_64x32x64 v0 | launch | 0.012334 | 0.351558 | 0.0351 | 7.15726e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_unified_v1_hilo_64x32x64 v0 | launch | 0.009809 | 0.340510 | 0.0288 | 4.79212e-07 | 1 |
+
+- **Analysis:** Full original launch benchmark exited0; compare measured rows to54 before attributing any timing change.
+- **Next:** Validate improvement and stress; use larger compute batches or register output accumulation next.
+- **Archive:** trajectory/20261014_190704_iter-55/
