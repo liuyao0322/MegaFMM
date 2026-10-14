@@ -4,14 +4,16 @@ H100 上 Strassen–Winograd 矩阵乘法的研究工程。2026-10-14 按用户�
 SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的首版。
 
 **当前保留 iter162（d8e6261）的七乘法、无补偿实验内核。持续优化目标尚未完成。**
-1024³ 同期交错测量，BF16/FP16 普通调用约 **11.337/11.542 μs**，调优 Dense 约
-**12.191/9.965 μs**。BF16 快约7.5%，FP16 仍慢约15.8%；FP16 还需减少约1.58 μs。
-Graph 的 SW 约10.959/11.164 μs，Dense 约11.263/9.505 μs。
+迭代至208后原样恢复162，最新1024³同期交错普通调用：BF16/FP16 SW约 **11.325/11.520 μs**，
+调优 Dense约 **12.300/9.925 μs**。BF16加速比1.086×；FP16仍慢约16.1%，还需减少约1.596 μs。
+历史162配对Graph：SW约10.959/11.164 μs，Dense约11.263/9.505 μs；208未重测Graph。
 
 **两种输入仍未通过原始精度门槛**：BF16 eF约0.0060152，FP16约0.000754626。
 `Auto` 和 `Dense` 继续普通调优 cuBLASLt GEMM；当前 SW 必须显式指定。
 
-[持续优化检查点、性能对比、精度失败及完整验证证据](trajectory/20261015_optimization-goal-checkpoint/REPORT.md)
+[当前持续优化检查点（165–208，目标仍在进行）](trajectory/20261015_optimization-goal-checkpoint-208/REPORT.md)
+
+[此前性能配对与完整独立验证（109–162）](trajectory/20261015_optimization-goal-checkpoint/REPORT.md)
 
 当前实现使用4 MiB调用方 workspace、213120B动态 shared 和四个 BK256 operand slots。
 128个 CTA，每 CTA768线程：1个 TMA warp、19个 CUDA pack warps、4个 WGMMA warps；
@@ -103,7 +105,7 @@ Graph 的新输入重放。SW 仅支持非转置、连续布局、alpha=1、beta
 强制 SW 抛错，不静默退回 Dense。Auto 始终保留 Dense。
 
 `scripts/bench.sh <label>` 保留 AKO 的源码快照逻辑；正式迭代记录 `ITERATIONS.md`
-和对应 Git 版本。持续 AKO4ALL 优化已按用户要求暂停；本次按明确请求完成 P shared bank conflict 修复和下一版流式重组试验。
+和对应 Git 版本。按用户最新指令持续 AKO4ALL 优化，目标仍在进行；每轮保存失败及有效结果，未通过精度或性能验收不宣布合格 winner。
 
 ## 历史与清理记录
 

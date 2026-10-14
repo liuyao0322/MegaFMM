@@ -2962,3 +2962,9 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Fresh full-call BF16 11.325 us versus Dense12.300 us,1.0860x; FP16 11.520 us versus Dense9.925 us,0.8615x. FP16 needs~1.596us or13.85percent SW-time reduction. Both original FP64 gates still fail with expected finite errors. Goal remains active; no physical floor or exhausted-directions claim.
 - **Next:** Archive current diagnostic evidence and continue new critical-path work from validated162; do not promote an approximate performance win to numerical acceptance
 - **Archive:** trajectory/20261015_041456_iter-208/
+
+### Sustained-goal checkpoint through208 — still active
+
+Restored selected162 verbatim and measured BF/FP11.32544/11.52032us against Dense12.29984/9.92480us. BF wins, FP still needs1.59552us or13.85percent SW-time reduction. Original FP64 gates fail both; AutoDense. No current-floor claim, no exhausted-directions claim, no goal completion.
+
+New source-specific stage diagnostics and raw profiles, candidate summaries, invalid-run exclusions, original full-trial results, and next-state recorded at trajectory/20261015_optimization-goal-checkpoint-208/REPORT.md and state.json. Next iteration209.
