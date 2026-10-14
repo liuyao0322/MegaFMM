@@ -561,6 +561,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 327 | TMA 256-byte L2 promotion | 1.0747 | 0.010160 | experiment |
 
+| 328 | Packed native S3 and T3 input differences | 1.0741 | 0.010131 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5096,3 +5098,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Benchmark started before interruption and its live session was re-polled to terminal exit2 on continuation. Inspect archived CSV for full-call timing and unchanged original precision gates before selecting anything. No cached input data or reference modifications are introduced.
 - **Next:** Inspect327 result and compare to contemporaneous selected282; continue current supply-path optimization without claiming numerical acceptance
 - **Archive:** trajectory/20261015_074442_iter-327/
+
+### Iter 328 — Packed native S3 and T3 input differences
+
+- **Hypothesis:** The two independent single-subtraction transforms can use native paired half/BF16 subtraction to eliminate scalar operations and final conversions
+- **Changes:** Restore selected282; use sub.rn.bf16x2 or sub.rn.f16x2 only for S3=A11-A21 and T3=B22-B12; all dependent transforms retain the FP32 association and all other kernel behavior is unchanged
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010131 ms; mean speedup=1.0741x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012149 | 0.010194 | 1.1918 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009629 | 0.010067 | 0.9565 | 0.000754626 | 0 |
+
+- **Analysis:** Formal benchmark completed; archived original FP64 gates remain authoritative, and any retained candidate still requires independent bitwise validation.327 L2 promotion rejected by full ABBA: ordinary FP16 10.10128 versus282 10.05472 us, Graph10.17232 versus10.01024 us; BF ordinary tiny0.23percent gain but Graph regresses.
+- **Next:** Inspect328 timings, generated primary instruction count and bitwise behavior before selecting; test additional prefetch depth only with a distinct completion/supply hypothesis
+- **Archive:** trajectory/20261015_074649_iter-328/

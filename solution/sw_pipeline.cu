@@ -2715,9 +2715,19 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
     #pragma unroll
     for(int j=0;j<8;++j){
       uint32_t word;
-      if constexpr(std::is_same_v<T,cute::bfloat16_t>)
-        asm("cvt.rn.bf16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
-      else asm("cvt.rn.f16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
+      if(j==2){
+        if constexpr(std::is_same_v<T,cute::bfloat16_t>)
+          asm("sub.rn.bf16x2 %0,%1,%2;" : "=r"(word) : "r"(abits[0]),"r"(abits[2]));
+        else asm("sub.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(abits[0]),"r"(abits[2]));
+      }else if(j==6){
+        if constexpr(std::is_same_v<T,cute::bfloat16_t>)
+          asm("sub.rn.bf16x2 %0,%1,%2;" : "=r"(word) : "r"(bbits[3]),"r"(bbits[1]));
+        else asm("sub.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(bbits[3]),"r"(bbits[1]));
+      }else{
+        if constexpr(std::is_same_v<T,cute::bfloat16_t>)
+          asm("cvt.rn.bf16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
+        else asm("cvt.rn.f16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
+      }
       reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=word;
     }
   }
@@ -2788,7 +2798,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
     uint32_t box[4]={64,BN,BK/64,1},element_strides[4]={1,1,1,1};
     auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
         transformed ? 4:3,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
-        CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_L2_256B,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+        CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
     if(result!=CUDA_SUCCESS)throw std::runtime_error("SW A tensor map status "+std::to_string(int(result)));
     return;
   }
@@ -2797,7 +2807,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   uint32_t box[3]={uint32_t(BM),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};
   auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
       transformed ? 3:2,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
-      CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_L2_256B,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+      CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
   if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map status "+std::to_string(int(result)));
 }
 } // namespace
