@@ -75,7 +75,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],4);Barrier::init(&s.product_free[j],4);}
+    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],64);}
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -141,24 +141,23 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     }
   }else if((tid>=32 && tid<128) || tid>=256){
     int worker=tid>=256 ? tid-160:tid-32;
-    if(worker<128){
-    constexpr int Chunks=(Elements+127)/128;
+    if(worker<64){
+    constexpr int Chunks=(Elements+63)/64;
     float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
     for(int step=0;step<7;++step){
       wait(&s.product_ready[step%2],(step/2)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*128;
+        int i=worker+j*64;
         if(i<Elements)current[j]=s.product[step%2][product_index(i/BN,i%BN)];
       }
       // Release shared P immediately after reading; arithmetic/global stores can
       // overlap the Tensor warpgroup's reuse of this slot two steps later.
-      __syncwarp();
-      if((tid&31)==0)arrive(&s.product_free[step%2]);
+      arrive(&s.product_free[step%2]);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*128;
+        int i=worker+j*64;
         if(i<Elements){
           int at=(m0+i/BN)*1024+n0+i%BN;
           if(step==0)first[j]=current[j]; // P1
@@ -198,8 +197,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         int mn=GMMA::CLayout_64x32{}(tid-128,j);
         s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
       }
-      __syncwarp();
-      if((tid&31)==0)arrive(&s.product_ready[step%2]);
+      arrive(&s.product_ready[step%2]);
     }
   }
   __syncthreads();

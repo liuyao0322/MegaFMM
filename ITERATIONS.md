@@ -175,6 +175,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 134 | Warp-leader product barrier publication and release | 0.8916 | 0.012520 | experiment |
 
+| 135 | Two recombination consumer warps | 0.7529 | 0.014806 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1642,3 +1644,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 133 vector swizzle preserves errors but no gain; full134 benchmark archived. New synchronization requires stress/sanitizers and fresh launch/Graph checks before retention.
 - **Next:** Compare complete-call timings and verify shared publication ordering
 - **Archive:** trajectory/20261015_022513_iter-134/
+
+### Iter 135 — Two recombination consumer warps
+
+- **Hypothesis:** Further reduce CUDA polling warps while retaining all512 transform threads
+- **Changes:** From131 consumers128->64,32scalar chunks each and matching64-count P-free barriers; no numerical or operand changes
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.014806 ms; mean speedup=0.7529x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012300 | 0.014762 | 0.8332 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009988 | 0.014850 | 0.6725 | 0.000754626 | 0 |
+
+- **Analysis:** 134 warp-leader product barriers did not improve first-run latency. Full135 benchmark archived for consumer bottleneck and resource assessment.
+- **Next:** Compare two versus four consumers and test partial TC product unrolling
+- **Archive:** trajectory/20261015_022616_iter-135/
