@@ -174,7 +174,6 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     }
     }
   }else if(tid>=128 && tid<256){
-    #pragma unroll 2
     for(int step=0;step<7;++step){
       int p=product_for_step(step);
       float acc[16]={};
@@ -227,7 +226,21 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map status "+std::to_string(int(result)));
 }
 } // namespace
-struct SWState{DType dtype;};
+struct SWState{
+  DType dtype;
+  const void* bound_a=nullptr;
+  const void* bound_b=nullptr;
+  const void* bound_workspace=nullptr;
+  CUtensorMap maps[4]{};
+};
+void bind_sw_pipeline(SWState& state,const void* A,const void* B,void* workspace){
+  CUtensorMap maps[4]{};
+  encode(maps[0],A,state.dtype,true,false);encode(maps[1],B,state.dtype,false,false);
+  encode(maps[2],workspace,state.dtype,true,true);
+  encode(maps[3],static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
+  for(int i=0;i<4;++i)state.maps[i]=maps[i];
+  state.bound_a=A;state.bound_b=B;state.bound_workspace=workspace;
+}
 std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   if(p.m!=1024 || p.n!=1024 || p.k!=1024 || p.trans_a || p.trans_b || p.lda!=1024 || p.ldb!=1024 || p.ldd!=1024 || p.alpha!=1 || p.beta!=0)
     throw std::invalid_argument("SW requires contiguous non-transposed1024^3 alpha1 beta0");
@@ -245,9 +258,15 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   return std::make_shared<SWState>(SWState{p.dtype});
 }
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
-  CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
-  encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
-  void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D};dim3 grid(16,8);
+  CUtensorMap fresh[4]{};
+  const CUtensorMap* maps=state.maps;
+  if(A!=state.bound_a || B!=state.bound_b || workspace!=state.bound_workspace){
+    encode(fresh[0],A,state.dtype,true,false);encode(fresh[1],B,state.dtype,false,false);
+    encode(fresh[2],workspace,state.dtype,true,true);
+    encode(fresh[3],static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
+    maps=fresh;
+  }
+  void* args[]={const_cast<CUtensorMap*>(maps),const_cast<CUtensorMap*>(maps+1),const_cast<CUtensorMap*>(maps+2),const_cast<CUtensorMap*>(maps+3),&A,&B,&workspace,&D};dim3 grid(16,8);
   if(state.dtype==DType::BF16)
     check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
   else

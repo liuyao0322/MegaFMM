@@ -364,7 +364,7 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
-  if (impl_->sw) return "sw_cooperative;warp_roles=1tma+4simt+4wgmma+7idle_after_pack;smem=213120;operand_stages=4;bk=256;workspace=8388608;st=global_once_fp32_high_only;recombine=streaming_early_output;product_order=1_2_6_7_5_3_4;product_slots=2;product_layout=row_xor_0_3_4;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;alpha=1;beta=0";
+  if (impl_->sw) return "sw_cooperative;warp_roles=1tma+4simt+4wgmma+7idle_after_pack;smem=213120;operand_stages=4;bk=256;workspace=8388608;st=global_once_fp32_high_only;recombine=streaming_early_output;product_order=1_2_6_7_5_3_4;product_slots=2;product_layout=row_xor_0_3_4;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;tma_bind=explicit_tune_checked_run_fallback;alpha=1;beta=0";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }
@@ -412,6 +412,7 @@ void tune(Plan& plan, const void* A, const void* B, const float* C0,
     if (!impl.scale && !impl.sw)
       tune_lt(impl.handle, *impl.dense, A, B, original_c, D,
               impl.bytes ? workspace : nullptr, stream);
+    if(impl.sw)detail::bind_sw_pipeline(*impl.sw,A,B,workspace);
     run_internal(impl, A, B, original_c, D, workspace, stream);
     cuda_check(cudaStreamSynchronize(stream), "finish explicit plan tuning");
   } catch (...) {

@@ -179,6 +179,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 136 | Partially unroll TC product loop by two | 0.8900 | 0.012540 | experiment |
 
+| 137 | Bind static TMA address metadata during explicit tuning | 0.8984 | 0.012450 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1678,3 +1680,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 131 NCU2.700M instructions,110regs,Tensor~15%; two-consumer135 regressed14.8us. Full136 benchmark archived for partial-unroll/code-size assessment.
 - **Next:** Compare with131 and collect same-invocation phase timing to guide remaining work
 - **Archive:** trajectory/20261015_022816_iter-136/
+
+### Iter 137 — Bind static TMA address metadata during explicit tuning
+
+- **Hypothesis:** Reuse descriptor metadata for identical current pointers to reduce host launch gaps without caching input values
+- **Changes:** Explicit tune prepares four tensor maps; const run compares allA/B/workspace pointers and re-encodes on any mismatch; no run allocation, GPU synchronization or mutable cache
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012450 ms; mean speedup=0.8984x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012328 | 0.012400 | 0.9942 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010032 | 0.012499 | 0.8027 | 0.000754626 | 0 |
+
+- **Analysis:** 131 independent72bitwise checks and memcheck/racecheck/synccheck all pass. Full137 benchmark archived; Graph expected largely unchanged because device work is identical.
+- **Next:** Validate bound and changed-pointer paths independently and compare full launch/Graph latency
+- **Archive:** trajectory/20261015_023111_iter-137/
