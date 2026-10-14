@@ -129,6 +129,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 111 | Hoist canonical operand descriptors outside product loop | 0.8557 | 0.013164 | experiment |
 
+| 112 | N16 K128 tiles with two CTA residency | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1234,3 +1236,17 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Complete SW benchmark archived with unchanged original FP64 gates; inspect measurements after commit.
 - **Next:** Compare latency and generated instructions, then explore CTA concurrency
 - **Archive:** trajectory/20261015_014859_iter-111/
+
+### Iter 112 — N16 K128 tiles with two CTA residency
+
+- **Hypothesis:** 256 smaller CTAs and two resident blocks per SM hide pipeline latency
+- **Changes:** 64x16 output tile, K128 four operand slots, 8-register accumulators, SW32 B layout and adjusted conflict-free P permutation; 90368B shared
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Full SW benchmark archived; unchanged original FP64 gates. Need inspect compile/runtime and compare with100.
+- **Next:** Assess achieved concurrency and full-call latency before choosing architecture
+- **Archive:** trajectory/20261015_014955_iter-112/
