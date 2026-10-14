@@ -24,10 +24,7 @@ template<class T> struct alignas(128) Shared {
   uint64_t pack_ready;
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
-__device__ void wait(const uint64_t* b,int phase){
-  uint32_t address=cute::cast_smem_ptr_to_uint(b);
-  asm volatile("{ .reg .pred done; wait_again: mbarrier.try_wait.parity.shared::cta.b64 done,[%0],%1,256; @!done bra wait_again; }" :: "r"(address),"r"(phase) : "memory");
-}
+__device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
 __device__ __forceinline__ int product_index(int row,int col){
@@ -78,7 +75,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],1);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
     Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
@@ -202,7 +199,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         mma_term<T>(ah,bh,acc);
         warpgroup_commit_batch();warpgroup_wait<0>();
         __syncwarp();
-        if((tid&31)==0)arrive(&s.free[slot]);
+        if(tid==128)arrive(&s.free[slot]);
       }
       if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
       #pragma unroll

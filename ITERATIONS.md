@@ -255,6 +255,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 174 | Short barrier suspension hint | 0.9717 | 0.011429 | experiment |
 
+| 175 | Single operand-release leader | 0.9805 | 0.011448 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2358,3 +2360,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about11.37us FP16 about11.49us, small single-run variation versus162, no3percent improvement. Expected original precision failures remain. Does not prove wakeup latency changed.
 - **Next:** Archive binary and restore162; single warpgroup leader releases operands after full WGMMA wait0.
 - **Archive:** trajectory/20261015_032840_iter-174/
+
+### Iter 175 — Single operand-release leader
+
+- **Hypothesis:** WGMMA wait0 completes all shared-operand reads, allowing one leader to free slots without four arrivals.
+- **Changes:** Restore162; operand free barrier count1, only tid128 arrives after unchanged collective WGMMA wait0 and syncwarp.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011448 ms; mean speedup=0.9805x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012518 | 0.011357 | 1.1023 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009910 | 0.011540 | 0.8587 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about11.36us FP16 about11.54us, no gain against162; original precision failures expected and nonfinite0. Reject as optimization; collective completion correctness needs validation if retained later.
+- **Next:** Review prior split-product DSM experiment; test global publication to remove cluster synchronization overhead.
+- **Archive:** trajectory/20261015_032937_iter-175/
