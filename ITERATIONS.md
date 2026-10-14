@@ -247,6 +247,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 170 | Immutable tensor-map geometry templates | 0.9701 | 0.011466 | experiment |
 
+| 171 | Two resident CTA N16 with current asynchronous frontend | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2290,3 +2292,17 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** FP16 about11.54us, no meaningful gain versus162. Original FP64 gates still fail with unchanged expected errors and nonfinite0. Native driver API accepted null-address templates. No cached tensor values or cross-call compute state. Reference https://docs.nvidia.com/cuda/archive/12.4.0/cuda-driver-api/group__CUDA__TENSOR__MEMORY.html.
 - **Next:** Return to device supply latency; test short suspension hints in barrier wait.
 - **Archive:** trajectory/20261015_032550_iter-170/
+
+### Iter 171 — Two resident CTA N16 with current asynchronous frontend
+
+- **Hypothesis:** N16 BK256 two stages permits256 CTA grid and two resident CTAs per SM, unlike current128CTA one perSM.
+- **Changes:** Restore162; N16, BK256 stages2,512threads352pack,8accumulators,128consumer8chunks,new bijective XOR layout,256leader publication and grid.
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Compilation failed only at incorrect static sizeof assertion90368; actual aligned allocation should90240. No timing or correctness result, excluded. Revisits113 with modern async frontend and twice K block, not identical113.
+- **Next:** Correct static assertion90240 and measure unchanged candidate.
+- **Archive:** trajectory/20261015_032702_iter-171/
