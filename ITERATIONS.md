@@ -135,6 +135,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 114 | Overlap S/T transform with first two original-input products | 0.7973 | 0.013971 | experiment |
 
+| 115 | More CUDA transform workers in overlapping pipeline | 0.8033 | 0.013890 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1286,3 +1288,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full benchmark archived; original FP64 gates unchanged. Need independent launch/Graph stress before retaining synchronization change.
 - **Next:** Assess overlap gain and tune remaining role allocation and pipeline issue
 - **Archive:** trajectory/20261015_015132_iter-114/
+
+### Iter 115 — More CUDA transform workers in overlapping pipeline
+
+- **Hypothesis:** 608 transform workers per CTA shorten the pack phase while TC executes P1/P2
+- **Changes:** Increase CTA from512 to768threads; consumers and transform workers352->608 with matching barrier counts and indexing
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013890 ms; mean speedup=0.8033x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012330 | 0.013761 | 0.8960 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009962 | 0.014019 | 0.7106 | 0.000754626 | 0 |
+
+- **Analysis:** Full SW measurements recorded, unchanged original accuracy gates;114 uses53regs and zero spills so resource headroom permits this experiment.
+- **Next:** Compare complete-call latency and reprofile if no gain
+- **Archive:** trajectory/20261015_015248_iter-115/
