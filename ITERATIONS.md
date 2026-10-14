@@ -239,6 +239,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 166 | Static sequential product pair helpers | 1.2358 | 0.013534 | experiment |
 
+| 167 | Three product slots | 0.9635 | 0.011551 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2218,3 +2220,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about13.43us and FP16 about13.64us are materially slower than selected162. Expected uncompensated FP64 gate failures preserved. Dense BF16 measured22-29us anomalously vs normal12us, so apparent speedup invalid as verdict; reject candidate based on own latency.
 - **Next:** Inspect generated resources, restore162 and test a third product buffer to reduce consumer backpressure.
 - **Archive:** trajectory/20261015_032253_iter-166/
+
+### Iter 167 — Three product slots
+
+- **Hypothesis:** One extra product slot absorbs consumer jitter and reduces TC backpressure.
+- **Changes:** Restore162 and expand P buffers and barriers from2 to3; update all slot and phase expressions; shared221312bytes.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011551 ms; mean speedup=0.9635x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012324 | 0.011472 | 1.0743 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009916 | 0.011629 | 0.8526 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about11.45us FP16 about11.63us, slightly slower than162. Expected errors and nonfinite0 retained. Extra buffer provides no useful gain on complete calls; config string stale claims2 slots so source sizes are authoritative.
+- **Next:** Restore162 and inspect host tensor-map construction and barrier wait implementation.
+- **Archive:** trajectory/20261015_032335_iter-167/

@@ -19,11 +19,11 @@ template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
   // Row-major P with an XOR permutation inside each 32-float row.
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
-  float product[2][Elements];
-  uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
+  float product[3][Elements];
+  uint64_t ready[Stages],free[Stages],product_ready[3],product_free[3];
   uint64_t pack_ready;
 };
-static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==221312,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -64,34 +64,6 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
   }
 }
 
-template<class T,int SlotBase,int ProductSlot>
-__device__ __forceinline__ void compute_product(Shared<T>& s,int step,int tid){
-  using namespace cute;
-  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
-  float acc[16]={};
-  #pragma unroll
-  for(int q=0;q<2;++q){
-    int slot=SlotBase+q;
-    wait(&s.ready[slot],(step/2)%2);
-    T* op=s.operand[slot];
-    auto ah=make_tensor(make_smem_ptr(op),la);
-    auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
-    warpgroup_arrive();
-    mma_term<T>(ah,bh,acc);
-    warpgroup_commit_batch();warpgroup_wait<0>();
-    __syncwarp();
-    if((tid&31)==0)arrive(&s.free[slot]);
-  }
-  if(step>=2)wait(&s.product_free[ProductSlot],((step-2)/2)%2);
-  #pragma unroll
-  for(int j=0;j<16;++j){
-    int mn=GMMA::CLayout_64x32{}(tid-128,j);
-    s.product[ProductSlot][product_index(mn%64,mn/64)]=acc[j];
-  }
-  arrive(&s.product_ready[ProductSlot]);
-}
-
 template<class T> __global__ __launch_bounds__(Threads,1)
 void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
                          const __grid_constant__ CUtensorMap bmap,
@@ -104,7 +76,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
+    for(int j=0;j<3;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
     Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
@@ -190,13 +162,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
     for(int step=0;step<7;++step){
-      wait(&s.product_ready[step%2],(step/2)%2);
+      wait(&s.product_ready[step%3],(step/3)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
         int idx=((j&1) ? base_odd:base_even)+j*128;
-        current[j]=s.product[step%2][idx];
+        current[j]=s.product[step%3][idx];
       }
-      arrive(&s.product_free[step%2]);
+      arrive(&s.product_free[step%3]);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
         if(step==0)first[j]=current[j];
@@ -212,12 +184,31 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     }
     }
   }else if(tid>=128 && tid<256){
-    #pragma unroll 1
-    for(int pair=0;pair<3;++pair){
-      compute_product<T,0,0>(s,2*pair,tid);
-      compute_product<T,2,1>(s,2*pair+1,tid);
+    for(int step=0;step<7;++step){
+      int p=product_for_step(step);
+      float acc[16]={};
+      // Four compact operand slots keep prefetch ahead; retire each K tile promptly.
+      #pragma unroll
+      for(int q=0;q<512/BK;++q){
+        int sequence=step*(512/BK)+q,slot=sequence%Stages;
+        wait(&s.ready[slot],(sequence/Stages)%2);
+        T* op=s.operand[slot];
+        auto ah=make_tensor(make_smem_ptr(op),la);
+        auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
+        warpgroup_arrive();
+        mma_term<T>(ah,bh,acc);
+        warpgroup_commit_batch();warpgroup_wait<0>();
+        __syncwarp();
+        if((tid&31)==0)arrive(&s.free[slot]);
+      }
+      if(step>=3)wait(&s.product_free[step%3],((step-3)/3)%2);
+      #pragma unroll
+      for(int j=0;j<16;++j){
+        int mn=GMMA::CLayout_64x32{}(tid-128,j);
+        s.product[step%3][product_index(mn%64,mn/64)]=acc[j];
+      }
+      arrive(&s.product_ready[step%3]);
     }
-    compute_product<T,0,0>(s,6,tid);
   }
   // CTA shared storage survives until all role threads return.
 }
