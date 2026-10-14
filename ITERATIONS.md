@@ -53,6 +53,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 73 | Pipeline two WGMMA K groups before releasing operands | 0.3639 | 0.030428 | passed |
 
+| 74 | Release operand slots with four warp leaders | 0.4706 | 0.023473 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -449,3 +451,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Complete1024 benchmark exited0 with original numerical gates passed. Asynchronous reuse needs targeted racecheck on selected source.
 - **Next:** Inspect complete latency and correctness stress; tune CTA roles or operand stages from evidence.
 - **Archive:** trajectory/20261014_194513_iter-73/
+
+### Iter 74 — Release operand slots with four warp leaders
+
+- **Hypothesis:** Full-K recombination removes CUDA handshakes; remaining128 arrivals per product slice may dominate operand release.
+- **Changes:** Restore72, initialize each free barrier to4 and publish one arrival per Tensor warp after warp sync and completed WGMMA wait.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.023473 ms; mean speedup=0.4706x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x128 v0 | launch | 0.012285 | 0.023495 | 0.5229 | 7.32914e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x128 v0 | launch | 0.009811 | 0.023452 | 0.4183 | 2.11007e-06 | 1 |
+
+- **Analysis:** Complete benchmark exited0, original gates passed. Two-inflight73 regressed to30us and is not retained.
+- **Next:** Inspect timings and test smaller tiles with two resident cooperative CTAs per SM.
+- **Archive:** trajectory/20261014_194632_iter-74/
