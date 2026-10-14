@@ -10,7 +10,7 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=64,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int BM=64,BN=32,BK=128,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
 constexpr int Plane=512*512,Threads=256;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
@@ -18,9 +18,10 @@ using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
   T operand[2][2*ASize+2*BSize];
   float product[7][Elements];
+  float output[4][Elements];
   uint64_t ready[2],free[2],product_ready,product_free;
 };
-static_assert(sizeof(Shared<cute::half_t>)==106624,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==188544,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -55,6 +56,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     Barrier::init(&s.product_ready,128);Barrier::init(&s.product_free,96);
     cutlass::arch::fence_barrier_init();
   }
+  for(int i=tid;i<4*Elements;i+=Threads)(&s.output[0][0])[i]=0;
   __syncthreads();
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   for(int i=(blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid;i<Plane;i+=gridDim.x*gridDim.y*Threads){
@@ -89,11 +91,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       T* op=s.operand[slot];
       if(alo){
         int plane=p==2 ? 6:2*(p-4);
-        SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op,k0,m0,plane);
-        SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op+ASize,k0,m0,plane+1);
+        for(int chunk=0;chunk<BK/64;++chunk){
+          SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op+chunk*BM*64,k0+chunk*64,m0,plane);
+          SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op+ASize+chunk*BM*64,k0+chunk*64,m0,plane+1);
+        }
       }else{
         int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
-        SM90_TMA_LOAD_2D::copy(&amap,&s.ready[slot],0,op,k0+col,m0+row);
+        for(int chunk=0;chunk<BK/64;++chunk)
+          SM90_TMA_LOAD_2D::copy(&amap,&s.ready[slot],0,op+chunk*BM*64,k0+col+chunk*64,m0+row);
       }
       if(blo){
         int plane=p==3 ? 6:2*(p-4);
@@ -106,32 +111,22 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     }
   }else if(tid>=32 && tid<128){
     int worker=tid-32;
-    constexpr int Chunks=(Elements+95)/96;
-    float q11[Chunks]={},q12[Chunks]={},q21[Chunks]={},q22[Chunks]={};
     for(int q=0;q<512/BK;++q){
       wait(&s.product_ready,q%2);
-      #pragma unroll
-      for(int chunk=0;chunk<Chunks;++chunk){
-        int i=worker+chunk*96;
-        if(i<Elements){
-          float p1=s.product[0][i],p2=s.product[1][i],p3=s.product[2][i],p4=s.product[3][i],p5=s.product[4][i],p6=s.product[5][i],p7=s.product[6][i];
-          float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6),u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
-          q11[chunk]=__fadd_rn(q11[chunk],u1);
-          q12[chunk]=__fadd_rn(q12[chunk],__fadd_rn(u4,p3));
-          q21[chunk]=__fadd_rn(q21[chunk],__fsub_rn(u3,p4));
-          q22[chunk]=__fadd_rn(q22[chunk],__fadd_rn(u3,p5));
-        }
+      for(int i=worker;i<Elements;i+=96){
+        float p1=s.product[0][i],p2=s.product[1][i],p3=s.product[2][i],p4=s.product[3][i],p5=s.product[4][i],p6=s.product[5][i],p7=s.product[6][i];
+        float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6),u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
+        s.output[0][i]=__fadd_rn(s.output[0][i],u1);
+        s.output[1][i]=__fadd_rn(s.output[1][i],__fadd_rn(u4,p3));
+        s.output[2][i]=__fadd_rn(s.output[2][i],__fsub_rn(u3,p4));
+        s.output[3][i]=__fadd_rn(s.output[3][i],__fadd_rn(u3,p5));
       }
       arrive(&s.product_free);
     }
-    #pragma unroll
-    for(int chunk=0;chunk<Chunks;++chunk){
-      int i=worker+chunk*96;
-      if(i<Elements){
-        int row=m0+i/BN,col=n0+i%BN;
-        D[row*1024+col]=q11[chunk];D[row*1024+col+512]=q12[chunk];
-        D[(row+512)*1024+col]=q21[chunk];D[(row+512)*1024+col+512]=q22[chunk];
-      }
+    for(int i=worker;i<Elements;i+=96){
+      int row=m0+i/BN,col=n0+i%BN;
+      D[row*1024+col]=s.output[0][i];D[row*1024+col+512]=s.output[1][i];
+      D[(row+512)*1024+col]=s.output[2][i];D[(row+512)*1024+col+512]=s.output[3][i];
     }
   }else if(tid>=128){
     for(int q=0;q<512/BK;++q){
@@ -161,7 +156,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   if(reinterpret_cast<uintptr_t>(ptr)%16)throw std::invalid_argument("SW TMA input must be16-byte aligned");
   uint64_t dims[3]={transformed ? 512ULL:1024ULL,transformed ? 512ULL:1024ULL,8};
   uint64_t strides[2]={dims[0]*2,dims[0]*dims[1]*2};
-  uint32_t box[3]={is_a ? BK:BN,is_a ? BM:BK,1},element_strides[3]={1,1,1};
+  uint32_t box[3]={uint32_t(is_a ? 64:BN),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};
   auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
       transformed ? 3:2,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
       is_a ? CU_TENSOR_MAP_SWIZZLE_128B:CU_TENSOR_MAP_SWIZZLE_64B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);

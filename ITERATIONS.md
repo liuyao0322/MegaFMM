@@ -41,6 +41,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 67 | Retain CUDA output accumulators in registers | 0.2419 | 0.045762 | passed |
 
+| 68 | Double reduction tile with split swizzled A loads | 0.3680 | 0.030149 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -332,3 +334,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Frozen complete benchmark exited0; all numerical gates passed. Instrumented64 timings are diagnostic rather than native latency claims.
 - **Next:** Inspect speed and full stress, then reassess recent batching alternatives.
 - **Archive:** trajectory/20261014_193329_iter-67/
+
+### Iter 68 — Double reduction tile with split swizzled A loads
+
+- **Hypothesis:** Three recent batching/recombination changes did not improve64; stage clocks show more than half time in MMA/store. Larger K tiles halve product barriers and short completion waits.
+- **Changes:** Restore64 with BK128 double buffers,188544-byte shared, and two64-column TMA boxes per A plane to respect SW128 inner-box bound; B loads full128 rows.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.030149 ms; mean speedup=0.3680x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x128 v0 | launch | 0.012297 | 0.030261 | 0.4064 | 7.17661e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x128 v0 | launch | 0.009898 | 0.030036 | 0.3295 | 8.25634e-07 | 1 |
+
+- **Analysis:** Complete unchanged benchmark exited0. Reassessment reviewed65-67, clock64 diagnostics, zero spills in66 and NVIDIA CUDA TMA swizzle restrictions plus CUTLASS warp-specialized pipeline docs.
+- **Next:** Inspect complete latency and validate stress/Graph for the selected candidate.
+- **Archive:** trajectory/20261014_193457_iter-68/
