@@ -201,6 +201,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 147 | Clustered products with asynchronous transform publication | 0.7496 | 0.014837 | experiment |
 
+| 148 | Balanced four-element64bit input transformation IO | 0.9609 | 0.011656 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1876,3 +1878,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Expected original numerical FAIL, baseline eF reproduced. Cluster improves15.72/15.86 to14.74/14.97us but remains slower than140. NCU146 full set failed LaunchFailed, resource probe103regs zero spills.
 - **Next:** Evaluate four-stage K128 clustered supply then return to best architecture if slower
 - **Archive:** trajectory/20261015_025003_iter-147/
+
+### Iter 148 — Balanced four-element64bit input transformation IO
+
+- **Hypothesis:** Reduce repeated transform IO instructions and loop trips on asynchronous608-worker packing
+- **Changes:** From140 vectorize four input elements per worker using uint64 loads/stores; preserve FP32 transform arithmetic and high rounding
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011656 ms; mean speedup=0.9609x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012418 | 0.011510 | 1.0788 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009949 | 0.011801 | 0.8431 | 0.000754626 | 0 |
+
+- **Analysis:** Baseline approximation errors unchanged and gates FAIL. Launch11.51/11.80us, no improvement over14011.42/11.58us; not retained.
+- **Next:** Remove terminal CTA barrier while retaining initial barrier and all per-slot completion dependencies
+- **Archive:** trajectory/20261015_025128_iter-148/
