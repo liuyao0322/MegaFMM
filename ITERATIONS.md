@@ -343,6 +343,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 218 | Static reversed-operand TC chain and register recombination | 1.0023 | 0.011096 | experiment |
 
+| 219 | Nine K128 operand slots after eliminating shared P | 0.9559 | 0.011650 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3148,3 +3150,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Fresh BF16 11.0512us FP16 11.1402us versus Dense12.2346/9.99904us. Expected seven-product errors and no nonfinite, both original gates FAIL. Promising small improvement versus215 and~3percentFP16 over162; requires paired timing, bitwise and sanitizer validation. Reassessment used215 full NCU and NVIDIA PTX documentation; no floor claim.
 - **Next:** Independently validate218, profile source-specific critical path, and test compiler metadata prefetch or shorter instruction lifetime
 - **Archive:** trajectory/20261015_044338_iter-218/
+
+### Iter 219 — Nine K128 operand slots after eliminating shared P
+
+- **Hypothesis:** Reclaimed P storage enables deeper prefetch while static TC issue removes modulo bookkeeping
+- **Changes:** From218 useBK128,9operand slots,221440Bshared and28immediate retire stages; TMA publication after8raw stages
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011650 ms; mean speedup=0.9559x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012297 | 0.011585 | 1.0614 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009961 | 0.011714 | 0.8503 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 11.5850us FP16 11.7142us slower than218. Finite expected seven-product errors and original gates FAIL.218 independent72checks,all3sanitizers,256two-stream launches pass; paired launch21811.01584/11.11312us beats16211.34032/11.51552us, while still slower than FP16Dense.
+- **Next:** Return218 geometry and test low32-only static descriptor updates identified from full SASS evidence
+- **Archive:** trajectory/20261015_044727_iter-219/
