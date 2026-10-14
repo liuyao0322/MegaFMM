@@ -431,6 +431,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 262 | PDL two-K groups wait1 then wait0 | 1.0130 | 0.010896 | experiment |
 
+| 263 | Single primary CTA leader PDL trigger | 1.0493 | 0.010511 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3936,3 +3938,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通调用 BF16 10.95648 us、FP16 10.83648 us，慢于254，Dense12.27808/9.81056 us。再次说明延后slot释放不能只凭wait0减少判断收益。原精度门槛FAIL，错误与七乘法基线一致，不保留。检查254 transform SASS发现已自动生成8条F2FP打包转换，不能虚构转换合并优化空间。
 - **Next:** 测试仅primary CTA单线程触发PDL，减少所有warps重复触发；然后重新审视当前关键路径。
 - **Archive:** trajectory/20261015_061300_iter-262/
+
+### Iter 263 — Single primary CTA leader PDL trigger
+
+- **Hypothesis:** PDL按CTA触发，减少其他warp重复调用trigger或能降低前置调度工作。
+- **Changes:** 254基础仅改为每个primary的thread0调用cudaTriggerProgrammaticLaunchCompletion；依赖完成等待保持。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010511 ms; mean speedup=1.0493x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012238 | 0.010595 | 1.1550 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009838 | 0.010426 | 0.9436 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通BF16 10.59520 us、FP16 10.42592 us，未证实优于254的稳定成对结果10.526/10.443us，BF略差，暂不选为winner。Dense12.23776/9.83776 us，原门槛FAIL。261至263无3percent改进；已重读254 NCU/SASS、连续批次trace及历史225（设备持久描述符，与主机模板不同），查询官方cuTensorMapReplaceAddress；transform已自动合并打包转换，无此项新收益依据。
+- **Next:** 测试只在计划创建时编码布局模板，每调用复制模板并用官方API替换所有当前指针，减少主机编码前置成本，不缓存输入。
+- **Archive:** trajectory/20261015_061341_iter-263/
