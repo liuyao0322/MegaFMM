@@ -1,0 +1,121 @@
+a21b2bb07f1c42cdcdfebee9bb2b6d2c236b4dedb8a2485162469d3786d9965d  solution/internal.h
+a5ba05fc0066bb60322382bdbd91f71fa130e1eda8a19ba7dc5ea5460235e863  solution/plan.cpp
+32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708  solution/scale_output.cu
+d3354f4e2b21148aee189e77a2aeeb9f93a3a7520c76e0980e9765b46fa3f80c  solution/sw_pipeline.cu
+d5564b71d399c934229c8dc2089c5dd8de7e942957845a9cf23977353186e475  include/megafmm/gemm.h
+0964fc49fdbd02945515ff2d8f6bb834c6a4c937fb4cfad396b1be313634ae4e  bench/benchmark.cu
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 10%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+[ 30%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 30%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(52): error: no instance of overloaded function "raw_pointer_cast" matches the argument list
+            argument types are: (cute::GMMA::DescriptorIterator)
+    auto da_base=raw_pointer_cast(da_tiles.data());
+                 ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/container/array_subbyte.hpp(310): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::subbyte_iterator<T> &)" failed deduction
+  raw_pointer_cast(subbyte_iterator<T> const& x) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_base.hpp(115): note #3327-D: candidate function template "cute::raw_pointer_cast(T *)" failed deduction
+  raw_pointer_cast(T* ptr) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_base.hpp(169): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::iter_adaptor<I, D> &)" failed deduction
+  raw_pointer_cast(iter_adaptor<I,D> const& x) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_base.hpp(219): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::counting_iterator<T> &)" failed deduction
+  raw_pointer_cast(counting_iterator<T> const& x) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_swizzle.hpp(142): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::swizzle_ptr<SwizzleFn, P> &)" failed deduction
+  raw_pointer_cast(swizzle_ptr<SwizzleFn,P> const& ptr) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp(340): note #3327-D: candidate function template "cute::GMMA::raw_pointer_cast" failed deduction
+  raw_pointer_cast(DescriptorIterator const& ptr) {
+  ^
+          detected during:
+            instantiation of "void megafmm::detail::<unnamed>::mma_term<T,TA,TB>(TA, TB, float (&)[16]) [with T=cutlass::bfloat16_t, TA=cute::Tensor<cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<3, 4, 3>, cute::smem_ptr<cutlass::bfloat16_t *>>>, cute::Layout<cute::tuple<cute::_64, cute::tuple<cute::_64, cute::_4>>, cute::tuple<cute::_64, cute::tuple<cute::C<1>, cute::C<4096>>>>>, TB=cute::Tensor<cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<2, 4, 3>, cute::smem_ptr<cutlass::bfloat16_t *>>>, cute::Layout<cute::tuple<cute::_32, cute::C<256>>, cute::tuple<cute::C<1>, cute::C<32>>>>]" at line 177
+            instantiation of "void megafmm::detail::<unnamed>::sw_cooperative_hilo(CUtensorMap, CUtensorMap, CUtensorMap, CUtensorMap, const T *, const T *, T *, float *) [with T=cutlass::bfloat16_t]" at line 215
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(53): error: no instance of overloaded function "raw_pointer_cast" matches the argument list
+            argument types are: (cute::GMMA::DescriptorIterator)
+    auto db_base=raw_pointer_cast(db_tiles.data());
+                 ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/container/array_subbyte.hpp(310): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::subbyte_iterator<T> &)" failed deduction
+  raw_pointer_cast(subbyte_iterator<T> const& x) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_base.hpp(115): note #3327-D: candidate function template "cute::raw_pointer_cast(T *)" failed deduction
+  raw_pointer_cast(T* ptr) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_base.hpp(169): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::iter_adaptor<I, D> &)" failed deduction
+  raw_pointer_cast(iter_adaptor<I,D> const& x) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_base.hpp(219): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::counting_iterator<T> &)" failed deduction
+  raw_pointer_cast(counting_iterator<T> const& x) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_swizzle.hpp(142): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::swizzle_ptr<SwizzleFn, P> &)" failed deduction
+  raw_pointer_cast(swizzle_ptr<SwizzleFn,P> const& ptr) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp(340): note #3327-D: candidate function template "cute::GMMA::raw_pointer_cast" failed deduction
+  raw_pointer_cast(DescriptorIterator const& ptr) {
+  ^
+          detected during:
+            instantiation of "void megafmm::detail::<unnamed>::mma_term<T,TA,TB>(TA, TB, float (&)[16]) [with T=cutlass::bfloat16_t, TA=cute::Tensor<cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<3, 4, 3>, cute::smem_ptr<cutlass::bfloat16_t *>>>, cute::Layout<cute::tuple<cute::_64, cute::tuple<cute::_64, cute::_4>>, cute::tuple<cute::_64, cute::tuple<cute::C<1>, cute::C<4096>>>>>, TB=cute::Tensor<cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<2, 4, 3>, cute::smem_ptr<cutlass::bfloat16_t *>>>, cute::Layout<cute::tuple<cute::_32, cute::C<256>>, cute::tuple<cute::C<1>, cute::C<32>>>>]" at line 177
+            instantiation of "void megafmm::detail::<unnamed>::sw_cooperative_hilo(CUtensorMap, CUtensorMap, CUtensorMap, CUtensorMap, const T *, const T *, T *, float *) [with T=cutlass::bfloat16_t]" at line 215
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(52): error: no instance of overloaded function "raw_pointer_cast" matches the argument list
+            argument types are: (cute::GMMA::DescriptorIterator)
+    auto da_base=raw_pointer_cast(da_tiles.data());
+                 ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/container/array_subbyte.hpp(310): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::subbyte_iterator<T> &)" failed deduction
+  raw_pointer_cast(subbyte_iterator<T> const& x) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_base.hpp(115): note #3327-D: candidate function template "cute::raw_pointer_cast(T *)" failed deduction
+  raw_pointer_cast(T* ptr) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_base.hpp(169): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::iter_adaptor<I, D> &)" failed deduction
+  raw_pointer_cast(iter_adaptor<I,D> const& x) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_base.hpp(219): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::counting_iterator<T> &)" failed deduction
+  raw_pointer_cast(counting_iterator<T> const& x) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_swizzle.hpp(142): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::swizzle_ptr<SwizzleFn, P> &)" failed deduction
+  raw_pointer_cast(swizzle_ptr<SwizzleFn,P> const& ptr) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp(340): note #3327-D: candidate function template "cute::GMMA::raw_pointer_cast" failed deduction
+  raw_pointer_cast(DescriptorIterator const& ptr) {
+  ^
+          detected during:
+            instantiation of "void megafmm::detail::<unnamed>::mma_term<T,TA,TB>(TA, TB, float (&)[16]) [with T=cutlass::half_t, TA=cute::Tensor<cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<3, 4, 3>, cute::smem_ptr<cutlass::half_t *>>>, cute::Layout<cute::tuple<cute::_64, cute::tuple<cute::_64, cute::_4>>, cute::tuple<cute::_64, cute::tuple<cute::C<1>, cute::C<4096>>>>>, TB=cute::Tensor<cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<2, 4, 3>, cute::smem_ptr<cutlass::half_t *>>>, cute::Layout<cute::tuple<cute::_32, cute::C<256>>, cute::tuple<cute::C<1>, cute::C<32>>>>]" at line 177
+            instantiation of "void megafmm::detail::<unnamed>::sw_cooperative_hilo(CUtensorMap, CUtensorMap, CUtensorMap, CUtensorMap, const T *, const T *, T *, float *) [with T=cutlass::half_t]" at line 218
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(53): error: no instance of overloaded function "raw_pointer_cast" matches the argument list
+            argument types are: (cute::GMMA::DescriptorIterator)
+    auto db_base=raw_pointer_cast(db_tiles.data());
+                 ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/container/array_subbyte.hpp(310): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::subbyte_iterator<T> &)" failed deduction
+  raw_pointer_cast(subbyte_iterator<T> const& x) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_base.hpp(115): note #3327-D: candidate function template "cute::raw_pointer_cast(T *)" failed deduction
+  raw_pointer_cast(T* ptr) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_base.hpp(169): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::iter_adaptor<I, D> &)" failed deduction
+  raw_pointer_cast(iter_adaptor<I,D> const& x) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_base.hpp(219): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::counting_iterator<T> &)" failed deduction
+  raw_pointer_cast(counting_iterator<T> const& x) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_swizzle.hpp(142): note #3327-D: candidate function template "cute::raw_pointer_cast(const cute::swizzle_ptr<SwizzleFn, P> &)" failed deduction
+  raw_pointer_cast(swizzle_ptr<SwizzleFn,P> const& ptr) {
+  ^
+/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp(340): note #3327-D: candidate function template "cute::GMMA::raw_pointer_cast" failed deduction
+  raw_pointer_cast(DescriptorIterator const& ptr) {
+  ^
+          detected during:
+            instantiation of "void megafmm::detail::<unnamed>::mma_term<T,TA,TB>(TA, TB, float (&)[16]) [with T=cutlass::half_t, TA=cute::Tensor<cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<3, 4, 3>, cute::smem_ptr<cutlass::half_t *>>>, cute::Layout<cute::tuple<cute::_64, cute::tuple<cute::_64, cute::_4>>, cute::tuple<cute::_64, cute::tuple<cute::C<1>, cute::C<4096>>>>>, TB=cute::Tensor<cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<2, 4, 3>, cute::smem_ptr<cutlass::half_t *>>>, cute::Layout<cute::tuple<cute::_32, cute::C<256>>, cute::tuple<cute::C<1>, cute::C<32>>>>]" at line 177
+            instantiation of "void megafmm::detail::<unnamed>::sw_cooperative_hilo(CUtensorMap, CUtensorMap, CUtensorMap, CUtensorMap, const T *, const T *, T *, float *) [with T=cutlass::half_t]" at line 218
+
+4 errors detected in the compilation of "/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu".
+gmake[2]: *** [CMakeFiles/megafmm.dir/build.make:106: CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:89: CMakeFiles/megafmm.dir/all] Error 2
+gmake: *** [Makefile:101: all] Error 2
+srun: error: g08: task 0: Exited with exit code 2

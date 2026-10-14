@@ -73,6 +73,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 83 | Reuse canonical GMMA descriptors across K tiles | 0.5328 | 0.020759 | passed |
 
+| 84 | Restrict GMMA K offsets to the low descriptor word | 0.0000 | 0.000000 | failed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -649,3 +651,17 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Full 1024 cubed BF16/FP16 benchmark completed; recorded numerical gates and complete-call timings in this archive. Generated instruction and independent correctness validation follow.
 - **Next:** Inspect timings, generated instructions and independent stress validation before retaining the candidate
 - **Archive:** trajectory/20261014_215354_iter-83/
+
+### Iter 84 — Restrict GMMA K offsets to the low descriptor word
+
+- **Hypothesis:** Shared addresses below 256 KiB allow eliminating 64-bit descriptor add/carry while preserving upper configuration fields
+- **Changes:** Read canonical CuTe descriptor bases and add K layout offsets only to reg32_[0]
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Build or benchmark failed; preserve this attempt before investigating the failure
+- **Next:** Inspect compiler output and correct descriptor representation access if needed
+- **Archive:** trajectory/20261014_215806_iter-84/

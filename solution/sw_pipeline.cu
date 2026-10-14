@@ -49,10 +49,16 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
       tiled_divide(a,Shape<_64,_16>{}));
   auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(
       tiled_divide(b,Shape<_32,_16>{}));
+  auto da_base=raw_pointer_cast(da_tiles.data());
+  auto db_base=raw_pointer_cast(db_tiles.data());
   #pragma unroll
   for(int kk=0;kk<BK/16;++kk){
-    uint64_t da=da_tiles(0,0,kk);
-    uint64_t db=db_tiles(0,0,kk);
+    // All operands fit below 256 KiB of shared memory. K offsets cannot carry
+    // out of the 14-bit start-address field (16-byte units), so keep the high
+    // descriptor word invariant rather than generating a 64-bit add/carry.
+    auto da=da_base,db=db_base;
+    da.reg32_[0]+=uint32_t(da_tiles.layout()(0,0,kk));
+    db.reg32_[0]+=uint32_t(db_tiles.layout()(0,0,kk));
     Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15]);
   }
 }
