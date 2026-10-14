@@ -199,6 +199,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 146 | Two-CTA DSM cluster with split seven-product ownership | 0.7066 | 0.015789 | experiment |
 
+| 147 | Clustered products with asynchronous transform publication | 0.7496 | 0.014837 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1858,3 +1860,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** All six fresh checks reproduce baseline error and no nonfinite; gates still FAIL. BF16/FP16 launch15.72/15.86us, materially slower than140. Needs profiling before further cluster tuning.
 - **Next:** Profile instruction resource and waiting overhead of DSM candidate
 - **Archive:** trajectory/20261015_024843_iter-146/
+
+### Iter 147 — Clustered products with asynchronous transform publication
+
+- **Hypothesis:** Overlap raw P1 P2 with transforms while peer starts transformed products after publication
+- **Changes:** From146 use768 threads and608 balanced CUDA pack workers; only TMA leaders publish through invocation-private cooperative workspace; remote readiness protects DSM lifetime
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.014837 ms; mean speedup=0.7496x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cluster_64x64x256 v0 | launch | 0.012248 | 0.014718 | 0.8322 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cluster_64x64x256 v0 | launch | 0.009976 | 0.014957 | 0.6670 | 0.000754626 | 0 |
+
+- **Analysis:** Expected original numerical FAIL, baseline eF reproduced. Cluster improves15.72/15.86 to14.74/14.97us but remains slower than140. NCU146 full set failed LaunchFailed, resource probe103regs zero spills.
+- **Next:** Evaluate four-stage K128 clustered supply then return to best architecture if slower
+- **Archive:** trajectory/20261015_025003_iter-147/

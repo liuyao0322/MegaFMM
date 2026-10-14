@@ -11,7 +11,7 @@
 namespace megafmm::detail {
 namespace {
 constexpr int BM=64,BN=64,BK=256,Stages=2,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=512;
+constexpr int Plane=512*512,Threads=768;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -22,7 +22,7 @@ template<class T> struct alignas(128) Shared {
   float product[2][Elements];
   uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
   float state[3][Elements];
-  uint64_t remote_ready,remote_free;
+  uint64_t remote_ready,remote_free,pack_ready;
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
@@ -79,10 +79,48 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],256);}
-    Barrier::init(&s.remote_ready,256);Barrier::init(&s.remote_free,256);
+    Barrier::init(&s.pack_ready,608);Barrier::init(&s.remote_ready,256);Barrier::init(&s.remote_free,256);
     cutlass::arch::fence_barrier_init();
   }
-  for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid);i<Plane;i+=2*gridDim.x*gridDim.y*Threads){
+  __syncthreads();
+  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+  if(tid==0){
+    for(int step=0;step<products;++step)for(int q=0;q<512/BK;++q){
+      int p=product_for_step(step,rank);
+      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
+      if(sequence==(rank==0 ? 4:0)){
+        wait(&s.pack_ready,0);
+        auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
+        uint32_t increment=(blockIdx.x==0&&blockIdx.y==0)?0x80000000u-127u:1u;
+        uint32_t old,current;
+        asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;":"=r"(old):"l"(barrier),"r"(increment):"memory");
+        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];":"=r"(current):"l"(barrier):"memory");}while(!((old^current)&0x80000000u));
+      }
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      // Seven-product experiment: only publish high operands; no residual loads.
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      if(alo){
+        int plane=p==2 ? 6:2*(p-4);
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op,0,m0,k0/64,plane);
+      }else{
+        int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op,0,m0+row,(k0+col)/64);
+      }
+      if(blo){
+        int plane=p==3 ? 6:2*(p-4);
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+ASize,n0,k0,plane);
+      }else{
+        int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize,n0+col,k0+row);
+      }
+    }
+  }else if((tid>=32 && tid<128)||tid>=256){
+    int worker=tid>=256 ? tid-160:tid-32;
+  for(int local=2*worker;local<2048;local+=2*608){
+    int i=(blockIdx.y*gridDim.x+blockIdx.x)*2048+local;
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -110,37 +148,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(2*j*Plane+i)/2]=words[2*j];
   }
 
-  asm volatile("fence.proxy.async.global;" ::: "memory");
-  // Includes a CTA barrier and makes all cluster peers' initialization visible.
-  cooperative_groups::this_grid().sync();
-  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
-  if(tid==0){
-    for(int step=0;step<products;++step)for(int q=0;q<512/BK;++q){
-      int p=product_for_step(step,rank);
-      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
-      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
-      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
-      // Seven-product experiment: only publish high operands; no residual loads.
-      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
-      T* op=s.operand[slot];
-      if(alo){
-        int plane=p==2 ? 6:2*(p-4);
-        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op,0,m0,k0/64,plane);
-      }else{
-        int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
-        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op,0,m0+row,(k0+col)/64);
-      }
-      if(blo){
-        int plane=p==3 ? 6:2*(p-4);
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+ASize,n0,k0,plane);
-      }else{
-        int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize,n0+col,k0+row);
-      }
-    }
-  }else if((tid>=32 && tid<128)||tid>=256){
-    int worker=tid>=256 ? tid-160:tid-32;
+    asm volatile("fence.proxy.async.global;" ::: "memory");
+    arrive(&s.pack_ready);
     if(worker<256){
       constexpr int Chunks=16;
       unsigned row=unsigned(worker)/BN,col=unsigned(worker)%BN;
