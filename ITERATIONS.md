@@ -947,3 +947,10 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - User explicitly requested retaining the seven-product no-compensation version after measurement. Restored solution verbatim from503c7de, superseding the interim compensated restoration. No implementation edits beyond the exact already-benchmarked source; no redundant benchmark required.
 - Current source:7products, ordinarylaunch BF16/FP16 14.17568/14.40080us; Graph13.56640/14.06144us in paired trials. Both original numerical gates FAIL, nonfinite0. Auto remainsDense.
 - README and HINTS now identify this as the current experimental source; previous compensated validation is historical.
+
+### Profiling current seven-product version — no solution change
+
+- User requested a fresh bottleneck conclusion. Currentsource still503c7de, selected0d5d74d. BothdtypeNCU39passes each,plusallrole3freshinputdiagnostics.
+- Main exposed interval nowoperandready~2.9us,issue2.37us,wait01.41us;TCloop7.94us. Transform+grid2.62us. Tensoractivity~13%,HBM<.4%,Pbankconflict0,regs56nospill. Shared213120stilllimitsoneCTA/SM,unusedlowspace98304B.
+- Formal launchBF16/FP16=14.16448/14.31584us,Graph13.85632/14.10080us. OriginalFP64gates remainFAIL; source retained per user instruction.
+- Recommendations only: improve slotreuse and dataoverlap, reconsider tile/Kpipeline, reduce transform/gridcost. No optimization implemented. Report trajectory/20261015_profile-iter97-seven-products/REPORT.md.

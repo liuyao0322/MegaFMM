@@ -142,3 +142,10 @@ the user's requests in this conversation:
 - User-requested no-compensation ablation completed as97(503c7de):7products, low generation/stores/TMA/waits removed, same shared/workspace/roles. A/B/B/A full-call launch BF16/FP16~14.176/14.401us vs15term18.921/19.153us (~25% lower); Graph13.566/14.061us vs18.603/18.811us. Still slower than Dense. Both FAIL original gates(eF.0060152/.000754626,limits.00100256/.000103753). Source restored verbatim to validated96 after experiment; final gates PASS. Evidence trajectory/20261015_validation-iter97-no-compensation/REPORT.md.
 
 - Latest user steering: explicitly KEEP the seven-product no-compensation version as current source, despite reported accuracy failure. This supersedes the earlier automatic restoration decision; do not restore compensated96 as current. Preserve original accuracy gates and Auto=Dense.
+
+## Current seven-product profile, user request2026-10-15
+
+- Profile only, no solution edits or compensated restore. NCU confirms56regs,no spill,shared213120,oneCTA/SM,~25%warpoccupancy,Tensoractivity~13%,HBM<.4%,L2hit97–98%,P16STS+42LDSall1way0excess.
+- Current TC same-invocation median BF16/FP16 ready2.880/2.912us,issue2.368/2.368,wait0 1.408/1.408,total7.936/7.936; transform+grid inclinit2.624us. Sparsecrosscheck ready2.688,issue2.368,wait01.312. TMAfreewaitstage-median-sum4.992/5.056us,consumerPwait4.448us,TC Pfreewait.384us; overlapping,notadditive.
+- Current bottleneck is more exposed operand supply/slot reuse latency + synchronization, not prior15term issue-dominant chain. HBM not bandwidth-bound in testedwarmcache workload; no claim about coldcache. Shared has98304B unused lowoperand space; reclaim may enable deeperpipeline, but128CTAon132SM means2CTA/SM capacity alone doesnot improve achievedoccupancy. No candidate implemented.
+- Diagnosticbaseline SASS identicalproduction(2416instructions/dtype),270timingrowsbitexact; independentFP64gate stillFAILboth. Evidence trajectory/20261015_profile-iter97-seven-products/REPORT.md.

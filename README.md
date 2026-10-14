@@ -9,6 +9,8 @@ Graph 约 **13.57/14.06 μs**；较此前15项补偿版耗时下降约25%–27%�
 **两种输入均未通过原精度门限**，仍慢于调优cuBLASLt Dense。
 `Auto` 和 `Dense` 继续执行普通 GEMM；`SWPipeline` / `--algorithm sw` 显式执行当前实验内核。
 
+[当前七乘法版本 profiling 与瓶颈结论](trajectory/20261015_profile-iter97-seven-products/REPORT.md)
+
 [七乘法无补偿实验（iter97：更快，但两种精度均未通过原验收）](trajectory/20261015_validation-iter97-no-compensation/REPORT.md)
 
 [历史补偿版输入变换与 TMA 优化报告（iter96）](trajectory/20261014_validation-iter96-supply/REPORT.md)
