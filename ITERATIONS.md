@@ -541,6 +541,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 317 | Five persistent transformed product accumulators | 0.9748 | 0.011200 | experiment |
 
+| 318 | K64 sixteen-slot five-product pipeline build attempt | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4918,3 +4920,17 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Rejected: BF16 approximately 11.25 us and FP16 11.16352 us, slower than selected 282. Compilation has no C7515 warning. Outputs remain finite with the same original precision-gate failures; this is not a numerically accepted winner. The completed independent ABBA comparison also rejects iteration 316: FP16 ordinary 10.08080 versus selected 282 10.06064 us, and Graph 10.02896 versus 9.97408 us. The apparent initial gain of 316 was accompanied by a faster Dense baseline.
 - **Next:** Profile iteration 317 resource use and supply stalls before deciding whether K64 with deeper transformed-group prefetch is justified; selected version remains 282
 - **Archive:** trajectory/20261015_073033_iter-317/
+
+### Iter 318 — K64 sixteen-slot five-product pipeline build attempt
+
+- **Hypothesis:** Smaller K blocks and sixteen slots can prefetch three transformed-product groups within a similar shared-memory budget
+- **Changes:** Generate BK64 with sixteen slots, fifty-six producer blocks and first transformed dependency wait at block sixteen
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Build failed; no runtime or precision result is valid for this candidate. Diagnose the archived compiler errors before another formal iteration. Iter317 NCU independently reports 106 registers, zero local sectors, 1.328M instructions and long-scoreboard/issue ratio 2.56, versus selected282 approximately 1.1; fewer barrier stalls did not improve latency.
+- **Next:** Read compiler diagnostics and fix K64 static operand indices or layout constraints, then benchmark as a new iteration
+- **Archive:** trajectory/20261015_073407_iter-318/

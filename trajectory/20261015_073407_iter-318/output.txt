@@ -1,0 +1,36 @@
+a21b2bb07f1c42cdcdfebee9bb2b6d2c236b4dedb8a2485162469d3786d9965d  solution/internal.h
+891830283da539b208e277b523c1fd9fff277bdb34cfc206672fb9f1215597df  solution/plan.cpp
+32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708  solution/scale_output.cu
+50450b31503801675b4ef4558bf62ffb5c65199bfc3e60e910f411ece2db430d  solution/sw_pipeline.cu
+d5564b71d399c934229c8dc2089c5dd8de7e942957845a9cf23977353186e475  include/megafmm/gemm.h
+0964fc49fdbd02945515ff2d8f6bb834c6a4c937fb4cfad396b1be313634ae4e  bench/benchmark.cu
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 10%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 30%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 30%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(13): warning #177-D: variable "megafmm::detail::<unnamed>::Elements" was declared but never referenced
+  constexpr int BM=64,BN=32,BK=64,Stages=16,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+                                                                    ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(25): warning #177-D: function "megafmm::detail::<unnamed>::arrive" was declared but never referenced
+            void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
+                 ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(27): warning #177-D: function "megafmm::detail::<unnamed>::product_index" was declared but never referenced
+                            int product_index(int row,int col){
+                                ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(34): warning #177-D: function "megafmm::detail::<unnamed>::product_for_step" was declared but never referenced
+            constexpr int product_for_step(int step){
+                          ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(48): error: Internal Compiler Error (codegen): "asm operand index requested is larger than the number of asm operands provided!"
+
+gmake[2]: *** [CMakeFiles/megafmm.dir/build.make:106: CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:89: CMakeFiles/megafmm.dir/all] Error 2
+gmake: *** [Makefile:101: all] Error 2
+srun: error: g08: task 0: Exited with exit code 2
