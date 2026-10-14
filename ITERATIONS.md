@@ -495,6 +495,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 294 | Two K128 blocks per completion group | 1.0675 | 0.010335 | experiment |
 
+| 295 | Single release leader on K128 pipeline | 1.0720 | 0.010335 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4512,3 +4514,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.36576us FP16 10.30432us regress versus282. Original FP64 gates FAIL unchanged, finite expected errors. Reject batching; no independent certification.
 - **Next:** Reassess full282 NCU and use a different memory layout direction
 - **Archive:** trajectory/20261015_065709_iter-294/
+
+### Iter 295 — Single release leader on K128 pipeline
+
+- **Hypothesis:** One completed-warpgroup arrival may reduce twice-as-frequent K128 free-barrier work versus four warp arrivals
+- **Changes:** On282 free barrier count1 and only tid128 signals after collective wait0 and unchanged warp sync; mirrors CUTLASS one-warpgroup release pattern
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010335 ms; mean speedup=1.0720x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012323 | 0.010372 | 1.1881 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009844 | 0.010297 | 0.9559 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.37184us FP16 10.29728us do not improve282. Original gatesFAIL unchanged; finite errors. Similar old175 was flat on older K256 architecture; current K128 retest also rejects. No independent certification.
+- **Next:** Test workspace placement padding as a distinct memory request layout direction
+- **Archive:** trajectory/20261015_065920_iter-295/
