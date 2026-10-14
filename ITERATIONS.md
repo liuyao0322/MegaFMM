@@ -433,6 +433,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 263 | Single primary CTA leader PDL trigger | 1.0493 | 0.010511 | experiment |
 
+| 264 | Immutable host TMA geometry templates | 1.0523 | 0.010483 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3954,3 +3956,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通BF16 10.59520 us、FP16 10.42592 us，未证实优于254的稳定成对结果10.526/10.443us，BF略差，暂不选为winner。Dense12.23776/9.83776 us，原门槛FAIL。261至263无3percent改进；已重读254 NCU/SASS、连续批次trace及历史225（设备持久描述符，与主机模板不同），查询官方cuTensorMapReplaceAddress；transform已自动合并打包转换，无此项新收益依据。
 - **Next:** 测试只在计划创建时编码布局模板，每调用复制模板并用官方API替换所有当前指针，减少主机编码前置成本，不缓存输入。
 - **Archive:** trajectory/20261015_061341_iter-263/
+
+### Iter 264 — Immutable host TMA geometry templates
+
+- **Hypothesis:** 每调用只替换地址可能减少四次完整TMA布局编码带来的主机前置时间。
+- **Changes:** 在计划创建时用临时合法设备指针编码四个布局模板后释放占位分配；每调用复制模板并通过cuTensorMapReplaceAddress更新全部当前地址，无输入缓存、无可变共享状态，设备计算保持254。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010483 ms; mean speedup=1.0523x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012297 | 0.010505 | 1.1706 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009772 | 0.010461 | 0.9341 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通 BF16 10.50496 us、FP16 10.46112 us，与254稳定结果相近，未证明有收益；Dense12.29728/9.77152 us，原门槛FAIL。不以设备计算不变推断主机编码为瓶颈，暂不保留模板复杂性。
+- **Next:** 恢复254设备架构，尝试静态TMA生产链以减少运行时分支及地址计算。
+- **Archive:** trajectory/20261015_061436_iter-264/

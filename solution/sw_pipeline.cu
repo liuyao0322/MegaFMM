@@ -2352,7 +2352,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
 }
 template<class T> __global__ __launch_bounds__(512,1)
 void sw_transform_pdl(const T* A,const T* B,T* packed){
-  if(threadIdx.x==0)cudaTriggerProgrammaticLaunchCompletion();
+  cudaTriggerProgrammaticLaunchCompletion();
   for(int i=2*(blockIdx.x*512+threadIdx.x);i<Plane;i+=2*512*128){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
@@ -2457,7 +2457,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map status "+std::to_string(int(result)));
 }
 } // namespace
-struct SWState{DType dtype;};
+struct SWState{DType dtype;CUtensorMap maps[4];};
 std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   if(p.m!=1024 || p.n!=1024 || p.k!=1024 || p.trans_a || p.trans_b || p.lda!=1024 || p.ldb!=1024 || p.ldd!=1024 || p.alpha!=1 || p.beta!=0)
     throw std::invalid_argument("SW requires contiguous non-transposed1024^3 alpha1 beta0");
@@ -2479,11 +2479,28 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
     check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&blocks,sw_cooperative_hilo<cute::half_t>,Threads,sizeof(Shared<cute::half_t>)),"SW occupancy capacity");
   }
   if(blocks*prop.multiProcessorCount<128)throw std::invalid_argument("SW cooperative grid requires128 resident CTA capacity");
-  return std::make_shared<SWState>(SWState{p.dtype});
+  auto state=std::make_shared<SWState>();state->dtype=p.dtype;
+  // Encode invariant tensor geometry once. Every invocation replaces all four
+  // addresses in private host copies, so plans remain safe across streams.
+  void* placeholder=nullptr;
+  check(cudaMalloc(&placeholder,16),"SW tensor template placeholder");
+  try{
+    encode(state->maps[0],placeholder,p.dtype,true,false);
+    encode(state->maps[1],placeholder,p.dtype,false,false);
+    encode(state->maps[2],placeholder,p.dtype,true,true);
+    encode(state->maps[3],placeholder,p.dtype,false,true);
+  }catch(...){cudaFree(placeholder);throw;}
+  check(cudaFree(placeholder),"SW tensor template placeholder free");
+  return state;
 }
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
-  CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
-  encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
+  CUtensorMap a=state.maps[0],b=state.maps[1],s=state.maps[2],t=state.maps[3];
+  auto bind=[](CUtensorMap& map,const void* pointer){
+    if(reinterpret_cast<uintptr_t>(pointer)%16)throw std::invalid_argument("SW TMA input must be16-byte aligned");
+    auto result=cuTensorMapReplaceAddress(&map,const_cast<void*>(pointer));
+    if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map replace status "+std::to_string(int(result)));
+  };
+  bind(a,A);bind(b,B);bind(s,workspace);bind(t,static_cast<char*>(workspace)+WorkspaceBytes/2);
   cudaLaunchAttribute attribute{};
   attribute.id=cudaLaunchAttributeProgrammaticStreamSerialization;
   attribute.val.programmaticStreamSerializationAllowed=1;
