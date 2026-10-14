@@ -259,6 +259,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 176 | Global U2 U3 split-product pair | 0.7316 | 0.015313 | experiment |
 
+| 177 | Three operand slots in global split-product pair | 0.7400 | 0.014998 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2394,3 +2396,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about15.48us FP16 about15.15us versus16211.34/11.54us, no win. Expected uncompensated errors and nonfinite0 retained. Global publication did not recover split-product cost; inspect registers and local spills before further variants.
 - **Next:** Inspect resource usage, then eliminate shared rank1 staging and attempt deeper operand pipeline only if resources support it.
 - **Archive:** trajectory/20261015_033052_iter-176/
+
+### Iter 177 — Three operand slots in global split-product pair
+
+- **Hypothesis:** Removing shared local partial staging permits deeper operand prefetch for paired product CTAs.
+- **Changes:** Base176; rank1 keeps P5/P3 in first/second registers and P4 current, no shared state; three operand slots and one product slot fit213120bytes.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.014998 ms; mean speedup=0.7400x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cluster_64x64x256 v0 | launch | 0.012269 | 0.014841 | 0.8267 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cluster_64x64x256 v0 | launch | 0.009901 | 0.015155 | 0.6533 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about14.84us and FP16 about15.15us, still far slower162; expected baseline errors retained and nonfinite0. No win from current deeper pair pipeline.
+- **Next:** Move P2 to the output-consuming CTA so U2/U3 producer finishes three products and exchange may overlap consumers fourth product.
+- **Archive:** trajectory/20261015_033152_iter-177/

@@ -10,7 +10,7 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=64,BK=256,Stages=2,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int BM=64,BN=64,BK=256,Stages=3,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
 constexpr int Plane=512*512,Threads=768;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 constexpr size_t PackedBytes=size_t(8)*Plane*2;
@@ -20,9 +20,8 @@ template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
   // Row-major P with an XOR permutation inside each 32-float row.
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
-  float product[2][Elements];
-  uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
-  float state[3][Elements];
+  float product[1][Elements];
+  uint64_t ready[Stages],free[Stages],product_ready[1],product_free[1];
   uint64_t pack_ready;
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
@@ -79,7 +78,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int products=rank==0 ? 4:3;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],256);}
+    for(int j=0;j<1;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],256);}
     Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
@@ -161,13 +160,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       float* out=D+(m0+row)*1024+n0+col;
       float first[Chunks],second[Chunks],current[Chunks];
       for(int step=0;step<products;++step){
-        wait(&s.product_ready[step%2],(step/2)%2);
+        wait(&s.product_ready[0],step%2);
         #pragma unroll
         for(int j=0;j<Chunks;++j){
           int idx=((j&1)?base_odd:base_even)+j*256;
-          current[j]=s.product[step%2][idx];
+          current[j]=s.product[0][idx];
         }
-        arrive(&s.product_free[step%2]);
+        arrive(&s.product_free[0]);
         #pragma unroll
         for(int j=0;j<Chunks;++j){
           if(rank==0){
@@ -175,7 +174,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
             else if(step==1)out[j*4096]=__fadd_rn(first[j],current[j]);
             else if(step==2)first[j]=__fadd_rn(first[j],current[j]);
             else second[j]=__fadd_rn(first[j],current[j]);
-          }else s.state[step][worker+j*256]=current[j];
+          }else{
+            if(step==0)first[j]=current[j];
+            else if(step==1)second[j]=current[j];
+          }
         }
       }
       float* u2buf=reinterpret_cast<float*>(reinterpret_cast<char*>(packed)+PackedBytes)+tile*Elements;
@@ -191,7 +193,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         #pragma unroll
         for(int j=0;j<Chunks;++j){
           float u2=u2buf[worker+j*256],u3=u3buf[worker+j*256];
-          float p5=s.state[0][worker+j*256],p3=s.state[1][worker+j*256],p4=s.state[2][worker+j*256];
+          float p5=first[j],p3=second[j],p4=current[j];
           out[j*4096+512]=__fadd_rn(__fadd_rn(u2,p5),p3);
           out[j*4096+512*1024+512]=__fadd_rn(u3,p5);
           out[j*4096+512*1024]=__fsub_rn(u3,p4);
@@ -212,13 +214,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         warpgroup_commit_batch();warpgroup_wait<0>();
         __syncwarp();if((tid&31)==0)arrive(&s.free[slot]);
       }
-      if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
+      if(step>=1)wait(&s.product_free[0],(step-1)%2);
       #pragma unroll
       for(int j=0;j<32;++j){
         int mn=GMMA::CLayout_64x64{}(tid-128,j);
-        s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
+        s.product[0][product_index(mn%64,mn/64)]=acc[j];
       }
-      arrive(&s.product_ready[step%2]);
+      arrive(&s.product_ready[0]);
     }
   }
 }
