@@ -99,6 +99,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 96 | Restore the validated small-gain iter92 candidate | 0.5822 | 0.019069 | passed |
 
+| 97 | Seven-product SW without residual compensation | 0.7728 | 0.014410 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -908,3 +910,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 
 | bf16 | 18.96224 | 12.26752 | 7.39458724362e-06 | 0.00100255679669 | PASS |
 | fp16 | 18.95360 | 9.94816 | 2.37135524364e-06 | 0.000103752760587 | PASS |
+
+### Iter 97 — Seven-product SW without residual compensation
+
+- **Hypothesis:** Removing eight residual products may improve full-call speed at a measurable accuracy cost
+- **Changes:** Remove low-part generation, global stores, TMA loads, low waits and eight correction products; preserve high transforms, shared budget and roles
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.014410 ms; mean speedup=0.7728x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012312 | 0.014464 | 0.8512 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009970 | 0.014356 | 0.6944 | 0.000754626 | 0 |
+
+- **Analysis:** User-requested performance ablation; original numerical gates remain authoritative. Benchmark exit may indicate numerical failure, not compilation failure; compare both dtype rows and fresh same-session baseline next.
+- **Next:** Run interleaved full-call comparisons versus rebuilt iter96 and report accuracy even if rejected
+- **Archive:** trajectory/20261015_010804_iter-97/

@@ -134,3 +134,7 @@ the user's requests in this conversation:
 - Four paired campaigns vs87: launchBF16~1.3–1.7% lower,FP16~0.8–1.5%; Graph smaller and one FP16 slight regression. Still slower than tuned Dense; Auto=Dense.
 - Critical new diagnostic:92->94 wait0~.992->.544us but operandwait2.336->4.192/4.352us, production11.552->12.896/12.832us. Deferring slot0 release harms refill overlap; lowering explicit WGMMA waits alone is not a performance criterion.
 - Final96 originalFP64 gates,72stress,all3quick sanitizers and3DAG tests passed. Full evidence trajectory/20261014_validation-iter96-supply/REPORT.md. No physical-floor or exhausted-space claim; this round ends with six tested optimization directions and best source retained.
+
+## User request 2026-10-15: seven-product ablation
+
+- User explicitly asked to remove extra compensation and measure performance. Test1024^3 BF16/FP16 seven main products, omitting residual generation/loads/waits/multiply terms. Preserve original FP64 numerical gates and report failures plainly. Keep workspace/shared/roles unchanged to isolate compensation cost. This is a measurement experiment, not authorization to weaken accuracy acceptance.
