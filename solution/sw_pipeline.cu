@@ -73,14 +73,15 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   using namespace cute;
   extern __shared__ __align__(128) unsigned char buffer[];
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
+  int rank=blockIdx.x&1;
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],2);Barrier::init(&s.free[j],rank==0?8:4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
     Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
-  __syncthreads();
+  cooperative_groups::this_cluster().sync();
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
@@ -101,14 +102,20 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       // Seven-product experiment: only publish high operands; no residual loads.
-      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*BSize);
+      if(rank==0){
+        TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*ASize);
+        TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*ASize,1,true);
+      }
       T* op=s.operand[slot];
+      if(rank==0){
       if(alo){
         int plane=p==2 ? 6:2*(p-4);
-        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op,0,m0,k0/64,plane);
+        SM90_TMA_LOAD_MULTICAST_4D::copy(&smap,&s.ready[slot],uint16_t(3),op,0,m0,k0/64,plane);
       }else{
         int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
-        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op,0,m0+row,(k0+col)/64);
+        SM90_TMA_LOAD_MULTICAST_3D::copy(&amap,&s.ready[slot],uint16_t(3),op,0,m0+row,(k0+col)/64);
+      }
       }
       if(blo){
         int plane=p==3 ? 6:2*(p-4);
@@ -199,7 +206,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         mma_term<T>(ah,bh,acc);
         warpgroup_commit_batch();warpgroup_wait<0>();
         __syncwarp();
-        if((tid&31)==0)arrive(&s.free[slot]);
+        if((tid&31)==0){
+          arrive(&s.free[slot]);
+          if(rank==1){asm volatile("" ::: "memory");Barrier::arrive(&s.free[slot],0,true);}
+        }
       }
       if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
       #pragma unroll
@@ -210,7 +220,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       arrive(&s.product_ready[step%2]);
     }
   }
-  // Shared storage remains alive until every CTA thread has returned.
+  cooperative_groups::this_cluster().sync();
 }
 void check(cudaError_t e,const char* where){if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));}
 void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transformed){
@@ -253,13 +263,23 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   if(blocks*prop.multiProcessorCount<128)throw std::invalid_argument("SW cooperative grid requires128 resident CTA capacity");
   return std::make_shared<SWState>(SWState{p.dtype});
 }
+template<class T> cudaLaunchConfig_t launch_config(cudaStream_t stream,cudaLaunchAttribute (&attrs)[2]){
+  attrs[0].id=cudaLaunchAttributeCooperative;attrs[0].val.cooperative=1;
+  attrs[1].id=cudaLaunchAttributeClusterDimension;attrs[1].val.clusterDim={2,1,1};
+  cudaLaunchConfig_t config{};config.gridDim=dim3(16,8);config.blockDim=Threads;
+  config.dynamicSmemBytes=sizeof(Shared<T>);config.stream=stream;config.attrs=attrs;config.numAttrs=2;
+  return config;
+}
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
   CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
   encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
-  void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D};dim3 grid(16,8);
-  if(state.dtype==DType::BF16)
-    check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
-  else
-    check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::half_t>),grid,Threads,args,sizeof(Shared<cute::half_t>),stream),"SW cooperative launch");
+  cudaLaunchAttribute attrs[2]{};
+  if(state.dtype==DType::BF16){
+    auto config=launch_config<cute::bfloat16_t>(stream,attrs);
+    check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::bfloat16_t>,a,b,s,t,static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace),D),"SW cluster launch");
+  }else{
+    auto config=launch_config<cute::half_t>(stream,attrs);
+    check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::half_t>,a,b,s,t,static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace),D),"SW cluster launch");
+  }
 }
 } // namespace megafmm::detail
