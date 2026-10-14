@@ -43,6 +43,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 68 | Double reduction tile with split swizzled A loads | 0.3680 | 0.030149 | passed |
 
+| 69 | Probe single-buffer BK256 geometry | 0.0000 | 0.000000 | failed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -350,3 +352,17 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Complete unchanged benchmark exited0. Reassessment reviewed65-67, clock64 diagnostics, zero spills in66 and NVIDIA CUDA TMA swizzle restrictions plus CUTLASS warp-specialized pipeline docs.
 - **Next:** Inspect complete latency and validate stress/Graph for the selected candidate.
 - **Archive:** trajectory/20261014_193457_iter-68/
+
+### Iter 69 — Probe single-buffer BK256 geometry
+
+- **Hypothesis:** Larger K amortizes product completion and recombination barriers.
+- **Changes:** BK256,one operand slot; phase alternates per product and A is split into64-column TMA boxes.
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Benchmark exited2 during build; inspect shared-budget static assertion before execution. No runtime or correctness evidence.
+- **Next:** Correct shared-budget accounting and rebuild.
+- **Archive:** trajectory/20261014_193556_iter-69/

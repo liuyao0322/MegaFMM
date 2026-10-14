@@ -10,18 +10,18 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=128,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int BM=64,BN=32,BK=256,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
 constexpr int Plane=512*512,Threads=256;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
-  T operand[2][2*ASize+2*BSize];
+  T operand[1][2*ASize+2*BSize];
   float product[7][Elements];
   float output[4][Elements];
-  uint64_t ready[2],free[2],product_ready,product_free;
+  uint64_t ready[1],free[1],product_ready,product_free;
 };
-static_assert(sizeof(Shared<cute::half_t>)==188544,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==188416,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -52,7 +52,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],128);}
+    for(int j=0;j<1;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],128);}
     Barrier::init(&s.product_ready,128);Barrier::init(&s.product_free,96);
     cutlass::arch::fence_barrier_init();
   }
@@ -83,8 +83,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
     for(int q=0;q<512/BK;++q)for(int p=0;p<7;++p){
-      int sequence=q*7+p,slot=sequence%2,k0=q*BK;
-      if(sequence>=2)wait(&s.free[slot],((sequence-2)/2)%2);
+      int sequence=q*7+p,slot=0,k0=q*BK;
+      if(sequence)wait(&s.free[slot],(sequence-1)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       int bytes=2*(ASize+BSize)+(alo ? 2*ASize:0)+(blo ? 2*BSize:0);
       TxBarrier::arrive_and_expect_tx(&s.ready[slot],bytes);
@@ -132,8 +132,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int q=0;q<512/BK;++q){
       if(q)wait(&s.product_free,(q-1)%2);
       for(int p=0;p<7;++p){
-        int sequence=q*7+p,slot=sequence%2;
-        wait(&s.ready[slot],(sequence/2)%2);
+        int sequence=q*7+p,slot=0;
+        wait(&s.ready[slot],sequence%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la),al=make_tensor(make_smem_ptr(op+ASize),la);
         auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb),bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
