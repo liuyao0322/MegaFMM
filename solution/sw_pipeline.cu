@@ -16,12 +16,11 @@ constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
-  T operand[11*(ASize+BSize)];
+  T operand[2][2*ASize+2*BSize];
   float product[7][Elements];
-  float output[4][Elements];
-  uint64_t ready,free,product_ready,product_free;
+  uint64_t ready[2],free[2],product_ready,product_free;
 };
-static_assert(sizeof(Shared<cute::half_t>)==225408,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==106624,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -52,11 +51,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    Barrier::init(&s.ready,1);Barrier::init(&s.free,128);
+    for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],128);}
     Barrier::init(&s.product_ready,128);Barrier::init(&s.product_free,96);
     cutlass::arch::fence_barrier_init();
   }
-  for(int i=tid;i<4*Elements;i+=Threads)(&s.output[0][0])[i]=0;
   __syncthreads();
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   for(int i=(blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid;i<Plane;i+=gridDim.x*gridDim.y*Threads){
@@ -82,65 +80,77 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
-    for(int q=0;q<512/BK;++q){
-      if(q)wait(&s.free,(q-1)%2);
-      int k0=q*BK;
-      TxBarrier::arrive_and_expect_tx(&s.ready,2*11*(ASize+BSize));
-      for(int j=0;j<3;++j){
-        int arow=j==2 ? 512:0,acol=j>=1 ? 512:0;
-        int brow=j>=1 ? 512:0,bcol=j==2 ? 512:0;
-        SM90_TMA_LOAD_2D::copy(&amap,&s.ready,0,s.operand+j*ASize,k0+acol,m0+arow);
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready,0,s.operand+11*ASize+j*BSize,n0+bcol,k0+brow);
+    for(int q=0;q<512/BK;++q)for(int p=0;p<7;++p){
+      int sequence=q*7+p,slot=sequence%2,k0=q*BK;
+      if(sequence>=2)wait(&s.free[slot],((sequence-2)/2)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      int bytes=2*(ASize+BSize)+(alo ? 2*ASize:0)+(blo ? 2*BSize:0);
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],bytes);
+      T* op=s.operand[slot];
+      if(alo){
+        int plane=p==2 ? 6:2*(p-4);
+        SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op,k0,m0,plane);
+        SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op+ASize,k0,m0,plane+1);
+      }else{
+        int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
+        SM90_TMA_LOAD_2D::copy(&amap,&s.ready[slot],0,op,k0+col,m0+row);
       }
-      for(int j=0;j<8;++j){
-        SM90_TMA_LOAD_3D::copy(&smap,&s.ready,0,s.operand+(3+j)*ASize,k0,m0,j);
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready,0,s.operand+11*ASize+(3+j)*BSize,n0,k0,j);
+      if(blo){
+        int plane=p==3 ? 6:2*(p-4);
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+2*ASize,n0,k0,plane);
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+2*ASize+BSize,n0,k0,plane+1);
+      }else{
+        int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+2*ASize,n0+col,k0+row);
       }
     }
   }else if(tid>=32 && tid<128){
     int worker=tid-32;
+    constexpr int Chunks=(Elements+95)/96;
+    float q11[Chunks]={},q12[Chunks]={},q21[Chunks]={},q22[Chunks]={};
     for(int q=0;q<512/BK;++q){
       wait(&s.product_ready,q%2);
-      for(int i=worker;i<Elements;i+=96){
-        float p1=s.product[0][i],p2=s.product[1][i],p3=s.product[2][i],p4=s.product[3][i],p5=s.product[4][i],p6=s.product[5][i],p7=s.product[6][i];
-        float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6),u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
-        s.output[0][i]=__fadd_rn(s.output[0][i],u1);
-        s.output[1][i]=__fadd_rn(s.output[1][i],__fadd_rn(u4,p3));
-        s.output[2][i]=__fadd_rn(s.output[2][i],__fsub_rn(u3,p4));
-        s.output[3][i]=__fadd_rn(s.output[3][i],__fadd_rn(u3,p5));
+      #pragma unroll
+      for(int chunk=0;chunk<Chunks;++chunk){
+        int i=worker+chunk*96;
+        if(i<Elements){
+          float p1=s.product[0][i],p2=s.product[1][i],p3=s.product[2][i],p4=s.product[3][i],p5=s.product[4][i],p6=s.product[5][i],p7=s.product[6][i];
+          float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6),u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
+          q11[chunk]=__fadd_rn(q11[chunk],u1);
+          q12[chunk]=__fadd_rn(q12[chunk],__fadd_rn(u4,p3));
+          q21[chunk]=__fadd_rn(q21[chunk],__fsub_rn(u3,p4));
+          q22[chunk]=__fadd_rn(q22[chunk],__fadd_rn(u3,p5));
+        }
       }
       arrive(&s.product_free);
     }
-    for(int i=worker;i<Elements;i+=96){
-      int row=m0+i/BN,col=n0+i%BN;
-      D[row*1024+col]=s.output[0][i];D[row*1024+col+512]=s.output[1][i];
-      D[(row+512)*1024+col]=s.output[2][i];D[(row+512)*1024+col+512]=s.output[3][i];
+    #pragma unroll
+    for(int chunk=0;chunk<Chunks;++chunk){
+      int i=worker+chunk*96;
+      if(i<Elements){
+        int row=m0+i/BN,col=n0+i%BN;
+        D[row*1024+col]=q11[chunk];D[row*1024+col+512]=q12[chunk];
+        D[(row+512)*1024+col]=q21[chunk];D[(row+512)*1024+col+512]=q22[chunk];
+      }
     }
   }else if(tid>=128){
     for(int q=0;q<512/BK;++q){
       if(q)wait(&s.product_free,(q-1)%2);
-      wait(&s.ready,q%2);
-      float acc[7][16]={};
-      warpgroup_arrive();
-      #pragma unroll
       for(int p=0;p<7;++p){
-        int ai=p==0 ? 0:p==1 ? 1:p==2 ? 9:p==3 ? 2:3+2*(p-4);
-        int bi=p==0 ? 0:p==1 ? 1:p==2 ? 2:p==3 ? 9:3+2*(p-4);
-        auto ah=make_tensor(make_smem_ptr(s.operand+ai*ASize),la);
-        auto al=make_tensor(make_smem_ptr(s.operand+(ai+1)*ASize),la);
-        auto bh=make_tensor(make_smem_ptr(s.operand+11*ASize+bi*BSize),lb);
-        auto bl=make_tensor(make_smem_ptr(s.operand+11*ASize+(bi+1)*BSize),lb);
-        mma_term<T>(ah,bh,acc[p]);
-        if(p==2 || p>=4)mma_term<T>(al,bh,acc[p]);
-        if(p==3 || p>=4)mma_term<T>(ah,bl,acc[p]);
-      }
-      warpgroup_commit_batch();warpgroup_wait<0>();
-      #pragma unroll
-      for(int p=0;p<7;++p){
+        int sequence=q*7+p,slot=sequence%2;
+        wait(&s.ready[slot],(sequence/2)%2);
+        T* op=s.operand[slot];
+        auto ah=make_tensor(make_smem_ptr(op),la),al=make_tensor(make_smem_ptr(op+ASize),la);
+        auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb),bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
+        float acc[16]={};warpgroup_arrive();
+        mma_term<T>(ah,bh,acc);
+        if(p==2 || p>=4)mma_term<T>(al,bh,acc);
+        if(p==3 || p>=4)mma_term<T>(ah,bl,acc);
+        warpgroup_commit_batch();warpgroup_wait<0>();
         #pragma unroll
-        for(int j=0;j<16;++j){int mn=GMMA::CLayout_64x32{}(tid-128,j);s.product[p][(mn%64)*BN+mn/64]=acc[p][j];}
+        for(int j=0;j<16;++j){int mn=GMMA::CLayout_64x32{}(tid-128,j);s.product[p][(mn%64)*BN+mn/64]=acc[j];}
+        arrive(&s.free[slot]);
       }
-      arrive(&s.free);
       arrive(&s.product_ready);
     }
   }

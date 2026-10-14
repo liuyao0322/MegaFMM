@@ -39,6 +39,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 66 | Issue seven independent WGMMA products before waiting | 0.1933 | 0.057705 | passed |
 
+| 67 | Retain CUDA output accumulators in registers | 0.2419 | 0.045762 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -314,3 +316,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Original full benchmark exited0 and numerical gates passed. Compare performance before selecting bulk batching.
 - **Next:** Inspect timings and register use; validate stress on a performance improvement.
 - **Archive:** trajectory/20261014_193108_iter-66/
+
+### Iter 67 — Retain CUDA output accumulators in registers
+
+- **Hypothesis:** Stage-clock64 finds significant output recombination stalls; static register accumulators remove repeated shared output reads and writes.
+- **Changes:** Restore64 and replace four shared Q planes with statically unrolled22-element per-worker register accumulators; shared106624 bytes.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.045762 ms; mean speedup=0.2419x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x64 v0 | launch | 0.012280 | 0.045980 | 0.2671 | 7.15726e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x64 v0 | launch | 0.009875 | 0.045543 | 0.2168 | 4.79212e-07 | 1 |
+
+- **Analysis:** Frozen complete benchmark exited0; all numerical gates passed. Instrumented64 timings are diagnostic rather than native latency claims.
+- **Next:** Inspect speed and full stress, then reassess recent batching alternatives.
+- **Archive:** trajectory/20261014_193329_iter-67/
