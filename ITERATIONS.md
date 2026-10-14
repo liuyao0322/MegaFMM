@@ -95,6 +95,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 33 | Add third operand bank to vector wait1 pipeline | 0.4091 | 0.364720 | no-change |
 
+| 48 | Unified-buffer SW v1 with TMA SIMT WGMMA roles and high-low operands | 0.0323 | 0.342927 | first-version-diagnostic |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -2004,3 +2006,19 @@ Final51 uses minCTA1/q40-128-128/I128/dynamic87040 after preserved min2 complete
 ROOTfuture7 SS delayedrelease/wait1 abstractschedule package remains CPU-only:352bounded schedules,7negative rejected,30consumerST opportunities at16stages; noCuTe/compiler/TMA/mbarrier/GPR/numeric/GPU/performance proof. Current47 uses wait0 every stage and is unchanged. Default/selected/strict/SAN actualterminal closure and uniqueimmutableprestatus audits follow, noautomatic48.
 
 Actual iteration47 validation terminal closure: defaultexit0 CASE/PASS/BEGIN3162/3388/6120; selected51 and52 eachactualexit0 with60/140/214. Aggregateoriginalstrict60gates=36PASS24FAIL/nonfinite0, shared30Dense reference cases gives90CASE, actualstrict exit2; full2010code domain was notexecuted. Forced37CLIactualexit1 with0CASE/BEGIN. AllsixserialSAN actualexit0; eachcomplete414 CASE/PASS/BEGIN marker multiset equalsselectedroute, memerrors/leaks0,racehazards/errors/warnings0,syncerrors0. SameabsoluteComputeSanitizerVersion2025.1.0.0 build35583870 before/after snapshotsactual0. No precisionpromotion, AutoDense unchanged. Original preparedff766 coveragefirstCPUattempt exit1 fromlegacyflat gate-linked-binding reader; archive retained andnew post-validation schema adapter onlyconsumer. NoGPUrerun.
+
+### Iter 48 — Unified-buffer SW v1 with TMA SIMT WGMMA roles and high-low operands
+
+- **Hypothesis:** An output-owning CTA can fuse all seven Winograd products without global intermediates; high-low operands reduce transform rounding error.
+- **Changes:** New 1024-only 64x32x32 kernel, 1 TMA warp / 3 SIMT warps / 4 WGMMA warps, 213120 shared bytes, FP32 ST and output, 15 low-precision leaf terms. Forced SW route; Auto stays Dense.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.342927 ms; mean speedup=0.0323x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_unified_v1_hilo_64x32x32 v0 | launch | 0.012352 | 0.354557 | 0.0348 | 1.3231 | 0 |
+| 1024,1024,1024 | fp16 | sw_unified_v1_hilo_64x32x32 v0 | launch | 0.009850 | 0.331297 | 0.0297 | 1.3231 | 0 |
+
+- **Analysis:** First complete launch benchmark only at 1024, both dtypes, unchanged FP64 gate, 20 warmups / 100 calls / 5 groups / 3 fresh trials. Command returned exit 2; read the recorded per-dtype gate results before any correctness or performance conclusion. Historical results deletions predate this implementation and are not staged.
+- **Next:** Inspect numerical failures; repair implementation correctness before collecting final Graph comparison and focused 1024 validation.
+- **Archive:** trajectory/20261014_182329_iter-48/

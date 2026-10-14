@@ -190,7 +190,7 @@ Options options(int argc, char** argv) {
     auto next = [&]() { if (!value.empty()) return value; if (++i == argc) throw std::runtime_error("missing value for " + arg); return std::string(argv[i]); };
     if (arg == "--help") {
       std::cout << "megafmm_bench --shapes 'M,N,K;...' --dtype bf16|fp16|both "
-        "--algorithm dense|auto "
+        "--algorithm dense|auto|sw "
         "--trials N --warmup N --groups N --correct-trials N --rotate-inputs N --graph --output CSV --profile [--profile-dense]\n";
       std::exit(0);
     } else if (arg == "--shapes") o.shapes = parse_shapes(next());
@@ -209,7 +209,7 @@ Options options(int argc, char** argv) {
   }
   if (o.profile_dense && !o.profile) throw std::runtime_error("--profile-dense requires --profile");
   if (o.dtype != "bf16" && o.dtype != "fp16" && o.dtype != "both") throw std::runtime_error("invalid dtype");
-  if (o.algorithm != "dense" && o.algorithm != "auto") throw std::runtime_error("invalid algorithm");
+  if (o.algorithm != "dense" && o.algorithm != "auto" && o.algorithm != "sw") throw std::runtime_error("invalid algorithm");
   if (o.trials <= 0 || o.groups <= 0 || o.warmup < 0 || o.correct_trials < 0 || o.rotate_inputs <= 0) throw std::runtime_error("invalid trial count");
   return o;
 }
@@ -277,7 +277,7 @@ template <class T> bool benchmark(const Options& o, int m, int n, int k, megafmm
   problem.m=m; problem.n=n; problem.k=k; problem.lda=k; problem.ldb=n; problem.ldc=n; problem.ldd=n; problem.dtype=dtype;
   megafmm::Policy policy;
   policy.workspace_limit=size_t(8)<<30;
-  policy.algorithm=o.algorithm=="auto" ? megafmm::Algorithm::Auto : megafmm::Algorithm::Dense;
+  policy.algorithm=o.algorithm=="sw" ? megafmm::Algorithm::SWPipeline : o.algorithm=="auto" ? megafmm::Algorithm::Auto : megafmm::Algorithm::Dense;
   if (o.profile && o.profile_dense) policy.algorithm=megafmm::Algorithm::Dense;
   auto setup_start=Clock::now();
   auto solution=megafmm::create_plan(problem,policy);

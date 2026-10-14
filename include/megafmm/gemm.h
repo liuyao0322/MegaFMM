@@ -7,7 +7,8 @@
 
 namespace megafmm {
 enum class DType { BF16, FP16 };
-enum class Algorithm { Auto, Dense };
+// Experimental forced route; Auto remains independently tuned Dense.
+enum class Algorithm { Auto, Dense, SWPipeline=3 };
 struct Problem {
   int64_t m=0, n=0, k=0;
   int64_t lda=0, ldb=0, ldc=0, ldd=0;

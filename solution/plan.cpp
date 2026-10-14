@@ -292,6 +292,7 @@ struct Plan::Impl {
   size_t bytes = 0;
   cublasLtHandle_t handle = nullptr;
   std::unique_ptr<LtOp> dense;
+  std::shared_ptr<detail::SWState> sw;
   ~Impl() {
     dense.reset();
     if (handle) cublasLtDestroy(handle);
@@ -340,6 +341,10 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     cuda_check(cudaPeekAtLastError(), "launch degenerate output kernel");
     return;
   }
+  if (plan.sw) {
+    detail::run_sw_pipeline(*plan.sw,A,B,D,stream);
+    return;
+  }
   lt_check(execute_lt(plan.handle, *plan.dense,
       bound_candidate(*plan.dense, A, B, C0, D), A, B, C0, D,
       plan.bytes ? workspace : nullptr, stream), "run dense GEMM");
@@ -353,18 +358,19 @@ Plan& Plan::operator=(Plan&&) noexcept = default;
 size_t Plan::workspace_bytes() const { return impl_->bytes; }
 const Problem& Plan::problem() const { return impl_->problem; }
 std::string Plan::algorithm_name() const {
-  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : "dense_cublaslt";
+  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw ? "sw_unified_v1_hilo_64x32x32" : "dense_cublaslt";
 }
 std::string Plan::lt_algorithm_config(const void* A, const void* B, const float* C0,
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
+  if (impl_->sw) return "sw_v1;warp_roles=1tma+3simt+4wgmma;smem=213120;st=fp32;operand=hi+lo;leaf_terms=15;current_pointer_maps=2;alpha=1;beta=0";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }
 std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   validate_problem(p);
-  if (policy.algorithm != Algorithm::Auto && policy.algorithm != Algorithm::Dense)
+  if (policy.algorithm != Algorithm::Auto && policy.algorithm != Algorithm::Dense && policy.algorithm != Algorithm::SWPipeline)
     throw std::invalid_argument("unsupported algorithm: old SW implementations have been removed");
   if (policy.heuristic_candidates < 1 || policy.heuristic_candidates > 128)
     throw std::invalid_argument("heuristic_candidates must be between 1 and 128");
@@ -372,7 +378,9 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   impl->problem = p;
   impl->empty = !p.m || !p.n;
   impl->scale = !p.k || p.alpha == 0.0f;
-  if (!impl->empty && !impl->scale) {
+  if (policy.algorithm==Algorithm::SWPipeline) {
+    impl->sw=detail::make_sw_pipeline(p);
+  } else if (!impl->empty && !impl->scale) {
     lt_check(cublasLtCreate(&impl->handle), "create cuBLASLt handle");
     impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);
     impl->bytes = impl->dense->scratch_bytes();
@@ -399,7 +407,7 @@ void tune(Plan& plan, const void* A, const void* B, const float* C0,
     original_c = snapshot;
   }
   try {
-    if (!impl.scale)
+    if (!impl.scale && !impl.sw)
       tune_lt(impl.handle, *impl.dense, A, B, original_c, D,
               impl.bytes ? workspace : nullptr, stream);
     run_internal(impl, A, B, original_c, D, workspace, stream);
