@@ -423,6 +423,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 258 | PDL BK512 双槽测试 | 0.9620 | 0.011433 | experiment |
 
+| 259 | PDL transform 256x256 | 1.0393 | 0.010598 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3864,3 +3866,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整基准 FP16 中位数 11.4496 us，同期 Dense 9.80608 us；BF16 约 11.43 us。明显慢于已独立验证的 iter254。原 FP64 精度门槛仍失败，无非有限值，不保留此配置。
 - **Next:** 恢复并继续优化 iter254 的 PDL 架构，分析供数与等待节奏，缩小 FP16 相对 Dense 的差距。
 - **Archive:** trajectory/20261015_060644_iter-258/
+
+### Iter 259 — PDL transform 256x256
+
+- **Hypothesis:** 将变换分配到更小的 CTA，减少每 CTA 的调度粒度并改善 PDL 前置供数。
+- **Changes:** 从已验证 iter254 出发，仅将 transform 的 128x512 改为 256x256，保持线程总数、计算顺序、compute 配置不变。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010598 ms; mean speedup=1.0393x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012235 | 0.010706 | 1.1428 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009817 | 0.010491 | 0.9358 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通调用 BF16 10.70592 us、FP16 10.49056 us，未优于254约10.53/10.44 us。FP16 Dense 9.81664 us；BF16 Dense 有单组37.6 us异常，不能据此宣称额外加速。原精度门槛仍 FAIL，不保留。
+- **Next:** 测试更小的一波 transform grid，并继续以完整普通调用衡量。
+- **Archive:** trajectory/20261015_060925_iter-259/
