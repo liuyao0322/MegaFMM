@@ -407,6 +407,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 250 | Isolate32x64 transform ownership from scoped publication | 1.0249 | 0.011021 | experiment |
 
+| 251 | Pad scoped counters and amortize GPU release fence | 0.8874 | 0.012545 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3720,3 +3722,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.9053 us vs Dense12.5037 us; FP16 11.1363 us vs Dense10.0589 us. Original expected errors and both gate failures unchanged. Geometry alone is broadly flat, so249 approximately2us regression requires profiling publication overhead; no retained winner yet.
 - **Next:** Profile224/249/250 together to inspect resource and synchronization changes, then test scoped linear-transform counter groups.
 - **Archive:** trajectory/20261015_054124_iter-250/
+
+### Iter 251 — Pad scoped counters and amortize GPU release fence
+
+- **Hypothesis:** 128-byte counter spacing avoids false sharing and one release fence can publish both S/T reductions.
+- **Changes:** From249 pad48counters to128B each,6144B extra workspace; one fence.acq_rel.gpu followed by two relaxed REDs establishes release patterns; unchanged coordinator and tile transform.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012545 ms; mean speedup=0.8874x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012292 | 0.012508 | 0.9827 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009966 | 0.012582 | 0.7921 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 12.5082 us vs Dense12.2915 us; FP16 12.5818 us vs Dense9.96608 us. Improves249 modestly but far slower224; expected errors, original gatesFAIL. Fresh224/249/250 fullNCU: all64regs/local0, warp instructions1.700/1.731/1.708M;249 regression is not spilling or a large instruction expansion.
+- **Next:** Measure249 coordinator, pack and scoped waits with sparse role timestamps before abandoning or revising synchronization structure.
+- **Archive:** trajectory/20261015_054357_iter-251/
