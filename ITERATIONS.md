@@ -49,6 +49,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 71 | Increase CUDA recombination parallelism on BK128 | 0.3920 | 0.028272 | passed |
 
+| 72 | Accumulate full-K products and recombine once | 0.5341 | 0.023643 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -413,3 +415,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - Added rejection checks for missing, misaligned, overlapping and under-budget workspace; full CTest and sanitizer after rebuild passed.
 - Details and raw logs: trajectory/20261014_193836_validation-iter71-graph/REPORT.md and validation.json.
 - The optimization goal remains active; no physical-floor or exhaustion claim. Next evaluate reducing WGMMA/P handoff stalls and global packing cost.
+
+### Iter 72 — Accumulate full-K products and recombine once
+
+- **Hypothesis:** Remove per-K CUDA output accumulation and product handshakes by making each P complete over all512 reduction elements before one U recombination.
+- **Changes:** P-major TMA/TC loops; persistent16-register accumulator per leaf, seven shared products written once, no shared Q or product-free barrier;155776 bytes dynamic shared.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.023643 ms; mean speedup=0.5341x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x128 v0 | launch | 0.012275 | 0.023541 | 0.5214 | 7.32914e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x128 v0 | launch | 0.012984 | 0.023744 | 0.5468 | 2.11007e-06 | 1 |
+
+- **Analysis:** Complete unchanged1024 benchmark exited0; original numerical gates passed. FP32 summation order changes and requires stress verification.
+- **Next:** Inspect latency, validate cancellation and fresh Graph inputs, then overlap sequential WGMMA K slices.
+- **Archive:** trajectory/20261014_194401_iter-72/

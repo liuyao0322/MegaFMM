@@ -18,10 +18,9 @@ using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
   T operand[2][2*ASize+2*BSize];
   float product[7][Elements];
-  float output[4][Elements];
-  uint64_t ready[2],free[2],product_ready,product_free;
+  uint64_t ready[2],free[2],product_ready;
 };
-static_assert(sizeof(Shared<cute::half_t>)==188544,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==155776,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -53,10 +52,9 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],128);}
-    Barrier::init(&s.product_ready,128);Barrier::init(&s.product_free,352);
+    Barrier::init(&s.product_ready,128);
     cutlass::arch::fence_barrier_init();
   }
-  for(int i=tid;i<4*Elements;i+=Threads)(&s.output[0][0])[i]=0;
   __syncthreads();
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   for(int i=(blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid;i<Plane;i+=gridDim.x*gridDim.y*Threads){
@@ -82,8 +80,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
-    for(int q=0;q<512/BK;++q)for(int p=0;p<7;++p){
-      int sequence=q*7+p,slot=sequence%2,k0=q*BK;
+    for(int p=0;p<7;++p)for(int q=0;q<512/BK;++q){
+      int sequence=p*(512/BK)+q,slot=sequence%2,k0=q*BK;
       if(sequence>=2)wait(&s.free[slot],((sequence-2)/2)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       int bytes=2*(ASize+BSize)+(alo ? 2*ASize:0)+(blo ? 2*BSize:0);
@@ -111,43 +109,34 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     }
   }else if((tid>=32 && tid<128) || tid>=256){
     int worker=tid>=256 ? tid-160:tid-32;
-    for(int q=0;q<512/BK;++q){
-      wait(&s.product_ready,q%2);
-      for(int i=worker;i<Elements;i+=352){
-        float p1=s.product[0][i],p2=s.product[1][i],p3=s.product[2][i],p4=s.product[3][i],p5=s.product[4][i],p6=s.product[5][i],p7=s.product[6][i];
-        float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6),u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
-        s.output[0][i]=__fadd_rn(s.output[0][i],u1);
-        s.output[1][i]=__fadd_rn(s.output[1][i],__fadd_rn(u4,p3));
-        s.output[2][i]=__fadd_rn(s.output[2][i],__fsub_rn(u3,p4));
-        s.output[3][i]=__fadd_rn(s.output[3][i],__fadd_rn(u3,p5));
-      }
-      arrive(&s.product_free);
-    }
+    wait(&s.product_ready,0);
     for(int i=worker;i<Elements;i+=352){
+      float p1=s.product[0][i],p2=s.product[1][i],p3=s.product[2][i],p4=s.product[3][i],p5=s.product[4][i],p6=s.product[5][i],p7=s.product[6][i];
+      float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6),u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
       int row=m0+i/BN,col=n0+i%BN;
-      D[row*1024+col]=s.output[0][i];D[row*1024+col+512]=s.output[1][i];
-      D[(row+512)*1024+col]=s.output[2][i];D[(row+512)*1024+col+512]=s.output[3][i];
+      D[row*1024+col]=u1;D[row*1024+col+512]=__fadd_rn(u4,p3);
+      D[(row+512)*1024+col]=__fsub_rn(u3,p4);D[(row+512)*1024+col+512]=__fadd_rn(u3,p5);
     }
   }else if(tid>=128 && tid<256){
-    for(int q=0;q<512/BK;++q){
-      if(q)wait(&s.product_free,(q-1)%2);
-      for(int p=0;p<7;++p){
-        int sequence=q*7+p,slot=sequence%2;
+    for(int p=0;p<7;++p){
+      float acc[16]={};
+      for(int q=0;q<512/BK;++q){
+        int sequence=p*(512/BK)+q,slot=sequence%2;
         wait(&s.ready[slot],(sequence/2)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la),al=make_tensor(make_smem_ptr(op+ASize),la);
         auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb),bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
-        float acc[16]={};warpgroup_arrive();
+        warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
         if(p==2 || p>=4)mma_term<T>(al,bh,acc);
         if(p==3 || p>=4)mma_term<T>(ah,bl,acc);
         warpgroup_commit_batch();warpgroup_wait<0>();
-        #pragma unroll
-        for(int j=0;j<16;++j){int mn=GMMA::CLayout_64x32{}(tid-128,j);s.product[p][(mn%64)*BN+mn/64]=acc[j];}
         arrive(&s.free[slot]);
       }
-      arrive(&s.product_ready);
+      #pragma unroll
+      for(int j=0;j<16;++j){int mn=GMMA::CLayout_64x32{}(tid-128,j);s.product[p][(mn%64)*BN+mn/64]=acc[j];}
     }
+    arrive(&s.product_ready);
   }
   __syncthreads();
 }
