@@ -69,23 +69,23 @@ template<class T>int validate(megafmm::DType dtype,bool quick){
   megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::SWPipeline;
   if(quick)policy.heuristic_candidates=1; // Sanitizer scope, never used for performance.
   auto sw=megafmm::create_plan(p,policy);
-  require(sw->algorithm_name().find("sw_unified_v1_hilo_")==0,"not native SW");
-  require(sw->workspace_bytes()==0,"SW should not allocate global intermediates");
+  require(sw->algorithm_name().find("sw_")==0,"not native SW");
+  require(sw->workspace_bytes()<=(size_t(8)<<20),"SW workspace exceeds8MiB");
   policy.algorithm=megafmm::Algorithm::Auto;auto dense=megafmm::create_plan(p,policy);
   require(dense->algorithm_name()=="dense_cublaslt","Auto was incorrectly promoted");
-  Buffer workspace(dense->workspace_bytes());
+  Buffer workspace(std::max(dense->workspace_bytes(),sw->workspace_bytes()));
   // Rejections use the same 1024 size and never execute a second matrix size.
   policy.algorithm=megafmm::Algorithm::SWPipeline;
   auto invalid=p;invalid.trans_a=true;bool rejected=false;
   try{auto x=megafmm::create_plan(invalid,policy);}catch(const std::invalid_argument&){rejected=true;}
   require(rejected,"SW accepted transpose");
-  rejected=false;try{megafmm::run(*sw,static_cast<char*>(a.p)+2,b.p,nullptr,d.as<float>(),nullptr,stream.s);}catch(const std::invalid_argument&){rejected=true;}
+  rejected=false;try{megafmm::run(*sw,static_cast<char*>(a.p)+2,b.p,nullptr,d.as<float>(),workspace.p,stream.s);}catch(const std::invalid_argument&){rejected=true;}
   require(rejected,"TMA accepted misaligned input");
   fill<<<512,256,0,stream.s>>>(a.as<T>(),b.as<T>(),a64.as<double>(),b64.as<double>(),0,1234);
   megafmm::tune(*dense,a.p,b.p,nullptr,base.as<float>(),workspace.p,stream.s);
-  megafmm::tune(*sw,a.p,b.p,nullptr,d.as<float>(),nullptr,stream.s);
+  megafmm::tune(*sw,a.p,b.p,nullptr,d.as<float>(),workspace.p,stream.s);
   check(cudaStreamBeginCapture(stream.s,cudaStreamCaptureModeThreadLocal));
-  megafmm::run(*sw,a.p,b.p,nullptr,d.as<float>(),nullptr,stream.s);
+  megafmm::run(*sw,a.p,b.p,nullptr,d.as<float>(),workspace.p,stream.s);
   check(cudaStreamEndCapture(stream.s,&graph.g));check(cudaGraphInstantiate(&graph.x,graph.g,nullptr,nullptr,0));
   const char* patterns[]={"uniform","positive","range16","cancellation","zero","identity"};
   int failures=0,checks=0;
@@ -99,7 +99,7 @@ template<class T>int validate(megafmm::DType dtype,bool quick){
     for(int mode=0;mode<2;++mode){
       // Poison output and replay the SAME captured graph on each freshly refilled input.
       check(cudaMemsetAsync(d.p,0xff,Count*4,stream.s));
-      if(mode)check(cudaGraphLaunch(graph.x,stream.s));else megafmm::run(*sw,a.p,b.p,nullptr,d.as<float>(),nullptr,stream.s);
+      if(mode)check(cudaGraphLaunch(graph.x,stream.s));else megafmm::run(*sw,a.p,b.p,nullptr,d.as<float>(),workspace.p,stream.s);
       Metric sm=metric(d.as<float>(),ref.as<double>(),scratch,stream.s);
       bool pass=dm.nonfinite==0 && sm.nonfinite==0 && ef(sm)<=gate;++checks;if(!pass)++failures;
       printf("CHECK size=1024 dtype=%s pattern=%s trial=%d mode=%s dense_ef=%.12g sw_ef=%.12g gate=%.12g nonfinite=%llu pass=%d\n",megafmm::dtype_name(dtype),patterns[pattern],trial,mode ? "graph":"launch",ef(dm),ef(sm),gate,sm.nonfinite,pass);

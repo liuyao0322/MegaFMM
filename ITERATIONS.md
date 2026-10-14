@@ -31,6 +31,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 62 | Scale producer population to twenty-seven warps | 0.0874 | 0.126517 | measured |
 
+| 63 | Compute shared global transforms once within a cooperative invocation | 0.2507 | 0.044046 | failed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -242,3 +244,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Full launch benchmark exited0; inspect actual complete-call latency and resource limits before choosing between61 and62.
 - **Next:** Validate faster source and inspect resource usage; next investigate eliminating repeated CTA-local transformations through cooperative once-per-invocation packing.
 - **Archive:** trajectory/20261014_192041_iter-62/
+
+### Iter 63 — Compute shared global transforms once within a cooperative invocation
+
+- **Hypothesis:** Remove repeated CTA-local operand construction by packing ST once into caller workspace, grid-syncing, then using TMA directly into WGMMA layouts.
+- **Changes:** Single cooperative128-CTA launch,8MiB caller workspace,all threads pack FP32 DAG high-low ST,async global proxy fence+grid sync,swizzled2D/3D TMA directly to double-buffered operands; same15 leaf terms.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.044046 ms; mean speedup=0.2507x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x64 v0 | launch | 0.012207 | 0.044301 | 0.2755 | 1.00221 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x64 v0 | launch | 0.009887 | 0.043790 | 0.2258 | 1.0022 | 0 |
+
+- **Analysis:** Benchmark exited2; failed numerical rows are diagnostic and cannot be promoted. Full input-dependent packing and cooperative barrier are inside every timed invocation.
+- **Next:** Inspect correctness and map/layout consistency, then repair or restore the best62 source.
+- **Archive:** trajectory/20261014_192502_iter-63/

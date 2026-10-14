@@ -342,7 +342,7 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     return;
   }
   if (plan.sw) {
-    detail::run_sw_pipeline(*plan.sw,A,B,D,stream);
+    detail::run_sw_pipeline(*plan.sw,A,B,D,workspace,stream);
     return;
   }
   lt_check(execute_lt(plan.handle, *plan.dense,
@@ -358,13 +358,13 @@ Plan& Plan::operator=(Plan&&) noexcept = default;
 size_t Plan::workspace_bytes() const { return impl_->bytes; }
 const Problem& Plan::problem() const { return impl_->problem; }
 std::string Plan::algorithm_name() const {
-  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw ? "sw_unified_v1_hilo_64x32x64" : "dense_cublaslt";
+  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw ? "sw_cooperative_hilo_64x32x64" : "dense_cublaslt";
 }
 std::string Plan::lt_algorithm_config(const void* A, const void* B, const float* C0,
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
-  if (impl_->sw) return "sw_v1;warp_roles=1tma+27simt+4wgmma;smem=188544;bk=64;st=fp32_register;operand=hi+lo;leaf_terms=15;current_pointer_maps=2;raw_stages=1;operand_layout=AK128_BMN64;alpha=1;beta=0";
+  if (impl_->sw) return "sw_cooperative;warp_roles=1tma+3simt+4wgmma;smem=139392;workspace=8388608;st=global_once_fp32_hilo;leaf_terms=15;current_pointer_maps=4;alpha=1;beta=0";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }
@@ -379,7 +379,9 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   impl->empty = !p.m || !p.n;
   impl->scale = !p.k || p.alpha == 0.0f;
   if (policy.algorithm==Algorithm::SWPipeline) {
+    if(policy.workspace_limit<(size_t(8)<<20))throw std::invalid_argument("SW needs8MiB workspace");
     impl->sw=detail::make_sw_pipeline(p);
+    impl->bytes=size_t(8)<<20;
   } else if (!impl->empty && !impl->scale) {
     lt_check(cublasLtCreate(&impl->handle), "create cuBLASLt handle");
     impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);
