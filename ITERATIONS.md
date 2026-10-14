@@ -209,6 +209,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 151 | Local shared transforms and seven persistent register accumulators | 0.4998 | 0.022367 | experiment |
 
+| 152 | Position-independent shared swizzle indexing | 0.5016 | 0.022383 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1948,3 +1950,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** INVALID numerical eF~1.58 for both dtypes, timing22.90/21.84us is not valid performance evidence. No C7515 warnings observed. Must diagnose local transform or accumulator layout before evaluating direction.
 - **Next:** Check shared vector layout and in-place transform race with independent product validation
 - **Archive:** trajectory/20261015_025705_iter-151/
+
+### Iter 152 — Position-independent shared swizzle indexing
+
+- **Hypothesis:** Use element-scaled CuTe swizzle and inline transform to eliminate layout and call-stack concerns
+- **Changes:** From151 convert flagged layout to position-independent swizzle layout and force inline local shared transform
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.022383 ms; mean speedup=0.5016x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_local_transform_64x32x128 v0 | launch | 0.012521 | 0.023043 | 0.5434 | 1.58558 | 0 |
+| 1024,1024,1024 | fp16 | sw_local_transform_64x32x128 v0 | launch | 0.009990 | 0.021724 | 0.4599 | 1.58553 | 0 |
+
+- **Analysis:** INVALID errors unchanged~1.58, so layout correction did not address numerical cause. Timing23.04/21.72us excluded. Investigate raw product accuracy and per-quadrant mismatches before more performance changes.
+- **Next:** Independent raw-product diagnostic without changing production benchmark contract
+- **Archive:** trajectory/20261015_025838_iter-152/

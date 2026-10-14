@@ -51,12 +51,12 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
 }
 
 template<class T,bool IsA,class Layout>
-__device__ void transform_shared(T* raw,T* extra,Layout layout,int worker){
+__device__ __forceinline__ void transform_shared(T* raw,T* extra,Layout layout,int worker){
   constexpr int Size=IsA ? ASize:BSize;
   for(int w=worker;w<Size/2;w+=224){
     int row=IsA ? (2*w)/BK:(2*w)%BN;
     int col=IsA ? (2*w)%BK:(2*w)/BN;
-    int idx=layout(row,col);
+    int idx=cute::as_position_independent_swizzle_layout(layout)(row,col);
     uint32_t bits[4];
     #pragma unroll
     for(int j=0;j<4;++j)bits[j]=*reinterpret_cast<uint32_t*>(raw+j*Size+idx);
