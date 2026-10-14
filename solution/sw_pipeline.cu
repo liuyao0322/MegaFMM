@@ -2715,17 +2715,13 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
     #pragma unroll
     for(int j=0;j<8;++j){
       uint32_t word;
-      if(j==2){
-        if constexpr(std::is_same_v<T,cute::bfloat16_t>)
-          asm("sub.rn.bf16x2 %0,%1,%2;" : "=r"(word) : "r"(abits[0]),"r"(abits[2]));
-        else asm("sub.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(abits[0]),"r"(abits[2]));
-      }else if(j==6){
-        if constexpr(std::is_same_v<T,cute::bfloat16_t>)
-          asm("sub.rn.bf16x2 %0,%1,%2;" : "=r"(word) : "r"(bbits[3]),"r"(bbits[1]));
-        else asm("sub.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(bbits[3]),"r"(bbits[1]));
-      }else{
-        if constexpr(std::is_same_v<T,cute::bfloat16_t>)
-          asm("cvt.rn.bf16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
+      if constexpr(std::is_same_v<T,cute::bfloat16_t>)
+        asm("cvt.rn.bf16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
+      else {
+        if(j==0) asm("add.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(abits[2]),"r"(abits[3]));
+        else if(j==2) asm("sub.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(abits[0]),"r"(abits[2]));
+        else if(j==4) asm("sub.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(bbits[1]),"r"(bbits[0]));
+        else if(j==6) asm("sub.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(bbits[3]),"r"(bbits[1]));
         else asm("cvt.rn.f16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
       }
       reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=word;

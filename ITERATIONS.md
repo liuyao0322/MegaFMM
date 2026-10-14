@@ -563,6 +563,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 328 | Packed native S3 and T3 input differences | 1.0741 | 0.010131 | experiment |
 
+| 329 | FP16 packed single-operation transform outputs | 1.0724 | 0.010153 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5114,3 +5116,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal benchmark completed; archived original FP64 gates remain authoritative, and any retained candidate still requires independent bitwise validation.327 L2 promotion rejected by full ABBA: ordinary FP16 10.10128 versus282 10.05472 us, Graph10.17232 versus10.01024 us; BF ordinary tiny0.23percent gain but Graph regresses.
 - **Next:** Inspect328 timings, generated primary instruction count and bitwise behavior before selecting; test additional prefetch depth only with a distinct completion/supply hypothesis
 - **Archive:** trajectory/20261015_074649_iter-328/
+
+### Iter 329 — FP16 packed single-operation transform outputs
+
+- **Hypothesis:** Native paired outputs for S1/S3/T1/T3 may shorten FP16 transform dependencies while avoiding the BF16 regression observed328
+- **Changes:** Start282; BF16 primary unchanged, FP16 outputs S1,S3,T1,T3 use native packed RN add/sub; FP32 S1/T1 temporaries still feed dependent S2/T2 without premature rounding
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010153 ms; mean speedup=1.0724x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012121 | 0.010175 | 1.1913 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009662 | 0.010132 | 0.9536 | 0.000754626 | 0 |
+
+- **Analysis:** Formal benchmark completed.328 ABBA shows FP16 small ordinary and Graph signal but BF16 regression, motivating dtype-specific implementation; no original FP64 numerical acceptance is inferred. Prepared independent all-finite-FP16-pair add/sub rounding check and full matrix bitwise/sanitizer/multistream validation for any retained candidate.
+- **Next:** Inspect329, archive executable, perform paired282/329 ordinary and Graph tests, then independent arithmetic and synchronization validation if signal persists
+- **Archive:** trajectory/20261015_074849_iter-329/
