@@ -11,6 +11,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 52 | Test independently aligned 32-byte swizzle operands | 0.0270 | 0.404168 | failed |
 
+| 53 | Write swizzled operands through typed CuTe tensor views | 0.0248 | 0.438394 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -44,3 +46,19 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 - **Analysis:** Benchmark exited2; retain full output and numerical failure before investigating. Timings are diagnostic until precision passes.
 - **Next:** Inspect the numerical results and compiled layout mapping; retain only a correct faster implementation.
 - **Archive:** trajectory/20261014_190111_iter-52/
+
+### Iter 53 — Write swizzled operands through typed CuTe tensor views
+
+- **Hypothesis:** Layout with smem_ptr_flag encodes byte-address swizzling; plain pointer[layout(element)] is not the physical address used by the descriptor. Typed tensor views must be used for stores.
+- **Changes:** Store hi/lo A/B through the same CuTe tensors consumed by WGMMA, keeping SW32 and all numerical operations unchanged.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.438394 ms; mean speedup=0.0248x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_unified_v1_hilo_64x32x32 v0 | launch | 0.012085 | 0.442599 | 0.0273 | 7.15225e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_unified_v1_hilo_64x32x32 v0 | launch | 0.009724 | 0.434189 | 0.0224 | 3.09536e-07 | 1 |
+
+- **Analysis:** Complete benchmark exited0; both dtypes pass all three fresh FP64 checks. Latency is recorded below; compare against baseline before claiming a gain.
+- **Next:** Inspect current assembly/resource use and elapsed latency; continue reducing real critical-path work.
+- **Archive:** trajectory/20261014_190221_iter-53/

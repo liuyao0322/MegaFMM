@@ -77,7 +77,7 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x;
   int m0=blockIdx.y*BM,n0=blockIdx.x*BN;
-  // Each K=16 subtile has an independently aligned 32-byte swizzle origin.
+  // Use tensor views for byte-address swizzles on both stores and descriptors.
   // Shared addresses are obtained from these exact layouts on both sides.
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW32_Atom<T>{},Shape<_64,_32>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW32_Atom<T>{},Shape<_32,_32>{});
@@ -135,15 +135,17 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
         int sequence=q*7+p,slot=sequence%2;
         if(sequence>=2)wait(&s.op_free[slot],((sequence-2)/2)%2);
         T* op=s.operand[slot];
+        auto ah=make_tensor(make_smem_ptr(op),la);
+        auto al=make_tensor(make_smem_ptr(op+ASize),la);
+        auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb);
+        auto bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
         for(int i=worker;i<ASize;i+=96) {
           float v=left_operand(s,bank,p,i);T hi=T(v),lo=T(__fsub_rn(v,float(hi)));
-          int offset=la(i/BK,i%BK);
-          op[offset]=hi;op[ASize+offset]=lo;
+          ah(i/BK,i%BK)=hi;al(i/BK,i%BK)=lo;
         }
         for(int i=worker;i<BSize;i+=96) {
           float v=right_operand(s,bank,p,i);T hi=T(v),lo=T(__fsub_rn(v,float(hi)));
-          int offset=lb(i%BN,i/BN);
-          op[2*ASize+offset]=hi;op[2*ASize+BSize+offset]=lo;
+          bh(i%BN,i/BN)=hi;bl(i%BN,i/BN)=lo;
         }
         asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
         arrive(&s.op_ready[slot]);
