@@ -99,6 +99,8 @@ retained tree includes the fast implementations from earlier iterations.
 
 | 49 | Correct WGMMA operand layout using canonical interleave | 0.0323 | 0.343984 | layout-correction-diagnostic |
 
+| 50 | Rebuild and validate canonical-interleaved unified SW v1 | 0.0287 | 0.379533 | numerical-pass-first-version |
+
 ## Iterations
 
 ## Baseline — full V1 / tuned cuBLASLt (2026-10-13)
@@ -2040,3 +2042,28 @@ Actual iteration47 validation terminal closure: defaultexit0 CASE/PASS/BEGIN3162
 - **Analysis:** Full 1024 launch run returned exit 2. Numerical and latency results are recorded below and require inspection before further conclusions; the first failed swizzle diagnostic is retained.
 - **Next:** Inspect whether remaining failure is numerical or another implementation defect; validate fresh Graph replay after correctness is established.
 - **Archive:** trajectory/20261014_182643_iter-49/
+
+#### Iter49 source/binary qualification correction
+The driver log contains no CUDA recompilation after the layout edit. On inspection,
+the object and executable timestamps were older than the source; shared-filesystem
+attribute caching caused make to retain the iter48 binary. Iter49 therefore measured
+the old swizzled binary, not the archived interleaved source. Its timing and failure
+are retained but are invalid evidence for the layout change. Build now uses
+--clean-first and records compute-node source SHA256 before compilation. Iter50 is
+the first complete benchmark of the interleaved implementation.
+
+### Iter 50 — Rebuild and validate canonical-interleaved unified SW v1
+
+- **Hypothesis:** A clean rebuild will apply the interleaved operand correction verified by the isolated WGMMA tile diagnostic.
+- **Changes:** Force clean compilation and record compute-node source SHA256; current unified high-low SW implementation otherwise unchanged.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.379533 ms; mean speedup=0.0287x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_unified_v1_hilo_64x32x32 v0 | launch | 0.012133 | 0.390256 | 0.0311 | 7.15225e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_unified_v1_hilo_64x32x32 v0 | launch | 0.009733 | 0.368811 | 0.0264 | 3.09536e-07 | 1 |
+
+- **Analysis:** Full 1024 launch benchmark completed with exit 0: both dtype rows passed all three fresh original-input FP64 gates. Includes all seven products, transforms, correction terms and output combination. No speedup or general-domain certification inferred before detailed inspection.
+- **Next:** Validate 1024 stress inputs, same-graph fresh-input replay and memory/synchronization correctness; collect Graph performance and write first-version comparison.
+- **Archive:** trajectory/20261014_182746_iter-50/
