@@ -231,6 +231,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 162 | Compact workspace with independent role returns | 0.9706 | 0.011437 | experiment |
 
+| 163 | Eight consumer warps with constant eight-row chunk offsets | 0.9714 | 0.011482 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2146,3 +2148,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Baseline seven-product errors preserved and original gates FAIL. FP16 launch11.516us, still slower than Dense~9.95us. Requires full paired140comparison and72-check/sanitizer validation before retaining as checkpoint.
 - **Next:** Paired complete-call launch Graph comparison and independent fresh-input validation
 - **Archive:** trajectory/20261015_031116_iter-162/
+
+### Iter 163 — Eight consumer warps with constant eight-row chunk offsets
+
+- **Hypothesis:** 256 consumers reduce per-warp recombination work and P-free backpressure without expensive general indexing
+- **Changes:** From162 use256 P-consumer threads and eight chunks, base swizzle invariant under eight-row increments;608packworkers unchanged, P-free count256
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011482 ms; mean speedup=0.9714x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012304 | 0.011383 | 1.0810 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009981 | 0.011582 | 0.8618 | 0.000754626 | 0 |
+
+- **Analysis:** Baseline numerical errors preserved and original gates FAIL. Launch11.383/11.582us does not improve selected16211.337/11.542us. More consumer warps alone do not recover remaining FP16 gap.
+- **Next:** Assign128consumers to pack workers with shorter one-trip input transformation
+- **Archive:** trajectory/20261015_031605_iter-163/
