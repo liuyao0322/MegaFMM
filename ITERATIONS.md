@@ -143,6 +143,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 118 | Fence accumulator operands for register recombination | 0.4359 | 0.025522 | experiment |
 
+| 119 | Specialize register recombination by unrolling leaf products | 0.6906 | 0.016136 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1358,3 +1360,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 117 emitted C7515 and ran25.5us; complete118 SW benchmark archived with unchanged FP64 gates. Inspect warning elimination and timing after commit.
 - **Next:** Validate corrected compiler scheduling and compare with100
 - **Archive:** trajectory/20261015_015739_iter-118/
+
+### Iter 119 — Specialize register recombination by unrolling leaf products
+
+- **Hypothesis:** Remove loop-carried accumulator aliases that cause ptxas to serialize every WGMMA
+- **Changes:** Unroll seven TC product steps so register recombination branches and accumulator lifetimes are static; keep operand fences from118
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.016136 ms; mean speedup=0.6906x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012328 | 0.016290 | 0.7568 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009980 | 0.015982 | 0.6244 | 0.000754626 | 0 |
+
+- **Analysis:** 118 fences alone did not remove C7515; SASS shows wait0 after every HGMMA despite no spills. Full119 benchmark archived for warning/timing inspection.
+- **Next:** Check whether specialization restores asynchronous WGMMA and evaluate full-call gain
+- **Archive:** trajectory/20261015_015915_iter-119/
