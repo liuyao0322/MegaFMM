@@ -383,6 +383,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 238 | Ordered quadrant handoff between two K-partial CTAs | 0.2651 | 0.042061 | experiment |
 
+| 239 | Shared final-C handoff generator escaping failure | 0.0000 | 0.000000 | failed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3506,3 +3508,17 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Rejected BF41.4982 FP42.6240us severe regression, finite expected approximate errors and both original gatesFAIL. No atomic FTZ, but scalar read/modify/write and cross-CTA waits are costly; profile actual local sectors before attributing entire cost to synchronization.
 - **Next:** Close split-K direction with resource profile, validate224 and restore proven best for checkpoint; goal remains active and FP16 still slowerDense
 - **Archive:** trajectory/20261015_052137_iter-238/
+
+### Iter 239 — Shared final-C handoff generator escaping failure
+
+- **Hypothesis:** Offload four final quadrant stores from TC threads to512 float4 CUDA copy workers
+- **Changes:** From224 add32KiB final-C shared storage with XOR bank permutation and four ready barriers; preserve private seven-product accumulation and mathematical order
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Build FAILED: generated add.u32 shared-base operand used escaped literal percent56 instead of inline-asm input56. No239 timings or numerical evidence. All2048 lane/j XOR decomposition identities checked by generator.
+- **Next:** Fix the shared-base placeholder escape and benchmark as240
+- **Archive:** trajectory/20261015_052422_iter-239/
