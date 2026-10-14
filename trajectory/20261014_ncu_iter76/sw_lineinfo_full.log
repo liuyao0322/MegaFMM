@@ -1,0 +1,15 @@
+==WARNING== Note: Running with uncontrolled GPU caches. Profiling results may be inconsistent.
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 1155343 (/share/home/liuyao/workspace/MegaFMM/results/ncu_iter76/build_lineinfo/megafmm_bench)
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=sw_cooperative;warp_roles=1tma+11simt+4wgmma;smem=213120;workspace=8388608;st=global_once_fp32_hilo;recombine=full_k_register_P;product_slots=2;operand_release=warp_leader;leaf_terms=15;current_pointer_maps=4;alpha=1;beta=0
+==WARNING== Unable to access the following 6 metrics: ctc__rx_bytes_data_user.sum, ctc__rx_bytes_data_user.sum.pct_of_peak_sustained_elapsed, ctc__rx_bytes_data_user.sum.per_second, ctc__tx_bytes_data_user.sum, ctc__tx_bytes_data_user.sum.pct_of_peak_sustained_elapsed, ctc__tx_bytes_data_user.sum.per_second.
+
+
+==PROF== Profiling "sw_cooperative_hilo": 0%....50%....100% - 39 passes
+PROFILE 1024,1024,1024 bf16 sw_cooperative_hilo_64x32x256 workspace=8388608 target=solution lt_config=sw_cooperative;warp_roles=1tma+11simt+4wgmma;smem=213120;workspace=8388608;st=global_once_fp32_hilo;recombine=full_k_register_P;product_slots=2;operand_release=warp_leader;leaf_terms=15;current_pointer_maps=4;alpha=1;beta=0
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=sw_cooperative;warp_roles=1tma+11simt+4wgmma;smem=213120;workspace=8388608;st=global_once_fp32_hilo;recombine=full_k_register_P;product_slots=2;operand_release=warp_leader;leaf_terms=15;current_pointer_maps=4;alpha=1;beta=0
+==PROF== Profiling "sw_cooperative_hilo": 0%....50%....100% - 39 passes
+PROFILE 1024,1024,1024 fp16 sw_cooperative_hilo_64x32x256 workspace=8388608 target=solution lt_config=sw_cooperative;warp_roles=1tma+11simt+4wgmma;smem=213120;workspace=8388608;st=global_once_fp32_hilo;recombine=full_k_register_P;product_slots=2;operand_release=warp_leader;leaf_terms=15;current_pointer_maps=4;alpha=1;beta=0
+==PROF== Disconnected from process 1155343
+==PROF== Report: /share/home/liuyao/workspace/MegaFMM/results/ncu_iter76/sw_lineinfo_full.ncu-rep

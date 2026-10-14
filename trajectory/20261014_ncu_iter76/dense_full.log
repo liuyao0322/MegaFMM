@@ -1,0 +1,15 @@
+==WARNING== Note: Running with uncontrolled GPU caches. Profiling results may be inconsistent.
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 1154679 (/share/home/liuyao/workspace/MegaFMM/results/ncu_iter76/build/megafmm_bench)
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=dense:id=24;tile=20;split_k=4;reduction=2;swizzle=0;stages=0;custom=0;inner=0;cluster=0;bound_candidate=18/24;tuned_candidate=18;bound_workspace=16777216;tuned=1;tune=4w/3x10median;tuning_ms=0.036048;align0=2;align1=2;align2=2;align3=2
+==WARNING== Unable to access the following 6 metrics: ctc__rx_bytes_data_user.sum, ctc__rx_bytes_data_user.sum.pct_of_peak_sustained_elapsed, ctc__rx_bytes_data_user.sum.per_second, ctc__tx_bytes_data_user.sum, ctc__tx_bytes_data_user.sum.pct_of_peak_sustained_elapsed, ctc__tx_bytes_data_user.sum.per_second.
+
+
+==PROF== Profiling "Kernel2" - 0 (1/2): 0%....50%....100% - 39 passes
+==PROF== Profiling "splitKreduce_kernel" - 1 (2/2): 0%....50%....100% - 39 passes
+PROFILE 1024,1024,1024 bf16 dense_cublaslt workspace=33554432 target=dense lt_config=dense:id=24;tile=20;split_k=4;reduction=2;swizzle=0;stages=0;custom=0;inner=0;cluster=0;bound_candidate=18/24;tuned_candidate=18;bound_workspace=16777216;tuned=1;tune=4w/3x10median;tuning_ms=0.036048;align0=2;align1=2;align2=2;align3=2
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.031216;align0=16;align1=16;align2=16;align3=16
+PROFILE 1024,1024,1024 fp16 dense_cublaslt workspace=33554432 target=dense lt_config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.031216;align0=16;align1=16;align2=16;align3=16
+==PROF== Disconnected from process 1154679
+==PROF== Report: /share/home/liuyao/workspace/MegaFMM/results/ncu_iter76/dense_full.ncu-rep

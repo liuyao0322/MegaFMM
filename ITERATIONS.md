@@ -557,3 +557,12 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Benchmark completed with exit0 before user paused optimization. No further optimization is authorized while paused; user separately requested NCU profiling.
 - **Next:** Inspect candidate performance, then profile the best accepted source as explicitly requested.
 - **Archive:** trajectory/20261014_195354_iter-79/
+
+## User-requested NCU profiling while optimization is paused
+
+- Profiled best accepted iter76 in an isolated snapshot; production solution remains iter79. No new optimization iteration.
+- NCU2025.1.1,39 passes per kernel, both1024 dtypes; complete SW .ncu-rep plus lineinfo capture and fixed-configuration Dense comparison saved in trajectory/20261014_ncu_iter76/.
+- Confirmed P store8-way bank conflicts at iter76 sw_pipeline.cu:154,401408 excessive shared wavefronts. Long-scoreboard hotspots include product-ready mbarrier consumers. HBM not saturated in this warm-cache capture; Tensor elapsed activity~18.8percent.
+- Occupancy24.93percent limited independently by shared and register capacity; Dense lower occupancy still runs faster. Original performance measurements remain authoritative; NCU durations are diagnostic.
+- Initial lock failure resolved with documented private TMPDIR after checking no concurrent ncu process. Initial NCU-retuned Dense picked the wrong comparison config and was excluded; fixed ids39/21 captured successfully.
+- Details: trajectory/20261014_ncu_iter76/REPORT.md. Optimization remains paused by user.
