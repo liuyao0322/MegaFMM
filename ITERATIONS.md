@@ -375,6 +375,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 234 | Split-K2 true64x64 private leaves with last-CTA partial-C merge | 0.2696 | 0.041388 | experiment |
 
+| 235 | Linear vector128 last-CTA split-K merge | 0.5249 | 0.021156 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3434,3 +3436,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF41.2470 FP41.5286us severe regression. Finite errors approximately.0060152/.000754625, both original gatesFAIL. No split-K performance claim; inspect register spills and merge epilogue before rejecting architecture on timing alone.
 - **Next:** Profile234 resources and merge; simplify merge index/vectorization only if evidence identifies removable overhead
 - **Archive:** trajectory/20261015_051440_iter-234/
+
+### Iter 235 — Linear vector128 last-CTA split-K merge
+
+- **Hypothesis:** Coalesced float4 merge lowers scalar epilogue instruction and address cost
+- **Changes:** From234 change final merge only to row-major unsigned linear indexing and float4 loads/stores; same128CTA twoK-partial mathematical schedule
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.021156 ms; mean speedup=0.5249x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012259 | 0.021358 | 0.5740 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009972 | 0.020955 | 0.4759 | 0.000754625 | 0 |
+
+- **Analysis:** BF21.3578 FP20.9546us, about half234 but still nearly twice224. Expected approximate errors retained; original FP64 gatesFAIL.234 minimalNCU126regs0local,1.618Minstructions confirms no spill explanation. Need stage timing to isolate remaining macro-design cost.
+- **Next:** Instrument235 TC phases outside solution, verify traced output against untraced235, and distinguish supply from final merge cost
+- **Archive:** trajectory/20261015_051554_iter-235/
