@@ -425,6 +425,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 259 | PDL transform 256x256 | 1.0393 | 0.010598 | experiment |
 
+| 260 | PDL transform 64x512 | 0.9205 | 0.011968 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3882,3 +3884,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通调用 BF16 10.70592 us、FP16 10.49056 us，未优于254约10.53/10.44 us。FP16 Dense 9.81664 us；BF16 Dense 有单组37.6 us异常，不能据此宣称额外加速。原精度门槛仍 FAIL，不保留。
 - **Next:** 测试更小的一波 transform grid，并继续以完整普通调用衡量。
 - **Archive:** trajectory/20261015_060925_iter-259/
+
+### Iter 260 — PDL transform 64x512
+
+- **Hypothesis:** 减少 primary CTA 数量，尽早满足 primary 全部 CTA 已启动的条件，让原始叶乘法覆盖更长的输入变换。
+- **Changes:** 从254出发仅将 transform grid128改为64，512线程与计算顺序不变，循环跨度调整确保全部元素覆盖。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011968 ms; mean speedup=0.9205x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012226 | 0.012048 | 1.0147 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009822 | 0.011887 | 0.8263 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通调用 BF16 12.04832 us、FP16 11.88704 us，比254明显变慢；Dense12.2256/9.8224 us，精度门槛仍 FAIL。减少变换并行度没有收益，不保留。258至260连续无3percent收益，已重读254全NCU与SASS等待样本、历史失败方向，并查询PTX与CUTLASS远程事务barrier和TMA multicast支持，下一步转向减少重复operand供数。
+- **Next:** 测试新的cluster双CTA multicast协议，以共同free计数替代每个K块cluster全量同步；保留原算术及128CTA并行度。
+- **Archive:** trajectory/20261015_061016_iter-260/
