@@ -85,6 +85,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 89 | Use eight evenly packed P-consumer warps | 0.5673 | 0.019577 | passed |
 
+| 90 | Vectorize input transformation IO in adjacent pairs | 0.5825 | 0.019053 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -764,3 +766,19 @@ Original-input FP64 gates, independent72-check stress and final quick memcheck/r
 - **Analysis:** Full 1024 cubed BF16/FP16 benchmark completed; compare against87 and the five-warp failed-performance candidate88
 - **Next:** Retain only with complete-call improvement; next investigate vectorized input transformation based on the measured4us phase
 - **Archive:** trajectory/20261014_223048_iter-89/
+
+### Iter 90 — Vectorize input transformation IO in adjacent pairs
+
+- **Hypothesis:** The measured4us transform/grid phase can shrink by halving global load/store instruction counts with aligned32bit pairs
+- **Changes:** Restore validated iter87 consumer layout; load pairs of input elements with32bit IO, preserve scalar FP32 transformation/rounding, and pack adjacent high/low outputs into32bit stores
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.019053 ms; mean speedup=0.5825x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012241 | 0.018909 | 0.6474 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009938 | 0.019196 | 0.5177 | 2.37136e-06 | 1 |
+
+- **Analysis:** Full1024 cubed BF16/FP16 benchmark completed; independently compare output bitwise and profile transform timing plus generated IO widths
+- **Next:** Verify original gates, paired full invocation, vectorized SASS and synchronization before retaining
+- **Archive:** trajectory/20261014_223240_iter-90/

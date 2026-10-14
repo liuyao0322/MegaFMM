@@ -12,7 +12,6 @@ namespace megafmm::detail {
 namespace {
 constexpr int BM=64,BN=32,BK=256,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
 constexpr int Plane=512*512,Threads=512;
-constexpr int Consumers=256;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -76,27 +75,41 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.low_ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],Consumers);}
+    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
   // All CTAs cooperate in one input transformation per invocation, never across calls.
-  for(int i=(blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid;i<Plane;i+=gridDim.x*gridDim.y*Threads){
+  // Transform two adjacent elements per thread with aligned 32-bit IO. Keep
+  // every scalar FP32 operation and each high/low rounding identical.
+  for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid);i<Plane;i+=2*gridDim.x*gridDim.y*Threads){
     int row=i/512,col=i%512,at=row*1024+col;
-    float a11=float(A[at]),a12=float(A[at+512]),a21=float(A[at+512*1024]),a22=float(A[at+512*1024+512]);
-    float b11=float(B[at]),b12=float(B[at+512]),b21=float(B[at+512*1024]),b22=float(B[at+512*1024+512]);
-    float s1=__fadd_rn(a21,a22),s2=__fsub_rn(s1,a11);
-    float t1=__fsub_rn(b12,b11),t2=__fsub_rn(b22,t1);
-    float sv[4]={s1,s2,__fsub_rn(a11,a21),__fsub_rn(a12,s2)};
-    float tv[4]={t1,t2,__fsub_rn(b22,b12),__fsub_rn(t2,b21)};
+    auto av=reinterpret_cast<const uint32_t*>(A);
+    auto bv=reinterpret_cast<const uint32_t*>(B);
+    uint32_t abits[4]={av[at/2],av[(at+512)/2],av[(at+512*1024)/2],av[(at+512*1024+512)/2]};
+    uint32_t bbits[4]={bv[at/2],bv[(at+512)/2],bv[(at+512*1024)/2],bv[(at+512*1024+512)/2]};
+    uint32_t words[16]={};
     #pragma unroll
-    for(int j=0;j<4;++j){
-      T sh=T(sv[j]),th=T(tv[j]);
-      packed[(2*j)*Plane+i]=sh;
-      packed[(2*j+1)*Plane+i]=T(__fsub_rn(sv[j],float(sh)));
-      packed[(8+2*j)*Plane+i]=th;
-      packed[(8+2*j+1)*Plane+i]=T(__fsub_rn(tv[j],float(th)));
+    for(int lane=0;lane<2;++lane){
+      float a11=float(T::bitcast(uint16_t(abits[0]>>(16*lane)))),a12=float(T::bitcast(uint16_t(abits[1]>>(16*lane))));
+      float a21=float(T::bitcast(uint16_t(abits[2]>>(16*lane)))),a22=float(T::bitcast(uint16_t(abits[3]>>(16*lane))));
+      float b11=float(T::bitcast(uint16_t(bbits[0]>>(16*lane)))),b12=float(T::bitcast(uint16_t(bbits[1]>>(16*lane))));
+      float b21=float(T::bitcast(uint16_t(bbits[2]>>(16*lane)))),b22=float(T::bitcast(uint16_t(bbits[3]>>(16*lane))));
+      float s1=__fadd_rn(a21,a22),s2=__fsub_rn(s1,a11);
+      float t1=__fsub_rn(b12,b11),t2=__fsub_rn(b22,t1);
+      float sv[4]={s1,s2,__fsub_rn(a11,a21),__fsub_rn(a12,s2)};
+      float tv[4]={t1,t2,__fsub_rn(b22,b12),__fsub_rn(t2,b21)};
+      #pragma unroll
+      for(int j=0;j<4;++j){
+        T sh=T(sv[j]),th=T(tv[j]);
+        words[2*j]|=uint32_t(sh.raw())<<(16*lane);
+        words[2*j+1]|=uint32_t(T(__fsub_rn(sv[j],float(sh))).raw())<<(16*lane);
+        words[8+2*j]|=uint32_t(th.raw())<<(16*lane);
+        words[8+2*j+1]|=uint32_t(T(__fsub_rn(tv[j],float(th))).raw())<<(16*lane);
+      }
     }
+    #pragma unroll
+    for(int j=0;j<16;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[j];
   }
   // Generic global stores become visible to TMA's async proxy before publication.
   asm volatile("fence.proxy.async.global;" ::: "memory");
@@ -141,16 +154,16 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         SM90_TMA_LOAD_3D::copy(&tmap,&s.low_ready[slot],0,op+2*ASize+BSize,n0,k0,plane+1);
       }
     }
-  }else if((tid>=32 && tid<128) || (tid>=256 && tid<Consumers+160)){
+  }else if((tid>=32 && tid<128) || tid>=256){
     int worker=tid>=256 ? tid-160:tid-32;
-    constexpr int Chunks=(Elements+Consumers-1)/Consumers;
+    constexpr int Chunks=(Elements+351)/352;
     float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
     for(int step=0;step<7;++step){
       wait(&s.product_ready[step%2],(step/2)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*Consumers;
+        int i=worker+j*352;
         if(i<Elements)current[j]=s.product[step%2][product_index(i/BN,i%BN)];
       }
       // Release shared P immediately after reading; arithmetic/global stores can
@@ -158,7 +171,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       arrive(&s.product_free[step%2]);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*Consumers;
+        int i=worker+j*352;
         if(i<Elements){
           int at=(m0+i/BN)*1024+n0+i%BN;
           if(step==0)first[j]=current[j]; // P1
