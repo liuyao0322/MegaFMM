@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-14",
+  "purpose": "Remove old SW implementation before architectural redesign",
+  "current_solution_files": [
+    "internal.h",
+    "plan.cpp",
+    "scale_output.cu"
+  ],
+  "current_algorithms": [
+    "Auto (Dense)",
+    "Dense"
+  ],
+  "removed_components": [
+    "Old SW kernels including Mega45 and Mega53",
+    "SW variant dispatch and public variant controls",
+    "Old route-specific tests and scripts",
+    "Obsolete scratch and build artifacts"
+  ],
+  "validation": {
+    "cuda_build": "passed before historical result removal",
+    "ctest": {
+      "passed": 2,
+      "failed": 0,
+      "tests": [
+        "gpu_correctness",
+        "exact_winograd_dag"
+      ]
+    },
+    "dense_smoke_csv": "results/architecture_reset_dense_smoke_20261014.csv",
+    "dense_smoke_log": "results/architecture_reset_dense_smoke_20261014.log",
+    "shape": [
+      128,
+      128,
+      128
+    ],
+    "dtypes": [
+      "bf16",
+      "fp16"
+    ],
+    "fresh_trials_per_dtype": 3,
+    "all_numerical_pass": true
+  },
+  "history_note": "Historical results and earlier cleanup manifests disappeared during final verification; they were not restored. Committed history remains in Git."
+}

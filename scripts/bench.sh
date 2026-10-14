@@ -15,12 +15,9 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 : > results/current.csv
 set +e
 { bash scripts/build.sh && bash scripts/on_gpu.sh ./build/megafmm_bench \
-  --algorithm "${MEGAFMM_ALGORITHM:-lt}" \
-  --shapes "${MEGAFMM_SHAPES:-4096,4096,4096;8192,8192,8192;16384,16384,16384}" \
+  --algorithm "${MEGAFMM_ALGORITHM:-dense}" \
+  --shapes "${MEGAFMM_SHAPES:-1024,1024,1024}" \
   --dtype "${MEGAFMM_DTYPE:-both}" \
-  --lt-variant "${MEGAFMM_LT_VARIANT:-0}" \
-  --mega-variant "${MEGAFMM_MEGA_VARIANT:-0}" \
-  --hopper-variant "${MEGAFMM_HOPPER_VARIANT:-0}" \
   --rotate-inputs "${MEGAFMM_ROTATE_INPUTS:-1}" \
   --trials "${MEGAFMM_TRIALS:-100}" --warmup "${MEGAFMM_WARMUP:-20}" \
   --groups "${MEGAFMM_GROUPS:-5}" --correct-trials "${MEGAFMM_CORRECT_TRIALS:-3}" \

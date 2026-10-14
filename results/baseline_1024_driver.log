@@ -1,0 +1,40 @@
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+gmake[2]: Warning: File 'CMakeFiles/megafmm.dir/compiler_depend.make' has modification time 9.5e-05 s in the future
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+[ 42%] Built target megafmm
+[100%] Built target megafmm_bench
+[100%] Built target test_correctness
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=dense config=dense:id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=14;bound_candidate=6/16;tuned_candidate=6;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.013430;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=dense:id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=10;bound_candidate=4/16;tuned_candidate=4;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.013216;align0=16;align1=16;align2=16;align3=16
+CHECK 1024,1024,1024 bf16 trial=0 dense_eF=8.51899e-07 solution_eF=8.51899e-07 gate=0.00100256 pass=1
+CHECK 1024,1024,1024 bf16 trial=1 dense_eF=8.52266e-07 solution_eF=8.52266e-07 gate=0.00100256 pass=1
+CHECK 1024,1024,1024 bf16 trial=2 dense_eF=8.50027e-07 solution_eF=8.50027e-07 gate=0.00100255 pass=1
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.0122557 wall_ms=0.0123578
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0125501 wall_ms=0.0126337
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.0125469 wall_ms=0.0126247
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.0123002 wall_ms=0.0123795
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.0123488 wall_ms=0.0124261
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.0124768 wall_ms=0.0125574
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.0123155 wall_ms=0.012395
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.0124829 wall_ms=0.0125627
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.0124653 wall_ms=0.0125433
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.0123178 wall_ms=0.0123988
+TUNE shape=1024,1024,1024 dtype=fp16 case=dense config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010442;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010598;align0=16;align1=16;align2=16;align3=16
+CHECK 1024,1024,1024 fp16 trial=0 dense_eF=1.24851e-06 solution_eF=1.24851e-06 gate=0.000103746 pass=1
+CHECK 1024,1024,1024 fp16 trial=1 dense_eF=1.25092e-06 solution_eF=1.25092e-06 gate=0.000103753 pass=1
+CHECK 1024,1024,1024 fp16 trial=2 dense_eF=1.24799e-06 solution_eF=1.24799e-06 gate=0.000103744 pass=1
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.0099536 wall_ms=0.0100418
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.0099936 wall_ms=0.0100744
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.0100179 wall_ms=0.0100992
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.00994944 wall_ms=0.0100288
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.00995424 wall_ms=0.0100317
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.00998656 wall_ms=0.0100662
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.0099728 wall_ms=0.0100546
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.00997504 wall_ms=0.0100553
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.00996832 wall_ms=0.0100453
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.00994624 wall_ms=0.010027
+Trajectory saved to: trajectory/20261014_181954_baseline-1024

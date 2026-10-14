@@ -162,9 +162,8 @@ struct Options {
     {8192,8192,8192}, {16384,16384,16384}, {8192,4096,8192},
     {4096,8192,8192}, {8192,8192,4096}, {8192,1024,512}, {1024,8192,512},
     {1025,1537,769}, {514,770,258}, {1,1,1}};
-  std::string dtype = "both", algorithm = "lt", output;
+  std::string dtype = "both", algorithm = "dense", output;
   int trials = 100, warmup = 20, groups = 5, correct_trials = 3;
-  int lt_variant = 0, mega_variant = 0, hopper_variant = 0;
   int rotate_inputs = 1;
   bool graph = false, profile = false, profile_dense = false;
 };
@@ -191,7 +190,7 @@ Options options(int argc, char** argv) {
     auto next = [&]() { if (!value.empty()) return value; if (++i == argc) throw std::runtime_error("missing value for " + arg); return std::string(argv[i]); };
     if (arg == "--help") {
       std::cout << "megafmm_bench --shapes 'M,N,K;...' --dtype bf16|fp16|both "
-        "--algorithm lt|hopper|mega --lt-variant 0|1 --mega-variant 0..52 --hopper-variant 0..12 "
+        "--algorithm dense|auto "
         "--trials N --warmup N --groups N --correct-trials N --rotate-inputs N --graph --output CSV --profile [--profile-dense]\n";
       std::exit(0);
     } else if (arg == "--shapes") o.shapes = parse_shapes(next());
@@ -202,9 +201,6 @@ Options options(int argc, char** argv) {
     else if (arg == "--warmup") o.warmup = std::stoi(next());
     else if (arg == "--groups") o.groups = std::stoi(next());
     else if (arg == "--correct-trials") o.correct_trials = std::stoi(next());
-    else if (arg == "--lt-variant") o.lt_variant = std::stoi(next());
-    else if (arg == "--mega-variant") o.mega_variant = std::stoi(next());
-    else if (arg == "--hopper-variant") o.hopper_variant = std::stoi(next());
     else if (arg == "--rotate-inputs") o.rotate_inputs = std::stoi(next());
     else if (arg == "--graph") o.graph = true;
     else if (arg == "--profile") o.profile = true;
@@ -213,10 +209,7 @@ Options options(int argc, char** argv) {
   }
   if (o.profile_dense && !o.profile) throw std::runtime_error("--profile-dense requires --profile");
   if (o.dtype != "bf16" && o.dtype != "fp16" && o.dtype != "both") throw std::runtime_error("invalid dtype");
-  if (o.algorithm != "lt" && o.algorithm != "hopper" && o.algorithm != "mega") throw std::runtime_error("invalid algorithm");
-  if (o.lt_variant < 0 || o.lt_variant > 1) throw std::runtime_error("lt-variant must be 0 or 1");
-  if (o.hopper_variant < 0 || o.hopper_variant > 12) throw std::runtime_error("hopper-variant must be between 0 and 12");
-  if (o.mega_variant < 0 || o.mega_variant > 52) throw std::runtime_error("mega-variant must be between 0 and 52");
+  if (o.algorithm != "dense" && o.algorithm != "auto") throw std::runtime_error("invalid algorithm");
   if (o.trials <= 0 || o.groups <= 0 || o.warmup < 0 || o.correct_trials < 0 || o.rotate_inputs <= 0) throw std::runtime_error("invalid trial count");
   return o;
 }
@@ -283,10 +276,8 @@ template <class T> bool benchmark(const Options& o, int m, int n, int k, megafmm
   megafmm::Problem problem;
   problem.m=m; problem.n=n; problem.k=k; problem.lda=k; problem.ldb=n; problem.ldc=n; problem.ldd=n; problem.dtype=dtype;
   megafmm::Policy policy;
-  policy.certified_range=true; policy.workspace_limit=size_t(8)<<30;
-  policy.lt_variant=o.lt_variant; policy.hopper_variant=o.hopper_variant; policy.mega_variant=o.mega_variant;
-  policy.algorithm=o.algorithm=="lt" ? megafmm::Algorithm::WinogradLt :
-    o.algorithm=="hopper" ? megafmm::Algorithm::WinogradHopper : megafmm::Algorithm::Megakernel;
+  policy.workspace_limit=size_t(8)<<30;
+  policy.algorithm=o.algorithm=="auto" ? megafmm::Algorithm::Auto : megafmm::Algorithm::Dense;
   if (o.profile && o.profile_dense) policy.algorithm=megafmm::Algorithm::Dense;
   auto setup_start=Clock::now();
   auto solution=megafmm::create_plan(problem,policy);
@@ -394,7 +385,7 @@ template <class T> bool benchmark(const Options& o, int m, int n, int k, megafmm
     }
   }
   auto ds=stats(dev), ss=stats(sev), dw=stats(dwall), sw=stats(swall);
-  int variant=o.algorithm=="mega" ? o.mega_variant : o.algorithm=="hopper" ? o.hopper_variant : o.lt_variant;
+  const int variant=0;
   csv << std::setprecision(12) << m << ',' << n << ',' << k << ',' << megafmm::dtype_name(dtype) << ','
       << o.algorithm << ',' << csv_string(solution->algorithm_name()) << ',' << variant << ','
       << (o.graph ? "graph" : "launch") << ',' << (o.rotate_inputs==1 ? "warm_cache":"rotating_inputs") << ','
