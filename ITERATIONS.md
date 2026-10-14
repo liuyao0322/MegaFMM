@@ -265,6 +265,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 179 | Single PTX block for sixteen WGMMA instructions | 0.9729 | 0.011512 | experiment |
 
+| 180 | PTX descriptor low-word arithmetic | 0.9754 | 0.011437 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2448,3 +2450,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about11.41us FP16 about11.62us, no improvement versus162. Expected numerical errors/nonfinite0. Must inspect SASS before making any claim about descriptor R2UR reduction.
 - **Next:** Inspect dynamic descriptor code generation; test immutable descriptor low-word construction if transfer count unchanged.
 - **Archive:** trajectory/20261015_033439_iter-179/
+
+### Iter 180 — PTX descriptor low-word arithmetic
+
+- **Hypothesis:** Avoid64bit descriptor carry and retain invariant high words inside the WGMMA assembly block.
+- **Changes:** Base179; unpack base descriptor into low/high32, add fixed K offsets only to low words, repack for each same-order WGMMA.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011437 ms; mean speedup=0.9754x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012325 | 0.011346 | 1.0863 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009965 | 0.011528 | 0.8644 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about11.35us FP16 about11.53us, flat162. Expected original precision failures remain. 179SASS had64bit carry and four R2UR around each WGMMA; this removes carry but has no substantial complete-call gain.
+- **Next:** Restore162 and use uniform slot dispatch with template-constant start descriptors, shared accumulator array and unchanged perK waits.
+- **Archive:** trajectory/20261015_033526_iter-180/
