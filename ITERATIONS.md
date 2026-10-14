@@ -169,6 +169,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 131 | Reduce recombination consumers to four warps | 0.9010 | 0.012435 | experiment |
 
+| 132 | Vectorized shared product exchange and output | 0.8942 | 0.012557 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1588,3 +1590,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 130 launch12.435/12.563us with original error level, promising versus100; full131 benchmark archived independently to isolate consumer allocation.
 - **Next:** Inspect consumer timing and test vector product exchange
 - **Archive:** trajectory/20261015_022028_iter-131/
+
+### Iter 132 — Vectorized shared product exchange and output
+
+- **Hypothesis:** Float2 exchange halves shared and output instruction count while preserving the conflict-free permutation
+- **Changes:** From131 use float2 P stores/loads with row-parity pair swapping,8vector chunks per128CUDAconsumers, vector output and exact FP32 lane arithmetic
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012557 ms; mean speedup=0.8942x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012448 | 0.012484 | 0.9971 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009994 | 0.012630 | 0.7913 | 0.000754626 | 0 |
+
+- **Analysis:** 131 launch12.384/12.485us,130 paired12.321/12.526us with Graph11.934/12.091; full132 benchmark archived, original gates unchanged.
+- **Next:** Check numerical equivalence, latency and shared bank metrics if retained
+- **Archive:** trajectory/20261015_022158_iter-132/
