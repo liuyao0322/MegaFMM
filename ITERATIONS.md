@@ -363,6 +363,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 228 | Full-K512 private transposed leaf with split256 LHS TMA | 0.9129 | 0.012248 | experiment |
 
+| 229 | 64ns publication polling backoff | 1.0059 | 0.011070 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3326,3 +3328,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Rejected BF12.0899 FP12.4067us; expected eF unchanged, original gatesFAIL. Fewer retirements do not compensate longer full-leaf supply and reduced prefetch lookahead; current BK256 remains preferable.
 - **Next:** Reprofile descriptor constant specialization and investigate producer scheduling/input transformation critical path
 - **Archive:** trajectory/20261015_050424_iter-228/
+
+### Iter 229 — 64ns publication polling backoff
+
+- **Hypothesis:** Less aggressive acquire polling reduces contention on the shared driver counter
+- **Changes:** From224 insert64ns nanosleep before global acquire poll; unchanged atomic, publication scope and numerical schedule
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011070 ms; mean speedup=1.0059x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012299 | 0.010978 | 1.1203 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009950 | 0.011162 | 0.8914 | 0.000754626 | 0 |
+
+- **Analysis:** Rejected BF10.9782 FP11.1616us, no improvement over224. Both frozen FP64 gatesFAIL. BF first-group wall-time outlier33.6us does not alter event ranking; do not treat as win. Fresh NCU221 constant descriptors lower instructions to1.468M but full-call gain absent;2241.700M, both64regs0local.
+- **Next:** Test two independent private accumulators interleaving leaf K chunks with wait1 on transposed geometry; preserve K and recombination order
+- **Archive:** trajectory/20261015_050645_iter-229/
