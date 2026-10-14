@@ -123,6 +123,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 108 | Specialize all seven TC product steps for fixed four-slot addresses | 0.7450 | 0.015039 | experiment |
 
+| 109 | Two Tensor Core warpgroups per CTA | 1.0033 | 0.011174 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1180,3 +1182,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - 72bitwise-vs97checks,270diagnostictimingrowsbitexact,all3quicksanitizers0errors/hazards/warnings,DAG3tests PASS. These do not certify original numerical acceptance.
 - Shared space recovered then reused for4prefetchslots,totalstill213120B. K128/K512,twoMMAgroups,64bittransform,splittransform,initialbarrierremoval,fullTCunroll rejected;104invalid andexcluded. Fronttransform/gridno reliableimprovement.
 - Report:trajectory/20261015_validation-seven-prefetch/REPORT.md. No physical-floor claim.
+
+### Iter 109 — Two Tensor Core warpgroups per CTA
+
+- **Hypothesis:** Overlap independent leaf products to shorten the serial seven-product critical path
+- **Changes:** Assign two 128-thread tensor warpgroups alternating products, three shared product slots and 224 CUDA consumers; four operand slots unchanged; shared221312B
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011174 ms; mean speedup=1.0033x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | dense_cublaslt v0 | launch | 0.012455 | 0.012428 | 1.0021 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | dense_cublaslt v0 | launch | 0.009965 | 0.009920 | 1.0045 | 1.25092e-06 | 1 |
+
+- **Analysis:** Full benchmark recorded; original FP64 gates remain unchanged. Inspect complete-call measurements and independent numerical behavior after commit.
+- **Next:** Compare with iter100 and validate pipeline synchronization before retention
+- **Archive:** trajectory/20261015_014634_iter-109/

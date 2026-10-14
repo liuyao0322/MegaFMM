@@ -19,10 +19,10 @@ template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
   // Row-major P with an XOR permutation inside each 32-float row.
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
-  float product[2][Elements];
-  uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
+  float product[3][Elements];
+  uint64_t ready[Stages],free[Stages],product_ready[3],product_free[3];
 };
-static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==221312,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -75,7 +75,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
+    for(int j=0;j<3;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],224);}
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -139,24 +139,24 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
 
     }
-  }else if((tid>=32 && tid<128) || tid>=256){
-    int worker=tid>=256 ? tid-160:tid-32;
-    constexpr int Chunks=(Elements+351)/352;
+  }else if((tid>=32 && tid<128) || tid>=384){
+    int worker=tid>=384 ? tid-288:tid-32;
+    constexpr int Chunks=(Elements+223)/224;
     float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
     for(int step=0;step<7;++step){
-      wait(&s.product_ready[step%2],(step/2)%2);
+      wait(&s.product_ready[step%3],(step/3)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*352;
-        if(i<Elements)current[j]=s.product[step%2][product_index(i/BN,i%BN)];
+        int i=worker+j*224;
+        if(i<Elements)current[j]=s.product[step%3][product_index(i/BN,i%BN)];
       }
       // Release shared P immediately after reading; arithmetic/global stores can
       // overlap the Tensor warpgroup's reuse of this slot two steps later.
-      arrive(&s.product_free[step%2]);
+      arrive(&s.product_free[step%3]);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*352;
+        int i=worker+j*224;
         if(i<Elements){
           int at=(m0+i/BN)*1024+n0+i%BN;
           if(step==0)first[j]=current[j]; // P1
@@ -171,8 +171,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         }
       }
     }
-  }else if(tid>=128 && tid<256){
-    for(int step=0;step<7;++step){
+  }else if(tid>=128 && tid<384){
+    for(int step=(tid-128)/128;step<7;step+=2){
       int p=product_for_step(step);
       float acc[16]={};
       // Four compact operand slots keep prefetch ahead; retire each K tile promptly.
@@ -189,13 +189,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         __syncwarp();
         if((tid&31)==0)arrive(&s.free[slot]);
       }
-      if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
+      if(step>=3)wait(&s.product_free[step%3],((step-3)/3)%2);
       #pragma unroll
       for(int j=0;j<16;++j){
-        int mn=GMMA::CLayout_64x32{}(tid-128,j);
-        s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
+        int mn=GMMA::CLayout_64x32{}((tid-128)%128,j);
+        s.product[step%3][product_index(mn%64,mn/64)]=acc[j];
       }
-      arrive(&s.product_ready[step%2]);
+      arrive(&s.product_ready[step%3]);
     }
   }
   __syncthreads();

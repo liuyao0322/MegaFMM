@@ -159,3 +159,7 @@ the user's requests in this conversation:
 - CurrentTCready1.440/1.472us,issue3.648/3.680,wait0 .512/.512,loop7.072/7.104;front2.592us. Dynamicinstructionsup3.204->3.921M despitegain. Do not attributeallgainonlytoTMAorclaimissueisallsoftware.
 - K128sixslots,K512twoslots,twoMMAgroups,64bittransform,splittransform,initCTAbarrierremoval,TCproductunroll rejected.104invalidtruncatedstorefixed105; exclude104timings. Frontcostnotimproved.
 - Final100matches97bitwise72checks and passes3quicksanitizers;270diagnosticexact,DAG3pass. OriginalFP64gates STILLFAIL,eF.0060152/.000754626. Userexplicitlykeepsuncompensatedroute,AutoDense. Evidence trajectory/20261015_validation-seven-prefetch/REPORT.md.
+
+## Latest sustained goal,2026-10-15
+
+- User explicitly requested continued optimization until faster than Dense. Resume sustained optimization from100; target both BF16/FP16 ordinary full-call1024^3 faster than contemporaneously independently tuned cuBLASLt Dense. Track Graph separately. Keep seven-product uncompensated route, original FP64 gates and Auto=Dense; accuracy failure must stay explicit. This supersedes earlier bounded-round scope.
