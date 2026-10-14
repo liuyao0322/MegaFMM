@@ -1,0 +1,95 @@
+{
+  "shapes": [
+    [
+      1024,
+      1024,
+      1024
+    ]
+  ],
+  "dtypes": [
+    "bf16",
+    "fp16"
+  ],
+  "modes": [
+    "launch",
+    "graph"
+  ],
+  "warmup": 20,
+  "trials": 100,
+  "groups": 5,
+  "correct_trials": 3,
+  "rotate_inputs": 1,
+  "heuristic_candidates": 32,
+  "workspace_limit": 8589934592,
+  "reference": "Independently tuned same-row cuBLASLt beforecapture,32candidates/8GiB; Dense/SW same ordinary/Graphmode; noGraph-specifictuning.",
+  "schema": "megafmm.iter46.original-hopper-input-placement-supplement.v1",
+  "declaration_scope": "supplemental_original_hopper_routes",
+  "declared_before_measurement": true,
+  "expected_row_count": 8,
+  "enabled_row_count": 8,
+  "frozen_sources": {
+    "CMakeLists.txt": "5777e6fe199870956956ab145001a28688d748cdea0826010f5642bd14a15726",
+    "bench/benchmark.cu": "c9887dc64d32ece616e5dd91da922fedfe005c25ec46456d2fa661acd3d3ce8e",
+    "include/megafmm/gemm.h": "1a21759750b7d42ab1cebb0110538c488b66a3b461c581e7ada403fff33e4e5c",
+    "include/megafmm/kernels.h": "794ee3be062337dfc78fed181492575717efc8d0fc6296fa247143852ce3e3e8",
+    "solution/plan.cpp": "5033ead947fa3aee27cd05e0516218bd1e85a14fc25103fcf991b03ddef85557",
+    "tests/test_correctness.cu": "678bd0d6f731693e8841548b266f83a6b2a45304afee0831612185cb29ec84c8",
+    "solution/megakernel_wgmma_psplit_tma_bn16_k32_window.cu": "973f5e48af06b0fd939bf84b1b55e80319753f6515d0794b1f2b0d52fa9b1a9c"
+  },
+  "frozen_binaries": {
+    "build/megafmm_bench": "bb5db71f30e0cf9c177939b42b768c992accbf457ed75a3a1abdbf3155021ce8",
+    "build/test_correctness": "020636b81e3a6d3bca04e8eccb1a105b60144c97be6d263aede31a699eb8dfa1"
+  },
+  "independent_compiled_gate": {
+    "path": "results/psplit_tma_bn16_k32_window_static_review_initial_iter46.json",
+    "sha256": "07865c1d72066baddb1e57a1457e6d1f214fdafaee03c5f622a9a6589dde4c67",
+    "status": "PASS_COMPILED_CAN_LAUNCH_50"
+  },
+  "new_source_paths": [],
+  "new_variants": [],
+  "route_configurations": {},
+  "routes": [
+    {
+      "label": "hopper_fused10",
+      "algorithm": "hopper",
+      "variant": 10,
+      "actual_name": "winograd_fused_input_32x64",
+      "enabled": true,
+      "native": false,
+      "complete_run_kernel_launches": 2,
+      "input_placement": "Per-P fused S/T construction inside product leaf; output epilogue second kernel."
+    },
+    {
+      "label": "hopper_st_once12",
+      "algorithm": "hopper",
+      "variant": 12,
+      "actual_name": "winograd_packed_input_32x64",
+      "enabled": true,
+      "native": false,
+      "complete_run_kernel_launches": 3,
+      "input_placement": "Construct S/T once globally, packed product leaf, then output epilogue."
+    }
+  ],
+  "csv_paths": [
+    "results/small_hopper_fused10_launch_iter46_full1024.csv",
+    "results/small_hopper_fused10_graph_iter46_full1024.csv",
+    "results/small_hopper_st_once12_launch_iter46_full1024.csv",
+    "results/small_hopper_st_once12_graph_iter46_full1024.csv"
+  ],
+  "comparison_pairs": [
+    {
+      "candidate_algorithm": "hopper",
+      "candidate_variant": 12,
+      "baseline_algorithm": "hopper",
+      "baseline_variant": 10,
+      "axis": "hopper12_vs_hopper10_input_placement",
+      "controlled_axis_claimed": false
+    }
+  ],
+  "timing_contract": "Complete unchanged original H10 two-launch versus H12 three-launch invocation with transforms/seven products/epilogue; matched same-row independently tuned Dense. Same20w/100calls/5groups/3fresh/32Lt/8GiB/rotate1; ordinary GPUevent and synchronized100call batch wall/100, Graphfixedbindings freshcontents. Original FP64 gates retained; no new numerical certificate or native one-launch claim.",
+  "legacy_implementation_sources": {
+    "solution/gemm_fused_leaf.cu": "c26c7b70cc535c7bef4237c3a4edc2b75fc28753d2276c2208cf873c744e43bc",
+    "solution/gemm_packed_leaf.cu": "babcf1b21acd9f64608e1b56df2053475ab3efdfdbe81701037121e850734e34"
+  },
+  "resource_scope": "Unchanged retained original Hopper implementations; fresh CAN50 does not certify H10/H12. New supplemental scope is8 separate rows, mandatory primary remains20."
+}

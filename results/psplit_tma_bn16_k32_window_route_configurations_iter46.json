@@ -1,0 +1,119 @@
+{
+  "49": {
+    "actual_name": "megakernel_wgmma_psplit_tma_bn16_min2_64x16",
+    "enabled": true,
+    "producer_quota": 40,
+    "consumer_quotas": [
+      88,
+      112
+    ],
+    "launch_bounds_min_ctas": 2,
+    "BM": 64,
+    "BN": 16,
+    "BK": 64,
+    "threads": 384,
+    "dynamic_shared_bytes": 95232,
+    "static_shared_bytes": 0,
+    "tool_resource_shared_bytes": 1024,
+    "initial_registers_per_thread": 80,
+    "initial_owned_CTA_pool_registers": 30720,
+    "requested_role_pool_registers": 30720,
+    "physical_windows": {
+      "windows_per_stage_per_WG": 4,
+      "order": "ascending K16 atom0,1,2,3",
+      "WG0_A_packed_words_per_window": 12,
+      "WG1_A_packed_words_per_window": 16,
+      "WG0_whole_P_words": 24,
+      "WG1_whole_P_words": 32,
+      "pending_generic_overlap_access_count": 0,
+      "postwait_A_and_P_fences_before_next_reuse": true,
+      "single_stage_release_after_all_four_windows": true,
+      "whole_stage_A48_64_is_not_current_physical_backing": true
+    },
+    "all_P_clear_after_successful_INC": false,
+    "legal_initial_owned_preINC_zero_present": true,
+    "occupancy_API_predicted_active_CTAs_per_SM": 2,
+    "actual_measured_CTA_residency": null,
+    "function_probe_path": "results/psplit_tma_bn16_min2_function_occupancy_probe_iter45.txt",
+    "resource_metadata_scope": "Retained legacy attributes; not a fresh iteration46 function or residency query."
+  },
+  "45": {
+    "actual_name": "megakernel_wgmma_psplit_selective_tma_a_64x32",
+    "enabled": true,
+    "producer_quota": 64,
+    "consumer_quotas": [
+      192,
+      192
+    ],
+    "launch_bounds_min_ctas": 1,
+    "BM": 64,
+    "BN": 32,
+    "BK": 64,
+    "threads": 384,
+    "dynamic_shared_bytes": 123904,
+    "static_shared_bytes": 0,
+    "tool_resource_shared_bytes": 1024,
+    "device_reserved_shared_bytes_per_CTA": 1024,
+    "initial_registers_per_thread": 168,
+    "initial_owned_CTA_pool_registers": 64512,
+    "requested_role_pool_registers": 57344,
+    "drain_barrier": "nonaligned barrier.sync6,384; epochs0/6/0; BOTH banks drained",
+    "raw_A_transaction_bytes_per_stage": 32768,
+    "raw_A_TMA_boxes_per_stage": 4,
+    "A_native_lda_upper_exclusive": 549755813888,
+    "B_native_stride_extra_bound": null,
+    "A_shared_absolute_alignment_bytes": 1024,
+    "occupancy_API_predicted_active_CTAs_per_SM": 1,
+    "actual_measured_CTA_residency": null,
+    "function_probe_path": "results/psplit_selective_tma_a_function_occupancy_probe_iter41.txt",
+    "resource_metadata_scope": "Retained legacy attributes; not a fresh iteration46 function or residency query."
+  },
+  "39": {
+    "actual_name": "megakernel_wgmma_psplit_rsa_64x32",
+    "producer_quota": 64,
+    "consumer_quotas": [
+      192,
+      192
+    ],
+    "launch_bounds_min_ctas": 1,
+    "enabled": true,
+    "BM": 64,
+    "BN": 32,
+    "BK": 64,
+    "threads": 384,
+    "dynamic_shared_bytes": 123008,
+    "predicted_dynamic_shared_bytes": 123008,
+    "static_shared_bytes": 1024,
+    "drain_barrier": "nonaligned barrier.sync6,384; CTAepochs0/6/0",
+    "compiled_gate": {
+      "path": "results/psplit_rsa_static_review_initial_iter36.json",
+      "sha256": "46db33836552063d31dd3cfde249ddb472cf0bdd252e2a9e4f790690362a1488",
+      "status": "PASS_COMPILED_CAN_LAUNCH_39_ONLY_37_REMAINS_BLOCKED"
+    },
+    "initial_registers_per_thread": 168,
+    "initial_owned_CTA_pool_registers": 64512,
+    "requested_role_pool_registers": 57344,
+    "producer_gpr_highest_including_implicit": 52,
+    "wg0_gpr_highest_including_implicit": 185,
+    "wg1_gpr_highest_including_implicit": 186,
+    "resource_metadata_scope": "Retained legacy attributes; not a fresh iteration46 function or residency query."
+  },
+  "50": {
+    "actual_name": "megakernel_wgmma_psplit_tma_bn16_k32_window_64x16",
+    "enabled": true,
+    "producer_quota": 40,
+    "consumer_quotas": [
+      96,
+      96
+    ],
+    "launch_bounds_min_ctas": 2,
+    "BM": 64,
+    "BN": 16,
+    "BK": 64,
+    "threads": 384,
+    "dynamic_shared_bytes": 95232,
+    "static_shared_bytes": 0,
+    "function_probe_path": "results/psplit_tma_bn16_k32_window_function_occupancy_probe_iter46.txt",
+    "resource_metadata_scope": "Fresh50 original gate/probe; occupancy API is static prediction and measured residency remains null."
+  }
+}

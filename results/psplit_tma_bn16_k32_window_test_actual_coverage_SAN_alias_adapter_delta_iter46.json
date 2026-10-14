@@ -1,0 +1,62 @@
+{
+  "schema": "megafmm.iter46.post-validation-single-SAN-alias-adapter.v1",
+  "source": {
+    "path": "results/psplit_tma_bn16_k32_window_test_actual_coverage_generator_iter46.py",
+    "sha256": "9aa02b2991e8d39ab97bad1b89b5c4b08b858d306ac2f03429aed4a1e16b6ebb"
+  },
+  "adapter": {
+    "path": "results/psplit_tma_bn16_k32_window_test_actual_coverage_SAN_alias_adapter_iter46.py",
+    "sha256": "01a5ec65dbfe3f02e0388bcc95baee835ddfea001b003cb1314a6de8c259452b"
+  },
+  "semantic_delta": "Only inherited expected SAN alias replaced by exact preexecution runner alias; chronology provenance distinguishes new CPU adapter from original prepared generator. No actual COMMAND/log/source/bin/GPU edits.",
+  "provenance": {
+    "original_prepared_generator": {
+      "path": "results/psplit_tma_bn16_k32_window_test_actual_coverage_generator_iter46.py",
+      "sha256": "9aa02b2991e8d39ab97bad1b89b5c4b08b858d306ac2f03429aed4a1e16b6ebb",
+      "prepared_after_source_freeze_before_actual_validation": true,
+      "measurement_source_commit": "9988cce85a02fd3e469802194f82dfb6b7975abf"
+    },
+    "preexecution_validation_runner": {
+      "path": "results/psplit_tma_bn16_k32_window_validation_runner_iter46.py",
+      "sha256": "88a46197e6477387648ba14aaea92c31eae016d10f13625e21ef213914300b37",
+      "measurement_source_commit": "9988cce85a02fd3e469802194f82dfb6b7975abf"
+    },
+    "first_CPU_failure": {
+      "path": "results/psplit_tma_bn16_k32_window_actual_coverage_execution_iter46.txt",
+      "sha256": "13be5a6a12c10b792cedccd0734dac2a2483108cf77d5fa11f328206ba756fd6",
+      "exit_path": "results/psplit_tma_bn16_k32_window_actual_coverage_execution_iter46.exit",
+      "actual_exit": 1,
+      "scope": "Consumer alias comparison mismatch; no GPU/source/log mutation."
+    }
+  },
+  "diff": [
+    "--- ",
+    "+++ ",
+    "@@ -564,7 +564,7 @@",
+    "         extra = ['--leak-check', 'full'] if tool == 'memcheck' else []",
+    "         check(command[:2] == ['bash', 'scripts/on_gpu.sh'] and command[2].endswith('/compute-sanitizer') and",
+    "               command[3:] == ['--tool', tool, '--error-exitcode', '97'] + extra +",
+    "-              ['./build/test_correctness', '--psplit-tma-bn16-min2-variant50-only'], 'Sanitizer executable/scope mismatch')",
+    "+              ['./build/test_correctness', '--psplit-tma-bn16-k32-window-variant50-only'], 'Sanitizer executable/scope mismatch')",
+    "         executable = expected_SAN_command_executable()",
+    "         check(command[2] == executable, 'Sanitizer path differs from predeclared absolute executable')",
+    "         version_evidence = audit_SAN_version(executable)",
+    "@@ -678,7 +678,7 @@",
+    "     if args.formal_expected:",
+    "         result['pre_execution_expected_snapshot']['formal_copy'] = {'path': display(args.formal_expected), 'sha256': EXPECTED_SHA}",
+    "     result['audit_generator_identity'] = {'path': display(__file__), 'sha256': sha(__file__), 'CPU_only': True,",
+    "-        'no_GPU_build_formal_write_or_git_mutation': True, 'prepared_after_source_freeze_before_actual_validation': True}",
+    "+        'no_GPU_build_formal_write_or_git_mutation': True, 'prepared_after_source_freeze_before_actual_validation': False, 'scope': 'Post-validation CPU-only single SAN alias comparison adapter; original prepared generator and exact validation commands remain frozen.'}",
+    "     result['limitations'] = [",
+    "         'All actual counts derive from closed stdout/sidecars. Expected counts are separate source-domain predictions.',",
+    "         '50 uses strict CROSSATOM N16 vs N32 TMA45 rawU plus independent volatile float RNalpha and std::fma betaC0 epilogue; bits are never relaxed.',",
+    "@@ -697,6 +697,7 @@",
+    "     check(sha(EXPECTED) == EXPECTED_SHA and sha(args.identity) == identity['sha256'] and sha(__file__) == result['audit_generator_identity']['sha256'],",
+    "           'Frozen generator/expected/identity changed during CPU audit')",
+    "     check(sha(old_expected) == OLD_EXPECTED_SHA and sha(old_actual) == OLD_ACTUAL_SHA, 'Historical snapshots changed during CPU audit')",
+    "+    result['CPU_adapter_provenance'] = {'original_prepared_generator': {'path': 'results/psplit_tma_bn16_k32_window_test_actual_coverage_generator_iter46.py', 'sha256': '9aa02b2991e8d39ab97bad1b89b5c4b08b858d306ac2f03429aed4a1e16b6ebb', 'prepared_after_source_freeze_before_actual_validation': True, 'measurement_source_commit': '9988cce85a02fd3e469802194f82dfb6b7975abf'}, 'preexecution_validation_runner': {'path': 'results/psplit_tma_bn16_k32_window_validation_runner_iter46.py', 'sha256': '88a46197e6477387648ba14aaea92c31eae016d10f13625e21ef213914300b37', 'measurement_source_commit': '9988cce85a02fd3e469802194f82dfb6b7975abf'}, 'first_CPU_failure': {'path': 'results/psplit_tma_bn16_k32_window_actual_coverage_execution_iter46.txt', 'sha256': '13be5a6a12c10b792cedccd0734dac2a2483108cf77d5fa11f328206ba756fd6', 'exit_path': 'results/psplit_tma_bn16_k32_window_actual_coverage_execution_iter46.exit', 'actual_exit': 1, 'scope': 'Consumer alias comparison mismatch; no GPU/source/log mutation.'}}",
+    "     OUTPUT.write_text(json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False) + '\\n')",
+    "     print(json.dumps({'output_path': display(OUTPUT), 'output_sha256': sha(OUTPUT), 'status': result['status'],",
+    "                       'actual_scope_summary': result['actual_scope_summary']}, ensure_ascii=False))"
+  ]
+}
