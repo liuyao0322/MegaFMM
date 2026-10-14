@@ -357,6 +357,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 225 | Immutable device TMA metadata prepared by explicit tuning | 0.9716 | 0.011450 | experiment |
 
+| 226 | 64x64 private transposed tile generator compile failure | 0.0000 | 0.000000 | failed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3274,3 +3276,17 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Rejected: BF11.3795 FP11.5203us, slower than218 and224. Expected original eF unchanged, both gatesFAIL. Metadata reuse does not improve full-call performance; extra ownership and graph lifetime complexity not retained.
 - **Next:** Reassess NCU/history and test larger private transposed output tile with lower CTA count and controlled register footprint
 - **Archive:** trajectory/20261015_050119_iter-225/
+
+### Iter 226 — 64x64 private transposed tile generator compile failure
+
+- **Hypothesis:** Larger tile reduces duplicate operand traffic with64 compute CTAs
+- **Changes:** Attempted512-thread64x64x256 three-slot private TC code; generator failed to expand WGMMA operand vector from16 to32 registers
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Build FAILED PTX vector size mismatch; no226 runtime or correctness evidence. results/current.csv may contain stale225 rows and must not be interpreted as226 measurements. An independent SASS read was accidentally batched after polling this failed benchmark; close now before correction.
+- **Next:** Correct generated WGMMA accumulator vector and rerun as227
+- **Archive:** trajectory/20261015_050243_iter-226/
