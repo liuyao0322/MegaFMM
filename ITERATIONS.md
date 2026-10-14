@@ -23,6 +23,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 58 | Batch BK128 using one operand stage and register outputs | 0.0311 | 0.356526 | measured |
 
+| 59 | Skip preparation of unused residual planes | 0.0317 | 0.349697 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -162,3 +164,19 @@ work/handshake tradeoff rather than continuing the unsuccessful layout-only path
 - **Analysis:** Full 1024 launch benchmark exited0; both dtypes pass fresh numerical gates. No claim about actual occupancy; register/shared costs must be assessed against measured runtime.
 - **Next:** Measure gain; remove unused residual-plane preparation for original operands and validate accepted candidate.
 - **Archive:** trajectory/20261014_191209_iter-58/
+
+### Iter 59 — Skip preparation of unused residual planes
+
+- **Hypothesis:** Original input operands need no low plane and their consumers never read one; avoid these conversions and shared stores.
+- **Changes:** From best56, prepare A-low only forP3/P5/P6/P7 and B-low only forP4/P5/P6/P7. All nonzero correction terms retained.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.349697 ms; mean speedup=0.0317x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_unified_v1_hilo_64x32x64 v0 | launch | 0.012389 | 0.355324 | 0.0349 | 7.15726e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_unified_v1_hilo_64x32x64 v0 | launch | 0.009826 | 0.344070 | 0.0286 | 4.79212e-07 | 1 |
+
+- **Analysis:** Full launch exited0; no numerical approximation was removed. Record all rows and compare complete-call own latency to56.
+- **Next:** Assess gain; explore BN16 with register outputs to enable two CTA capacity per SM.
+- **Archive:** trajectory/20261014_191357_iter-59/

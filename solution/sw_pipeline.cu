@@ -9,7 +9,7 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64, BN=32, BK=128, Elements=BM*BN;
+constexpr int BM=64, BN=32, BK=64, Elements=BM*BN;
 constexpr int ASize=BM*BK, BSize=BK*BN;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -17,12 +17,13 @@ using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 // One allocation; independent regions never alias a live asynchronous operand.
 template<class T> struct alignas(128) Shared {
   T raw[1][4*ASize+4*BSize];
-  T operand[1][2*ASize+2*BSize];
+  T operand[2][2*ASize+2*BSize];
   float product[7][Elements];
+  float output[4][Elements];
   uint64_t raw_ready[2],raw_free[2],op_ready[2],op_free[2];
   uint64_t product_ready,product_free;
 };
-static_assert(sizeof(Shared<cute::half_t>)==204928, "recheck shared-memory budget");
+static_assert(sizeof(Shared<cute::half_t>)==188544, "recheck shared-memory budget");
 
 __device__ void wait(const uint64_t* b,int phase) {
   Barrier::wait(b,phase); asm volatile("" ::: "memory");
@@ -98,6 +99,7 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
     Barrier::init(&s.product_free,96);
     cutlass::arch::fence_barrier_init();
   }
+  for(int i=tid;i<4*Elements;i+=256) (&s.output[0][0])[i]=0;
   __syncthreads();
 
   if(tid==0) {
@@ -116,65 +118,57 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
     }
   } else if(tid>=32 && tid<128) {
     int worker=tid-32;
-    constexpr int Chunks=(Elements+95)/96;
-    float q11[Chunks]={},q12[Chunks]={},q21[Chunks]={},q22[Chunks]={};
     for(int q=0;q<512/BK;++q) {
       int bank=0;
       wait(&s.raw_ready[bank],q%2);
       for(int p=0;p<7;++p) {
-        int sequence=q*7+p,slot=0;
-        if(sequence)wait(&s.op_free[slot],(sequence-1)%2);
+        int sequence=q*7+p,slot=sequence%2;
+        if(sequence>=2)wait(&s.op_free[slot],((sequence-2)/2)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto al=make_tensor(make_smem_ptr(op+ASize),la);
         auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb);
         auto bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
         for(int i=worker;i<ASize;i+=96) {
-          float v=left_operand(s,bank,p,i);T hi=T(v),lo=T(__fsub_rn(v,float(hi)));
-          ah(i/BK,i%BK)=hi;al(i/BK,i%BK)=lo;
+          float v=left_operand(s,bank,p,i);T hi=T(v);
+          ah(i/BK,i%BK)=hi;
+          if(p==2 || p>=4)al(i/BK,i%BK)=T(__fsub_rn(v,float(hi)));
         }
         for(int i=worker;i<BSize;i+=96) {
-          float v=right_operand(s,bank,p,i);T hi=T(v),lo=T(__fsub_rn(v,float(hi)));
-          bh(i%BN,i/BN)=hi;bl(i%BN,i/BN)=lo;
+          float v=right_operand(s,bank,p,i);T hi=T(v);
+          bh(i%BN,i/BN)=hi;
+          if(p==3 || p>=4)bl(i%BN,i/BN)=T(__fsub_rn(v,float(hi)));
         }
         asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
         arrive(&s.op_ready[slot]);
       }
       arrive(&s.raw_free[bank]);
       wait(&s.product_ready,q%2);
-      #pragma unroll
-      for(int chunk=0;chunk<Chunks;++chunk) {
-        int i=worker+chunk*96;
-        if(i<Elements) {
+      for(int i=worker;i<Elements;i+=96) {
         float p1=s.product[0][i],p2=s.product[1][i],p3=s.product[2][i];
         float p4=s.product[3][i],p5=s.product[4][i],p6=s.product[5][i],p7=s.product[6][i];
         float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6);
         float u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
-        q11[chunk]=__fadd_rn(q11[chunk],u1);
-        q12[chunk]=__fadd_rn(q12[chunk],__fadd_rn(u4,p3));
-        q21[chunk]=__fadd_rn(q21[chunk],__fsub_rn(u3,p4));
-        q22[chunk]=__fadd_rn(q22[chunk],__fadd_rn(u3,p5));
+        s.output[0][i]=__fadd_rn(s.output[0][i],u1);
+        s.output[1][i]=__fadd_rn(s.output[1][i],__fadd_rn(u4,p3));
+        s.output[2][i]=__fadd_rn(s.output[2][i],__fsub_rn(u3,p4));
+        s.output[3][i]=__fadd_rn(s.output[3][i],__fadd_rn(u3,p5));
       }
-        }
       arrive(&s.product_free);
     }
-    #pragma unroll
-    for(int chunk=0;chunk<Chunks;++chunk) {
-      int i=worker+chunk*96;
-      if(i<Elements) {
+    for(int i=worker;i<Elements;i+=96) {
       int row=m0+i/BN,col=n0+i%BN;
-      D[row*1024+col]=q11[chunk];
-      D[row*1024+col+512]=q12[chunk];
-      D[(row+512)*1024+col]=q21[chunk];
-      D[(row+512)*1024+col+512]=q22[chunk];
+      D[row*1024+col]=s.output[0][i];
+      D[row*1024+col+512]=s.output[1][i];
+      D[(row+512)*1024+col]=s.output[2][i];
+      D[(row+512)*1024+col+512]=s.output[3][i];
     }
-      }
   } else if(tid>=128) {
     for(int q=0;q<512/BK;++q) {
       if(q)wait(&s.product_free,(q-1)%2);
       for(int p=0;p<7;++p) {
-        int sequence=q*7+p,slot=0;
-        wait(&s.op_ready[slot],sequence%2);
+        int sequence=q*7+p,slot=sequence%2;
+        wait(&s.op_ready[slot],(sequence/2)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto al=make_tensor(make_smem_ptr(op+ASize),la);
