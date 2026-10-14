@@ -20,7 +20,7 @@ template<class T> struct alignas(128) Shared {
   // Row-major P with an XOR permutation inside each 32-float row.
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
   float product[2][Elements];
-  uint64_t ready[2],low_ready[2],free[2],product_ready[2],product_free[2];
+  uint64_t ready[2],unused_low_ready[2],free[2],product_ready[2],product_free[2];
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
@@ -74,14 +74,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.low_ready[j],1);Barrier::init(&s.free[j],4);}
+    for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
   // All CTAs cooperate in one input transformation per invocation, never across calls.
-  // Transform two adjacent elements per thread with aligned 32-bit IO. Keep
-  // every scalar FP32 operation and each high/low rounding identical.
+  // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
+  // retain FP32 transforms and high rounding, omit residual generation.
   for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid);i<Plane;i+=2*gridDim.x*gridDim.y*Threads){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
@@ -103,13 +103,11 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       for(int j=0;j<4;++j){
         T sh=T(sv[j]),th=T(tv[j]);
         words[2*j]|=uint32_t(sh.raw())<<(16*lane);
-        words[2*j+1]|=uint32_t(T(__fsub_rn(sv[j],float(sh))).raw())<<(16*lane);
         words[8+2*j]|=uint32_t(th.raw())<<(16*lane);
-        words[8+2*j+1]|=uint32_t(T(__fsub_rn(tv[j],float(th))).raw())<<(16*lane);
       }
     }
     #pragma unroll
-    for(int j=0;j<16;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[j];
+    for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(2*j*Plane+i)/2]=words[2*j];
   }
   // Generic global stores become visible to TMA's async proxy before publication.
   asm volatile("fence.proxy.async.global;" ::: "memory");
@@ -122,10 +120,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       int sequence=step*(512/BK)+q,slot=sequence%2,k0=q*BK;
       if(sequence>=2)wait(&s.free[slot],((sequence-2)/2)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
-      // Publish high operands first so their MMA can overlap residual loads.
-      // Advance both barrier phases on every stage, including zero-byte lows.
+      // Seven-product experiment: only publish high operands; no residual loads.
       TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
-      TxBarrier::arrive_and_expect_tx(&s.low_ready[slot],(alo ? 2*ASize:0)+(blo ? 2*BSize:0));
       T* op=s.operand[slot];
       if(alo){
         int plane=p==2 ? 6:2*(p-4);
@@ -141,14 +137,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
         SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+2*ASize,n0+col,k0+row);
       }
-      if(alo){
-        int plane=p==2 ? 6:2*(p-4);
-        SM90_TMA_LOAD_4D::copy(&smap,&s.low_ready[slot],0,op+ASize,0,m0,k0/64,plane+1);
-      }
-      if(blo){
-        int plane=p==3 ? 6:2*(p-4);
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.low_ready[slot],0,op+2*ASize+BSize,n0,k0,plane+1);
-      }
+
     }
   }else if((tid>=32 && tid<128) || tid>=256){
     int worker=tid>=256 ? tid-160:tid-32;
@@ -192,13 +181,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         int sequence=step*(512/BK)+q,slot=sequence%2;
         wait(&s.ready[slot],(sequence/2)%2);
         T* op=s.operand[slot];
-        auto ah=make_tensor(make_smem_ptr(op),la),al=make_tensor(make_smem_ptr(op+ASize),la);
-        auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb),bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
+        auto ah=make_tensor(make_smem_ptr(op),la);
+        auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb);
         warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
-        if(p>=2)wait(&s.low_ready[slot],(sequence/2)%2);
-        if(p==2 || p>=4)mma_term<T>(al,bh,acc);
-        if(p==3 || p>=4)mma_term<T>(ah,bl,acc);
         warpgroup_commit_batch();warpgroup_wait<0>();
         __syncwarp();
         if((tid&31)==0)arrive(&s.free[slot]);

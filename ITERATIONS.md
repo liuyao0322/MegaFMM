@@ -941,3 +941,9 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - Seven-product BF16 eF=.00601520 vs gate.00100256; FP16eF=.000754626 vs gate.000103753: both FAIL,nonfinite0. Benchmark exit2 expected.
 - Verbatim restored solution from5f5327d and final full benchmark passed both dtypes. Experimental source remains503c7de and trajectory/20261015_010804_iter-97/.
 - Report: trajectory/20261015_validation-iter97-no-compensation/REPORT.md. No winner certification for no-compensation candidate.
+
+### User-directed selection — keep iter97
+
+- User explicitly requested retaining the seven-product no-compensation version after measurement. Restored solution verbatim from503c7de, superseding the interim compensated restoration. No implementation edits beyond the exact already-benchmarked source; no redundant benchmark required.
+- Current source:7products, ordinarylaunch BF16/FP16 14.17568/14.40080us; Graph13.56640/14.06144us in paired trials. Both original numerical gates FAIL, nonfinite0. Auto remainsDense.
+- README and HINTS now identify this as the current experimental source; previous compensated validation is historical.
