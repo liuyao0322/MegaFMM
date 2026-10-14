@@ -10,7 +10,7 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int BM=64,BN=32,BK=192,Stages=5,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
 constexpr int Plane=512*512,Threads=768;
 constexpr size_t WorkspaceBytes=size_t(8)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
@@ -23,7 +23,7 @@ template<class T> struct alignas(128) Shared {
   uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
   uint64_t pack_ready;
 };
-static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==200832,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -38,7 +38,7 @@ __device__ constexpr int product_for_step(int step){
   return step<2 ? step:step==2 ? 5:step==3 ? 6:step==4 ? 4:step==5 ? 2:3;
 }
 
-template<class T,class TA,class TB>
+template<class T,int ActiveK,class TA,class TB>
 __device__ void mma_term(TA a,TB b,float (&d)[16]) {
   using namespace cute;
   using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,
@@ -53,7 +53,7 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
   auto da_base=da_tiles(0,0,0);
   auto db_base=db_tiles(0,0,0);
   #pragma unroll
-  for(int kk=0;kk<BK/16;++kk){
+  for(int kk=0;kk<ActiveK/16;++kk){
     // All operands fit below 256 KiB of shared memory. K offsets cannot carry
     // out of the 14-bit start-address field (16-byte units), so keep the high
     // descriptor word invariant rather than generating a 64-bit add/carry.
@@ -84,10 +84,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
-    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
+    for(int step=0;step<7;++step)for(int q=0;q<((512+BK-1)/BK);++q){
       int p=product_for_step(step);
-      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
-      if(sequence==4){
+      int sequence=step*(((512+BK-1)/BK))+q,slot=sequence%Stages,k0=q*BK;
+      if(sequence==6){
         wait(&s.pack_ready,0);
         // CUDA12.4 cooperative launch gives each invocation its own initialized
         // driver workspace. Only TMA leaders join this publication barrier;
@@ -189,14 +189,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       float acc[16]={};
       // Four compact operand slots keep prefetch ahead; retire each K tile promptly.
       #pragma unroll
-      for(int q=0;q<512/BK;++q){
-        int sequence=step*(512/BK)+q,slot=sequence%Stages;
+      for(int q=0;q<((512+BK-1)/BK);++q){
+        int sequence=step*(((512+BK-1)/BK))+q,slot=sequence%Stages;
         wait(&s.ready[slot],(sequence/Stages)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
         warpgroup_arrive();
-        mma_term<T>(ah,bh,acc);
+        if(q==2)mma_term<T,128>(ah,bh,acc);else mma_term<T,BK>(ah,bh,acc);
         warpgroup_commit_batch();warpgroup_wait<0>();
         __syncwarp();
         if((tid&31)==0)arrive(&s.free[slot]);

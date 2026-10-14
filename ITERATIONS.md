@@ -337,6 +337,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 215 | Transpose each leaf and exchange physical operand roles | 0.9905 | 0.011238 | experiment |
 
+| 216 | K192 five-slot transposed operand prefetch with K128 tail | 0.8747 | 0.012745 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3094,3 +3096,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Fresh BF16 11.1334us FP16 11.3424us versus Dense12.3379/9.90016us; expected seven-product errors finite, original gates FAIL. Modest initial improvement relative to162, needs paired performance and independent bitwise validation before selection.
 - **Next:** Run independent72-check comparison and full NCU, then tune this reversed operand geometry from measured evidence
 - **Archive:** trajectory/20261015_043801_iter-215/
+
+### Iter 216 — K192 five-slot transposed operand prefetch with K128 tail
+
+- **Hypothesis:** Intermediate K geometry and one extra prefetched tile may shorten exposed supply latency
+- **Changes:** From215 BK192,5slots,200832Bshared; three slices192+192+128; final slice executes only first8MMA tiles despite full TMA box; preserve accumulation order
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012745 ms; mean speedup=0.8747x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012290 | 0.012530 | 0.9809 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009960 | 0.012961 | 0.7685 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 12.5299us FP16 12.9606us materially slower than215 and162. Expected original errors finite and both precision gates FAIL.215 validation72bitwise,3sanitizers and256multistream launches passed; paired215 ordinary improves~1.3percent but FP16Graph regresses~.35percent, no universal win.
+- **Next:** Retain K256 and test a smaller true N16 WGMMA with two resident CTAs rather than padded N32 arithmetic
+- **Archive:** trajectory/20261015_044050_iter-216/
