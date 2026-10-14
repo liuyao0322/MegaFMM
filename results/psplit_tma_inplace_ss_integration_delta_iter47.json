@@ -1,0 +1,106 @@
+{
+  "schema": "megafmm.iter47.inplace-ss-integration-delta.v1",
+  "operations": [
+    {
+      "path": "include/megafmm/kernels.h",
+      "old": "// Native50 paired-K16 windows",
+      "new": "// Native51/52 inplace SS, current A/B TMA; columns32/16, configuration0.\nbool wgmma_psplit_tma_inplace_ss_can_implement(const Problem& p,int columns,int configuration=0);\nbool wgmma_psplit_tma_inplace_ss_full_tiles(const Problem& p,const void* A,const void* B,int columns,int configuration=0);\nvoid prepare_wgmma_psplit_tma_inplace_ss(const Problem& p,int columns,int configuration=0);\nvoid launch_wgmma_psplit_tma_inplace_ss(const Problem& p,const void* A,const void* B,\n    const float* C0,float* D,cudaStream_t stream,int columns,int configuration=0);\n\n// Native50 paired-K16 windows",
+      "count": 1,
+      "before_sha256": "794ee3be062337dfc78fed181492575717efc8d0fc6296fa247143852ce3e3e8",
+      "after_sha256": "0ac999fb9bc52c7885ba9650c97744a0226bceba173116046f79fc716c01446b"
+    },
+    {
+      "path": "include/megafmm/gemm.h",
+      "old": "  int mega_variant=0;",
+      "new": "  // 51/52=BN32/16 BK32 inplace final shared ST, eight currentAB TMA boxes.\n  // Fresh four-instance resource/sync gate required; original precision floors.\n  int mega_variant=0;",
+      "count": 1,
+      "before_sha256": "1a21759750b7d42ab1cebb0110538c488b66a3b461c581e7ada403fff33e4e5c",
+      "after_sha256": "9731cdb5cc153a4cb13d7992211198004e8cdeab5eac79e187bbb001dddeeb22"
+    },
+    {
+      "path": "bench/benchmark.cu",
+      "old": "--mega-variant 0..50",
+      "new": "--mega-variant 0..52",
+      "count": 1,
+      "before_sha256": "c9887dc64d32ece616e5dd91da922fedfe005c25ec46456d2fa661acd3d3ce8e",
+      "after_sha256": "729776700347e427bcf79b53af551790c0bcb0d1f530f9bc2e28a599a0c2683b"
+    },
+    {
+      "path": "bench/benchmark.cu",
+      "old": "o.mega_variant > 50",
+      "new": "o.mega_variant > 52",
+      "count": 1,
+      "before_sha256": "729776700347e427bcf79b53af551790c0bcb0d1f530f9bc2e28a599a0c2683b",
+      "after_sha256": "2a91b9af2ac8e5e56428516fc7514fd38b59823d46277510c2c2af16f1bfa3a4"
+    },
+    {
+      "path": "bench/benchmark.cu",
+      "old": "mega-variant must be between 0 and 50",
+      "new": "mega-variant must be between 0 and 52",
+      "count": 1,
+      "before_sha256": "2a91b9af2ac8e5e56428516fc7514fd38b59823d46277510c2c2af16f1bfa3a4",
+      "after_sha256": "0994bfe7d30534240a853cf78bfe9981bd34378427ad7ce19789f8bb3688c691"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "old": "solution/megakernel_wgmma_psplit_tma_bn16_k32_window.cu)",
+      "new": "solution/megakernel_wgmma_psplit_tma_bn16_k32_window.cu solution/megakernel_wgmma_psplit_tma_inplace_ss.cu)",
+      "count": 1,
+      "before_sha256": "5777e6fe199870956956ab145001a28688d748cdea0826010f5642bd14a15726",
+      "after_sha256": "8ce775d97b4a5fe7dd8a82b5ad7144002f5ccbbd03364600e6249cdfbb513ee7"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "append": "set_source_files_properties new TU keep-dir iter47"
+    },
+    {
+      "path": "solution/plan.cpp",
+      "old": "    if (plan.policy.mega_variant == 50) {",
+      "new": "    if (plan.policy.mega_variant == 51 || plan.policy.mega_variant == 52) {\n      const int columns=plan.policy.mega_variant==51 ? 32 : 16;\n      if (wgmma_psplit_tma_inplace_ss_full_tiles(p,A,B,columns,0))\n        launch_wgmma_psplit_tma_inplace_ss(p,A,B,C0,D,stream,columns,0);\n      else launch_packed_mma(p,A,B,C0,D,stream,7);\n    } else if (plan.policy.mega_variant == 50) {",
+      "count": 1,
+      "before_sha256": "5033ead947fa3aee27cd05e0516218bd1e85a14fc25103fcf991b03ddef85557",
+      "after_sha256": "ec0b5877dcd12898e5bbb30e3929ff69d1b0b8fc72e4fe16f36a5d0553f73f6a"
+    },
+    {
+      "path": "solution/plan.cpp",
+      "old": "      if (impl_->policy.mega_variant == 50) {",
+      "new": "      if (impl_->policy.mega_variant == 51 || impl_->policy.mega_variant == 52) {\n        const int columns=impl_->policy.mega_variant==51 ? 32 : 16;\n        if (wgmma_psplit_tma_inplace_ss_can_implement(impl_->problem,columns,0))\n          return columns==32 ? \"megakernel_wgmma_psplit_tma_inplace_ss_64x32\" : \"megakernel_wgmma_psplit_tma_inplace_ss_64x16\";\n        return \"megakernel_warp_mma_packed\";\n      }\n      if (impl_->policy.mega_variant == 50) {",
+      "count": 1,
+      "before_sha256": "ec0b5877dcd12898e5bbb30e3929ff69d1b0b8fc72e4fe16f36a5d0553f73f6a",
+      "after_sha256": "e35a5db978473de1aad87bed004c84f201ec01aa6402171bbad8dbf379a2c8f3"
+    },
+    {
+      "path": "solution/plan.cpp",
+      "old": "policy.mega_variant > 50",
+      "new": "policy.mega_variant > 52",
+      "count": 1,
+      "before_sha256": "e35a5db978473de1aad87bed004c84f201ec01aa6402171bbad8dbf379a2c8f3",
+      "after_sha256": "5137479101ca9769b2dfbd521f39bdf91f7a1ec3b9581777d41635a0409a7998"
+    },
+    {
+      "path": "solution/plan.cpp",
+      "old": "mega_variant must be between 0 and 50",
+      "new": "mega_variant must be between 0 and 52",
+      "count": 1,
+      "before_sha256": "5137479101ca9769b2dfbd521f39bdf91f7a1ec3b9581777d41635a0409a7998",
+      "after_sha256": "d366edd6154f229735b42b7fcfc743772876d4bdea3bfefec5e435bebb1a59db"
+    },
+    {
+      "path": "solution/plan.cpp",
+      "old": "    const bool supported = policy.mega_variant == 50",
+      "new": "    const bool supported = policy.mega_variant == 51 || policy.mega_variant == 52\n                             ? (wgmma_psplit_tma_inplace_ss_can_implement(p,policy.mega_variant==51 ? 32 : 16,0) || packed_mma_can_implement(p,7))\n                           : policy.mega_variant == 50",
+      "count": 1,
+      "before_sha256": "d366edd6154f229735b42b7fcfc743772876d4bdea3bfefec5e435bebb1a59db",
+      "after_sha256": "54cef0c9f5c1e1d304e967688bc2251c1955c3c5d0accbee924b89ed15d73afd"
+    },
+    {
+      "path": "solution/plan.cpp",
+      "old": "    if (policy.mega_variant == 50) {",
+      "new": "    if (policy.mega_variant == 51 || policy.mega_variant == 52) {\n      const int columns=policy.mega_variant==51 ? 32 : 16;\n      if (wgmma_psplit_tma_inplace_ss_can_implement(p,columns,0)) prepare_wgmma_psplit_tma_inplace_ss(p,columns,0);\n      else prepare_packed_mma(p,7);\n    } else if (policy.mega_variant == 50) {",
+      "count": 1,
+      "before_sha256": "54cef0c9f5c1e1d304e967688bc2251c1955c3c5d0accbee924b89ed15d73afd",
+      "after_sha256": "6b789045611e7819b1991d09fd65c486f6af37694c495915b1457d76fe3f1662"
+    }
+  ],
+  "scope": "only new template51/52 CMake/API/Plan/bench declarations; tests independentchild delta; source-only no runtime proof"
+}

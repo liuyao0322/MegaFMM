@@ -1,0 +1,592 @@
+{
+  "schema": "megafmm.iter47.inplace-ss-independent-compiled-static-review.v1",
+  "status": "PASS_COMPILED_CAN_LAUNCH_51_52",
+  "issues": [],
+  "compiled_gate_inherited_from_iteration46": false,
+  "compiled_gate_inherited_from_any_prior": false,
+  "allowed_native_launch_variants": [
+    51,
+    52
+  ],
+  "disabled_instances": [],
+  "legacy_disabled_variants": [
+    37
+  ],
+  "instances": [
+    {
+      "variant": 52,
+      "dtype": "fp16",
+      "symbol": "_ZN7megafmm74_GLOBAL__N__3c75913d_41_megakernel_wgmma_psplit_tma_inplace_ss_cu_62d0210a36winograd_wgmma_psplit_tma_inplace_ssIN7cutlass6half_tELi16EEEvNS_7ProblemENS0_23TmaInplaceSSDescriptorsEPKfPf",
+      "bm": 64,
+      "bn": 16,
+      "bk": 32,
+      "threads": 384,
+      "stages": 2,
+      "launch_bounds_min_CTAs_per_SM": 2,
+      "effective_initial_registers_per_thread": 80,
+      "initial_owned_CTA_pool_registers": 30720,
+      "requested_role_pool_registers": 26624,
+      "producer_register_quota": 48,
+      "consumer_WG0_register_quota": 80,
+      "consumer_WG1_register_quota": 80,
+      "register_quota_direction_gate": {
+        "producer_DEC_le_initial": true,
+        "consumer_INC_ge_initial": [
+          true,
+          true
+        ],
+        "producer_max_lt_quota": true,
+        "consumer_max_lt_quotas": [
+          true,
+          true
+        ]
+      },
+      "role_CFG": [
+        {
+          "role": "producer",
+          "gpr_highest_including_implicit": 37,
+          "register_quota": 48,
+          "includes_common_U_loopbacks_waitstubs": true
+        },
+        {
+          "role": "WG0",
+          "gpr_highest_including_implicit": 55,
+          "register_quota": 80,
+          "includes_common_U_loopbacks_waitstubs": true
+        },
+        {
+          "role": "WG1",
+          "gpr_highest_including_implicit": 57,
+          "register_quota": 80,
+          "includes_common_U_loopbacks_waitstubs": true
+        }
+      ],
+      "initialization_gate": {
+        "all_P_clear_after_INC": false,
+        "legal_initial_owned_preINC_zero": true,
+        "first_MMA_accumulator_zero_definition_missing_count": 0,
+        "high_register_access_before_successful_INC_count": 0,
+        "grown_registers_actually_accessed": [],
+        "grown_register_read_before_definition_count": 0,
+        "actual_CFG_successful_INC_exit_PCs": {
+          "producer": "-0x1",
+          "WG0": "0x1780",
+          "WG1": "0x3e0"
+        },
+        "scope": "Actual current initial-owned zero definitions may precede INC. Current INC equals initial I; no expanded-register access exists."
+      },
+      "stack_bytes": 0,
+      "local_bytes": 0,
+      "spill_store_bytes": 0,
+      "spill_load_bytes": 0,
+      "new_C7512_warnings": false,
+      "dynamic_shared_bytes": 72704,
+      "actual_host_optin_and_launch_shared_bytes": 72704,
+      "shared_alignment_bytes": 1024,
+      "Driver_static_shared_bytes": 0,
+      "tool_resource_SHARED_bytes": 1024,
+      "tool_SHARED_is_not_Driver_static_bytes": true,
+      "occupancy_API_predicted_active_CTAs_per_SM": 2,
+      "measured_residency": null,
+      "complete_object_bench_test_instruction_streams_equal": true,
+      "instruction_count": 1208,
+      "physical_windows": {
+        "operand_mode": "SS",
+        "windows_per_K32_stage_per_WG": 1,
+        "k16_atoms_per_product": 2,
+        "WG0_product_count": 3,
+        "WG1_product_count": 4,
+        "WG0_MMA_count": 6,
+        "WG1_MMA_count": 8,
+        "P_words_per_product": 8,
+        "RS_A_register_backing": false,
+        "generic_P_access_before_matching_wait0": 0,
+        "shared_or_local_store_before_matching_wait0": 0,
+        "all_pending_operand_shared_banks_retained_until_both_WG_wait0_release": true
+      },
+      "raw_TMA": {
+        "copies_per_stage": 8,
+        "raw_expected_TX_bytes": 20480,
+        "raw_phase_is_pipeline_phase_XOR_1": true,
+        "all128_producer_proxy_fence_then_full_arrival": true
+      },
+      "consumer_publication": {
+        "writers": 256,
+        "nonaligned_barrier_id": 1,
+        "barrier_count": 256,
+        "four_raw_words_before_overwrite": true,
+        "early_load_destination_later_unconsumed_address_collisions": 0,
+        "fresh_raw_quartets_per_instance": 4
+      },
+      "tail": {
+        "both_banks_drained": true,
+        "nonaligned_barrier_id": 6,
+        "barrier_count": 384,
+        "P_shared_STS_after_drain_barrier": true,
+        "common_publish_bar0_before_U": true,
+        "bytes": 28672,
+        "bank_bytes": 35840,
+        "cross_bank1_bytes": 0
+      },
+      "status": "PASS_COMPILED_CAN_LAUNCH"
+    },
+    {
+      "variant": 52,
+      "dtype": "bf16",
+      "symbol": "_ZN7megafmm74_GLOBAL__N__3c75913d_41_megakernel_wgmma_psplit_tma_inplace_ss_cu_62d0210a36winograd_wgmma_psplit_tma_inplace_ssIN7cutlass10bfloat16_tELi16EEEvNS_7ProblemENS0_23TmaInplaceSSDescriptorsEPKfPf",
+      "bm": 64,
+      "bn": 16,
+      "bk": 32,
+      "threads": 384,
+      "stages": 2,
+      "launch_bounds_min_CTAs_per_SM": 2,
+      "effective_initial_registers_per_thread": 80,
+      "initial_owned_CTA_pool_registers": 30720,
+      "requested_role_pool_registers": 26624,
+      "producer_register_quota": 48,
+      "consumer_WG0_register_quota": 80,
+      "consumer_WG1_register_quota": 80,
+      "register_quota_direction_gate": {
+        "producer_DEC_le_initial": true,
+        "consumer_INC_ge_initial": [
+          true,
+          true
+        ],
+        "producer_max_lt_quota": true,
+        "consumer_max_lt_quotas": [
+          true,
+          true
+        ]
+      },
+      "role_CFG": [
+        {
+          "role": "producer",
+          "gpr_highest_including_implicit": 37,
+          "register_quota": 48,
+          "includes_common_U_loopbacks_waitstubs": true
+        },
+        {
+          "role": "WG0",
+          "gpr_highest_including_implicit": 55,
+          "register_quota": 80,
+          "includes_common_U_loopbacks_waitstubs": true
+        },
+        {
+          "role": "WG1",
+          "gpr_highest_including_implicit": 57,
+          "register_quota": 80,
+          "includes_common_U_loopbacks_waitstubs": true
+        }
+      ],
+      "initialization_gate": {
+        "all_P_clear_after_INC": false,
+        "legal_initial_owned_preINC_zero": true,
+        "first_MMA_accumulator_zero_definition_missing_count": 0,
+        "high_register_access_before_successful_INC_count": 0,
+        "grown_registers_actually_accessed": [],
+        "grown_register_read_before_definition_count": 0,
+        "actual_CFG_successful_INC_exit_PCs": {
+          "producer": "-0x1",
+          "WG0": "0x1780",
+          "WG1": "0x3e0"
+        },
+        "scope": "Actual current initial-owned zero definitions may precede INC. Current INC equals initial I; no expanded-register access exists."
+      },
+      "stack_bytes": 0,
+      "local_bytes": 0,
+      "spill_store_bytes": 0,
+      "spill_load_bytes": 0,
+      "new_C7512_warnings": false,
+      "dynamic_shared_bytes": 72704,
+      "actual_host_optin_and_launch_shared_bytes": 72704,
+      "shared_alignment_bytes": 1024,
+      "Driver_static_shared_bytes": 0,
+      "tool_resource_SHARED_bytes": 1024,
+      "tool_SHARED_is_not_Driver_static_bytes": true,
+      "occupancy_API_predicted_active_CTAs_per_SM": 2,
+      "measured_residency": null,
+      "complete_object_bench_test_instruction_streams_equal": true,
+      "instruction_count": 1208,
+      "physical_windows": {
+        "operand_mode": "SS",
+        "windows_per_K32_stage_per_WG": 1,
+        "k16_atoms_per_product": 2,
+        "WG0_product_count": 3,
+        "WG1_product_count": 4,
+        "WG0_MMA_count": 6,
+        "WG1_MMA_count": 8,
+        "P_words_per_product": 8,
+        "RS_A_register_backing": false,
+        "generic_P_access_before_matching_wait0": 0,
+        "shared_or_local_store_before_matching_wait0": 0,
+        "all_pending_operand_shared_banks_retained_until_both_WG_wait0_release": true
+      },
+      "raw_TMA": {
+        "copies_per_stage": 8,
+        "raw_expected_TX_bytes": 20480,
+        "raw_phase_is_pipeline_phase_XOR_1": true,
+        "all128_producer_proxy_fence_then_full_arrival": true
+      },
+      "consumer_publication": {
+        "writers": 256,
+        "nonaligned_barrier_id": 1,
+        "barrier_count": 256,
+        "four_raw_words_before_overwrite": true,
+        "early_load_destination_later_unconsumed_address_collisions": 0,
+        "fresh_raw_quartets_per_instance": 4
+      },
+      "tail": {
+        "both_banks_drained": true,
+        "nonaligned_barrier_id": 6,
+        "barrier_count": 384,
+        "P_shared_STS_after_drain_barrier": true,
+        "common_publish_bar0_before_U": true,
+        "bytes": 28672,
+        "bank_bytes": 35840,
+        "cross_bank1_bytes": 0
+      },
+      "status": "PASS_COMPILED_CAN_LAUNCH"
+    },
+    {
+      "variant": 51,
+      "dtype": "fp16",
+      "symbol": "_ZN7megafmm74_GLOBAL__N__3c75913d_41_megakernel_wgmma_psplit_tma_inplace_ss_cu_62d0210a36winograd_wgmma_psplit_tma_inplace_ssIN7cutlass6half_tELi32EEEvNS_7ProblemENS0_23TmaInplaceSSDescriptorsEPKfPf",
+      "bm": 64,
+      "bn": 32,
+      "bk": 32,
+      "threads": 384,
+      "stages": 2,
+      "launch_bounds_min_CTAs_per_SM": 1,
+      "effective_initial_registers_per_thread": 128,
+      "initial_owned_CTA_pool_registers": 49152,
+      "requested_role_pool_registers": 37888,
+      "producer_register_quota": 40,
+      "consumer_WG0_register_quota": 128,
+      "consumer_WG1_register_quota": 128,
+      "register_quota_direction_gate": {
+        "producer_DEC_le_initial": true,
+        "consumer_INC_ge_initial": [
+          true,
+          true
+        ],
+        "producer_max_lt_quota": true,
+        "consumer_max_lt_quotas": [
+          true,
+          true
+        ]
+      },
+      "role_CFG": [
+        {
+          "role": "producer",
+          "gpr_highest_including_implicit": 37,
+          "register_quota": 40,
+          "includes_common_U_loopbacks_waitstubs": true
+        },
+        {
+          "role": "WG0",
+          "gpr_highest_including_implicit": 105,
+          "register_quota": 128,
+          "includes_common_U_loopbacks_waitstubs": true
+        },
+        {
+          "role": "WG1",
+          "gpr_highest_including_implicit": 105,
+          "register_quota": 128,
+          "includes_common_U_loopbacks_waitstubs": true
+        }
+      ],
+      "initialization_gate": {
+        "all_P_clear_after_INC": false,
+        "legal_initial_owned_preINC_zero": true,
+        "first_MMA_accumulator_zero_definition_missing_count": 0,
+        "high_register_access_before_successful_INC_count": 0,
+        "grown_registers_actually_accessed": [],
+        "grown_register_read_before_definition_count": 0,
+        "actual_CFG_successful_INC_exit_PCs": {
+          "producer": "-0x1",
+          "WG0": "0x1960",
+          "WG1": "0x4a0"
+        },
+        "scope": "Actual current initial-owned zero definitions may precede INC. Current INC equals initial I; no expanded-register access exists."
+      },
+      "stack_bytes": 0,
+      "local_bytes": 0,
+      "spill_store_bytes": 0,
+      "spill_load_bytes": 0,
+      "new_C7512_warnings": false,
+      "dynamic_shared_bytes": 87040,
+      "actual_host_optin_and_launch_shared_bytes": 87040,
+      "shared_alignment_bytes": 1024,
+      "Driver_static_shared_bytes": 0,
+      "tool_resource_SHARED_bytes": 1024,
+      "tool_SHARED_is_not_Driver_static_bytes": true,
+      "occupancy_API_predicted_active_CTAs_per_SM": 1,
+      "measured_residency": null,
+      "complete_object_bench_test_instruction_streams_equal": true,
+      "instruction_count": 1344,
+      "physical_windows": {
+        "operand_mode": "SS",
+        "windows_per_K32_stage_per_WG": 1,
+        "k16_atoms_per_product": 2,
+        "WG0_product_count": 3,
+        "WG1_product_count": 4,
+        "WG0_MMA_count": 6,
+        "WG1_MMA_count": 8,
+        "P_words_per_product": 16,
+        "RS_A_register_backing": false,
+        "generic_P_access_before_matching_wait0": 0,
+        "shared_or_local_store_before_matching_wait0": 0,
+        "all_pending_operand_shared_banks_retained_until_both_WG_wait0_release": true
+      },
+      "raw_TMA": {
+        "copies_per_stage": 8,
+        "raw_expected_TX_bytes": 24576,
+        "raw_phase_is_pipeline_phase_XOR_1": true,
+        "all128_producer_proxy_fence_then_full_arrival": true
+      },
+      "consumer_publication": {
+        "writers": 256,
+        "nonaligned_barrier_id": 1,
+        "barrier_count": 256,
+        "four_raw_words_before_overwrite": true,
+        "early_load_destination_later_unconsumed_address_collisions": 0,
+        "fresh_raw_quartets_per_instance": 4
+      },
+      "tail": {
+        "both_banks_drained": true,
+        "nonaligned_barrier_id": 6,
+        "barrier_count": 384,
+        "P_shared_STS_after_drain_barrier": true,
+        "common_publish_bar0_before_U": true,
+        "bytes": 57344,
+        "bank_bytes": 43008,
+        "cross_bank1_bytes": 14336
+      },
+      "status": "PASS_COMPILED_CAN_LAUNCH"
+    },
+    {
+      "variant": 51,
+      "dtype": "bf16",
+      "symbol": "_ZN7megafmm74_GLOBAL__N__3c75913d_41_megakernel_wgmma_psplit_tma_inplace_ss_cu_62d0210a36winograd_wgmma_psplit_tma_inplace_ssIN7cutlass10bfloat16_tELi32EEEvNS_7ProblemENS0_23TmaInplaceSSDescriptorsEPKfPf",
+      "bm": 64,
+      "bn": 32,
+      "bk": 32,
+      "threads": 384,
+      "stages": 2,
+      "launch_bounds_min_CTAs_per_SM": 1,
+      "effective_initial_registers_per_thread": 128,
+      "initial_owned_CTA_pool_registers": 49152,
+      "requested_role_pool_registers": 37888,
+      "producer_register_quota": 40,
+      "consumer_WG0_register_quota": 128,
+      "consumer_WG1_register_quota": 128,
+      "register_quota_direction_gate": {
+        "producer_DEC_le_initial": true,
+        "consumer_INC_ge_initial": [
+          true,
+          true
+        ],
+        "producer_max_lt_quota": true,
+        "consumer_max_lt_quotas": [
+          true,
+          true
+        ]
+      },
+      "role_CFG": [
+        {
+          "role": "producer",
+          "gpr_highest_including_implicit": 37,
+          "register_quota": 40,
+          "includes_common_U_loopbacks_waitstubs": true
+        },
+        {
+          "role": "WG0",
+          "gpr_highest_including_implicit": 105,
+          "register_quota": 128,
+          "includes_common_U_loopbacks_waitstubs": true
+        },
+        {
+          "role": "WG1",
+          "gpr_highest_including_implicit": 105,
+          "register_quota": 128,
+          "includes_common_U_loopbacks_waitstubs": true
+        }
+      ],
+      "initialization_gate": {
+        "all_P_clear_after_INC": false,
+        "legal_initial_owned_preINC_zero": true,
+        "first_MMA_accumulator_zero_definition_missing_count": 0,
+        "high_register_access_before_successful_INC_count": 0,
+        "grown_registers_actually_accessed": [],
+        "grown_register_read_before_definition_count": 0,
+        "actual_CFG_successful_INC_exit_PCs": {
+          "producer": "-0x1",
+          "WG0": "0x1960",
+          "WG1": "0x4a0"
+        },
+        "scope": "Actual current initial-owned zero definitions may precede INC. Current INC equals initial I; no expanded-register access exists."
+      },
+      "stack_bytes": 0,
+      "local_bytes": 0,
+      "spill_store_bytes": 0,
+      "spill_load_bytes": 0,
+      "new_C7512_warnings": false,
+      "dynamic_shared_bytes": 87040,
+      "actual_host_optin_and_launch_shared_bytes": 87040,
+      "shared_alignment_bytes": 1024,
+      "Driver_static_shared_bytes": 0,
+      "tool_resource_SHARED_bytes": 1024,
+      "tool_SHARED_is_not_Driver_static_bytes": true,
+      "occupancy_API_predicted_active_CTAs_per_SM": 1,
+      "measured_residency": null,
+      "complete_object_bench_test_instruction_streams_equal": true,
+      "instruction_count": 1344,
+      "physical_windows": {
+        "operand_mode": "SS",
+        "windows_per_K32_stage_per_WG": 1,
+        "k16_atoms_per_product": 2,
+        "WG0_product_count": 3,
+        "WG1_product_count": 4,
+        "WG0_MMA_count": 6,
+        "WG1_MMA_count": 8,
+        "P_words_per_product": 16,
+        "RS_A_register_backing": false,
+        "generic_P_access_before_matching_wait0": 0,
+        "shared_or_local_store_before_matching_wait0": 0,
+        "all_pending_operand_shared_banks_retained_until_both_WG_wait0_release": true
+      },
+      "raw_TMA": {
+        "copies_per_stage": 8,
+        "raw_expected_TX_bytes": 24576,
+        "raw_phase_is_pipeline_phase_XOR_1": true,
+        "all128_producer_proxy_fence_then_full_arrival": true
+      },
+      "consumer_publication": {
+        "writers": 256,
+        "nonaligned_barrier_id": 1,
+        "barrier_count": 256,
+        "four_raw_words_before_overwrite": true,
+        "early_load_destination_later_unconsumed_address_collisions": 0,
+        "fresh_raw_quartets_per_instance": 4
+      },
+      "tail": {
+        "both_banks_drained": true,
+        "nonaligned_barrier_id": 6,
+        "barrier_count": 384,
+        "P_shared_STS_after_drain_barrier": true,
+        "common_publish_bar0_before_U": true,
+        "bytes": 57344,
+        "bank_bytes": 43008,
+        "cross_bank1_bytes": 14336
+      },
+      "status": "PASS_COMPILED_CAN_LAUNCH"
+    }
+  ],
+  "base_checkpoint": "49a6a00cf2f6bb0a6f1118201d6c7f79ea963639",
+  "frozen_bindings": {
+    "frozen_sources": {
+      "CMakeLists.txt": "5c36c0ab08aeb55b6b2bb5520e591a4cde6a4f0bf6e5c62db5ee7b009a4f0aa9",
+      "include/megafmm/kernels.h": "0ac999fb9bc52c7885ba9650c97744a0226bceba173116046f79fc716c01446b",
+      "include/megafmm/gemm.h": "9731cdb5cc153a4cb13d7992211198004e8cdeab5eac79e187bbb001dddeeb22",
+      "solution/plan.cpp": "6b789045611e7819b1991d09fd65c486f6af37694c495915b1457d76fe3f1662",
+      "bench/benchmark.cu": "0994bfe7d30534240a853cf78bfe9981bd34378427ad7ce19789f8bb3688c691",
+      "tests/test_correctness.cu": "5b7d08a4199fe24d8f4f80233ceec830e32ca5a860dbe5675df719a7a5334cee",
+      "solution/megakernel_wgmma_psplit_tma_inplace_ss.cu": "733709ff8c820ac708cdb4977946d3312950df864e1e736a22ea437bc992e818"
+    },
+    "frozen_binaries": {
+      "build/megafmm_bench": "c67886412fbf7643a67461288d0f6856184a4df348b17580506a5e2884bdf9a8",
+      "build/test_correctness": "40f05f0b83ea350cb42d45d21005329d8ca4f6373750bc529fa2064c33ce07b1"
+    },
+    "pregate_identity": {
+      "path": "results/psplit_tma_inplace_ss_initial_frozen_identity_iter47.json",
+      "sha256": "c2cdf360d0ba4bc6190a94fa9916715c70dda515878512c780b6ba26191fccaa"
+    },
+    "consumer_identity": {
+      "path": "results/psplit_tma_inplace_ss_consumer_frozen_identity_iter47.json",
+      "sha256": "7f29de8d69a629434a4231e4dde3484bf2216925186be38947254a50a68264e4"
+    },
+    "actual_artifacts": {
+      "results/psplit_tma_inplace_ss_initial_frozen_identity_iter47.json": "c2cdf360d0ba4bc6190a94fa9916715c70dda515878512c780b6ba26191fccaa",
+      "results/psplit_tma_inplace_ss_consumer_frozen_identity_iter47.json": "7f29de8d69a629434a4231e4dde3484bf2216925186be38947254a50a68264e4",
+      "results/psplit_tma_inplace_ss_final_link_identity_iter47.json": "e9584cf0d78cfbbc08bf3199c2cae0afa081076f32808570a8d2de4a3afe4aea",
+      "results/psplit_tma_inplace_ss_final_object_sass_iter47.txt": "eab55a3ffc22b580449f9d9721433af7ccd44af3f6eeba80c25226ac5b3ee384",
+      "results/psplit_tma_inplace_ss_final_object_resources_iter47.txt": "a78d83fc7a383520fde93f56bd87c6c3994f345aa97bcaa43dbec5155533fdab",
+      "results/psplit_tma_inplace_ss_final_object_elf_iter47.txt": "8da4716b45855c3a2abc7ad823e8a5e943f426285713db0e54b082dd37f8efb4",
+      "results/psplit_tma_inplace_ss_final_host_objdump_iter47.txt": "47a8da3bc3af74e1b9db6b74004d4373465810f9b106f4dc328dd7cf347beb4d",
+      "results/psplit_tma_inplace_ss_final_megakernel_wgmma_psplit_tma_inplace_ss_iter47.ptx": "7bdde65cd74664cb3033e3534f4b6d9fb313fa3aabf14c10cc1e52dd1566a3cc",
+      "results/psplit_tma_inplace_ss_final_megakernel_wgmma_psplit_tma_inplace_ss_iter47.cubin": "43a26889fce5a3992c05d57e1e2c24b9369f7494bac64dd69cdda47464e24c14",
+      "results/psplit_tma_inplace_ss_final_test_sass_iter47.txt": "b7d989dc411715f608ea54cec8712ac8ab91d6f6ff9bea36b66f8296d3d1058b",
+      "results/small_psplit_tma_inplace_ss_final_sass_iter47.txt": "b7d989dc411715f608ea54cec8712ac8ab91d6f6ff9bea36b66f8296d3d1058b",
+      "results/psplit_tma_inplace_ss_function_occupancy_probe_iter47.txt": "acf6675bb4f7f3059bed5a15825972cf8b75902afcfe6a9efe5d80797f36aada",
+      "results/psplit_tma_inplace_ss_function_occupancy_probe_iter47.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "results/psplit_tma_inplace_ss_actual_layout_probe_byte_flag_adapter_execution_iter47.txt": "16dbccd144a3b2deecfa2fea0bf8b4169846f94ad2f0da089adf2ea8746f37bb",
+      "results/psplit_tma_inplace_ss_actual_layout_probe_byte_flag_adapter_execution_iter47.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "results/psplit_tma_inplace_ss_actual_layout_probe_byte_flag_adapter_delta_iter47.json": "0cf033fe1dd4674dc057648deedbc4f789d1f53c7925960936275f56769c336f",
+      "results/psplit_tma_inplace_ss_revision3_source_delta_iter47.json": "1d44188853e7701d28fee82079db6a4ae2d4cf1c43a7de2c00fd93772cb83436",
+      ".scratch/psplit_tma_inplace_ss_initialization_cfg_iter47.json": "5dc8cd7d1798c7cadb58d078b4d68787fbfa7d907112e85b4a42d4367c4483cc",
+      ".scratch/psplit_tma_inplace_ss_pending_windows_iter47.json": "ce152f92e84f1642971384698d051cdb601a3c8352ec0d77b26df2623fbdda65",
+      ".scratch/psplit_tma_inplace_ss_scope_role_cfg_iter47.py": "790f9ca821e0205b02b25ac868a8222060b1f6688eefad90a777c693d6148a97",
+      ".scratch/psplit_tma_inplace_ss_definite_register_state_iter47.py": "2749db5b0393d06d3f556987c1139dea30144171b85e607a37b5a5bb35d9d433",
+      ".scratch/psplit_tma_inplace_ss_grow_register_state_iter47.py": "0bbadca1074492fe1b9d842df92984d6f40ce0c57f51c8df26b55a987c293283"
+    }
+  },
+  "source_API_gate": {
+    "proper_51_52_else50_dispatch": true,
+    "max52_invalid53_before_degenerate": true,
+    "blocked37_before_degenerate": true,
+    "native_guards": "M%128,K%64, N%64 for51 orN%32 for52; AB16 valid ranges/strides/pointers; both lda andldb<2^39",
+    "maps": "Two current A/B tensor maps encoded inside each ordinary native call or fresh capture; truthful packed7/Dense routing before encoding",
+    "C0_D_alias_active_four_loads_before_four_stores": true,
+    "beta_zero_null_C0_not_read": true,
+    "same_atom_references": {
+      "51": 36,
+      "52": 43
+    },
+    "reference52_native_parentN64_only": true,
+    "new_test_source_whole_inverse_to_previous": "bc1220f20a48df1974fd21361722f1e844242cd059c2fe095dd16e23ce8e2001",
+    "original_FP64_floors_unchanged": true,
+    "whole7P_fixedU_original_FP32_RN_DAG_final_once_cast": true,
+    "ST_constructed_once_scope": "Per CTA/current bank K32 stage, reused by SS products. Does not establish global whole-matrix S/T-once."
+  },
+  "fresh_actual_sync_gate": {
+    "CTA_events": "Initialization bar0; all384 drain nonaligned bar6; all384 final-P publish bar0. Separate nonaligned bar1/count256 per consumer stage.",
+    "producer_raw_wait_before_full_commit": true,
+    "consumer_transform_proxy_fence_before_bar1_before_HGMMA": true,
+    "both_WG_wait0_release_before_bank_reuse": true,
+    "unique_pair2_transform_owners": true,
+    "actual_four_LDS_address_lifetime_pairs_checked": 96,
+    "actual_four_LDS_address_collisions": 0,
+    "no_CALL_or_indirect_jump_or_LDL_STL_in_final_CFG": true
+  },
+  "layout_probe_scope": "Existing actual pinned CuTe four-type CPU probe with byte-flag consumer adapter proves geometry/byte-address mapping; it is not CUDA correctness. Original failed element-offset probe retained; current helper RN and sync independently audited.",
+  "chronological_failures": [
+    {
+      "source_path": "results/psplit_tma_inplace_ss_initial_source_iter47.cu",
+      "scope": "First source460352 frontend compile exit2: absent API / eager unselected layout instantiation. No new machine proof. Earlier mathematical/protocol read is not a compiled API PASS."
+    },
+    {
+      "source_path": "results/psplit_tma_inplace_ss_revision1_source_iter47.cu",
+      "scope": "Rev1 BN32 REG80 STACK64 P16 locals/C7512; BN16 REG72 yet INC64 direction illegal. No launch."
+    },
+    {
+      "source_path": "results/psplit_tma_inplace_ss_revision2_source_iter47.cu",
+      "scope": "Rev2 BN32 still P16 spill;52 conservative quotas legal. No launch."
+    },
+    {
+      "source_path": "solution/megakernel_wgmma_psplit_tma_inplace_ss.cu",
+      "sha256": "733709ff8c820ac708cdb4977946d3312950df864e1e736a22ea437bc992e818",
+      "scope": "Final rev3:51min1 40/128/128;52min2 48/80/80; all actual fresh four-instance gate PASS."
+    }
+  ],
+  "validation_scope": {
+    "GPU_validation_included": false,
+    "performance_included": false,
+    "precision_certification": false,
+    "AutoDense_unchanged": true,
+    "goal_complete": false,
+    "future_CPU_packages_excluded": true,
+    "old_future_files": 241,
+    "new_future_overlap_files": 7
+  },
+  "scope": "CPU source/actual final feeding PTX/ELF/SASS plus actual existing no-kernel Driver attributes, ABI and complete current object/bench/test identity. Analysis code may be reused, all machine facts are freshly bound. No build/extraction/GPU/Git/formal write by this reviewer."
+}

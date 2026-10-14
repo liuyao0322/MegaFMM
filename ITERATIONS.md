@@ -1952,3 +1952,20 @@ Evidence: results/1024_MEGAKERNEL_PSPLIT_TMA_BN16_REPORT.md; small_psplit_tma_bn
 - Actualdefault CASE/PASS/BEGIN 3042/3112/5692, selected50 60/140/204 exits0. Strictoriginal30 18PASS/12FAIL/NF0;30separateDense references give60CASE, full1950codeonlynotexecuted. SAN3actualexit0/errors0/memleak0/racehazardswarnings0; nonmem leaksnull. CROSSATOMref45 rawU84ref+162candidate=246total andGraph40/120fresh are structural scopes, not generalFP64 certification.
 - Quick AKOexit2 thennexttwoowner toolcallslogger/Git9988cce. Main7c10de36/supp0e5f1eb3 andonceidentitya4afcdd2 werefirst-createdafterquickGit/beforeANYfulltiming; sourceGit binds7sources only, laterprestatusGit bindsplans/identity. Prepared9aa CPUfirstexit1 was only inherited SAN alias comparison, preserved; distinctsingle-token adapter is explicitlypostvalidationfalse, originalpreparedtrue/actualfrozencommands preserved. No GPU rerun. Huge-stride10setup_unavailable/status15/zeroallocation-encode-native, no successfulPlanrouteclaims. AutoDense/precisionfalse/goalfalse; no automaticiteration47/public51.
 - Separate next-designCPU geometry package7files: inplaceSS BM64BN32BK32/q40-88-104/I80 is uncompiledhypothesis; BN16 sibling I64 alsounproven.128CTAs for132SM does not prove two-CTAbenefit. No sourceintegration/CuTe/compiler/GPU/numerical/performance proof; geometry actualCPUexit0 only. OriginaloldCPUprecisionfuture remainshistorical andnot certified. Full report: results/1024_MEGAKERNEL_PSPLIT_TMA_BN16_K32_WINDOW_REPORT.md.
+
+### Iter47 — cooperative in-place shared ST, SS WGMMA BN32/BN16
+
+- **Hypothesis:** Eight raw quadrant TMA boxes load into the first four shared final planes, then all256 consumers own disjoint packed pairs and construct final S/T once per CTA/bankstage. This is not global H12 ST-once. Both current A/B maps encode inside each ordinary call. More consumer transform work/bar1 may offset avoiding redundant constructions; no source-only speed claim.
+- **Changes:** ONLY51/52 new shared TU with original RN DAG/final onecast/wholeK sevenP/fixedU/alphaRNbetaFMA unchanged. Initial frontend failures, CPU byte-flag consumer diagnostics and BN32 min2 complete-P spills retained. Final51 min1 q40/128/128,52 min2 q48/80/80; fresh four-instance independent compiled gate binds final source/bin streams, role initialization/actual pool/pending/layout/TMA/sync. Initial-owned preINC zeros remain truthful.
+- **Bench:** One combined serial quick51+52,20warm20calls5groups1fresh. Original gates/exit2 retained; full24 timing required regardless3% gain.
+
+| dtype | native route | Dense us | SW complete us | Dense/SW | original gate |
+|---|---|---:|---:|---:|---|
+| bf16 | megakernel_wgmma_psplit_tma_inplace_ss_64x32 v51 | 13.249600 | 25.084800 | 0.528192 | FAIL |
+| fp16 | megakernel_wgmma_psplit_tma_inplace_ss_64x32 v51 | 10.488000 | 25.331199 | 0.414035 | FAIL |
+| bf16 | megakernel_wgmma_psplit_tma_inplace_ss_64x16 v52 | 13.313600 | 31.312001 | 0.425192 | FAIL |
+| fp16 | megakernel_wgmma_psplit_tma_inplace_ss_64x16 v52 | 10.416000 | 31.011200 | 0.335879 | FAIL |
+
+- **Analysis:** Own SW complete-call latency will rank routes, not Dense denominator changes. Static occupancy API is not measured residency or causality; no precision promotion.
+- **Next:** After this quick source Git checkpoint, create immutable full24 plan and once-complete identity before first full timing:51/52/45/50/39/Lt1 ×two dtype ×ordinary/Graph;20warm100calls5groups3fresh32Lt8GiBrotate1. Six axes×four modes=24, strict30each with shared30Dense refs, SAN3each serial. Fresh H10/H12 remain iteration46 history. Close unique prestatus and independent audits; no automatic48.
+- **Archive:** trajectory/20261014_104756_iter-47/

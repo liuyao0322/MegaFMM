@@ -1,0 +1,6 @@
+{
+  "scope": "Owner CPU probe command-construction before any command/file execution; not compiler, kernel or GPU failure",
+  "actual_tool_exit": 1,
+  "traceback_observed": "Traceback (most recent call last):\n  File \"<stdin>\", line 6, in <module>\nTypeError: 'tuple' object does not support item assignment",
+  "repair": "New distinct frozen runner directly creates complete g++ command without tuple reassignment; no runtime source changes"
+}

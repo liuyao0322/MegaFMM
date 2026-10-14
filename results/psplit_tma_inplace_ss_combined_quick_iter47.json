@@ -1,0 +1,43 @@
+{
+  "schema": "megafmm.iter47.combined-quick.v1",
+  "variants": [
+    51,
+    52
+  ],
+  "quick51_exit": 2,
+  "quick52_exit": 2,
+  "archive": "trajectory/20261014_104756_iter-47",
+  "rows": 4,
+  "second_command": [
+    "bash",
+    "scripts/on_gpu.sh",
+    "./build/megafmm_bench",
+    "--algorithm",
+    "mega",
+    "--mega-variant",
+    "52",
+    "--shapes",
+    "1024,1024,1024",
+    "--dtype",
+    "both",
+    "--rotate-inputs",
+    "1",
+    "--warmup",
+    "20",
+    "--trials",
+    "20",
+    "--groups",
+    "5",
+    "--correct-trials",
+    "1",
+    "--output",
+    "results/psplit_tma_inplace_ss52_quick_original_iter47.csv"
+  ],
+  "protocol": {
+    "warmup": 20,
+    "trials": 20,
+    "groups": 5,
+    "fresh_checks": 1,
+    "ordinary": true
+  }
+}

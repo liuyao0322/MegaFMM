@@ -1,0 +1,178 @@
+{
+  "schema": "megafmm.iter47.inplace-ss-source-delta.v1",
+  "parent_path": "results/psplit_tma_inplace_ss_parent43_source_iter47.cu",
+  "parent_sha256": "9427713174fc2204ec5f9bf5f5b3a4f5bf63d66eed25a8e10b79ed9b2684c723",
+  "new_path": "solution/megakernel_wgmma_psplit_tma_inplace_ss.cu",
+  "new_sha256": "460352b64ba0df249090a3cae97a6117b70a98cfb0947b83b1ca732c0ac7817f",
+  "steps": [
+    {
+      "old": "// Native Mega43 SS BN16 P3+4; actual compiled launch gate required.\n// BM64 BN16 BK32, final shared A7/B7; wholeP3+4 and two banks retained.\n// Hypothesis q64/80/80 and minblocks2; no inherited compiler/resource gate.\n// Original ordered producer final onecast ST and fixedU/alphaRN/betaFMA.\n",
+      "new": "// Native51 BN32 / Native52 BN16 inplace SS TMA, BM64/BK32, two banks.\n// Eight raw quadrant TMA boxes alias first four final planes. Each consumer pair\n// loads all four words before overwriting; final RN ST cast once per bank stage.\n// Both current A/B maps encoded per ordinary call; fresh four-instance CAN required.\n",
+      "count": 1,
+      "before_sha256": "9427713174fc2204ec5f9bf5f5b3a4f5bf63d66eed25a8e10b79ed9b2684c723",
+      "after_sha256": "b3e3cc87cd485981e79a1a6c8f539c487b3aa54c37640957f824de78f123ccff"
+    },
+    {
+      "old": "#include <cute/tensor.hpp>",
+      "new": "#include <cute/tensor.hpp>\n#include <cute/arch/copy_sm90_tma.hpp>\n#include <cute/arch/copy_sm90_desc.hpp>\n#include <cuda.h>",
+      "count": 1,
+      "before_sha256": "b3e3cc87cd485981e79a1a6c8f539c487b3aa54c37640957f824de78f123ccff",
+      "after_sha256": "a4bad754e4c504ee5049d6d9caae40e249a37dfad3cb44d271336654e5ce23af"
+    },
+    {
+      "old": "#include <cstdint>",
+      "new": "#include <cstdint>\n#include <cstddef>",
+      "count": 1,
+      "before_sha256": "a4bad754e4c504ee5049d6d9caae40e249a37dfad3cb44d271336654e5ce23af",
+      "after_sha256": "88f953f5de5b84d93f08d928be6a0101ff5e752dd74f92a221d9ca02de8add0f"
+    },
+    {
+      "old": "psplit_ss_bn16",
+      "new": "psplit_tma_inplace_ss",
+      "count": 87,
+      "before_sha256": "88f953f5de5b84d93f08d928be6a0101ff5e752dd74f92a221d9ca02de8add0f",
+      "after_sha256": "978cb5b1525d46d145c0d537f2ff16a801a4be0c8cc41bfe09739092fba38203"
+    },
+    {
+      "old": "PSplitSSBN16Traits",
+      "new": "PSplitTmaInplaceSSTraits",
+      "count": 4,
+      "before_sha256": "978cb5b1525d46d145c0d537f2ff16a801a4be0c8cc41bfe09739092fba38203",
+      "after_sha256": "a080fff090868079fede1f4b05ddebbdb16d95618803c33e592c7fabace05917"
+    },
+    {
+      "old": "static_assert(Cols == 16,\"this uncompiled SS companion uses typed BN16 only\");",
+      "new": "static_assert(Cols == 16 || Cols == 32,\"typed BN16/BN32 only\");",
+      "count": 1,
+      "before_sha256": "a080fff090868079fede1f4b05ddebbdb16d95618803c33e592c7fabace05917",
+      "after_sha256": "ca95390706177250daf27542bb7dce6117da3c38c73a59d40bee41d1328cbd42"
+    },
+    {
+      "old": "GMMA::Layout_K_SW32_Atom<Element>",
+      "new": "GMMA::Layout_K_SW64_Atom<Element>",
+      "count": 1,
+      "before_sha256": "ca95390706177250daf27542bb7dce6117da3c38c73a59d40bee41d1328cbd42",
+      "after_sha256": "8800a31a331ed82f7b6afff5018d62c7a5d8b5f56cbca7f52dea526e211d500b"
+    },
+    {
+      "old": "  using LayoutB = decltype(tile_to_shape(GMMA::Layout_MN_SW32_Atom<Element>{},\n      make_shape(Int<BN>{},Int<BK>{},Int<7>{})));\n  using Op = std::conditional_t<std::is_same_v<Element,cutlass::half_t>,\n      SM90_64x16x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>,\n      SM90_64x16x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>>;",
+      "new": "  using LayoutB = std::conditional_t<Cols == 32,\n      decltype(tile_to_shape(GMMA::Layout_MN_SW64_Atom<Element>{},make_shape(Int<BN>{},Int<BK>{},Int<7>{}))),\n      decltype(tile_to_shape(GMMA::Layout_MN_SW32_Atom<Element>{},make_shape(Int<BN>{},Int<BK>{},Int<7>{})))>;\n  using Op = decltype(GMMA::ss_op_selector<Element,Element,float,Tile,\n      GMMA::Major::K,GMMA::Major::MN>());",
+      "count": 1,
+      "before_sha256": "8800a31a331ed82f7b6afff5018d62c7a5d8b5f56cbca7f52dea526e211d500b",
+      "after_sha256": "a7ccf0e887d73625afd036631c0881cca038c7c35aa9a41ffba9cf37ccb09cec"
+    },
+    {
+      "old": "struct alignas(128) SharedStorage",
+      "new": "struct alignas(1024) SharedStorage",
+      "count": 1,
+      "before_sha256": "a7ccf0e887d73625afd036631c0881cca038c7c35aa9a41ffba9cf37ccb09cec",
+      "after_sha256": "5ac5899f0357bee378a88458a6543ad410399bb6d9134528b29855931851ec1b"
+    },
+    {
+      "old": "    typename Pipeline::SharedStorage barriers;",
+      "new": "    typename Pipeline::SharedStorage barriers;\n    alignas(8) uint64_t raw_done[Stages];",
+      "count": 1,
+      "before_sha256": "5ac5899f0357bee378a88458a6543ad410399bb6d9134528b29855931851ec1b",
+      "after_sha256": "b0133412aa39bb092b4f7192910b47d523da4b4c339cdcf42ca4f05336f999b2"
+    },
+    {
+      "old": "  static constexpr size_t SharedBytes = sizeof(SharedStorage);",
+      "new": "  static constexpr size_t SharedBytes = sizeof(SharedStorage);\n  static constexpr uint32_t RawBytes = 4*(BM+BN)*BK*sizeof(Element);\n  static_assert(RawBytes == (Cols==32 ? 24576 : 20480),\"all eight raw boxes contribute TX bytes\");\n  static_assert(BM*BK*sizeof(Element)%512==0 && BN*BK*sizeof(Element)%512==0 &&\n      ElementsA*sizeof(Element)%512==0 && BankElements*sizeof(Element)%512==0,\n      \"all absolute SW64/SW32 boxes have zero swizzle pattern offsets\");\n  static_assert(offsetof(SharedStorage,raw_done)>=offsetof(SharedStorage,barriers)+sizeof(typename Pipeline::SharedStorage),\n      \"raw barriers never overlap bank operands or pipeline barriers\");",
+      "count": 1,
+      "before_sha256": "b0133412aa39bb092b4f7192910b47d523da4b4c339cdcf42ca4f05336f999b2",
+      "after_sha256": "f5d613db7ad0dcd0291c5336b6d6071c8f8cc745ea4a5c00a480f3d12781a69a"
+    },
+    {
+      "old": "struct PSplitBN16SSFuture38PackedEight {\n  uint4 bits;\n  CUTE_DEVICE uint16_t raw(int lane) const {\n    const uint32_t word = lane < 2 ? bits.x : lane < 4 ? bits.y\n                                            : lane < 6 ? bits.z : bits.w;\n    return uint16_t(word >> (16 * (lane & 1)));\n  }\n};\n\ntemplate <class Element>\nCUTE_DEVICE PSplitBN16SSFuture38PackedEight psplit_tma_inplace_ss_read_eight(const Element* ptr) {\n  PSplitBN16SSFuture38PackedEight result;\n  asm volatile(\"ld.global.v4.u32 {%0, %1, %2, %3}, [%4];\"\n      : \"=r\"(result.bits.x),\"=r\"(result.bits.y),\n        \"=r\"(result.bits.z),\"=r\"(result.bits.w)\n      : \"l\"(ptr) : \"memory\");\n  return result;\n}\n\ntemplate <class Element>\nCUTE_DEVICE float psplit_tma_inplace_ss_unpack(const PSplitBN16SSFuture38PackedEight& packed,int lane) {\n  return float(Element::bitcast(packed.raw(lane)));\n}\n\nCUTE_DEVICE void psplit_tma_inplace_ss_store_eight(void* ptr,const PSplitBN16SSFuture38PackedEight& v) {\n  const uint32_t address = uint32_t(__cvta_generic_to_shared(ptr));\n  asm volatile(\"st.shared.v4.b32 [%0], {%1, %2, %3, %4};\"\n      :: \"r\"(address),\"r\"(v.bits.x),\"r\"(v.bits.y),\n         \"r\"(v.bits.z),\"r\"(v.bits.w) : \"memory\");\n}\n\ntemplate <class Element>\nCUTE_DEVICE uint32_t psplit_tma_inplace_ss_round_pair(float even,float odd) {\n  cutlass::Array<float,2> source;\n  source[0] = even; source[1] = odd;\n  using Converter = cutlass::NumericArrayConverter<\n      Element,float,2,cutlass::FloatRoundStyle::round_to_nearest>;\n  const auto rounded = Converter{}(source);\n  static_assert(sizeof(rounded) == sizeof(uint32_t),\"one pair is one packed word\");\n  // Same representation cast as the existing cooperative paired converter.\n  return reinterpret_cast<const uint32_t&>(rounded);\n}\n\nCUTE_DEVICE void psplit_tma_inplace_ss_put_word(PSplitBN16SSFuture38PackedEight& out,int pair,uint32_t word) {\n  if (pair == 0) out.bits.x = word;\n  else if (pair == 1) out.bits.y = word;\n  else if (pair == 2) out.bits.z = word;\n  else out.bits.w = word;\n}\n\n// Each task owns eight K elements of one row. All256 tasks are assigned once\n// to128 producer threads. Every original quadrant vector is read exactly once\n// for this CTA/stage and every final seven-slot A element has one writer.\ntemplate <class Element,class SmemA>\nCUTE_DEVICE void psplit_tma_inplace_ss_fill_a(const Problem& p,const Element* A,\n    int64_t row_base,int64_t k_base,int task,SmemA sA) {\n  const int64_t mh = p.m/2, kh = p.k/2;\n  const int row = task/4, k = (task&3)*8;\n  const int64_t gr = row_base+row, gk = k_base+k;\n  const auto a11 = psplit_tma_inplace_ss_read_eight(A + gr*p.lda + gk);\n  const auto a12 = psplit_tma_inplace_ss_read_eight(A + gr*p.lda + gk + kh);\n  const auto a21 = psplit_tma_inplace_ss_read_eight(A + (gr+mh)*p.lda + gk);\n  const auto a22 = psplit_tma_inplace_ss_read_eight(A + (gr+mh)*p.lda + gk + kh);\n  psplit_tma_inplace_ss_store_eight(&sA(row,k,0),a11);\n  psplit_tma_inplace_ss_store_eight(&sA(row,k,1),a12);\n  psplit_tma_inplace_ss_store_eight(&sA(row,k,3),a22);\n  PSplitBN16SSFuture38PackedEight s1{make_uint4(0,0,0,0)},s2{make_uint4(0,0,0,0)};\n  PSplitBN16SSFuture38PackedEight s3{make_uint4(0,0,0,0)},s4{make_uint4(0,0,0,0)};\n  CUTE_UNROLL\n  for (int pair = 0; pair < 4; ++pair) {\n    float f1[2],f2[2],f3[2],f4[2];\n    CUTE_UNROLL\n    for (int j = 0; j < 2; ++j) {\n      const int lane = 2*pair+j;\n      const float x11 = psplit_tma_inplace_ss_unpack<Element>(a11,lane);\n      const float x12 = psplit_tma_inplace_ss_unpack<Element>(a12,lane);\n      const float x21 = psplit_tma_inplace_ss_unpack<Element>(a21,lane);\n      const float x22 = psplit_tma_inplace_ss_unpack<Element>(a22,lane);\n      f1[j] = __fadd_rn(x21,x22);\n      f2[j] = __fsub_rn(f1[j],x11);\n      f3[j] = __fsub_rn(x11,x21);\n      f4[j] = __fsub_rn(x12,f2[j]);\n    }\n    psplit_tma_inplace_ss_put_word(s1,pair,psplit_tma_inplace_ss_round_pair<Element>(f1[0],f1[1]));\n    psplit_tma_inplace_ss_put_word(s2,pair,psplit_tma_inplace_ss_round_pair<Element>(f2[0],f2[1]));\n    psplit_tma_inplace_ss_put_word(s3,pair,psplit_tma_inplace_ss_round_pair<Element>(f3[0],f3[1]));\n    psplit_tma_inplace_ss_put_word(s4,pair,psplit_tma_inplace_ss_round_pair<Element>(f4[0],f4[1]));\n  }\n  psplit_tma_inplace_ss_store_eight(&sA(row,k,2),s4);\n  psplit_tma_inplace_ss_store_eight(&sA(row,k,4),s1);\n  psplit_tma_inplace_ss_store_eight(&sA(row,k,5),s2);\n  psplit_tma_inplace_ss_store_eight(&sA(row,k,6),s3);\n}\n\n// BN16:64 tasks; BN32:128 tasks. All use vector8 original reads/stores.\n// A temporaries are dead before this helper starts; there is no raw shared bank.\ntemplate <class Element,int Cols,class SmemB>\nCUTE_DEVICE void psplit_tma_inplace_ss_fill_b(const Problem& p,const Element* B,\n    int64_t col_base,int64_t k_base,int task,SmemB sB) {\n  constexpr int VectorsPerRow = Cols/8;\n  const int64_t nh = p.n/2, kh = p.k/2;\n  const int k = task/VectorsPerRow, col = (task%VectorsPerRow)*8;\n  const int64_t gk = k_base+k, gc = col_base+col;\n  const auto b11 = psplit_tma_inplace_ss_read_eight(B + gk*p.ldb + gc);\n  const auto b12 = psplit_tma_inplace_ss_read_eight(B + gk*p.ldb + gc + nh);\n  const auto b21 = psplit_tma_inplace_ss_read_eight(B + (gk+kh)*p.ldb + gc);\n  const auto b22 = psplit_tma_inplace_ss_read_eight(B + (gk+kh)*p.ldb + gc + nh);\n  psplit_tma_inplace_ss_store_eight(&sB(col,k,0),b11);\n  psplit_tma_inplace_ss_store_eight(&sB(col,k,1),b21);\n  psplit_tma_inplace_ss_store_eight(&sB(col,k,2),b22);\n  PSplitBN16SSFuture38PackedEight t1{make_uint4(0,0,0,0)},t2{make_uint4(0,0,0,0)};\n  PSplitBN16SSFuture38PackedEight t3{make_uint4(0,0,0,0)},t4{make_uint4(0,0,0,0)};\n  CUTE_UNROLL\n  for (int pair = 0; pair < 4; ++pair) {\n    float f1[2],f2[2],f3[2],f4[2];\n    CUTE_UNROLL\n    for (int j = 0; j < 2; ++j) {\n      const int lane = 2*pair+j;\n      const float x11 = psplit_tma_inplace_ss_unpack<Element>(b11,lane);\n      const float x12 = psplit_tma_inplace_ss_unpack<Element>(b12,lane);\n      const float x21 = psplit_tma_inplace_ss_unpack<Element>(b21,lane);\n      const float x22 = psplit_tma_inplace_ss_unpack<Element>(b22,lane);\n      f1[j] = __fsub_rn(x12,x11);\n      f2[j] = __fsub_rn(x22,f1[j]);\n      f3[j] = __fsub_rn(x22,x12);\n      f4[j] = __fsub_rn(f2[j],x21);\n    }\n    psplit_tma_inplace_ss_put_word(t1,pair,psplit_tma_inplace_ss_round_pair<Element>(f1[0],f1[1]));\n    psplit_tma_inplace_ss_put_word(t2,pair,psplit_tma_inplace_ss_round_pair<Element>(f2[0],f2[1]));\n    psplit_tma_inplace_ss_put_word(t3,pair,psplit_tma_inplace_ss_round_pair<Element>(f3[0],f3[1]));\n    psplit_tma_inplace_ss_put_word(t4,pair,psplit_tma_inplace_ss_round_pair<Element>(f4[0],f4[1]));\n  }\n  psplit_tma_inplace_ss_store_eight(&sB(col,k,3),t4);\n  psplit_tma_inplace_ss_store_eight(&sB(col,k,4),t1);\n  psplit_tma_inplace_ss_store_eight(&sB(col,k,5),t2);\n  psplit_tma_inplace_ss_store_eight(&sB(col,k,6),t3);\n}\n\n\n",
+      "new": "// Raw and final share the same flagged CuTe layout. Each pair task owns\n// its coordinates in all seven planes. Four explicit loads are one asm statement;\n// every mutating store is a later memory-clobbered statement.\nCUTE_DEVICE uint4 psplit_tma_inplace_ss_load_four(const void* p0,const void* p1,\n    const void* p2,const void* p3) {\n  const uint32_t a0=uint32_t(__cvta_generic_to_shared(p0));\n  const uint32_t a1=uint32_t(__cvta_generic_to_shared(p1));\n  const uint32_t a2=uint32_t(__cvta_generic_to_shared(p2));\n  const uint32_t a3=uint32_t(__cvta_generic_to_shared(p3));\n  uint4 r;\n  asm volatile(\"ld.shared.b32 %0,[%4]; ld.shared.b32 %1,[%5]; ld.shared.b32 %2,[%6]; ld.shared.b32 %3,[%7];\"\n      : \"=r\"(r.x),\"=r\"(r.y),\"=r\"(r.z),\"=r\"(r.w)\n      : \"r\"(a0),\"r\"(a1),\"r\"(a2),\"r\"(a3) : \"memory\");\n  return r;\n}\nCUTE_DEVICE void psplit_tma_inplace_ss_store_pair(void* p,uint32_t v) {\n  const uint32_t a=uint32_t(__cvta_generic_to_shared(p));\n  asm volatile(\"st.shared.b32 [%0],%1;\" :: \"r\"(a),\"r\"(v) : \"memory\");\n}\ntemplate<class Element>\nCUTE_DEVICE float psplit_tma_inplace_ss_unpack_word(uint32_t x,int j) {\n  return float(Element::bitcast(uint16_t(x>>(16*j))));\n}\ntemplate<class Element>\nCUTE_DEVICE uint32_t psplit_tma_inplace_ss_round_pair(float x,float y) {\n  cutlass::Array<float,2> f; f[0]=x; f[1]=y;\n  using C=cutlass::NumericArrayConverter<Element,float,2,cutlass::FloatRoundStyle::round_to_nearest>;\n  const auto r=C{}(f);\n  return reinterpret_cast<const uint32_t&>(r);\n}\ntemplate<class Element,class SmemA>\nCUTE_DEVICE void psplit_tma_inplace_ss_transform_a(int task,SmemA a) {\n  const int row=task/16,k=(task%16)*2;\n  const auto raw=psplit_tma_inplace_ss_load_four(&a(row,k,0),&a(row,k,1),&a(row,k,2),&a(row,k,3));\n  float s1[2],s2[2],s3[2],s4[2];\n  CUTE_UNROLL\n  for(int j=0;j<2;++j) {\n    const float a11=psplit_tma_inplace_ss_unpack_word<Element>(raw.x,j);\n    const float a12=psplit_tma_inplace_ss_unpack_word<Element>(raw.y,j);\n    const float a21=psplit_tma_inplace_ss_unpack_word<Element>(raw.z,j);\n    const float a22=psplit_tma_inplace_ss_unpack_word<Element>(raw.w,j);\n    s1[j]=__fadd_rn(a21,a22);\n    s2[j]=__fsub_rn(s1[j],a11);\n    s3[j]=__fsub_rn(a11,a21);\n    s4[j]=__fsub_rn(a12,s2[j]);\n  }\n  // Raw A11/A12/A22 already reside in their unchanged final slots0/1/3.\n  psplit_tma_inplace_ss_store_pair(&a(row,k,4),psplit_tma_inplace_ss_round_pair<Element>(s1[0],s1[1]));\n  psplit_tma_inplace_ss_store_pair(&a(row,k,5),psplit_tma_inplace_ss_round_pair<Element>(s2[0],s2[1]));\n  psplit_tma_inplace_ss_store_pair(&a(row,k,6),psplit_tma_inplace_ss_round_pair<Element>(s3[0],s3[1]));\n  psplit_tma_inplace_ss_store_pair(&a(row,k,2),psplit_tma_inplace_ss_round_pair<Element>(s4[0],s4[1]));\n}\ntemplate<class Element,int Cols,class SmemB>\nCUTE_DEVICE void psplit_tma_inplace_ss_transform_b(int task,SmemB b) {\n  const int k=task/(Cols/2),col=(task%(Cols/2))*2;\n  const auto raw=psplit_tma_inplace_ss_load_four(&b(col,k,0),&b(col,k,1),&b(col,k,2),&b(col,k,3));\n  // All raw loads precede the two bitcopy moves that overwrite raw B12/B21.\n  psplit_tma_inplace_ss_store_pair(&b(col,k,1),raw.z);\n  psplit_tma_inplace_ss_store_pair(&b(col,k,2),raw.w);\n  float t1[2],t2[2],t3[2],t4[2];\n  CUTE_UNROLL\n  for(int j=0;j<2;++j) {\n    const float b11=psplit_tma_inplace_ss_unpack_word<Element>(raw.x,j);\n    const float b12=psplit_tma_inplace_ss_unpack_word<Element>(raw.y,j);\n    const float b21=psplit_tma_inplace_ss_unpack_word<Element>(raw.z,j);\n    const float b22=psplit_tma_inplace_ss_unpack_word<Element>(raw.w,j);\n    t1[j]=__fsub_rn(b12,b11);\n    t2[j]=__fsub_rn(b22,t1[j]);\n    t3[j]=__fsub_rn(b22,b12);\n    t4[j]=__fsub_rn(t2[j],b21);\n  }\n  psplit_tma_inplace_ss_store_pair(&b(col,k,4),psplit_tma_inplace_ss_round_pair<Element>(t1[0],t1[1]));\n  psplit_tma_inplace_ss_store_pair(&b(col,k,5),psplit_tma_inplace_ss_round_pair<Element>(t2[0],t2[1]));\n  psplit_tma_inplace_ss_store_pair(&b(col,k,6),psplit_tma_inplace_ss_round_pair<Element>(t3[0],t3[1]));\n  psplit_tma_inplace_ss_store_pair(&b(col,k,3),psplit_tma_inplace_ss_round_pair<Element>(t4[0],t4[1]));\n}\ntemplate<class Element,int Cols,class SmemA,class SmemB>\nCUTE_DEVICE void psplit_tma_inplace_ss_transform_stage(SmemA a,SmemB b) {\n  unsigned fresh_tid;\n  asm volatile(\"mov.u32 %0, %%tid.x;\" : \"=r\"(fresh_tid) :: \"memory\");\n  const int consumer=int(fresh_tid)-128;\n  CUTE_UNROLL\n  for(int task=consumer;task<64*32/2;task+=256)\n    psplit_tma_inplace_ss_transform_a<Element>(task,a);\n  CUTE_UNROLL\n  for(int task=consumer;task<Cols*32/2;task+=256)\n    psplit_tma_inplace_ss_transform_b<Element,Cols>(task,b);\n  asm volatile(\"fence.proxy.async.shared::cta;\" ::: \"memory\");\n  // All256 own writers must retire generic stores before either SS WG reads.\n  asm volatile(\"barrier.sync 1,256;\" ::: \"memory\");\n}\nstruct alignas(64) TmaInplaceSSDescriptors { CUtensorMap a; CUtensorMap b; };\n\n",
+      "count": 1,
+      "before_sha256": "f5d613db7ad0dcd0291c5336b6d6071c8f8cc745ea4a5c00a480f3d12781a69a",
+      "after_sha256": "fbebc956e2bb2b12391090024c87cc4d42431c22f675a72c81522646b5e79814"
+    },
+    {
+      "old": "void winograd_wgmma_psplit_tma_inplace_ss(Problem p,const Element* __restrict__ A,\n    const Element* __restrict__ B,const float* C0,float* D)",
+      "new": "void winograd_wgmma_psplit_tma_inplace_ss(Problem p,\n    const __grid_constant__ TmaInplaceSSDescriptors maps,const float* C0,float* D)",
+      "count": 1,
+      "before_sha256": "fbebc956e2bb2b12391090024c87cc4d42431c22f675a72c81522646b5e79814",
+      "after_sha256": "4ffc75691cabb8e731bf0a635df68634a6fe3ec7d1b3e9f818bf6c4ff779e297"
+    },
+    {
+      "old": "extern __shared__ __align__(128) unsigned char raw_storage[];",
+      "new": "extern __shared__ __align__(1024) unsigned char raw_storage[];",
+      "count": 1,
+      "before_sha256": "4ffc75691cabb8e731bf0a635df68634a6fe3ec7d1b3e9f818bf6c4ff779e297",
+      "after_sha256": "8ddfeff8df315f5b640bd3d3546139830432c9821514e39402fe8d9c725175ae"
+    },
+    {
+      "old": "  // Initial PipelineAsync construction and full/empty init are collective384.",
+      "new": "  if(tid==0) {\n    CUTE_UNROLL\n    for(int stage=0;stage<T::Stages;++stage) cutlass::arch::initialize_barrier(storage.raw_done[stage],1);\n    cutlass::arch::fence_barrier_init();\n  }\n  // Initial PipelineAsync construction and full/empty init are collective384.",
+      "count": 1,
+      "before_sha256": "8ddfeff8df315f5b640bd3d3546139830432c9821514e39402fe8d9c725175ae",
+      "after_sha256": "ed27793c1835d7d946dd918e0998ccfc9ef58d3c55618a6aedd52dee65b6be03"
+    },
+    {
+      "old": "cutlass::arch::warpgroup_reg_dealloc<64>();",
+      "new": "cutlass::arch::warpgroup_reg_dealloc<48>();",
+      "count": 1,
+      "before_sha256": "ed27793c1835d7d946dd918e0998ccfc9ef58d3c55618a6aedd52dee65b6be03",
+      "after_sha256": "1d7247f98bfb5a7ef45a58c0cc1ae9c659e1fb077ff34c8fd7b0e1383d6174f1"
+    },
+    {
+      "old": "      CUTE_UNROLL\n      for (int task = tid; task < T::BM*T::BK/8; task += T::ProducerThreads)\n        psplit_tma_inplace_ss_fill_a(p,A,row_base,k_base,task,sA);\n      CUTE_UNROLL\n      for (int task = tid; task < T::BN*T::BK/8; task += T::ProducerThreads)\n        psplit_tma_inplace_ss_fill_b<Element,Cols>(p,B,col_base,k_base,task,sB);\n      // Each writer fences its own generic shared stores into WGMMA's async\n      // proxy before its full-barrier arrival. The128th arrival publishes all.\n      asm volatile(\"fence.proxy.async.shared::cta;\" ::: \"memory\");\n",
+      "new": "      auto& raw_done=storage.raw_done[state.index()];\n      if(cute::elect_one_sync() && tid<32) {\n        cutlass::arch::set_barrier_transaction_bytes(raw_done,T::RawBytes);\n        constexpr uint64_t hint=uint64_t(TMA::CacheHintSm90::EVICT_NORMAL);\n        const int k=int(k_base),r=int(row_base),c=int(col_base);\n        const int mh=int(p.m/2),nh=int(p.n/2),kh=int(p.k/2);\n        SM90_TMA_LOAD_2D::copy(&maps.a,raw_done,hint,&sA(0,0,0),k,r);\n        SM90_TMA_LOAD_2D::copy(&maps.a,raw_done,hint,&sA(0,0,1),k+kh,r);\n        SM90_TMA_LOAD_2D::copy(&maps.a,raw_done,hint,&sA(0,0,2),k,r+mh);\n        SM90_TMA_LOAD_2D::copy(&maps.a,raw_done,hint,&sA(0,0,3),k+kh,r+mh);\n        SM90_TMA_LOAD_2D::copy(&maps.b,raw_done,hint,&sB(0,0,0),c,k);\n        SM90_TMA_LOAD_2D::copy(&maps.b,raw_done,hint,&sB(0,0,1),c+nh,k);\n        SM90_TMA_LOAD_2D::copy(&maps.b,raw_done,hint,&sB(0,0,2),c,k+kh);\n        SM90_TMA_LOAD_2D::copy(&maps.b,raw_done,hint,&sB(0,0,3),c+nh,k+kh);\n      }\n      cutlass::arch::wait_barrier(raw_done,state.phase()^1);\n      asm volatile(\"\" ::: \"memory\");\n      // Full publishes RAW operands. Consumerbar1 publishes final ST later.\n",
+      "count": 1,
+      "before_sha256": "1d7247f98bfb5a7ef45a58c0cc1ae9c659e1fb077ff34c8fd7b0e1383d6174f1",
+      "after_sha256": "4dbd8161cba07668dab2e0488fd5d81e924b225f61b6ea940a5917ec59550e1a"
+    },
+    {
+      "old": "    // Conservative source hypothesis, not actual compiler resource evidence.\n    // Source pool need=128*(64+80+80)=28672; hypothetical I80 owns30720,\n    // plus actual role-register bounds and no spills must be proved first.\n    cutlass::arch::warpgroup_reg_alloc<80>();",
+      "new": "    // Source quotas are hypotheses until all four actual machine instances pass.\n    constexpr int WG0Quota=Cols==32 ? 88 : 64;\n    constexpr int WG1Quota=Cols==32 ? 104 : 72;",
+      "count": 1,
+      "before_sha256": "4dbd8161cba07668dab2e0488fd5d81e924b225f61b6ea940a5917ec59550e1a",
+      "after_sha256": "7059058e2ffbffbe92c8dc9faccff707b50cf4ccda87e2e56f851f6933d32009"
+    },
+    {
+      "old": "    if (tid < 256) {\n      clear(q0);",
+      "new": "    if (tid < 256) {\n      cutlass::arch::warpgroup_reg_alloc<WG0Quota>();\n      clear(q0);",
+      "count": 1,
+      "before_sha256": "7059058e2ffbffbe92c8dc9faccff707b50cf4ccda87e2e56f851f6933d32009",
+      "after_sha256": "396868526c2e8bb4529b19a79f7e5ee0a0accacdb31c1fe612d08867af981b13"
+    },
+    {
+      "old": "    } else {\n      clear(q0);",
+      "new": "    } else {\n      cutlass::arch::warpgroup_reg_alloc<WG1Quota>();\n      clear(q0);",
+      "count": 1,
+      "before_sha256": "396868526c2e8bb4529b19a79f7e5ee0a0accacdb31c1fe612d08867af981b13",
+      "after_sha256": "c40a42019f5c26073a18344a86ddb845f633f4acbaf4232174c99e400959fa58"
+    },
+    {
+      "old": "        auto sB = make_tensor(make_smem_ptr(bank+T::ElementsA),typename T::LayoutB{});\n        auto tCrA",
+      "new": "        auto sB = make_tensor(make_smem_ptr(bank+T::ElementsA),typename T::LayoutB{});\n        psplit_tma_inplace_ss_transform_stage<Element,Cols>(sA,sB);\n        auto tCrA",
+      "count": 2,
+      "before_sha256": "c40a42019f5c26073a18344a86ddb845f633f4acbaf4232174c99e400959fa58",
+      "after_sha256": "8d6b97ea763cd7c80b3a0c73c702a559114e1c914f06442538a8783f3ebaf2b1"
+    },
+    {
+      "old": "template <class Element>\nvoid prepare_wgmma_psplit_tma_inplace_ss_typed() {\n  constexpr size_t shared = PSplitTmaInplaceSSTraits<Element,16>::SharedBytes;\n  static_assert(shared > 48*1024 && shared < 227*1024,\"H100 two-bank shared budget\");\n  const auto e = cudaFuncSetAttribute(winograd_wgmma_psplit_tma_inplace_ss<Element,16>,\n      cudaFuncAttributeMaxDynamicSharedMemorySize,int(shared));\n  if (e != cudaSuccess) throw std::runtime_error(std::string(\"Psplit shared opt-in: \")+cudaGetErrorString(e));\n}\n\ntemplate <class Element>\nvoid launch_wgmma_psplit_tma_inplace_ss_typed(const Problem& p,const void* A,const void* B,\n    const float* C0,float* D,cudaStream_t stream) {\n  using T = PSplitTmaInplaceSSTraits<Element,16>;\n  const dim3 grid(unsigned(p.m/(2*T::BM)),unsigned(p.n/(2*T::BN)));\n  winograd_wgmma_psplit_tma_inplace_ss<Element,16><<<grid,T::Threads,T::SharedBytes,stream>>>(\n      p,static_cast<const Element*>(A),static_cast<const Element*>(B),C0,D);\n}\n} // namespace\n\nbool wgmma_psplit_tma_inplace_ss_can_implement(const Problem& p,int configuration) {\n  return configuration == 0 && megakernel_can_implement(p,0) &&\n      p.m%128 == 0 && p.n%64 == 0 && p.k%64 == 0 && p.lda%8 == 0 && p.ldb%8 == 0;\n}\nbool wgmma_psplit_tma_inplace_ss_full_tiles(const Problem& p,const void* A,const void* B,int configuration) {\n  return wgmma_psplit_tma_inplace_ss_can_implement(p,configuration) && A && B &&\n      (reinterpret_cast<uintptr_t>(A)&15) == 0 && (reinterpret_cast<uintptr_t>(B)&15) == 0;\n}\nvoid prepare_wgmma_psplit_tma_inplace_ss(const Problem& p,int configuration) {\n  if (!wgmma_psplit_tma_inplace_ss_can_implement(p,configuration))\n    throw std::invalid_argument(\"unsupported Psplit metadata/configuration\");\n  if (p.dtype == DType::BF16) prepare_wgmma_psplit_tma_inplace_ss_typed<cutlass::bfloat16_t>();\n  else prepare_wgmma_psplit_tma_inplace_ss_typed<cutlass::half_t>();\n}\nvoid launch_wgmma_psplit_tma_inplace_ss(const Problem& p,const void* A,const void* B,\n    const float* C0,float* D,cudaStream_t stream,int configuration) {\n  if (!wgmma_psplit_tma_inplace_ss_can_implement(p,configuration) || !wgmma_psplit_tma_inplace_ss_full_tiles(p,A,B,configuration))\n    throw std::invalid_argument(\"Psplit requires native full tiles and current AB16B\");\n  if (!D || (p.beta != 0.0f && !C0)) throw std::invalid_argument(\"Psplit active output/source is null\");\n  // Native-only helper. Integrating Plan retains common current span/end,\n  // overlap, scalar D/C0 alignment, exact C0==D, certification/range, degenerate,\n  // invalid policy before empty/scale, truthful packed7/Dense fallback and Auto.\n  // prepare is outside timing. Every run/capture reads current original AB;\n  // replay fixed captured addresses still recomputes fresh ST on device.\n  if (p.dtype == DType::BF16) launch_wgmma_psplit_tma_inplace_ss_typed<cutlass::bfloat16_t>(p,A,B,C0,D,stream);\n  else launch_wgmma_psplit_tma_inplace_ss_typed<cutlass::half_t>(p,A,B,C0,D,stream);\n}\n} // namespace megafmm\n",
+      "new": "template<class Element,int Cols>\nvoid prepare_wgmma_psplit_tma_inplace_ss_typed() {\n  constexpr size_t bytes=PSplitTmaInplaceSSTraits<Element,Cols>::SharedBytes;\n  static_assert(bytes>48*1024 && bytes<227*1024,\"H100 two-bank shared budget\");\n  const auto e=cudaFuncSetAttribute(winograd_wgmma_psplit_tma_inplace_ss<Element,Cols>,\n      cudaFuncAttributeMaxDynamicSharedMemorySize,int(bytes));\n  if(e!=cudaSuccess) throw std::runtime_error(std::string(\"Psplit shared opt-in: \")+cudaGetErrorString(e));\n}\ntemplate<int Cols>\nTmaInplaceSSDescriptors make_tma_inplace_ss_descriptors(const Problem& p,const void* A,const void* B) {\n  TmaInplaceSSDescriptors maps{};\n  const auto type=p.dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16 : CU_TENSOR_MAP_DATA_TYPE_FLOAT16;\n  const cuuint64_t adims[2]={cuuint64_t(p.k),cuuint64_t(p.m)},bdims[2]={cuuint64_t(p.n),cuuint64_t(p.k)};\n  const cuuint64_t astride[1]={cuuint64_t(p.lda)*2},bstride[1]={cuuint64_t(p.ldb)*2};\n  const cuuint32_t abox[2]={32,64},bbox[2]={Cols,32},step[2]={1,1};\n  auto e=cuTensorMapEncodeTiled(&maps.a,type,2,const_cast<void*>(A),adims,astride,abox,step,\n      CU_TENSOR_MAP_INTERLEAVE_NONE,CU_TENSOR_MAP_SWIZZLE_64B,CU_TENSOR_MAP_L2_PROMOTION_L2_128B,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);\n  if(e!=CUDA_SUCCESS) throw std::runtime_error(\"Inplace SS A tensor-map encode error=\"+std::to_string(int(e)));\n  e=cuTensorMapEncodeTiled(&maps.b,type,2,const_cast<void*>(B),bdims,bstride,bbox,step,\n      CU_TENSOR_MAP_INTERLEAVE_NONE,Cols==32 ? CU_TENSOR_MAP_SWIZZLE_64B : CU_TENSOR_MAP_SWIZZLE_32B,\n      CU_TENSOR_MAP_L2_PROMOTION_L2_128B,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);\n  if(e!=CUDA_SUCCESS) throw std::runtime_error(\"Inplace SS B tensor-map encode error=\"+std::to_string(int(e)));\n  return maps;\n}\ntemplate<class Element,int Cols>\nvoid launch_wgmma_psplit_tma_inplace_ss_typed(const Problem& p,const void* A,const void* B,\n    const float* C0,float* D,cudaStream_t stream) {\n  using T=PSplitTmaInplaceSSTraits<Element,Cols>;\n  // Both current-input encodes are inside every ordinary call/capture.\n  const auto maps=make_tma_inplace_ss_descriptors<Cols>(p,A,B);\n  const dim3 grid(unsigned(p.m/(2*T::BM)),unsigned(p.n/(2*T::BN)));\n  winograd_wgmma_psplit_tma_inplace_ss<Element,Cols><<<grid,T::Threads,T::SharedBytes,stream>>>(p,maps,C0,D);\n}\n} // namespace\nbool wgmma_psplit_tma_inplace_ss_can_implement(const Problem& p,int columns,int configuration) {\n  return configuration==0 && (columns==32 || columns==16) && megakernel_can_implement(p,0) &&\n      p.m%128==0 && p.n%(2*columns)==0 && p.k%64==0 && p.lda%8==0 && p.ldb%8==0 &&\n      uint64_t(p.lda)<(uint64_t(1)<<39) && uint64_t(p.ldb)<(uint64_t(1)<<39);\n}\nbool wgmma_psplit_tma_inplace_ss_full_tiles(const Problem& p,const void* A,const void* B,int columns,int configuration) {\n  return wgmma_psplit_tma_inplace_ss_can_implement(p,columns,configuration) && A && B &&\n      (reinterpret_cast<uintptr_t>(A)&15)==0 && (reinterpret_cast<uintptr_t>(B)&15)==0;\n}\nvoid prepare_wgmma_psplit_tma_inplace_ss(const Problem& p,int columns,int configuration) {\n  if(!wgmma_psplit_tma_inplace_ss_can_implement(p,columns,configuration)) throw std::invalid_argument(\"unsupported inplace SS metadata/configuration\");\n  if(columns==32) {\n    if(p.dtype==DType::BF16) prepare_wgmma_psplit_tma_inplace_ss_typed<cutlass::bfloat16_t,32>();\n    else prepare_wgmma_psplit_tma_inplace_ss_typed<cutlass::half_t,32>();\n  } else {\n    if(p.dtype==DType::BF16) prepare_wgmma_psplit_tma_inplace_ss_typed<cutlass::bfloat16_t,16>();\n    else prepare_wgmma_psplit_tma_inplace_ss_typed<cutlass::half_t,16>();\n  }\n}\nvoid launch_wgmma_psplit_tma_inplace_ss(const Problem& p,const void* A,const void* B,const float* C0,float* D,\n    cudaStream_t stream,int columns,int configuration) {\n  if(!wgmma_psplit_tma_inplace_ss_full_tiles(p,A,B,columns,configuration)) throw std::invalid_argument(\"inplace SS requires native full tiles/currentAB16B\");\n  if(!D || (p.beta!=0.0f && !C0)) throw std::invalid_argument(\"inplace SS active output/source null\");\n  if(columns==32) {\n    if(p.dtype==DType::BF16) launch_wgmma_psplit_tma_inplace_ss_typed<cutlass::bfloat16_t,32>(p,A,B,C0,D,stream);\n    else launch_wgmma_psplit_tma_inplace_ss_typed<cutlass::half_t,32>(p,A,B,C0,D,stream);\n  } else {\n    if(p.dtype==DType::BF16) launch_wgmma_psplit_tma_inplace_ss_typed<cutlass::bfloat16_t,16>(p,A,B,C0,D,stream);\n    else launch_wgmma_psplit_tma_inplace_ss_typed<cutlass::half_t,16>(p,A,B,C0,D,stream);\n  }\n}\n} // namespace megafmm\n",
+      "count": 1,
+      "before_sha256": "8d6b97ea763cd7c80b3a0c73c702a559114e1c914f06442538a8783f3ebaf2b1",
+      "after_sha256": "bd13935221413781b86ec44acf378bf5b070a9686c5a5928193a69d1528323aa"
+    },
+    {
+      "old": "Shared layout construction uses existing SW32 atoms. Each bank has its",
+      "new": "Shared layout uses SW64 A, SW64 BN32 B or SW32 BN16 B. Each bank has its",
+      "count": 1,
+      "before_sha256": "bd13935221413781b86ec44acf378bf5b070a9686c5a5928193a69d1528323aa",
+      "after_sha256": "de820fd0a597cdad68ca4970d6fd0e840d6bf0dc858d4d8c1cece34076a975e4"
+    },
+    {
+      "old": "Complete all7168 FP32 P words",
+      "new": "Complete all7*BM*BN FP32 P words",
+      "count": 1,
+      "before_sha256": "de820fd0a597cdad68ca4970d6fd0e840d6bf0dc858d4d8c1cece34076a975e4",
+      "after_sha256": "460352b64ba0df249090a3cae97a6117b70a98cfb0947b83b1ca732c0ac7817f"
+    }
+  ],
+  "scope": "new inplace TMA raw-to-final shared SS template; original perP math/wholeK/tailU from parent43, no compiled or GPU proof"
+}

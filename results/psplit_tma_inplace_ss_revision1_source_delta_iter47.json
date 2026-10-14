@@ -1,0 +1,50 @@
+{
+  "schema": "megafmm.iter47.revision1-interface-layout-asm-adapter.v1",
+  "old_source_sha256": "460352b64ba0df249090a3cae97a6117b70a98cfb0947b83b1ca732c0ac7817f",
+  "new_source_sha256": "295615ea50e42d57ca0ce45c1c5b826ebfccd28faa2664b7b0ee70ef8e2a7831",
+  "operations": [
+    {
+      "old": "  using LayoutB = std::conditional_t<Cols == 32,\n      decltype(tile_to_shape(GMMA::Layout_MN_SW64_Atom<Element>{},make_shape(Int<BN>{},Int<BK>{},Int<7>{}))),\n      decltype(tile_to_shape(GMMA::Layout_MN_SW32_Atom<Element>{},make_shape(Int<BN>{},Int<BK>{},Int<7>{})))>;",
+      "new": "  using BAtom = std::conditional_t<Cols == 32,\n      GMMA::Layout_MN_SW64_Atom<Element>,GMMA::Layout_MN_SW32_Atom<Element>>;\n  using LayoutB = decltype(tile_to_shape(BAtom{},make_shape(Int<BN>{},Int<BK>{},Int<7>{})));",
+      "count": 1,
+      "before_sha256": "460352b64ba0df249090a3cae97a6117b70a98cfb0947b83b1ca732c0ac7817f",
+      "after_sha256": "aade1ce9d423c66a7d592ddc15d8377b8bbb4ee4a2baf19e1fed6bf04691a1e2"
+    },
+    {
+      "old": "cutlass::arch::initialize_barrier(storage.raw_done[stage],1)",
+      "new": "cutlass::arch::ClusterTransactionBarrier::init(&storage.raw_done[stage],1)",
+      "count": 1,
+      "before_sha256": "aade1ce9d423c66a7d592ddc15d8377b8bbb4ee4a2baf19e1fed6bf04691a1e2",
+      "after_sha256": "b0049b710ac92bff0631437e9de81f779c5a54c15a9d3330b1396ba93cf999cb"
+    },
+    {
+      "old": "auto& raw_done=storage.raw_done[state.index()];",
+      "new": "auto* raw_done=&storage.raw_done[state.index()];",
+      "count": 1,
+      "before_sha256": "b0049b710ac92bff0631437e9de81f779c5a54c15a9d3330b1396ba93cf999cb",
+      "after_sha256": "23a4f5bcd133054ebbf9da2c6e428343240b515481c3778f1c82e06c1be4367b"
+    },
+    {
+      "old": "cutlass::arch::set_barrier_transaction_bytes(raw_done,T::RawBytes)",
+      "new": "cutlass::arch::ClusterTransactionBarrier::arrive_and_expect_tx(raw_done,T::RawBytes)",
+      "count": 1,
+      "before_sha256": "23a4f5bcd133054ebbf9da2c6e428343240b515481c3778f1c82e06c1be4367b",
+      "after_sha256": "8a995da8712258d3052834d91f87d3e8d0f02d4aeda541ff62639164c6c5dcc0"
+    },
+    {
+      "old": "cutlass::arch::wait_barrier(raw_done,state.phase()^1)",
+      "new": "cutlass::arch::ClusterTransactionBarrier::wait(raw_done,state.phase()^1u)",
+      "count": 1,
+      "before_sha256": "8a995da8712258d3052834d91f87d3e8d0f02d4aeda541ff62639164c6c5dcc0",
+      "after_sha256": "60d52c53def7cc2fc1b7bb854469e3eb015e1819a5fcc31d76bdc13309ff49e8"
+    },
+    {
+      "old": ": \"=r\"(r.x),\"=r\"(r.y),\"=r\"(r.z),\"=r\"(r.w)",
+      "new": ": \"=&r\"(r.x),\"=&r\"(r.y),\"=&r\"(r.z),\"=&r\"(r.w)",
+      "count": 1,
+      "before_sha256": "60d52c53def7cc2fc1b7bb854469e3eb015e1819a5fcc31d76bdc13309ff49e8",
+      "after_sha256": "295615ea50e42d57ca0ce45c1c5b826ebfccd28faa2664b7b0ee70ef8e2a7831"
+    }
+  ],
+  "scope": "pinned ClusterTransactionBarrier API/pointer, lazyconditional B atom and explicit early-clobber asm outputs only; no geometry/math/ST DAG or protocol change"
+}
