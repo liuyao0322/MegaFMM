@@ -1,0 +1,471 @@
+{
+  "scope": "Private BM64 BN64 BK64 source derivation: widen N tile, B/P/tail coordinates and native N guard; source quotas40/224/240 with separate consumer INC before clear; preserve rawA4 TMA/math/order/phase/publication/host encode.",
+  "parent_path": "/share/home/liuyao/workspace/MegaFMM/solution/megakernel_wgmma_psplit_selective_tma_a.cu",
+  "parent_sha256": "3c84b3104bf65fa90b6b3373343aa12d10b16bbe4d8c1859cc3e1d6c87958197",
+  "candidate_path": "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_tma_bn64_root_future42_candidate.cu",
+  "candidate_sha256": "d8d4df9bc1995878d4615b4ed31daecef31cb528bc01ad215b066bd8fa3d67a3",
+  "replacement_count": 21,
+  "ordered_exact_replacements": [
+    {
+      "old": "// Iteration41 selective rawA4 TMA, B transforms remain SIMT; explicit variant45.\n",
+      "new": "// Private CPU-prepared BN64 TMA hypothesis derived from frozen45; no public variant.\n",
+      "count": 1,
+      "old_positions": [
+        0
+      ],
+      "new_positions": [
+        0
+      ],
+      "before_sha256": "3c84b3104bf65fa90b6b3373343aa12d10b16bbe4d8c1859cc3e1d6c87958197",
+      "after_sha256": "2d172f949dd0000caf403b7b3d0c8c56f5b185627c42256431a127d52deaebe5"
+    },
+    {
+      "old": "// BM64/BN32/BK64, producer64/consumer192/192; actual allocation must be proven.\n",
+      "new": "// BM64/BN64/BK64, producer40/WG0 224/WG1 240; fresh actual allocation proof required.\n",
+      "count": 1,
+      "old_positions": [
+        86
+      ],
+      "new_positions": [
+        86
+      ],
+      "before_sha256": "2d172f949dd0000caf403b7b3d0c8c56f5b185627c42256431a127d52deaebe5",
+      "after_sha256": "afcbdc87682b6283b5bb8ee4e1a1b72d3862b5f7d7232939a1f15c1153764b4c"
+    },
+    {
+      "old": "psplit_selective_tma_a",
+      "new": "psplit_tma_bn64_root_future42",
+      "count": 81,
+      "old_positions": [
+        1057,
+        5762,
+        6253,
+        6588,
+        6737,
+        7091,
+        7616,
+        7938,
+        8212,
+        8683,
+        9424,
+        9498,
+        9572,
+        9679,
+        9826,
+        9902,
+        9978,
+        10054,
+        10311,
+        10493,
+        10569,
+        10645,
+        10857,
+        10938,
+        11019,
+        11311,
+        11648,
+        11721,
+        11799,
+        11877,
+        11943,
+        11999,
+        12055,
+        12450,
+        12524,
+        12598,
+        12672,
+        12872,
+        12912,
+        12974,
+        13014,
+        13076,
+        13116,
+        13178,
+        13218,
+        13282,
+        13337,
+        13392,
+        13447,
+        13760,
+        14382,
+        17063,
+        21110,
+        22491,
+        24533,
+        24614,
+        24695,
+        24792,
+        25424,
+        25508,
+        25592,
+        25676,
+        25760,
+        25844,
+        25928,
+        26928,
+        27180,
+        28396,
+        28714,
+        28873,
+        29184,
+        29299,
+        29479,
+        29553,
+        29730,
+        29804,
+        29873,
+        30025,
+        30089,
+        30772,
+        30862
+      ],
+      "new_positions": [
+        1057,
+        5769,
+        6267,
+        6609,
+        6765,
+        7126,
+        7658,
+        7987,
+        8268,
+        8746,
+        9494,
+        9575,
+        9656,
+        9770,
+        9924,
+        10007,
+        10090,
+        10173,
+        10437,
+        10626,
+        10709,
+        10792,
+        11011,
+        11099,
+        11187,
+        11486,
+        11830,
+        11910,
+        11995,
+        12080,
+        12153,
+        12216,
+        12279,
+        12681,
+        12762,
+        12843,
+        12924,
+        13131,
+        13178,
+        13247,
+        13294,
+        13363,
+        13410,
+        13479,
+        13526,
+        13597,
+        13659,
+        13721,
+        13783,
+        14103,
+        14732,
+        17420,
+        21474,
+        22862,
+        24911,
+        24999,
+        25087,
+        25191,
+        25830,
+        25921,
+        26012,
+        26103,
+        26194,
+        26285,
+        26376,
+        27383,
+        27642,
+        28865,
+        29190,
+        29356,
+        29674,
+        29796,
+        29983,
+        30064,
+        30248,
+        30329,
+        30405,
+        30564,
+        30635,
+        31325,
+        31422
+      ],
+      "before_sha256": "afcbdc87682b6283b5bb8ee4e1a1b72d3862b5f7d7232939a1f15c1153764b4c",
+      "after_sha256": "6dfea6fe65d8b33eaf23c9e1a083eefa2dc81d330e4545ba7a1c5e08b4586ab4"
+    },
+    {
+      "old": "PSplitSelectiveTmaATraits",
+      "new": "PSplitTmaBN64Traits",
+      "count": 4,
+      "old_positions": [
+        2805,
+        14901,
+        27451,
+        29011
+      ],
+      "new_positions": [
+        2805,
+        14895,
+        27439,
+        28993
+      ],
+      "before_sha256": "6dfea6fe65d8b33eaf23c9e1a083eefa2dc81d330e4545ba7a1c5e08b4586ab4",
+      "after_sha256": "d0b7c03ce06e4362d2d00abe629fac5bf80c80ebb7f136709ad1194615eaedb8"
+    },
+    {
+      "old": "SelectiveTmaADescriptor",
+      "new": "TmaBN64Descriptor",
+      "count": 7,
+      "old_positions": [
+        14355,
+        14422,
+        14463,
+        14526,
+        14791,
+        27996,
+        28087
+      ],
+      "new_positions": [
+        14355,
+        14416,
+        14451,
+        14508,
+        14767,
+        27966,
+        28051
+      ],
+      "before_sha256": "d0b7c03ce06e4362d2d00abe629fac5bf80c80ebb7f136709ad1194615eaedb8",
+      "after_sha256": "0a6223cfce45d8b7d120b4b918ef3bd47d28d2e30a8b126f89614934459c3a08"
+    },
+    {
+      "old": "make_selective_tmaA_descriptor",
+      "new": "make_tma_bn64_descriptor",
+      "count": 2,
+      "old_positions": [
+        27984,
+        29002
+      ],
+      "new_positions": [
+        27984,
+        28996
+      ],
+      "before_sha256": "0a6223cfce45d8b7d120b4b918ef3bd47d28d2e30a8b126f89614934459c3a08",
+      "after_sha256": "44e030fd82c03781ce40d23397b916dfe3ddafe3b07e3f009348a089d3160bc2"
+    },
+    {
+      "old": "#include \"megafmm/kernels.h\"\n",
+      "new": "#include \"megafmm/kernels.h\"\n#include \"psplit_tma_bn64_root_future42_api.h\"\n",
+      "count": 1,
+      "old_positions": [
+        327
+      ],
+      "new_positions": [
+        327
+      ],
+      "before_sha256": "44e030fd82c03781ce40d23397b916dfe3ddafe3b07e3f009348a089d3160bc2",
+      "after_sha256": "c04db1a623492b77400727f88af5a25c241b9566f4341bc27aa9528d69a92b38"
+    },
+    {
+      "old": "namespace megafmm {\n",
+      "new": "namespace megafmm {\nnamespace tma_bn64_future42 {\n",
+      "count": 1,
+      "old_positions": [
+        828
+      ],
+      "new_positions": [
+        828
+      ],
+      "before_sha256": "c04db1a623492b77400727f88af5a25c241b9566f4341bc27aa9528d69a92b38",
+      "after_sha256": "eeb927fa39f62f237c4467cdb118bae8005b3eb37dfaf5c8bc723c965a447bd9"
+    },
+    {
+      "old": "} // namespace megafmm\n",
+      "new": "} // namespace tma_bn64_future42\n} // namespace megafmm\n",
+      "count": 1,
+      "old_positions": [
+        31496
+      ],
+      "new_positions": [
+        31496
+      ],
+      "before_sha256": "eeb927fa39f62f237c4467cdb118bae8005b3eb37dfaf5c8bc723c965a447bd9",
+      "after_sha256": "696fb7128ef13759d3a6ecbbcfc47a0095c485f98ce56a49435c2166c46cf7f1"
+    },
+    {
+      "old": "static_assert(Cols == 32,\"this prototype uses BN32 only\");",
+      "new": "static_assert(Cols == 64,\"this private hypothesis uses BN64 only\");",
+      "count": 1,
+      "old_positions": [
+        2906
+      ],
+      "new_positions": [
+        2906
+      ],
+      "before_sha256": "696fb7128ef13759d3a6ecbbcfc47a0095c485f98ce56a49435c2166c46cf7f1",
+      "after_sha256": "a8e3a2c78feb92e6044dbefb22796aebabaca59371f8dcfa31b944717099cce4"
+    },
+    {
+      "old": "// BK64/BN32 has256 B vector tasks; the finalB7 onecast DAG is unchanged.\n",
+      "new": "// BK64/BN64 has512 B vector tasks; the finalB7 onecast DAG is unchanged.\n",
+      "count": 1,
+      "old_positions": [
+        11352
+      ],
+      "new_positions": [
+        11352
+      ],
+      "before_sha256": "a8e3a2c78feb92e6044dbefb22796aebabaca59371f8dcfa31b944717099cce4",
+      "after_sha256": "7aabe08735f9a47502f8cd58c035adc6fefc1c582f0b2388af1430344e539836"
+    },
+    {
+      "old": "return product*2048+row*32+(col^xor_mask);",
+      "new": "return product*4096+row*64+(col^xor_mask);",
+      "count": 1,
+      "old_positions": [
+        14303
+      ],
+      "new_positions": [
+        14303
+      ],
+      "before_sha256": "7aabe08735f9a47502f8cd58c035adc6fefc1c582f0b2388af1430344e539836",
+      "after_sha256": "4743ff066ddf74bbffeb1f59938ae1f3fae1bc472d41c9b639f8492dca2dd019"
+    },
+    {
+      "old": "cutlass::arch::warpgroup_reg_dealloc<64>();",
+      "new": "cutlass::arch::warpgroup_reg_dealloc<40>();",
+      "count": 1,
+      "old_positions": [
+        16090
+      ],
+      "new_positions": [
+        16090
+      ],
+      "before_sha256": "4743ff066ddf74bbffeb1f59938ae1f3fae1bc472d41c9b639f8492dca2dd019",
+      "after_sha256": "e2c5d69211e90911598d6bafaac1cf03c8fc4c4cf098456d8d4fe7cfb38edd3d"
+    },
+    {
+      "old": "static_assert(size(q0) == 16,\"each assigned full P has 16 floats/thread\");",
+      "new": "static_assert(size(q0) == 32,\"each assigned full P has 32 floats/thread\");",
+      "count": 1,
+      "old_positions": [
+        19555
+      ],
+      "new_positions": [
+        19555
+      ],
+      "before_sha256": "e2c5d69211e90911598d6bafaac1cf03c8fc4c4cf098456d8d4fe7cfb38edd3d",
+      "after_sha256": "57cd5e659abebc4b369e24b2904b7d91dd3bd363775bc9014d8a0dcf676b404e"
+    },
+    {
+      "old": "    cutlass::arch::warpgroup_reg_alloc<192>();\n",
+      "new": "",
+      "count": 1,
+      "old_positions": [
+        20998
+      ],
+      "new_positions": [
+        20998
+      ],
+      "before_sha256": "57cd5e659abebc4b369e24b2904b7d91dd3bd363775bc9014d8a0dcf676b404e",
+      "after_sha256": "3c8e51f40306dabd584834f387456bbbdd4c7c3c8f0c4ce5f99c48a69a1b32e2"
+    },
+    {
+      "old": "    if (tid < 256) {\n      clear(q0); clear(q1); clear(q2);",
+      "new": "    if (tid < 256) {\n      cutlass::arch::warpgroup_reg_alloc<224>();\n      clear(q0); clear(q1); clear(q2);",
+      "count": 1,
+      "old_positions": [
+        20998
+      ],
+      "new_positions": [
+        20998
+      ],
+      "before_sha256": "3c8e51f40306dabd584834f387456bbbdd4c7c3c8f0c4ce5f99c48a69a1b32e2",
+      "after_sha256": "e2cdaf3ddec6d8224fb0ed34acb896c576c1c197db9e25c66f2bcff37bf4e0b0"
+    },
+    {
+      "old": "    } else {\n      clear(q0); clear(q1); clear(q2);",
+      "new": "    } else {\n      cutlass::arch::warpgroup_reg_alloc<240>();\n      clear(q0); clear(q1); clear(q2);",
+      "count": 1,
+      "old_positions": [
+        22426
+      ],
+      "new_positions": [
+        22426
+      ],
+      "before_sha256": "e2cdaf3ddec6d8224fb0ed34acb896c576c1c197db9e25c66f2bcff37bf4e0b0",
+      "after_sha256": "11a387ddf58fa6d15c9b3a2aa7d9727c951d63b6ff093b5cf716139bf818b3d6"
+    },
+    {
+      "old": "// Complete all14336 FP32 P words before any generic U load across WGs.",
+      "new": "// Complete all28672 FP32 P words before any generic U load across WGs.",
+      "count": 1,
+      "old_positions": [
+        25367
+      ],
+      "new_positions": [
+        25367
+      ],
+      "before_sha256": "11a387ddf58fa6d15c9b3a2aa7d9727c951d63b6ff093b5cf716139bf818b3d6",
+      "after_sha256": "b5fe633e0481b9570b99e679628d9ebfde99b1353b15589e7c3a58043d52c789"
+    },
+    {
+      "old": "PSplitTmaBN64Traits<Element,32>",
+      "new": "PSplitTmaBN64Traits<Element,64>",
+      "count": 2,
+      "old_positions": [
+        27546,
+        29082
+      ],
+      "new_positions": [
+        27546,
+        29082
+      ],
+      "before_sha256": "b5fe633e0481b9570b99e679628d9ebfde99b1353b15589e7c3a58043d52c789",
+      "after_sha256": "b60a7b5583c4eda5b7526d5b164e70d93aeef7bfa6263eb23f53208124aa0c8a"
+    },
+    {
+      "old": "winograd_wgmma_psplit_tma_bn64_root_future42<Element,32>",
+      "new": "winograd_wgmma_psplit_tma_bn64_root_future42<Element,64>",
+      "count": 2,
+      "old_positions": [
+        27716,
+        29234
+      ],
+      "new_positions": [
+        27716,
+        29234
+      ],
+      "before_sha256": "b60a7b5583c4eda5b7526d5b164e70d93aeef7bfa6263eb23f53208124aa0c8a",
+      "after_sha256": "7b04af9637485cf342ae916447307b509d7ab4379194a6a114d965ac1cf36db5"
+    },
+    {
+      "old": "p.m%128 == 0 && p.n%64 == 0 && p.k%128 == 0",
+      "new": "p.m%128 == 0 && p.n%128 == 0 && p.k%128 == 0",
+      "count": 1,
+      "old_positions": [
+        29567
+      ],
+      "new_positions": [
+        29567
+      ],
+      "before_sha256": "7b04af9637485cf342ae916447307b509d7ab4379194a6a114d965ac1cf36db5",
+      "after_sha256": "d8d4df9bc1995878d4615b4ed31daecef31cb528bc01ad215b066bd8fa3d67a3"
+    }
+  ],
+  "actual_CUDA_compilation": null,
+  "actual_GPU": null,
+  "actual_performance": null,
+  "formal_public_registration": false
+}

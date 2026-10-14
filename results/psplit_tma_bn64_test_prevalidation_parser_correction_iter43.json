@@ -1,0 +1,9 @@
+{
+  "prevalidation_CPU_parser_correction_only": true,
+  "old_runner_sha256": "b5905f614395c787bb9ae465925b1c169cf80462fcd6dada5e2028d9ee9adf41",
+  "new_runner_sha256": "5e96f69dc86bb932d33406b7aef2301c6e368c4188fe6601db6fbf549cfaeca6",
+  "old": "    stage_cases = [row for row in actual if row['shape'][:2] == [128, 128] and row['shape'][2] in ks and row['actual_route'] == native]",
+  "new": "    # The first14 ordered cases per dtype are stages; the separate null-C0\n    # K384 case shares MN128,128 and must not inflate the stage domain.\n    stage_cases = [row for index, row in enumerate(actual) if\n                   index % len(basic['basic_cases_per_dtype']) < len(ks) and\n                   row['shape'][:2] == [128, 128] and row['shape'][2] in ks and row['actual_route'] == native]",
+  "source_expected_history_bytes_unchanged": true,
+  "actual_generator_run_not_called": true
+}

@@ -81,6 +81,7 @@ struct Policy {
   // 44=BK64 RS-A single owning stageA; perP fourK16 commit/wait0 before A reuse.
   // 45=BK64 RS-A rawA4 TMA/finalB7 SIMT; one currentA map per run, A lda<2^39.
   // 46=SW128 SIMT rawA control; same one unused currentA map encode and native domain.
+  // 47=BN64 BK64 RS-A rawA4 TMA/finalB7 SIMT; native parentM/N/K multiples128.
   int mega_variant=0;
 };
 class Plan {

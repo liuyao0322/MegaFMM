@@ -1,0 +1,38 @@
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 91%] Built target megafmm
+gmake[2]: Warning: File 'CMakeFiles/test_correctness.dir/compiler_depend.make' has modification time 0.0055 s in the future
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake[2]: Warning: File 'CMakeFiles/megafmm_bench.dir/compiler_depend.make' has modification time 0.0043 s in the future
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+[ 95%] Built target test_correctness
+[100%] Built target megafmm_bench
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=dense config=dense:id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=6;bound_candidate=2/16;tuned_candidate=2;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.014989;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=none
+CHECK 1024,1024,1024 bf16 trial=0 dense_eF=8.51899e-07 solution_eF=0.00600975 gate=0.00100256 pass=0
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.0263664 wall_ms=0.0271396
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0155024 wall_ms=0.0160804
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.014648 wall_ms=0.0152371
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.0263472 wall_ms=0.0269203
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.02636 wall_ms=0.0269307
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.0149712 wall_ms=0.0155426
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.0263872 wall_ms=0.0269879
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.0147936 wall_ms=0.0153891
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.0146448 wall_ms=0.0152018
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.026264 wall_ms=0.0268398
+TUNE shape=1024,1024,1024 dtype=fp16 case=dense config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010730;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=none
+CHECK 1024,1024,1024 fp16 trial=0 dense_eF=1.24851e-06 solution_eF=0.000751819 gate=0.000103746 pass=0
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.026464 wall_ms=0.0270979
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.010504 wall_ms=0.0110797
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.0106304 wall_ms=0.0112017
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.0265872 wall_ms=0.0271486
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.0265248 wall_ms=0.0270925
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.0105696 wall_ms=0.0111272
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.0264752 wall_ms=0.0270555
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.0105712 wall_ms=0.0111373
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.0105792 wall_ms=0.011129
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.0264368 wall_ms=0.026997
+srun: error: g08: task 0: Exited with exit code 2

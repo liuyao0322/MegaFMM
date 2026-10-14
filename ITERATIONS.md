@@ -1848,3 +1848,18 @@ Full samebinary20 rows45/39/44/36/Lt1,20warm100calls5groups3fresh32Lt8GiB. Origi
 #### Iter42 mandatory full1024 closure
 
 Mandatory samebinary20 rows46/45/39/36/Lt1,20warm100calls5groups3fresh32Lt8GiB completed with all five groups/authorityCSV retained. Original60/60 fresh numericalFAIL/NF0 and ten innerexit2 remain. SW128 SIMT46 with deliberately unused currentA map encode is slower than selectiveTMA45 by ordinary BF33.0511%/FP31.6073%, Graph35.6808%/31.7414%;45 remains fastest measured native. Current45 ordinary Dense/SW0.696120/0.558143 and Graph0.668873/0.553662 remain below1, original precision still fails. Strict30=18PASS12FAIL/NF0, SAN3 actualexit0 with zero summaries, structural default/target PASS; these do not certify FP64 floors. Full1830 code domain unexecuted. CPU-only coverage/metadata adapter failures and exact narrow corrections are archived without changing source/bin/raw or repeating GPU. Full primary report binds event/100-call batchwall scope, no isolated physical-cause or residency claim. AutoDense/goalactive; no automatic next iteration.
+
+### Iter43 — BN64 selective rawA TMA with whole-stage RS operands
+
+- **Hypothesis:** Increase BN32 toBN64 while retaining four rawA SW128 TMA boxes, SIMT finalB7, currentA map encode inside each ordinary call. The doubled N tile changes B/P/tail perCTA and grid shape; no isolated causality or residency claim.
+- **Changes:** ONLY47, BM64BN64BK64/2banks/wholeP3+4/fourascendingK16/finalonecast/fixedU/RNalphaFMA/AutoDense and original floors retained. Initial40/224/240 actual STACK128spill168; fresh stage-local address reconstruction reduced STACK/spill to8, then48/216/240 same64512 pool eliminated spill. Every failed source/build/SASS is archived; final new compiled gate required before first47 kernel.
+- **Bench:** quick20warm/20calls/5groups/1fresh, screen only; failed numerical results retained.
+
+| M,N,K | dtype | route | mode | Dense us | complete SW us | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | megakernel_wgmma_psplit_tma_bn64_64x64 v47 | launch | 14.793600 | 26.359999 | 0.561214 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_psplit_tma_bn64_64x64 v47 | launch | 10.571200 | 26.475200 | 0.399287 | FAIL |
+
+- **Analysis:** Own complete SW latency ranks code changes; Dense timing variation and machine/fixture/SAN PASS do not certify original FP64 numerical accuracy.
+- **Next:** Mandatory samebinaryfull20 for47/45/39/36/Lt1,100calls5groups3fresh irrespectivequick3%, originalstrict30 andserialSAN3, coverage/profile/report/twoindependentfinal audits.
+- **Archive:** trajectory/20261014_081904_iter-43/
