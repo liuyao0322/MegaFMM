@@ -82,7 +82,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }
   __syncthreads();
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_16,Int<BK>>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW32_Atom<T>{},Shape<_16,Int<BK>>{});
   if(tid==0){
     for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step);
@@ -232,7 +232,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   uint32_t box[3]={uint32_t(is_a ? 64:BN),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};
   auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
       transformed ? 3:2,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
-      is_a ? CU_TENSOR_MAP_SWIZZLE_128B:CU_TENSOR_MAP_SWIZZLE_64B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+      is_a ? CU_TENSOR_MAP_SWIZZLE_128B:CU_TENSOR_MAP_SWIZZLE_32B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
   if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map status "+std::to_string(int(result)));
 }
 } // namespace

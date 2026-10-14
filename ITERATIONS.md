@@ -251,6 +251,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 172 | N16 shared budget correction | 0.0000 | 0.000000 | experiment |
 
+| 173 | Measure corrected N16 asynchronous two-CTA pipeline | 0.6760 | 0.016503 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2322,3 +2324,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Compile failed at MN SW64 atom minimum32 rows versus N16. No performance data; must use MN SW32 atom and matching TMA32B swizzle, as113.
 - **Next:** Correct B shared layout and tensor-map swizzle then run same candidate.
 - **Archive:** trajectory/20261015_032724_iter-172/
+
+### Iter 173 — Measure corrected N16 asynchronous two-CTA pipeline
+
+- **Hypothesis:** Two resident CTA pipelines hide latency with N16 and BK256.
+- **Changes:** Correct MN shared atom toSW32 and B tensor map swizzle32B; all171architecture otherwise unchanged.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.016503 ms; mean speedup=0.6760x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012288 | 0.016409 | 0.7489 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010011 | 0.016597 | 0.6032 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about16.41us FP16 about16.60us, slower than162 despite correct baseline errors/nonfinite0. Smaller N doubles global CTA supply traffic and publication participation; no occupancy-based win. Config string still stale162geometry, actual source is N16 and shared90240.
+- **Next:** Restore162; test shortened barrier suspension hint.
+- **Archive:** trajectory/20261015_032756_iter-173/
