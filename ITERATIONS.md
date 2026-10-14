@@ -323,6 +323,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 208 | Restore validated162 for sustained-goal checkpoint | 0.9738 | 0.011423 | experiment |
 
+| 209 | Local in-place transforms with FP32 partial leaves | 0.5431 | 0.020465 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2968,3 +2970,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 Restored selected162 verbatim and measured BF/FP11.32544/11.52032us against Dense12.29984/9.92480us. BF wins, FP still needs1.59552us or13.85percent SW-time reduction. Original FP64 gates fail both; AutoDense. No current-floor claim, no exhausted-directions claim, no goal completion.
 
 New source-specific stage diagnostics and raw profiles, candidate summaries, invalid-run exclusions, original full-trial results, and next-state recorded at trajectory/20261015_optimization-goal-checkpoint-208/REPORT.md and state.json. Next iteration209.
+
+### Iter 209 — Local in-place transforms with FP32 partial leaves
+
+- **Hypothesis:** Local raw-tile reuse removes global S/T publication while workspace partial leaves avoid seven live accumulators and preserve K order
+- **Changes:** One K256 raw tile221312Bshared,608 transform workers, B-then-A transform after raw P1/P2 and P4;7MiB coalesced FP32 partial workspace; static private PTX TC chain; ordinary launch and two current tensor maps
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.020465 ms; mean speedup=0.5431x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012263 | 0.020621 | 0.5947 | 0.866674 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009981 | 0.020310 | 0.4915 | 0.866668 | 0 |
+
+- **Analysis:** Build succeeds but numerical error about0.865 for both dtypes, far above expected seven-product error. This is an implementation error, not the accepted approximation. All20us timings excluded from performance comparison pending correction.
+- **Next:** Diagnose quadrant-specific failure and shared live-range ordering, correct before judging the architecture
+- **Archive:** trajectory/20261015_042205_iter-209/

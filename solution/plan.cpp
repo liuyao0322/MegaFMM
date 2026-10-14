@@ -364,7 +364,7 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
-  if (impl_->sw) return "sw_cooperative;warp_roles=1tma+4simt+4wgmma+15pack_only;smem=213120;operand_stages=4;bk=256;workspace=4194304;st=compact4planes_balanced_async_p1p2;publication=tma_leader_driver_workspace_barrier_cuda12.4;terminal_cta_barrier=off;recombine=streaming_fixed_chunk_offsets;product_order=1_2_6_7_5_3_4;product_slots=2;product_layout=row_xor_0_3_4;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;alpha=1;beta=0";
+  if (impl_->sw) return "sw_local_shared;threads=768;warp_roles=1tma_4tc_19transform;smem=221312;bk=256;raw_slots=1;workspace=7340032;leaf_terms=7;residual_correction=off;partial_fp32_leaves=workspace;transform=local_inplace_B_then_A;recombine=static_ptx_original_order;grid_publication=none;current_pointer_maps=2";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }
@@ -381,7 +381,7 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   if (policy.algorithm==Algorithm::SWPipeline) {
     if(policy.workspace_limit<(size_t(8)<<20))throw std::invalid_argument("SW needs8MiB workspace");
     impl->sw=detail::make_sw_pipeline(p);
-    impl->bytes=size_t(4)<<20;
+    impl->bytes=size_t(7)<<20;
   } else if (!impl->empty && !impl->scale) {
     lt_check(cublasLtCreate(&impl->handle), "create cuBLASLt handle");
     impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);
