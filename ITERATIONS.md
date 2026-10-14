@@ -387,6 +387,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 240 | Bank-swizzled final-C shared handoff and512 float4 copy workers | 0.9984 | 0.011118 | experiment |
 
+| 241 | Two final-C shared slots with early reuse | 0.9797 | 0.011343 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3540,3 +3542,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF11.0339 FP11.2026us, slower22410.93/11.10us. Expected original errors unchanged, both original gatesFAIL. Extra final-C storage may affect input-side L1; test smaller streaming payload before deciding design.
 - **Next:** Use two final-C slots with warp-aggregated free publication to reclaim16KiB shared without blocking operand retirement
 - **Archive:** trajectory/20261015_052510_iter-240/
+
+### Iter 241 — Two final-C shared slots with early reuse
+
+- **Hypothesis:** Reclaiming half the final-C staging storage may reduce shared pressure while preserving vectorized output overlap.
+- **Changes:** Use two 8KiB final-C slots; four one-shot quadrant-ready barriers and two 16-warp release barriers; Tensor Core groups acquire slots before C12 and C21; preserve operand release and arithmetic order.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011343 ms; mean speedup=0.9797x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012163 | 0.011229 | 1.0832 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010040 | 0.011457 | 0.8763 | 0.000754626 | 0 |
+
+- **Analysis:** Full launch benchmark BF16 11.22944 us vs Dense 12.16320 us; FP16 11.45696 us vs Dense 10.03968 us. Slower than selected private-output iter224. Original FP64 numerical gates fail both dtypes with unchanged errors and zero nonfinite values. Reduced storage does not recover the extra handoff cost.
+- **Next:** Reject final-C shared staging; retain iter224 as measured best and investigate operand reuse across two Tensor Core groups.
+- **Archive:** trajectory/20261015_052618_iter-241/
