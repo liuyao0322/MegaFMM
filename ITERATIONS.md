@@ -395,6 +395,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 244 | Three private-output operand stages reclaim shared | 0.9953 | 0.011287 | experiment |
 
+| 245 | Pair two K groups on one private accumulator | 0.9949 | 0.011214 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3612,3 +3614,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 11.1603 us vs Dense 12.4416 us; FP16 11.4134 us vs Dense 9.9952 us. Slower than224; original precision gates fail as expected, zero nonfinite. Four-stage prefetch remains worthwhile.
 - **Next:** Test same-accumulator two-K-group issue with explicit wait1 retirement to reduce completion serialization.
 - **Archive:** trajectory/20261015_053318_iter-244/
+
+### Iter 245 — Pair two K groups on one private accumulator
+
+- **Hypothesis:** Issue both K256 groups before completion waits to overlap Tensor Core command issue and execution.
+- **Changes:** From224 commit q0 without waiting, omit unnecessary q1 fence, issue and commit q1; wait1 then release q0, wait0 then release q1; preserve all FP32 operations and four operand slots.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011214 ms; mean speedup=0.9949x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012284 | 0.011136 | 1.1031 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010013 | 0.011292 | 0.8867 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 11.1363 us vs Dense 12.2845 us; FP16 11.2925 us vs Dense 10.0131 us, no gain over224. Original numerical gates fail with expected errors. FP16 group4 wall time has a 22.5us host outlier; event remains11.35us and no win is claimed.
+- **Next:** Test one commit for both K chunks to distinguish group bookkeeping from delayed operand release.
+- **Archive:** trajectory/20261015_053408_iter-245/
