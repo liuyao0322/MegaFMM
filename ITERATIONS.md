@@ -131,6 +131,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 112 | N16 K128 tiles with two CTA residency | 0.0000 | 0.000000 | experiment |
 
+| 113 | Correct small-tile shared budget and measure | 0.6347 | 0.017593 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1250,3 +1252,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full SW benchmark archived; unchanged original FP64 gates. Need inspect compile/runtime and compare with100.
 - **Next:** Assess achieved concurrency and full-call latency before choosing architecture
 - **Archive:** trajectory/20261015_014955_iter-112/
+
+### Iter 113 — Correct small-tile shared budget and measure
+
+- **Hypothesis:** Two resident smaller CTAs hide operand and issue latency
+- **Changes:** Correct shared size assertion to90240B for N16 K128 four slots;112 failed build at assertion and has no timing evidence
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.017593 ms; mean speedup=0.6347x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012340 | 0.017434 | 0.7078 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009969 | 0.017751 | 0.5616 | 0.000754626 | 0 |
+
+- **Analysis:** Full benchmark archived with original FP64 gates unchanged; inspect results after commit.
+- **Next:** Evaluate CTA concurrency, then overlap original-input P1/P2 with input transformation
+- **Archive:** trajectory/20261015_015025_iter-113/

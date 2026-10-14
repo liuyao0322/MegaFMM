@@ -22,7 +22,7 @@ template<class T> struct alignas(128) Shared {
   float product[2][Elements];
   uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
 };
-static_assert(sizeof(Shared<cute::half_t>)==90368,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==90240,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
