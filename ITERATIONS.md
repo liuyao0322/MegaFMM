@@ -305,6 +305,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 199 | Cluster-local seven-leaf DSM combination | 0.0000 | 0.000000 | experiment |
 
+| 200 | Four-WG leaf CTAs and explicit cluster capacity check | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2802,3 +2804,17 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Build succeeds but launch rejected: too many blocks in cooperative launch. Per-SM capacity check alone does not establish cluster-resident capacity. No timing or numerical evidence valid. Fresh198NCU64regs,zero local sectors,2.92Minstructions versus1622.52M; higher tensor activity did not reduce full latency.
 - **Next:** Reduce cluster count by doubling output N extent per cluster, and explicitly query active-cluster capacity
 - **Archive:** trajectory/20261015_040200_iter-199/
+
+### Iter 200 — Four-WG leaf CTAs and explicit cluster capacity check
+
+- **Hypothesis:** Doubling per-cluster M coverage halves the number of clusters to16 and retains one leaf per rank
+- **Changes:** BM256 BN64 four tensor WGs,640threads,163968Bshared;128CTA grid;608 transformed pack workers; explicit cudaOccupancyMaxActiveClusters query
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Build succeeds; explicit occupancy query reports15 active clusters versus required16, so safely rejects before launch. No performance or numerical results. Cluster topology, not aggregate132SM capacity, restricts launch.
+- **Next:** Use15 persistent clusters, with one cluster processing an extra output tile, and retain global input publication only once
+- **Archive:** trajectory/20261015_040326_iter-200/
