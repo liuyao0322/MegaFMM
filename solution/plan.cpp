@@ -364,7 +364,7 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
-  if (impl_->sw) return "sw_v1;warp_roles=1tma+3simt+4wgmma;smem=188544;bk=64;st=fp32_register;operand=hi+lo;leaf_terms=15;current_pointer_maps=2;raw_stages=1;operand_layout=AK128_BMN64;alpha=1;beta=0";
+  if (impl_->sw) return "sw_v1;warp_roles=1tma+3simt+4wgmma;smem=155776;bk=64;st=fp32_register;operand=hi+lo;leaf_terms=15;current_pointer_maps=2;q=register;raw_stages=1;operand_layout=AK128_BMN64;alpha=1;beta=0";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }

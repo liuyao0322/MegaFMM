@@ -19,11 +19,10 @@ template<class T> struct alignas(128) Shared {
   T raw[1][4*ASize+4*BSize];
   T operand[2][2*ASize+2*BSize];
   float product[7][Elements];
-  float output[4][Elements];
   uint64_t raw_ready[2],raw_free[2],op_ready[2],op_free[2];
   uint64_t product_ready,product_free;
 };
-static_assert(sizeof(Shared<cute::half_t>)==188544, "recheck shared-memory budget");
+static_assert(sizeof(Shared<cute::half_t>)==155776, "recheck shared-memory budget");
 
 __device__ void wait(const uint64_t* b,int phase) {
   Barrier::wait(b,phase); asm volatile("" ::: "memory");
@@ -99,7 +98,6 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
     Barrier::init(&s.product_free,96);
     cutlass::arch::fence_barrier_init();
   }
-  for(int i=tid;i<4*Elements;i+=256) (&s.output[0][0])[i]=0;
   __syncthreads();
 
   if(tid==0) {
@@ -118,6 +116,8 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
     }
   } else if(tid>=32 && tid<128) {
     int worker=tid-32;
+    constexpr int Chunks=(Elements+95)/96;
+    float q11[Chunks]={},q12[Chunks]={},q21[Chunks]={},q22[Chunks]={};
     for(int q=0;q<512/BK;++q) {
       int bank=0;
       wait(&s.raw_ready[bank],q%2);
@@ -142,25 +142,33 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
       }
       arrive(&s.raw_free[bank]);
       wait(&s.product_ready,q%2);
-      for(int i=worker;i<Elements;i+=96) {
+      #pragma unroll
+      for(int chunk=0;chunk<Chunks;++chunk) {
+        int i=worker+chunk*96;
+        if(i<Elements) {
         float p1=s.product[0][i],p2=s.product[1][i],p3=s.product[2][i];
         float p4=s.product[3][i],p5=s.product[4][i],p6=s.product[5][i],p7=s.product[6][i];
         float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6);
         float u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
-        s.output[0][i]=__fadd_rn(s.output[0][i],u1);
-        s.output[1][i]=__fadd_rn(s.output[1][i],__fadd_rn(u4,p3));
-        s.output[2][i]=__fadd_rn(s.output[2][i],__fsub_rn(u3,p4));
-        s.output[3][i]=__fadd_rn(s.output[3][i],__fadd_rn(u3,p5));
+        q11[chunk]=__fadd_rn(q11[chunk],u1);
+        q12[chunk]=__fadd_rn(q12[chunk],__fadd_rn(u4,p3));
+        q21[chunk]=__fadd_rn(q21[chunk],__fsub_rn(u3,p4));
+        q22[chunk]=__fadd_rn(q22[chunk],__fadd_rn(u3,p5));
       }
+        }
       arrive(&s.product_free);
     }
-    for(int i=worker;i<Elements;i+=96) {
+    #pragma unroll
+    for(int chunk=0;chunk<Chunks;++chunk) {
+      int i=worker+chunk*96;
+      if(i<Elements) {
       int row=m0+i/BN,col=n0+i%BN;
-      D[row*1024+col]=s.output[0][i];
-      D[row*1024+col+512]=s.output[1][i];
-      D[(row+512)*1024+col]=s.output[2][i];
-      D[(row+512)*1024+col+512]=s.output[3][i];
+      D[row*1024+col]=q11[chunk];
+      D[row*1024+col+512]=q12[chunk];
+      D[(row+512)*1024+col]=q21[chunk];
+      D[(row+512)*1024+col+512]=q22[chunk];
     }
+      }
   } else if(tid>=128) {
     for(int q=0;q<512/BK;++q) {
       if(q)wait(&s.product_free,(q-1)%2);
