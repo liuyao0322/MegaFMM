@@ -393,6 +393,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 243 | Dual N16 consumers retain 128 CTA grid | 0.8965 | 0.012460 | experiment |
 
+| 244 | Three private-output operand stages reclaim shared | 0.9953 | 0.011287 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3594,3 +3596,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 12.3600 us vs Dense 12.2925 us; FP16 12.5597 us vs Dense 10.0278 us. Original errors unchanged, gates fail. Better than dual N32 242 but still substantially slower than 224. Profile242 confirms 64 registers and zero local sectors: its regression is not spilling.
 - **Next:** Reject dual-group variants and reassess frontend publication and supply dependencies.
 - **Archive:** trajectory/20261015_053135_iter-243/
+
+### Iter 244 — Three private-output operand stages reclaim shared
+
+- **Hypothesis:** Reclaim 48KiB shared from the four-stage private-output pipeline to allow more L1 capacity without changing CTA coverage.
+- **Changes:** From224 use three BK256 operand stages and matching static slot phases, 147584 shared bytes, same 512 transform workers and private accumulators; preserve raw four-tile overlap and FP32 order.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011287 ms; mean speedup=0.9953x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012442 | 0.011160 | 1.1148 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009995 | 0.011413 | 0.8757 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 11.1603 us vs Dense 12.4416 us; FP16 11.4134 us vs Dense 9.9952 us. Slower than224; original precision gates fail as expected, zero nonfinite. Four-stage prefetch remains worthwhile.
+- **Next:** Test same-accumulator two-K-group issue with explicit wait1 retirement to reduce completion serialization.
+- **Archive:** trajectory/20261015_053318_iter-244/
