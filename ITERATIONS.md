@@ -389,6 +389,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 241 | Two final-C shared slots with early reuse | 0.9797 | 0.011343 | experiment |
 
+| 242 | Two Tensor Core groups share full-K LHS | 0.7760 | 0.014393 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3558,3 +3560,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Full launch benchmark BF16 11.22944 us vs Dense 12.16320 us; FP16 11.45696 us vs Dense 10.03968 us. Slower than selected private-output iter224. Original FP64 numerical gates fail both dtypes with unchanged errors and zero nonfinite values. Reduced storage does not recover the extra handoff cost.
 - **Next:** Reject final-C shared staging; retain iter224 as measured best and investigate operand reuse across two Tensor Core groups.
 - **Archive:** trajectory/20261015_052618_iter-241/
+
+### Iter 242 — Two Tensor Core groups share full-K LHS
+
+- **Hypothesis:** Two N32 consumer groups within a 64x64 CTA can share LHS traffic and overlap independent wait0 phases.
+- **Changes:** 64 CTAs with 1024 threads, 736 transform workers and two 128-thread TC groups; three BK256 operand slots; full N64 RHS descriptor split into N32 subtiles; eight warp-leader releases per slot; unchanged private arithmetic and output.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.014393 ms; mean speedup=0.7760x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012327 | 0.014337 | 0.8598 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010002 | 0.014448 | 0.6922 | 0.000754626 | 0 |
+
+- **Analysis:** Full benchmark BF16 14.3373 us vs Dense 12.3274 us; FP16 14.4480 us vs Dense 10.0016 us. Numerically matches expected uncompensated errors, original FP64 gates fail both. Larger per-CTA transform and half-SM grid outweigh reuse; no speed gain.
+- **Next:** Inspect resource use and phase critical path before changing dual-group geometry.
+- **Archive:** trajectory/20261015_053004_iter-242/
