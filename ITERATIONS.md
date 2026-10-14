@@ -1898,3 +1898,18 @@ Timing/source provenance: quicksourceGit987ef70 preceded final plan creation bec
 Reassessment after42–44: none gives≥3% own-latency improvement over best45; current44 SW timing is stable within the retained group statistics. No measured physical-floor/stall/traffic or occupancy-cause conclusion; no Ncu retry. Next work should reconsider register residency/lifetimes, rather than assume smallerBN alone helps. NVIDIA Hopper CUDA12.4.1 tuning documents64Kregisters/SM and PTX setmaxnreg documents CTA-internal redistribution; pool arithmetic alone cannot establish twoCTA residency. Primary sources: https://docs.nvidia.com/cuda/archive/12.4.1/hopper-tuning-guide/index.html#occupancy and https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#miscellaneous-instructions-setmaxnreg . Frozen private min2 future44 q40/88/112 is CPU-only/uncompiled; actual48 role125/124 flags pressure risk without proving future compilation outcome. No49/public diagnostic/nextiteration automatically started.
 
 Evidence: results/1024_MEGAKERNEL_PSPLIT_TMA_BN16_REPORT.md; small_psplit_tma_bn16_measurements_iter44.json/profile_iter44.json; psplit_tma_bn16_test_coverage_iter44.json; immutable compiled gate383ca8b8 and failedinitialf9f3d83a.
+
+### Iter45 — BN16 minCTA2 with atom-local RS inputs
+
+- **Hypothesis:** Test register residency and shorter transformed-A lifetime on BN16/BK64 while retaining four rawA TMA boxes and SIMT finalB7. MinCTA2 is a source constraint; occupancy API predicts2, measured residency is unknown.
+- **Changes:** ONLY49 q40/88/112, BM64BN16BK64/2banks/384threads. Known48 stage-local raw coordinates and B finalcast scheduling preserve RN. Firstcompile actual I80 STACK24/spill40FP16/36BF16 and newC7512 prohibited launch; failed source/PTX/SASS/resources retained. Revision1 uses one K16 A atom per P, four ascending atom windows each build/fence/3or4HGMMA/commitwait0/postfences, release after all4; whole FP32P/wholeK/fixedU/RNalpha-betaFMA/original floors unchanged. Fresh roles37/77/71, zeroSTACKLOCALspill, owned30720=request30720. Legal initial-owned commonP R32..55 preINC zeros recorded truthfully; no meaningful growth access. Fresh independent CAN49 only.
+- **Bench:** quick20warm/20calls/5groups/1fresh, screen only; all originalgate failures retained.
+
+| M,N,K | dtype | route | mode | Dense us | complete SW us | Dense/SW | originalgate |
+|---|---|---|---|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | megakernel_wgmma_psplit_tma_bn16_min2_64x16 v49 | launch | 13.097601 | 26.012799 | 0.503506 | FAIL |
+| 1024,1024,1024 | fp16 | megakernel_wgmma_psplit_tma_bn16_min2_64x16 v49 | launch | 10.420800 | 25.880000 | 0.402658 | FAIL |
+
+- **Analysis:** Complete own SW latency evaluates the combined resource/lifetime change. No measured residency/stall/traffic cause or numerical certification is inferred. Current A encode remains inside each ordinary complete call.
+- **Next:** Mandatory samebinaryfull20 for49/48/45/39/Lt1,20warm100calls5groups3fresh regardlessquick3%; final plan and once-complete identity created after this quick Git checkpoint but before full timing. SourceGit proves seven executed sources; later unique prestatus Git binds plan/identity. Originalstrict30 andserialSAN3, coverage/profile/report and independentfinal audits follow.
+- **Archive:** trajectory/20261014_091648_iter-45/

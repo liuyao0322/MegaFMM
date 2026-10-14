@@ -1,0 +1,63 @@
+{
+  "scope": "Private CPU future; no CUDA build/GPU/Git/public49/iteration45 activation",
+  "parent": ".scratch/psplit_tma_bn16_root_future43_candidate.cu",
+  "parent_sha256": "dbf59ae8c784812464f46548bdebd0130a5513f9a7ead0f94cb07b2226594de9",
+  "BM_BN_BK": [
+    64,
+    16,
+    64
+  ],
+  "threads": 384,
+  "stages": 2,
+  "source_launch_bound_minCTA": 2,
+  "source_quotas": [
+    40,
+    88,
+    112
+  ],
+  "source_requested_pool_words": 30720,
+  "two_source_pools_words": 61440,
+  "arithmetic_required_initial_per_thread": 80,
+  "actual_initial_allocation": null,
+  "source_initial80_producer_release": 5120,
+  "source_initial80_consumer_acquire": [
+    1024,
+    4096
+  ],
+  "source_whole_A_words": [
+    48,
+    64
+  ],
+  "source_whole_P_words": [
+    24,
+    32
+  ],
+  "source_lower_bound_A_plus_P": [
+    72,
+    96
+  ],
+  "source_remaining_quota_words": [
+    16,
+    16
+  ],
+  "predicted_dynamic_shared_bytes": 95232,
+  "predicted_two_dynamic_shared_bytes": 190464,
+  "actual_shared_sizeof": null,
+  "actual_residency": null,
+  "actual_GPR_fit": null,
+  "actual_STACK_LOCAL_spill": null,
+  "actual_CAN": null,
+  "actual_correctness": null,
+  "actual_precision": null,
+  "actual_latency": null,
+  "actual_speedup": null,
+  "prior_geometry_proof_scope": "Unchanged parent future43 CPU geometry is referenced, not rerun or converted to GPU/CAN proof",
+  "before_any_future_GPU_required": [
+    "Fresh feeding compilation/initial quota granularity and full3role implicit widths; actual initial-owned pool >=30720/CTA and both CTA allocations fit65536",
+    "Actual initial to DEC40, INC88/112 directions legal; meaningful grown access after successful INC and first writes; legal owned preINC commonzeros recorded truthfully",
+    "Actual producer R<40/WG0 R<88/WG1 R<112 and zero STACK/LOCAL/spill, whole A48/64+P24/32 no generic access until wait0",
+    "Actual sharedABI/resource optin/min2 occupancy API and independent full TMA/barrier/drain/tail/streamproofs; no measured residency assumed",
+    "Fresh ordinary currentAencode/freshinput transforms/whole7P/fixedU/originalprecisionfloor and same-mode tunedcuBLAS timing; original gateFAIL cannot certify goal"
+  ],
+  "possible_blocker": "Narrow quota slack may spill or exceed full-role bounds; CPU arithmetic does not prove compiled feasibility."
+}
