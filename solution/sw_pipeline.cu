@@ -64,9 +64,23 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
 }
 
 template<class T> __global__ __launch_bounds__(Threads,1)
-void sw_transform(const T* A,const T* B,T* packed){
+void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
+                         const __grid_constant__ CUtensorMap bmap,
+                         const __grid_constant__ CUtensorMap smap,
+                         const __grid_constant__ CUtensorMap tmap,
+                         const T* A,const T* B,T* packed,float* D){
   using namespace cute;
-  int tid=threadIdx.x;
+  extern __shared__ __align__(128) unsigned char buffer[];
+  auto& s=*reinterpret_cast<Shared<T>*>(buffer);
+  int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
+  if(tid==0){
+    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
+    cutlass::arch::fence_barrier_init();
+  }
+  // Barrier initialization is consumed only after the cooperative grid sync.
+  // That sync also orders initialization across this CTA, so no earlier CTA
+  // barrier is needed before the independent global input transformation.
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
@@ -97,25 +111,9 @@ void sw_transform(const T* A,const T* B,T* packed){
     #pragma unroll
     for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(2*j*Plane+i)/2]=words[2*j];
   }
+  // Generic global stores become visible to TMA's async proxy before publication.
   asm volatile("fence.proxy.async.global;" ::: "memory");
-}
-
-template<class T> __global__ __launch_bounds__(Threads,1)
-void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
-                         const __grid_constant__ CUtensorMap bmap,
-                         const __grid_constant__ CUtensorMap smap,
-                         const __grid_constant__ CUtensorMap tmap,
-                         const T* A,const T* B,T* packed,float* D){
-  using namespace cute;
-  extern __shared__ __align__(128) unsigned char buffer[];
-  auto& s=*reinterpret_cast<Shared<T>*>(buffer);
-  int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
-  if(tid==0){
-    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
-    cutlass::arch::fence_barrier_init();
-  }
-  __syncthreads();
+  cooperative_groups::this_grid().sync();
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
@@ -249,14 +247,9 @@ void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,v
   CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
   encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
   void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D};dim3 grid(16,8);
-  void* transform_args[]={&A,&B,&workspace};
   if(state.dtype==DType::BF16)
-    check(cudaLaunchKernel(reinterpret_cast<void*>(sw_transform<cute::bfloat16_t>),grid,Threads,transform_args,0,stream),"SW transform launch");
+    check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
   else
-    check(cudaLaunchKernel(reinterpret_cast<void*>(sw_transform<cute::half_t>),grid,Threads,transform_args,0,stream),"SW transform launch");
-  if(state.dtype==DType::BF16)
-    check(cudaLaunchKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
-  else
-    check(cudaLaunchKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::half_t>),grid,Threads,args,sizeof(Shared<cute::half_t>),stream),"SW cooperative launch");
+    check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::half_t>),grid,Threads,args,sizeof(Shared<cute::half_t>),stream),"SW cooperative launch");
 }
 } // namespace megafmm::detail
