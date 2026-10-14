@@ -283,6 +283,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 188 | Coalesced row-major last-CTA recombination | 0.5224 | 0.021359 | experiment |
 
+| 189 | Reuse waiting TC warps for parallel-leaf input transformation | 0.5797 | 0.019352 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2610,3 +2612,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about21.39us FP16 about21.33us, roughly10us faster187 but still much slower162. Original approximation errors retained/nonfinite0. Diagnostic187 had~10percent time perturbation and16Bspill; use it only as localization evidence, production187fullNCU79regs/local0.
 - **Next:** Reassess start-time spread and optimize parallel-leaf tile shape only if phase budget supports improvement; preserve162 selected checkpoint.
 - **Archive:** trajectory/20261015_034653_iter-188/
+
+### Iter 189 — Reuse waiting TC warps for parallel-leaf input transformation
+
+- **Hypothesis:** Five transformed-product CTA classes have idle TC warps before publication; using them for pack raises worker count and reduces front latency.
+- **Changes:** Base188; raw-product CTAs96pack workers, transformed-product CTAs352including theirTCthreads; contiguous global worker partition62464 workers with full coverage, local pack barrier counts adjusted.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.019352 ms; mean speedup=0.5797x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.012493 | 0.019166 | 0.6518 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.009917 | 0.019537 | 0.5076 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about19.17us FP16 about19.54us, improves188 but still much slower162. Original errors retained and nonfinite0. Trace187 allCTAstartspread0.224us, publication6.5us, so launch skew was not the main cause.
+- **Next:** Test direct atomic recombination to remove serialized last-CTA global reads; explicitly report changed FP32 summation order and unchanged original precision gates.
+- **Archive:** trajectory/20261015_034821_iter-189/

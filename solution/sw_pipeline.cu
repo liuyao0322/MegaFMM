@@ -61,14 +61,15 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
  auto* counts=reinterpret_cast<uint32_t*>(reinterpret_cast<char*>(packed)+(size_t(11)<<20));
  if(tid==0){
   for(int j=0;j<Stages;++j){Barrier::init(&sh.ready[j],1);Barrier::init(&sh.free[j],8);}
-  Barrier::init(&sh.pack_ready,96);Barrier::init(&sh.global_ready,1);
+  Barrier::init(&sh.pack_ready,p<2 ? 96:352);Barrier::init(&sh.global_ready,1);
   cutlass::arch::fence_barrier_init();
  }
  __syncthreads();
- if(tid>=32 && tid<128){
+ if((tid>=32 && tid<128)||(p>=2 && tid>=128 && tid<384)){
   int worker=tid-32;
+  int global_worker=p<2 ? (p*32+tile)*96+worker : 2*32*96+((p-2)*32+tile)*352+worker;
   if(p==0 && worker==0)counts[tile]=0;
-  for(int i=2*(cta*96+worker);i<Plane;i+=2*224*96){
+  for(int i=2*global_worker;i<Plane;i+=2*62464){
    int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -98,7 +99,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }
   asm volatile("fence.proxy.async.global;" ::: "memory");
   arrive(&sh.pack_ready);
- }else if(tid==0){
+ }
+ if(tid==0){
   // Raw P1/P2 may execute while CUDA warps pack; all publication waits remain per invocation.
   for(int q=0;q<=512/BK;++q){
    if(q==(p<2 ? 512/BK:0)){
