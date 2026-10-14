@@ -303,6 +303,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 198 | Dual tensor warpgroups with608 transform workers | 0.9651 | 0.011685 | experiment |
 
+| 199 | Cluster-local seven-leaf DSM combination | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2786,3 +2788,17 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 11.548 us and FP16 11.822 us; Dense12.332/10.195 us. Recovers much of197 slowdown but not selected162 performance. Finite expected errors and both original gates fail. No adoption.
 - **Next:** Profile dual-warpgroup instruction and resource behavior, then investigate cluster-local parallel leaf combination
 - **Archive:** trajectory/20261015_040020_iter-198/
+
+### Iter 199 — Cluster-local seven-leaf DSM combination
+
+- **Hypothesis:** Seven parallel leaf CTAs and one DSM epilogue CTA eliminate global P traffic and last-CTA counters
+- **Changes:** Base189; cluster8 grid256; retired operand memory reused for32KiB swizzled P; rank7 row-major DSM reads and exact original recombination;4MiB workspace; final cluster lifetime barrier
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Build succeeds but launch rejected: too many blocks in cooperative launch. Per-SM capacity check alone does not establish cluster-resident capacity. No timing or numerical evidence valid. Fresh198NCU64regs,zero local sectors,2.92Minstructions versus1622.52M; higher tensor activity did not reduce full latency.
+- **Next:** Reduce cluster count by doubling output N extent per cluster, and explicitly query active-cluster capacity
+- **Archive:** trajectory/20261015_040200_iter-199/
