@@ -1,0 +1,1046 @@
+{
+  "source_commit": "2870c75",
+  "scope": "1024^3 BF16/FP16; FP32 output; full invocation; original-input FP64 gates",
+  "paired": [
+    {
+      "mode": "launch",
+      "dtype": "bf16",
+      "iter82": 21.2999999523,
+      "iter85": 20.6527996063,
+      "reduction_pct": 3.0384992837998226
+    },
+    {
+      "mode": "launch",
+      "dtype": "fp16",
+      "iter82": 21.311199665100002,
+      "iter85": 20.85775971415,
+      "reduction_pct": 2.127707299803361
+    },
+    {
+      "mode": "graph",
+      "dtype": "bf16",
+      "iter82": 20.8428800106,
+      "iter85": 20.1198399067,
+      "reduction_pct": 3.469002861083892
+    },
+    {
+      "mode": "graph",
+      "dtype": "fp16",
+      "iter82": 20.64352035525,
+      "iter85": 20.3155195713,
+      "reduction_pct": 1.5888800858841035
+    }
+  ],
+  "metrics": {
+    "bf16": {
+      "gpu__time_duration.sum": {
+        "value": 21.184,
+        "unit": "us"
+      },
+      "smsp__inst_executed.sum": {
+        "value": 5395148.0,
+        "unit": "inst"
+      },
+      "launch__registers_per_thread": {
+        "value": 110.0,
+        "unit": "register/thread"
+      },
+      "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+        "value": 19.721052,
+        "unit": "%"
+      },
+      "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+        "value": 32.136396,
+        "unit": "%"
+      }
+    },
+    "fp16": {
+      "gpu__time_duration.sum": {
+        "value": 21.024,
+        "unit": "us"
+      },
+      "smsp__inst_executed.sum": {
+        "value": 5419281.0,
+        "unit": "inst"
+      },
+      "launch__registers_per_thread": {
+        "value": 110.0,
+        "unit": "register/thread"
+      },
+      "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+        "value": 19.68737,
+        "unit": "%"
+      },
+      "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+        "value": 32.536667,
+        "unit": "%"
+      }
+    }
+  },
+  "sass": {
+    "opcodes": {
+      "bf16": {
+        "LDC": 4096.0,
+        "S2R": 15104.0,
+        "S2UR": 4352.0,
+        "BSSY": 112768.0,
+        "USHF.L.U32": 4096.0,
+        "ISETP.NE.AND": 22656.0,
+        "BRA": 368527.0,
+        "UMOV": 34176.0,
+        "UPRMT": 128.0,
+        "NOP": 8320.0,
+        "FENCE.VIEW.ASYNC.S": 128.0,
+        "SYNCS.EXCH.64": 1024.0,
+        "BSYNC": 112896.0,
+        "ULDC": 6400.0,
+        "BAR.SYNC.DEFER_BLOCKING": 8192.0,
+        "UIMAD": 2304.0,
+        "ULDC.64": 2176.0,
+        "IMAD.U32": 61824.0,
+        "LEA": 36352.0,
+        "ISETP.GT.AND": 22738.0,
+        "LDC.64": 39040.0,
+        "IMAD": 155392.0,
+        "SHF.R.S32.HI": 176640.0,
+        "LEA.HI": 145920.0,
+        "SHF.L.U32": 90112.0,
+        "LOP3.LUT": 533970.0,
+        "IADD3": 63872.0,
+        "IMAD.WIDE": 57344.0,
+        "LDG.E.U16": 65536.0,
+        "FADD": 188416.0,
+        "F2F.BF16.F32": 65536.0,
+        "STG.E.U16": 131072.0,
+        "F2FP.BF16.F32.PACK_AB": 65536.0,
+        "ISETP.GE.AND": 15360.0,
+        "ISETP.NE.U32.AND": 2048.0,
+        "FENCE.VIEW.ASYNC.G": 2048.0,
+        "ISETP.NE.AND.EX": 2048.0,
+        "BPT.TRAP": 0.0,
+        "IMAD.IADD": 131072.0,
+        "VOTEU.ANY": 2688.0,
+        "UIADD3": 248064.0,
+        "FLO.U32": 128.0,
+        "MOV": 190485.0,
+        "POPC": 256.0,
+        "UISETP.NE.AND": 1152.0,
+        "ISETP.EQ.U32.AND": 128.0,
+        "USEL": 3200.0,
+        "MEMBAR.ALL.CTA": 128.0,
+        "MEMBAR.ALL.GPU": 128.0,
+        "ERRBAR": 128.0,
+        "CGAERRBAR": 128.0,
+        "ATOM.E.ADD.STRONG.GPU": 128.0,
+        "VOTE.ANY": 640.0,
+        "SHFL.IDX": 128.0,
+        "LD.E.STRONG.GPU": 3026.0,
+        "CCTL.IVALL": 3026.0,
+        "YIELD": 3026.0,
+        "WARPSYNC.ALL": 26880.0,
+        "VIADD": 369152.0,
+        "ISETP.LT.U32.OR": 2048.0,
+        "IMAD.SHL.U32": 75264.0,
+        "IMAD.MOV.U32": 382336.0,
+        "ISETP.GE.U32.AND": 15104.0,
+        "SEL": 12288.0,
+        "CS2R": 28672.0,
+        "SHF.R.U32.HI": 29696.0,
+        "ISETP.EQ.OR": 7168.0,
+        "PRMT": 8704.0,
+        "SYNCS.PHASECHK.TRANS64.TRYWAIT": 194410.0,
+        "WARPGROUP.ARRIVE": 22528.0,
+        "R2UR": 995968.0,
+        "HGMMA.64x32x16.F32.BF16": 245760.0,
+        "HGMMA.64x8x16.F16": 7168.0,
+        "WARPGROUP.DEPBAR.LE": 7168.0,
+        "SYNCS.ARRIVE.TRANS64.A1T0": 20608.0,
+        "ISETP.GT.U32.AND": 4352.0,
+        "STS": 57344.0,
+        "LDS": 57344.0,
+        "STG.E": 32768.0,
+        "PLOP3.LUT": 42240.0,
+        "UIADD3.X": 256.0,
+        "SYNCS.ARRIVE.TRANS64": 1792.0,
+        "ELECT": 14080.0,
+        "UTMALDG.2D": 3840.0,
+        "BRA.U.ANY": 14080.0,
+        "ISETP.GT.U32.OR": 768.0,
+        "IMAD.MOV": 768.0,
+        "IMAD.X": 3072.0,
+        "ULOP3.LUT": 512.0,
+        "ULEA": 1024.0,
+        "UTMALDG.3D": 10240.0,
+        "UISETP.GE.U32.AND": 512.0,
+        "EXIT": 2048.0,
+        "DEPBAR.LE": 174570.0,
+        "NANOSLEEP.SYNCS": 174570.0,
+        "SYNCS.PHASECHK.TRANS64": 174570.0
+      },
+      "fp16": {
+        "LDC": 4096.0,
+        "S2R": 15104.0,
+        "S2UR": 4352.0,
+        "BSSY": 112768.0,
+        "USHF.L.U32": 4096.0,
+        "ISETP.NE.AND": 22656.0,
+        "BRA": 364377.0,
+        "UMOV": 34176.0,
+        "UPRMT": 128.0,
+        "NOP": 8320.0,
+        "FENCE.VIEW.ASYNC.S": 128.0,
+        "SYNCS.EXCH.64": 1024.0,
+        "BSYNC": 112896.0,
+        "ULDC": 6400.0,
+        "BAR.SYNC.DEFER_BLOCKING": 8192.0,
+        "UIMAD": 2304.0,
+        "ULDC.64": 2176.0,
+        "IMAD.U32": 12672.0,
+        "LEA": 36352.0,
+        "ISETP.GT.AND": 22803.0,
+        "LDC.64": 39040.0,
+        "IMAD": 155392.0,
+        "SHF.R.S32.HI": 176640.0,
+        "LEA.HI": 145920.0,
+        "SHF.L.U32": 8192.0,
+        "LOP3.LUT": 534035.0,
+        "IADD3": 63872.0,
+        "IMAD.WIDE": 57344.0,
+        "LDG.E.U16": 65536.0,
+        "ISETP.GE.AND": 15360.0,
+        "HADD2.F32": 131072.0,
+        "FADD": 188416.0,
+        "F2FP.F16.F32.PACK_AB": 73728.0,
+        "STG.E.U16": 131072.0,
+        "PRMT": 90624.0,
+        "ISETP.NE.U32.AND": 2048.0,
+        "FENCE.VIEW.ASYNC.G": 2048.0,
+        "ISETP.NE.AND.EX": 2048.0,
+        "BPT.TRAP": 0.0,
+        "IMAD.IADD": 131072.0,
+        "VOTEU.ANY": 2688.0,
+        "UIADD3": 248064.0,
+        "FLO.U32": 128.0,
+        "MOV": 183793.0,
+        "POPC": 256.0,
+        "UISETP.NE.AND": 1152.0,
+        "ISETP.EQ.U32.AND": 128.0,
+        "USEL": 3200.0,
+        "MEMBAR.ALL.CTA": 128.0,
+        "MEMBAR.ALL.GPU": 128.0,
+        "ERRBAR": 128.0,
+        "CGAERRBAR": 128.0,
+        "ATOM.E.ADD.STRONG.GPU": 128.0,
+        "VOTE.ANY": 640.0,
+        "SHFL.IDX": 128.0,
+        "LD.E.STRONG.GPU": 3091.0,
+        "CCTL.IVALL": 3091.0,
+        "YIELD": 3091.0,
+        "WARPSYNC.ALL": 26880.0,
+        "VIADD": 369152.0,
+        "ISETP.LT.U32.OR": 2048.0,
+        "IMAD.SHL.U32": 75264.0,
+        "IMAD.MOV.U32": 382336.0,
+        "ISETP.GE.U32.AND": 15104.0,
+        "SEL": 12288.0,
+        "CS2R": 28672.0,
+        "SHF.R.U32.HI": 29696.0,
+        "ISETP.EQ.OR": 7168.0,
+        "SYNCS.PHASECHK.TRANS64.TRYWAIT": 190200.0,
+        "WARPGROUP.ARRIVE": 22528.0,
+        "R2UR": 995968.0,
+        "HGMMA.64x32x16.F32": 245760.0,
+        "HGMMA.64x8x16.F16": 7168.0,
+        "WARPGROUP.DEPBAR.LE": 7168.0,
+        "SYNCS.ARRIVE.TRANS64.A1T0": 20608.0,
+        "ISETP.GT.U32.AND": 4352.0,
+        "STS": 57344.0,
+        "LDS": 57344.0,
+        "STG.E": 32768.0,
+        "PLOP3.LUT": 42240.0,
+        "UIADD3.X": 256.0,
+        "SYNCS.ARRIVE.TRANS64": 1792.0,
+        "ELECT": 14080.0,
+        "UTMALDG.2D": 3840.0,
+        "BRA.U.ANY": 14080.0,
+        "ISETP.GT.U32.OR": 768.0,
+        "IMAD.MOV": 768.0,
+        "IMAD.X": 3072.0,
+        "ULOP3.LUT": 512.0,
+        "ULEA": 1024.0,
+        "UTMALDG.3D": 10240.0,
+        "UISETP.GE.U32.AND": 512.0,
+        "EXIT": 2048.0,
+        "DEPBAR.LE": 170360.0,
+        "NANOSLEEP.SYNCS": 170360.0,
+        "SYNCS.PHASECHK.TRANS64": 170360.0
+      }
+    },
+    "product_instructions": [
+      {
+        "dtype": "bf16",
+        "source": "      STS [R41+0x30000], R24",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R4+0x30000], R25",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R5+0x30000], R26",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R6+0x30000], R27",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R3+0x30000], R28",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R42+0x30000], R29",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R43+0x30000], R30",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R44+0x30000], R31",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R41+0x30000], R32",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R24+0x30000], R33",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R25+0x30000], R34",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R4+0x30000], R35",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R5+0x30000], R36",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R6+0x30000], R37",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R3+0x30000], R38",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      STS [R2+0x30000], R39",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R27, [R27+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R26, [R26+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R25, [R25+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R24, [R24+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R23, [R23+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R21, [R21+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R22, [R22+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R19, [R19+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R20, [R20+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R17, [R17+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R18, [R18+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R16, [R16+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R22, [R22+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R19, [R19+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R20, [R20+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R17, [R17+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R18, [R18+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R16, [R16+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R22, [R22+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R19, [R19+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R20, [R20+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R17, [R17+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R18, [R18+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R16, [R16+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R22, [R22+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R19, [R19+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R20, [R20+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R17, [R17+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R18, [R18+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R16, [R16+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R22, [R22+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R19, [R19+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R20, [R20+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R17, [R17+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R18, [R18+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R16, [R16+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R22, [R22+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R19, [R19+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R20, [R20+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R17, [R17+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R18, [R18+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "bf16",
+        "source": "      LDS R16, [R16+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R41+0x30000], R24",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R4+0x30000], R25",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R5+0x30000], R26",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R6+0x30000], R27",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R3+0x30000], R28",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R42+0x30000], R29",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R43+0x30000], R30",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R44+0x30000], R31",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R41+0x30000], R32",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R24+0x30000], R33",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R25+0x30000], R34",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R4+0x30000], R35",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R5+0x30000], R36",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R6+0x30000], R37",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R3+0x30000], R38",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      STS [R2+0x30000], R39",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R27, [R27+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R26, [R26+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R25, [R25+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R24, [R24+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R23, [R23+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R21, [R21+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R22, [R22+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R19, [R19+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R20, [R20+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R17, [R17+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R18, [R18+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R16, [R16+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R22, [R22+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R19, [R19+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R20, [R20+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R17, [R17+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R18, [R18+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R16, [R16+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R22, [R22+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R19, [R19+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R20, [R20+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R17, [R17+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R18, [R18+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R16, [R16+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R22, [R22+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R19, [R19+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R20, [R20+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R17, [R17+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R18, [R18+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R16, [R16+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R22, [R22+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R19, [R19+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R20, [R20+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R17, [R17+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R18, [R18+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R16, [R16+0x32000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R22, [R22+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R19, [R19+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R20, [R20+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R17, [R17+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R18, [R18+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      },
+      {
+        "dtype": "fp16",
+        "source": "      LDS R16, [R16+0x30000]",
+        "nway": "1",
+        "excess": "0"
+      }
+    ]
+  },
+  "producer_timing": {
+    "bf16": {
+      "t0": 2.496,
+      "t1": 7.776,
+      "t2": 0.352,
+      "t3": 12.64,
+      "samples": 3840,
+      "trace_perturbation_pct": 0.08877052818465625
+    },
+    "fp16": {
+      "t0": 2.432,
+      "t1": 7.744,
+      "t2": 0.352,
+      "t3": 12.576,
+      "samples": 3840,
+      "trace_perturbation_pct": -0.6094833370610675
+    }
+  },
+  "baseline_timing": {
+    "bf16": {
+      "t0": 2.432,
+      "t1": 8.608,
+      "t2": 0.352,
+      "t3": 13.408,
+      "samples": 3840,
+      "trace_perturbation_pct": 1.0648648648648562
+    },
+    "fp16": {
+      "t0": 2.464,
+      "t1": 8.608,
+      "t2": 0.352,
+      "t3": 13.44,
+      "samples": 3840,
+      "trace_perturbation_pct": 0.7214146235625885
+    }
+  },
+  "clock_control": "none",
+  "cache_control": "none",
+  "paired_iter83_vs85": [
+    {
+      "mode": "launch",
+      "dtype": "bf16",
+      "iter83": 20.84511995315,
+      "iter85": 20.6299209595,
+      "reduction_pct": 1.032371097569429
+    },
+    {
+      "mode": "launch",
+      "dtype": "fp16",
+      "iter83": 20.9275197983,
+      "iter85": 20.780960321400002,
+      "reduction_pct": 0.7003193799960172
+    },
+    {
+      "mode": "graph",
+      "dtype": "bf16",
+      "iter83": 20.03919959065,
+      "iter85": 19.86000001435,
+      "reduction_pct": 0.8942451792516293
+    },
+    {
+      "mode": "graph",
+      "dtype": "fp16",
+      "iter83": 20.129120349849998,
+      "iter85": 20.370080471050002,
+      "reduction_pct": -1.1970722863793748
+    }
+  ]
+}
