@@ -92,3 +92,12 @@ the user's requests in this conversation:
 - Full standard launch BF16/FP16=21.350/21.462us, tuned Dense=12.194/9.978us. Contemporaneous ABBA comparison against rebuilt iter81 shows~1.60%/1.49% lower launch time; Graph~0.84%/1.44% lower. Small improvement, below3% threshold; no performance winner certification.
 - Compiled registers remain110/thread with0 local/stack and213120 dynamic shared; Tensor activity~19percent unchanged; dynamic instructions increase~7percent. No stage timing was added.
 - Evidence: trajectory/20261014_validation-iter82-streaming/REPORT.md. Keep this correct candidate; deeper WGMMA pipelining and warp-count changes have not been implemented.
+
+## Production-chain diagnosis — latest explicit user request
+
+- User asked to distinguish TMA supply waits from per-K WGMMA full waits. This authorizes isolated diagnostic timing, not a new optimization loop. Production solution remains iter82 unchanged.
+- Independent sparse per-stage timestamps and same-invocation cumulative timing agree: per-CTA TC production-loop median BF16/FP16~13.344/13.408us; operand waits2.432/2.464us; prepare+issue8.544/8.576us; explicit wait0 residual0.352/0.352us. Sparse cross-check residual sum~0.448us.
+- This corrects the prior hypothesis that per-K wait0 is the main bottleneck. Among waits, operand supply wait is~7x larger; the largest measured production interval is descriptor preparation and WGMMA issue, with execution overlapped. Do not equate this entire interval with pure descriptor cost or removable latency.
+- Producer-stage fractions are~64% prepare/issue,18% operand waits,2.7% explicit wait0; these are not whole-kernel percentages. CUDA consumers still wait for P. TMA also waits for free operand slots.
+- Baseline clone has identical2800 SASS instructions and operands to production for both dtypes. Trace output matches baseline bitwise on3fresh inputs; cumulative timing raises registers110->118 without spill or occupancy change; event-time perturbation~0.5–0.7% average.
+- Evidence: trajectory/20261014_profile-production-chain/REPORT.md, compressed raw traces, generated sources and reproduce scripts. Only1024^3 tested.

@@ -12,6 +12,8 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 
 [P shared bank conflict 修复报告](trajectory/20261014_validation-iter81-p-banks/REPORT.md)
 
+[生产链条分段计时：TMA 等待、WGMMA 提交与完成等待](trajectory/20261014_profile-production-chain/REPORT.md)
+
 [最初首版报告（历史）](trajectory/20261014_183039_validation-graph-1024/REPORT.md)
 
 当前源码为 iter82，`sw_cooperative_hilo_64x32x256`。按 P1→P2→P6→P7→P5→P3→P4
