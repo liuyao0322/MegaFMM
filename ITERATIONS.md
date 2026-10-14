@@ -51,6 +51,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 72 | Accumulate full-K products and recombine once | 0.5341 | 0.023643 | passed |
 
+| 73 | Pipeline two WGMMA K groups before releasing operands | 0.3639 | 0.030428 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -431,3 +433,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Complete unchanged1024 benchmark exited0; original numerical gates passed. FP32 summation order changes and requires stress verification.
 - **Next:** Inspect latency, validate cancellation and fresh Graph inputs, then overlap sequential WGMMA K slices.
 - **Archive:** trajectory/20261014_194401_iter-72/
+
+### Iter 73 — Pipeline two WGMMA K groups before releasing operands
+
+- **Hypothesis:** Keep two independent operand slots busy while serial K updates of one leaf accumulator execute asynchronously, reducing per-slice completion bubbles.
+- **Changes:** Fence accumulators once per P, commit each K group, wait_group1 then release previous slot, drain wait_group0 before reading accumulators and releasing final slot.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.030428 ms; mean speedup=0.3639x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x128 v0 | launch | 0.012260 | 0.030550 | 0.4013 | 7.32914e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x128 v0 | launch | 0.009897 | 0.030306 | 0.3266 | 2.11007e-06 | 1 |
+
+- **Analysis:** Complete1024 benchmark exited0 with original numerical gates passed. Asynchronous reuse needs targeted racecheck on selected source.
+- **Next:** Inspect complete latency and correctness stress; tune CTA roles or operand stages from evidence.
+- **Archive:** trajectory/20261014_194513_iter-73/

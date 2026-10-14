@@ -120,19 +120,21 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }else if(tid>=128 && tid<256){
     for(int p=0;p<7;++p){
       float acc[16]={};
+      warpgroup_arrive();
       for(int q=0;q<512/BK;++q){
         int sequence=p*(512/BK)+q,slot=sequence%2;
         wait(&s.ready[slot],(sequence/2)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la),al=make_tensor(make_smem_ptr(op+ASize),la);
         auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb),bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
-        warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
         if(p==2 || p>=4)mma_term<T>(al,bh,acc);
         if(p==3 || p>=4)mma_term<T>(ah,bl,acc);
-        warpgroup_commit_batch();warpgroup_wait<0>();
-        arrive(&s.free[slot]);
+        warpgroup_commit_batch();
+        if(q){warpgroup_wait<1>();arrive(&s.free[(sequence-1)%2]);}
       }
+      warpgroup_wait<0>();
+      arrive(&s.free[(p*(512/BK)+512/BK-1)%2]);
       #pragma unroll
       for(int j=0;j<16;++j){int mn=GMMA::CLayout_64x32{}(tid-128,j);s.product[p][(mn%64)*BN+mn/64]=acc[j];}
     }
