@@ -27,6 +27,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 60 | Enable two-CTA capacity with BN16 and register output | 0.0338 | 0.319083 | measured |
 
+| 61 | Increase CUDA producer parallelism based on stage clocks | 0.0719 | 0.152644 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -206,3 +208,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Complete launch benchmark exited0; do not infer measured occupancy from capacity. Use latency and resources for assessment.
 - **Next:** Inspect performance and resource use; instrument stage clocks if low occupancy or producer waits remain ambiguous.
 - **Archive:** trajectory/20261014_191528_iter-60/
+
+### Iter 61 — Increase CUDA producer parallelism based on stage clocks
+
+- **Hypothesis:** Instrumented56 shows operand preparation about94percent of CUDA-worker cycles while Tensor waits; increase producer warps to hide load/convert/address dependencies.
+- **Changes:** Restore56,512-thread CTA with11 SIMT producer warps,4 WGMMA warps,1 TMA warp; matching352 arrivals and disjoint worker indices. Precision and shared layout unchanged.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.152644 ms; mean speedup=0.0719x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_unified_v1_hilo_64x32x64 v0 | launch | 0.012254 | 0.155966 | 0.0786 | 7.15726e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_unified_v1_hilo_64x32x64 v0 | launch | 0.009736 | 0.149323 | 0.0652 | 4.79212e-07 | 1 |
+
+- **Analysis:** Full original 1024 launch benchmark exited0. Diagnostic clocks are from a separate instrumented clone, not the formally timed kernel; no source caching or input-dependent work removal.
+- **Next:** Inspect actual speedup and verify stress if improved; tune producer population and operand generation based on evidence.
+- **Archive:** trajectory/20261014_191901_iter-61/
