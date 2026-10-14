@@ -133,6 +133,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 113 | Correct small-tile shared budget and measure | 0.6347 | 0.017593 | experiment |
 
+| 114 | Overlap S/T transform with first two original-input products | 0.7973 | 0.013971 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1268,3 +1270,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full benchmark archived with original FP64 gates unchanged; inspect results after commit.
 - **Next:** Evaluate CTA concurrency, then overlap original-input P1/P2 with input transformation
 - **Archive:** trajectory/20261015_015025_iter-113/
+
+### Iter 114 — Overlap S/T transform with first two original-input products
+
+- **Hypothesis:** P1/P2 can execute before S/T publication, hiding transform and grid synchronization behind useful tensor work
+- **Changes:** Split cooperative pipeline into P1/P2 and remaining five products; CUDA consumers transform inputs before consuming P1/P2, then all roles grid-sync once; keep slot phase continuity and arithmetic
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013971 ms; mean speedup=0.7973x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012260 | 0.013852 | 0.8850 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009996 | 0.014090 | 0.7095 | 0.000754626 | 0 |
+
+- **Analysis:** Full benchmark archived; original FP64 gates unchanged. Need independent launch/Graph stress before retaining synchronization change.
+- **Next:** Assess overlap gain and tune remaining role allocation and pipeline issue
+- **Archive:** trajectory/20261015_015132_iter-114/
