@@ -1969,3 +1969,38 @@ Evidence: results/1024_MEGAKERNEL_PSPLIT_TMA_BN16_REPORT.md; small_psplit_tma_bn
 - **Analysis:** Own SW complete-call latency will rank routes, not Dense denominator changes. Static occupancy API is not measured residency or causality; no precision promotion.
 - **Next:** After this quick source Git checkpoint, create immutable full24 plan and once-complete identity before first full timing:51/52/45/50/39/Lt1 ×two dtype ×ordinary/Graph;20warm100calls5groups3fresh32Lt8GiBrotate1. Six axes×four modes=24, strict30each with shared30Dense refs, SAN3each serial. Fresh H10/H12 remain iteration46 history. Close unique prestatus and independent audits; no automatic48.
 - **Archive:** trajectory/20261014_104756_iter-47/
+
+#### Iter47 mandatory full24 and validation closure (actual timing complete)
+All six predeclared routes completed both dtype and ordinary/Graph full runs after plan and once-identity freeze:24rows,240TIMEgroups,72originalCHECK FAIL,nonfinite0,12innerexit2; allfivegroups retained. OriginalFP64 floors and native numeric policy remain unchanged. SourceGit5bc3207 binds source7; immutableplan6a52716d and onceidentity5c63549c were created afterquickGit beforefirstfulltiming, not assumed present in that earlier commit.
+| variant | dtype | mode | complete GPU us | synchronized100call wall/call us | matchedDense/SW | originalgate |
+|---|---|---|---:|---:|---:|---|
+| 1 | bf16 | graph | 17.088640 | 17.16928 | 0.661604 | FAIL finite |
+| 1 | fp16 | graph | 17.564800 | 17.64687 | 0.543760 | FAIL finite |
+| 1 | bf16 | launch | 19.401920 | 19.48398 | 0.633076 | FAIL finite |
+| 1 | fp16 | launch | 19.682879 | 19.76240 | 0.506219 | FAIL finite |
+| 39 | bf16 | graph | 22.967680 | 23.05545 | 0.490735 | FAIL finite |
+| 39 | fp16 | graph | 22.829759 | 22.91899 | 0.412626 | FAIL finite |
+| 39 | bf16 | launch | 23.224959 | 23.31178 | 0.530340 | FAIL finite |
+| 39 | fp16 | launch | 23.072641 | 23.15265 | 0.430792 | FAIL finite |
+| 45 | bf16 | graph | 17.019520 | 17.09660 | 0.671173 | FAIL finite |
+| 45 | fp16 | graph | 17.394561 | 17.47714 | 0.547794 | FAIL finite |
+| 45 | bf16 | launch | 17.721280 | 17.80754 | 0.689160 | FAIL finite |
+| 45 | fp16 | launch | 17.759360 | 17.83782 | 0.559372 | FAIL finite |
+| 50 | bf16 | graph | 25.464320 | 25.55411 | 0.446881 | FAIL finite |
+| 50 | fp16 | graph | 24.968960 | 25.04891 | 0.378082 | FAIL finite |
+| 50 | bf16 | launch | 25.714879 | 25.80659 | 0.476711 | FAIL finite |
+| 50 | fp16 | launch | 25.208001 | 25.28970 | 0.395316 | FAIL finite |
+| 51 | bf16 | graph | 24.419200 | 24.51450 | 0.465234 | FAIL finite |
+| 51 | fp16 | graph | 24.438720 | 24.52193 | 0.389978 | FAIL finite |
+| 51 | bf16 | launch | 24.739201 | 24.81872 | 0.498862 | FAIL finite |
+| 51 | fp16 | launch | 24.906881 | 24.98819 | 0.398168 | FAIL finite |
+| 52 | bf16 | graph | 30.775361 | 30.85475 | 0.370665 | FAIL finite |
+| 52 | fp16 | graph | 30.010879 | 30.09045 | 0.316003 | FAIL finite |
+| 52 | bf16 | launch | 31.077120 | 31.15526 | 0.394621 | FAIL finite |
+| 52 | fp16 | launch | 30.458241 | 30.54554 | 0.324967 | FAIL finite |
+
+Current45 is fastest across the measured native/Lt routes in allfour scenarios.51 versus45 ordinary BF/FP is39.602/40.246% slower,Graph43.478/40.496%;52 is75.366/71.505% slower ordinary,80.824/72.530% Graph. Complete-call ownSW latency establishes these comparisons; no denominator-only or bank/stall/residency causal inference. MaxDenseCV0.640606% and maxSWCV0.163078%; nooutliertrim/rebench.
+Final51 uses minCTA1/q40-128-128/I128/dynamic87040 after preserved min2 completeP spills;52 minCTA2/q48-80-80/I80/dynamic72704. Both fresh4instance compiled gates are separate from original numerical certification; occupancyAPI1/2 onlypredicts capacity, not measuredresidency. CurrentA/currentB encode insideeveryordinarycall;Graphcapture encodes fixedbindings then replays freshcontents. S/T construction occurs once perCTA/currentbankstage/pair/finalplane; acrossCTA repeats and this is not originalH12 globalSTonce. OriginalH10/H12 full8 remains separately frozen iteration46 history, not current47 rows.
+ROOTfuture7 SS delayedrelease/wait1 abstractschedule package remains CPU-only:352bounded schedules,7negative rejected,30consumerST opportunities at16stages; noCuTe/compiler/TMA/mbarrier/GPR/numeric/GPU/performance proof. Current47 uses wait0 every stage and is unchanged. Default/selected/strict/SAN actualterminal closure and uniqueimmutableprestatus audits follow, noautomatic48.
+
+Actual iteration47 validation terminal closure: defaultexit0 CASE/PASS/BEGIN3162/3388/6120; selected51 and52 eachactualexit0 with60/140/214. Aggregateoriginalstrict60gates=36PASS24FAIL/nonfinite0, shared30Dense reference cases gives90CASE, actualstrict exit2; full2010code domain was notexecuted. Forced37CLIactualexit1 with0CASE/BEGIN. AllsixserialSAN actualexit0; eachcomplete414 CASE/PASS/BEGIN marker multiset equalsselectedroute, memerrors/leaks0,racehazards/errors/warnings0,syncerrors0. SameabsoluteComputeSanitizerVersion2025.1.0.0 build35583870 before/after snapshotsactual0. No precisionpromotion, AutoDense unchanged. Original preparedff766 coveragefirstCPUattempt exit1 fromlegacyflat gate-linked-binding reader; archive retained andnew post-validation schema adapter onlyconsumer. NoGPUrerun.

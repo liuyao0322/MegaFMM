@@ -1,0 +1,296 @@
+{
+  "shapes": [
+    [
+      1024,
+      1024,
+      1024
+    ]
+  ],
+  "dtypes": [
+    "bf16",
+    "fp16"
+  ],
+  "modes": [
+    "launch",
+    "graph"
+  ],
+  "warmup": 20,
+  "trials": 100,
+  "groups": 5,
+  "correct_trials": 3,
+  "rotate_inputs": 1,
+  "heuristic_candidates": 32,
+  "workspace_limit": 8589934592,
+  "reference": "Independently tuned same-row cuBLASLt beforecapture,32candidates/8GiB; Dense/SW same ordinary/Graphmode; noGraph-specifictuning.",
+  "schema": "megafmm.iter47.full1024-plan.v1",
+  "declared_before_measurement": true,
+  "reason": "Mandatory new BK32 SS-inplace51 BN32 and52 BN16 versus retained TMA-A45, K32-window TMA-A50, RS-A39 and Lt1 full24. Current A/B descriptor encodes for enabled ordinary51/52 are inside each complete call; compiled blocks retain exact missing keys irrespective quick outcome.",
+  "routes": [
+    {
+      "label": "psplit_tma_inplace_ss51",
+      "algorithm": "mega",
+      "variant": 51,
+      "actual_name": "megakernel_wgmma_psplit_tma_inplace_ss_64x32",
+      "enabled": true,
+      "native": true
+    },
+    {
+      "label": "psplit_tma_inplace_ss52",
+      "algorithm": "mega",
+      "variant": 52,
+      "actual_name": "megakernel_wgmma_psplit_tma_inplace_ss_64x16",
+      "enabled": true,
+      "native": true
+    },
+    {
+      "label": "psplit_selective_tma_a45",
+      "algorithm": "mega",
+      "variant": 45,
+      "actual_name": "megakernel_wgmma_psplit_selective_tma_a_64x32",
+      "enabled": true,
+      "native": true
+    },
+    {
+      "label": "psplit_tma_bn16_k32_window50",
+      "algorithm": "mega",
+      "variant": 50,
+      "actual_name": "megakernel_wgmma_psplit_tma_bn16_k32_window_64x16",
+      "enabled": true,
+      "native": true
+    },
+    {
+      "label": "psplit_rsa39",
+      "algorithm": "mega",
+      "variant": 39,
+      "actual_name": "megakernel_wgmma_psplit_rsa_64x32",
+      "enabled": true,
+      "native": true
+    },
+    {
+      "label": "packed_lt1",
+      "algorithm": "lt",
+      "variant": 1,
+      "actual_name": "winograd_lt_batched",
+      "enabled": true,
+      "native": false
+    }
+  ],
+  "frozen_sources": {
+    "CMakeLists.txt": "5c36c0ab08aeb55b6b2bb5520e591a4cde6a4f0bf6e5c62db5ee7b009a4f0aa9",
+    "include/megafmm/kernels.h": "0ac999fb9bc52c7885ba9650c97744a0226bceba173116046f79fc716c01446b",
+    "include/megafmm/gemm.h": "9731cdb5cc153a4cb13d7992211198004e8cdeab5eac79e187bbb001dddeeb22",
+    "solution/plan.cpp": "6b789045611e7819b1991d09fd65c486f6af37694c495915b1457d76fe3f1662",
+    "bench/benchmark.cu": "0994bfe7d30534240a853cf78bfe9981bd34378427ad7ce19789f8bb3688c691",
+    "tests/test_correctness.cu": "5b7d08a4199fe24d8f4f80233ceec830e32ca5a860dbe5675df719a7a5334cee",
+    "solution/megakernel_wgmma_psplit_tma_inplace_ss.cu": "733709ff8c820ac708cdb4977946d3312950df864e1e736a22ea437bc992e818"
+  },
+  "frozen_binaries": {
+    "build/megafmm_bench": "c67886412fbf7643a67461288d0f6856184a4df348b17580506a5e2884bdf9a8",
+    "build/test_correctness": "40f05f0b83ea350cb42d45d21005329d8ca4f6373750bc529fa2064c33ce07b1"
+  },
+  "route_configurations": {
+    "45": {
+      "actual_name": "megakernel_wgmma_psplit_selective_tma_a_64x32",
+      "enabled": true,
+      "producer_quota": 64,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "launch_bounds_min_ctas": 1,
+      "BM": 64,
+      "BN": 32,
+      "BK": 64,
+      "threads": 384,
+      "dynamic_shared_bytes": 123904,
+      "static_shared_bytes": 0,
+      "tool_resource_shared_bytes": 1024,
+      "device_reserved_shared_bytes_per_CTA": 1024,
+      "initial_registers_per_thread": 168,
+      "initial_owned_CTA_pool_registers": 64512,
+      "requested_role_pool_registers": 57344,
+      "drain_barrier": "nonaligned barrier.sync6,384; epochs0/6/0; BOTH banks drained",
+      "raw_A_transaction_bytes_per_stage": 32768,
+      "raw_A_TMA_boxes_per_stage": 4,
+      "A_native_lda_upper_exclusive": 549755813888,
+      "B_native_stride_extra_bound": null,
+      "A_shared_absolute_alignment_bytes": 1024,
+      "occupancy_API_predicted_active_CTAs_per_SM": 1,
+      "actual_measured_CTA_residency": null,
+      "function_probe_path": "results/psplit_selective_tma_a_function_occupancy_probe_iter41.txt",
+      "resource_metadata_scope": "Retained legacy attributes; not a fresh iteration46 function or residency query."
+    },
+    "50": {
+      "actual_name": "megakernel_wgmma_psplit_tma_bn16_k32_window_64x16",
+      "enabled": true,
+      "producer_quota": 40,
+      "consumer_quotas": [
+        96,
+        96
+      ],
+      "launch_bounds_min_ctas": 2,
+      "BM": 64,
+      "BN": 16,
+      "BK": 64,
+      "threads": 384,
+      "dynamic_shared_bytes": 95232,
+      "static_shared_bytes": 0,
+      "function_probe_path": "results/psplit_tma_bn16_k32_window_function_occupancy_probe_iter46.txt",
+      "resource_metadata_scope": "Fresh50 original gate/probe; occupancy API is static prediction and measured residency remains null."
+    },
+    "39": {
+      "actual_name": "megakernel_wgmma_psplit_rsa_64x32",
+      "producer_quota": 64,
+      "consumer_quotas": [
+        192,
+        192
+      ],
+      "launch_bounds_min_ctas": 1,
+      "enabled": true,
+      "BM": 64,
+      "BN": 32,
+      "BK": 64,
+      "threads": 384,
+      "dynamic_shared_bytes": 123008,
+      "predicted_dynamic_shared_bytes": 123008,
+      "static_shared_bytes": 1024,
+      "drain_barrier": "nonaligned barrier.sync6,384; CTAepochs0/6/0",
+      "compiled_gate": {
+        "path": "results/psplit_rsa_static_review_initial_iter36.json",
+        "sha256": "46db33836552063d31dd3cfde249ddb472cf0bdd252e2a9e4f790690362a1488",
+        "status": "PASS_COMPILED_CAN_LAUNCH_39_ONLY_37_REMAINS_BLOCKED"
+      },
+      "initial_registers_per_thread": 168,
+      "initial_owned_CTA_pool_registers": 64512,
+      "requested_role_pool_registers": 57344,
+      "producer_gpr_highest_including_implicit": 52,
+      "wg0_gpr_highest_including_implicit": 185,
+      "wg1_gpr_highest_including_implicit": 186,
+      "resource_metadata_scope": "Retained legacy attributes; not a fresh iteration46 function or residency query."
+    },
+    "51": {
+      "actual_name": "megakernel_wgmma_psplit_tma_inplace_ss_64x32",
+      "enabled": true,
+      "BM": 64,
+      "BN": 32,
+      "BK": 32,
+      "threads": 384,
+      "producer_quota": 40,
+      "consumer_quotas": [
+        128,
+        128
+      ],
+      "launch_bounds_min_ctas": 1,
+      "dynamic_shared_bytes": 87040,
+      "static_shared_bytes": 0,
+      "resource_metadata_scope": "Fresh actual51 four-instance certificate/Driver/link, occupancyAPIpredictionnotresidency"
+    },
+    "52": {
+      "actual_name": "megakernel_wgmma_psplit_tma_inplace_ss_64x16",
+      "enabled": true,
+      "BM": 64,
+      "BN": 16,
+      "BK": 32,
+      "threads": 384,
+      "producer_quota": 48,
+      "consumer_quotas": [
+        80,
+        80
+      ],
+      "launch_bounds_min_ctas": 2,
+      "dynamic_shared_bytes": 72704,
+      "static_shared_bytes": 0,
+      "resource_metadata_scope": "Fresh actual52 four-instance certificate/Driver/link, occupancyAPIpredictionnotresidency"
+    }
+  },
+  "independent_compiled_gate": {
+    "path": "results/psplit_tma_inplace_ss_static_review_initial_iter47.json",
+    "sha256": "da626aff7f5673add4a1a04bdcfd75b0ef2714f331059e703da6fa7c239b1d62",
+    "status": "PASS_COMPILED_CAN_LAUNCH_51_52"
+  },
+  "initial_identity": {
+    "path": "results/psplit_tma_inplace_ss_consumer_frozen_identity_iter47.json",
+    "sha256": "7f29de8d69a629434a4231e4dde3484bf2216925186be38947254a50a68264e4"
+  },
+  "route_configuration_input": {
+    "path": "results/psplit_tma_inplace_ss_route_configurations_iter47.json",
+    "sha256": "e518257a8ced443362a11402c7d13067d5e062eb047def6f17c699f29a98594f"
+  },
+  "csv_paths": [
+    "results/small_psplit_tma_inplace_ss51_launch_iter47_full1024.csv",
+    "results/small_psplit_tma_inplace_ss51_graph_iter47_full1024.csv",
+    "results/small_psplit_tma_inplace_ss52_launch_iter47_full1024.csv",
+    "results/small_psplit_tma_inplace_ss52_graph_iter47_full1024.csv",
+    "results/small_psplit_selective_tma_a45_launch_iter47_full1024.csv",
+    "results/small_psplit_selective_tma_a45_graph_iter47_full1024.csv",
+    "results/small_psplit_tma_bn16_k32_window50_launch_iter47_full1024.csv",
+    "results/small_psplit_tma_bn16_k32_window50_graph_iter47_full1024.csv",
+    "results/small_psplit_rsa39_launch_iter47_full1024.csv",
+    "results/small_psplit_rsa39_graph_iter47_full1024.csv",
+    "results/small_packed_lt1_launch_iter47_full1024.csv",
+    "results/small_packed_lt1_graph_iter47_full1024.csv"
+  ],
+  "timing_contract": "Complete invocation including all input transforms/products/output epilogue. Independent same-row cuBLASLt tuning before capture, no Graph-specific tuning. Enabled ordinary51/52 each include current-A and current-B tensor-map encodes plus the complete kernel;45/50 retain one current-A descriptor encode and39 encodes none. Graph encodes current descriptors during capture for fixed pointers, then replays fresh contents without re-encoding. Ordinary/Graph each20warmup/100calls/5groups/3fresh; full GPU event and synchronized100-call batch wall/100, tune/setup/capture excluded. Original FP64 gates/floors unchanged. No fresh H10/H12 supplement is part of this iteration47 main plan.",
+  "freeze_status": "Fresh terminal iteration47 gate bound before mandatory timing; actual enabled scope comes from current route configurations. Initial pending snapshot remains historical; compiled safety is separate from numerical/performance certification.",
+  "expected_row_count": 24,
+  "enabled_row_count": 24,
+  "new_variants": [
+    51,
+    52
+  ],
+  "new_source_paths": [
+    "solution/megakernel_wgmma_psplit_tma_inplace_ss.cu"
+  ],
+  "comparison_pairs": [
+    {
+      "candidate_algorithm": "mega",
+      "candidate_variant": 51,
+      "baseline_algorithm": "mega",
+      "baseline_variant": 45,
+      "axis": "TMA_INPLACE_SS51_vs_45",
+      "controlled_axis_claimed": false
+    },
+    {
+      "candidate_algorithm": "mega",
+      "candidate_variant": 52,
+      "baseline_algorithm": "mega",
+      "baseline_variant": 45,
+      "axis": "TMA_INPLACE_SS52_vs_45",
+      "controlled_axis_claimed": false
+    },
+    {
+      "candidate_algorithm": "mega",
+      "candidate_variant": 51,
+      "baseline_algorithm": "mega",
+      "baseline_variant": 52,
+      "axis": "TMA_INPLACE_SS51_vs_52",
+      "controlled_axis_claimed": false
+    },
+    {
+      "candidate_algorithm": "mega",
+      "candidate_variant": 51,
+      "baseline_algorithm": "mega",
+      "baseline_variant": 50,
+      "axis": "TMA_INPLACE_SS51_vs_50",
+      "controlled_axis_claimed": false
+    },
+    {
+      "candidate_algorithm": "mega",
+      "candidate_variant": 52,
+      "baseline_algorithm": "mega",
+      "baseline_variant": 50,
+      "axis": "TMA_INPLACE_SS52_vs_50",
+      "controlled_axis_claimed": false
+    },
+    {
+      "candidate_algorithm": "mega",
+      "candidate_variant": 45,
+      "baseline_algorithm": "mega",
+      "baseline_variant": 39,
+      "axis": "TMA_INPLACE_SS45_vs_39",
+      "controlled_axis_claimed": false
+    }
+  ],
+  "retained_control_resource_scope": "Legacy controls retain previously frozen attributes; these are not new iteration47 function resource or residency queries.",
+  "compiled_blocked_rows": []
+}
