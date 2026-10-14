@@ -2513,7 +2513,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,const __grid_c
      SM90_TMA_LOAD_3D::copy(&amap,&s.raw[slot],0,op.a[p],0,n0+(p/2)*512,(q*BK+(p%2)*512)/64);
     }
    }
-   wait(&s.raw[slot],q%2);
+   wait(&s.raw[slot],phase);
    transform(op,tid-128);
    asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
    arrive(&s.pack[slot]);

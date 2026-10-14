@@ -529,6 +529,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 311 | Exclude incorrect K64 local double-buffer candidate | 0.7216 | 0.015338 | experiment |
 
+| 312 | Reject corrected K64 local double buffering | 0.6999 | 0.015929 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4812,3 +4814,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** INVALID output: BF16 errors up to1e36 and FP16 around1e3 versus expected.006/.00075; exclude all timing from valid ranking. Compiler phase unused warning indicates raw ready wait may have retained old q modulo2 rather than per-slot phase. No speedup or correctness claim.
 - **Next:** Inspect generated raw wait and stage descriptor offsets; correct phase before evaluating design and reprofile
 - **Archive:** trajectory/20261015_072133_iter-311/
+
+### Iter 312 — Reject corrected K64 local double buffering
+
+- **Hypothesis:** Correct per-slot barrier phase restores local transform pipeline correctness
+- **Changes:** Fix raw wait parity from q modulo2 to floor(q/2) modulo2; unchanged two-stage K64 local design
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.015929 ms; mean speedup=0.6999x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012394 | 0.016160 | 0.7669 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009935 | 0.015699 | 0.6328 | 0.000754626 | 0 |
+
+- **Analysis:** Original finite errors restored; both original accuracy gates remain FAIL as expected. BF16 about16.16us FP16 about15.70us still far slower than282, so local transform route is not selected.311 timings invalid. Removing global S/T traffic does not compensate duplicated SIMT transforms and local staging costs.
+- **Next:** Restore selected282 verbatim, refresh full benchmark, archive checkpoint, then investigate PDL global split4/3 with rank1 precomputation
+- **Archive:** trajectory/20261015_072306_iter-312/
