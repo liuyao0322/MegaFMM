@@ -2352,8 +2352,16 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
 }
 template<class T> __global__ __launch_bounds__(512,1)
 void sw_transform_pdl(const T* A,const T* B,T* packed){
-  cudaTriggerProgrammaticLaunchCompletion();
-  for(int i=2*(blockIdx.x*512+threadIdx.x);i<Plane;i+=2*512*128){
+  auto flag=reinterpret_cast<uint32_t*>(reinterpret_cast<char*>(packed)+WorkspaceBytes)+blockIdx.x*32;
+  if(threadIdx.x==0){
+    asm volatile("st.global.relaxed.gpu.u32 [%0],%1;" :: "l"(flag),"r"(0) : "memory");
+    // Publish this invocation's zero before its CTA permits secondary launch.
+    // Every primary CTA must trigger, so no secondary may see stale flags.
+    __threadfence();
+    cudaTriggerProgrammaticLaunchCompletion();
+  }
+  for(int local=2*threadIdx.x;local<32*64;local+=2*512){
+    int i=(int(blockIdx.x)/8*32+local/64)*512+(int(blockIdx.x)%8)*64+local%64;
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -2381,6 +2389,8 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
     for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[2*j];
   }
   asm volatile("fence.proxy.async.global;" ::: "memory");
+  __syncthreads();
+  if(threadIdx.x==0)asm volatile("st.global.release.gpu.u32 [%0],%1;" :: "l"(flag),"r"(1) : "memory");
 }
 template<class T> __global__ __launch_bounds__(Threads,1)
 void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
@@ -2406,9 +2416,18 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step);
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
-      // Raw P1/P2 can run while the primary transforms S/T. This wait
-      // guarantees completion and visibility even if no overlap is scheduled.
-      if(sequence==4)cudaGridDependencySynchronize();
+      // Per-tile acquire observes this invocation's release publication.
+      if(sequence==4 || sequence==5){
+        auto flags=reinterpret_cast<const uint32_t*>(reinterpret_cast<const char*>(packed)+WorkspaceBytes);
+        auto await_tile=[&](int tile){
+          uint32_t ready;
+          do{asm volatile("ld.global.acquire.gpu.u32 %0,[%1];":"=r"(ready):"l"(flags+tile*32):"memory");}while(!ready);
+        };
+        // Each primary produces all eight S/T planes for its32x64 input tile.
+        // First transformed leaf q0/q1 covers every transformed region later used.
+        for(int j=0;j<8;++j)await_tile((k0/32+j)*8+m0/64);
+        for(int j=0;j<4;++j)await_tile((n0/32)*8+k0/64+j);
+      }
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));

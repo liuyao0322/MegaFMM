@@ -447,6 +447,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 270 | Graph refresh of selected266 | 1.0262 | 0.010081 | experiment |
 
+| 271 | Per-primary tile flags with fenced PDL initialization | 0.6587 | 0.016816 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4080,3 +4082,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Graph BF16 10.03968us、FP16 10.12256us，对应Dense11.28544/9.39648us，原FP64门槛仍FAIL。完整ABBA254到266普通BF10.51568到10.50944、FP10.42944到10.36512us；Graph BF10.15168到10.03136、FP10.07216到10.13264us，明确FP Graph略退化。266独立72逐位检查、3quick sanitizer、256双stream/Graph均通过；这些不等于原FP64精度通过。选择266作为普通目标的小幅改进，目标仍active未达成，无物理下限/方向耗尽结论。
 - **Next:** 归档249至270证据并更新README/HINTS，继续细粒度PDL供数优化。
 - **Archive:** trajectory/20261015_062250_iter-270/
+
+### Iter 271 — Per-primary tile flags with fenced PDL initialization
+
+- **Hypothesis:** 每CTA独占flag并在PDL trigger前fence其zero可消除249全grid初始化，按24个输入tile发布替代全primary依赖等待。
+- **Changes:** 266基础primary32x64tile，每flag128Bpadding、前置zero+threadfence+CTAleader trigger、所有worker proxy fence后CTA汇合并release1；TMA仅首变换q0/q1各等待8LHS+4RHS flag，workspace增加16KiB；协议证明存results/opt_goal/scopedpdl271/PROTOCOL.md。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.016816 ms; mean speedup=0.6587x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012320 | 0.016836 | 0.7317 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009836 | 0.016795 | 0.5857 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通BF16 16.83648us、FP16 16.79456us，明显退化；FP有45us单组离群，中位仍慢。原三fresh错误值一致、门槛FAIL，但未独立验证新协议，不保留。24个顺序acquire观察可能自身昂贵，需控制实验区分，不直接归因全部prefixfence。
+- **Next:** 批量并行读取12flags后单次acquire fence，保持相同初始化/发布，以区分串行观察成本。
+- **Archive:** trajectory/20261015_062622_iter-271/
