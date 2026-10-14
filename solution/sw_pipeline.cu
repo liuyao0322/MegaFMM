@@ -32,6 +32,11 @@ __device__ __forceinline__ int product_index(int row,int col){
   return row*BN+(col^((row&1)|((row&6)<<2)));
 }
 
+// Zero-based P IDs. Producer and consumers advance barriers by step, not P ID.
+__device__ constexpr int product_for_step(int step){
+  return step<2 ? step:step==2 ? 5:step==3 ? 6:step==4 ? 4:step==5 ? 2:3;
+}
+
 template<class T,class TA,class TB>
 __device__ void mma_term(TA a,TB b,float (&d)[16]) {
   using namespace cute;
@@ -88,8 +93,9 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
-    for(int p=0;p<7;++p)for(int q=0;q<512/BK;++q){
-      int sequence=p*(512/BK)+q,slot=sequence%2,k0=q*BK;
+    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
+      int p=product_for_step(step);
+      int sequence=step*(512/BK)+q,slot=sequence%2,k0=q*BK;
       if(sequence>=2)wait(&s.free[slot],((sequence-2)/2)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       int bytes=2*(ASize+BSize)+(alo ? 2*ASize:0)+(blo ? 2*BSize:0);
@@ -118,33 +124,41 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }else if((tid>=32 && tid<128) || tid>=256){
     int worker=tid>=256 ? tid-160:tid-32;
     constexpr int Chunks=(Elements+351)/352;
-    float values[7][Chunks];
+    float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
-    for(int p=0;p<7;++p){
-      wait(&s.product_ready[p%2],(p/2)%2);
+    for(int step=0;step<7;++step){
+      wait(&s.product_ready[step%2],(step/2)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
         int i=worker+j*352;
-        if(i<Elements)values[p][j]=s.product[p%2][product_index(i/BN,i%BN)];
+        if(i<Elements)current[j]=s.product[step%2][product_index(i/BN,i%BN)];
       }
-      arrive(&s.product_free[p%2]);
-    }
-    #pragma unroll
-    for(int j=0;j<Chunks;++j){
-      int i=worker+j*352;
-      if(i<Elements){
-        float p1=values[0][j],p2=values[1][j],p3=values[2][j],p4=values[3][j],p5=values[4][j],p6=values[5][j],p7=values[6][j];
-        float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6),u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
-        int row=m0+i/BN,col=n0+i%BN;
-        D[row*1024+col]=u1;D[row*1024+col+512]=__fadd_rn(u4,p3);
-        D[(row+512)*1024+col]=__fsub_rn(u3,p4);D[(row+512)*1024+col+512]=__fadd_rn(u3,p5);
+      // Release shared P immediately after reading; arithmetic/global stores can
+      // overlap the Tensor warpgroup's reuse of this slot two steps later.
+      arrive(&s.product_free[step%2]);
+      #pragma unroll
+      for(int j=0;j<Chunks;++j){
+        int i=worker+j*352;
+        if(i<Elements){
+          int at=(m0+i/BN)*1024+n0+i%BN;
+          if(step==0)first[j]=current[j]; // P1
+          else if(step==1)D[at]=__fadd_rn(first[j],current[j]); // U1
+          else if(step==2)first[j]=__fadd_rn(first[j],current[j]); // U2
+          else if(step==3)second[j]=__fadd_rn(first[j],current[j]); // U3
+          else if(step==4){
+            D[at+512*1024+512]=__fadd_rn(second[j],current[j]); // D22
+            first[j]=__fadd_rn(first[j],current[j]); // U4
+          }else if(step==5)D[at+512]=__fadd_rn(first[j],current[j]); // D12
+          else D[at+512*1024]=__fsub_rn(second[j],current[j]); // D21
+        }
       }
     }
   }else if(tid>=128 && tid<256){
-    for(int p=0;p<7;++p){
+    for(int step=0;step<7;++step){
+      int p=product_for_step(step);
       float acc[16]={};
       for(int q=0;q<512/BK;++q){
-        int sequence=p*(512/BK)+q,slot=sequence%2;
+        int sequence=step*(512/BK)+q,slot=sequence%2;
         wait(&s.ready[slot],(sequence/2)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la),al=make_tensor(make_smem_ptr(op+ASize),la);
@@ -157,13 +171,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         __syncwarp();
         if((tid&31)==0)arrive(&s.free[slot]);
       }
-      if(p>=2)wait(&s.product_free[p%2],((p-2)/2)%2);
+      if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
       #pragma unroll
       for(int j=0;j<16;++j){
         int mn=GMMA::CLayout_64x32{}(tid-128,j);
-        s.product[p%2][product_index(mn%64,mn/64)]=acc[j];
+        s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
       }
-      arrive(&s.product_ready[p%2]);
+      arrive(&s.product_ready[step%2]);
     }
   }
   __syncthreads();
