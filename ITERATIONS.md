@@ -1164,3 +1164,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Both original dtype gates remain FAIL by design of uncompensated route; numerical agreement with97 and independent synchronization checks determine implementation validity.
 - **Next:** Compare108with100/97,retain fastest validated source and complete final sanitizer/profiling evidence
 - **Archive:** trajectory/20261015_013630_iter-108/
+
+### Final selection — restore100 after98–108 experiments
+
+- Selected100(76b4d09),compact4slotBK256 with timely per-K release; verbatimrestore and finalfullbenchmark completed. User-requested7products retained; originalFP64gates FAILboth,nonfinite0.
+- Finalpaired97/100/108:
+
+| mode | dtype |97us|100us| reduction | concurrentDenseus |
+|---|---|---:|---:|---:|---:|
+| launch | bf16 | 14.23776 | 13.05968 | 8.27% | 12.28576 |
+| launch | fp16 | 14.38592 | 13.24832 | 7.91% | 9.97968 |
+| graph | bf16 | 13.56512 | 12.27312 | 9.52% | 11.30288 |
+| graph | fp16 | 14.06352 | 12.53360 | 10.88% | 9.52576 |
+
+- 72bitwise-vs97checks,270diagnostictimingrowsbitexact,all3quicksanitizers0errors/hazards/warnings,DAG3tests PASS. These do not certify original numerical acceptance.
+- Shared space recovered then reused for4prefetchslots,totalstill213120B. K128/K512,twoMMAgroups,64bittransform,splittransform,initialbarrierremoval,fullTCunroll rejected;104invalid andexcluded. Fronttransform/gridno reliableimprovement.
+- Report:trajectory/20261015_validation-seven-prefetch/REPORT.md. No physical-floor claim.

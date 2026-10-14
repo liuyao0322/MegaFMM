@@ -153,3 +153,9 @@ the user's requests in this conversation:
 ## User-authorized seven-product optimization round,2026-10-15
 
 - Explicit directions: reclaim unused shared and test deeper operand prefetch with timely release; tune K blocking and issue/wait rhythm; reduce input-transform/grid-sync front cost. Keep current seven-product no-compensation semantics, originalFP64gates and Auto=Dense. Report accuracy FAIL plainly; compare bitwise with97 to catch synchronization/arithmetic regressions separately. Use complete1024^3 BF16/FP16 timings and independent diagnostics/sanitizers on retained changes.
+
+- Completed authorized98–108round,selected100(76b4d09):4compactoperand slots,BK256,immediatewait0/free perK. Recovered98304B reusedfor2extraslots; finalshared213120,regs53,nospill,oneCTA/SM.
+- Finalpaired vs97launchBF16/FP16~14.238/14.386->13.060/13.248us,Graph13.565/14.064->12.273/12.534us(~8%launch,9–12%Graph). Still slowerDense.
+- CurrentTCready1.440/1.472us,issue3.648/3.680,wait0 .512/.512,loop7.072/7.104;front2.592us. Dynamicinstructionsup3.204->3.921M despitegain. Do not attributeallgainonlytoTMAorclaimissueisallsoftware.
+- K128sixslots,K512twoslots,twoMMAgroups,64bittransform,splittransform,initCTAbarrierremoval,TCproductunroll rejected.104invalidtruncatedstorefixed105; exclude104timings. Frontcostnotimproved.
+- Final100matches97bitwise72checks and passes3quicksanitizers;270diagnosticexact,DAG3pass. OriginalFP64gates STILLFAIL,eF.0060152/.000754626. Userexplicitlykeepsuncompensatedroute,AutoDense. Evidence trajectory/20261015_validation-seven-prefetch/REPORT.md.

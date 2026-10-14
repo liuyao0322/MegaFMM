@@ -172,8 +172,6 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
     }
   }else if(tid>=128 && tid<256){
-    // Specialize every product step so all four operand slot addresses are fixed.
-    #pragma unroll
     for(int step=0;step<7;++step){
       int p=product_for_step(step);
       float acc[16]={};

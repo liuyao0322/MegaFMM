@@ -3,13 +3,15 @@
 H100 上 Strassen–Winograd 矩阵乘法的研究工程。2026-10-14 按用户要求移除旧
 SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的首版。
 
-**当前 SW 源码按用户要求保留七乘法、无额外补偿版本（iter97）。**
-1024³ 的 BF16/FP16 完整调用普通 launch 约 **14.18/14.40 μs**，
-Graph 约 **13.57/14.06 μs**；较此前15项补偿版耗时下降约25%–27%。
-**两种输入均未通过原精度门限**，仍慢于调优cuBLASLt Dense。
-`Auto` 和 `Dense` 继续执行普通 GEMM；`SWPipeline` / `--algorithm sw` 显式执行当前实验内核。
+**当前 SW 源码保留七乘法、无补偿路线，已优化为四 operand slot 预取（iter100）。**
+1024³ 的同期交错测量，BF16/FP16普通launch约 **13.06/13.25 μs**，Graph约 **12.27/12.53 μs**；
+较此前双slot七乘法版，普通调用耗时下降约8%，Graph约9%–12%。
+**两种输入仍未通过原精度门限**，仍慢于调优cuBLASLt Dense。
+`Auto` 和 `Dense` 继续普通GEMM；`SWPipeline` / `--algorithm sw` 显式执行当前实验内核。
 
-[当前七乘法版本 profiling 与瓶颈结论](trajectory/20261015_profile-iter97-seven-products/REPORT.md)
+[当前四slot预取优化与完整验证报告](trajectory/20261015_validation-seven-prefetch/REPORT.md)
+
+[双slot七乘法版本 profiling（历史）](trajectory/20261015_profile-iter97-seven-products/REPORT.md)
 
 [七乘法无补偿实验（iter97：更快，但两种精度均未通过原验收）](trajectory/20261015_validation-iter97-no-compensation/REPORT.md)
 
@@ -27,18 +29,18 @@ Graph 约 **13.57/14.06 μs**；较此前15项补偿版耗时下降约25%–27%�
 
 [最初首版报告（历史）](trajectory/20261014_183039_validation-graph-1024/REPORT.md)
 
-当前源码逐文件恢复自 iter97（503c7de），`sw_cooperative_hilo_64x32x256`。
-保留输入32位成对读写、A侧合并TMA和流式重组；删除低部分生成、写回、TMA供数、等待及八项补偿乘法。
-原始FP64参考与数值门限保持不变。BF16 eF约0.0060152，门限0.00100256；
-FP16 eF约0.000754626，门限0.000103753，均FAIL，非有限值0。
-此前补偿版的72项独立检查及sanitizer通过结果仅适用于补偿版，不能用于认证当前无补偿版。
+当前源码逐文件恢复自iter100（76b4d09），`sw_cooperative_hilo_64x32x256`。
+回收低部分shared空间用于四slot高部分预取，保留BK256和及时释放；最终shared总量213120字节。
+原始FP64参考与数值门限保持不变：BF16eF约0.0060152、FP16约0.000754626，两者FAIL。
+与原七乘法版通过72项独立逐位一致性检查、三种quick sanitizer及DAG测试；这些检查不代表精度验收通过。
+64位变换、拆分transform kernel、移除初始同步均无可靠完整调用收益，未合并。
 
 每次调用先在调用方提供的 **8 MiB 全局 workspace** 中以FP32生成S/T，再仅写入目标dtype的高部分，
 通过 cooperative grid barrier 后，以 TMA 装入统一 shared buffer 并执行 WGMMA。
 128 个 CTA，每个 512 线程：1 个 TMA warp、11 个 CUDA Core warp、4 个 WGMMA warp。
 动态 shared 每 CTA 213120 字节，BM=64、BN=32、BK=256。需要支持至少128个同时驻留
 CTA 的 Hopper cooperative launch；当前在132 SM H100上验证。`run()`不分配、不进行host同步。
-当前执行7项叶乘法；为隔离补偿成本，workspace与shared布局预算暂沿用旧版，尚未压缩。原始FP64参考和数值门限保持不变。
+当前执行7项叶乘法；全局workspace预算暂沿用旧版；shared已压缩为高部分布局，并用于四slot预取。原始FP64参考和数值门限保持不变。
 
 ## 当前目录
 
