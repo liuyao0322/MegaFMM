@@ -445,6 +445,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 269 | Restore266 verbatim for independent paired comparison | 1.0598 | 0.010475 | experiment |
 
+| 270 | Graph refresh of selected266 | 1.0262 | 0.010081 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4062,3 +4064,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.54912us、FP16 10.40128us，Dense12.3904/9.82944us，未达到FP Dense，原门槛FAIL。下一步独立二进制与254比较，不能把本轮单次结果当作新winner认证。
 - **Next:** 归档266二进制，执行254/266普通和Graph的完整ABBA。
 - **Archive:** trajectory/20261015_061926_iter-269/
+
+### Iter 270 — Graph refresh of selected266
+
+- **Hypothesis:** 普通调用的descriptor预取小收益不能替代独立Graph报告，保持两模式完整验收。
+- **Changes:** 源码保持原样266，只使用既有MEGAFMM_GRAPH=1完整测量。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010081 ms; mean speedup=1.0262x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | graph | 0.011285 | 0.010040 | 1.1241 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | graph | 0.009396 | 0.010123 | 0.9283 | 0.000754626 | 0 |
+
+- **Analysis:** Graph BF16 10.03968us、FP16 10.12256us，对应Dense11.28544/9.39648us，原FP64门槛仍FAIL。完整ABBA254到266普通BF10.51568到10.50944、FP10.42944到10.36512us；Graph BF10.15168到10.03136、FP10.07216到10.13264us，明确FP Graph略退化。266独立72逐位检查、3quick sanitizer、256双stream/Graph均通过；这些不等于原FP64精度通过。选择266作为普通目标的小幅改进，目标仍active未达成，无物理下限/方向耗尽结论。
+- **Next:** 归档249至270证据并更新README/HINTS，继续细粒度PDL供数优化。
+- **Archive:** trajectory/20261015_062250_iter-270/
