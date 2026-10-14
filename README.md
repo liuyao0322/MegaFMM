@@ -8,11 +8,15 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 BF16加速比约1.190×；FP16仍慢约4.40%，还需减少约0.432 μs（SW时间的4.22%）。
 Graph单独配对：SW约 **9.976/9.993 μs**，Dense约 **11.274/9.341 μs**；不替代普通调用目标。
 279相对266普通BF16/FP16改善约2.43%/0.70%；282相对279仅约0.47%/0.35%，没有新的3%以上突破。
+313逐字恢复后的新测BF16/FP16约10.293/10.246 μs，Dense约12.469/9.791 μs；FP16仍需减少约0.455 μs。
+292–312的cluster分工、本地shared变换及同步改动均未改善保留版普通调用；错误或未编译候选明确排除。
 
 **两种输入仍未通过原始精度门槛**：BF16 eF约0.0060152，FP16约0.000754626。
 `Auto` 和 `Dense` 继续普通调优 cuBLASLt GEMM；当前 SW 必须显式指定。
 
-[当前持续优化检查点（271–291，目标仍在进行）](trajectory/20261015_optimization-goal-checkpoint-291/REPORT.md)
+[当前持续优化检查点（292–313，目标仍在进行）](trajectory/20261015_optimization-goal-checkpoint-313/REPORT.md)
+
+[此前271–291检查点](trajectory/20261015_optimization-goal-checkpoint-291/REPORT.md)
 
 [此前249–270检查点](trajectory/20261015_optimization-goal-checkpoint-270/REPORT.md)
 

@@ -1,0 +1,12 @@
+==WARNING== Note: Running with uncontrolled GPU caches. Profiling results may be inconsistent.
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 1460774 (/share/home/liuyao/workspace/MegaFMM/results/opt_seven_round/iter311_bench)
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=sw_local_shared_transform;threads=384;warp_roles=8cuda+4wgmma;tma_leader=128;smem=172160;bk=64;operand_stages=2;accumulators=7x16;transform=fp32_pair_final_rn;leaf=Btrans_Atrans;publication=local_double_buffer_barriers;workspace_reserved=4194304;workspace_used=0;current_pointer_maps=2;leaf_terms=7;residual_correction=off;alpha=1;beta=0
+==PROF== Profiling "sw_cooperative_hilo": 0%....50%....100% - 1 pass
+PROFILE 1024,1024,1024 bf16 sw_cooperative_hilo_64x32x256 workspace=4194304 target=solution lt_config=sw_local_shared_transform;threads=384;warp_roles=8cuda+4wgmma;tma_leader=128;smem=172160;bk=64;operand_stages=2;accumulators=7x16;transform=fp32_pair_final_rn;leaf=Btrans_Atrans;publication=local_double_buffer_barriers;workspace_reserved=4194304;workspace_used=0;current_pointer_maps=2;leaf_terms=7;residual_correction=off;alpha=1;beta=0
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=sw_local_shared_transform;threads=384;warp_roles=8cuda+4wgmma;tma_leader=128;smem=172160;bk=64;operand_stages=2;accumulators=7x16;transform=fp32_pair_final_rn;leaf=Btrans_Atrans;publication=local_double_buffer_barriers;workspace_reserved=4194304;workspace_used=0;current_pointer_maps=2;leaf_terms=7;residual_correction=off;alpha=1;beta=0
+==PROF== Profiling "sw_cooperative_hilo": 0%....50%....100% - 1 pass
+PROFILE 1024,1024,1024 fp16 sw_cooperative_hilo_64x32x256 workspace=4194304 target=solution lt_config=sw_local_shared_transform;threads=384;warp_roles=8cuda+4wgmma;tma_leader=128;smem=172160;bk=64;operand_stages=2;accumulators=7x16;transform=fp32_pair_final_rn;leaf=Btrans_Atrans;publication=local_double_buffer_barriers;workspace_reserved=4194304;workspace_used=0;current_pointer_maps=2;leaf_terms=7;residual_correction=off;alpha=1;beta=0
+==PROF== Disconnected from process 1460774
+==PROF== Report: /share/home/liuyao/workspace/MegaFMM/results/opt_goal/profile311/basic.ncu-rep
