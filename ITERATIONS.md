@@ -535,6 +535,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 314 | PDL global split4plus3 initial build | 0.0000 | 0.000000 | experiment |
 
+| 315 | Reject PDL global split4plus3 with three-leaf precomputation | 0.8066 | 0.013638 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4864,3 +4866,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Compile failed: generated u2/u3 register array names end in digits and do not match u20 references. No valid timing or correctness results. The earlier explicit scalar naming fix must also cover these temporary vectors.
 - **Next:** Declare U temporary scalar registers explicitly and rerun same architecture
 - **Archive:** trajectory/20261015_072627_iter-314/
+
+### Iter 315 — Reject PDL global split4plus3 with three-leaf precomputation
+
+- **Hypothesis:** Remove cluster and DSM overhead and compute rank1 leaves before waiting for global U state
+- **Changes:** Explicit U temporary registers; seven K128 operand stages; ordinary128CTA N64 pairs with2MiB U and per-warp flags initialized by primary
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013638 ms; mean speedup=0.8066x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012190 | 0.013537 | 0.9005 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009793 | 0.013740 | 0.7128 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 13.53696us and FP16 13.73984us versus Dense12.1904/9.79328us. Expected finite original errors retained, original gates fail. Improves299 cluster16us but slower than selected28210.2us, not selected. Need profile resources and memory transactions before interpreting remaining split cost.
+- **Next:** Profile315; investigate balanced raw-product ownership or return to selected single-CTA issue/supply optimization
+- **Archive:** trajectory/20261015_072706_iter-315/
