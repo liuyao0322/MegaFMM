@@ -163,6 +163,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 128 | Correct direct-producer recombination extraction | 0.0941 | 0.118200 | experiment |
 
+| 129 | TMA-leader publication while TC and CUDA roles progress independently | 0.8641 | 0.012951 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1534,3 +1536,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 127 failed compile and has no timings; full128 benchmark archived with original numerical gates unchanged.
 - **Next:** Assess full-call cost of direct producers and profile retained baseline if it regresses
 - **Archive:** trajectory/20261015_021356_iter-128/
+
+### Iter 129 — TMA-leader publication while TC and CUDA roles progress independently
+
+- **Hypothesis:** Overlap P1/P2 with S/T generation without draining TC at an all-thread grid barrier
+- **Changes:** CUDA workers transform and arrive shared pack barrier; TMA leader issues first four K tiles then joins per-invocation driver-workspace release/acquire barrier; TC and consumers do not join grid barrier; CUDA12.4 internal ABI dependency explicit
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012951 ms; mean speedup=0.8641x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012358 | 0.012890 | 0.9587 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010013 | 0.013013 | 0.7695 | 0.000754626 | 0 |
+
+- **Analysis:** Full benchmark archived with original FP64 gates. Independent fresh-input launch/Graph/concurrency and sanitizer validation required before retention; no persistent computed data or host counter.
+- **Next:** Evaluate complete-call improvement and tune transform worker allocation if promising
+- **Archive:** trajectory/20261015_021723_iter-129/
