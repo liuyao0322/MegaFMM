@@ -487,6 +487,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 290 | Restore independently validated K128 iter282 | 1.0687 | 0.010293 | experiment |
 
+| 291 | Validated iter282 Graph refresh | 1.0361 | 0.009996 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4440,3 +4442,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Fresh FP16 10.27808us vs Dense9.824us remains slower.282 already passed72bitwise baseline162 checks,three quick sanitizers and256two-stream calls; paired279/282 supports small ordinary improvement. Original FP64 gates FAIL; Auto Dense; sustained goal remains active.
 - **Next:** Refresh Graph unchanged, archive evidence and continue new directions
 - **Archive:** trajectory/20261015_065245_iter-290/
+
+### Iter 291 — Validated iter282 Graph refresh
+
+- **Hypothesis:** Report Graph separately from the ordinary-call target with unchanged selected source
+- **Changes:** No source modification; standard Graph benchmark on verbatim282 restored in290
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.009996 ms; mean speedup=1.0361x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | graph | 0.011284 | 0.009993 | 1.1292 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | graph | 0.009428 | 0.009999 | 0.9430 | 0.000754626 | 0 |
+
+- **Analysis:** Graph BF16 9.99264us vs Dense11.28384us; FP16 9.99872us vs Dense9.42848us still slower. Original FP64 gates FAIL unchanged. Independent implementation checks and paired ordinary performance support selected282; sustained goal remains active.
+- **Next:** Archive checkpoint291 and continue current K128 primary scheduling or improved cross-CTA reuse protocols
+- **Archive:** trajectory/20261015_065327_iter-291/
