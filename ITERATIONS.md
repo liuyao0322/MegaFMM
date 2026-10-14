@@ -335,6 +335,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 214 | Four product slots for static dual-TC pipeline | 0.9589 | 0.011574 | experiment |
 
+| 215 | Transpose each leaf and exchange physical operand roles | 0.9905 | 0.011238 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3076,3 +3078,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 11.5027us FP16 11.6461us, finite expected errors and both original gates FAIL. Small recovery versus213 but still slower than selected162. More product slots do not resolve the FP16 gap.
 - **Next:** Profile compact dual-TC issue and return to a different operand-prefetch geometry rather than tuning P buffering further
 - **Archive:** trajectory/20261015_043542_iter-214/
+
+### Iter 215 — Transpose each leaf and exchange physical operand roles
+
+- **Hypothesis:** Wider MN-major B reads and K-major original A reads may reduce operand supply and descriptor overhead
+- **Changes:** From162 compute B_leaf transpose times A_leaf transpose, use MN128/K128 shared layouts, adjusted TMA boxes, column-swizzled P and coalesced transposed consumer output
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011238 ms; mean speedup=0.9905x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012338 | 0.011133 | 1.1082 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009900 | 0.011342 | 0.8728 | 0.000754626 | 0 |
+
+- **Analysis:** Fresh BF16 11.1334us FP16 11.3424us versus Dense12.3379/9.90016us; expected seven-product errors finite, original gates FAIL. Modest initial improvement relative to162, needs paired performance and independent bitwise validation before selection.
+- **Next:** Run independent72-check comparison and full NCU, then tune this reversed operand geometry from measured evidence
+- **Archive:** trajectory/20261015_043801_iter-215/
