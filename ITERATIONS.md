@@ -537,6 +537,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 315 | Reject PDL global split4plus3 with three-leaf precomputation | 0.8066 | 0.013638 | experiment |
 
+| 316 | Leaf-entry-only WGMMA fence | 1.0791 | 0.010127 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4882,3 +4884,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 13.53696us and FP16 13.73984us versus Dense12.1904/9.79328us. Expected finite original errors retained, original gates fail. Improves299 cluster16us but slower than selected28210.2us, not selected. Need profile resources and memory transactions before interpreting remaining split cost.
 - **Next:** Profile315; investigate balanced raw-product ownership or return to selected single-CTA issue/supply optimization
 - **Archive:** trajectory/20261015_072706_iter-315/
+
+### Iter 316 — Leaf-entry-only WGMMA fence
+
+- **Hypothesis:** Same-shape accumulator continuation needs no new register fence at K128 subblocks without intervening CPU accumulator access
+- **Changes:** Selected282 retain fence at each leaf q0 only, preserve every wait0 and four-leader immediate release
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010127 ms; mean speedup=1.0791x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012280 | 0.010190 | 1.2051 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009593 | 0.010063 | 0.9532 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.19040us FP16 10.06336us versus Dense12.28000/9.59264us. Small own-latency signal requires same-round282/316 ABBA; FP16 still slower than Dense. Expected finite original errors and gatesFAIL. A proposal file write was inadvertently batched after completion polling before this log; close immediately and keep future completion poll last in a tool batch.
+- **Next:** Archive316 binary; paired timing and independent synchronization validation, then investigate five transformed-product accumulator groups
+- **Archive:** trajectory/20261015_072849_iter-316/
