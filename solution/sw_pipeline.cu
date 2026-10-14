@@ -64,6 +64,43 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
 }
 
 template<class T> __global__ __launch_bounds__(Threads,1)
+void sw_transform(const T* A,const T* B,T* packed){
+  using namespace cute;
+  int tid=threadIdx.x;
+  // All CTAs cooperate in one input transformation per invocation, never across calls.
+  // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
+  // retain FP32 transforms and high rounding, omit residual generation.
+  for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid);i<Plane;i+=2*gridDim.x*gridDim.y*Threads){
+    int row=i/512,col=i%512,at=row*1024+col;
+    auto av=reinterpret_cast<const uint32_t*>(A);
+    auto bv=reinterpret_cast<const uint32_t*>(B);
+    uint32_t abits[4]={av[at/2],av[(at+512)/2],av[(at+512*1024)/2],av[(at+512*1024+512)/2]};
+    uint32_t bbits[4]={bv[at/2],bv[(at+512)/2],bv[(at+512*1024)/2],bv[(at+512*1024+512)/2]};
+    uint32_t words[16]={};
+    #pragma unroll
+    for(int lane=0;lane<2;++lane){
+      float a11=float(T::bitcast(uint16_t(abits[0]>>(16*lane)))),a12=float(T::bitcast(uint16_t(abits[1]>>(16*lane))));
+      float a21=float(T::bitcast(uint16_t(abits[2]>>(16*lane)))),a22=float(T::bitcast(uint16_t(abits[3]>>(16*lane))));
+      float b11=float(T::bitcast(uint16_t(bbits[0]>>(16*lane)))),b12=float(T::bitcast(uint16_t(bbits[1]>>(16*lane))));
+      float b21=float(T::bitcast(uint16_t(bbits[2]>>(16*lane)))),b22=float(T::bitcast(uint16_t(bbits[3]>>(16*lane))));
+      float s1=__fadd_rn(a21,a22),s2=__fsub_rn(s1,a11);
+      float t1=__fsub_rn(b12,b11),t2=__fsub_rn(b22,t1);
+      float sv[4]={s1,s2,__fsub_rn(a11,a21),__fsub_rn(a12,s2)};
+      float tv[4]={t1,t2,__fsub_rn(b22,b12),__fsub_rn(t2,b21)};
+      #pragma unroll
+      for(int j=0;j<4;++j){
+        T sh=T(sv[j]),th=T(tv[j]);
+        words[2*j]|=uint32_t(sh.raw())<<(16*lane);
+        words[8+2*j]|=uint32_t(th.raw())<<(16*lane);
+      }
+    }
+    #pragma unroll
+    for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(2*j*Plane+i)/2]=words[2*j];
+  }
+  asm volatile("fence.proxy.async.global;" ::: "memory");
+}
+
+template<class T> __global__ __launch_bounds__(Threads,1)
 void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
                          const __grid_constant__ CUtensorMap bmap,
                          const __grid_constant__ CUtensorMap smap,
@@ -79,39 +116,6 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
-  // All CTAs cooperate in one input transformation per invocation, never across calls.
-  // Transform four adjacent elements per thread with aligned 64-bit IO. Experimental seven-product path:
-  // retain FP32 transforms and high rounding, omit residual generation.
-  for(int i=4*((blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid);i<Plane;i+=4*gridDim.x*gridDim.y*Threads){
-    int row=i/512,col=i%512,at=row*1024+col;
-    auto av=reinterpret_cast<const uint64_t*>(A);
-    auto bv=reinterpret_cast<const uint64_t*>(B);
-    uint64_t abits[4]={av[at/4],av[(at+512)/4],av[(at+512*1024)/4],av[(at+512*1024+512)/4]};
-    uint64_t bbits[4]={bv[at/4],bv[(at+512)/4],bv[(at+512*1024)/4],bv[(at+512*1024+512)/4]};
-    uint64_t words[16]={};
-    #pragma unroll
-    for(int lane=0;lane<4;++lane){
-      float a11=float(T::bitcast(uint16_t(abits[0]>>(16*lane)))),a12=float(T::bitcast(uint16_t(abits[1]>>(16*lane))));
-      float a21=float(T::bitcast(uint16_t(abits[2]>>(16*lane)))),a22=float(T::bitcast(uint16_t(abits[3]>>(16*lane))));
-      float b11=float(T::bitcast(uint16_t(bbits[0]>>(16*lane)))),b12=float(T::bitcast(uint16_t(bbits[1]>>(16*lane))));
-      float b21=float(T::bitcast(uint16_t(bbits[2]>>(16*lane)))),b22=float(T::bitcast(uint16_t(bbits[3]>>(16*lane))));
-      float s1=__fadd_rn(a21,a22),s2=__fsub_rn(s1,a11);
-      float t1=__fsub_rn(b12,b11),t2=__fsub_rn(b22,t1);
-      float sv[4]={s1,s2,__fsub_rn(a11,a21),__fsub_rn(a12,s2)};
-      float tv[4]={t1,t2,__fsub_rn(b22,b12),__fsub_rn(t2,b21)};
-      #pragma unroll
-      for(int j=0;j<4;++j){
-        T sh=T(sv[j]),th=T(tv[j]);
-        words[2*j]|=uint64_t(sh.raw())<<(16*lane);
-        words[8+2*j]|=uint64_t(th.raw())<<(16*lane);
-      }
-    }
-    #pragma unroll
-    for(int j=0;j<8;++j)reinterpret_cast<uint64_t*>(packed)[(2*j*Plane+i)/4]=words[2*j];
-  }
-  // Generic global stores become visible to TMA's async proxy before publication.
-  asm volatile("fence.proxy.async.global;" ::: "memory");
-  cooperative_groups::this_grid().sync();
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
@@ -245,9 +249,14 @@ void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,v
   CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
   encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
   void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D};dim3 grid(16,8);
+  void* transform_args[]={&A,&B,&workspace};
   if(state.dtype==DType::BF16)
-    check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
+    check(cudaLaunchKernel(reinterpret_cast<void*>(sw_transform<cute::bfloat16_t>),grid,Threads,transform_args,0,stream),"SW transform launch");
   else
-    check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::half_t>),grid,Threads,args,sizeof(Shared<cute::half_t>),stream),"SW cooperative launch");
+    check(cudaLaunchKernel(reinterpret_cast<void*>(sw_transform<cute::half_t>),grid,Threads,transform_args,0,stream),"SW transform launch");
+  if(state.dtype==DType::BF16)
+    check(cudaLaunchKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
+  else
+    check(cudaLaunchKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::half_t>),grid,Threads,args,sizeof(Shared<cute::half_t>),stream),"SW cooperative launch");
 }
 } // namespace megafmm::detail

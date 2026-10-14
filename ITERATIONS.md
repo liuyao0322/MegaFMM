@@ -117,6 +117,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 105 | Correct64bit transform output pointer width | 0.8444 | 0.013184 | experiment |
 
+| 106 | Separate transform kernel instead of cooperative grid barrier | 0.7748 | 0.014437 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1098,3 +1100,25 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Iter104 is INVALID: truncated stores caused errors unrelated to accepted seven-product approximation; exclude all104 timings. Corrected105 must match97 output independently.
 - **Next:** Bitwise-check candidates,compare105vs100,profile best ring before split-transform experiment
 - **Archive:** trajectory/20261015_013122_iter-105/
+
+### Reassessment after101–105
+
+- K128/6slots andK512/2slots are slower than100; two outstanding groups103 ties or regresses100;104 invalid due truncated store,105corrected matches original approximation but is slower than100. No >=3% improvement over100 across these candidates.
+- Fresh100NCU and all-role diagnostics completed. Same-invocation BF16/FP16 operandready1.440/1.472us,issue3.648/3.680us,wait0 .512/.512us,TCloop7.072/7.104us; fronttransform+grid2.592us. Compare historical97ready2.880/2.912,issue2.368,wait01.408,loop7.936. Changes affect codegen too; do not attribute entire gain only to prefetch.
+- Reviewed NVIDIA Hopper pipeline guidance and CUTLASS TMA/WGMMA examples. Next distinct direction: separate transform kernel to replace cooperative grid synchronization with stream-order dependency; ordinarylaunch overhead may offset Graph benefit. Keep100 as baseline and measure bothmodes.
+
+### Iter 106 — Separate transform kernel instead of cooperative grid barrier
+
+- **Hypothesis:** Replacing in-kernel grid sync with stream-ordered transform and compute kernels may shorten the front phase, especially under Graph
+- **Changes:** Basedon100; launch standalone high-only transform then ordinary math kernel,no cooperative grid barrier; preserve transform/accumulation arithmetic and shared ring
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.014437 ms; mean speedup=0.7748x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012356 | 0.014228 | 0.8684 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009978 | 0.014645 | 0.6813 | 0.000754626 | 0 |
+
+- **Analysis:** Full two-kernel invocation measured with unchanged trial counts and original accuracy gates. Extra launch cost must be included; do not time compute kernel alone.
+- **Next:** Compare complete call versus100; retain only independent bitwise-safe improvement and finalize validated selection
+- **Archive:** trajectory/20261015_013336_iter-106/
