@@ -49,7 +49,7 @@ __device__ void mma_term(TA a,TB b,float (&d)[32]) {
   auto da_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(
       tiled_divide(a,Shape<_64,_16>{}));
   auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(
-      tiled_divide(b,Shape<_32,_16>{}));
+      tiled_divide(b,Shape<_64,_16>{}));
   auto da_base=da_tiles(0,0,0);
   auto db_base=db_tiles(0,0,0);
   #pragma unroll
@@ -76,7 +76,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<1;++j){Barrier::init(&s.product_ready[j],256);Barrier::init(&s.product_free[j],256);}
+    for(int j=0;j<1;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],256);}
     Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }

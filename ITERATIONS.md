@@ -297,6 +297,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 195 | Single CTA N64 with three operand slots | 0.0000 | 0.000000 | experiment |
 
+| 196 | Correct and measure N64 single-P pipeline | 0.7840 | 0.014195 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2732,3 +2734,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Compiled but first invocation stalled: P-ready initialized with 256 arrivals while only128 TC producers arrive. Explicitly terminated the hung job step. No timing or numerical results valid.
 - **Next:** Correct ready producer count to128, retaining consumer free count256, and fix descriptor tile extent toN64
 - **Archive:** trajectory/20261015_035738_iter-195/
+
+### Iter 196 — Correct and measure N64 single-P pipeline
+
+- **Hypothesis:** Three K256 operand slots and wider WGMMA reduce issue and duplicated A traffic
+- **Changes:** Correct P-ready producer count128 vs free consumer count256; B descriptor extentN64
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.014195 ms; mean speedup=0.7840x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012265 | 0.014095 | 0.8702 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009975 | 0.014296 | 0.6977 | 0.000754626 | 0 |
+
+- **Analysis:** Finite expected approximate errors; original precision gates fail both. BF16 14.095 us and FP16 14.296 us versus Dense12.265/9.975 us. Wider tiles and64CTA grid lose to selected162. Reassessment used current162/187NCU and phase timing plus NVIDIA efficient GEMM/warp specialization documentation; no floor established.
+- **Next:** Return to128CTA N32 grid and test two tensor warpgroups with balanced asynchronous input transform
+- **Archive:** trajectory/20261015_035839_iter-196/
