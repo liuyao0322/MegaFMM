@@ -61,6 +61,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 77 | Load complete reduction operands before each leaf | 0.3903 | 0.028540 | passed |
 
+| 78 | Reduce per-worker P register footprint with27 CUDA warps | 0.3839 | 0.028947 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -521,3 +523,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Full original benchmark exited0 with all numerical gates passed;76 passed72 stress checks and had110 registers with zero local/stack.
 - **Next:** Inspect latency, then focus on lower-cost packed ST generation and mixed operand layouts.
 - **Archive:** trajectory/20261014_195039_iter-77/
+
+### Iter 78 — Reduce per-worker P register footprint with27 CUDA warps
+
+- **Hypothesis:** More CUDA workers halve live P registers per thread and raise packing parallelism; test whether fewer registers and faster handoffs improve76.
+- **Changes:** Restore76 with1024 threads,864 CUDA workers,three register chunks per worker and matched864 product-free arrivals.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.028947 ms; mean speedup=0.3839x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012250 | 0.028840 | 0.4248 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009966 | 0.029053 | 0.3430 | 2.37136e-06 | 1 |
+
+- **Analysis:** Complete unchanged benchmark exited0; numerical gates passed. Full-K single-buffer77 regressed, retaining BK256 double buffering.
+- **Next:** Inspect latency and spills, then evaluate four BK128 operand slots with one leaf completion wait.
+- **Archive:** trajectory/20261014_195223_iter-78/
