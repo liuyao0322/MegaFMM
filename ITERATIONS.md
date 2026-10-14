@@ -217,6 +217,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 155 | Compact uncompensated operand planes into4MiB workspace | 0.9687 | 0.011534 | experiment |
 
+| 156 | Explicit paired16bit conversion for transformed operands | 0.9620 | 0.011586 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2020,3 +2022,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Fresh baseline errors preserved and original gates FAIL. Launch11.446/11.622us is flat versus140; workspace reduction useful but no performance claim pending paired validation.
 - **Next:** Test packed two-result dtype conversion and inspect emitted conversion instructions
 - **Archive:** trajectory/20261015_030308_iter-155/
+
+### Iter 156 — Explicit paired16bit conversion for transformed operands
+
+- **Hypothesis:** Pack two FP32 transformed results in one dtype-conversion instruction
+- **Changes:** From155 compute two lanes in FP32 and use cvt.rn.f16x2.f32 or bf16x2 packing with documented high/low operand order
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011586 ms; mean speedup=0.9620x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012310 | 0.011494 | 1.0710 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009961 | 0.011678 | 0.8530 | 0.000754626 | 0 |
+
+- **Analysis:** Original seven-product errors preserved, gates FAIL. Launch11.494/11.678us does not improve155 or140; do not retain purely from static instruction expectations.
+- **Next:** Test non-returning reduction for one-shot invocation-local publication counter
+- **Archive:** trajectory/20261015_030407_iter-156/
