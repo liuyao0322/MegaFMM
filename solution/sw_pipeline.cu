@@ -21,7 +21,7 @@ template<class T> struct alignas(128) Shared {
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
   float product[2][Elements];
   uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
-  uint64_t pack_ready;
+  uint64_t pack_ready,global_ready;
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
@@ -75,19 +75,20 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],2);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
-    Barrier::init(&s.pack_ready,608);
+    Barrier::init(&s.pack_ready,576);Barrier::init(&s.global_ready,1);
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
-  if(tid==0){
+  if(tid==0 || tid==32){
     for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step);
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
       if(sequence==4){
+        if(tid==0){
         wait(&s.pack_ready,0);
         // CUDA12.4 cooperative launch gives each invocation its own initialized
         // driver workspace. Only TMA leaders join this publication barrier;
@@ -97,12 +98,15 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         uint32_t old,current;
         asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;" : "=r"(old) : "l"(barrier),"r"(increment) : "memory");
         do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(!((old^current)&0x80000000u));
+        arrive(&s.global_ready);
+        }else wait(&s.global_ready,0);
       }
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       // Seven-product experiment: only publish high operands; no residual loads.
-      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(tid==0 ? ASize:BSize));
       T* op=s.operand[slot];
+      if(tid==0){
       if(alo){
         int plane=p==2 ? 3:p-4;
         SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op,0,m0,k0/64,plane);
@@ -110,6 +114,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
         SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op,0,m0+row,(k0+col)/64);
       }
+      }else{
       if(blo){
         int plane=p==3 ? 3:p-4;
         SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+ASize,n0,k0,plane);
@@ -117,14 +122,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
         SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize,n0+col,k0+row);
       }
-
+      }
     }
-  }else if((tid>=32 && tid<128) || tid>=256){
-    int worker=tid>=256 ? tid-160:tid-32;
+  }else if((tid>=64 && tid<128) || tid>=256){
+    int worker=tid>=256 ? tid-192:tid-64;
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
-  for(int local=2*worker;local<Plane/(16*8);local+=2*608){
+  for(int local=2*worker;local<Plane/(16*8);local+=2*576){
     int i=(blockIdx.y*gridDim.x+blockIdx.x)*(Plane/(16*8))+local;
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
@@ -195,7 +200,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
-        if(q==0)warpgroup_arrive();
+        warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
         warpgroup_commit_batch();warpgroup_wait<0>();
         __syncwarp();
