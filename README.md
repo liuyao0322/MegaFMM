@@ -3,29 +3,32 @@
 H100 上 Strassen–Winograd 矩阵乘法的研究工程。2026-10-14 按用户要求移除旧
 SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的首版。
 
-**当前保留 iter224（62142fc）的七乘法、无补偿实验内核。持续优化目标尚未完成。**
-迭代至248后原样恢复224，最新1024³同期交错普通调用：BF16/FP16 SW约 **10.978/11.090 μs**，
-调优 Dense约 **12.275/9.975 μs**。BF16加速比1.118×；FP16仍慢约11.17%，还需减少约1.115 μs（SW时间的10.05%）。
-单独Graph复测：SW约 **10.511/10.877 μs**，Dense约 **11.368/9.441 μs**；Graph不替代普通调用目标。
+**当前保留 iter266（18f9a6f）的七乘法、无补偿实验内核。持续优化目标尚未完成。**
+完整A/B/B/A普通调用：BF16/FP16 SW约 **10.509/10.365 μs**，同期调优Dense约 **12.321/9.806 μs**。
+BF16加速比约1.172×；FP16仍慢约5.71%，还需减少约0.560 μs（SW时间的5.40%）。
+Graph单独配对：SW约 **10.031/10.133 μs**，Dense约 **11.326/9.346 μs**；不替代普通调用目标。
+266较254普通FP16改善仅0.62%、BF持平，FP16 Graph退化0.60%，没有跨模式普遍改善。
 
 **两种输入仍未通过原始精度门槛**：BF16 eF约0.0060152，FP16约0.000754626。
 `Auto` 和 `Dense` 继续普通调优 cuBLASLt GEMM；当前 SW 必须显式指定。
 
-[当前持续优化检查点（209–248，目标仍在进行）](trajectory/20261015_optimization-goal-checkpoint-248/REPORT.md)
+[当前持续优化检查点（249–270，目标仍在进行）](trajectory/20261015_optimization-goal-checkpoint-270/REPORT.md)
+
+[此前209–248检查点](trajectory/20261015_optimization-goal-checkpoint-248/REPORT.md)
 
 [此前165–208检查点](trajectory/20261015_optimization-goal-checkpoint-208/REPORT.md)
 
 [此前性能配对与完整独立验证（109–162）](trajectory/20261015_optimization-goal-checkpoint/REPORT.md)
 
-当前实现使用4 MiB调用方 workspace、196736B动态 shared 和四个 BK256 operand slots。
-128个 CTA，每 CTA672线程：1个 TMA warp、16个 CUDA变换warps、4个 WGMMA warps。
-叶乘法按B转置乘A转置组织；Tensor Core私有寄存器保存中间结果并直接重组输出，移除P shared交换。
-P1/P2与输入变换重叠，每个K块完成后及时释放slot。
-发布屏障依赖CUDA12.4 cooperative-groups内部的每次调用独立driver workspace；移植工具链时需复核。
+当前实现使用4 MiB调用方workspace、196736B动态shared和四个BK256 operand slots。
+输入变换是128 CTA×512线程的primary kernel；乘法是128 CTA×256线程的secondary，
+TMA warp0、TC warps4–7，warp1 leader提前预取四个当前descriptor。
+叶乘法按B转置乘A转置组织，TC私有寄存器直接重组输出；P1/P2可与变换重叠，及时释放slot。
+使用官方PDL与首次变换块前的grid dependency wait，两个kernel统一设置100%shared carveout。
 `run()`无分配、无host同步；每次为当前指针编码tensor maps，无跨调用计算值缓存。
 
-当前224与保留162通过72项fresh-input逐位检查、三种quick sanitizer，以及256次双stream/Graph重放检查。
-验证所用源码与当前solution逐字一致。这些检查验证实现与同步，**不代表通过原始FP64精度验收**。
+254和当前266分别通过72项fresh-input逐位检查、三种quick sanitizer，以及256次双stream/Graph调用。
+266验证源码与当前solution逐字一致。这些检查验证实现与同步，**不代表通过原始FP64精度验收**。
 
 [历史四slot预取优化（iter100）](trajectory/20261015_validation-seven-prefetch/REPORT.md)
 
@@ -39,7 +42,7 @@ P1/P2与输入变换重叠，每个K块完成后及时释放slot。
 solution/
   plan.cpp             Dense 规划、cuBLASLt 调优、指针检查和执行
   scale_output.cu      alpha=0 或 K=0 时的 FP32 输出处理
-  sw_pipeline.cu       1024³ cooperative SW、统一 S/T workspace、TMA/WGMMA 流水
+  sw_pipeline.cu       1024³ PDL 双kernel SW、统一 S/T workspace、TMA/WGMMA 流水
   internal.h           内部声明
 include/megafmm/gemm.h  Problem、Policy、Plan 和 run/tune 接口
 bench/benchmark.cu     普通 launch/Graph 计时和原始输入的 FP64 参考检查
