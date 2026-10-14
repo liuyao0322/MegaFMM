@@ -451,6 +451,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 272 | Batch tile observations with one acquire fence | 0.8719 | 0.012622 | experiment |
 
+| 273 | PDL initialization-prefix control | 0.9954 | 0.011121 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4116,3 +4118,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通BF16 12.75584us、FP16 12.48896us，比271明显改善但仍慢于266约10.5/10.37us。Dense12.22208/9.81152us，原门槛FAIL。显示串行观察确实昂贵，但不能把剩余全部归于初始化或producer，需对照。未独立验收，不保留。
 - **Next:** 对照仅增加primary前缀初始化fence而保持全primary依赖等待，以区分prefix与tile观察开销。
 - **Archive:** trajectory/20261015_062726_iter-272/
+
+### Iter 273 — PDL initialization-prefix control
+
+- **Hypothesis:** 仅添加每CTA zero及GPU fence对照可区分271/272细粒度协议前置成本。
+- **Changes:** 恢复266原变换所有权和cudaGridDependencySynchronize，只保留primary leader zero paddedflag、threadfence后trigger；无tile release/observe。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011121 ms; mean speedup=0.9954x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012344 | 0.011149 | 1.1071 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009803 | 0.011092 | 0.8838 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通 BF16 11.14944us、FP16 11.09184us，较266约多0.6至0.7us，前缀已有明显代价；仍不能精确拆分271/272其余成本，因为所有权与末CTA汇合也不同。原门槛FAIL，不保留。271至273无3percent改善；已重读266计数器、254阶段/批次trace和历史N48/N64，查询官方PTX确认支持m64n40形状，转向更细N分块折中。
+- **Next:** 测试N40/104CTA与四槽BK256，保留PDL和描述符预取，边缘输出加保护。
+- **Archive:** trajectory/20261015_062826_iter-273/
