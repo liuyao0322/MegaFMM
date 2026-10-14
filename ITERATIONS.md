@@ -411,6 +411,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 252 | Two-kernel Programmatic Dependent Launch | 0.9042 | 0.012212 | experiment |
 
+| 253 | Graph test of full two-kernel PDL call | 0.8368 | 0.012371 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3756,3 +3758,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 12.1859 us vs Dense12.3245 us; FP16 12.2390 us vs Dense9.75552 us, worse than224. Expected original errors/gatesFAIL. Official opportunistic concurrency requires no mutual progress and both kernels finish even if serialized.249 sparse trace30exactchecks/3840rows: coordinator2.75-2.78us, TMAinitwait1.82-1.92us, packwait.032us, publication.83-.86us;64regs/stack0 both traced andbase, diagnostic regime only.
 - **Next:** Measure PDL Graph separately and profile producer/consumer overlap before judging launch cost or compute path.
 - **Archive:** trajectory/20261015_054702_iter-252/
+
+### Iter 253 — Graph test of full two-kernel PDL call
+
+- **Hypothesis:** Graph replay removes host submission gaps and may expose actual PDL overlap benefits.
+- **Changes:** Unchanged252 source; full standard Graph benchmark for both solution and tuned Dense, all input transforms and both kernels included.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012371 ms; mean speedup=0.8368x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | graph | 0.011335 | 0.012324 | 0.9198 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | graph | 0.009363 | 0.012419 | 0.7539 | 0.000754626 | 0 |
+
+- **Analysis:** Graph BF16 12.3235 us vs Dense11.3354 us; FP16 12.4192 us vs Dense9.36256 us, both worse than selected224 Graph. Expected original errors and numerical gatesFAIL. PDL invocation also fails to improve under Graph; overlap must be observed, not assumed.
+- **Next:** Inspect actual kernel concurrency with Nsight Systems or absolute device timestamps; retain224 unless a verified full-call gain appears.
+- **Archive:** trajectory/20261015_054740_iter-253/
