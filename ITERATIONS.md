@@ -339,6 +339,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 216 | K192 five-slot transposed operand prefetch with K128 tail | 0.8747 | 0.012745 | experiment |
 
+| 217 | True N16 WGMMA with two resident CTAs per SM | 0.7991 | 0.013925 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3112,3 +3114,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 12.5299us FP16 12.9606us materially slower than215 and162. Expected original errors finite and both precision gates FAIL.215 validation72bitwise,3sanitizers and256multistream launches passed; paired215 ordinary improves~1.3percent but FP16Graph regresses~.35percent, no universal win.
 - **Next:** Retain K256 and test a smaller true N16 WGMMA with two resident CTAs rather than padded N32 arithmetic
 - **Archive:** trajectory/20261015_044050_iter-216/
+
+### Iter 217 — True N16 WGMMA with two resident CTAs per SM
+
+- **Hypothesis:** N16 arithmetic and two-block residency can hide operand latency without padded N32 work
+- **Changes:** From215 use64x16x128,5slots,110720Bshared,512threads,256cooperativeCTAs,8FP32accumulators, inline true m64n16k16 PTX and two-block launch bounds
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013925 ms; mean speedup=0.7991x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012272 | 0.013790 | 0.8899 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009959 | 0.014060 | 0.7083 | 0.000754626 | 0 |
+
+- **Analysis:** Expected finite seven-product errors, original gates FAIL. BF16 13.7904us FP16 14.0602us slower than215 and162. Increased residency does not compensate repeated input traffic and finer-grained production.
+- **Next:** Return215 and reduce issue and supply overhead with a full static single-TC chain on reversed geometry
+- **Archive:** trajectory/20261015_044211_iter-217/
