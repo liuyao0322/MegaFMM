@@ -167,6 +167,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 130 | 608 workers for asynchronous S/T publication | 0.8952 | 0.012499 | experiment |
 
+| 131 | Reduce recombination consumers to four warps | 0.9010 | 0.012435 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1570,3 +1572,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 129 paired launch improves~2% but Graph is flat; NCU53regs,3.84M instructions,Tensor14.7–14.9%. Full130 benchmark archived.
 - **Next:** Assess transform scaling and test consumer or product vectorization independently
 - **Archive:** trajectory/20261015_021918_iter-130/
+
+### Iter 131 — Reduce recombination consumers to four warps
+
+- **Hypothesis:** Fewer polling CUDA warps reduce scheduler pressure on the TC issue chain
+- **Changes:** From100 retain all512 transform threads but use128 product consumers; adjust P-free counts and16chunks per consumer; other workers idle after pack
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012435 ms; mean speedup=0.9010x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012390 | 0.012384 | 1.0004 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010007 | 0.012485 | 0.8015 | 0.000754626 | 0 |
+
+- **Analysis:** 130 launch12.435/12.563us with original error level, promising versus100; full131 benchmark archived independently to isolate consumer allocation.
+- **Next:** Inspect consumer timing and test vector product exchange
+- **Archive:** trajectory/20261015_022028_iter-131/

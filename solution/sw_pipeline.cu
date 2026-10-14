@@ -11,7 +11,7 @@
 namespace megafmm::detail {
 namespace {
 constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=768;
+constexpr int Plane=512*512,Threads=512;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -21,7 +21,6 @@ template<class T> struct alignas(128) Shared {
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
   float product[2][Elements];
   uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
-  uint64_t pack_ready;
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
@@ -76,55 +75,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],608);}
-    Barrier::init(&s.pack_ready,608);
+    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
-  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
-  if(tid==0){
-    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
-      int p=product_for_step(step);
-      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
-      if(sequence==4){
-        wait(&s.pack_ready,0);
-        // CUDA12.4 cooperative launch gives each invocation its own initialized
-        // driver workspace. Only TMA leaders join this publication barrier;
-        // the shared pack barrier has already acquired every CUDA writer.
-        auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
-        uint32_t increment=(blockIdx.x==0 && blockIdx.y==0) ? 0x80000000u-127u:1u;
-        uint32_t old,current;
-        asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;" : "=r"(old) : "l"(barrier),"r"(increment) : "memory");
-        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(!((old^current)&0x80000000u));
-      }
-      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
-      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
-      // Seven-product experiment: only publish high operands; no residual loads.
-      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
-      T* op=s.operand[slot];
-      if(alo){
-        int plane=p==2 ? 6:2*(p-4);
-        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op,0,m0,k0/64,plane);
-      }else{
-        int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
-        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op,0,m0+row,(k0+col)/64);
-      }
-      if(blo){
-        int plane=p==3 ? 6:2*(p-4);
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+ASize,n0,k0,plane);
-      }else{
-        int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize,n0+col,k0+row);
-      }
-
-    }
-  }else if((tid>=32 && tid<128) || tid>=256){
-    int worker=tid>=256 ? tid-160:tid-32;
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
-  for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*608+worker);i<Plane;i+=2*gridDim.x*gridDim.y*608){
+  for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid);i<Plane;i+=2*gridDim.x*gridDim.y*Threads){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -151,16 +109,47 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     #pragma unroll
     for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(2*j*Plane+i)/2]=words[2*j];
   }
-    asm volatile("fence.proxy.async.global;" ::: "memory");
-    arrive(&s.pack_ready);
-    constexpr int Chunks=(Elements+607)/608;
+  // Generic global stores become visible to TMA's async proxy before publication.
+  asm volatile("fence.proxy.async.global;" ::: "memory");
+  cooperative_groups::this_grid().sync();
+  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
+  if(tid==0){
+    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
+      int p=product_for_step(step);
+      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+      bool alo=p==2 || p>=4,blo=p==3 || p>=4;
+      // Seven-product experiment: only publish high operands; no residual loads.
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      T* op=s.operand[slot];
+      if(alo){
+        int plane=p==2 ? 6:2*(p-4);
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op,0,m0,k0/64,plane);
+      }else{
+        int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op,0,m0+row,(k0+col)/64);
+      }
+      if(blo){
+        int plane=p==3 ? 6:2*(p-4);
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+ASize,n0,k0,plane);
+      }else{
+        int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize,n0+col,k0+row);
+      }
+
+    }
+  }else if((tid>=32 && tid<128) || tid>=256){
+    int worker=tid>=256 ? tid-160:tid-32;
+    if(worker<128){
+    constexpr int Chunks=(Elements+127)/128;
     float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
     for(int step=0;step<7;++step){
       wait(&s.product_ready[step%2],(step/2)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*608;
+        int i=worker+j*128;
         if(i<Elements)current[j]=s.product[step%2][product_index(i/BN,i%BN)];
       }
       // Release shared P immediately after reading; arithmetic/global stores can
@@ -168,7 +157,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       arrive(&s.product_free[step%2]);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*608;
+        int i=worker+j*128;
         if(i<Elements){
           int at=(m0+i/BN)*1024+n0+i%BN;
           if(step==0)first[j]=current[j]; // P1
@@ -182,6 +171,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
           else D[at+512*1024]=__fsub_rn(second[j],current[j]); // D21
         }
       }
+    }
     }
   }else if(tid>=128 && tid<256){
     for(int step=0;step<7;++step){
