@@ -93,10 +93,11 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         // driver workspace. Only TMA leaders join this publication barrier;
         // the shared pack barrier has already acquired every CUDA writer.
         auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
-        uint32_t increment=(blockIdx.x==0 && blockIdx.y==0) ? 0x80000000u-127u:1u;
-        uint32_t old,current;
-        asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;" : "=r"(old) : "l"(barrier),"r"(increment) : "memory");
-        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(!((old^current)&0x80000000u));
+        uint32_t current;
+        // One-shot barrier: driver initializes the invocation counter to zero.
+        // Release reductions form the modification sequence acquired at128.
+        asm volatile("red.release.gpu.global.add.u32 [%0],1;" :: "l"(barrier) : "memory");
+        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(current!=128u);
       }
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
@@ -131,7 +132,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     auto bv=reinterpret_cast<const uint32_t*>(B);
     uint32_t abits[4]={av[at/2],av[(at+512)/2],av[(at+512*1024)/2],av[(at+512*1024+512)/2]};
     uint32_t bbits[4]={bv[at/2],bv[(at+512)/2],bv[(at+512*1024)/2],bv[(at+512*1024+512)/2]};
-    float values[8][2];
+    uint32_t words[16]={};
     #pragma unroll
     for(int lane=0;lane<2;++lane){
       float a11=float(T::bitcast(uint16_t(abits[0]>>(16*lane)))),a12=float(T::bitcast(uint16_t(abits[1]>>(16*lane))));
@@ -143,15 +144,11 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       float sv[4]={s1,s2,__fsub_rn(a11,a21),__fsub_rn(a12,s2)};
       float tv[4]={t1,t2,__fsub_rn(b22,b12),__fsub_rn(t2,b21)};
       #pragma unroll
-      for(int j=0;j<4;++j){values[j][lane]=sv[j];values[4+j][lane]=tv[j];}
-    }
-    uint32_t words[16]={};
-    #pragma unroll
-    for(int j=0;j<8;++j){
-      if constexpr(std::is_same_v<T,cute::bfloat16_t>)
-        asm("cvt.rn.bf16x2.f32 %0,%1,%2;":"=r"(words[2*j]):"f"(values[j][1]),"f"(values[j][0]));
-      else
-        asm("cvt.rn.f16x2.f32 %0,%1,%2;":"=r"(words[2*j]):"f"(values[j][1]),"f"(values[j][0]));
+      for(int j=0;j<4;++j){
+        T sh=T(sv[j]),th=T(tv[j]);
+        words[2*j]|=uint32_t(sh.raw())<<(16*lane);
+        words[8+2*j]|=uint32_t(th.raw())<<(16*lane);
+      }
     }
     #pragma unroll
     for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[2*j];

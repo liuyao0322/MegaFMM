@@ -219,6 +219,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 156 | Explicit paired16bit conversion for transformed operands | 0.9620 | 0.011586 | experiment |
 
+| 157 | One-shot release reduction publication counter | 0.9667 | 0.011551 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2038,3 +2040,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Original seven-product errors preserved, gates FAIL. Launch11.494/11.678us does not improve155 or140; do not retain purely from static instruction expectations.
 - **Next:** Test non-returning reduction for one-shot invocation-local publication counter
 - **Archive:** trajectory/20261015_030407_iter-156/
+
+### Iter 157 — One-shot release reduction publication counter
+
+- **Hypothesis:** Non-returning atomic reduction avoids returned atomic serialization and phase bookkeeping
+- **Changes:** From155 RED release increments private invocation workspace counter and leaders acquire-wait for128; same CUDA-to-TMA shared publication and no cross-call state
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011551 ms; mean speedup=0.9667x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012348 | 0.011477 | 1.0758 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009968 | 0.011625 | 0.8575 | 0.000754626 | 0 |
+
+- **Analysis:** Baseline numerical errors reproduced, both original gates FAIL. Launch11.477/11.625us remains flat versus155. Compact workspace and counter changes do not resolve FP16 gap.
+- **Next:** Reassess best NCU and test direct two-accumulator interleaving with immediate retire
+- **Archive:** trajectory/20261015_030453_iter-157/
