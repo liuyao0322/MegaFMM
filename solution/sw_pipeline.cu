@@ -2689,7 +2689,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
 template<class T> __global__ __launch_bounds__(1024,1)
 void sw_transform_pdl(const T* A,const T* B,T* packed){
   cudaTriggerProgrammaticLaunchCompletion();
-  for(int i=2*(blockIdx.x*1024+threadIdx.x);i<Plane;i+=2*1024*128){
+  for(int i=2*(blockIdx.x*1024+threadIdx.x);i<Plane;i+=2*1024*64){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -2835,11 +2835,11 @@ void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,v
   config.dynamicSmemBytes=sizeof(Shared<cute::half_t>);config.stream=stream;
   config.attrs=&attribute;config.numAttrs=1;
   if(state.dtype==DType::BF16){
-    sw_transform_pdl<cute::bfloat16_t><<<128,1024,0,stream>>>(static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace));
+    sw_transform_pdl<cute::bfloat16_t><<<64,1024,0,stream>>>(static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace));
     check(cudaPeekAtLastError(),"SW PDL transform launch");
     check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::bfloat16_t>,a,b,s,t,static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace),D),"SW PDL compute launch");
   }else{
-    sw_transform_pdl<cute::half_t><<<128,1024,0,stream>>>(static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace));
+    sw_transform_pdl<cute::half_t><<<64,1024,0,stream>>>(static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace));
     check(cudaPeekAtLastError(),"SW PDL transform launch");
     check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::half_t>,a,b,s,t,static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace),D),"SW PDL compute launch");
   }
