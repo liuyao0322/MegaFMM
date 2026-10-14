@@ -8,7 +8,20 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 `Auto` 和 `Dense` 都执行普通 GEMM；`SWPipeline` / `--algorithm sw` 显式执行新内核。
 旧 Mega45 等路线已从当前源码和公共 API 删除。
 
-[首版实现、精度与性能报告](trajectory/20261014_183039_validation-graph-1024/REPORT.md)
+[当前优化版本的精度与性能报告](trajectory/20261014_193836_validation-iter71-graph/REPORT.md)
+
+[最初首版报告（历史）](trajectory/20261014_183039_validation-graph-1024/REPORT.md)
+
+当前最快通过标准数值门限的 SW 为 iter71，`sw_cooperative_hilo_64x32x128`。
+普通调用 BF16/FP16 约 **28.33/28.22 μs**；同期独立调优的 cuBLASLt Dense 为
+**12.27/9.91 μs**，SW 仍慢 **2.31/2.85 倍**。仅测 1024³，不能据此称为加速 winner。
+
+每次调用先在调用方提供的 **8 MiB 全局 workspace** 中重新生成 FP32 S/T 的高低部分，
+通过 cooperative grid barrier 后，以 TMA 装入统一 shared buffer 并执行 WGMMA。
+128 个 CTA，每个 512 线程：1 个 TMA warp、11 个 CUDA Core warp、4 个 WGMMA warp。
+动态 shared 每 CTA 188544 字节，BM=64、BN=32、BK=128。需要支持至少128个同时驻留
+CTA 的 Hopper cooperative launch；当前在132 SM H100上验证。`run()`不分配、不进行host同步。
+高低部分补偿共有15项叶乘法，原始FP64参考和数值门限保持不变。详见当前报告。
 
 ## 当前目录
 
@@ -16,7 +29,7 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 solution/
   plan.cpp             Dense 规划、cuBLASLt 调优、指针检查和执行
   scale_output.cu      alpha=0 或 K=0 时的 FP32 输出处理
-  sw_pipeline.cu       1024³ 统一 shared buffer、warp 分工与高低部分操作数
+  sw_pipeline.cu       1024³ cooperative SW、统一 S/T workspace、TMA/WGMMA 流水
   internal.h           内部声明
 include/megafmm/gemm.h  Problem、Policy、Plan 和 run/tune 接口
 bench/benchmark.cu     普通 launch/Graph 计时和原始输入的 FP64 参考检查
@@ -85,7 +98,7 @@ Graph 的新输入重放。SW 仅支持非转置、连续布局、alpha=1、beta
 强制 SW 抛错，不静默退回 Dense。Auto 始终保留 Dense。
 
 `scripts/bench.sh <label>` 保留 AKO 的源码快照逻辑；正式迭代记录 `ITERATIONS.md`
-和对应 Git 版本。首版完成比较后停止，不自动展开后续优化。
+和对应 Git 版本。后续已按用户指令持续进行 AKO4ALL 优化；当前目标仍在进行。
 
 ## 历史与清理记录
 

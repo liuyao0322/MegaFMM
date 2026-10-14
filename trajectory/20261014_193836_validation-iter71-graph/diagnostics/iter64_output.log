@@ -1,0 +1,29 @@
+results/clock_probe64/probe.cu(161): warning #2361-D: invalid narrowing conversion from "int" to "unsigned int"
+    uint32_t box[3]={is_a ? BK:BN,is_a ? BM:BK,1},element_strides[3]={1,1,1};
+                     ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+results/clock_probe64/probe.cu(161): warning #2361-D: invalid narrowing conversion from "int" to "unsigned int"
+    uint32_t box[3]={is_a ? BK:BN,is_a ? BM:BK,1},element_strides[3]={1,1,1};
+                                  ^
+
+results/clock_probe64/probe.cu(161): warning #2361-D: invalid narrowing conversion from "int" to "unsigned int"
+    uint32_t box[3]={is_a ? BK:BN,is_a ? BM:BK,1},element_strides[3]={1,1,1};
+                     ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+results/clock_probe64/probe.cu(161): warning #2361-D: invalid narrowing conversion from "int" to "unsigned int"
+    uint32_t box[3]={is_a ? BK:BN,is_a ? BM:BK,1},element_strides[3]={1,1,1};
+                                  ^
+
+results/clock_probe64/probe.cu: In function ‘void megafmm::detail::_GLOBAL__N__651cabd6_8_probe_cu_e594aa00::encode(CUtensorMap&, const void*, megafmm::DType, bool, bool)’:
+results/clock_probe64/probe.cu:161:25: warning: narrowing conversion of ‘(int)(is_a ?  megafmm::detail::_GLOBAL__N__651cabd6_8_probe_cu_e594aa00::BK :  megafmm::detail::_GLOBAL__N__651cabd6_8_probe_cu_e594aa00::BN)’ from ‘int’ to ‘uint32_t’ {aka ‘unsigned int’} [-Wnarrowing]
+  161 |   uint32_t box[3]={is_a ? BK:BN,is_a ? BM:BK,1},element_strides[3]={1,1,1};
+      |                    ~~~~~^~~~~~~~~
+results/clock_probe64/probe.cu:161:41: warning: narrowing conversion of ‘(int)(is_a ?  megafmm::detail::_GLOBAL__N__651cabd6_8_probe_cu_e594aa00::BM :  megafmm::detail::_GLOBAL__N__651cabd6_8_probe_cu_e594aa00::BK)’ from ‘int’ to ‘uint32_t’ {aka ‘unsigned int’} [-Wnarrowing]
+  161 |   uint32_t box[3]={is_a ? BK:BN,is_a ? BM:BK,1},element_strides[3]={1,1,1};
+      |                                    ~~~~~^~~~~~~~~
+dtype=bf16 error=no error pack_grid=11366 tc_total=74206 operandwait=6425 mma_store=40379 productfreewait=12559
+dtype=fp16 error=no error pack_grid=10443 tc_total=73283 operandwait=6358 mma_store=40262 productfreewait=12729

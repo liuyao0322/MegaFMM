@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-14",
+  "source_commit": "8b1e8ca",
+  "scope": "M=N=K=1024 only; BF16/FP16; FP32 output",
+  "status": "numerical checks passed; slower than tuned cuBLASLt; active optimization continues",
+  "source_sha256": {
+    "solution/internal.h": "a21b2bb07f1c42cdcdfebee9bb2b6d2c236b4dedb8a2485162469d3786d9965d",
+    "solution/scale_output.cu": "32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708",
+    "solution/plan.cpp": "d7ca88de2627787590d15221304f705686cb0535fae113a614fa0312d6c661d5",
+    "solution/sw_pipeline.cu": "32eafbdd224fe602d3c7ae6e48ea1730c8134b1468d1ae53ed3c2f84c7e3dd28"
+  },
+  "launch_results": "../20261014_193739_iter-71/results.csv",
+  "graph_results": "results.csv",
+  "stress": {
+    "checks": 72,
+    "failures": 0,
+    "same_graph_fresh_inputs": true
+  },
+  "ctest": {
+    "tests": 2,
+    "failures": 0
+  },
+  "sanitizer": {
+    "version": "CUDA12.8",
+    "application_cuda": "12.4",
+    "memcheck": {
+      "exit": 0,
+      "errors": 0,
+      "scope": "entire quick program"
+    },
+    "racecheck": {
+      "exit": 0,
+      "hazards": 0,
+      "errors": 0,
+      "warnings": 0,
+      "scope": "kns=sw_cooperative_hilo"
+    },
+    "synccheck": {
+      "exit": 0,
+      "errors": 0,
+      "scope": "kns=sw_cooperative_hilo"
+    }
+  },
+  "workspace_bytes": 8388608,
+  "dynamic_shared_bytes": 188544,
+  "static_shared_bytes": 1024,
+  "registers_per_thread": 74,
+  "stack_bytes": 0,
+  "local_bytes": 0,
+  "auto": "dense_cublaslt"
+}

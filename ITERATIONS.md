@@ -402,3 +402,14 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Full original benchmark exited0 with all numerical gates passing; BK256 single-buffer70 was slower than68 and is not selected.
 - **Next:** Validate best latency source with72 stress, Graph timing and memory checks.
 - **Archive:** trajectory/20261014_193739_iter-71/
+
+## Validated milestone after iter71
+
+- Selected source: iter71, commit8b1e8ca, BK128/512 threads/11 CUDA warps,8MiB workspace.
+- Matching launch Dense/SW BF16=12.2666/28.3264us,FP16=9.9053/28.2166us. SW remains slower.
+- Same source Graph Dense/SW BF16=11.5149/27.5709us,FP16=9.4352/27.5062us.
+- All12 fresh standard numerical checks,72 stress checks,2 scoped CTests passed; no other size tested.
+- CUDA12.8 memcheck fullquick=0 errors; SW-filtered racecheck=0 hazards/errors/warnings; synccheck=0 errors. Tools exited0.
+- Added rejection checks for missing, misaligned, overlapping and under-budget workspace; full CTest and sanitizer after rebuild passed.
+- Details and raw logs: trajectory/20261014_193836_validation-iter71-graph/REPORT.md and validation.json.
+- The optimization goal remains active; no physical-floor or exhaustion claim. Next evaluate reducing WGMMA/P handoff stalls and global packing cost.
