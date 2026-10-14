@@ -165,6 +165,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 129 | TMA-leader publication while TC and CUDA roles progress independently | 0.8641 | 0.012951 | experiment |
 
+| 130 | 608 workers for asynchronous S/T publication | 0.8952 | 0.012499 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1552,3 +1554,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full benchmark archived with original FP64 gates. Independent fresh-input launch/Graph/concurrency and sanitizer validation required before retention; no persistent computed data or host counter.
 - **Next:** Evaluate complete-call improvement and tune transform worker allocation if promising
 - **Archive:** trajectory/20261015_021723_iter-129/
+
+### Iter 130 — 608 workers for asynchronous S/T publication
+
+- **Hypothesis:** Two transform iterations per worker reduce publication delay while TC computes P1/P2
+- **Changes:** Increase asynchronous129 CTA512->768threads, CUDA workers352->608 with matching pack and product barriers
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012499 ms; mean speedup=0.8952x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012420 | 0.012435 | 0.9988 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009944 | 0.012563 | 0.7915 | 0.000754626 | 0 |
+
+- **Analysis:** 129 paired launch improves~2% but Graph is flat; NCU53regs,3.84M instructions,Tensor14.7–14.9%. Full130 benchmark archived.
+- **Next:** Assess transform scaling and test consumer or product vectorization independently
+- **Archive:** trajectory/20261015_021918_iter-130/

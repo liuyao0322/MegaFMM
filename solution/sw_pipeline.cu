@@ -11,7 +11,7 @@
 namespace megafmm::detail {
 namespace {
 constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=512;
+constexpr int Plane=512*512,Threads=768;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -76,8 +76,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
-    Barrier::init(&s.pack_ready,352);
+    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],608);}
+    Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -124,7 +124,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
-  for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*352+worker);i<Plane;i+=2*gridDim.x*gridDim.y*352){
+  for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*608+worker);i<Plane;i+=2*gridDim.x*gridDim.y*608){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -153,14 +153,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }
     asm volatile("fence.proxy.async.global;" ::: "memory");
     arrive(&s.pack_ready);
-    constexpr int Chunks=(Elements+351)/352;
+    constexpr int Chunks=(Elements+607)/608;
     float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
     for(int step=0;step<7;++step){
       wait(&s.product_ready[step%2],(step/2)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*352;
+        int i=worker+j*608;
         if(i<Elements)current[j]=s.product[step%2][product_index(i/BN,i%BN)];
       }
       // Release shared P immediately after reading; arithmetic/global stores can
@@ -168,7 +168,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       arrive(&s.product_free[step%2]);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*352;
+        int i=worker+j*608;
         if(i<Elements){
           int at=(m0+i/BN)*1024+n0+i%BN;
           if(step==0)first[j]=current[j]; // P1
