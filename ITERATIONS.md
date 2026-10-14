@@ -97,6 +97,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 95 | Prefetch tensor-map descriptors during input transformation | 0.5804 | 0.019156 | passed |
 
+| 96 | Restore the validated small-gain iter92 candidate | 0.5822 | 0.019069 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -880,3 +882,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full1024 cubed BF16/FP16 benchmark completed; compare against92/87 to avoid attributing unlocked-clock variation to prefetch
 - **Next:** Retain only with full-call improvement; finalize the best validated source and archive rejected consumer/vector/pipeline candidates
 - **Archive:** trajectory/20261014_224940_iter-95/
+
+### Iter 96 — Restore the validated small-gain iter92 candidate
+
+- **Hypothesis:** The32bit transform plus combined A TMA gives the most consistent ordinary full-call improvement without the mode-specific regressions of alias/prefetch candidates
+- **Changes:** Verbatim git checkout of bf34e5a solution; discard reduced consumers,64bit transform,alias hint,two-group delayed retirement and descriptor prefetch
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.019069 ms; mean speedup=0.5822x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012252 | 0.018952 | 0.6465 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009939 | 0.019187 | 0.5180 | 2.37136e-06 | 1 |
+
+- **Analysis:** Full1024 cubed BF16/FP16 restore benchmark completed. Gains over87 remain small (~1-2percent ordinary launch); do not certify a >=3percent universal win or Dense speedup.
+- **Next:** Run final independent stress/sanitizers, freeze best source and archive all profiling plus rejected candidates
+- **Archive:** trajectory/20261014_225150_iter-96/

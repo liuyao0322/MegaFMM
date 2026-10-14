@@ -74,9 +74,6 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    // Hide tensor-map descriptor fetch behind the independent input transform.
-    prefetch_tma_descriptor(&amap);prefetch_tma_descriptor(&bmap);
-    prefetch_tma_descriptor(&smap);prefetch_tma_descriptor(&tmap);
     for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.low_ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
     cutlass::arch::fence_barrier_init();
