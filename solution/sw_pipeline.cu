@@ -197,9 +197,15 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
         warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
-        warpgroup_commit_batch();warpgroup_wait<0>();
-        __syncwarp();
-        if((tid&31)==0)arrive(&s.free[slot]);
+        warpgroup_commit_batch();
+        if(q>0){
+          warpgroup_wait<1>();__syncwarp();
+          if((tid&31)==0)arrive(&s.free[(sequence-1)%Stages]);
+        }
+        if(q==512/BK-1){
+          warpgroup_wait<0>();__syncwarp();
+          if((tid&31)==0)arrive(&s.free[slot]);
+        }
       }
       if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
       #pragma unroll

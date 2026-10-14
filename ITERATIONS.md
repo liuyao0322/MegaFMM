@@ -191,6 +191,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 142 | Eight K128 operand slots on the balanced asynchronous pipeline | 0.9104 | 0.012285 | experiment |
 
+| 143 | Two outstanding WGMMA groups with eight K128 slots | 0.9153 | 0.012092 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1786,3 +1788,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 1411024threads regressed11.77/11.86us,140768retained as validated best. Full142 benchmark archived for K/prefetch tuning.
 - **Next:** Try overlapping WGMMA groups on deeper slots if numerical behavior is unchanged
 - **Archive:** trajectory/20261015_023949_iter-142/
+
+### Iter 143 — Two outstanding WGMMA groups with eight K128 slots
+
+- **Hypothesis:** Smaller K tiles need overlapping WGMMA groups to hide issue/completion latency
+- **Changes:** On142 issue next K group before wait1 releases previous slot, drain wait0 only at product end; keep up to two groups in flight
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012092 ms; mean speedup=0.9153x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012190 | 0.012010 | 1.0150 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009928 | 0.012173 | 0.8156 | 0.000754626 | 0 |
+
+- **Analysis:** 142 immediate waits regressed12.17/12.40us. Full143 benchmark archived; no arithmetic changes or gate relaxation.
+- **Next:** Assess issue/wait overlap, reprofile best and try statically validated descriptor bases if needed
+- **Archive:** trajectory/20261015_024055_iter-143/
