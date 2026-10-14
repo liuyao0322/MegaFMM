@@ -295,6 +295,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 194 | Vectorize P exchange and fixed-offset recombination | 0.9725 | 0.011436 | experiment |
 
+| 195 | Single CTA N64 with three operand slots | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2716,3 +2718,17 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Valid finite approximate output with unchanged original precision failures. BF16 solution 11.328 us versus Dense 12.264 us; FP16 11.544 us versus Dense 9.955 us. No material improvement over iter162 and FP16 remains slower.
 - **Next:** Restore selected iter162 and investigate a different source of producer or tensor execution latency
 - **Archive:** trajectory/20261015_035421_iter-194/
+
+### Iter 195 — Single CTA N64 with three operand slots
+
+- **Hypothesis:** Wider N reduces repeated A loads and WGMMA issue, with three operand slots sustaining overlap
+- **Changes:** N64 single-CTA tiles; grid64; three K256 operand slots; single P slot; 256 consumers
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Compiled but first invocation stalled: P-ready initialized with 256 arrivals while only128 TC producers arrive. Explicitly terminated the hung job step. No timing or numerical results valid.
+- **Next:** Correct ready producer count to128, retaining consumer free count256, and fix descriptor tile extent toN64
+- **Archive:** trajectory/20261015_035738_iter-195/
