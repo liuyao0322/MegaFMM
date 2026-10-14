@@ -161,9 +161,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }
   asm volatile("bar.sync 3,256;" ::: "memory");
   if(sh.last){
-   #pragma unroll
-   for(int j=0;j<32;j+=2){
-    int mn=GMMA::CLayout_64x64{}(lane,j),row=m0+wg*64+mn%64,col=n0+mn/64;
+   #pragma unroll 1
+   for(int j=0;j<16;++j){
+    int worker=tid-128;
+    int row=m0+worker/32+8*j,col=n0+2*(worker%32);
     int index=row*512+col;
     float2 v[7];
     #pragma unroll

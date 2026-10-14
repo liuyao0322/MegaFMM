@@ -281,6 +281,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 187 | 384 threads for parallel leaf register headroom | 0.3521 | 0.031880 | experiment |
 
+| 188 | Coalesced row-major last-CTA recombination | 0.5224 | 0.021359 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2592,3 +2594,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 and FP16 about31.87/31.89us, essentially unchanged and much slower162. Expected original precision failures retained/nonfinite0. Removing register pressure alone does not rescue this direction; inspect actual spill counters before conclusions.
 - **Next:** Profile187 actual resources and phase tail; investigate last-CTA epilogue code-size overhead before rejecting coarse leaf parallelism.
 - **Archive:** trajectory/20261015_034338_iter-187/
+
+### Iter 188 — Coalesced row-major last-CTA recombination
+
+- **Hypothesis:** 187trace shows9-14us epilogue; use row-major contiguous float2 loads/stores and a compact loop instead of unrolled fragment-order reads.
+- **Changes:** Base187;256TCthreads remap to8rows64columns per chunk,16rowchunks with fixed8row stride, loop kept compact; all seven values and FP32 arithmetic order unchanged.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.021359 ms; mean speedup=0.5224x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.012336 | 0.021388 | 0.5768 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.009982 | 0.021329 | 0.4680 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about21.39us FP16 about21.33us, roughly10us faster187 but still much slower162. Original approximation errors retained/nonfinite0. Diagnostic187 had~10percent time perturbation and16Bspill; use it only as localization evidence, production187fullNCU79regs/local0.
+- **Next:** Reassess start-time spread and optimize parallel-leaf tile shape only if phase budget supports improvement; preserve162 selected checkpoint.
+- **Archive:** trajectory/20261015_034653_iter-188/
