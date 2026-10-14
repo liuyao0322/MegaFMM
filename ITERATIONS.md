@@ -523,6 +523,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 308 | Local shared transforms with seven persistent accumulators | 0.4620 | 0.024130 | experiment |
 
+| 309 | Unroll local-transform K phases to restore async WGMMA | 0.6017 | 0.018484 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4758,3 +4760,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 24.54208 us FP16 23.71744 us versus Dense12.32832/9.99872 us, severe regression. Original finite approximation errors retained and gates fail. Compiler emits C7515 WGMMA serialization for both dtypes; cannot assess intended asynchronous architecture before fixing generated code. No independent bitwise certification yet.
 - **Next:** Profile308 local sectors and SASS, then fully unroll K phases to remove loop-carried accumulator aliasing
 - **Archive:** trajectory/20261015_071801_iter-308/
+
+### Iter 309 — Unroll local-transform K phases to restore async WGMMA
+
+- **Hypothesis:** Remove loop-carried accumulator aliasing responsible for C7515 serialization
+- **Changes:** Fully static four K128 phases with constant overwrite predicate on first phase and all seven private accumulator groups retained
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.018484 ms; mean speedup=0.6017x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012288 | 0.018705 | 0.6569 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009979 | 0.018263 | 0.5464 | 0.000754626 | 0 |
+
+- **Analysis:** C7515 warning eliminated; BF16 improves24.54 to18.70528us and FP16 23.72 to18.26336us but remains much slower than282. Original errors finite and gates fail.308NCU138regs,zero local sectors,5.223M instructions; no spill-based explanation. Local transform/compute is serialized perK and duplicated transforms cost instructions.
+- **Next:** Use linear physical shared offsets for elementwise transforms; then test K64 double buffering to overlap local transform and tensor work
+- **Archive:** trajectory/20261015_071911_iter-309/
