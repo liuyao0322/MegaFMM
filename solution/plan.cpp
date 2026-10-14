@@ -358,13 +358,13 @@ Plan& Plan::operator=(Plan&&) noexcept = default;
 size_t Plan::workspace_bytes() const { return impl_->bytes; }
 const Problem& Plan::problem() const { return impl_->problem; }
 std::string Plan::algorithm_name() const {
-  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw ? "sw_cluster_64x64x256" : "dense_cublaslt";
+  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw ? "sw_cooperative_hilo_64x32x256" : "dense_cublaslt";
 }
 std::string Plan::lt_algorithm_config(const void* A, const void* B, const float* C0,
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
-  if (impl_->sw) return "sw_global_pair;cluster=none;roles=1tma+4tc+8consumer;smem=213120;bk=256;stages=3;product_slots=1;products=3plus4;order=P1_P6_P7__P2_P5_P3_P4;exchange=global_P1_U2_U3_per_consumer_release_acquire;local_partial=registers;st=compact_balanced_async608;publication=tma_leader_driver_workspace_cuda12.4;leaf_terms=7;residual_correction=off;workspace=8388608;alpha=1;beta=0";
+  if (impl_->sw) return "sw_cooperative;warp_roles=1tma+4simt+4wgmma+15pack_only;smem=213120;operand_stages=4;bk=256;workspace=4194304;st=compact4planes_balanced_async_p1p2;publication=tma_leader_driver_workspace_barrier_cuda12.4;terminal_cta_barrier=off;recombine=streaming_fixed_chunk_offsets;product_order=1_2_6_7_5_3_4;product_slots=2;product_layout=row_xor_0_3_4;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;alpha=1;beta=0";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }
@@ -381,7 +381,7 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   if (policy.algorithm==Algorithm::SWPipeline) {
     if(policy.workspace_limit<(size_t(8)<<20))throw std::invalid_argument("SW needs8MiB workspace");
     impl->sw=detail::make_sw_pipeline(p);
-    impl->bytes=size_t(8)<<20;
+    impl->bytes=size_t(4)<<20;
   } else if (!impl->empty && !impl->scale) {
     lt_check(cublasLtCreate(&impl->handle), "create cuBLASLt handle");
     impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);

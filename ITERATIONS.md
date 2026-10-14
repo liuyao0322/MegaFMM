@@ -263,6 +263,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 178 | Hide global pair exchange behind fourth consumer product | 0.6285 | 0.017677 | experiment |
 
+| 179 | Single PTX block for sixteen WGMMA instructions | 0.9729 | 0.011512 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2430,3 +2432,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about17.67us FP16 about17.69us, regresses177 and far slower162. Expected numerical errors/nonfinite0 retained. Splitting early raw products reduces overlap available before global transformed-input publication, and extra exchange does not help.
 - **Next:** Re-profile178 supply issue and local spill counters; restore162 before next independent direction.
 - **Archive:** trajectory/20261015_033239_iter-178/
+
+### Iter 179 — Single PTX block for sixteen WGMMA instructions
+
+- **Hypothesis:** Keeping descriptors and accumulator references within one assembly block permits ptxas to reduce uniform-register transfer overhead.
+- **Changes:** Restore162; one asm block per K256 tile, shared descriptor bases passed once, fixed CuTe K offsets as immediates, sixteen same-order WGMMA operations and unchanged transpose/scales.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011512 ms; mean speedup=0.9729x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012442 | 0.011406 | 1.0909 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009933 | 0.011618 | 0.8550 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about11.41us FP16 about11.62us, no improvement versus162. Expected numerical errors/nonfinite0. Must inspect SASS before making any claim about descriptor R2UR reduction.
+- **Next:** Inspect dynamic descriptor code generation; test immutable descriptor low-word construction if transfer count unchanged.
+- **Archive:** trajectory/20261015_033439_iter-179/
