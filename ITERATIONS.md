@@ -319,6 +319,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 206 | Asymmetric A4 B5 independent operand prefetch | 0.9275 | 0.011979 | experiment |
 
+| 207 | Asymmetric A5 B3 independent operand prefetch | 0.9360 | 0.011930 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2926,3 +2928,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Finite unchanged approximate errors and original gates fail. BF16 11.853 us and FP16 12.105 us versus Dense12.289/9.905 us. Slower than162 and204. Fresh205NCU74regs,zero spill,1.895Minstructions but no full-call gain: lower instruction count alone does not establish latency improvement.
 - **Next:** Try asymmetric A5 B3 to distinguish A versus B prefetch sensitivity on this direct-register architecture
 - **Archive:** trajectory/20261015_041305_iter-206/
+
+### Iter 207 — Asymmetric A5 B3 independent operand prefetch
+
+- **Hypothesis:** An extra larger A slot may help more than the extra B slot in206
+- **Changes:** Independent A5/B3 rings with static distinct modulo phases and release addresses; same800threads608pack and213248Bshared
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011930 ms; mean speedup=0.9360x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012308 | 0.011833 | 1.0401 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010004 | 0.012027 | 0.8318 | 0.000754626 | 0 |
+
+- **Analysis:** Finite expected errors, both original gates fail. BF16 11.833 us and FP16 12.027 us versus Dense12.308/10.004 us; small improvement on206 but slower than162 and204. Asymmetric split producers do not establish a winning supply improvement.
+- **Next:** Restore selected162 verbatim for an updated checkpoint and continue from its validated asynchronous pipeline
+- **Archive:** trajectory/20261015_041410_iter-207/
