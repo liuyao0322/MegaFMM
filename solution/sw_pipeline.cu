@@ -9,7 +9,7 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64, BN=32, BK=64, Elements=BM*BN;
+constexpr int BM=64, BN=32, BK=128, Elements=BM*BN;
 constexpr int ASize=BM*BK, BSize=BK*BN;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -17,12 +17,12 @@ using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 // One allocation; independent regions never alias a live asynchronous operand.
 template<class T> struct alignas(128) Shared {
   T raw[1][4*ASize+4*BSize];
-  T operand[2][2*ASize+2*BSize];
+  T operand[1][2*ASize+2*BSize];
   float product[7][Elements];
   uint64_t raw_ready[2],raw_free[2],op_ready[2],op_free[2];
   uint64_t product_ready,product_free;
 };
-static_assert(sizeof(Shared<cute::half_t>)==155776, "recheck shared-memory budget");
+static_assert(sizeof(Shared<cute::half_t>)==204928, "recheck shared-memory budget");
 
 __device__ void wait(const uint64_t* b,int phase) {
   Barrier::wait(b,phase); asm volatile("" ::: "memory");
@@ -122,8 +122,8 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
       int bank=0;
       wait(&s.raw_ready[bank],q%2);
       for(int p=0;p<7;++p) {
-        int sequence=q*7+p,slot=sequence%2;
-        if(sequence>=2)wait(&s.op_free[slot],((sequence-2)/2)%2);
+        int sequence=q*7+p,slot=0;
+        if(sequence)wait(&s.op_free[slot],(sequence-1)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto al=make_tensor(make_smem_ptr(op+ASize),la);
@@ -173,8 +173,8 @@ void sw_unified_v1(const __grid_constant__ CUtensorMap map_a,
     for(int q=0;q<512/BK;++q) {
       if(q)wait(&s.product_free,(q-1)%2);
       for(int p=0;p<7;++p) {
-        int sequence=q*7+p,slot=sequence%2;
-        wait(&s.op_ready[slot],(sequence/2)%2);
+        int sequence=q*7+p,slot=0;
+        wait(&s.op_ready[slot],sequence%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
         auto al=make_tensor(make_smem_ptr(op+ASize),la);

@@ -21,6 +21,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 57 | Keep four output tiles in CUDA worker registers | 0.0349 | 0.317959 | measured |
 
+| 58 | Batch BK128 using one operand stage and register outputs | 0.0311 | 0.356526 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -144,3 +146,19 @@ work/handshake tradeoff rather than continuing the unsuccessful layout-only path
 - **Analysis:** Full 1024 launch benchmark exited0 with both dtype fresh gates passing. Assess runtime and register/local-memory resources before retaining.
 - **Next:** Inspect resource usage and stress; exploit reduced shared footprint to increase K batching if faster.
 - **Archive:** trajectory/20261014_191045_iter-57/
+
+### Iter 58 — Batch BK128 using one operand stage and register outputs
+
+- **Hypothesis:** Four rather than eight K slices reduce seven-P publication/recombination boundaries; one operand stage keeps the larger working set within Hopper shared capacity.
+- **Changes:** From57, BK128, one raw stage, one operand stage, dynamic shared204928 bytes, unchanged15 high-low leaf terms and FP32 RN DAG.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.356526 ms; mean speedup=0.0311x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_unified_v1_hilo_64x32x128 v0 | launch | 0.012230 | 0.355055 | 0.0344 | 7.17661e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_unified_v1_hilo_64x32x128 v0 | launch | 0.009918 | 0.357996 | 0.0277 | 8.25634e-07 | 1 |
+
+- **Analysis:** Full 1024 launch benchmark exited0; both dtypes pass fresh numerical gates. No claim about actual occupancy; register/shared costs must be assessed against measured runtime.
+- **Next:** Measure gain; remove unused residual-plane preparation for original operands and validate accepted candidate.
+- **Archive:** trajectory/20261014_191209_iter-58/
