@@ -149,3 +149,7 @@ the user's requests in this conversation:
 - Current TC same-invocation median BF16/FP16 ready2.880/2.912us,issue2.368/2.368,wait0 1.408/1.408,total7.936/7.936; transform+grid inclinit2.624us. Sparsecrosscheck ready2.688,issue2.368,wait01.312. TMAfreewaitstage-median-sum4.992/5.056us,consumerPwait4.448us,TC Pfreewait.384us; overlapping,notadditive.
 - Current bottleneck is more exposed operand supply/slot reuse latency + synchronization, not prior15term issue-dominant chain. HBM not bandwidth-bound in testedwarmcache workload; no claim about coldcache. Shared has98304B unused lowoperand space; reclaim may enable deeperpipeline, but128CTAon132SM means2CTA/SM capacity alone doesnot improve achievedoccupancy. No candidate implemented.
 - Diagnosticbaseline SASS identicalproduction(2416instructions/dtype),270timingrowsbitexact; independentFP64gate stillFAILboth. Evidence trajectory/20261015_profile-iter97-seven-products/REPORT.md.
+
+## User-authorized seven-product optimization round,2026-10-15
+
+- Explicit directions: reclaim unused shared and test deeper operand prefetch with timely release; tune K blocking and issue/wait rhythm; reduce input-transform/grid-sync front cost. Keep current seven-product no-compensation semantics, originalFP64gates and Auto=Dense. Report accuracy FAIL plainly; compare bitwise with97 to catch synchronization/arithmetic regressions separately. Use complete1024^3 BF16/FP16 timings and independent diagnostics/sanitizers on retained changes.

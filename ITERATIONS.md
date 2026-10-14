@@ -101,6 +101,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 97 | Seven-product SW without residual compensation | 0.7728 | 0.014410 | experiment |
 
+| 98 | Compact two-stage operand shared storage | 0.7745 | 0.014399 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -954,3 +956,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - Main exposed interval nowoperandready~2.9us,issue2.37us,wait01.41us;TCloop7.94us. Transform+grid2.62us. Tensoractivity~13%,HBM<.4%,Pbankconflict0,regs56nospill. Shared213120stilllimitsoneCTA/SM,unusedlowspace98304B.
 - Formal launchBF16/FP16=14.16448/14.31584us,Graph13.85632/14.10080us. OriginalFP64gates remainFAIL; source retained per user instruction.
 - Recommendations only: improve slotreuse and dataoverlap, reconsider tile/Kpipeline, reduce transform/gridcost. No optimization implemented. Report trajectory/20261015_profile-iter97-seven-products/REPORT.md.
+
+### Iter 98 — Compact two-stage operand shared storage
+
+- **Hypothesis:** Reclaim unused residual slots without changing seven-product arithmetic or release timing
+- **Changes:** Compact operand A/B into two high-only stages,remove unused low barriers; shared213120 to114816bytes
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.014399 ms; mean speedup=0.7745x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012324 | 0.014318 | 0.8607 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009964 | 0.014479 | 0.6882 | 0.000754626 | 0 |
+
+- **Analysis:** Expected original numerical failure remains; correctness of scheduling will be checked bitwise against97. Full-call retention requires paired measurement.
+- **Next:** Measure paired performance then test deeper prefetch in reclaimed space
+- **Archive:** trajectory/20261015_012249_iter-98/

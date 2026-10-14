@@ -10,19 +10,19 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=256,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int BM=64,BN=32,BK=256,Stages=2,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
 constexpr int Plane=512*512,Threads=512;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
-  T operand[2][2*ASize+2*BSize];
+  T operand[Stages][ASize+BSize];
   // Row-major P with an XOR permutation inside each 32-float row.
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
   float product[2][Elements];
-  uint64_t ready[2],unused_low_ready[2],free[2],product_ready[2],product_free[2];
+  uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
 };
-static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==114816,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -74,7 +74,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
     cutlass::arch::fence_barrier_init();
   }
@@ -117,8 +117,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   if(tid==0){
     for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step);
-      int sequence=step*(512/BK)+q,slot=sequence%2,k0=q*BK;
-      if(sequence>=2)wait(&s.free[slot],((sequence-2)/2)%2);
+      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
+      if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       // Seven-product experiment: only publish high operands; no residual loads.
       TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
@@ -132,10 +132,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
       if(blo){
         int plane=p==3 ? 6:2*(p-4);
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+2*ASize,n0,k0,plane);
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+ASize,n0,k0,plane);
       }else{
         int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+2*ASize,n0+col,k0+row);
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize,n0+col,k0+row);
       }
 
     }
@@ -178,11 +178,11 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       // Two fixed slots: expose their shared addresses to descriptor lowering.
       #pragma unroll
       for(int q=0;q<512/BK;++q){
-        int sequence=step*(512/BK)+q,slot=sequence%2;
-        wait(&s.ready[slot],(sequence/2)%2);
+        int sequence=step*(512/BK)+q,slot=sequence%Stages;
+        wait(&s.ready[slot],(sequence/Stages)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la);
-        auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb);
+        auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
         warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
         warpgroup_commit_batch();warpgroup_wait<0>();
