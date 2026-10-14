@@ -321,6 +321,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 207 | Asymmetric A5 B3 independent operand prefetch | 0.9360 | 0.011930 | experiment |
 
+| 208 | Restore validated162 for sustained-goal checkpoint | 0.9738 | 0.011423 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2944,3 +2946,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Finite expected errors, both original gates fail. BF16 11.833 us and FP16 12.027 us versus Dense12.308/10.004 us; small improvement on206 but slower than162 and204. Asymmetric split producers do not establish a winning supply improvement.
 - **Next:** Restore selected162 verbatim for an updated checkpoint and continue from its validated asynchronous pipeline
 - **Archive:** trajectory/20261015_041410_iter-207/
+
+### Iter 208 — Restore validated162 for sustained-goal checkpoint
+
+- **Hypothesis:** Verbatim validated162 remains the selected baseline after165-207 candidates fail to establish a better full-call result
+- **Changes:** git checkout d8e6261 -- solution/; restore exact768thread608pack,128consumer, four operand slots and4MiB workspace
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011423 ms; mean speedup=0.9738x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012300 | 0.011325 | 1.0860 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009925 | 0.011520 | 0.8615 | 0.000754626 | 0 |
+
+- **Analysis:** Fresh full-call BF16 11.325 us versus Dense12.300 us,1.0860x; FP16 11.520 us versus Dense9.925 us,0.8615x. FP16 needs~1.596us or13.85percent SW-time reduction. Both original FP64 gates still fail with expected finite errors. Goal remains active; no physical floor or exhausted-directions claim.
+- **Next:** Archive current diagnostic evidence and continue new critical-path work from validated162; do not promote an approximate performance win to numerical acceptance
+- **Archive:** trajectory/20261015_041456_iter-208/
