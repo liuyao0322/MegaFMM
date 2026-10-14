@@ -10,20 +10,16 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=512;
+constexpr int BM=64,BN=128,BK=64,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int Plane=512*512,Threads=256;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
-struct DescriptorSet{uint64_t a[Stages],b[Stages];};
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
-  // Row-major P with an XOR permutation inside each 32-float row.
-  // Both WGMMA fragment stores and row-major consumer loads use every bank once.
-  float product[2][Elements];
-  uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
+  uint64_t ready[Stages],free[Stages];
 };
-static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==98432,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -39,18 +35,19 @@ __device__ constexpr int product_for_step(int step){
 }
 
 template<class T,class TA,class TB>
-__device__ void mma_term(TA a,TB b,uint64_t da_word,uint64_t db_word,float (&d)[16]) {
+__device__ void mma_term(TA a,TB b,float (&d)[64]) {
   using namespace cute;
   using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,
-      SM90_64x32x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
-      SM90_64x32x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>>;
+      SM90_64x128x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
+      SM90_64x128x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>>;
   // Build the canonical descriptor once; CuTe preserves the swizzled K offsets
   // in descriptor units instead of rebuilding address bitfields for each MMA.
   auto da_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(
       tiled_divide(a,Shape<_64,_16>{}));
   auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(
-      tiled_divide(b,Shape<_32,_16>{}));
-  GmmaDescriptor da_base(da_word),db_base(db_word);
+      tiled_divide(b,Shape<_128,_16>{}));
+  auto da_base=da_tiles(0,0,0);
+  auto db_base=db_tiles(0,0,0);
   #pragma unroll
   for(int kk=0;kk<BK/16;++kk){
     // All operands fit below 256 KiB of shared memory. K offsets cannot carry
@@ -59,7 +56,7 @@ __device__ void mma_term(TA a,TB b,uint64_t da_word,uint64_t db_word,float (&d)[
     auto da=da_base,db=db_base;
     da.reg32_[0]+=uint32_t(da_tiles.layout()(0,0,kk));
     db.reg32_[0]+=uint32_t(db_tiles.layout()(0,0,kk));
-    Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15]);
+    Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15],d[16],d[17],d[18],d[19],d[20],d[21],d[22],d[23],d[24],d[25],d[26],d[27],d[28],d[29],d[30],d[31],d[32],d[33],d[34],d[35],d[36],d[37],d[38],d[39],d[40],d[41],d[42],d[43],d[44],d[45],d[46],d[47],d[48],d[49],d[50],d[51],d[52],d[53],d[54],d[55],d[56],d[57],d[58],d[59],d[60],d[61],d[62],d[63]);
   }
 }
 
@@ -68,22 +65,23 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
                          const __grid_constant__ CUtensorMap bmap,
                          const __grid_constant__ CUtensorMap smap,
                          const __grid_constant__ CUtensorMap tmap,
-                         const T* A,const T* B,T* packed,float* D,
-                         const __grid_constant__ DescriptorSet descriptors){
+                         const T* A,const T* B,T* packed,float* D){
   using namespace cute;
   extern __shared__ __align__(128) unsigned char buffer[];
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
+  int cta=(blockIdx.z*gridDim.y+blockIdx.y)*gridDim.x+blockIdx.x;
+  int blocks=gridDim.x*gridDim.y*gridDim.z;
+  int p=blockIdx.z;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
-  for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid);i<Plane;i+=2*gridDim.x*gridDim.y*Threads){
+  for(int i=2*(cta*Threads+tid);i<Plane;i+=2*blocks*Threads){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -114,11 +112,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   asm volatile("fence.proxy.async.global;" ::: "memory");
   cooperative_groups::this_grid().sync();
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
-  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_128,Int<BK>>{},Step<_2,_1>{});
   if(tid==0){
-    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
-      int p=product_for_step(step);
-      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
+    for(int q=0;q<512/BK;++q){
+      int sequence=q,slot=sequence%Stages,k0=q*BK;
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       // Seven-product experiment: only publish high operands; no residual loads.
@@ -133,74 +130,65 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
       if(blo){
         int plane=p==3 ? 6:2*(p-4);
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+ASize,n0,k0,plane);
+        SM90_TMA_LOAD_4D::copy(&tmap,&s.ready[slot],0,op+ASize,0,k0,n0/64,plane);
       }else{
         int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+ASize,n0+col,k0+row);
+        SM90_TMA_LOAD_3D::copy(&bmap,&s.ready[slot],0,op+ASize,0,k0+row,(n0+col)/64);
       }
 
     }
-  }else if((tid>=32 && tid<128) || tid>=256){
-    int worker=tid>=256 ? tid-160:tid-32;
-    constexpr int Chunks=(Elements+351)/352;
-    float first[Chunks],second[Chunks],current[Chunks];
-    #pragma unroll
-    for(int step=0;step<7;++step){
-      wait(&s.product_ready[step%2],(step/2)%2);
-      #pragma unroll
-      for(int j=0;j<Chunks;++j){
-        int i=worker+j*352;
-        if(i<Elements)current[j]=s.product[step%2][product_index(i/BN,i%BN)];
-      }
-      // Release shared P immediately after reading; arithmetic/global stores can
-      // overlap the Tensor warpgroup's reuse of this slot two steps later.
-      arrive(&s.product_free[step%2]);
-      #pragma unroll
-      for(int j=0;j<Chunks;++j){
-        int i=worker+j*352;
-        if(i<Elements){
-          int at=(m0+i/BN)*1024+n0+i%BN;
-          if(step==0)first[j]=current[j]; // P1
-          else if(step==1)D[at]=__fadd_rn(first[j],current[j]); // U1
-          else if(step==2)first[j]=__fadd_rn(first[j],current[j]); // U2
-          else if(step==3)second[j]=__fadd_rn(first[j],current[j]); // U3
-          else if(step==4){
-            D[at+512*1024+512]=__fadd_rn(second[j],current[j]); // D22
-            first[j]=__fadd_rn(first[j],current[j]); // U4
-          }else if(step==5)D[at+512]=__fadd_rn(first[j],current[j]); // D12
-          else D[at+512*1024]=__fsub_rn(second[j],current[j]); // D21
-        }
-      }
-    }
   }else if(tid>=128 && tid<256){
-    for(int step=0;step<7;++step){
-      int p=product_for_step(step);
-      float acc[16]={};
-      // Four compact operand slots keep prefetch ahead; retire each K tile promptly.
+    float acc[64]={};
+    #pragma unroll 1
+    for(int q=0;q<512/BK;++q){
+      int slot=q%Stages;
+      wait(&s.ready[slot],(q/Stages)%2);
+      T* op=s.operand[slot];
+      auto ah=make_tensor(make_smem_ptr(op),la);
+      auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
       #pragma unroll
-      for(int q=0;q<512/BK;++q){
-        int sequence=step*(512/BK)+q,slot=sequence%Stages;
-        wait(&s.ready[slot],(sequence/Stages)%2);
-        T* op=s.operand[slot];
-        auto ah=make_tensor(make_smem_ptr(op),la);
-        auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
-        warpgroup_arrive();
-        mma_term<T>(ah,bh,descriptors.a[slot],descriptors.b[slot],acc);
-        warpgroup_commit_batch();warpgroup_wait<0>();
-        __syncwarp();
-        if((tid&31)==0)arrive(&s.free[slot]);
-      }
-      if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
+      for(int j=0;j<64;++j)warpgroup_fence_operand(acc[j]);
+      warpgroup_arrive();mma_term<T>(ah,bh,acc);warpgroup_commit_batch();warpgroup_wait<0>();
       #pragma unroll
-      for(int j=0;j<16;++j){
-        int mn=GMMA::CLayout_64x32{}(tid-128,j);
-        s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
-      }
-      arrive(&s.product_ready[step%2]);
+      for(int j=0;j<64;++j)warpgroup_fence_operand(acc[j]);
+      __syncwarp();if((tid&31)==0)arrive(&s.free[slot]);
+    }
+    float* products=reinterpret_cast<float*>(packed+16*Plane);
+    #pragma unroll
+    for(int j=0;j<32;++j){
+      int mn=GMMA::CLayout_64x128{}(tid-128,2*j);
+      int at=p*Plane+(m0+mn%64)*512+n0+mn/64;
+      *reinterpret_cast<float2*>(products+at)=make_float2(acc[2*j],acc[2*j+1]);
     }
   }
-  __syncthreads();
+  cooperative_groups::this_grid().sync();
+  const float* products=reinterpret_cast<const float*>(packed+16*Plane);
+  for(int i=2*(cta*Threads+tid);i<Plane;i+=2*blocks*Threads){
+    float2 values[7];
+    #pragma unroll
+    for(int j=0;j<7;++j)values[j]=*reinterpret_cast<const float2*>(products+j*Plane+i);
+    float2 out[4];
+    #pragma unroll
+    for(int lane=0;lane<2;++lane){
+      float v[7];
+      #pragma unroll
+      for(int j=0;j<7;++j)v[j]=lane==0 ? values[j].x:values[j].y;
+      float u1=__fadd_rn(v[0],v[1]);
+      float u2=__fadd_rn(v[0],v[5]);
+      float u3=__fadd_rn(u2,v[6]);
+      float u4=__fadd_rn(u2,v[4]);
+      float c[4]={u1,__fadd_rn(u4,v[2]),__fsub_rn(u3,v[3]),__fadd_rn(u3,v[4])};
+      #pragma unroll
+      for(int j=0;j<4;++j){if(lane==0)out[j].x=c[j];else out[j].y=c[j];}
+    }
+    int at=(i/512)*1024+i%512;
+    *reinterpret_cast<float2*>(D+at)=out[0];
+    *reinterpret_cast<float2*>(D+at+512)=out[1];
+    *reinterpret_cast<float2*>(D+at+512*1024)=out[2];
+    *reinterpret_cast<float2*>(D+at+512*1024+512)=out[3];
+  }
 }
+
 void check(cudaError_t e,const char* where){if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));}
 void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transformed){
   if(reinterpret_cast<uintptr_t>(ptr)%16)throw std::invalid_argument("SW TMA input must be16-byte aligned");
@@ -216,16 +204,16 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
     if(result!=CUDA_SUCCESS)throw std::runtime_error("SW A tensor map status "+std::to_string(int(result)));
     return;
   }
-  uint64_t dims[3]={transformed ? 512ULL:1024ULL,transformed ? 512ULL:1024ULL,8};
-  uint64_t strides[2]={dims[0]*2,dims[0]*dims[1]*2};
-  uint32_t box[3]={uint32_t(is_a ? 64:BN),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};
+  uint64_t dims[4]={64,transformed ? 512ULL:1024ULL,transformed ? 8ULL:16ULL,8};
+  uint64_t strides[3]={transformed ? 1024ULL:2048ULL,128,512ULL*512*2};
+  uint32_t box[4]={64,BK,BN/64,1},element_strides[4]={1,1,1,1};
   auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
-      transformed ? 3:2,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
-      is_a ? CU_TENSOR_MAP_SWIZZLE_128B:CU_TENSOR_MAP_SWIZZLE_64B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
-  if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map status "+std::to_string(int(result)));
+      transformed ? 4:3,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
+      CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+  if(result!=CUDA_SUCCESS)throw std::runtime_error("SW B tensor map status "+std::to_string(int(result)));
 }
 } // namespace
-struct SWState{DType dtype;DescriptorSet descriptors;};
+struct SWState{DType dtype;};
 std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   if(p.m!=1024 || p.n!=1024 || p.k!=1024 || p.trans_a || p.trans_b || p.lda!=1024 || p.ldb!=1024 || p.ldd!=1024 || p.alpha!=1 || p.beta!=0)
     throw std::invalid_argument("SW requires contiguous non-transposed1024^3 alpha1 beta0");
@@ -239,24 +227,13 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
     check(cudaFuncSetAttribute(sw_cooperative_hilo<cute::half_t>,cudaFuncAttributeMaxDynamicSharedMemorySize,sizeof(Shared<cute::half_t>)),"SW shared opt-in");
     check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&blocks,sw_cooperative_hilo<cute::half_t>,Threads,sizeof(Shared<cute::half_t>)),"SW occupancy capacity");
   }
-  if(blocks*prop.multiProcessorCount<128)throw std::invalid_argument("SW cooperative grid requires128 resident CTA capacity");
-  cudaFuncAttributes attr{};
-  if(p.dtype==DType::BF16)check(cudaFuncGetAttributes(&attr,sw_cooperative_hilo<cute::bfloat16_t>),"SW attributes");
-  else check(cudaFuncGetAttributes(&attr,sw_cooperative_hilo<cute::half_t>),"SW attributes");
-  if((attr.sharedSizeBytes+prop.reservedSharedMemPerBlock)%128)throw std::runtime_error("SW dynamic shared base alignment");
-  DescriptorSet descriptors{};
-  for(int slot=0;slot<Stages;++slot){
-    uint64_t start=(attr.sharedSizeBytes+prop.reservedSharedMemPerBlock)/16+slot*((ASize+BSize)*2/16);
-    descriptors.a[slot]=0x4000004000010000ULL|start;
-    descriptors.b[slot]=0x8000002000000000ULL|(start+ASize*2/16);
-  }
-  return std::make_shared<SWState>(SWState{p.dtype,descriptors});
+  if(blocks*prop.multiProcessorCount<224)throw std::invalid_argument("SW cooperative grid requires224 resident CTA capacity");
+  return std::make_shared<SWState>(SWState{p.dtype});
 }
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
   CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
   encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
-  DescriptorSet descriptors=state.descriptors;
-  void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D,&descriptors};dim3 grid(16,8);
+  void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D};dim3 grid(4,8,7);
   if(state.dtype==DType::BF16)
     check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
   else

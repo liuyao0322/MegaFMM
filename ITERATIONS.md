@@ -153,6 +153,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 123 | Uniform descriptors with compact single-product loop | 0.8408 | 0.013301 | experiment |
 
+| 124 | Distributed wide leaf GEMMs and global product recombination | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1448,3 +1450,17 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 122 numerical error restored to baseline but128regs and552B stack with STL/LDL explain regression; full123 benchmark archived.
 - **Next:** Assess compact descriptor path, then widen and distribute leaf GEMM tiles
 - **Archive:** trajectory/20261015_020626_iter-123/
+
+### Iter 124 — Distributed wide leaf GEMMs and global product recombination
+
+- **Hypothesis:** 64x128 tiles reduce repeated A reads and WGMMA issue count while224 CTAs permit two-block residency
+- **Changes:** Assign one P tile per CTA, K64 four slots,256threads,98304B operand data, second cooperative grid barrier before vector global recombination; workspace15MiB
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Benchmark attempt archived; original gates unchanged. Inspect any build/runtime failure before interpreting performance.
+- **Next:** Debug distributed architecture and compare complete-call latency after correctness checks
+- **Archive:** trajectory/20261015_020828_iter-124/
