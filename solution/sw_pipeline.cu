@@ -80,17 +80,17 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }
   __syncthreads();
   // All CTAs cooperate in one input transformation per invocation, never across calls.
-  // Transform two adjacent elements per thread with aligned 32-bit IO. Keep
+  // Transform four adjacent elements per thread with aligned 64-bit IO. Keep
   // every scalar FP32 operation and each high/low rounding identical.
-  for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid);i<Plane;i+=2*gridDim.x*gridDim.y*Threads){
+  for(int i=4*((blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid);i<Plane;i+=4*gridDim.x*gridDim.y*Threads){
     int row=i/512,col=i%512,at=row*1024+col;
-    auto av=reinterpret_cast<const uint32_t*>(A);
-    auto bv=reinterpret_cast<const uint32_t*>(B);
-    uint32_t abits[4]={av[at/2],av[(at+512)/2],av[(at+512*1024)/2],av[(at+512*1024+512)/2]};
-    uint32_t bbits[4]={bv[at/2],bv[(at+512)/2],bv[(at+512*1024)/2],bv[(at+512*1024+512)/2]};
-    uint32_t words[16]={};
+    auto av=reinterpret_cast<const uint64_t*>(A);
+    auto bv=reinterpret_cast<const uint64_t*>(B);
+    uint64_t abits[4]={av[at/4],av[(at+512)/4],av[(at+512*1024)/4],av[(at+512*1024+512)/4]};
+    uint64_t bbits[4]={bv[at/4],bv[(at+512)/4],bv[(at+512*1024)/4],bv[(at+512*1024+512)/4]};
+    uint64_t words[16]={};
     #pragma unroll
-    for(int lane=0;lane<2;++lane){
+    for(int lane=0;lane<4;++lane){
       float a11=float(T::bitcast(uint16_t(abits[0]>>(16*lane)))),a12=float(T::bitcast(uint16_t(abits[1]>>(16*lane))));
       float a21=float(T::bitcast(uint16_t(abits[2]>>(16*lane)))),a22=float(T::bitcast(uint16_t(abits[3]>>(16*lane))));
       float b11=float(T::bitcast(uint16_t(bbits[0]>>(16*lane)))),b12=float(T::bitcast(uint16_t(bbits[1]>>(16*lane))));
@@ -102,14 +102,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       #pragma unroll
       for(int j=0;j<4;++j){
         T sh=T(sv[j]),th=T(tv[j]);
-        words[2*j]|=uint32_t(sh.raw())<<(16*lane);
-        words[2*j+1]|=uint32_t(T(__fsub_rn(sv[j],float(sh))).raw())<<(16*lane);
-        words[8+2*j]|=uint32_t(th.raw())<<(16*lane);
-        words[8+2*j+1]|=uint32_t(T(__fsub_rn(tv[j],float(th))).raw())<<(16*lane);
+        words[2*j]|=uint64_t(sh.raw())<<(16*lane);
+        words[2*j+1]|=uint64_t(T(__fsub_rn(sv[j],float(sh))).raw())<<(16*lane);
+        words[8+2*j]|=uint64_t(th.raw())<<(16*lane);
+        words[8+2*j+1]|=uint64_t(T(__fsub_rn(tv[j],float(th))).raw())<<(16*lane);
       }
     }
     #pragma unroll
-    for(int j=0;j<16;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[j];
+    for(int j=0;j<16;++j)reinterpret_cast<uint64_t*>(packed)[(j*Plane+i)/4]=words[j];
   }
   // Generic global stores become visible to TMA's async proxy before publication.
   asm volatile("fence.proxy.async.global;" ::: "memory");

@@ -87,6 +87,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 90 | Vectorize input transformation IO in adjacent pairs | 0.5825 | 0.019053 | passed |
 
+| 91 | Transform four adjacent elements with64bit IO | 0.5703 | 0.019613 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -782,3 +784,23 @@ Original-input FP64 gates, independent72-check stress and final quick memcheck/r
 - **Analysis:** Full1024 cubed BF16/FP16 benchmark completed; independently compare output bitwise and profile transform timing plus generated IO widths
 - **Next:** Verify original gates, paired full invocation, vectorized SASS and synchronization before retaining
 - **Archive:** trajectory/20261014_223240_iter-90/
+
+### Reassessment after iter88–90
+
+Three candidates did not establish a >=3percent full-call gain over87. Five/eight consumer warp allocations regress;32bit input IO halves load/store instructions and reduces measured transform/grid phase~4.0->3.68us, but full-call gain is only~1percent and BF16Graph regresses~1percent. Reread current NCU and paired CSVs; no performance floor is claimed. NVIDIA CUDA programming guide supports naturally aligned8byte global IO; all current input/workspace alignment constraints satisfy it. Next isolate64bit/four-element IO so every original thread handles exactly one input group, preserving full CTA transform parallelism.
+
+### Iter 91 — Transform four adjacent elements with64bit IO
+
+- **Hypothesis:** Four-element aligned IO reduces instruction count further and removes the per-thread transform loop without reducing CTA parallelism
+- **Changes:** Widen input/output vectors32->64bits and process four scalar lanes with unchanged FP32 arithmetic and rounding; keep iter87 producer/consumer roles
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.019613 ms; mean speedup=0.5703x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012427 | 0.019552 | 0.6356 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009935 | 0.019673 | 0.5050 | 2.37136e-06 | 1 |
+
+- **Analysis:** Full1024 cubed BF16/FP16 benchmark completed after documented stall reassessment; compare against87 and90 and inspect resource changes
+- **Next:** Profile transform/grid timing, bitwise equivalence and paired complete-call latency
+- **Archive:** trajectory/20261014_223537_iter-91/
