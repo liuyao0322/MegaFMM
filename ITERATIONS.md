@@ -289,6 +289,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 191 | TMA tensor reduction of shared leaf tiles | 0.0000 | 0.000000 | experiment |
 
+| 192 | Aligned TMA tensor reduction | 0.7058 | 0.015783 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2662,3 +2664,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Runtime failed with misaligned address during explicit tuning. Reduction buffer follows48bytes of barriers and lacks128B alignment required by swizzled TMA output. No valid timings or correctness results; exclude candidate.
 - **Next:** Align reduction array128bytes and correct static shared budget114944; rerun.
 - **Archive:** trajectory/20261015_035040_iter-191/
+
+### Iter 192 — Aligned TMA tensor reduction
+
+- **Hypothesis:** Correct TMA reduction source alignment and measure aggregate hardware reduction versus scalar atomic190.
+- **Changes:** Move128B-aligned reduction arrays immediately after operand storage so base is also1024B-aligned with driver reservation; retain total shared114816 instead of increasing padded allocation. Otherwise191 unchanged.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.015783 ms; mean speedup=0.7058x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.012274 | 0.015676 | 0.7829 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.009990 | 0.015891 | 0.6287 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about15.68us FP16 about15.89us, much faster scalar190 but slower162. eF remains near.0060152/.000754626 with unchanged gates FAIL, nonfinite0. Sum order nondeterministic; no bitwise97 equivalence claimed. Valid performance experiment, not accepted winner.
+- **Next:** Profile192 reduction waits and consider reusing retired operand memory for one full128x64 reduction tile to remove half-tile barrier round.
+- **Archive:** trajectory/20261015_035129_iter-192/

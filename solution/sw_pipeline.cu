@@ -16,8 +16,8 @@ using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared{
   T operand[Stages][ASize+BSize];
+  alignas(128) float reduction[2][64*32];
   uint64_t ready[Stages],free[Stages],pack_ready,global_ready;
-  float reduction[2][64*32];
   uint32_t last;
 };
 static_assert(sizeof(Shared<cute::half_t>)==114816,"shared budget");
