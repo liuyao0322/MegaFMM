@@ -82,6 +82,7 @@ struct Policy {
   // 45=BK64 RS-A rawA4 TMA/finalB7 SIMT; one currentA map per run, A lda<2^39.
   // 46=SW128 SIMT rawA control; same one unused currentA map encode and native domain.
   // 47=BN64 BK64 RS-A rawA4 TMA/finalB7 SIMT; native parentM/N/K multiples128.
+  // 48=BN16 BK64 RS-A rawA4 TMA/finalB7 SIMT; parentM/K%128, parentN%32.
   int mega_variant=0;
 };
 class Plan {

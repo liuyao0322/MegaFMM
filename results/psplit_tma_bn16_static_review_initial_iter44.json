@@ -1,0 +1,1092 @@
+{
+  "schema": "megafmm.iter44.bn16-tma-independent-compiled-static-review.v1",
+  "status": "PASS_COMPILED_CAN_LAUNCH_48",
+  "reviewer": "/root/pipeline_review30",
+  "compiled_gate_inherited_from_iteration43": false,
+  "compiled_gate_inherited_from_iteration41": false,
+  "compiled_gate_inherited_from_iteration39": false,
+  "compiled_gate_inherited_from_parent45_or_any_prior": false,
+  "allowed_native_launch_variants": [
+    48
+  ],
+  "scope": "Only current revision1 new48 FP16/BF16 complete feeding/object/bench/test machine proof. Source/API/test-domain review retained; no GPU validation, original FP64 precision or performance certificate in this initial gate. Future min2 candidate excluded.",
+  "frozen_bindings": {
+    "CMakeLists.txt": "ff86a98efccd8e85a1000d47dadc437e702c414866b26eef3aa2b4239b3696c3",
+    "bench/benchmark.cu": "c18b265a34dc7a7f9fdcc7e2834d0ec1b9ac093130471e058cbdf53f4f8622bc",
+    "include/megafmm/gemm.h": "ffebb139c567bccd828c439364bc7354ac29d8a1bb149b46734606753f1156ee",
+    "include/megafmm/kernels.h": "11609c57e11fec2b664e8a0315ddef221aab4d75a96cf7ba11317570e403bc4c",
+    "solution/plan.cpp": "1952fa53789601e4ffc754a2d8ff01ebb3f73e75b1e8d6c6f791d03b76d29d32",
+    "tests/test_correctness.cu": "48aea03e26a221a82cfbe963164c1e1000941beddbb7b1640750637f18b97a46",
+    "solution/megakernel_wgmma_psplit_tma_bn16.cu": "e89031f58d222231fb26640d3a13a233af9e7ab4c2d2a1c8197cd78917d5485c",
+    "build/megafmm_bench": "54727c915ed06d12964980d806304fa949c5cd2e35adbf8ed2e43c07fcf92e5b",
+    "build/test_correctness": "45a0fe15d7ab8111b405e9d1edf116609f617eba43f4db8b8d1a42d125349ca9",
+    "results/psplit_tma_bn16_initial_frozen_identity_iter44.json": "57bef1331f044e7420d9291c28d685aa60a1a1c69816ab254d733a9406809a38",
+    "results/psplit_tma_bn16_final_link_identity_iter44.json": "05de3775f5c7b10f4cc7954c87f383208877bd2b0d459051672e44b2902ef344",
+    "results/psplit_tma_bn16_final_object_sass_iter44.txt": "4ff1524c257b1ad732511304aef11cfabb20647dfc410c5957b86681ed897a19",
+    "results/small_psplit_tma_bn16_final_sass_iter44.txt": "c62eea1b21779e3dc1a6c5faece95810e2e2dcbd74718b77e814436fb348b06a",
+    "results/psplit_tma_bn16_final_test_sass_iter44.txt": "c62eea1b21779e3dc1a6c5faece95810e2e2dcbd74718b77e814436fb348b06a",
+    "results/psplit_tma_bn16_final_object_resources_iter44.txt": "f2fcf62c03d16f4b9323db70a9bd204b23c21dea00416e04b549bfc90be10ade",
+    "results/psplit_tma_bn16_final_object_elf_iter44.txt": "6ab13746e6a9e6070ec82fbf9d59fbcfd36ae884bff61e669ed8e7a71d207753",
+    "results/psplit_tma_bn16_final_megakernel_wgmma_psplit_tma_bn16_iter44.ptx": "ea5ce9448e2209fe19aec7fa879e4171537142f6f0cf2038c474ef7c7c2e1745",
+    "results/psplit_tma_bn16_final_megakernel_wgmma_psplit_tma_bn16_iter44.cubin": "163f8377b13b91e4e66e6470fd8d466212bf4af1e22de3219e6079778ee3eef7",
+    "results/psplit_tma_bn16_final_host_objdump_iter44.txt": "1d4842a4df5faddb342e62abf677c69c402fbba8b45b860e607af44e80a82eed",
+    "results/psplit_tma_bn16_function_occupancy_probe_iter44.txt": "5b015b257562b6409c9ea159ac1b3296f84c137b026b72a26c40c00148d21644",
+    "results/psplit_tma_bn16_function_occupancy_probe_iter44.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/psplit_tma_bn16_initial_source_iter44.cu": "c48dee6016ed68e1cf9a7c0837c2a018fb3164de4ae7ff99d04e1c3db4dc3df8",
+    "results/psplit_tma_bn16_revision1_source_iter44.cu": "e89031f58d222231fb26640d3a13a233af9e7ab4c2d2a1c8197cd78917d5485c",
+    "results/psplit_tma_bn16_revision1_delta_iter44.json": "c3a72721aaade157a6470ea8c718e97109d7c288b839aed365008657f9c6aa8f",
+    "results/psplit_tma_bn16_revision1_delta_iter44.patch": "629618d76a737bab634de9ddb1c1fd5e62eb561808c09e4adcb4a9cbcb2a6049",
+    "results/psplit_tma_bn16_initial_build_iter44.txt": "263236880bc32818ad8002b469322eb74601e14e7e597c2955ff94cb7f60cc1b",
+    "results/psplit_tma_bn16_initial_build_iter44.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/psplit_tma_bn16_revision1_build_iter44.txt": "d29d16632be610643a589eac94c95b1ae56fbc465a819f8381f29d76f4c94b86",
+    "results/psplit_tma_bn16_revision1_build_iter44.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    ".scratch/psplit_tma_bn16_static_review_failed_initial_iter44.json": "f9f3d83aa5f9dcf8085d5793e1d6a5e73c88c8a98cc214e272f9cd63aa72eff2",
+    ".scratch/psplit_tma_bn16_static_review_source_iter44.json": "151e157c6744c5618f0b439a25a52878448cc2e6202efaa422c6efafc7b3a884",
+    ".scratch/psplit_tma_bn16_review_cfg_iter44.py": "19a793637782f663c225e9c115a8975042e5a11334db6f09ef33d7ee86fa2799",
+    ".scratch/psplit_tma_bn16_review_init_cfg_iter44.py": "a4c1acc99f22b019217bcbd61dd83706159cc4d7f5d909988ddf72e256704715",
+    ".scratch/psplit_tma_bn16_review_grow_cfg_iter44.py": "a6c2ba201be1d50a47427eb70002b3f72c7cbe7efdbe6be10351a48fc1808f75"
+  },
+  "instances": [
+    {
+      "variant": 48,
+      "dtype": "fp16",
+      "function": "_ZN7megafmm68_GLOBAL__N__b7d3cc70_35_megakernel_wgmma_psplit_tma_bn16_cu_cf92e38030winograd_wgmma_psplit_tma_bn16IN7cutlass6half_tELi16EEEvNS_7ProblemENS0_17TmaBN16DescriptorEPKT_PKfPf",
+      "status": "PASS_FRESH_COMPILED_STATIC_LAUNCH_GATE",
+      "bm": 64,
+      "bn": 16,
+      "bk": 64,
+      "threads": 384,
+      "stages": 2,
+      "k16_atoms_per_stage": 4,
+      "parent_1024_stage_count": 8,
+      "static_instruction_count": 2360,
+      "canonical_pc_predicate_instruction_sha256": "0b669892429225bf5bd43ef918ffcdc7407e4ad6523a4ae9310100ebcb77c1d2",
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "actual_reported_registers": 128,
+      "effective_initial_registers_per_thread": 128,
+      "effective_initial_evidence": [
+        "Fresh feeding ELF EIATTR_REGCOUNT128; EIATTR_MAXREG_COUNT0xa8 is compiler cap, not initial168",
+        "Fresh actual ptxas REG128, Driver registers128, actual DEC40/TRY_ALLOC128",
+        "Actual maxntid384/minnctapersm1; no startup allocation inherited"
+      ],
+      "producer_quota": 40,
+      "wg0_quota": 128,
+      "wg1_quota": 128,
+      "consumer_quotas": [
+        128,
+        128
+      ],
+      "initial_owned_CTA_pool_registers": 49152,
+      "requested_role_pool_registers": 37888,
+      "initial_owned_cta_register_pool": 49152,
+      "required_role_register_pool": 37888,
+      "required_legal_initial_minimum_arithmetic_only": 99,
+      "setmaxnreg_direction_legal": true,
+      "producer_gpr_highest_including_implicit": 37,
+      "wg0_gpr_highest_including_implicit": 125,
+      "wg1_gpr_highest_including_implicit": 124,
+      "consumer_gpr_highest_including_implicit": 125,
+      "consumer_successful_INC_fallthrough_pc": "0x360",
+      "consumer_grown_registers": [],
+      "consumer_INC_equals_initial": true,
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 597,
+          "possibly_executed_instruction_count": 596,
+          "abstract_state_count": 838,
+          "gpr_highest_including_implicit": 37,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x8b80",
+              "instruction": "IMAD.WIDE.U32 R36, R27.reuse, UR16, R30",
+              "highest": 37
+            },
+            {
+              "pc": "0x8bf0",
+              "instruction": "IADD3 R33, R37, R33, RZ",
+              "highest": 37
+            },
+            {
+              "pc": "0x8b80",
+              "instruction": "IMAD.WIDE.U32 R36, R27.reuse, UR16, R30",
+              "highest": 37
+            },
+            {
+              "pc": "0x8bf0",
+              "instruction": "IADD3 R33, R37, R33, RZ",
+              "highest": 37
+            }
+          ],
+          "pending_RS_A_and_P_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 1233,
+          "possibly_executed_instruction_count": 1209,
+          "abstract_state_count": 1662,
+          "gpr_highest_including_implicit": 125,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x3ee0",
+              "instruction": "IADD3 R125, R10.reuse, 0x1030, R119.reuse",
+              "highest": 125
+            },
+            {
+              "pc": "0x3f50",
+              "instruction": "IMAD.U32 R28, R125, 0x2, R2.reuse",
+              "highest": 125
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x6550",
+              "last_issue_pc": "0x6820",
+              "covered_wait0_pc": "0x6830",
+              "MMA_count": 12,
+              "A_packed_register_count": 48,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87,
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95
+              ],
+              "P_register_count": 24,
+              "P_registers": [
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all complete-stage physical A words from first MMA until covered wait0,including future-issued A; actual role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 1126,
+          "possibly_executed_instruction_count": 1121,
+          "abstract_state_count": 1221,
+          "gpr_highest_including_implicit": 124,
+          "highest_instruction_examples": [
+            {
+              "pc": "0xde0",
+              "instruction": "IADD3 R124, R21.reuse, 0x28, R114.reuse",
+              "highest": 124
+            },
+            {
+              "pc": "0xe30",
+              "instruction": "IMAD.U32 R124, R124, 0x2, R5.reuse",
+              "highest": 124
+            },
+            {
+              "pc": "0x18b0",
+              "instruction": "LOP3.LUT R63, R124, 0x380, RZ, 0xc0, !PT",
+              "highest": 124
+            },
+            {
+              "pc": "0x1a20",
+              "instruction": "LOP3.LUT R63, R63, R124, RZ, 0x3c, !PT",
+              "highest": 124
+            },
+            {
+              "pc": "0x1ac0",
+              "instruction": "LOP3.LUT R124, R15, 0x380, RZ, 0xc0, !PT",
+              "highest": 124
+            },
+            {
+              "pc": "0x1be0",
+              "instruction": "SHF.R.U64 R124, R124, 0x3, RZ",
+              "highest": 124
+            },
+            {
+              "pc": "0x1cb0",
+              "instruction": "LOP3.LUT R15, R124, R15, RZ, 0x3c, !PT",
+              "highest": 124
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x2ed0",
+              "last_issue_pc": "0x3290",
+              "covered_wait0_pc": "0x32a0",
+              "MMA_count": 16,
+              "A_packed_register_count": 64,
+              "A_registers": [
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87,
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                116,
+                117,
+                118,
+                119
+              ],
+              "P_register_count": 32,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all complete-stage physical A words from first MMA until covered wait0,including future-issued A; actual role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        }
+      ],
+      "first_MMA_accumulator_zero_and_preINC_CFG": [
+        {
+          "role": "producer",
+          "abstract_states": 2036,
+          "first_accumulator_zero_definition_missing_count": 0,
+          "missing_first_zero": [],
+          "P_first_issue_fragments": [],
+          "high_register_access_before_successful_INC_count": 0,
+          "pre_INC_accesses": []
+        },
+        {
+          "role": "WG0",
+          "abstract_states": 2455,
+          "first_accumulator_zero_definition_missing_count": 0,
+          "missing_first_zero": [],
+          "P_first_issue_fragments": [
+            {
+              "pc": "0x6550",
+              "base_register": 32
+            },
+            {
+              "pc": "0x6660",
+              "base_register": 48
+            },
+            {
+              "pc": "0x6760",
+              "base_register": 40
+            }
+          ],
+          "high_register_access_before_successful_INC_count": 0,
+          "pre_INC_accesses": []
+        },
+        {
+          "role": "WG1",
+          "abstract_states": 2243,
+          "first_accumulator_zero_definition_missing_count": 0,
+          "missing_first_zero": [],
+          "P_first_issue_fragments": [
+            {
+              "pc": "0x2ed0",
+              "base_register": 32
+            },
+            {
+              "pc": "0x2fd0",
+              "base_register": 48
+            },
+            {
+              "pc": "0x30d0",
+              "base_register": 40
+            },
+            {
+              "pc": "0x31d0",
+              "base_register": 24
+            }
+          ],
+          "high_register_access_before_successful_INC_count": 0,
+          "pre_INC_accesses": []
+        }
+      ],
+      "grown_register_definite_write_CFG": [
+        {
+          "role": "producer",
+          "abstract_states": 838,
+          "grown_registers_actually_accessed": [],
+          "grown_register_read_before_definition_count": 0,
+          "read_before_definition": [],
+          "pre_INC_grow_access_count": 0,
+          "pre_INC_accesses": [],
+          "first_definitions": []
+        },
+        {
+          "role": "WG0",
+          "abstract_states": 1662,
+          "grown_registers_actually_accessed": [],
+          "grown_register_read_before_definition_count": 0,
+          "read_before_definition": [],
+          "pre_INC_grow_access_count": 0,
+          "pre_INC_accesses": [],
+          "first_definitions": []
+        },
+        {
+          "role": "WG1",
+          "abstract_states": 1221,
+          "grown_registers_actually_accessed": [],
+          "grown_register_read_before_definition_count": 0,
+          "read_before_definition": [],
+          "pre_INC_grow_access_count": 0,
+          "pre_INC_accesses": [],
+          "first_definitions": []
+        }
+      ],
+      "all_P_clear_after_successful_INC": true,
+      "legal_initial_owned_preINC_zero_present": false,
+      "stack_bytes": 0,
+      "local_bytes": 0,
+      "spill_store_bytes": 0,
+      "spill_load_bytes": 0,
+      "new_C7512_warning": false,
+      "HGMMA_implicit_RS_A_words": 4,
+      "HGMMA_implicit_accumulator_words": 8,
+      "dynamic_shared_bytes": 95232,
+      "actual_driver_static_shared_bytes": 0,
+      "resource_tool_shared_bytes": 1024,
+      "resource_tool_shared_accounting_is_not_driver_static": true,
+      "host_optin_and_launch_size_bytes": 95232,
+      "extern_shared_alignment_bytes": 1024,
+      "operand_bank_bytes": 47104,
+      "all_banks_operand_bytes": 94208,
+      "A_bytes_per_bank": 32768,
+      "B_bytes_per_bank": 14336,
+      "barriers_offset_bytes": 94208,
+      "raw_done_offset_bytes": 94240,
+      "typed_tail_bytes": 28672,
+      "typed_tail_bank0_only": true,
+      "both_banks_drained_before_typed_tail": true,
+      "raw_TMA_boxes": 4,
+      "raw_TMA_transaction_bytes": 32768,
+      "raw_TMA_phase": "producer PipelineState phase XOR1",
+      "B_descriptor": {
+        "leading_byte_offset": 0,
+        "leading_offset_degenerate_unused_residual_N_extent": 1,
+        "stride_byte_offset": 256,
+        "swizzle": "SW32",
+        "source": "canonical pinned CuTe make_gmma_desc; actual SASS high descriptor0xc0000010 and PTX descriptor8byte source, not manual substitute"
+      },
+      "CTA_collective_epochs": {
+        "init_bar0_pc": "0x2d0",
+        "consumer_non_aligned_drain_bar6_384_pc": "0x68c0",
+        "producer_non_aligned_drain_bar6_384_pc": "0x8410",
+        "publish_bar0_pc": "0x8440",
+        "logical_collective_event_count": 3
+      },
+      "TMA_and_SIMT_publication": "Four actual UTMALDG.2D boxes; all128 SIMT B writers MEMBAR.ALL.CTA+FENCE.VIEW.ASYNC.S at81a0/81b0, raw TX paritywait81f0 then fullarrive8220; 128full/256empty arrivals; bothWGwait0 thenrelease before two-bank producer_tail8350/83f0 and bar6; tailSTS afterconsumerbar6 only",
+      "current_A_grid_constant_parameter": {
+        "bytes": 128,
+        "alignment": 64,
+        "kernel_param_offset": "0x70",
+        "current_A_encode_inside_each_ordinary_call": true,
+        "object_param_global_load_or_local_copy_for_descriptor": false
+      },
+      "active_C0_alias": {
+        "four_C0_LDG_before_four_D_STG": true,
+        "C0_LDG_PCs": [
+          "0x8c70",
+          "0x8cb0",
+          "0x8cf0",
+          "0x8d50"
+        ],
+        "first_D_STG_PC": "0x8f30",
+        "beta_positive_or_negative_zero_branch_reads_C0": false,
+        "alpha_RN_FMUL_then_active_beta_FFMA": true
+      },
+      "function_attributes": {
+        "max_threads_per_block": 384,
+        "static_shared_bytes": 0,
+        "local_bytes": 0,
+        "registers_per_thread": 128,
+        "max_dynamic_shared_bytes_before_optin": 49152,
+        "max_dynamic_shared_bytes_after_optin": 95232
+      },
+      "occupancy_API_predicted_active_CTAs_per_SM": 1,
+      "measured_residency": null
+    },
+    {
+      "variant": 48,
+      "dtype": "bf16",
+      "function": "_ZN7megafmm68_GLOBAL__N__b7d3cc70_35_megakernel_wgmma_psplit_tma_bn16_cu_cf92e38030winograd_wgmma_psplit_tma_bn16IN7cutlass10bfloat16_tELi16EEEvNS_7ProblemENS0_17TmaBN16DescriptorEPKT_PKfPf",
+      "status": "PASS_FRESH_COMPILED_STATIC_LAUNCH_GATE",
+      "bm": 64,
+      "bn": 16,
+      "bk": 64,
+      "threads": 384,
+      "stages": 2,
+      "k16_atoms_per_stage": 4,
+      "parent_1024_stage_count": 8,
+      "static_instruction_count": 2360,
+      "canonical_pc_predicate_instruction_sha256": "aa23a7de2884555f1a25bd8a06ffcb6a0e49785fa0b59c1da113fd390d3ceb88",
+      "object_bench_test_complete_instruction_streams_equal": true,
+      "actual_reported_registers": 128,
+      "effective_initial_registers_per_thread": 128,
+      "effective_initial_evidence": [
+        "Fresh feeding ELF EIATTR_REGCOUNT128; EIATTR_MAXREG_COUNT0xa8 is compiler cap, not initial168",
+        "Fresh actual ptxas REG128, Driver registers128, actual DEC40/TRY_ALLOC128",
+        "Actual maxntid384/minnctapersm1; no startup allocation inherited"
+      ],
+      "producer_quota": 40,
+      "wg0_quota": 128,
+      "wg1_quota": 128,
+      "consumer_quotas": [
+        128,
+        128
+      ],
+      "initial_owned_CTA_pool_registers": 49152,
+      "requested_role_pool_registers": 37888,
+      "initial_owned_cta_register_pool": 49152,
+      "required_role_register_pool": 37888,
+      "required_legal_initial_minimum_arithmetic_only": 99,
+      "setmaxnreg_direction_legal": true,
+      "producer_gpr_highest_including_implicit": 37,
+      "wg0_gpr_highest_including_implicit": 125,
+      "wg1_gpr_highest_including_implicit": 124,
+      "consumer_gpr_highest_including_implicit": 125,
+      "consumer_successful_INC_fallthrough_pc": "0x360",
+      "consumer_grown_registers": [],
+      "consumer_INC_equals_initial": true,
+      "role_CFG": [
+        {
+          "role": "producer",
+          "reachable_instruction_count": 597,
+          "possibly_executed_instruction_count": 596,
+          "abstract_state_count": 838,
+          "gpr_highest_including_implicit": 37,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x8b80",
+              "instruction": "IMAD.WIDE.U32 R36, R27.reuse, UR16, R30",
+              "highest": 37
+            },
+            {
+              "pc": "0x8bf0",
+              "instruction": "IADD3 R33, R37, R33, RZ",
+              "highest": 37
+            },
+            {
+              "pc": "0x8b80",
+              "instruction": "IMAD.WIDE.U32 R36, R27.reuse, UR16, R30",
+              "highest": 37
+            },
+            {
+              "pc": "0x8bf0",
+              "instruction": "IADD3 R33, R37, R33, RZ",
+              "highest": 37
+            }
+          ],
+          "pending_RS_A_and_P_regions": []
+        },
+        {
+          "role": "WG0",
+          "reachable_instruction_count": 1233,
+          "possibly_executed_instruction_count": 1209,
+          "abstract_state_count": 1662,
+          "gpr_highest_including_implicit": 125,
+          "highest_instruction_examples": [
+            {
+              "pc": "0x3ee0",
+              "instruction": "IADD3 R125, R10.reuse, 0x1030, R119.reuse",
+              "highest": 125
+            },
+            {
+              "pc": "0x4490",
+              "instruction": "IMAD.U32 R28, R125, 0x2, R2.reuse",
+              "highest": 125
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x6560",
+              "last_issue_pc": "0x6820",
+              "covered_wait0_pc": "0x6830",
+              "MMA_count": 12,
+              "A_packed_register_count": 48,
+              "A_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87,
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95
+              ],
+              "P_register_count": 24,
+              "P_registers": [
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all complete-stage physical A words from first MMA until covered wait0,including future-issued A; actual role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        },
+        {
+          "role": "WG1",
+          "reachable_instruction_count": 1126,
+          "possibly_executed_instruction_count": 1121,
+          "abstract_state_count": 1221,
+          "gpr_highest_including_implicit": 124,
+          "highest_instruction_examples": [
+            {
+              "pc": "0xdf0",
+              "instruction": "IADD3 R124, R21.reuse, 0x28, R114.reuse",
+              "highest": 124
+            },
+            {
+              "pc": "0xfa0",
+              "instruction": "IMAD.U32 R124, R124, 0x2, R5.reuse",
+              "highest": 124
+            },
+            {
+              "pc": "0x1940",
+              "instruction": "LOP3.LUT R63, R124, 0x380, RZ, 0xc0, !PT",
+              "highest": 124
+            },
+            {
+              "pc": "0x1aa0",
+              "instruction": "LOP3.LUT R63, R63, R124, RZ, 0x3c, !PT",
+              "highest": 124
+            },
+            {
+              "pc": "0x1b60",
+              "instruction": "LOP3.LUT R124, R15, 0x380, RZ, 0xc0, !PT",
+              "highest": 124
+            },
+            {
+              "pc": "0x1c80",
+              "instruction": "SHF.R.U64 R124, R124, 0x3, RZ",
+              "highest": 124
+            },
+            {
+              "pc": "0x1d70",
+              "instruction": "LOP3.LUT R15, R124, R15, RZ, 0x3c, !PT",
+              "highest": 124
+            }
+          ],
+          "pending_RS_A_and_P_regions": [
+            {
+              "first_issue_pc": "0x2ed0",
+              "last_issue_pc": "0x3290",
+              "covered_wait0_pc": "0x32a0",
+              "MMA_count": 16,
+              "A_packed_register_count": 64,
+              "A_registers": [
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87,
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                116,
+                117,
+                118,
+                119
+              ],
+              "P_register_count": 32,
+              "P_registers": [
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55
+              ],
+              "generic_full_stage_A_or_P_accesses_before_wait0": [],
+              "scope": "Conservative union of all complete-stage physical A words from first MMA until covered wait0,including future-issued A; actual role CFG includes all loopbacks/wait stubs/common U."
+            }
+          ]
+        }
+      ],
+      "first_MMA_accumulator_zero_and_preINC_CFG": [
+        {
+          "role": "producer",
+          "abstract_states": 2036,
+          "first_accumulator_zero_definition_missing_count": 0,
+          "missing_first_zero": [],
+          "P_first_issue_fragments": [],
+          "high_register_access_before_successful_INC_count": 0,
+          "pre_INC_accesses": []
+        },
+        {
+          "role": "WG0",
+          "abstract_states": 2455,
+          "first_accumulator_zero_definition_missing_count": 0,
+          "missing_first_zero": [],
+          "P_first_issue_fragments": [
+            {
+              "pc": "0x6560",
+              "base_register": 32
+            },
+            {
+              "pc": "0x6660",
+              "base_register": 48
+            },
+            {
+              "pc": "0x6760",
+              "base_register": 40
+            }
+          ],
+          "high_register_access_before_successful_INC_count": 0,
+          "pre_INC_accesses": []
+        },
+        {
+          "role": "WG1",
+          "abstract_states": 2243,
+          "first_accumulator_zero_definition_missing_count": 0,
+          "missing_first_zero": [],
+          "P_first_issue_fragments": [
+            {
+              "pc": "0x2ed0",
+              "base_register": 32
+            },
+            {
+              "pc": "0x2fd0",
+              "base_register": 48
+            },
+            {
+              "pc": "0x30d0",
+              "base_register": 40
+            },
+            {
+              "pc": "0x31d0",
+              "base_register": 24
+            }
+          ],
+          "high_register_access_before_successful_INC_count": 0,
+          "pre_INC_accesses": []
+        }
+      ],
+      "grown_register_definite_write_CFG": [
+        {
+          "role": "producer",
+          "abstract_states": 838,
+          "grown_registers_actually_accessed": [],
+          "grown_register_read_before_definition_count": 0,
+          "read_before_definition": [],
+          "pre_INC_grow_access_count": 0,
+          "pre_INC_accesses": [],
+          "first_definitions": []
+        },
+        {
+          "role": "WG0",
+          "abstract_states": 1662,
+          "grown_registers_actually_accessed": [],
+          "grown_register_read_before_definition_count": 0,
+          "read_before_definition": [],
+          "pre_INC_grow_access_count": 0,
+          "pre_INC_accesses": [],
+          "first_definitions": []
+        },
+        {
+          "role": "WG1",
+          "abstract_states": 1221,
+          "grown_registers_actually_accessed": [],
+          "grown_register_read_before_definition_count": 0,
+          "read_before_definition": [],
+          "pre_INC_grow_access_count": 0,
+          "pre_INC_accesses": [],
+          "first_definitions": []
+        }
+      ],
+      "all_P_clear_after_successful_INC": true,
+      "legal_initial_owned_preINC_zero_present": false,
+      "stack_bytes": 0,
+      "local_bytes": 0,
+      "spill_store_bytes": 0,
+      "spill_load_bytes": 0,
+      "new_C7512_warning": false,
+      "HGMMA_implicit_RS_A_words": 4,
+      "HGMMA_implicit_accumulator_words": 8,
+      "dynamic_shared_bytes": 95232,
+      "actual_driver_static_shared_bytes": 0,
+      "resource_tool_shared_bytes": 1024,
+      "resource_tool_shared_accounting_is_not_driver_static": true,
+      "host_optin_and_launch_size_bytes": 95232,
+      "extern_shared_alignment_bytes": 1024,
+      "operand_bank_bytes": 47104,
+      "all_banks_operand_bytes": 94208,
+      "A_bytes_per_bank": 32768,
+      "B_bytes_per_bank": 14336,
+      "barriers_offset_bytes": 94208,
+      "raw_done_offset_bytes": 94240,
+      "typed_tail_bytes": 28672,
+      "typed_tail_bank0_only": true,
+      "both_banks_drained_before_typed_tail": true,
+      "raw_TMA_boxes": 4,
+      "raw_TMA_transaction_bytes": 32768,
+      "raw_TMA_phase": "producer PipelineState phase XOR1",
+      "B_descriptor": {
+        "leading_byte_offset": 0,
+        "leading_offset_degenerate_unused_residual_N_extent": 1,
+        "stride_byte_offset": 256,
+        "swizzle": "SW32",
+        "source": "canonical pinned CuTe make_gmma_desc; actual SASS high descriptor0xc0000010 and PTX descriptor8byte source, not manual substitute"
+      },
+      "CTA_collective_epochs": {
+        "init_bar0_pc": "0x2d0",
+        "consumer_non_aligned_drain_bar6_384_pc": "0x68c0",
+        "producer_non_aligned_drain_bar6_384_pc": "0x8410",
+        "publish_bar0_pc": "0x8440",
+        "logical_collective_event_count": 3
+      },
+      "TMA_and_SIMT_publication": "Four actual UTMALDG.2D boxes; all128 SIMT B writers MEMBAR.ALL.CTA+FENCE.VIEW.ASYNC.S at81a0/81b0, raw TX paritywait81f0 then fullarrive8220; 128full/256empty arrivals; bothWGwait0 thenrelease before two-bank producer_tail8350/83f0 and bar6; tailSTS afterconsumerbar6 only",
+      "current_A_grid_constant_parameter": {
+        "bytes": 128,
+        "alignment": 64,
+        "kernel_param_offset": "0x70",
+        "current_A_encode_inside_each_ordinary_call": true,
+        "object_param_global_load_or_local_copy_for_descriptor": false
+      },
+      "active_C0_alias": {
+        "four_C0_LDG_before_four_D_STG": true,
+        "C0_LDG_PCs": [
+          "0x8c70",
+          "0x8cb0",
+          "0x8cf0",
+          "0x8d50"
+        ],
+        "first_D_STG_PC": "0x8f30",
+        "beta_positive_or_negative_zero_branch_reads_C0": false,
+        "alpha_RN_FMUL_then_active_beta_FFMA": true
+      },
+      "function_attributes": {
+        "max_threads_per_block": 384,
+        "static_shared_bytes": 0,
+        "local_bytes": 0,
+        "registers_per_thread": 128,
+        "max_dynamic_shared_bytes_before_optin": 49152,
+        "max_dynamic_shared_bytes_after_optin": 95232
+      },
+      "occupancy_API_predicted_active_CTAs_per_SM": 1,
+      "measured_residency": null
+    }
+  ],
+  "disabled_instances": [
+    {
+      "variant": 37,
+      "status": "RETAINED_EXPLICIT_DISABLED_STACK_SPILL_FAILURE",
+      "native_launch_allowed": false
+    }
+  ],
+  "initial_failed_revision": {
+    "archived_source_path": "results/psplit_tma_bn16_initial_source_iter44.cu",
+    "source_sha256": "c48dee6016ed68e1cf9a7c0837c2a018fb3164de4ae7ff99d04e1c3db4dc3df8",
+    "status": "FAIL_STACK168_SPILL224_NO_LAUNCH",
+    "logical_source_path": "solution/megakernel_wgmma_psplit_tma_bn16.cu",
+    "current_source_distinct": true,
+    "fresh_role_maxima": [
+      34,
+      125,
+      125
+    ],
+    "producer_local_spills": 0,
+    "consumer_spill_attribution": "31WG0 raw A addresses;24WG1 raw A addresses+1 barrier CTA-rank/sharedbase word; not P or packed finalA values inside pending window"
+  },
+  "revision1_source_repair": "Stage-local fresh volatile tid reconstructs same lane/coordinates; independent B pair finalcasts shortened lifetime retaining unrounded f2 for T4. All RN DAGs, geometry, quotas, typed layout, guards and output unchanged.",
+  "source_API_tests_review": {
+    "source7_current_sha_verified": true,
+    "invalid49_and_blocked37_before_empty_or_scale": true,
+    "native_geometry": "M%128,N%32,K%128; currentAB16,strides%8,A-only lda<2^39 and original span/scalar/alias guards",
+    "fallback": "non-native currentbindings use truthful packed7/Dense before encoding",
+    "ordinary_run": "one currentA tensor-map encode followed by one kernel and zero global STP workspace",
+    "fixture_reference": "crossatom BN16 vs native BN32 route45 rawU strictbits plus independent RNalpha/FMA hostepilogue; no privateoracle or FP64 certification",
+    "Graph": "capture current immutable map once; fixed buffers receive fresh contents; source fixture actual unexecuted at gate"
+  },
+  "original_FP64_gate": {
+    "status": "NOT_EXECUTED_OR_CERTIFIED_BY_THIS_COMPILED_GATE",
+    "floors_unchanged": true
+  },
+  "limitations": [
+    "Actual correctness/strict/SAN/full20 timing require owner separate runtime evidence",
+    "Static occupancy API prediction1 does not prove measured residency, traffic or a performance cause",
+    "Source initial failed archive and revision1 actual proof remain distinct; no inherited prior CUDA certificate"
+  ],
+  "issues": []
+}

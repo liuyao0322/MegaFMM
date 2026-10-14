@@ -1,0 +1,14 @@
+COMMAND ["python3", "results/psplit_tma_bn16_data_fullplan_generator_iter44.py", "--gate", "results/psplit_tma_bn16_static_review_initial_iter44.json", "--initial-identity", "results/psplit_tma_bn16_initial_frozen_identity_iter44.json", "--route-configurations", "results/psplit_tma_bn16_route_configurations_iter44.json", "--output", "results/psplit_tma_bn161024_plan_iter44.json"]
+SCOPE exact reproduction of original generator/schema rejection, no output existed and no fulltiming executed
+Traceback (most recent call last):
+  File "/share/home/liuyao/workspace/MegaFMM/results/psplit_tma_bn16_data_fullplan_generator_iter44.py", line 160, in <module>
+    emit(generate(args.gate, args.initial_identity, args.route_configurations, args.template), args.output)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/share/home/liuyao/workspace/MegaFMM/results/psplit_tma_bn16_data_fullplan_generator_iter44.py", line 115, in generate
+    initial, gate = verify_inputs(gate_path, initial_path, configurations)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/share/home/liuyao/workspace/MegaFMM/results/psplit_tma_bn16_data_fullplan_generator_iter44.py", line 57, in verify_inputs
+    require(gate.get('compiled_gate_inherited_from_iteration43') is False and
+  File "/share/home/liuyao/workspace/MegaFMM/results/psplit_tma_bn16_data_fullplan_generator_iter44.py", line 26, in require
+    raise ValueError(message)
+ValueError: Require explicit fresh gate, never inherited iteration43/42 proof
