@@ -120,6 +120,9 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int q=0;q<512/BK;++q){
       if(q)wait(&s.product_free,(q-1)%2);
       wait(&s.ready,q%2);
+      float acc[7][16]={};
+      warpgroup_arrive();
+      #pragma unroll
       for(int p=0;p<7;++p){
         int ai=p==0 ? 0:p==1 ? 1:p==2 ? 9:p==3 ? 2:3+2*(p-4);
         int bi=p==0 ? 0:p==1 ? 1:p==2 ? 2:p==3 ? 9:3+2*(p-4);
@@ -127,13 +130,15 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         auto al=make_tensor(make_smem_ptr(s.operand+(ai+1)*ASize),la);
         auto bh=make_tensor(make_smem_ptr(s.operand+11*ASize+bi*BSize),lb);
         auto bl=make_tensor(make_smem_ptr(s.operand+11*ASize+(bi+1)*BSize),lb);
-        float acc[16]={};warpgroup_arrive();
-        mma_term<T>(ah,bh,acc);
-        if(p==2 || p>=4)mma_term<T>(al,bh,acc);
-        if(p==3 || p>=4)mma_term<T>(ah,bl,acc);
-        warpgroup_commit_batch();warpgroup_wait<0>();
+        mma_term<T>(ah,bh,acc[p]);
+        if(p==2 || p>=4)mma_term<T>(al,bh,acc[p]);
+        if(p==3 || p>=4)mma_term<T>(ah,bl,acc[p]);
+      }
+      warpgroup_commit_batch();warpgroup_wait<0>();
+      #pragma unroll
+      for(int p=0;p<7;++p){
         #pragma unroll
-        for(int j=0;j<16;++j){int mn=GMMA::CLayout_64x32{}(tid-128,j);s.product[p][(mn%64)*BN+mn/64]=acc[j];}
+        for(int j=0;j<16;++j){int mn=GMMA::CLayout_64x32{}(tid-128,j);s.product[p][(mn%64)*BN+mn/64]=acc[p][j];}
       }
       arrive(&s.free);
       arrive(&s.product_ready);

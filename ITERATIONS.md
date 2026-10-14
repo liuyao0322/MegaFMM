@@ -37,6 +37,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 65 | Batch all leaf operands per K slice | 0.2471 | 0.044803 | passed |
 
+| 66 | Issue seven independent WGMMA products before waiting | 0.1933 | 0.057705 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -296,3 +298,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Full unchanged benchmark exited0. All numerical gates passed; compare actual complete invocation timings.
 - **Next:** Inspect latency and validate faster shared-buffer arrangement.
 - **Archive:** trajectory/20261014_192948_iter-65/
+
+### Iter 66 — Issue seven independent WGMMA products before waiting
+
+- **Hypothesis:** Independent P accumulators remove per-product completion latency bubbles in the bulk operand design.
+- **Changes:** Seven16-register accumulator fragments and one WGMMA commit/wait per K slice; preserve fixed leaf order and CUDA output recombination.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.057705 ms; mean speedup=0.1933x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x64 v0 | launch | 0.012445 | 0.058099 | 0.2142 | 7.15726e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x64 v0 | launch | 0.009875 | 0.057312 | 0.1723 | 4.79212e-07 | 1 |
+
+- **Analysis:** Original full benchmark exited0 and numerical gates passed. Compare performance before selecting bulk batching.
+- **Next:** Inspect timings and register use; validate stress on a performance improvement.
+- **Archive:** trajectory/20261014_193108_iter-66/
