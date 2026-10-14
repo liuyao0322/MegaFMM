@@ -57,6 +57,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 75 | Fit two cooperative CTAs per SM using BN16 | 0.3649 | 0.030256 | passed |
 
+| 76 | Stream complete products into CUDA registers and double BK | 0.5152 | 0.021564 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -485,3 +487,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Original full benchmark exited0 and numerical gates passed. Resource capacity is checked at plan creation, not claimed as measured occupancy.
 - **Next:** Inspect latency and stress; reassess three recent non-improving directions if75 does not beat72 by3percent.
 - **Archive:** trajectory/20261014_194738_iter-75/
+
+### Iter 76 — Stream complete products into CUDA registers and double BK
+
+- **Hypothesis:** Reassessment73-75 finds no3percent improvement; shrink shared P to two slots so BK256 double operands fit without losing TMA overlap.
+- **Changes:** Restore74, BK256,213120-byte arena, two shared P slots with ready/free barriers, statically unrolled CUDA registers retain seven P before fixed U recombination.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.021564 ms; mean speedup=0.5152x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012272 | 0.021245 | 0.5776 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009908 | 0.021883 | 0.4528 | 2.37136e-06 | 1 |
+
+- **Analysis:** Full1024 benchmark exited0 and frozen numerical gates passed. Reviewed recent latency/stress and NVIDIA TMA box limits plus CUTLASS register/pipeline docs before changing direction.
+- **Next:** Check actual improvement, compiler spills and fresh-input stress; test full-K single-slot geometry if warranted.
+- **Archive:** trajectory/20261014_194938_iter-76/
