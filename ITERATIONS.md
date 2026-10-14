@@ -89,6 +89,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 91 | Transform four adjacent elements with64bit IO | 0.5703 | 0.019613 | passed |
 
+| 92 | Combine A chunk transfers with higher-rank TMA maps | 0.5813 | 0.019093 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -804,3 +806,19 @@ Three candidates did not establish a >=3percent full-call gain over87. Five/eigh
 - **Analysis:** Full1024 cubed BF16/FP16 benchmark completed after documented stall reassessment; compare against87 and90 and inspect resource changes
 - **Next:** Profile transform/grid timing, bitwise equivalence and paired complete-call latency
 - **Archive:** trajectory/20261014_223537_iter-91/
+
+### Iter 92 — Combine A chunk transfers with higher-rank TMA maps
+
+- **Hypothesis:** One3D/4D A transfer can replace four64-column commands, reducing TMA issue overhead without changing shared layout
+- **Changes:** Restore32bit vectorized transform from90; encode A/S with split-K tensor dimensions and load fullBK tile in oneTMA command per high/low plane; B/T and transaction bytes unchanged
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.019093 ms; mean speedup=0.5813x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012228 | 0.019151 | 0.6385 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009975 | 0.019035 | 0.5240 | 2.37136e-06 | 1 |
+
+- **Analysis:** Driver map probe accepts the permuted strides; full1024 cubed BF16/FP16 benchmark completed. Check numerical gates and independent bitwise plus sanitizer validation.
+- **Next:** Profile TMA instruction reduction and operand waits, compare against87/90 and retain only after full-call validation
+- **Archive:** trajectory/20261014_223916_iter-92/

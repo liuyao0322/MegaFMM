@@ -80,17 +80,17 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }
   __syncthreads();
   // All CTAs cooperate in one input transformation per invocation, never across calls.
-  // Transform four adjacent elements per thread with aligned 64-bit IO. Keep
+  // Transform two adjacent elements per thread with aligned 32-bit IO. Keep
   // every scalar FP32 operation and each high/low rounding identical.
-  for(int i=4*((blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid);i<Plane;i+=4*gridDim.x*gridDim.y*Threads){
+  for(int i=2*((blockIdx.y*gridDim.x+blockIdx.x)*Threads+tid);i<Plane;i+=2*gridDim.x*gridDim.y*Threads){
     int row=i/512,col=i%512,at=row*1024+col;
-    auto av=reinterpret_cast<const uint64_t*>(A);
-    auto bv=reinterpret_cast<const uint64_t*>(B);
-    uint64_t abits[4]={av[at/4],av[(at+512)/4],av[(at+512*1024)/4],av[(at+512*1024+512)/4]};
-    uint64_t bbits[4]={bv[at/4],bv[(at+512)/4],bv[(at+512*1024)/4],bv[(at+512*1024+512)/4]};
-    uint64_t words[16]={};
+    auto av=reinterpret_cast<const uint32_t*>(A);
+    auto bv=reinterpret_cast<const uint32_t*>(B);
+    uint32_t abits[4]={av[at/2],av[(at+512)/2],av[(at+512*1024)/2],av[(at+512*1024+512)/2]};
+    uint32_t bbits[4]={bv[at/2],bv[(at+512)/2],bv[(at+512*1024)/2],bv[(at+512*1024+512)/2]};
+    uint32_t words[16]={};
     #pragma unroll
-    for(int lane=0;lane<4;++lane){
+    for(int lane=0;lane<2;++lane){
       float a11=float(T::bitcast(uint16_t(abits[0]>>(16*lane)))),a12=float(T::bitcast(uint16_t(abits[1]>>(16*lane))));
       float a21=float(T::bitcast(uint16_t(abits[2]>>(16*lane)))),a22=float(T::bitcast(uint16_t(abits[3]>>(16*lane))));
       float b11=float(T::bitcast(uint16_t(bbits[0]>>(16*lane)))),b12=float(T::bitcast(uint16_t(bbits[1]>>(16*lane))));
@@ -102,14 +102,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       #pragma unroll
       for(int j=0;j<4;++j){
         T sh=T(sv[j]),th=T(tv[j]);
-        words[2*j]|=uint64_t(sh.raw())<<(16*lane);
-        words[2*j+1]|=uint64_t(T(__fsub_rn(sv[j],float(sh))).raw())<<(16*lane);
-        words[8+2*j]|=uint64_t(th.raw())<<(16*lane);
-        words[8+2*j+1]|=uint64_t(T(__fsub_rn(tv[j],float(th))).raw())<<(16*lane);
+        words[2*j]|=uint32_t(sh.raw())<<(16*lane);
+        words[2*j+1]|=uint32_t(T(__fsub_rn(sv[j],float(sh))).raw())<<(16*lane);
+        words[8+2*j]|=uint32_t(th.raw())<<(16*lane);
+        words[8+2*j+1]|=uint32_t(T(__fsub_rn(tv[j],float(th))).raw())<<(16*lane);
       }
     }
     #pragma unroll
-    for(int j=0;j<16;++j)reinterpret_cast<uint64_t*>(packed)[(j*Plane+i)/4]=words[j];
+    for(int j=0;j<16;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[j];
   }
   // Generic global stores become visible to TMA's async proxy before publication.
   asm volatile("fence.proxy.async.global;" ::: "memory");
@@ -129,13 +129,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       T* op=s.operand[slot];
       if(alo){
         int plane=p==2 ? 6:2*(p-4);
-        for(int chunk=0;chunk<BK/64;++chunk){
-          SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op+chunk*BM*64,k0+chunk*64,m0,plane);
-        }
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op,0,m0,k0/64,plane);
       }else{
         int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
-        for(int chunk=0;chunk<BK/64;++chunk)
-          SM90_TMA_LOAD_2D::copy(&amap,&s.ready[slot],0,op+chunk*BM*64,k0+col+chunk*64,m0+row);
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op,0,m0+row,(k0+col)/64);
       }
       if(blo){
         int plane=p==3 ? 6:2*(p-4);
@@ -146,8 +143,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
       if(alo){
         int plane=p==2 ? 6:2*(p-4);
-        for(int chunk=0;chunk<BK/64;++chunk)
-          SM90_TMA_LOAD_3D::copy(&smap,&s.low_ready[slot],0,op+ASize+chunk*BM*64,k0+chunk*64,m0,plane+1);
+        SM90_TMA_LOAD_4D::copy(&smap,&s.low_ready[slot],0,op+ASize,0,m0,k0/64,plane+1);
       }
       if(blo){
         int plane=p==3 ? 6:2*(p-4);
@@ -221,6 +217,18 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
 void check(cudaError_t e,const char* where){if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));}
 void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transformed){
   if(reinterpret_cast<uintptr_t>(ptr)%16)throw std::invalid_argument("SW TMA input must be16-byte aligned");
+  if(is_a){
+    // Expose K/64 as an outer tensor dimension. The shared box still packs
+    // (64 K elements, BM rows, BK/64 chunks), matching the existing GMMA layout.
+    uint64_t dims[4]={64,transformed ? 512ULL:1024ULL,transformed ? 8ULL:16ULL,8};
+    uint64_t strides[3]={transformed ? 1024ULL:2048ULL,128,512ULL*512*2};
+    uint32_t box[4]={64,BM,BK/64,1},element_strides[4]={1,1,1,1};
+    auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
+        transformed ? 4:3,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
+        CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+    if(result!=CUDA_SUCCESS)throw std::runtime_error("SW A tensor map status "+std::to_string(int(result)));
+    return;
+  }
   uint64_t dims[3]={transformed ? 512ULL:1024ULL,transformed ? 512ULL:1024ULL,8};
   uint64_t strides[2]={dims[0]*2,dims[0]*dims[1]*2};
   uint32_t box[3]={uint32_t(is_a ? 64:BN),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};
