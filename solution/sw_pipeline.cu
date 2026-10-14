@@ -17,9 +17,10 @@ using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
+  float product[2][Elements];
   uint64_t ready[Stages],free[Stages];
 };
-static_assert(sizeof(Shared<cute::half_t>)==196736,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -136,8 +137,6 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
 
     }
   }else if(tid>=128 && tid<256){
-    float first[16],second[16];
-    #pragma unroll
     for(int step=0;step<7;++step){
       int p=product_for_step(step);
       float acc[16]={};
@@ -168,14 +167,15 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         #pragma unroll
         for(int lane=0;lane<2;++lane){
           int i=v+lane;
+          int idx=product_index(mn%64,mn/64+lane);
           float value=0;
-          if(step==0)first[i]=acc[i];
-          else if(step==1)value=__fadd_rn(first[i],acc[i]);
-          else if(step==2)first[i]=__fadd_rn(first[i],acc[i]);
-          else if(step==3)second[i]=__fadd_rn(first[i],acc[i]);
-          else if(step==4){value=__fadd_rn(second[i],acc[i]);first[i]=__fadd_rn(first[i],acc[i]);}
-          else if(step==5)value=__fadd_rn(first[i],acc[i]);
-          else value=__fsub_rn(second[i],acc[i]);
+          if(step==0)s.product[0][idx]=acc[i];
+          else if(step==1)value=__fadd_rn(s.product[0][idx],acc[i]);
+          else if(step==2)s.product[0][idx]=__fadd_rn(s.product[0][idx],acc[i]);
+          else if(step==3)s.product[1][idx]=__fadd_rn(s.product[0][idx],acc[i]);
+          else if(step==4){value=__fadd_rn(s.product[1][idx],acc[i]);s.product[0][idx]=__fadd_rn(s.product[0][idx],acc[i]);}
+          else if(step==5)value=__fadd_rn(s.product[0][idx],acc[i]);
+          else value=__fsub_rn(s.product[1][idx],acc[i]);
           if(lane==0)out.x=value;else out.y=value;
         }
         if(step==1)*reinterpret_cast<float2*>(D+at)=out;

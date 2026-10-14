@@ -145,6 +145,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 119 | Specialize register recombination by unrolling leaf products | 0.6906 | 0.016136 | experiment |
 
+| 120 | TC-owned shared recombination state | 0.5416 | 0.020784 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1376,3 +1378,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 118 fences alone did not remove C7515; SASS shows wait0 after every HGMMA despite no spills. Full119 benchmark archived for warning/timing inspection.
 - **Next:** Check whether specialization restores asynchronous WGMMA and evaluate full-call gain
 - **Archive:** trajectory/20261015_015915_iter-119/
+
+### Iter 120 — TC-owned shared recombination state
+
+- **Hypothesis:** Keep compact product loop and avoid inter-warpgroup P exchange without register aliasing
+- **Changes:** Replace carried first/second register arrays with TC-owned swizzled shared state; direct float2 output; no product consumer barriers
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.020784 ms; mean speedup=0.5416x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012508 | 0.020787 | 0.6017 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010005 | 0.020780 | 0.4815 | 0.000754626 | 0 |
+
+- **Analysis:** 119 unrolling removed C7515 but still16us; full120 SW benchmark archived with unchanged precision gates.
+- **Next:** Check scheduling diagnostics and pursue uniform descriptor issue if needed
+- **Archive:** trajectory/20261015_020022_iter-120/
