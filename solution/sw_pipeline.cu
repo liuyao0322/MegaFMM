@@ -49,8 +49,8 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
       tiled_divide(a,Shape<_64,_16>{}));
   auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(
       tiled_divide(b,Shape<_32,_16>{}));
-  auto da_base=raw_pointer_cast(da_tiles.data());
-  auto db_base=raw_pointer_cast(db_tiles.data());
+  auto da_base=da_tiles(0,0,0);
+  auto db_base=db_tiles(0,0,0);
   #pragma unroll
   for(int kk=0;kk<BK/16;++kk){
     // All operands fit below 256 KiB of shared memory. K offsets cannot carry
