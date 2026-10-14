@@ -29,6 +29,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 61 | Increase CUDA producer parallelism based on stage clocks | 0.0719 | 0.152644 | measured |
 
+| 62 | Scale producer population to twenty-seven warps | 0.0874 | 0.126517 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -224,3 +226,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Full original 1024 launch benchmark exited0. Diagnostic clocks are from a separate instrumented clone, not the formally timed kernel; no source caching or input-dependent work removal.
 - **Next:** Inspect actual speedup and verify stress if improved; tune producer population and operand generation based on evidence.
 - **Archive:** trajectory/20261014_191901_iter-61/
+
+### Iter 62 — Scale producer population to twenty-seven warps
+
+- **Hypothesis:** More independent producer warps can hide operand load/convert/address dependency latency identified by stage clocks.
+- **Changes:** From61,1024-thread CTA,864 CUDA workers,128 WGMMA consumers,one TMA warp; matching arrival counts. Same shared geometry and arithmetic.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.126517 ms; mean speedup=0.0874x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_unified_v1_hilo_64x32x64 v0 | launch | 0.012330 | 0.129250 | 0.0954 | 7.15726e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_unified_v1_hilo_64x32x64 v0 | launch | 0.009817 | 0.123784 | 0.0793 | 4.79212e-07 | 1 |
+
+- **Analysis:** Full launch benchmark exited0; inspect actual complete-call latency and resource limits before choosing between61 and62.
+- **Next:** Validate faster source and inspect resource usage; next investigate eliminating repeated CTA-local transformations through cooperative once-per-invocation packing.
+- **Archive:** trajectory/20261014_192041_iter-62/

@@ -11,7 +11,7 @@ namespace megafmm::detail {
 namespace {
 constexpr int BM=64, BN=32, BK=64, Elements=BM*BN;
 constexpr int ASize=BM*BK, BSize=BK*BN;
-constexpr int Workers=352,Threads=512;
+constexpr int Workers=864,Threads=1024;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 
