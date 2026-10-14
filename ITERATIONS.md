@@ -45,6 +45,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 69 | Probe single-buffer BK256 geometry | 0.0000 | 0.000000 | failed |
 
+| 70 | Measure BK256 with correct aligned shared budget | 0.3132 | 0.035336 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -366,3 +368,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Benchmark exited2 during build; inspect shared-budget static assertion before execution. No runtime or correctness evidence.
 - **Next:** Correct shared-budget accounting and rebuild.
 - **Archive:** trajectory/20261014_193556_iter-69/
+
+### Iter 70 — Measure BK256 with correct aligned shared budget
+
+- **Hypothesis:** BK256 halves K slices again while retaining fixed precision and within188544-byte shared capacity.
+- **Changes:** Correct sizeof assertion and metadata for128-byte struct alignment; execute69 design unchanged.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.035336 ms; mean speedup=0.3132x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012284 | 0.035601 | 0.3451 | 7.25171e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009864 | 0.035071 | 0.2813 | 1.52049e-06 | 1 |
+
+- **Analysis:** Frozen full benchmark exited0 and numerical gates passed. No size other than1024 was executed.
+- **Next:** Select faster candidate, stress fresh inputs and Graph, and check sanitizer.
+- **Archive:** trajectory/20261014_193634_iter-70/
