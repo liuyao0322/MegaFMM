@@ -183,6 +183,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 138 | Combine asynchronous transform publication with four consumers | 0.9186 | 0.012177 | experiment |
 
+| 139 | Simplify four-consumer shared and output address generation | 0.9102 | 0.012211 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1714,3 +1716,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 137 address-metadata reuse has no material timing gain. Full138 benchmark archived; synchronization changes require independent stress before retention.
 - **Next:** Assess combined full-call gain and simplify consumer addresses to reduce register pressure
 - **Archive:** trajectory/20261015_023244_iter-138/
+
+### Iter 139 — Simplify four-consumer shared and output address generation
+
+- **Hypothesis:** Fixed chunk offsets and unsigned row/column arithmetic reduce consumer registers and issue instructions
+- **Changes:** Explicit16valid chunks per128consumers, two precomputed P bases for even/odd chunks, one global output base with constant offsets; preserve early slot release and async138 publication
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012211 ms; mean speedup=0.9102x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012254 | 0.012140 | 1.0093 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009962 | 0.012282 | 0.8111 | 0.000754626 | 0 |
+
+- **Analysis:** 138 first launch12.054/12.300us, BF16 narrowly ahead of current Dense but not certified; full139 benchmark archived with original gates unchanged.
+- **Next:** Inspect register reduction and independently stress retained asynchronous candidate
+- **Archive:** trajectory/20261015_023425_iter-139/

@@ -154,34 +154,31 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     asm volatile("fence.proxy.async.global;" ::: "memory");
     arrive(&s.pack_ready);
     if(worker<128){
-    constexpr int Chunks=(Elements+127)/128;
+    constexpr int Chunks=16;
+    unsigned row=unsigned(worker)/BN,col=unsigned(worker)%BN;
+    int base_even=product_index(row,col),base_odd=product_index(row+4,col)-128;
+    float* out=D+(m0+row)*1024+n0+col;
     float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
     for(int step=0;step<7;++step){
       wait(&s.product_ready[step%2],(step/2)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*128;
-        if(i<Elements)current[j]=s.product[step%2][product_index(i/BN,i%BN)];
+        int idx=((j&1) ? base_odd:base_even)+j*128;
+        current[j]=s.product[step%2][idx];
       }
-      // Release shared P immediately after reading; arithmetic/global stores can
-      // overlap the Tensor warpgroup's reuse of this slot two steps later.
       arrive(&s.product_free[step%2]);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*128;
-        if(i<Elements){
-          int at=(m0+i/BN)*1024+n0+i%BN;
-          if(step==0)first[j]=current[j]; // P1
-          else if(step==1)D[at]=__fadd_rn(first[j],current[j]); // U1
-          else if(step==2)first[j]=__fadd_rn(first[j],current[j]); // U2
-          else if(step==3)second[j]=__fadd_rn(first[j],current[j]); // U3
-          else if(step==4){
-            D[at+512*1024+512]=__fadd_rn(second[j],current[j]); // D22
-            first[j]=__fadd_rn(first[j],current[j]); // U4
-          }else if(step==5)D[at+512]=__fadd_rn(first[j],current[j]); // D12
-          else D[at+512*1024]=__fsub_rn(second[j],current[j]); // D21
-        }
+        if(step==0)first[j]=current[j];
+        else if(step==1)out[j*4096]=__fadd_rn(first[j],current[j]);
+        else if(step==2)first[j]=__fadd_rn(first[j],current[j]);
+        else if(step==3)second[j]=__fadd_rn(first[j],current[j]);
+        else if(step==4){
+          out[j*4096+512*1024+512]=__fadd_rn(second[j],current[j]);
+          first[j]=__fadd_rn(first[j],current[j]);
+        }else if(step==5)out[j*4096+512]=__fadd_rn(first[j],current[j]);
+        else out[j*4096+512*1024]=__fsub_rn(second[j],current[j]);
       }
     }
     }
