@@ -87,3 +87,8 @@ the user's requests in this conversation:
 - Keep BK256, two operand slots, two conflict-free P slots and current warp roles for this experiment; do not conflate it with deeper WGMMA pipelining or warp-count changes.
 - Advance operand/product slot phases by execution sequence, not logical P number. Retain original recombination operation order and original-input precision gates.
 - Only1024^3 BF16/FP16; measure full invocations against tuned Dense, independent launch/Graph correctness and NCU evidence. This request does not resume an indefinite optimization goal.
+
+- Iter82 (77e1489) implements this candidate and passes original numerical gates, independent72-check launch/Graph stress and memcheck/racecheck/synccheck. P STS/LDS remain1-way,0 excessive wavefront.
+- Full standard launch BF16/FP16=21.350/21.462us, tuned Dense=12.194/9.978us. Contemporaneous ABBA comparison against rebuilt iter81 shows~1.60%/1.49% lower launch time; Graph~0.84%/1.44% lower. Small improvement, below3% threshold; no performance winner certification.
+- Compiled registers remain110/thread with0 local/stack and213120 dynamic shared; Tensor activity~19percent unchanged; dynamic instructions increase~7percent. No stage timing was added.
+- Evidence: trajectory/20261014_validation-iter82-streaming/REPORT.md. Keep this correct candidate; deeper WGMMA pipelining and warp-count changes have not been implemented.

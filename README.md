@@ -8,15 +8,18 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 `Auto` 和 `Dense` 都执行普通 GEMM；`SWPipeline` / `--algorithm sw` 显式执行新内核。
 旧 Mega45 等路线已从当前源码和公共 API 删除。
 
-[当前 P shared 布局修复与验证报告](trajectory/20261014_validation-iter81-p-banks/REPORT.md)
+[当前流式重组版本的精度与性能报告](trajectory/20261014_validation-iter82-streaming/REPORT.md)
+
+[P shared bank conflict 修复报告](trajectory/20261014_validation-iter81-p-banks/REPORT.md)
 
 [最初首版报告（历史）](trajectory/20261014_183039_validation-graph-1024/REPORT.md)
 
-当前源码为 iter81，`sw_cooperative_hilo_64x32x256`。通过行内 XOR swizzle，
-NCU 已确认 P shared 写入由 8-way 降为 1-way，P 写入额外 wavefront 从401408降为0；
-读取也为1-way。普通完整调用 BF16/FP16 为 **21.22/21.66 μs**，同期调优
-cuBLASLt Dense 为 **12.38/9.99 μs**，SW 仍慢 **1.71/2.17 倍**。
-与 iter76 的21.25/21.88 μs基本持平，本次修复未证明显著整体提速。仅验证1024³。
+当前源码为 iter82，`sw_cooperative_hilo_64x32x256`。按 P1→P2→P6→P7→P5→P3→P4
+计算并流式重组，输出 tile 完成后立即写回。同期对照普通调用较 iter81 改善约1.5%–1.6%，
+Graph 改善约0.8%–1.4%，尚无明显整体提速。正式普通调用 BF16/FP16 为
+**21.35/21.46 μs**，同期调优 cuBLASLt Dense 为 **12.19/9.98 μs**，
+SW 仍慢 **1.75/2.15 倍**。NCU确认P shared读写仍为1-way、0额外wavefront。
+仅验证1024³，不能称为性能winner。
 
 每次调用先在调用方提供的 **8 MiB 全局 workspace** 中重新生成 FP32 S/T 的高低部分，
 通过 cooperative grid barrier 后，以 TMA 装入统一 shared buffer 并执行 WGMMA。
@@ -100,7 +103,7 @@ Graph 的新输入重放。SW 仅支持非转置、连续布局、alpha=1、beta
 强制 SW 抛错，不静默退回 Dense。Auto 始终保留 Dense。
 
 `scripts/bench.sh <label>` 保留 AKO 的源码快照逻辑；正式迭代记录 `ITERATIONS.md`
-和对应 Git 版本。持续 AKO4ALL 优化已按用户要求暂停；本次仅完成明确要求的 P shared bank conflict 修复。
+和对应 Git 版本。持续 AKO4ALL 优化已按用户要求暂停；本次按明确请求完成 P shared bank conflict 修复和下一版流式重组试验。
 
 ## 历史与清理记录
 
