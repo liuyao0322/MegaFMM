@@ -64,6 +64,33 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
   }
 }
 
+template<class T,int Slot>
+__device__ __forceinline__ void issue_fixed(Shared<T>& s,int phase,float (&acc)[16]){
+  using namespace cute;
+  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
+  wait(&s.ready[Slot],phase);
+  #pragma unroll
+  for(int j=0;j<16;++j)warpgroup_fence_operand(acc[j]);
+  warpgroup_arrive();
+  mma_term<T>(make_tensor(make_smem_ptr(s.operand[Slot]),la),make_tensor(make_smem_ptr(s.operand[Slot]+ASize),lb),acc);
+  warpgroup_commit_batch();
+}
+template<class T,int Slot>
+__device__ __forceinline__ void free_fixed(Shared<T>& s){
+  __syncwarp();if((threadIdx.x&31)==0)arrive(&s.free[Slot]);
+}
+template<class T,int Slot>
+__device__ __forceinline__ void publish_fixed(Shared<T>& s,int pair,float (&acc)[16]){
+  using namespace cute;
+  #pragma unroll
+  for(int j=0;j<16;++j)warpgroup_fence_operand(acc[j]);
+  if(pair>0)wait(&s.product_free[Slot],(pair-1)%2);
+  #pragma unroll
+  for(int j=0;j<16;++j){int mn=GMMA::CLayout_64x32{}(threadIdx.x-128,j);s.product[Slot][product_index(mn%64,mn/64)]=acc[j];}
+  arrive(&s.product_ready[Slot]);
+}
+
 template<class T> __global__ __launch_bounds__(Threads,1)
 void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
                          const __grid_constant__ CUtensorMap bmap,
@@ -93,11 +120,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         // driver workspace. Only TMA leaders join this publication barrier;
         // the shared pack barrier has already acquired every CUDA writer.
         auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
-        uint32_t current;
-        // One-shot barrier: driver initializes the invocation counter to zero.
-        // Release reductions form the modification sequence acquired at128.
-        asm volatile("red.release.gpu.global.add.u32 [%0],1;" :: "l"(barrier) : "memory");
-        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(current!=128u);
+        uint32_t increment=(blockIdx.x==0 && blockIdx.y==0) ? 0x80000000u-127u:1u;
+        uint32_t old,current;
+        asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;" : "=r"(old) : "l"(barrier),"r"(increment) : "memory");
+        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(!((old^current)&0x80000000u));
       }
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
@@ -185,32 +211,26 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     }
     }
   }else if(tid>=128 && tid<256){
-    for(int step=0;step<7;++step){
-      int p=product_for_step(step);
-      float acc[16]={};
-      // Four compact operand slots keep prefetch ahead; retire each K tile promptly.
-      #pragma unroll
-      for(int q=0;q<512/BK;++q){
-        int sequence=step*(512/BK)+q,slot=sequence%Stages;
-        wait(&s.ready[slot],(sequence/Stages)%2);
-        T* op=s.operand[slot];
-        auto ah=make_tensor(make_smem_ptr(op),la);
-        auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
-        warpgroup_arrive();
-        mma_term<T>(ah,bh,acc);
-        warpgroup_commit_batch();warpgroup_wait<0>();
-        __syncwarp();
-        if((tid&31)==0)arrive(&s.free[slot]);
-      }
-      if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
-      #pragma unroll
-      for(int j=0;j<16;++j){
-        int mn=GMMA::CLayout_64x32{}(tid-128,j);
-        s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
-      }
-      arrive(&s.product_ready[step%2]);
+    #pragma unroll 1
+    for(int pair=0;pair<3;++pair){
+      float acc0[16]={},acc1[16]={};
+      issue_fixed<T,0>(s,pair%2,acc0);
+      issue_fixed<T,2>(s,pair%2,acc1);
+      warpgroup_wait<1>();free_fixed<T,0>(s);
+      issue_fixed<T,1>(s,pair%2,acc0);
+      warpgroup_wait<1>();free_fixed<T,2>(s);
+      issue_fixed<T,3>(s,pair%2,acc1);
+      warpgroup_wait<1>();free_fixed<T,1>(s);
+      publish_fixed<T,0>(s,pair,acc0);
+      warpgroup_wait<0>();free_fixed<T,3>(s);
+      publish_fixed<T,1>(s,pair,acc1);
     }
+    float tail[16]={};
+    issue_fixed<T,0>(s,1,tail);warpgroup_wait<0>();free_fixed<T,0>(s);
+    issue_fixed<T,1>(s,1,tail);warpgroup_wait<0>();free_fixed<T,1>(s);
+    publish_fixed<T,0>(s,3,tail);
   }
+
   __syncthreads();
 }
 void check(cudaError_t e,const char* where){if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));}

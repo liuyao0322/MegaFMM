@@ -221,6 +221,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 157 | One-shot release reduction publication counter | 0.9667 | 0.011551 | experiment |
 
+| 158 | Two-accumulator interleaved K issue with explicit retirement | 0.6338 | 0.017603 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2056,3 +2058,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Baseline numerical errors reproduced, both original gates FAIL. Launch11.477/11.625us remains flat versus155. Compact workspace and counter changes do not resolve FP16 gap.
 - **Next:** Reassess best NCU and test direct two-accumulator interleaving with immediate retire
 - **Archive:** trajectory/20261015_030453_iter-157/
+
+### Iter 158 — Two-accumulator interleaved K issue with explicit retirement
+
+- **Hypothesis:** Interleave independent products on slots0 2 1 3 to overlap GMMA groups without lambda accumulator aliases
+- **Changes:** From155 explicit fixed-slot helpers, acc0 acc1; wait1 frees each completed operand, publish P0 before P1 drain; tail seventh product ordinary
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.017603 ms; mean speedup=0.6338x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012324 | 0.017640 | 0.6986 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009993 | 0.017565 | 0.5689 | 0.000754626 | 0 |
+
+- **Analysis:** Baseline errors preserved and original gates FAIL. No C7515 compiler warning, but launch17.65/17.57us is slower than155 and140. Inspect generated spills before treating independent-accumulator approach exhausted.
+- **Next:** Check resource usage and then target remaining best-kernel wait/descriptor overhead
+- **Archive:** trajectory/20261015_030630_iter-158/
