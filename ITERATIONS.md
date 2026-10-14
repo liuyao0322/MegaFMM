@@ -515,6 +515,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 304 | Reject asymmetric K128 plus K384 completion groups | 1.0676 | 0.010327 | experiment |
 
+| 305 | Exclude stale candidate after local generator failure | 1.0675 | 0.010344 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4690,3 +4692,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.37632 us FP16 10.27744 us versus Dense12.29792/9.76416 us; no improvement. Both original gates fail with finite original errors. Full282/303 ABBA shows303 ordinary BF10.29696 FP10.25584 versus28210.27952/10.22128, so303 not selected despite passing72bitwise,3quick sanitizer and256stream checks.
 - **Next:** Test immutable validated K128 shared descriptor starts to reduce issue instructions, then reprofile if no gain
 - **Archive:** trajectory/20261015_071256_iter-304/
+
+### Iter 305 — Exclude stale candidate after local generator failure
+
+- **Hypothesis:** Prepare a new single-kernel CTA-local shared transform architecture
+- **Changes:** Generator failed before writing source due Python base variable shadowing; benchmark unintentionally repeated unchanged304
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010344 ms; mean speedup=1.0675x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012263 | 0.010370 | 1.1826 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009828 | 0.010319 | 0.9524 | 0.000754626 | 0 |
+
+- **Analysis:** NOT evidence for local transform architecture. Source hash equals304 and configuration confirms old asymmetric K groups; retain raw repeated timings only for provenance, exclude from ranking new architecture. BF16 10.36960us FP16 10.31904us, original gates fail.
+- **Next:** Correct generator variable shadowing and use shell fail-fast before new formal run; profile unchanged304 as reassessment
+- **Archive:** trajectory/20261015_071603_iter-305/
