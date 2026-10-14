@@ -2465,6 +2465,13 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   if(prop.major!=9 || prop.minor!=0 || !prop.cooperativeLaunch)throw std::invalid_argument("SW needs cooperative Hopper launch");
   int blocks=0;
   if(p.dtype==DType::BF16){
+    check(cudaFuncSetAttribute(sw_transform_pdl<cute::bfloat16_t>,cudaFuncAttributePreferredSharedMemoryCarveout,100),"SW pack carveout");
+    check(cudaFuncSetAttribute(sw_cooperative_hilo<cute::bfloat16_t>,cudaFuncAttributePreferredSharedMemoryCarveout,100),"SW compute carveout");
+  }else{
+    check(cudaFuncSetAttribute(sw_transform_pdl<cute::half_t>,cudaFuncAttributePreferredSharedMemoryCarveout,100),"SW pack carveout");
+    check(cudaFuncSetAttribute(sw_cooperative_hilo<cute::half_t>,cudaFuncAttributePreferredSharedMemoryCarveout,100),"SW compute carveout");
+  }
+  if(p.dtype==DType::BF16){
     check(cudaFuncSetAttribute(sw_cooperative_hilo<cute::bfloat16_t>,cudaFuncAttributeMaxDynamicSharedMemorySize,sizeof(Shared<cute::bfloat16_t>)),"SW shared opt-in");
     check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&blocks,sw_cooperative_hilo<cute::bfloat16_t>,Threads,sizeof(Shared<cute::bfloat16_t>)),"SW occupancy capacity");
   }else{

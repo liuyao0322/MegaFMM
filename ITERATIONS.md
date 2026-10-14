@@ -413,6 +413,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 253 | Graph test of full two-kernel PDL call | 0.8368 | 0.012371 | experiment |
 
+| 254 | Align producer and compute shared carveout for PDL | 1.0581 | 0.010463 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3774,3 +3776,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Graph BF16 12.3235 us vs Dense11.3354 us; FP16 12.4192 us vs Dense9.36256 us, both worse than selected224 Graph. Expected original errors and numerical gatesFAIL. PDL invocation also fails to improve under Graph; overlap must be observed, not assumed.
 - **Next:** Inspect actual kernel concurrency with Nsight Systems or absolute device timestamps; retain224 unless a verified full-call gain appears.
 - **Archive:** trajectory/20261015_054740_iter-253/
+
+### Iter 254 — Align producer and compute shared carveout for PDL
+
+- **Hypothesis:** Different L1/shared partition preferences may prevent PDL concurrency or insert device synchronization; align both kernels to100percent shared preference.
+- **Changes:** From252 set cudaFuncAttributePreferredSharedMemoryCarveout=100 on both transform and compute at plan setup for eachdtype; unchanged arithmetic, caller stream and full two-kernel timing.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010463 ms; mean speedup=1.0581x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012366 | 0.010550 | 1.1721 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009796 | 0.010376 | 0.9441 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about10.51us vs Dense12.38us; FP16 median10.37568us vs Dense9.79584us. Substantial improvement over25212.2us and selected22411.09FP, though FP still about0.58us short. Original precision gates remainFAIL with expected errors. Nsys252 single-call traces show transform.927/.895us followed by compute10.368/10.688us with1ns gap and no overlap; changed cache preference is a source-supported hypothesis, actual254 overlap still to verify.
+- **Next:** Profile254 actual overlap, measure Graph and pair against224; validate bitwise, sanitizers and concurrent streams before selecting.
+- **Archive:** trajectory/20261015_054917_iter-254/
