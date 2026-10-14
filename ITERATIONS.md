@@ -926,3 +926,18 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** User-requested performance ablation; original numerical gates remain authoritative. Benchmark exit may indicate numerical failure, not compilation failure; compare both dtype rows and fresh same-session baseline next.
 - **Next:** Run interleaved full-call comparisons versus rebuilt iter96 and report accuracy even if rejected
 - **Archive:** trajectory/20261015_010804_iter-97/
+
+### Iter97 follow-up and final restore
+
+- A/B/B/A rebuilt96/97 full-call comparison,20warmup,5x100calls,3freshaccuracy inputs; unchanged original gates.
+
+| mode | dtype | compensated us | seven-product us | latency reduction | concurrent Dense us |
+|---|---|---:|---:|---:|---:|
+| launch | bf16 | 18.92112 | 14.17568 | 25.08% | 12.25952 |
+| launch | fp16 | 19.15296 | 14.40080 | 24.81% | 9.95504 |
+| graph | bf16 | 18.60288 | 13.56640 | 27.07% | 11.27648 |
+| graph | fp16 | 18.81120 | 14.06144 | 25.25% | 9.54912 |
+
+- Seven-product BF16 eF=.00601520 vs gate.00100256; FP16eF=.000754626 vs gate.000103753: both FAIL,nonfinite0. Benchmark exit2 expected.
+- Verbatim restored solution from5f5327d and final full benchmark passed both dtypes. Experimental source remains503c7de and trajectory/20261015_010804_iter-97/.
+- Report: trajectory/20261015_validation-iter97-no-compensation/REPORT.md. No winner certification for no-compensation candidate.

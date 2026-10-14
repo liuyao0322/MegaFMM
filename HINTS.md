@@ -138,3 +138,7 @@ the user's requests in this conversation:
 ## User request 2026-10-15: seven-product ablation
 
 - User explicitly asked to remove extra compensation and measure performance. Test1024^3 BF16/FP16 seven main products, omitting residual generation/loads/waits/multiply terms. Preserve original FP64 numerical gates and report failures plainly. Keep workspace/shared/roles unchanged to isolate compensation cost. This is a measurement experiment, not authorization to weaken accuracy acceptance.
+
+- User-requested no-compensation ablation completed as97(503c7de):7products, low generation/stores/TMA/waits removed, same shared/workspace/roles. A/B/B/A full-call launch BF16/FP16~14.176/14.401us vs15term18.921/19.153us (~25% lower); Graph13.566/14.061us vs18.603/18.811us. Still slower than Dense. Both FAIL original gates(eF.0060152/.000754626,limits.00100256/.000103753). Source restored verbatim to validated96 after experiment; final gates PASS. Evidence trajectory/20261015_validation-iter97-no-compensation/REPORT.md.
+
+- Latest user steering: explicitly KEEP the seven-product no-compensation version as current source, despite reported accuracy failure. This supersedes the earlier automatic restoration decision; do not restore compensated96 as current. Preserve original accuracy gates and Auto=Dense.

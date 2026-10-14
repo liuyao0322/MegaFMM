@@ -8,6 +8,8 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 `Auto` 和 `Dense` 都执行普通 GEMM；`SWPipeline` / `--algorithm sw` 显式执行新内核。
 旧 Mega45 等路线已从当前源码和公共 API 删除。
 
+[七乘法无补偿实验（iter97：更快，但两种精度均未通过原验收）](trajectory/20261015_validation-iter97-no-compensation/REPORT.md)
+
 [当前输入变换与 TMA 优化报告（iter96，源码等同 iter92）](trajectory/20261014_validation-iter96-supply/REPORT.md)
 
 [固定 slot 与分阶段供数版本报告（iter87）](trajectory/20261014_validation-iter87-staged-ready/REPORT.md)
