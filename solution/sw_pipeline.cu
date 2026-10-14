@@ -10,15 +10,15 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=256,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=1024;
+constexpr int BM=64,BN=32,BK=128,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int Plane=512*512,Threads=512;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
-  T operand[2][2*ASize+2*BSize];
+  T operand[4][2*ASize+2*BSize];
   float product[2][Elements];
-  uint64_t ready[2],free[2],product_ready[2],product_free[2];
+  uint64_t ready[4],free[4],product_ready[2],product_free[2];
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
@@ -51,8 +51,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],864);}
+    for(int j=0;j<4;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -81,8 +81,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
   if(tid==0){
     for(int p=0;p<7;++p)for(int q=0;q<512/BK;++q){
-      int sequence=p*(512/BK)+q,slot=sequence%2,k0=q*BK;
-      if(sequence>=2)wait(&s.free[slot],((sequence-2)/2)%2);
+      int sequence=p*(512/BK)+q,slot=sequence%4,k0=q*BK;
+      if(sequence>=4)wait(&s.free[slot],((sequence-4)/4)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
       int bytes=2*(ASize+BSize)+(alo ? 2*ASize:0)+(blo ? 2*BSize:0);
       TxBarrier::arrive_and_expect_tx(&s.ready[slot],bytes);
@@ -109,21 +109,21 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     }
   }else if((tid>=32 && tid<128) || tid>=256){
     int worker=tid>=256 ? tid-160:tid-32;
-    constexpr int Chunks=(Elements+863)/864;
+    constexpr int Chunks=(Elements+351)/352;
     float values[7][Chunks];
     #pragma unroll
     for(int p=0;p<7;++p){
       wait(&s.product_ready[p%2],(p/2)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*864;
+        int i=worker+j*352;
         if(i<Elements)values[p][j]=s.product[p%2][i];
       }
       arrive(&s.product_free[p%2]);
     }
     #pragma unroll
     for(int j=0;j<Chunks;++j){
-      int i=worker+j*864;
+      int i=worker+j*352;
       if(i<Elements){
         float p1=values[0][j],p2=values[1][j],p3=values[2][j],p4=values[3][j],p5=values[4][j],p6=values[5][j],p7=values[6][j];
         float u1=__fadd_rn(p1,p2),u2=__fadd_rn(p1,p6),u3=__fadd_rn(u2,p7),u4=__fadd_rn(u2,p5);
@@ -135,20 +135,20 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }else if(tid>=128 && tid<256){
     for(int p=0;p<7;++p){
       float acc[16]={};
+      warpgroup_arrive();
       for(int q=0;q<512/BK;++q){
-        int sequence=p*(512/BK)+q,slot=sequence%2;
-        wait(&s.ready[slot],(sequence/2)%2);
+        int sequence=p*(512/BK)+q,slot=sequence%4;
+        wait(&s.ready[slot],(sequence/4)%2);
         T* op=s.operand[slot];
         auto ah=make_tensor(make_smem_ptr(op),la),al=make_tensor(make_smem_ptr(op+ASize),la);
         auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb),bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
-        warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
         if(p==2 || p>=4)mma_term<T>(al,bh,acc);
         if(p==3 || p>=4)mma_term<T>(ah,bl,acc);
-        warpgroup_commit_batch();warpgroup_wait<0>();
-        __syncwarp();
-        if((tid&31)==0)arrive(&s.free[slot]);
       }
+      warpgroup_commit_batch();warpgroup_wait<0>();
+      __syncwarp();
+      if((tid&31)==0)for(int slot=0;slot<4;++slot)arrive(&s.free[slot]);
       if(p>=2)wait(&s.product_free[p%2],((p-2)/2)%2);
       #pragma unroll
       for(int j=0;j<16;++j){int mn=GMMA::CLayout_64x32{}(tid-128,j);s.product[p%2][(mn%64)*BN+mn/64]=acc[j];}

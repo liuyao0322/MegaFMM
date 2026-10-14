@@ -63,6 +63,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 78 | Reduce per-worker P register footprint with27 CUDA warps | 0.3839 | 0.028947 | passed |
 
+| 79 | Four operand slots with a single WGMMA wait per P | 0.4464 | 0.024899 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -539,3 +541,19 @@ performance and compiler resources must verify whether it helps, not assume it.
 - **Analysis:** Complete unchanged benchmark exited0; numerical gates passed. Full-K single-buffer77 regressed, retaining BK256 double buffering.
 - **Next:** Inspect latency and spills, then evaluate four BK128 operand slots with one leaf completion wait.
 - **Archive:** trajectory/20261014_195223_iter-78/
+
+### Iter 79 — Four operand slots with a single WGMMA wait per P
+
+- **Hypothesis:** Keep per-slice TMA/compute overlap while removing intermediate WGMMA completion waits using four BK128 slots.
+- **Changes:** Restore76; four BK128 operands, one WGMMA group per complete P and all four slots released after wait0; same213120 shared.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.024899 ms; mean speedup=0.4464x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x128 v0 | launch | 0.012319 | 0.024951 | 0.4937 | 7.32914e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x128 v0 | launch | 0.009914 | 0.024847 | 0.3990 | 2.11007e-06 | 1 |
+
+- **Analysis:** Benchmark completed with exit0 before user paused optimization. No further optimization is authorized while paused; user separately requested NCU profiling.
+- **Next:** Inspect candidate performance, then profile the best accepted source as explicitly requested.
+- **Archive:** trajectory/20261014_195354_iter-79/
