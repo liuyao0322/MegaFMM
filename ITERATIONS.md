@@ -353,6 +353,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 223 | Cluster-local hierarchical input publication | 0.8046 | 0.013892 | experiment |
 
+| 224 | 512 balanced transform workers with private transposed products | 1.0111 | 0.011018 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3238,3 +3240,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Rejected: BF13.7677us FP14.0160us versus218 approximately11.0/11.1us. Original expected eF unchanged and both frozen gates FAIL. Cluster launch/synchronization cost exceeds possible counter savings; no speedup claim.
 - **Next:** Restore218 architecture; test512 transform workers to reduce launch footprint and eliminate partial third warp-batch work
 - **Archive:** trajectory/20261015_045900_iter-223/
+
+### Iter 224 — 512 balanced transform workers with private transposed products
+
+- **Hypothesis:** Two uniform transform batches reduce role footprint relative to608 partially active workers
+- **Changes:** From218 use672 total threads,512 pack workers, unchanged4-stage BK256 private TC schedule
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011018 ms; mean speedup=1.0111x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012276 | 0.010932 | 1.1229 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009984 | 0.011104 | 0.8992 | 0.000754626 | 0 |
+
+- **Analysis:** BF10.9322 FP11.1037us; small sub3percent improvement signal, independent pairing needed. Both original FP64 gates stillFAIL with expected eF. FP remains slower than contemporaneous9.98432us Dense.
+- **Next:** Archive224 and compare against218 while testing descriptor metadata reuse as a new frontend direction
+- **Archive:** trajectory/20261015_050001_iter-224/
