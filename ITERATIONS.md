@@ -481,6 +481,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 287 | PDL K192 with K128 tail | 0.9402 | 0.011846 | experiment |
 
+| 288 | Explicit normal TMA cache hint | 1.0743 | 0.010292 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4386,3 +4388,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 11.5888us FP16 12.10304us regress severely versus282. Original FP64 gates fail unchanged and no nonfinite; no independent certification.
 - **Next:** Investigate primary launch trigger and cache policy; retain validated282 as current best
 - **Archive:** trajectory/20261015_064916_iter-287/
+
+### Iter 288 — Explicit normal TMA cache hint
+
+- **Hypothesis:** Use the CUTLASS normal eviction policy encoding rather than zero cache-hint operand
+- **Changes:** On282 pass CacheHintSm90::EVICT_NORMAL to every operand TMA load, preserving all maps and math
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010292 ms; mean speedup=1.0743x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012289 | 0.010315 | 1.1914 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009830 | 0.010270 | 0.9572 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.31456us FP16 10.27008us show no improvement over282; original FP64 gates unchanged FAIL. Reject as speed optimization.
+- **Next:** Reassess profiles/history and test leader-only primary PDL trigger on current K128 pipeline
+- **Archive:** trajectory/20261015_065006_iter-288/
