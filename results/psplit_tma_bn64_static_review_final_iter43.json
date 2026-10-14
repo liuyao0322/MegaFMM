@@ -1,0 +1,262 @@
+{
+  "schema": "megafmm.iter43.psplit-tma-bn64-independent-final-review.v1",
+  "status": "PASS_INDEPENDENT_FINAL_REVIEW_ORIGINAL_NUMERICAL_GATE_FAIL",
+  "reviewer": "/root/pipeline_review30",
+  "reviewed_prestatus_checkpoint": "e8320bf548552c24fe896ff672d20fe63a4652b2",
+  "reviewed_prestatus_profile_sha256": "21eb3b58785d14d7a25f944af827325c594c211e3909920f224784294b0bd341",
+  "scope": "Necessary iteration43 source/bin identity, original fresh compiled-gate preservation, actual default/selected/strict/SAN and report scope. No repeated compilation, GPU, role-CFG, occupancy query or full data-map/statistics audit.",
+  "frozen_bindings": {
+    "results/small_psplit_tma_bn64_profile_iter43.json": "21eb3b58785d14d7a25f944af827325c594c211e3909920f224784294b0bd341",
+    "results/1024_MEGAKERNEL_PSPLIT_TMA_BN64_REPORT.md": "aadae2a91a38e47cbb8f78b98a14fd3dcfb0e894da748f77c1cc55030a033a7e",
+    "results/small_psplit_tma_bn64_measurements_iter43.json": "b2f944fd96306f0b3ea843236ac412bd86330e3b628b4eca777cf11e7ab3557b",
+    "results/psplit_tma_bn64_test_coverage_iter43.json": "793e0865f56224bcf013ad8363bfa88850db8e50ab966aba81911f307681419c",
+    "CMakeLists.txt": "629ae2d718bc9ff1b7b29ef0d6d47aaf7761a3431f53b7e7ea59486e1286af80",
+    "bench/benchmark.cu": "af908ef420fd86de0a1c2fce3aac8035f6d8bcf4c07c76911f199de9b0942c10",
+    "include/megafmm/gemm.h": "a3c275c7dad808671bb53fea96e1b2142d352994ea449ed68aaad2e502351109",
+    "include/megafmm/kernels.h": "3c4d9a3358d562d6fd50fdfd450b121bf314d6fdf9974224d61e66a53aad4a3c",
+    "solution/plan.cpp": "40522e4bd8047acdcede6abe4c08550b24f7784a3c8f692490ffc10de8a489e1",
+    "tests/test_correctness.cu": "da9585f0a0c139994a6d9589d31ee26426e01b5ac5f0e1c46f52cf6bc674262c",
+    "solution/megakernel_wgmma_psplit_tma_bn64.cu": "eaf8cb153514ab0f39bc471040b30cd12a3ceabb2d143dbb14fe8c8d920826f9",
+    "build/megafmm_bench": "c7bc0ce35fb95480e599ea4e8a9a5d3585144838edbcc3e8af0c62f7bb079c19",
+    "build/test_correctness": "3455372e7ea31ef3d90d0f8cb4cd128ad4f26a3eb4c8c0572f455ab20e24f61c",
+    "results/psplit_tma_bn64_static_review_initial_iter43.json": "72964366e66c1f4ccb07d3df787da578c076992c921998cf3de656bf14e0adb0",
+    "results/psplit_tma_bn64_static_review_initial_iter43.md": "f4a77e8d04fb7f37c4080607672c568fc916103cb1e388d8e90f0420c5995d52",
+    "results/psplit_tma_bn64_initial_frozen_identity_iter43.json": "b565aa77db8b3c0e833796c684f056f09cb3097fa50ae9a58b82264b46599780",
+    "results/psplit_tma_bn64_final_link_identity_iter43.json": "41b592eaac33fa0cd45567c2ffcaef30814e41969e7315f6cb97165c1005a64f",
+    "results/psplit_tma_bn64_old_cuda_iter43.json": "ce84682439c07f4cfacfda2bac671c0bc7b8ef278ee8ceac04fa5ca24362836e",
+    "results/correctness_psplit_tma_bn64_iter43.txt": "84087d6f0b6cf8972e4f5efa35ff03e4ba8c5e599267fd6c3c82371305f4e8ee",
+    "results/correctness_psplit_tma_bn64_iter43.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/correctness_psplit_tma_bn6447_targeted_iter43.txt": "2d1e9774f2600012dbc7502107b87d0a02cc9ade47104335c00416316ba95737",
+    "results/correctness_psplit_tma_bn6447_targeted_iter43.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/disabled_psplit_tma_bn6437_cli_iter43.txt": "a9fccfc2796ef871f2689d23d493ec40e436bdb52ea22616bcd2c8e1a256bf64",
+    "results/disabled_psplit_tma_bn6437_cli_iter43.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "results/strict_psplit_tma_bn64_iter43.txt": "9b9060b3cc30f08a5dded0de53b89cc5a27b155425f64ab249823c29d1edb13c",
+    "results/strict_psplit_tma_bn64_iter43.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "results/sanitizer_psplit_tma_bn6447_memcheck_iter43.txt": "39e4b833d9e4c9bf6c3953defdbe59cbd852973551fc6211289940c156f427d7",
+    "results/sanitizer_psplit_tma_bn6447_memcheck_iter43.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/sanitizer_psplit_tma_bn6447_racecheck_iter43.txt": "ca7bfd11c0a222ee15c77460ac3860c91f7fcd02d2004bf6e6f5be04492d68c4",
+    "results/sanitizer_psplit_tma_bn6447_racecheck_iter43.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/sanitizer_psplit_tma_bn6447_synccheck_iter43.txt": "137a963bcc26a278527261761e4d0e72068f30ca8e84988cea77f6dd7e93dd7d",
+    "results/sanitizer_psplit_tma_bn6447_synccheck_iter43.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "results/psplit_tma_bn64_actual_test_coverage_generator_iter43.py": "5e96f69dc86bb932d33406b7aef2301c6e368c4188fe6601db6fbf549cfaeca6"
+  },
+  "compiled_gate_inherited_from_iteration42": false,
+  "compiled_gate_inherited_from_earlier_iterations": false,
+  "allowed_native_launch_variants": [
+    47
+  ],
+  "compiled_gate": {
+    "path": "results/psplit_tma_bn64_static_review_initial_iter43.json",
+    "sha256": "72964366e66c1f4ccb07d3df787da578c076992c921998cf3de656bf14e0adb0",
+    "status": "PASS_COMPILED_CAN_LAUNCH_47",
+    "profile_and_measurements_preserve_all_original_instances_exactly": true,
+    "effective_initial_registers": 168,
+    "initial_owned_CTA_pool_registers": 64512,
+    "requested_role_pool_registers": 64512,
+    "quotas": [
+      48,
+      216,
+      240
+    ],
+    "actual_role_highest_GPR": [
+      37,
+      209,
+      215
+    ],
+    "RS_A_words_per_atom": 4,
+    "FP32_accumulator_words_per_atom": 32,
+    "dynamic_shared_bytes": 181248,
+    "Driver_static_shared_bytes": 0,
+    "tool_SHARED_bytes": 1024,
+    "STACK_LOCAL_spill_bytes": 0,
+    "all_P_clear_after_INC": false,
+    "legal_initial_owned_preINC_zero": true,
+    "new_hardware_proof_repeated_for_final": false
+  },
+  "actual_structural_validation": {
+    "default": {
+      "path": "results/correctness_psplit_tma_bn64_iter43.txt",
+      "exit_path": "results/correctness_psplit_tma_bn64_iter43.exit",
+      "exit": 0,
+      "CASE": 2862,
+      "PASS": 2698,
+      "BEGIN": 5080
+    },
+    "selected47": {
+      "path": "results/correctness_psplit_tma_bn6447_targeted_iter43.txt",
+      "exit_path": "results/correctness_psplit_tma_bn6447_targeted_iter43.exit",
+      "exit": 0,
+      "CASE": 60,
+      "PASS": 140,
+      "BEGIN": 204
+    },
+    "disabled37_cli": {
+      "path": "results/disabled_psplit_tma_bn6437_cli_iter43.txt",
+      "exit_path": "results/disabled_psplit_tma_bn6437_cli_iter43.exit",
+      "exit": 1,
+      "CASE": 0,
+      "PASS": 0,
+      "BEGIN": 0
+    }
+  },
+  "new47_fixture_scope": {
+    "basic_native_P7_Dense": [
+      34,
+      16,
+      10
+    ],
+    "crossatom_rawU_fixture_groups": 84,
+    "reference_variant": 45,
+    "reference_atom_BN": 32,
+    "candidate_atom_BN": 64,
+    "sameatom_claim": false,
+    "bound_total_kernel_runs": 246,
+    "reference_kernel_runs": 84,
+    "candidate_kernel_runs": 162,
+    "strict_rawU_bits_and_specified_host_epilogue": true,
+    "AB_bindings": 20,
+    "epilogue_fixture_groups": 10,
+    "epilogue_runs": 30,
+    "new_Graph_configs": 40,
+    "new_Graph_fresh_AB_replays": 120,
+    "Graph_native_P7_configs": [
+      28,
+      12
+    ],
+    "default_all_Graph_configs": 550,
+    "default_all_Graph_fresh_AB_replays": 1650,
+    "Graph_single_kernel_and_current_contents_checked": true,
+    "partial_K_fallbacks": [
+      64,
+      192,
+      320
+    ],
+    "N64_N32_K128_P7_boundary_checked": true
+  },
+  "huge_stride_actual_scope": {
+    "host_metadata_cases": 10,
+    "native_helper_predicate_cases": 4,
+    "successful_Plan_setups": 0,
+    "setup_unavailable_cases": 10,
+    "message": "query Lt heuristics: cuBLAS status 15",
+    "allocated_input_bytes": 0,
+    "tensor_map_encodes": 0,
+    "native_runs": 0,
+    "huge_stride_GPU_fallback_certified": false
+  },
+  "actual_original_strict": {
+    "candidate_gates": 30,
+    "PASS": 18,
+    "FAIL": 12,
+    "nonfinite": 0,
+    "CASE": 60,
+    "exit": 2,
+    "native_candidate_gates": 24,
+    "Dense_fallback_candidate_gates": 6,
+    "full1860_code_domain_executed": false,
+    "original_tolerances_unchanged": true
+  },
+  "actual_sanitizers": [
+    {
+      "tool": "memcheck",
+      "path": "results/sanitizer_psplit_tma_bn6447_memcheck_iter43.txt",
+      "exit": 0,
+      "CASE": 60,
+      "PASS": 140,
+      "BEGIN": 204,
+      "selected_marker_multiset_equal": true,
+      "errors": 0,
+      "hazards": null,
+      "warnings": null,
+      "leaked_bytes": 0,
+      "non_memcheck_leaks_measured": null
+    },
+    {
+      "tool": "racecheck",
+      "path": "results/sanitizer_psplit_tma_bn6447_racecheck_iter43.txt",
+      "exit": 0,
+      "CASE": 60,
+      "PASS": 140,
+      "BEGIN": 204,
+      "selected_marker_multiset_equal": true,
+      "errors": 0,
+      "hazards": 0,
+      "warnings": 0,
+      "leaked_bytes": null,
+      "non_memcheck_leaks_measured": false
+    },
+    {
+      "tool": "synccheck",
+      "path": "results/sanitizer_psplit_tma_bn6447_synccheck_iter43.txt",
+      "exit": 0,
+      "CASE": 60,
+      "PASS": 140,
+      "BEGIN": 204,
+      "selected_marker_multiset_equal": true,
+      "errors": 0,
+      "hazards": null,
+      "warnings": null,
+      "leaked_bytes": null,
+      "non_memcheck_leaks_measured": false
+    }
+  ],
+  "coverage_generation_scope": {
+    "original_prepared_generator": "5e96f69dc86bb932d33406b7aef2301c6e368c4188fe6601db6fbf549cfaeca6",
+    "prepared_before_actual_validation": true,
+    "CPU_generator_after_terminal_exit": 0,
+    "adapter_used": false,
+    "expected_snapshot_not_substituted_for_actual": true
+  },
+  "full20_scope": {
+    "same_binary_variants": [
+      47,
+      45,
+      39,
+      36
+    ],
+    "Lt_variant": 1,
+    "rows": 20,
+    "TIME_groups": 200,
+    "fresh_original_CHECK": 60,
+    "PASS": 0,
+    "FAIL": 60,
+    "nonfinite": 0,
+    "own_fastest_measured_native_variant": 45,
+    "Mega47_slower_than_same_binary_Mega45_ordinary_percent": [
+      46.823,
+      46.097
+    ],
+    "Mega47_slower_than_same_binary_Mega45_Graph_percent": [
+      50.489,
+      48.454
+    ],
+    "Dense_noise_groups_retained_no_pruning_or_rebench": true,
+    "baseline_Dense_CV_outliers_percent": [
+      48.4429,
+      49.76
+    ]
+  },
+  "report_contract": {
+    "ordinary_current_A_encode_inside_full_call": true,
+    "Graph_capture_map_fixed_addresses_current_contents": true,
+    "ordinary_Graph_difference_claimed_as_isolated_encode_duration": false,
+    "batchwall_is_100_call_batch_divided_by100": true,
+    "occupancy_API_is_static_prediction_only": true,
+    "measured_residency": null,
+    "isolated_BN_or_transport_causal_claim": false,
+    "original_failed_builds_and_clockskew_diagnostics_retained": true,
+    "legacy_resource_metadata_labelled_retained_not_fresh": true
+  },
+  "old_source_and_history_scope": "Owner/data audit separately checks original40 CUDA/history/frozenfuture maps and Git bindings; this narrow review binds their retained map without redoing thousands of data bindings.",
+  "original_FP64_precision_certified": false,
+  "AutoDense_unchanged": true,
+  "goal_complete": false,
+  "promotion": false,
+  "issues": [],
+  "limitations": [
+    "Review PASS is evidence/contract consistency; original strict and full20 numerical gates remain FAIL.",
+    "No dynamic occupancy, bank traffic, transaction grouping, stalls or isolated performance cause was measured by this review.",
+    "Initial failed source and revision1 failed source are retained historical identities, not the current zero-spill revision2.",
+    "Final metadata-only closure may append two audit objects and exact copies; this certificate stays bound to the reviewed prestatus snapshot without self-hash backfill."
+  ]
+}
