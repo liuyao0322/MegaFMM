@@ -11,14 +11,14 @@
 namespace megafmm::detail {
 namespace {
 constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=672;
+constexpr int Plane=512*512,Threads=704;
 constexpr size_t WorkspaceBytes=size_t(8)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
   uint64_t ready[Stages],free[Stages];
-  uint64_t pack_ready;
+  uint64_t pack_ready,init_ready;
 };
 static_assert(sizeof(Shared<cute::half_t>)==196736,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
@@ -2360,9 +2360,12 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   extern __shared__ __align__(128) unsigned char buffer[];
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
+  // Invocation-local counters: S[row32][K256] count4; T[col64][K256] count8.
+  auto* counters=reinterpret_cast<uint32_t*>(packed+8*Plane);
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     Barrier::init(&s.pack_ready,512);
+    Barrier::init(&s.init_ready,1);
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -2373,15 +2376,22 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       int p=product_for_step(step);
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
       if(sequence==4){
+        // Initialization is globally ordered by a separate coordinator warp,
+        // overlapped with raw P1/P2 and CUDA transformation, before any RED.
+        wait(&s.init_ready,0);
         wait(&s.pack_ready,0);
-        // CUDA12.4 cooperative launch gives each invocation its own initialized
-        // driver workspace. Only TMA leaders join this publication barrier;
-        // the shared pack barrier has already acquired every CUDA writer.
-        auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
-        uint32_t increment=(blockIdx.x==0 && blockIdx.y==0) ? 0x80000000u-127u:1u;
-        uint32_t old,current;
-        asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;" : "=r"(old) : "l"(barrier),"r"(increment) : "memory");
-        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(!((old^current)&0x80000000u));
+        auto* sf=counters+2*blockIdx.x+blockIdx.y/4;
+        auto* tf=counters+32+2*blockIdx.y+blockIdx.x/8;
+        asm volatile("red.release.gpu.global.add.u32 [%0],1;" :: "l"(sf) : "memory");
+        asm volatile("red.release.gpu.global.add.u32 [%0],1;" :: "l"(tf) : "memory");
+      }
+      if(sequence==4 || sequence==5){
+        // Once acquired, the corresponding K-half remains immutable this call.
+        auto* sf=counters+2*blockIdx.x+q;
+        auto* tf=counters+32+2*blockIdx.y+q;
+        uint32_t v;
+        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];":"=r"(v):"l"(sf):"memory");}while(v!=4);
+        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];":"=r"(v):"l"(tf):"memory");}while(v!=8);
       }
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
@@ -2405,13 +2415,24 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
 
     }
-  }else if((tid>=32 && tid<128) || tid>=256){
-    int worker=tid>=256 ? tid-160:tid-32;
+  }else if(tid==32){
+    // Every counter has one initializer. No counter can receive a publication
+    // until all initializers joined the per-invocation driver barrier.
+    if(blockIdx.y%4==0)counters[2*blockIdx.x+blockIdx.y/4]=0;
+    if(blockIdx.x%8==0)counters[32+2*blockIdx.y+blockIdx.x/8]=0;
+    auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
+    uint32_t increment=(blockIdx.x==0 && blockIdx.y==0)?0x80000000u-127u:1u;
+    uint32_t old,current;
+    asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;":"=r"(old):"l"(barrier),"r"(increment):"memory");
+    do{asm volatile("ld.acquire.gpu.u32 %0,[%1];":"=r"(current):"l"(barrier):"memory");}while(!((old^current)&0x80000000u));
+    arrive(&s.init_ready);
+  }else if((tid>=64 && tid<128) || tid>=256){
+    int worker=tid>=256 ? tid-192:tid-64;
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
   for(int local=2*worker;local<Plane/(16*8);local+=2*512){
-    int i=(blockIdx.y*gridDim.x+blockIdx.x)*(Plane/(16*8))+local;
+    int i=(blockIdx.x*32+local/64)*512+blockIdx.y*64+local%64;
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);

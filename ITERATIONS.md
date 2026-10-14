@@ -403,6 +403,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 248 | Refresh selected224 CUDA Graph comparison | 0.9747 | 0.010694 | experiment |
 
+| 249 | Early initialization coordinator and scoped S/T readiness | 0.8610 | 0.012911 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3684,3 +3686,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Graph BF16 10.51136 us vs Dense11.36832 us, 1.0815x; FP16 10.87744 us vs Dense9.44064 us, 0.8679x. Original FP64 gates FAIL both. Ordinary target remains unmet:247 FP16 11.0896 vs9.97504 us. No source change or completion claim.
 - **Next:** Archive validated224 checkpoint with fresh launch and Graph evidence, and continue dependency-aware frontend investigations.
 - **Archive:** trajectory/20261015_053636_iter-248/
+
+### Iter 249 — Early initialization coordinator and scoped S/T readiness
+
+- **Hypothesis:** Overlap invocation counter initialization with raw supply and transform, then wait only on the S/T K-half dependencies needed by each CTA.
+- **Changes:** 704 threads including dedicated coordinator warp; coordinator uniquely zeros48counters then joins private-driver initialization barrier;512pack workers transform32x64 chunks; TMA acquires init and pack barriers then release-reduces S count4 and T count8; two K-half acquire pairs replace global input-ready barrier;256extra workspace bytes.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012911 ms; mean speedup=0.8610x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012281 | 0.012794 | 0.9599 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009928 | 0.013028 | 0.7621 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 12.7936 us vs Dense12.2806 us; FP16 13.0278 us vs Dense9.92832 us. Fresh expected original errors/nonfinite0 preserved, gatesFAIL. Worse than224; scoped synchronization plus changed transform locality is not a win. No independent certification claimed.
+- **Next:** Isolate two-dimensional transform locality from publication protocol, then profile dependency wait costs before retaining any change.
+- **Archive:** trajectory/20261015_054027_iter-249/
