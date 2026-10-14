@@ -147,6 +147,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 120 | TC-owned shared recombination state | 0.5416 | 0.020784 | experiment |
 
+| 121 | Uniform parameter descriptors and fixed slot product pairs | 0.4638 | 0.024103 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1394,3 +1396,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 119 unrolling removed C7515 but still16us; full120 SW benchmark archived with unchanged precision gates.
 - **Next:** Check scheduling diagnostics and pursue uniform descriptor issue if needed
 - **Archive:** trajectory/20261015_020022_iter-120/
+
+### Iter 121 — Uniform parameter descriptors and fixed slot product pairs
+
+- **Hypothesis:** Host static-layout descriptors loaded from grid-constant parameters remove repeated lane-register descriptor construction
+- **Changes:** Derive shared base from cudaFuncGetAttributes, encode canonical A/B descriptors at setup, pass four descriptor pairs by grid-constant value, specialize TC even/odd products to slots0/1 and2/3
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.024103 ms; mean speedup=0.4638x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012336 | 0.024061 | 0.5127 | 1.64825e+36 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010016 | 0.024145 | 0.4148 | 639.111 | 0 |
+
+- **Analysis:** Full SW benchmark archived; exact numerical and SASS uniformization checks needed. Static setup uses no input contents, all transforms and arithmetic remain timed per invocation.
+- **Next:** Inspect descriptor correctness, latency and actual R2UR elimination
+- **Archive:** trajectory/20261015_020220_iter-121/
