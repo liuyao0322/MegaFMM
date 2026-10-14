@@ -109,6 +109,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 101 | K128 with six operand prefetch stages | 0.9326 | 0.013673 | experiment |
 
+| 102 | K512 one completion group per product | 0.8022 | 0.013924 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1026,3 +1028,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Both dtype full benchmarks completed; original accuracy failures remain expected. More K stages also increase synchronization frequency.
 - **Next:** Compare withK256/4stages; testK512 with split B TMA to reduce completion frequency
 - **Archive:** trajectory/20261015_012641_iter-101/
+
+### Iter 102 — K512 one completion group per product
+
+- **Hypothesis:** A full512-wide product tile halves wait0 and barrier frequency while two full-K slots prefetch the next product
+- **Changes:** BK512,Stages2,shared213120; split B TMA into two256-wide chunks, keep A combined higher-rank TMA and accumulation order
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013924 ms; mean speedup=0.8022x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012331 | 0.013880 | 0.8884 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010001 | 0.013968 | 0.7160 | 0.000754626 | 0 |
+
+- **Analysis:** Full benchmark completed with original expected no-compensation accuracy failures. Reduced synchronization may be offset by longer individual MMA groups or TMA latency.
+- **Next:** Compare K128/K256/K512 variants then optimize front-end transform and grid synchronization
+- **Archive:** trajectory/20261015_012733_iter-102/
