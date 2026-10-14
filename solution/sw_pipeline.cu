@@ -11,7 +11,7 @@
 namespace megafmm::detail {
 namespace {
 constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=160;
+constexpr int Plane=512*512,Threads=256;
 constexpr size_t WorkspaceBytes=size_t(8)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -43,7 +43,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
  auto b=make_tensor(make_smem_ptr(s.operand[0]+ASize),lb);
  auto da_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(tiled_divide(a,Shape<_64,_16>{}));
  auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(tiled_divide(b,Shape<_32,_16>{}));
- int mn=GMMA::CLayout_64x32{}(tid,0);
+ int mn=GMMA::CLayout_64x32{}(tid-128,0);
  float* out=D+(n0+mn/64)*1024+m0+mn%64;
  if constexpr(std::is_same_v<T,bfloat16_t>){asm volatile(
   "{ .reg .pred p,noacc,leader,done; .reg .b64 ba,bb,da,db,dst;\n"
@@ -2392,14 +2392,17 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   extern __shared__ __align__(128) unsigned char buffer[];
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
-  if(tid==128){
+  if(tid==32){
+    asm volatile("prefetch.tensormap [%0]; prefetch.tensormap [%1]; prefetch.tensormap [%2]; prefetch.tensormap [%3];" :: "l"(&amap),"l"(&bmap),"l"(&smap),"l"(&tmap) : "memory");
+  }
+  if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
   constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_32,Int<BK>>{});
-  if(tid==128){
+  if(tid==0){
     for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step);
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
@@ -2428,7 +2431,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
 
     }
-  }else if(tid<128){
+  }else if(tid>=128 && tid<256){
     tensor_chain(s,tid,m0,n0,D);
   }
   // CTA shared storage survives until all role threads return.

@@ -443,6 +443,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 268 | Compact160-thread compute CTA | 1.0493 | 0.010540 | experiment |
 
+| 269 | Restore266 verbatim for independent paired comparison | 1.0598 | 0.010475 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4044,3 +4046,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通BF16 10.6240 us、FP16 10.45536 us，未超过254；Dense12.31616/9.82016us，精度仍FAIL，暂不保留。只缩小CTA并未带来可确认收益。
 - **Next:** 对266的descriptor预取潜在小收益做独立完整ABBA比较，然后恢复实际最优源码并更新验证检查点。
 - **Archive:** trajectory/20261015_061847_iter-268/
+
+### Iter 269 — Restore266 verbatim for independent paired comparison
+
+- **Hypothesis:** 266预取小收益需新构建与完整ABBA确认，避免选择单次噪声。
+- **Changes:** git checkout 18f9a6f -- solution，原样恢复266并完整普通调用测量。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010475 ms; mean speedup=1.0598x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012390 | 0.010549 | 1.1745 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009829 | 0.010401 | 0.9450 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.54912us、FP16 10.40128us，Dense12.3904/9.82944us，未达到FP Dense，原门槛FAIL。下一步独立二进制与254比较，不能把本轮单次结果当作新winner认证。
+- **Next:** 归档266二进制，执行254/266普通和Graph的完整ABBA。
+- **Archive:** trajectory/20261015_061926_iter-269/
