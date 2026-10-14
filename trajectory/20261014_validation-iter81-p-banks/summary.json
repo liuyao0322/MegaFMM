@@ -1,0 +1,53 @@
+{
+  "source_commit": "58743df",
+  "baseline_commit": "456ce9d",
+  "scope": "1024^3 BF16/FP16, FP32 output",
+  "ncu_version": "2025.1.1",
+  "ncu_command": "TMPDIR=/tmp/megafmm-ncu-1052 /share/app/cuda/cuda-12.8/bin/ncu --target-processes all --set full --profile-from-start off --kernel-name regex:sw_cooperative_hilo --launch-count 2 --clock-control none --cache-control none --force-overwrite -o results/ncu_iter81/sw_full ./build/megafmm_bench --algorithm sw --shapes 1024,1024,1024 --dtype both --profile",
+  "kernels": {
+    "bf16": {
+      "STS": {
+        "static_instructions": 16,
+        "n_way": 1,
+        "excessive_wavefronts": 0,
+        "wavefronts": 57344.0,
+        "ideal_wavefronts": 57344.0
+      },
+      "LDS": {
+        "static_instructions": 42,
+        "n_way": 1,
+        "excessive_wavefronts": 0,
+        "wavefronts": 57344.0,
+        "ideal_wavefronts": 57344.0
+      },
+      "gpu__time_duration.sum": "21.920000",
+      "launch__registers_per_thread": "110",
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": "3111",
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": "180"
+    },
+    "fp16": {
+      "STS": {
+        "static_instructions": 16,
+        "n_way": 1,
+        "excessive_wavefronts": 0,
+        "wavefronts": 57344.0,
+        "ideal_wavefronts": 57344.0
+      },
+      "LDS": {
+        "static_instructions": 42,
+        "n_way": 1,
+        "excessive_wavefronts": 0,
+        "wavefronts": 57344.0,
+        "ideal_wavefronts": 57344.0
+      },
+      "gpu__time_duration.sum": "21.952000",
+      "launch__registers_per_thread": "110",
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": "3282",
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": "180"
+    }
+  },
+  "source_sha256": {
+    "solution/sw_pipeline.cu": "ee1d803174407a56316592f2988e6d709ae0789379d87ed214ddc23882cfb0a3",
+    "solution/plan.cpp": "a451ce52e1e35b14b1b6fa8b354a0264a35f16be94249c50011b73ada5818de0"
+  }
+}

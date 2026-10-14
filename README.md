@@ -8,18 +8,20 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 `Auto` 和 `Dense` 都执行普通 GEMM；`SWPipeline` / `--algorithm sw` 显式执行新内核。
 旧 Mega45 等路线已从当前源码和公共 API 删除。
 
-[当前优化版本的精度与性能报告](trajectory/20261014_193836_validation-iter71-graph/REPORT.md)
+[当前 P shared 布局修复与验证报告](trajectory/20261014_validation-iter81-p-banks/REPORT.md)
 
 [最初首版报告（历史）](trajectory/20261014_183039_validation-graph-1024/REPORT.md)
 
-当前最快通过标准数值门限的 SW 为 iter71，`sw_cooperative_hilo_64x32x128`。
-普通调用 BF16/FP16 约 **28.33/28.22 μs**；同期独立调优的 cuBLASLt Dense 为
-**12.27/9.91 μs**，SW 仍慢 **2.31/2.85 倍**。仅测 1024³，不能据此称为加速 winner。
+当前源码为 iter81，`sw_cooperative_hilo_64x32x256`。通过行内 XOR swizzle，
+NCU 已确认 P shared 写入由 8-way 降为 1-way，P 写入额外 wavefront 从401408降为0；
+读取也为1-way。普通完整调用 BF16/FP16 为 **21.22/21.66 μs**，同期调优
+cuBLASLt Dense 为 **12.38/9.99 μs**，SW 仍慢 **1.71/2.17 倍**。
+与 iter76 的21.25/21.88 μs基本持平，本次修复未证明显著整体提速。仅验证1024³。
 
 每次调用先在调用方提供的 **8 MiB 全局 workspace** 中重新生成 FP32 S/T 的高低部分，
 通过 cooperative grid barrier 后，以 TMA 装入统一 shared buffer 并执行 WGMMA。
 128 个 CTA，每个 512 线程：1 个 TMA warp、11 个 CUDA Core warp、4 个 WGMMA warp。
-动态 shared 每 CTA 188544 字节，BM=64、BN=32、BK=128。需要支持至少128个同时驻留
+动态 shared 每 CTA 213120 字节，BM=64、BN=32、BK=256。需要支持至少128个同时驻留
 CTA 的 Hopper cooperative launch；当前在132 SM H100上验证。`run()`不分配、不进行host同步。
 高低部分补偿共有15项叶乘法，原始FP64参考和数值门限保持不变。详见当前报告。
 
@@ -98,7 +100,7 @@ Graph 的新输入重放。SW 仅支持非转置、连续布局、alpha=1、beta
 强制 SW 抛错，不静默退回 Dense。Auto 始终保留 Dense。
 
 `scripts/bench.sh <label>` 保留 AKO 的源码快照逻辑；正式迭代记录 `ITERATIONS.md`
-和对应 Git 版本。后续已按用户指令持续进行 AKO4ALL 优化；当前目标仍在进行。
+和对应 Git 版本。持续 AKO4ALL 优化已按用户要求暂停；本次仅完成明确要求的 P shared bank conflict 修复。
 
 ## 历史与清理记录
 
