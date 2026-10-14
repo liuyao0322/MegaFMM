@@ -8,7 +8,9 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 `Auto` 和 `Dense` 都执行普通 GEMM；`SWPipeline` / `--algorithm sw` 显式执行新内核。
 旧 Mega45 等路线已从当前源码和公共 API 删除。
 
-[当前 descriptor 优化版本的精度与性能报告](trajectory/20261014_validation-iter85-descriptors/REPORT.md)
+[当前固定 slot 与分阶段供数版本报告](trajectory/20261014_validation-iter87-staged-ready/REPORT.md)
+
+[基础 descriptor 优化报告（iter85）](trajectory/20261014_validation-iter85-descriptors/REPORT.md)
 
 [流式重组版本报告（iter82）](trajectory/20261014_validation-iter82-streaming/REPORT.md)
 
@@ -18,13 +20,13 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 
 [最初首版报告（历史）](trajectory/20261014_183039_validation-graph-1024/REPORT.md)
 
-当前源码为 iter85，`sw_cooperative_hilo_64x32x256`。沿用 P1→P2→P6→P7→P5→P3→P4
-流式重组；WGMMA 使用基础 descriptor 加 CuTe K 偏移，只更新地址低位以减少准备指令。
-同期 A/B/B/A 对照较 iter82，普通调用 BF16/FP16 耗时下降约 **3.04%/2.13%**，
-Graph 下降约 **3.47%/1.59%**。收益较小，且 iter85 对 iter83 的 FP16 Graph 对照有1.20%回退。
-正式普通调用 BF16/FP16 为 **20.85/21.01 μs**，同期调优 cuBLASLt Dense 为
-**12.51/10.01 μs**，SW 仍慢 **1.67/2.10 倍**。
-NCU确认P shared读写仍为1-way、0额外wavefront；R2UR数量未减少。
+当前源码为 iter87，`sw_cooperative_hilo_64x32x256`。沿用 P1→P2→P6→P7→P5→P3→P4
+流式重组；展开两个TC operand slot，并将TMA高、低部分分阶段发布，hi×hi发射后再等待低部分。
+同期 A/B/C/C/B/A 对照较iter85，普通调用 BF16/FP16 耗时下降约 **6.32%/6.76%**，
+Graph下降约 **7.43%/8.74%**。普通调用当前约 **19.29/19.30 μs**。
+正式独立bench SW为 **19.32/19.28 μs**，同期调优cuBLASLt Dense为 **12.30/9.95 μs**，
+SW仍慢 **1.57/1.94倍**。R2UR由995968降至178944/dtype，P shared读写仍1-way、0额外wavefront。
+原精度门限、72项独立launch/Graph检查及3种quick sanitizer均通过。
 仅验证1024³，Auto继续Dense，不能称为性能winner。
 
 每次调用先在调用方提供的 **8 MiB 全局 workspace** 中重新生成 FP32 S/T 的高低部分，
