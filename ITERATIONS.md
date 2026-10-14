@@ -149,6 +149,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 121 | Uniform parameter descriptors and fixed slot product pairs | 0.4638 | 0.024103 | experiment |
 
+| 122 | Include driver-reserved shared region in descriptor bases | 0.4609 | 0.024365 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1412,3 +1414,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full SW benchmark archived; exact numerical and SASS uniformization checks needed. Static setup uses no input contents, all transforms and arithmetic remain timed per invocation.
 - **Next:** Inspect descriptor correctness, latency and actual R2UR elimination
 - **Archive:** trajectory/20261015_020220_iter-121/
+
+### Iter 122 — Include driver-reserved shared region in descriptor bases
+
+- **Hypothesis:** Correct descriptors must include cudaDeviceProp reservedSharedMemPerBlock
+- **Changes:** Add queried1024B driver shared reservation to reported static shared base;121 was invalid from wrong start fields and all its timings excluded
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.024365 ms; mean speedup=0.4609x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012431 | 0.024354 | 0.5104 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010029 | 0.024377 | 0.4114 | 0.000754626 | 0 |
+
+- **Analysis:** Diagnostic shows actual start0x40 versus supplied0; attributes static0 reserved1024. Complete122 benchmark archived with original FP64 gates unchanged.
+- **Next:** Check corrected errors and instruction savings, then consider wider distributed leaf tiles
+- **Archive:** trajectory/20261015_020448_iter-122/

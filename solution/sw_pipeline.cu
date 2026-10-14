@@ -248,10 +248,10 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   cudaFuncAttributes attr{};
   if(p.dtype==DType::BF16)check(cudaFuncGetAttributes(&attr,sw_cooperative_hilo<cute::bfloat16_t>),"SW attributes");
   else check(cudaFuncGetAttributes(&attr,sw_cooperative_hilo<cute::half_t>),"SW attributes");
-  if(attr.sharedSizeBytes%128)throw std::runtime_error("SW dynamic shared base alignment");
+  if((attr.sharedSizeBytes+prop.reservedSharedMemPerBlock)%128)throw std::runtime_error("SW dynamic shared base alignment");
   DescriptorSet descriptors{};
   for(int slot=0;slot<Stages;++slot){
-    uint64_t start=attr.sharedSizeBytes/16+slot*((ASize+BSize)*2/16);
+    uint64_t start=(attr.sharedSizeBytes+prop.reservedSharedMemPerBlock)/16+slot*((ASize+BSize)*2/16);
     descriptors.a[slot]=0x4000004000010000ULL|start;
     descriptors.b[slot]=0x8000002000000000ULL|(start+ASize*2/16);
   }
