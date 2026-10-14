@@ -20,7 +20,7 @@ template<class T> struct alignas(128) Shared {
   // Row-major P with an XOR permutation inside each 32-float row.
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
   float product[2][Elements];
-  uint64_t ready[2],free[2],product_ready[2],product_free[2];
+  uint64_t ready[2],low_ready[2],free[2],product_ready[2],product_free[2];
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
@@ -74,7 +74,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
-    for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+    for(int j=0;j<2;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.low_ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
     cutlass::arch::fence_barrier_init();
   }
@@ -108,14 +108,15 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       int sequence=step*(512/BK)+q,slot=sequence%2,k0=q*BK;
       if(sequence>=2)wait(&s.free[slot],((sequence-2)/2)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
-      int bytes=2*(ASize+BSize)+(alo ? 2*ASize:0)+(blo ? 2*BSize:0);
-      TxBarrier::arrive_and_expect_tx(&s.ready[slot],bytes);
+      // Publish high operands first so their MMA can overlap residual loads.
+      // Advance both barrier phases on every stage, including zero-byte lows.
+      TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(ASize+BSize));
+      TxBarrier::arrive_and_expect_tx(&s.low_ready[slot],(alo ? 2*ASize:0)+(blo ? 2*BSize:0));
       T* op=s.operand[slot];
       if(alo){
         int plane=p==2 ? 6:2*(p-4);
         for(int chunk=0;chunk<BK/64;++chunk){
           SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op+chunk*BM*64,k0+chunk*64,m0,plane);
-          SM90_TMA_LOAD_3D::copy(&smap,&s.ready[slot],0,op+ASize+chunk*BM*64,k0+chunk*64,m0,plane+1);
         }
       }else{
         int col=(p==1 || p==3) ? 512:0,row=p==3 ? 512:0;
@@ -125,10 +126,18 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       if(blo){
         int plane=p==3 ? 6:2*(p-4);
         SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+2*ASize,n0,k0,plane);
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op+2*ASize+BSize,n0,k0,plane+1);
       }else{
         int col=p==2 ? 512:0,row=p==1 || p==2 ? 512:0;
         SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op+2*ASize,n0+col,k0+row);
+      }
+      if(alo){
+        int plane=p==2 ? 6:2*(p-4);
+        for(int chunk=0;chunk<BK/64;++chunk)
+          SM90_TMA_LOAD_3D::copy(&smap,&s.low_ready[slot],0,op+ASize+chunk*BM*64,k0+chunk*64,m0,plane+1);
+      }
+      if(blo){
+        int plane=p==3 ? 6:2*(p-4);
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.low_ready[slot],0,op+2*ASize+BSize,n0,k0,plane+1);
       }
     }
   }else if((tid>=32 && tid<128) || tid>=256){
@@ -177,6 +186,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         auto bh=make_tensor(make_smem_ptr(op+2*ASize),lb),bl=make_tensor(make_smem_ptr(op+2*ASize+BSize),lb);
         warpgroup_arrive();
         mma_term<T>(ah,bh,acc);
+        if(p>=2)wait(&s.low_ready[slot],(sequence/2)%2);
         if(p==2 || p>=4)mma_term<T>(al,bh,acc);
         if(p==3 || p>=4)mma_term<T>(ah,bl,acc);
         warpgroup_commit_batch();warpgroup_wait<0>();

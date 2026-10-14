@@ -79,6 +79,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 86 | Expose fixed operand slot addresses to GMMA lowering | 0.5448 | 0.020372 | passed |
 
+| 87 | Publish high operands before residual operands | 0.5764 | 0.019300 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -705,3 +707,19 @@ Current iter85 passes original-input FP64 gates, independent72-check launch/Grap
 - **Analysis:** Full 1024 cubed BF16/FP16 benchmark completed; inspect SASS and paired complete-call measurements next
 - **Next:** Measure whether actual R2UR and descriptor preparation decrease before advancing to staged readiness
 - **Archive:** trajectory/20261014_220736_iter-86/
+
+### Iter 87 — Publish high operands before residual operands
+
+- **Hypothesis:** Split high/low TMA readiness lets the high-high WGMMA issue while residual transfers finish
+- **Changes:** Separate high and low transaction barriers; issue all high TMA loads before lows; wait for lows after issuing high-high and before correction terms; release slots after the unchanged full WGMMA wait
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.019300 ms; mean speedup=0.5764x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012303 | 0.019316 | 0.6369 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009949 | 0.019283 | 0.5160 | 2.37136e-06 | 1 |
+
+- **Analysis:** Full 1024 cubed BF16/FP16 benchmark completed; retain exact accumulation order and phase advancement even for zero-byte low stages. Independent synchronization and comparative validation follow.
+- **Next:** Compare against iter86 and measure total high+low waits separately from WGMMA issue; retain only with complete-call benefit and sanitizer passes
+- **Archive:** trajectory/20261014_221021_iter-87/
