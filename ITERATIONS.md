@@ -243,6 +243,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 168 | Barrier test-wait fast path | 0.9697 | 0.011486 | experiment |
 
+| 169 | Warp-aggregated pack publication | 0.9762 | 0.011403 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2254,3 +2256,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about11.44us and FP16 about11.53us, flat versus162 with no substantial reduction. Expected original numerical failures preserved. NVIDIA PTX documents try_wait suspension and test_wait nonblocking; reference https://docs.nvidia.com/cuda/archive/12.0.0/parallel-thread-execution/index.html.
 - **Next:** Restore162; aggregate pack publication to19 warp leaders with full-warp ordering.
 - **Archive:** trajectory/20261015_032426_iter-168/
+
+### Iter 169 — Warp-aggregated pack publication
+
+- **Hypothesis:** Reducing608 pack barrier arrivals to19 warp-leader arrivals reduces publication contention.
+- **Changes:** Restore162; every pack lane retains proxy fence, then syncwarp and only lane0 arrives; pack barrier count19.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011403 ms; mean speedup=0.9762x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012276 | 0.011304 | 1.0860 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009966 | 0.011502 | 0.8665 | 0.000754626 | 0 |
+
+- **Analysis:** FP16 about11.50us versus selected16211.54us, negligible single-run change. BF16 retains expected error; both original numerical gates fail and nonfinite0. Full validation required before adopting synchronization change.
+- **Next:** Archive binary for later paired comparison; investigate tensor-map host construction.
+- **Archive:** trajectory/20261015_032500_iter-169/

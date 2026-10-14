@@ -24,7 +24,7 @@ template<class T> struct alignas(128) Shared {
   uint64_t pack_ready;
 };
 static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
-__device__ void wait(const uint64_t* b,int phase){if(!Barrier::test_wait(b,phase,1))Barrier::wait(b,phase);asm volatile("" ::: "memory");}
+__device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
 __device__ __forceinline__ int product_index(int row,int col){
@@ -77,7 +77,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
-    Barrier::init(&s.pack_ready,608);
+    Barrier::init(&s.pack_ready,19);
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -153,7 +153,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[2*j];
   }
     asm volatile("fence.proxy.async.global;" ::: "memory");
-    arrive(&s.pack_ready);
+    __syncwarp();
+    if((tid&31)==0)arrive(&s.pack_ready);
     if(worker<128){
     constexpr int Chunks=16;
     unsigned row=unsigned(worker)/BN,col=unsigned(worker)%BN;
