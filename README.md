@@ -3,16 +3,18 @@
 H100 上 Strassen–Winograd 矩阵乘法的研究工程。2026-10-14 按用户要求移除旧
 SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的首版。
 
-**当前保留 iter266（18f9a6f）的七乘法、无补偿实验内核。持续优化目标尚未完成。**
-完整A/B/B/A普通调用：BF16/FP16 SW约 **10.509/10.365 μs**，同期调优Dense约 **12.321/9.806 μs**。
-BF16加速比约1.172×；FP16仍慢约5.71%，还需减少约0.560 μs（SW时间的5.40%）。
-Graph单独配对：SW约 **10.031/10.133 μs**，Dense约 **11.326/9.346 μs**；不替代普通调用目标。
-266较254普通FP16改善仅0.62%、BF持平，FP16 Graph退化0.60%，没有跨模式普遍改善。
+**当前保留 iter282（1bdfb29）的七乘法、无补偿实验内核。持续优化目标尚未完成。**
+完整A/B/B/A普通调用：BF16/FP16 SW约 **10.273/10.238 μs**，同期调优Dense约 **12.228/9.807 μs**。
+BF16加速比约1.190×；FP16仍慢约4.40%，还需减少约0.432 μs（SW时间的4.22%）。
+Graph单独配对：SW约 **9.976/9.993 μs**，Dense约 **11.274/9.341 μs**；不替代普通调用目标。
+279相对266普通BF16/FP16改善约2.43%/0.70%；282相对279仅约0.47%/0.35%，没有新的3%以上突破。
 
 **两种输入仍未通过原始精度门槛**：BF16 eF约0.0060152，FP16约0.000754626。
 `Auto` 和 `Dense` 继续普通调优 cuBLASLt GEMM；当前 SW 必须显式指定。
 
-[当前持续优化检查点（249–270，目标仍在进行）](trajectory/20261015_optimization-goal-checkpoint-270/REPORT.md)
+[当前持续优化检查点（271–291，目标仍在进行）](trajectory/20261015_optimization-goal-checkpoint-291/REPORT.md)
+
+[此前249–270检查点](trajectory/20261015_optimization-goal-checkpoint-270/REPORT.md)
 
 [此前209–248检查点](trajectory/20261015_optimization-goal-checkpoint-248/REPORT.md)
 
@@ -20,15 +22,15 @@ Graph单独配对：SW约 **10.031/10.133 μs**，Dense约 **11.326/9.346 μs**�
 
 [此前性能配对与完整独立验证（109–162）](trajectory/20261015_optimization-goal-checkpoint/REPORT.md)
 
-当前实现使用4 MiB调用方workspace、196736B动态shared和四个BK256 operand slots。
+当前实现使用4 MiB调用方workspace、196736B动态shared和八个BK128 operand slots。
 输入变换是128 CTA×512线程的primary kernel；乘法是128 CTA×256线程的secondary，
 TMA warp0、TC warps4–7，warp1 leader提前预取四个当前descriptor。
 叶乘法按B转置乘A转置组织，TC私有寄存器直接重组输出；P1/P2可与变换重叠，及时释放slot。
 使用官方PDL与首次变换块前的grid dependency wait，两个kernel统一设置100%shared carveout。
 `run()`无分配、无host同步；每次为当前指针编码tensor maps，无跨调用计算值缓存。
 
-254和当前266分别通过72项fresh-input逐位检查、三种quick sanitizer，以及256次双stream/Graph调用。
-266验证源码与当前solution逐字一致。这些检查验证实现与同步，**不代表通过原始FP64精度验收**。
+279和当前282分别通过72项fresh-input逐位检查、三种quick sanitizer，以及256次双stream/Graph调用。
+282验证源码与当前solution逐字一致。这些检查验证实现与同步，**不代表通过原始FP64精度验收**。
 
 [历史四slot预取优化（iter100）](trajectory/20261015_validation-seven-prefetch/REPORT.md)
 
