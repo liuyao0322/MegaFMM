@@ -91,6 +91,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 92 | Combine A chunk transfers with higher-rank TMA maps | 0.5813 | 0.019093 | passed |
 
+| 93 | Expose the existing no-write-alias binding contract to NVCC | 0.5835 | 0.019041 | passed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -822,3 +824,19 @@ Three candidates did not establish a >=3percent full-call gain over87. Five/eigh
 - **Analysis:** Driver map probe accepts the permuted strides; full1024 cubed BF16/FP16 benchmark completed. Check numerical gates and independent bitwise plus sanitizer validation.
 - **Next:** Profile TMA instruction reduction and operand waits, compare against87/90 and retain only after full-call validation
 - **Archive:** trajectory/20261014_223916_iter-92/
+
+### Iter 93 — Expose the existing no-write-alias binding contract to NVCC
+
+- **Hypothesis:** Restricted packed/output pointers allow more input-load scheduling freedom across transform stores without changing accepted bindings
+- **Changes:** Add restrict qualifiers to kernel input/workspace/output pointers; existing API rejects writable overlap and permits read-only A/B sharing
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.019041 ms; mean speedup=0.5835x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012261 | 0.018975 | 0.6462 | 7.39459e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009952 | 0.019107 | 0.5209 | 2.37136e-06 | 1 |
+
+- **Analysis:** Full1024 cubed BF16/FP16 benchmark completed; evaluate generated code and complete-call measurements rather than assuming a benefit
+- **Next:** Compare against92 and87; inspect whether load ordering changes before trying explicit transform software pipelining
+- **Archive:** trajectory/20261014_224418_iter-93/

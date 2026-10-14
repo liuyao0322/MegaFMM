@@ -68,7 +68,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
                          const __grid_constant__ CUtensorMap bmap,
                          const __grid_constant__ CUtensorMap smap,
                          const __grid_constant__ CUtensorMap tmap,
-                         const T* A,const T* B,T* packed,float* D){
+                         const T* __restrict__ A,const T* __restrict__ B,
+                         T* __restrict__ packed,float* __restrict__ D){
   using namespace cute;
   extern __shared__ __align__(128) unsigned char buffer[];
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
