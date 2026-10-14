@@ -54,8 +54,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
  using namespace cute;
  extern __shared__ __align__(128) unsigned char buffer[];
  auto& sh=*reinterpret_cast<Shared<T>*>(buffer);
- int tid=threadIdx.x,p=blockIdx.x%8,tile=blockIdx.y*8+blockIdx.x/8;
- int cta=tile*8+p,m0=blockIdx.y*BM,n0=(blockIdx.x/8)*BN;
+ int tid=threadIdx.x,p=blockIdx.x%8,tile=blockIdx.x/8;
+ int cta=tile*8+p;
  if(tid==0){
   for(int j=0;j<Stages;++j){Barrier::init(&sh.ready[j],1);Barrier::init(&sh.free[j],16);}
   Barrier::init(&sh.pack_ready,p<2 ? 96:608);Barrier::init(&sh.global_ready,1);
@@ -64,8 +64,8 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
  __syncthreads();
  if((tid>=32 && tid<128)||(p>=2 && tid>=128 && tid<640)){
   int worker=tid-32;
-  int global_worker=p<2 ? (p*16+tile)*96+worker : 2*16*96+((p-2)*16+tile)*608+worker;
-  for(int i=2*global_worker;i<Plane;i+=2*61440){
+  int global_worker=p<2 ? (p*15+tile)*96+worker : 2*15*96+((p-2)*15+tile)*608+worker;
+  for(int i=2*global_worker;i<Plane;i+=2*57600){
    int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -96,13 +96,15 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   asm volatile("fence.proxy.async.global;" ::: "memory");
   arrive(&sh.pack_ready);
  }
+ for(int work=tile;work<16;work+=15){
+ int m0=(work/8)*BM,n0=(work%8)*BN;
  if(tid==0){
   // Raw P1/P2 may execute while CUDA warps pack; all publication waits remain per invocation.
   for(int q=0;q<=512/BK;++q){
-   if(q==(p<2 ? 512/BK:0)){
+   if(work<15 && q==(p<2 ? 512/BK:0)){
     wait(&sh.pack_ready,0);
     auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
-    uint32_t inc=cta==0 ? 0x80000000u-127u:1u,old,now;
+    uint32_t inc=cta==0 ? 0x80000000u-119u:1u,old,now;
     asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;":"=r"(old):"l"(barrier),"r"(inc):"memory");
     do{asm volatile("ld.acquire.gpu.u32 %0,[%1];":"=r"(now):"l"(barrier):"memory");}while(!((old^now)&0x80000000u));
     arrive(&sh.global_ready);
@@ -189,6 +191,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
    }
  }
  cluster.sync();
+ }
 }
 void check(cudaError_t e,const char* where){if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));}
 void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transformed){
@@ -229,17 +232,17 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
     check(cudaFuncSetAttribute(sw_cooperative_hilo<cute::half_t>,cudaFuncAttributeMaxDynamicSharedMemorySize,sizeof(Shared<cute::half_t>)),"SW shared opt-in");
     check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&blocks,sw_cooperative_hilo<cute::half_t>,Threads,sizeof(Shared<cute::half_t>)),"SW occupancy capacity");
   }
-  if(blocks*prop.multiProcessorCount<128)throw std::invalid_argument("SW cooperative grid requires128 resident CTA capacity");
+  if(blocks*prop.multiProcessorCount<120)throw std::invalid_argument("SW cooperative grid requires120 resident CTA capacity");
   cudaLaunchAttribute attrs[2]{};int clusters=0;
   if(p.dtype==DType::BF16){auto cfg=launch_config<cute::bfloat16_t>(nullptr,attrs);check(cudaOccupancyMaxActiveClusters(&clusters,sw_cooperative_hilo<cute::bfloat16_t>,&cfg),"SW cluster capacity");}
   else{auto cfg=launch_config<cute::half_t>(nullptr,attrs);check(cudaOccupancyMaxActiveClusters(&clusters,sw_cooperative_hilo<cute::half_t>,&cfg),"SW cluster capacity");}
-  if(clusters<16)throw std::invalid_argument("SW cluster grid needs16 active clusters, available="+std::to_string(clusters));
+  if(clusters<15)throw std::invalid_argument("SW cluster grid needs15 active clusters, available="+std::to_string(clusters));
   return std::make_shared<SWState>(SWState{p.dtype});
 }
 template<class T> cudaLaunchConfig_t launch_config(cudaStream_t stream,cudaLaunchAttribute (&attrs)[2]){
  attrs[0].id=cudaLaunchAttributeCooperative;attrs[0].val.cooperative=1;
  attrs[1].id=cudaLaunchAttributeClusterDimension;attrs[1].val.clusterDim={8,1,1};
- cudaLaunchConfig_t config{};config.gridDim=dim3(64,2);config.blockDim=Threads;
+ cudaLaunchConfig_t config{};config.gridDim=dim3(120,1);config.blockDim=Threads;
  config.dynamicSmemBytes=sizeof(Shared<T>);config.stream=stream;config.attrs=attrs;config.numAttrs=2;
  return config;
 }

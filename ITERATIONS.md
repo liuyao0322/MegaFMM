@@ -307,6 +307,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 200 | Four-WG leaf CTAs and explicit cluster capacity check | 0.0000 | 0.000000 | experiment |
 
+| 201 | Measure fifteen persistent eight-CTA leaf clusters | 0.3261 | 0.034099 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2818,3 +2820,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Build succeeds; explicit occupancy query reports15 active clusters versus required16, so safely rejects before launch. No performance or numerical results. Cluster topology, not aggregate132SM capacity, restricts launch.
 - **Next:** Use15 persistent clusters, with one cluster processing an extra output tile, and retain global input publication only once
 - **Archive:** trajectory/20261015_040326_iter-200/
+
+### Iter 201 — Measure fifteen persistent eight-CTA leaf clusters
+
+- **Hypothesis:** Fifteen resident clusters with one processing a second tile fit the measured topology and expose DSM exchange cost
+- **Changes:** 120CTA grid;15clusters; cluster0 processes extra tile15; one per-invocation global transform publication; same barrier phases reused after cluster lifetime synchronization
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.034099 ms; mean speedup=0.3261x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_leaf_cluster8_128x64x128 v0 | launch | 0.012201 | 0.033944 | 0.3594 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_leaf_cluster8_128x64x128 v0 | launch | 0.010030 | 0.034254 | 0.2928 | 0.000754626 | 0 |
+
+- **Analysis:** Finite expected approximate output and both original gates fail; BF16 33.944 us and FP16 34.254 us versus Dense12.201/10.030 us. Slow cluster8 route rejected. Configuration string inherited stale grid/thread descriptions; actual source120CTA640threads4TCgroups163968Bshared is authoritative.
+- **Next:** Inspect cluster resource and instruction counters, then return to162 for a new synchronization and supply direction
+- **Archive:** trajectory/20261015_040441_iter-201/
