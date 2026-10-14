@@ -461,6 +461,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 277 | 64bit primary transform IO | 0.9989 | 0.011068 | experiment |
 
+| 278 | Two resident N16 computation CTAs | 0.7541 | 0.014682 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4206,3 +4208,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 median 11.1562 us and FP16 10.9798 us regress versus selected 266; original FP64 accuracy gates fail unchanged. Reject wider primary IO.
 - **Next:** Inspect the completed mapping comparison NCU and test a different occupancy configuration
 - **Archive:** trajectory/20261015_063325_iter-277/
+
+### Iter 278 — Two resident N16 computation CTAs
+
+- **Hypothesis:** Two independently progressing CTAs per SM might hide operand latency
+- **Changes:** Use 64x16 leaf tiles, 256 computation CTAs, two BK256 operand slots and 82048 bytes shared; regenerate eight-value private PTX fragments and preserve math order
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.014682 ms; mean speedup=0.7541x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012316 | 0.014568 | 0.8454 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009805 | 0.014795 | 0.6627 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 14.5680 us and FP16 14.7952 us regress substantially versus selected 266. Original FP64 gates fail unchanged; independent protocol certification not performed for this rejected candidate.
+- **Next:** Return to N32 and test smaller K blocks with deeper prefetch under PDL
+- **Archive:** trajectory/20261015_063603_iter-278/
