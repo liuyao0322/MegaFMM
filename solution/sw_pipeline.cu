@@ -11,7 +11,7 @@
 namespace megafmm::detail {
 namespace {
 constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=672;
+constexpr int Plane=512*512,Threads=768;
 constexpr size_t WorkspaceBytes=size_t(8)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -2355,14 +2355,14 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
                          const __grid_constant__ CUtensorMap bmap,
                          const __grid_constant__ CUtensorMap smap,
                          const __grid_constant__ CUtensorMap tmap,
-                         const T* A,const T* B,T* packed,float* D){
+                         const T* A,const T* B,T* packed,float* D,const CUtensorMap* maps,bool bound_ab){
   using namespace cute;
   extern __shared__ __align__(128) unsigned char buffer[];
   auto& s=*reinterpret_cast<Shared<T>*>(buffer);
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    Barrier::init(&s.pack_ready,512);
+    Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -2390,18 +2390,18 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       // LHS is B_leaf^T, M-contiguous original B data.
       if(blo){
         int plane=p==3?3:p-4;
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+        SM90_TMA_LOAD_3D::copy(maps ? maps+3 : &tmap,&s.ready[slot],0,op,m0,k0,plane);
       }else{
         int col=p==2?512:0,row=p==1 || p==2?512:0;
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
+        SM90_TMA_LOAD_2D::copy(maps && bound_ab ? maps+1 : &bmap,&s.ready[slot],0,op,m0+col,k0+row);
       }
       // RHS is A_leaf^T, K-contiguous original A data.
       if(alo){
         int plane=p==2?3:p-4;
-        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
+        SM90_TMA_LOAD_4D::copy(maps ? maps+2 : &smap,&s.ready[slot],0,op+ASize,0,n0,k0/64,plane);
       }else{
         int col=p==1 || p==3?512:0,row=p==3?512:0;
-        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
+        SM90_TMA_LOAD_3D::copy(maps && bound_ab ? maps : &amap,&s.ready[slot],0,op+ASize,0,n0+row,(k0+col)/64);
       }
 
     }
@@ -2410,7 +2410,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
-  for(int local=2*worker;local<Plane/(16*8);local+=2*512){
+  for(int local=2*worker;local<Plane/(16*8);local+=2*608){
     int i=(blockIdx.y*gridDim.x+blockIdx.x)*(Plane/(16*8))+local;
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
@@ -2469,7 +2469,19 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
   if(result!=CUDA_SUCCESS)throw std::runtime_error("SW tensor map status "+std::to_string(int(result)));
 }
 } // namespace
-struct SWState{DType dtype;};
+struct SWState{
+ DType dtype;CUtensorMap* maps=nullptr;const void* A=nullptr;const void* B=nullptr;void* workspace=nullptr;bool initialized=false;
+ explicit SWState(DType t):dtype(t){check(cudaMalloc(reinterpret_cast<void**>(&maps),4*sizeof(CUtensorMap)),"SW immutable metadata");}
+ ~SWState(){cudaFree(maps);}
+};
+void tune_sw_pipeline(SWState& state,const void* A,const void* B,void* workspace,cudaStream_t stream){
+ if(state.initialized)return; // Existing captured graphs retain immutable descriptor contents.
+ CUtensorMap maps[4]{};encode(maps[0],A,state.dtype,true,false);encode(maps[1],B,state.dtype,false,false);
+ encode(maps[2],workspace,state.dtype,true,true);encode(maps[3],static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
+ check(cudaMemcpyAsync(state.maps,maps,sizeof(maps),cudaMemcpyHostToDevice,stream),"SW upload metadata");
+ check(cudaStreamSynchronize(stream),"SW finish explicit metadata tuning");
+ state.A=A;state.B=B;state.workspace=workspace;state.initialized=true;
+}
 std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
   if(p.m!=1024 || p.n!=1024 || p.k!=1024 || p.trans_a || p.trans_b || p.lda!=1024 || p.ldb!=1024 || p.ldd!=1024 || p.alpha!=1 || p.beta!=0)
     throw std::invalid_argument("SW requires contiguous non-transposed1024^3 alpha1 beta0");
@@ -2484,12 +2496,14 @@ std::shared_ptr<SWState> make_sw_pipeline(const Problem& p){
     check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&blocks,sw_cooperative_hilo<cute::half_t>,Threads,sizeof(Shared<cute::half_t>)),"SW occupancy capacity");
   }
   if(blocks*prop.multiProcessorCount<128)throw std::invalid_argument("SW cooperative grid requires128 resident CTA capacity");
-  return std::make_shared<SWState>(SWState{p.dtype});
+  return std::make_shared<SWState>(p.dtype);
 }
 void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream){
   CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
   encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+WorkspaceBytes/2,state.dtype,false,true);
-  void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D};dim3 grid(16,8);
+  const CUtensorMap* maps=state.initialized && workspace==state.workspace ? state.maps : nullptr;
+  bool bound_ab=maps && A==state.A && B==state.B;
+  void* args[]={&a,&b,&s,&t,&A,&B,&workspace,&D,&maps,&bound_ab};dim3 grid(16,8);
   if(state.dtype==DType::BF16)
     check(cudaLaunchCooperativeKernel(reinterpret_cast<void*>(sw_cooperative_hilo<cute::bfloat16_t>),grid,Threads,args,sizeof(Shared<cute::bfloat16_t>),stream),"SW cooperative launch");
   else

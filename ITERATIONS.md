@@ -355,6 +355,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 224 | 512 balanced transform workers with private transposed products | 1.0111 | 0.011018 | experiment |
 
+| 225 | Immutable device TMA metadata prepared by explicit tuning | 0.9716 | 0.011450 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3256,3 +3258,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF10.9322 FP11.1037us; small sub3percent improvement signal, independent pairing needed. Both original FP64 gates stillFAIL with expected eF. FP remains slower than contemporaneous9.98432us Dense.
 - **Next:** Archive224 and compare against218 while testing descriptor metadata reuse as a new frontend direction
 - **Archive:** trajectory/20261015_050001_iter-224/
+
+### Iter 225 — Immutable device TMA metadata prepared by explicit tuning
+
+- **Hypothesis:** Reusing stable descriptor addresses lowers metadata and host encoding frontend cost
+- **Changes:** From218 allocate512B plan metadata at setup, initialize once in explicit tune; matching workspace reuses S/T maps, matching A/B reuse raw maps; inline current-pointer fallback; run never allocates or synchronizes
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011450 ms; mean speedup=0.9716x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012274 | 0.011380 | 1.0786 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009960 | 0.011520 | 0.8646 | 0.000754626 | 0 |
+
+- **Analysis:** Rejected: BF11.3795 FP11.5203us, slower than218 and224. Expected original eF unchanged, both gatesFAIL. Metadata reuse does not improve full-call performance; extra ownership and graph lifetime complexity not retained.
+- **Next:** Reassess NCU/history and test larger private transposed output tile with lower CTA count and controlled register footprint
+- **Archive:** trajectory/20261015_050119_iter-225/
