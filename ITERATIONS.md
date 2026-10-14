@@ -547,6 +547,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 320 | Rolling five-product WGMMA retirement | 0.9720 | 0.011263 | experiment |
 
+| 321 | Two Tensor Core warpgroups with CTA-local product exchange | 1.0275 | 0.010572 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4970,3 +4972,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal benchmark completed; latency and original FP64 numerical verdict are recorded in the archived CSV. No adoption or independent synchronization certification is implied. Previous319 K64 deeper prefetch was rejected: BF16 16.93184 and FP16 16.71264 us with finite unchanged approximate errors.
 - **Next:** Inspect rolling-retirement timing and generated instructions; consider current-PDL dual tensor warpgroup product ownership only after reviewing old197/198 and shared-exchange lifetime
 - **Archive:** trajectory/20261015_073525_iter-320/
+
+### Iter 321 — Two Tensor Core warpgroups with CTA-local product exchange
+
+- **Hypothesis:** Parallel four-plus-three leaf ownership can overlap Tensor Core issue without the global intermediate traffic of315 or the old in-kernel transform/consumer overhead of197/198
+- **Changes:** Preserve selected282 PDL primary and 128 tile CTAs; use384 compute-kernel threads, two independent four-slot K128 pipelines, private static PTX accumulators and 16KiB shared U2/U3 exchange with128-arrival CTA barriers; rank1 computes all three leaves before waiting
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010572 ms; mean speedup=1.0275x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012121 | 0.010605 | 1.1430 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009611 | 0.010538 | 0.9120 | 0.000754626 | 0 |
+
+- **Analysis:** Formal benchmark completed; inspect archived CSV for runtime and original precision gates before any adoption. This candidate changes synchronization and requires independent bitwise, sanitizer and multistream validation if retained. Rolling320 is rejected at BF16 11.28096 and FP16 11.24480 us with finite unchanged original errors.
+- **Next:** Inspect321 result and profile resources; if promising validate against162 plus paired ordinary and Graph comparison with282, otherwise investigate shared operand reuse with a cheaper protocol
+- **Archive:** trajectory/20261015_073659_iter-321/
