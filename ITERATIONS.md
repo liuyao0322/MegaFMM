@@ -237,6 +237,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 165 | Four independent TMA slot owners | 0.8825 | 0.012623 | experiment |
 
+| 166 | Static sequential product pair helpers | 1.2358 | 0.013534 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2200,3 +2202,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full-call BF16 about12.52us and FP16 about12.73us regress versus16211.34/11.54us. Original FP64 gates still fail with expected baseline errors and nonfinite0. Divergent lane scheduling adds overhead; reject.
 - **Next:** Restore162 and try static two-product sequential helpers without dual live accumulators.
 - **Archive:** trajectory/20261015_032205_iter-165/
+
+### Iter 166 — Static sequential product pair helpers
+
+- **Hypothesis:** Compile-time operand and product slots remove descriptor address overhead without dual live accumulator arrays.
+- **Changes:** Restore162; three runtime pairs call forced-inline SlotBase0/P0 and SlotBase2/P1 helpers sequentially; tail static0/P0.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013534 ms; mean speedup=1.2358x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.023324 | 0.013431 | 1.7365 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010023 | 0.013636 | 0.7350 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about13.43us and FP16 about13.64us are materially slower than selected162. Expected uncompensated FP64 gate failures preserved. Dense BF16 measured22-29us anomalously vs normal12us, so apparent speedup invalid as verdict; reject candidate based on own latency.
+- **Next:** Inspect generated resources, restore162 and test a third product buffer to reduce consumer backpressure.
+- **Archive:** trajectory/20261015_032253_iter-166/

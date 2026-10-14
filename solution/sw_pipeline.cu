@@ -64,6 +64,34 @@ __device__ void mma_term(TA a,TB b,float (&d)[16]) {
   }
 }
 
+template<class T,int SlotBase,int ProductSlot>
+__device__ __forceinline__ void compute_product(Shared<T>& s,int step,int tid){
+  using namespace cute;
+  constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
+  constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
+  float acc[16]={};
+  #pragma unroll
+  for(int q=0;q<2;++q){
+    int slot=SlotBase+q;
+    wait(&s.ready[slot],(step/2)%2);
+    T* op=s.operand[slot];
+    auto ah=make_tensor(make_smem_ptr(op),la);
+    auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
+    warpgroup_arrive();
+    mma_term<T>(ah,bh,acc);
+    warpgroup_commit_batch();warpgroup_wait<0>();
+    __syncwarp();
+    if((tid&31)==0)arrive(&s.free[slot]);
+  }
+  if(step>=2)wait(&s.product_free[ProductSlot],((step-2)/2)%2);
+  #pragma unroll
+  for(int j=0;j<16;++j){
+    int mn=GMMA::CLayout_64x32{}(tid-128,j);
+    s.product[ProductSlot][product_index(mn%64,mn/64)]=acc[j];
+  }
+  arrive(&s.product_ready[ProductSlot]);
+}
+
 template<class T> __global__ __launch_bounds__(Threads,1)
 void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
                          const __grid_constant__ CUtensorMap bmap,
@@ -83,25 +111,20 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   __syncthreads();
   constexpr auto la=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_MN_SW64_Atom<T>{},Shape<_32,Int<BK>>{});
-  if(tid<4){
-    // Each participating lane owns one operand slot and its barrier phases.
-    for(int sequence=tid;sequence<7*(512/BK);sequence+=Stages){
-      int step=sequence/(512/BK),q=sequence%(512/BK);
+  if(tid==0){
+    for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step);
-      int slot=sequence%Stages,k0=q*BK;
-      if(sequence>=4 && sequence<8){
+      int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
+      if(sequence==4){
         wait(&s.pack_ready,0);
         // CUDA12.4 cooperative launch gives each invocation its own initialized
         // driver workspace. Only TMA leaders join this publication barrier;
         // the shared pack barrier has already acquired every CUDA writer.
-        if(tid==0){
         auto* barrier=&cooperative_groups::details::get_grid_workspace()->barrier;
         uint32_t increment=(blockIdx.x==0 && blockIdx.y==0) ? 0x80000000u-127u:1u;
         uint32_t old,current;
         asm volatile("atom.add.acq_rel.gpu.u32 %0,[%1],%2;" : "=r"(old) : "l"(barrier),"r"(increment) : "memory");
-        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory"); }while(!((old^current)&0x80000000u));
-        }
-        __syncwarp(0xFu);
+        do{asm volatile("ld.acquire.gpu.u32 %0,[%1];" : "=r"(current) : "l"(barrier) : "memory");}while(!((old^current)&0x80000000u));
       }
       if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
       bool alo=p==2 || p>=4,blo=p==3 || p>=4;
@@ -189,31 +212,12 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     }
     }
   }else if(tid>=128 && tid<256){
-    for(int step=0;step<7;++step){
-      int p=product_for_step(step);
-      float acc[16]={};
-      // Four compact operand slots keep prefetch ahead; retire each K tile promptly.
-      #pragma unroll
-      for(int q=0;q<512/BK;++q){
-        int sequence=step*(512/BK)+q,slot=sequence%Stages;
-        wait(&s.ready[slot],(sequence/Stages)%2);
-        T* op=s.operand[slot];
-        auto ah=make_tensor(make_smem_ptr(op),la);
-        auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
-        warpgroup_arrive();
-        mma_term<T>(ah,bh,acc);
-        warpgroup_commit_batch();warpgroup_wait<0>();
-        __syncwarp();
-        if((tid&31)==0)arrive(&s.free[slot]);
-      }
-      if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
-      #pragma unroll
-      for(int j=0;j<16;++j){
-        int mn=GMMA::CLayout_64x32{}(tid-128,j);
-        s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
-      }
-      arrive(&s.product_ready[step%2]);
+    #pragma unroll 1
+    for(int pair=0;pair<3;++pair){
+      compute_product<T,0,0>(s,2*pair,tid);
+      compute_product<T,2,1>(s,2*pair+1,tid);
     }
+    compute_product<T,0,0>(s,6,tid);
   }
   // CTA shared storage survives until all role threads return.
 }
