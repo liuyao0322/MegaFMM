@@ -463,6 +463,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 278 | Two resident N16 computation CTAs | 0.7541 | 0.014682 | experiment |
 
+| 279 | PDL K128 eight-stage operands | 1.0776 | 0.010282 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4224,3 +4226,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 14.5680 us and FP16 14.7952 us regress substantially versus selected 266. Original FP64 gates fail unchanged; independent protocol certification not performed for this rejected candidate.
 - **Next:** Return to N32 and test smaller K blocks with deeper prefetch under PDL
 - **Archive:** trajectory/20261015_063603_iter-278/
+
+### Iter 279 — PDL K128 eight-stage operands
+
+- **Hypothesis:** Smaller first raw TMA blocks and eight-stage lookahead can offset additional MMA waits
+- **Changes:** Regenerate seven-product PTX for four K128 groups per leaf and eight operand slots; preserve original per-element accumulation and timely slot release; wait for primary at sequence eight
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010282 ms; mean speedup=1.0776x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012285 | 0.010269 | 1.1963 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009872 | 0.010295 | 0.9589 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 median 10.26944 us and FP16 10.29472 us modestly improve single-run signal versus selected266 but do not meet FP16 Dense9.872us. Original FP64 gates fail unchanged. Requires paired comparison and independent validation before selection.
+- **Next:** Reassess profiles and try paired K128 retirement to reduce redundant completion waits
+- **Archive:** trajectory/20261015_063646_iter-279/
