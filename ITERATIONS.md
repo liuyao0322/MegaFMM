@@ -549,6 +549,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 321 | Two Tensor Core warpgroups with CTA-local product exchange | 1.0275 | 0.010572 | experiment |
 
+| 322 | Dual Tensor Core groups with two K256 slots each | 0.9476 | 0.011484 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4988,3 +4990,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal benchmark completed; inspect archived CSV for runtime and original precision gates before any adoption. This candidate changes synchronization and requires independent bitwise, sanitizer and multistream validation if retained. Rolling320 is rejected at BF16 11.28096 and FP16 11.24480 us with finite unchanged original errors.
 - **Next:** Inspect321 result and profile resources; if promising validate against162 plus paired ordinary and Graph comparison with282, otherwise investigate shared operand reuse with a cheaper protocol
 - **Archive:** trajectory/20261015_073659_iter-321/
+
+### Iter 322 — Dual Tensor Core groups with two K256 slots each
+
+- **Hypothesis:** Larger K blocks reduce per-leaf ready/wait/free handshakes while retaining parallel four-plus-three product execution
+- **Changes:** Start from321; increaseBK128 to256, reduce each independent pipeline fromfour totwo slots, keep384threads and shared U2/U3 exchange; shared213120bytes
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011484 ms; mean speedup=0.9476x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012089 | 0.011306 | 1.0692 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009631 | 0.011661 | 0.8259 | 0.000754626 | 0 |
+
+- **Analysis:** Formal benchmark completed; inspect archived CSV for timing and numerical results before adoption.321 was finite with unchanged original gate failures and BF16/FP16 10.60512/10.53824 us, slower than selected282. Full321 NCU72regs and zero local sectors,1.422Minst; sampled long-scoreboard stalls occur mainly on polling-loop branches and require phase attribution rather than a spill claim.
+- **Next:** Test balanced raw-leaf ownership so both tensor groups can start before the primary transforms finish: rank0 P1P6P7P4 and rank1 P2P5P3, shared P1/U2/U3 exchange
+- **Archive:** trajectory/20261015_073823_iter-322/
