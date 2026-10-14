@@ -309,6 +309,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 201 | Measure fifteen persistent eight-CTA leaf clusters | 0.3261 | 0.034099 | experiment |
 
+| 202 | TC register recombination with private PTX product accumulators | 0.5977 | 0.018628 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2836,3 +2838,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Finite expected approximate output and both original gates fail; BF16 33.944 us and FP16 34.254 us versus Dense12.201/10.030 us. Slow cluster8 route rejected. Configuration string inherited stale grid/thread descriptions; actual source120CTA640threads4TCgroups163968Bshared is authoritative.
 - **Next:** Inspect cluster resource and instruction counters, then return to162 for a new synchronization and supply direction
 - **Archive:** trajectory/20261015_040441_iter-201/
+
+### Iter 202 — TC register recombination with private PTX product accumulators
+
+- **Hypothesis:** Lexically private accumulators over both K tiles avoid cross-product register alias serialization and remove P exchange
+- **Changes:** Restore162 frontend; remove shared P and consumer role; 196736Bshared; one PTX block per leaf holds internal16accumulators over bothK tiles, explicit waits and prompt per-warp free arrivals; float2 direct recombination in original order
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.018628 ms; mean speedup=0.5977x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012263 | 0.018522 | 0.6621 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009990 | 0.018733 | 0.5333 | 0.000754626 | 0 |
+
+- **Analysis:** Build emits no C7515 warning, finite expected numerical errors; both original gates fail. BF16 18.522 us and FP16 18.733 us versus Dense12.263/9.990 us; slower than162. Need inspect resource/spill/issue before attributing cause.
+- **Next:** Inspect202 SASS and NCU, then specialize static product lifetimes or reject direct register path
+- **Archive:** trajectory/20261015_040634_iter-202/
