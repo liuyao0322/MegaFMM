@@ -453,6 +453,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 273 | PDL initialization-prefix control | 0.9954 | 0.011121 | experiment |
 
+| 274 | N40 compromise with104 compute CTAs | 1.0531 | 0.010549 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4134,3 +4136,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 完整普通 BF16 11.14944us、FP16 11.09184us，较266约多0.6至0.7us，前缀已有明显代价；仍不能精确拆分271/272其余成本，因为所有权与末CTA汇合也不同。原门槛FAIL，不保留。271至273无3percent改善；已重读266计数器、254阶段/批次trace和历史N48/N64，查询官方PTX确认支持m64n40形状，转向更细N分块折中。
 - **Next:** 测试N40/104CTA与四槽BK256，保留PDL和描述符预取，边缘输出加保护。
 - **Archive:** trajectory/20261015_062826_iter-273/
+
+### Iter 274 — N40 compromise with104 compute CTAs
+
+- **Hypothesis:** N40减少重复LHS供数，同时比N48/64保留更多SM并行度，可能改善供数与算力折中。
+- **Changes:** 104CTA、64x40、四BK256槽213120Bshared、20累加寄存器；复用CLayout64x48前20值，PTX m64n40，partial-edge输出保护，保留PDL/carveout和descriptor预取。
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010549 ms; mean speedup=1.0531x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012420 | 0.010612 | 1.1704 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009812 | 0.010486 | 0.9357 | 0.000754626 | 0 |
+
+- **Analysis:** 完整普通 BF16 10.61152us、FP16 10.4864us，慢于26610.509/10.365us；原三fresh错误一致但未独立边缘验收，原门槛FAIL，不保留。
+- **Next:** 保持N32和128CTA，改变二维CTA映射以分散同时LHS请求，检验首块供数的地址分布敏感性。
+- **Archive:** trajectory/20261015_062952_iter-274/
