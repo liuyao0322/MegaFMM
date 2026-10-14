@@ -13,6 +13,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 53 | Write swizzled operands through typed CuTe tensor views | 0.0248 | 0.438394 | measured |
 
+| 54 | Process BK64 with on-demand FP32 transforms | 0.0330 | 0.335406 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -62,3 +64,29 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 - **Analysis:** Complete benchmark exited0; both dtypes pass all three fresh FP64 checks. Latency is recorded below; compare against baseline before claiming a gain.
 - **Next:** Inspect current assembly/resource use and elapsed latency; continue reducing real critical-path work.
 - **Archive:** trajectory/20261014_190221_iter-53/
+
+#### Reassessment after three non-improving candidates (51–53)
+51 regressed despite fewer arrivals;52 invalid swizzled stores failed;53 fixes typed
+byte-address swizzling and passes but is slower (443/434us). No new ncu probe per
+known prior failure. SASS resource inspection shows no local spills or CALL in the
+SW kernels; static operand/store/control work remains substantial. CUTLASS primary
+pipeline documentation https://github.com/NVIDIA/cutlass/blob/main/media/docs/cpp/pipeline.md
+supports organizing real producer/consumer overlap; it does not prove our bottleneck.
+Next direction: larger K slices and remove global shared ST table, evaluating total
+work/handshake tradeoff rather than continuing the unsuccessful layout-only path.
+
+### Iter 54 — Process BK64 with on-demand FP32 transforms
+
+- **Hypothesis:** Halve the K-slice handshake/recombination count; remove shared ST table to fit larger slices, computing each final operand through the same RN FP32 DAG.
+- **Changes:** Restore iter50 core, BK64, one raw stage and two operand stages, on-demand ST, dynamic shared188544 bytes, matching A/B TMA box dimensions. Keep hi+lo and 15 leaf terms.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.335406 ms; mean speedup=0.0330x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_unified_v1_hilo_64x32x64 v0 | launch | 0.012383 | 0.342049 | 0.0362 | 7.15726e-06 | 1 |
+| 1024,1024,1024 | fp16 | sw_unified_v1_hilo_64x32x64 v0 | launch | 0.009782 | 0.328763 | 0.0298 | 4.79212e-07 | 1 |
+
+- **Analysis:** Complete benchmark exited0. Both dtypes pass all three fresh original-input checks; timings below determine actual improvement. Transform operation count rises because shared ST reuse is removed.
+- **Next:** Inspect measured gain and validate stress; explore larger K slices if critical-path reduction is effective.
+- **Archive:** trajectory/20261014_190538_iter-54/

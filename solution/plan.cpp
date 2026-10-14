@@ -358,13 +358,13 @@ Plan& Plan::operator=(Plan&&) noexcept = default;
 size_t Plan::workspace_bytes() const { return impl_->bytes; }
 const Problem& Plan::problem() const { return impl_->problem; }
 std::string Plan::algorithm_name() const {
-  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw ? "sw_unified_v1_hilo_64x32x32" : "dense_cublaslt";
+  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw ? "sw_unified_v1_hilo_64x32x64" : "dense_cublaslt";
 }
 std::string Plan::lt_algorithm_config(const void* A, const void* B, const float* C0,
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
-  if (impl_->sw) return "sw_v1;warp_roles=1tma+3simt+4wgmma;smem=213120;st=fp32;operand=hi+lo;leaf_terms=15;current_pointer_maps=2;operand_layout=sw32;alpha=1;beta=0";
+  if (impl_->sw) return "sw_v1;warp_roles=1tma+3simt+4wgmma;smem=188544;bk=64;st=fp32_register;operand=hi+lo;leaf_terms=15;current_pointer_maps=2;raw_stages=1;alpha=1;beta=0";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }
