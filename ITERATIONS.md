@@ -197,6 +197,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 145 | K512 two-slot asynchronous input publication | 0.8824 | 0.012664 | experiment |
 
+| 146 | Two-CTA DSM cluster with split seven-product ownership | 0.7066 | 0.015789 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1840,3 +1842,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Numerically matches seven-product baseline, both original gates fail as expected. Launch12.66/12.67us regresses versus14011.42/11.58us; longer stages dominate saved waits.
 - **Next:** Explore clustered wider tiles to reduce seven-product instruction and exchange overhead
 - **Archive:** trajectory/20261015_024706_iter-145/
+
+### Iter 146 — Two-CTA DSM cluster with split seven-product ownership
+
+- **Hypothesis:** Wider WGMMA reduces instructions while DSM exchanges only recombination state
+- **Changes:** 64x64x256 tile, two operand slots, cluster2; CTA0 P1 P2 P6 P7, CTA1 P5 P3 P4; 256 consumers, remote mbarrier protects DSM state lifetime; full grid input publication
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.015789 ms; mean speedup=0.7066x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cluster_64x64x256 v0 | launch | 0.012315 | 0.015717 | 0.7835 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cluster_64x64x256 v0 | launch | 0.009989 | 0.015862 | 0.6297 | 0.000754626 | 0 |
+
+- **Analysis:** All six fresh checks reproduce baseline error and no nonfinite; gates still FAIL. BF16/FP16 launch15.72/15.86us, materially slower than140. Needs profiling before further cluster tuning.
+- **Next:** Profile instruction resource and waiting overhead of DSM candidate
+- **Archive:** trajectory/20261015_024843_iter-146/
