@@ -3,44 +3,30 @@
 H100 上 Strassen–Winograd 矩阵乘法的研究工程。2026-10-14 按用户要求移除旧
 SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的首版。
 
-**当前 SW 源码保留七乘法、无补偿路线，已优化为四 operand slot 预取（iter100）。**
-1024³ 的同期交错测量，BF16/FP16普通launch约 **13.06/13.25 μs**，Graph约 **12.27/12.53 μs**；
-较此前双slot七乘法版，普通调用耗时下降约8%，Graph约9%–12%。
-**两种输入仍未通过原精度门限**，仍慢于调优cuBLASLt Dense。
-`Auto` 和 `Dense` 继续普通GEMM；`SWPipeline` / `--algorithm sw` 显式执行当前实验内核。
+**当前保留 iter162（d8e6261）的七乘法、无补偿实验内核。持续优化目标尚未完成。**
+1024³ 同期交错测量，BF16/FP16 普通调用约 **11.337/11.542 μs**，调优 Dense 约
+**12.191/9.965 μs**。BF16 快约7.5%，FP16 仍慢约15.8%；FP16 还需减少约1.58 μs。
+Graph 的 SW 约10.959/11.164 μs，Dense 约11.263/9.505 μs。
 
-[当前四slot预取优化与完整验证报告](trajectory/20261015_validation-seven-prefetch/REPORT.md)
+**两种输入仍未通过原始精度门槛**：BF16 eF约0.0060152，FP16约0.000754626。
+`Auto` 和 `Dense` 继续普通调优 cuBLASLt GEMM；当前 SW 必须显式指定。
 
-[双slot七乘法版本 profiling（历史）](trajectory/20261015_profile-iter97-seven-products/REPORT.md)
+[持续优化检查点、性能对比、精度失败及完整验证证据](trajectory/20261015_optimization-goal-checkpoint/REPORT.md)
 
-[七乘法无补偿实验（iter97：更快，但两种精度均未通过原验收）](trajectory/20261015_validation-iter97-no-compensation/REPORT.md)
+当前实现使用4 MiB调用方 workspace、213120B动态 shared 和四个 BK256 operand slots。
+128个 CTA，每 CTA768线程：1个 TMA warp、19个 CUDA pack warps、4个 WGMMA warps；
+pack完成后只有4个CUDA warps继续消费 P。P1/P2 与输入变换重叠，slot及时释放，输出流式重组。
+发布屏障依赖 CUDA12.4 cooperative-groups 内部的每次调用独立 driver workspace；移植工具链时需复核。
+`run()`无分配、无host同步；每次为当前指针编码 tensor maps，无跨调用计算值缓存。
 
-[历史补偿版输入变换与 TMA 优化报告（iter96）](trajectory/20261014_validation-iter96-supply/REPORT.md)
+与保留七乘法版97通过72项 fresh-input逐位检查、三种quick sanitizer，以及256次双stream/Graph重放检查。
+这些验证用于检查实现与同步正确性，**不代表通过原始FP64精度验收**。
 
-[固定 slot 与分阶段供数版本报告（iter87）](trajectory/20261014_validation-iter87-staged-ready/REPORT.md)
+[历史四slot预取优化（iter100）](trajectory/20261015_validation-seven-prefetch/REPORT.md)
 
-[基础 descriptor 优化报告（iter85）](trajectory/20261014_validation-iter85-descriptors/REPORT.md)
+[历史七乘法 profiling（iter97）](trajectory/20261015_profile-iter97-seven-products/REPORT.md)
 
-[流式重组版本报告（iter82）](trajectory/20261014_validation-iter82-streaming/REPORT.md)
-
-[P shared bank conflict 修复报告](trajectory/20261014_validation-iter81-p-banks/REPORT.md)
-
-[生产链条分段计时：TMA 等待、WGMMA 提交与完成等待](trajectory/20261014_profile-production-chain/REPORT.md)
-
-[最初首版报告（历史）](trajectory/20261014_183039_validation-graph-1024/REPORT.md)
-
-当前源码逐文件恢复自iter100（76b4d09），`sw_cooperative_hilo_64x32x256`。
-回收低部分shared空间用于四slot高部分预取，保留BK256和及时释放；最终shared总量213120字节。
-原始FP64参考与数值门限保持不变：BF16eF约0.0060152、FP16约0.000754626，两者FAIL。
-与原七乘法版通过72项独立逐位一致性检查、三种quick sanitizer及DAG测试；这些检查不代表精度验收通过。
-64位变换、拆分transform kernel、移除初始同步均无可靠完整调用收益，未合并。
-
-每次调用先在调用方提供的 **8 MiB 全局 workspace** 中以FP32生成S/T，再仅写入目标dtype的高部分，
-通过 cooperative grid barrier 后，以 TMA 装入统一 shared buffer 并执行 WGMMA。
-128 个 CTA，每个 512 线程：1 个 TMA warp、11 个 CUDA Core warp、4 个 WGMMA warp。
-动态 shared 每 CTA 213120 字节，BM=64、BN=32、BK=256。需要支持至少128个同时驻留
-CTA 的 Hopper cooperative launch；当前在132 SM H100上验证。`run()`不分配、不进行host同步。
-当前执行7项叶乘法；全局workspace预算暂沿用旧版；shared已压缩为高部分布局，并用于四slot预取。原始FP64参考和数值门限保持不变。
+[历史补偿版输入变换优化（iter96，精度通过但更慢）](trajectory/20261014_validation-iter96-supply/REPORT.md)
 
 ## 当前目录
 

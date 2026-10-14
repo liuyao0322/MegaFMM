@@ -1,0 +1,11 @@
+==WARNING== Note: Running with uncontrolled GPU caches. Profiling results may be inconsistent.
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 1323347 (/share/home/liuyao/workspace/MegaFMM/results/opt_seven_round/iter146_bench)
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=sw_cluster;cluster=2x1x1;roles=1tma+4tc+8consumer;smem=213120;bk=256;stages=2;products=4plus3;exchange=DSM_U2_U3;st=fp32_high_only_global_pack;publication=cooperative_grid;leaf_terms=7;residual_correction=off;workspace=8388608;alpha=1;beta=0
+==PROF== Profiling "sw_cooperative_hilo": Application replay pass 1
+
+==ERROR== An error was reported by the driver:
+==ERROR== LaunchFailed
+==PROF== Trying to shutdown target application
+==ERROR== The application returned an error code (9).

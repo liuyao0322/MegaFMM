@@ -163,3 +163,12 @@ the user's requests in this conversation:
 ## Latest sustained goal,2026-10-15
 
 - User explicitly requested continued optimization until faster than Dense. Resume sustained optimization from100; target both BF16/FP16 ordinary full-call1024^3 faster than contemporaneously independently tuned cuBLASLt Dense. Track Graph separately. Keep seven-product uncompensated route, original FP64 gates and Auto=Dense; accuracy failure must stay explicit. This supersedes earlier bounded-round scope.
+
+## Sustained-goal checkpoint through162 (goal still active)
+
+- Selected162(d8e6261):140 asynchronous608-worker pack/128-consumer architecture plus4MiB compact high planes and no terminal CTA barrier.64regs,213120Bshared,no local sectors. Current original FP64 gates stillFAILboth; AutoDense.
+- Paired140/162 A/B/B/A:162 launchBF11.33696us vsDense12.19088;FP11.54240 vs9.96544. GraphBF10.95920 vs11.26336;FP11.16416 vs9.50496. BF wins,FP stillneeds~1.577us/13.66percent SW-time reduction. Goal NOT complete.
+-162 passed72bitwise97checks,all3quick sanitizers,256two-stream/Graph launches withpoisonedworkspaces. Private CUDA12.4 driver-workspace barrier is an internalABI dependency; no cross-call solution state.
+- Full162NCU~2.519Minstructions,Tensor16.7–16.9percent,L2throughput~50.8percent,hitrate~98percent,PsourceSTS/LDS1way0excess. No floor claim.131 phase diagnostics predate asyncfrontend and mustnot be called162phase timings.
+- Rejected newer directions:K128eightstages142/143,K512145;DSM split-product cluster146/147;multicastA150;local shared transform153/154;dualaccumulator interleave158/159;warpMMA160/161.151/152numericallyinvalid swappedP3/P4 fixed153.146NCULaunchFailed no reliablecounterdata.153/158/160spilldespitecuobjdumpLOCAL0; inspectSTACKandSTL/LDL.
+- Evidence trajectory/20261015_optimization-goal-checkpoint/REPORT.md. Continue current critical-path diagnostics; next256consumerworkers has simpleconstant8row chunk offsets and has not been tested. ThirdPslot also untested on this architecture. Do not stop or claim exhausted directions based on this checkpoint.
