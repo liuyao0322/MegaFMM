@@ -189,6 +189,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 141 | 1024-thread balanced asynchronous transform CTA | 0.9441 | 0.011814 | experiment |
 
+| 142 | Eight K128 operand slots on the balanced asynchronous pipeline | 0.9104 | 0.012285 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1768,3 +1770,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 140 paired launch11.422/11.584us, Graph10.965/11.308;72bitwise checks and3sanitizers pass. Full141 benchmark archived with original gates unchanged.
 - **Next:** Select worker count, then test deeper small-K prefetch and issue/wait cadence
 - **Archive:** trajectory/20261015_023840_iter-141/
+
+### Iter 142 — Eight K128 operand slots on the balanced asynchronous pipeline
+
+- **Hypothesis:** Double slot count with smaller K tiles enables a different latency-overlap regime
+- **Changes:** From140 K256/four slots ->K128/eight slots,shared213248B; publication starts after both original-input products have been prefetched; immediate release remains
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012285 ms; mean speedup=0.9104x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012346 | 0.012172 | 1.0143 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009997 | 0.012397 | 0.8064 | 0.000754626 | 0 |
+
+- **Analysis:** 1411024threads regressed11.77/11.86us,140768retained as validated best. Full142 benchmark archived for K/prefetch tuning.
+- **Next:** Try overlapping WGMMA groups on deeper slots if numerical behavior is unchanged
+- **Archive:** trajectory/20261015_023949_iter-142/

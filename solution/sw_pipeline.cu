@@ -10,8 +10,8 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=256,Stages=4,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
-constexpr int Plane=512*512,Threads=1024;
+constexpr int BM=64,BN=32,BK=128,Stages=8,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int Plane=512*512,Threads=768;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
@@ -23,7 +23,7 @@ template<class T> struct alignas(128) Shared {
   uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
   uint64_t pack_ready;
 };
-static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==213248,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -77,7 +77,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
     for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
-    Barrier::init(&s.pack_ready,864);
+    Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -87,7 +87,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step);
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
-      if(sequence==4){
+      if(sequence==2*(512/BK)){
         wait(&s.pack_ready,0);
         // CUDA12.4 cooperative launch gives each invocation its own initialized
         // driver workspace. Only TMA leaders join this publication barrier;
@@ -124,7 +124,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
-  for(int local=2*worker;local<Plane/(16*8);local+=2*864){
+  for(int local=2*worker;local<Plane/(16*8);local+=2*608){
     int i=(blockIdx.y*gridDim.x+blockIdx.x)*(Plane/(16*8))+local;
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
