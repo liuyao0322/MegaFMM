@@ -371,6 +371,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 232 | Unsigned transform indices and explicit TC fragment lane bits | 1.0079 | 0.011034 | experiment |
 
+| 233 | Separate256 S and256 T transform workers | 0.9271 | 0.012037 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3398,3 +3400,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF10.9309 FP11.1366us, effectively flat relative224. Original expected errors unchanged, gatesFAIL. Do not claim meaningful speedup from instruction simplification alone.
 - **Next:** Test split S/T transform worker roles to lower per-worker operand dependencies, retaining224 as measured baseline
 - **Archive:** trajectory/20261015_051127_iter-232/
+
+### Iter 233 — Separate256 S and256 T transform workers
+
+- **Hypothesis:** Each warp handles only A or B transformations, reducing live input dependencies per worker
+- **Changes:** From224 split512 workers into256 S and256 T, each four packed-pair batches; same FP32 transforms, one high rounding, workspace and512-count pack barrier
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012037 ms; mean speedup=0.9271x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012332 | 0.011952 | 1.0319 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009970 | 0.012123 | 0.8224 | 0.000754626 | 0 |
+
+- **Analysis:** Rejected BF11.9517 FP12.1232us, substantially slower224. Expected uncompensated errors unchanged, both original gatesFAIL. Shallower per-worker live state does not offset extra iterations and reduced parallelism per transform.
+- **Next:** Reassess current profiles and explore split-K tile parallelism as a new macro architecture rather than further transform microtuning
+- **Archive:** trajectory/20261015_051256_iter-233/

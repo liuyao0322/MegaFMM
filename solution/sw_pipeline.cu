@@ -35,6 +35,27 @@ __device__ constexpr int product_for_step(int step){
   return step<2 ? step:step==2 ? 5:step==3 ? 6:step==4 ? 4:step==5 ? 2:3;
 }
 
+template<class T,bool IsB> __device__ __forceinline__ void transform_pack(const T* input,T* packed,unsigned worker){
+ for(unsigned local=2*worker;local<2048;local+=512){
+  unsigned i=(blockIdx.y*gridDim.x+blockIdx.x)*2048+local;
+  unsigned at=(i/512)*1024+i%512;
+  auto v=reinterpret_cast<const uint32_t*>(input);
+  uint32_t bits[4]={v[at/2],v[(at+512)/2],v[(at+512*1024)/2],v[(at+512*1024+512)/2]},words[4]={};
+  #pragma unroll
+  for(int lane=0;lane<2;++lane){
+   float v11=float(T::bitcast(uint16_t(bits[0]>>(16*lane)))),v12=float(T::bitcast(uint16_t(bits[1]>>(16*lane))));
+   float v21=float(T::bitcast(uint16_t(bits[2]>>(16*lane)))),v22=float(T::bitcast(uint16_t(bits[3]>>(16*lane))));
+   float values[4];
+   if constexpr(IsB){float t1=__fsub_rn(v12,v11),t2=__fsub_rn(v22,t1);values[0]=t1;values[1]=t2;values[2]=__fsub_rn(v22,v12);values[3]=__fsub_rn(t2,v21);}
+   else{float s1=__fadd_rn(v21,v22),s2=__fsub_rn(s1,v11);values[0]=s1;values[1]=s2;values[2]=__fsub_rn(v11,v21);values[3]=__fsub_rn(v12,s2);}
+   #pragma unroll
+   for(int j=0;j<4;++j){T value=T(values[j]);words[j]|=uint32_t(value.raw())<<(16*lane);}
+  }
+  #pragma unroll
+  for(int j=0;j<4;++j)reinterpret_cast<uint32_t*>(packed)[(((IsB?4:0)+j)*Plane+i)/2]=words[j];
+ }
+}
+
 template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int tid,int m0,int n0,float* D){
  using namespace cute;
  constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
@@ -43,9 +64,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
  auto b=make_tensor(make_smem_ptr(s.operand[0]+ASize),lb);
  auto da_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(tiled_divide(a,Shape<_64,_16>{}));
  auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(tiled_divide(b,Shape<_32,_16>{}));
- uint32_t lane=uint32_t(tid)&127u;
- uint32_t mn=((lane&3u)<<7)|((lane&28u)>>2)|((lane&96u)>>1);
- static_assert([]{for(int t=0;t<128;++t)if(GMMA::CLayout_64x32{}(t,0)!=int(((t&3)<<7)|((t&28)>>2)|((t&96)>>1)))return false;return true;}(),"fragment index");
+ int mn=GMMA::CLayout_64x32{}(tid-128,0);
  float* out=D+(n0+mn/64)*1024+m0+mn%64;
  if constexpr(std::is_same_v<T,bfloat16_t>){asm volatile(
   "{ .reg .pred p,noacc,leader,done; .reg .b64 ba,bb,da,db,dst;\n"
@@ -2408,38 +2427,12 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
 
     }
   }else if((tid>=32 && tid<128) || tid>=256){
-    unsigned worker=tid>=256 ? tid-160:tid-32;
+    int worker=tid>=256 ? tid-160:tid-32;
   // All CTAs cooperate in one input transformation per invocation, never across calls.
   // Transform two adjacent elements per thread with aligned 32-bit IO. Experimental seven-product path:
   // retain FP32 transforms and high rounding, omit residual generation.
-  for(unsigned local=2*worker;local<Plane/(16*8);local+=2*512){
-    unsigned i=(blockIdx.y*gridDim.x+blockIdx.x)*(Plane/(16*8))+local;
-    unsigned row=i/512,col=i%512,at=row*1024+col;
-    auto av=reinterpret_cast<const uint32_t*>(A);
-    auto bv=reinterpret_cast<const uint32_t*>(B);
-    uint32_t abits[4]={av[at/2],av[(at+512)/2],av[(at+512*1024)/2],av[(at+512*1024+512)/2]};
-    uint32_t bbits[4]={bv[at/2],bv[(at+512)/2],bv[(at+512*1024)/2],bv[(at+512*1024+512)/2]};
-    uint32_t words[16]={};
-    #pragma unroll
-    for(int lane=0;lane<2;++lane){
-      float a11=float(T::bitcast(uint16_t(abits[0]>>(16*lane)))),a12=float(T::bitcast(uint16_t(abits[1]>>(16*lane))));
-      float a21=float(T::bitcast(uint16_t(abits[2]>>(16*lane)))),a22=float(T::bitcast(uint16_t(abits[3]>>(16*lane))));
-      float b11=float(T::bitcast(uint16_t(bbits[0]>>(16*lane)))),b12=float(T::bitcast(uint16_t(bbits[1]>>(16*lane))));
-      float b21=float(T::bitcast(uint16_t(bbits[2]>>(16*lane)))),b22=float(T::bitcast(uint16_t(bbits[3]>>(16*lane))));
-      float s1=__fadd_rn(a21,a22),s2=__fsub_rn(s1,a11);
-      float t1=__fsub_rn(b12,b11),t2=__fsub_rn(b22,t1);
-      float sv[4]={s1,s2,__fsub_rn(a11,a21),__fsub_rn(a12,s2)};
-      float tv[4]={t1,t2,__fsub_rn(b22,b12),__fsub_rn(t2,b21)};
-      #pragma unroll
-      for(int j=0;j<4;++j){
-        T sh=T(sv[j]),th=T(tv[j]);
-        words[2*j]|=uint32_t(sh.raw())<<(16*lane);
-        words[8+2*j]|=uint32_t(th.raw())<<(16*lane);
-      }
-    }
-    #pragma unroll
-    for(int j=0;j<8;++j)reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=words[2*j];
-  }
+    if(worker<256)transform_pack<T,false>(A,packed,worker);
+    else transform_pack<T,true>(B,packed,worker-256);
     asm volatile("fence.proxy.async.global;" ::: "memory");
     arrive(&s.pack_ready);
   }else if(tid>=128 && tid<256){
