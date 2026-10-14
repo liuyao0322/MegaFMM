@@ -16,11 +16,10 @@ using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared{
   T operand[Stages][ASize+BSize];
-  alignas(128) float reduction[2][64*32];
   uint64_t ready[Stages],free[Stages],pack_ready,global_ready;
   uint32_t last;
 };
-static_assert(sizeof(Shared<cute::half_t>)==114816,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==98432,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 template<class T,class TA,class TB>
@@ -154,26 +153,26 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
    __syncwarp();if((tid&31)==0)arrive(&sh.free[slot]);
   }
   wait(&sh.global_ready,0);
-  // TMA tensor reduce-add; leaf accumulation order across CTAs is nondeterministic.
+  // All K tiles have retired. Reuse operand bytes only after both TC groups finish reading them.
+  asm volatile("bar.sync 3,256;" ::: "memory");
+  float* reduction=reinterpret_cast<float*>(sh.operand)+wg*4096;
   #pragma unroll
-  for(int half=0;half<2;++half){
-   #pragma unroll
-   for(int j=0;j<16;++j){
-    int mn=GMMA::CLayout_64x64{}(lane,half*16+j),row=mn%64,col=mn/64-half*32;
-    sh.reduction[wg][row*32+(col^((row&7)<<2))]=p==3 ? -acc[half*16+j]:acc[half*16+j];
-   }
-   asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
-   asm volatile("bar.sync 3,256;" ::: "memory");
-   if(tid==128 || tid==256){
-    int x=n0+half*32,y=m0+wg*64;
-    if(p==0 || p==1)SM90_TMA_REDUCE_ADD_2D::copy(&dmap,sh.reduction[wg],x,y);
-    if(p==0 || p==2 || p==4 || p==5)SM90_TMA_REDUCE_ADD_2D::copy(&dmap,sh.reduction[wg],x+512,y);
-    if(p==0 || p==3 || p==5 || p==6)SM90_TMA_REDUCE_ADD_2D::copy(&dmap,sh.reduction[wg],x,y+512);
-    if(p==0 || p==4 || p==5 || p==6)SM90_TMA_REDUCE_ADD_2D::copy(&dmap,sh.reduction[wg],x+512,y+512);
-    asm volatile("cp.async.bulk.commit_group; cp.async.bulk.wait_group 0;" ::: "memory");
-   }
-   asm volatile("bar.sync 3,256;" ::: "memory");
+  for(int j=0;j<32;++j){
+   int mn=GMMA::CLayout_64x64{}(lane,j),row=mn%64,col=mn/64;
+   int index=(col/32)*2048+row*32+((col%32)^((row&7)<<2));
+   reduction[index]=p==3 ? -acc[j]:acc[j];
   }
+  asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
+  asm volatile("bar.sync 3,256;" ::: "memory");
+  if(tid==128 || tid==256){
+   int x=n0/32,y=m0+wg*64;
+   if(p==0 || p==1)SM90_TMA_REDUCE_ADD_3D::copy(&dmap,reduction,0,y,x);
+   if(p==0 || p==2 || p==4 || p==5)SM90_TMA_REDUCE_ADD_3D::copy(&dmap,reduction,0,y,x+16);
+   if(p==0 || p==3 || p==5 || p==6)SM90_TMA_REDUCE_ADD_3D::copy(&dmap,reduction,0,y+512,x);
+   if(p==0 || p==4 || p==5 || p==6)SM90_TMA_REDUCE_ADD_3D::copy(&dmap,reduction,0,y+512,x+16);
+   asm volatile("cp.async.bulk.commit_group; cp.async.bulk.wait_group 0;" ::: "memory");
+  }
+  asm volatile("bar.sync 3,256;" ::: "memory");
  }
 }
 void check(cudaError_t e,const char* where){if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));}
@@ -221,8 +220,8 @@ void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,v
   CUtensorMap a{},b{},s{},t{};encode(a,A,state.dtype,true,false);encode(b,B,state.dtype,false,false);
   encode(s,workspace,state.dtype,true,true);encode(t,static_cast<char*>(workspace)+PackedBytes/2,state.dtype,false,true);
   CUtensorMap outmap{};
-  uint64_t dims[2]={1024,1024},strides[1]={4096};uint32_t box[2]={32,64},steps[2]={1,1};
-  auto status=cuTensorMapEncodeTiled(&outmap,CU_TENSOR_MAP_DATA_TYPE_FLOAT32,2,D,dims,strides,box,steps,CU_TENSOR_MAP_INTERLEAVE_NONE,CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+  uint64_t dims[3]={32,1024,32},strides[2]={4096,128};uint32_t box[3]={32,64,2},steps[3]={1,1,1};
+  auto status=cuTensorMapEncodeTiled(&outmap,CU_TENSOR_MAP_DATA_TYPE_FLOAT32,3,D,dims,strides,box,steps,CU_TENSOR_MAP_INTERLEAVE_NONE,CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
   if(status!=CUDA_SUCCESS)throw std::runtime_error("SW output map status "+std::to_string(int(status)));
   void* args[]={&a,&b,&s,&t,&outmap,&A,&B,&workspace,&D};dim3 grid(8,4,7);
   if(state.dtype==DType::BF16)

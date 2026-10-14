@@ -291,6 +291,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 192 | Aligned TMA tensor reduction | 0.7058 | 0.015783 | experiment |
 
+| 193 | Reuse retired operands for full TMA reduction tiles | 0.7107 | 0.015616 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2680,3 +2682,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about15.68us FP16 about15.89us, much faster scalar190 but slower162. eF remains near.0060152/.000754626 with unchanged gates FAIL, nonfinite0. Sum order nondeterministic; no bitwise97 equivalence claimed. Valid performance experiment, not accepted winner.
 - **Next:** Profile192 reduction waits and consider reusing retired operand memory for one full128x64 reduction tile to remove half-tile barrier round.
 - **Archive:** trajectory/20261015_035129_iter-192/
+
+### Iter 193 — Reuse retired operands for full TMA reduction tiles
+
+- **Hypothesis:** Aliasing completed operand storage with full64x64FP32 output tiles removes half-tile TMA reduction round and shared allocation.
+- **Changes:** Base192; TCgroups rendezvous after allWGMMA operands retire; reuse first32KiBoperand as two64x64tile buffers, rank3 output tensor map boxes32x64x2, oneTMAreduce per quadrant perWG; shared98432.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.015616 ms; mean speedup=0.7107x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.012277 | 0.015971 | 0.7687 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.009960 | 0.015262 | 0.6526 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about15.97us FP16 about15.26us, mixed against192 and slower162. Expected approximation errors/nonfinite0 retained, FP32 sum order remains nondeterministic. Reclaimed16384sharedbytes but no occupancy class change.
+- **Next:** Return162 and inspect prior vector consumer mappings before pursuing a distinct vector output epilogue.
+- **Archive:** trajectory/20261015_035258_iter-193/
