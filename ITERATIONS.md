@@ -485,6 +485,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 289 | Reorder final independent leaf products | 1.0728 | 0.010318 | experiment |
 
+| 290 | Restore independently validated K128 iter282 | 1.0687 | 0.010293 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4422,3 +4424,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.32384us FP16 10.31296us do not improve282. Expected errors unchanged, both original FP64 gates FAIL. Reject order; no independent certification.
 - **Next:** Restore validated282 and refresh ordinary and Graph checkpoints before further directions
 - **Archive:** trajectory/20261015_065127_iter-289/
+
+### Iter 290 — Restore independently validated K128 iter282
+
+- **Hypothesis:** Keep the best ordinary-call paired candidate after rejected follow-up experiments
+- **Changes:** Restore solution verbatim from1bdfb29; no reconstruction or extra modifications
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010293 ms; mean speedup=1.0687x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012179 | 0.010308 | 1.1815 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009824 | 0.010278 | 0.9558 | 0.000754626 | 0 |
+
+- **Analysis:** Fresh FP16 10.27808us vs Dense9.824us remains slower.282 already passed72bitwise baseline162 checks,three quick sanitizers and256two-stream calls; paired279/282 supports small ordinary improvement. Original FP64 gates FAIL; Auto Dense; sustained goal remains active.
+- **Next:** Refresh Graph unchanged, archive evidence and continue new directions
+- **Archive:** trajectory/20261015_065245_iter-290/
