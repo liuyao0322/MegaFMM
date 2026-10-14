@@ -19,10 +19,10 @@ template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
   // Row-major P with an XOR permutation inside each 32-float row.
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
-  float product[3][Elements];
-  uint64_t ready[Stages],free[Stages],product_ready[3],product_free[3];
+  float product[2][Elements];
+  uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
 };
-static_assert(sizeof(Shared<cute::half_t>)==221312,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -38,27 +38,22 @@ __device__ constexpr int product_for_step(int step){
 }
 
 template<class T,class TA,class TB>
-__device__ void mma_term(TA a,TB b,float (&d)[16]) {
+__device__ void mma_term(TA a,TB b,int slot,float (&d)[16]) {
   using namespace cute;
   using Op=std::conditional_t<std::is_same_v<T,bfloat16_t>,
       SM90_64x32x16_F32BF16BF16_SS<GMMA::Major::K,GMMA::Major::MN>,
       SM90_64x32x16_F32F16F16_SS<GMMA::Major::K,GMMA::Major::MN>>;
-  // Build the canonical descriptor once; CuTe preserves the swizzled K offsets
-  // in descriptor units instead of rebuilding address bitfields for each MMA.
-  auto da_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(
-      tiled_divide(a,Shape<_64,_16>{}));
-  auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(
-      tiled_divide(b,Shape<_32,_16>{}));
-  auto da_base=da_tiles(0,0,0);
-  auto db_base=db_tiles(0,0,0);
+  auto da_base=a(0,0,0),db_base=b(0,0,0);
+  da_base.reg32_[0]+=uint32_t(slot*((ASize+BSize)*sizeof(T)/16));
+  db_base.reg32_[0]+=uint32_t(slot*((ASize+BSize)*sizeof(T)/16));
   #pragma unroll
   for(int kk=0;kk<BK/16;++kk){
     // All operands fit below 256 KiB of shared memory. K offsets cannot carry
     // out of the 14-bit start-address field (16-byte units), so keep the high
     // descriptor word invariant rather than generating a 64-bit add/carry.
     auto da=da_base,db=db_base;
-    da.reg32_[0]+=uint32_t(da_tiles.layout()(0,0,kk));
-    db.reg32_[0]+=uint32_t(db_tiles.layout()(0,0,kk));
+    da.reg32_[0]+=uint32_t(a.layout()(0,0,kk));
+    db.reg32_[0]+=uint32_t(b.layout()(0,0,kk));
     Op::fma(da,db,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15]);
   }
 }
@@ -75,7 +70,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<3;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],224);}
+    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],352);}
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
@@ -139,24 +134,24 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       }
 
     }
-  }else if((tid>=32 && tid<128) || tid>=384){
-    int worker=tid>=384 ? tid-288:tid-32;
-    constexpr int Chunks=(Elements+223)/224;
+  }else if((tid>=32 && tid<128) || tid>=256){
+    int worker=tid>=256 ? tid-160:tid-32;
+    constexpr int Chunks=(Elements+351)/352;
     float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
     for(int step=0;step<7;++step){
-      wait(&s.product_ready[step%3],(step/3)%2);
+      wait(&s.product_ready[step%2],(step/2)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*224;
-        if(i<Elements)current[j]=s.product[step%3][product_index(i/BN,i%BN)];
+        int i=worker+j*352;
+        if(i<Elements)current[j]=s.product[step%2][product_index(i/BN,i%BN)];
       }
       // Release shared P immediately after reading; arithmetic/global stores can
       // overlap the Tensor warpgroup's reuse of this slot two steps later.
-      arrive(&s.product_free[step%3]);
+      arrive(&s.product_free[step%2]);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int i=worker+j*224;
+        int i=worker+j*352;
         if(i<Elements){
           int at=(m0+i/BN)*1024+n0+i%BN;
           if(step==0)first[j]=current[j]; // P1
@@ -171,8 +166,12 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         }
       }
     }
-  }else if(tid>=128 && tid<384){
-    for(int step=(tid-128)/128;step<7;step+=2){
+  }else if(tid>=128 && tid<256){
+    auto ah0=make_tensor(make_smem_ptr(s.operand[0]),la);
+    auto bh0=make_tensor(make_smem_ptr(s.operand[0]+ASize),lb);
+    auto da0=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(tiled_divide(ah0,Shape<_64,_16>{}));
+    auto db0=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(tiled_divide(bh0,Shape<_32,_16>{}));
+    for(int step=0;step<7;++step){
       int p=product_for_step(step);
       float acc[16]={};
       // Four compact operand slots keep prefetch ahead; retire each K tile promptly.
@@ -180,22 +179,20 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       for(int q=0;q<512/BK;++q){
         int sequence=step*(512/BK)+q,slot=sequence%Stages;
         wait(&s.ready[slot],(sequence/Stages)%2);
-        T* op=s.operand[slot];
-        auto ah=make_tensor(make_smem_ptr(op),la);
-        auto bh=make_tensor(make_smem_ptr(op+ASize),lb);
+
         warpgroup_arrive();
-        mma_term<T>(ah,bh,acc);
+        mma_term<T>(da0,db0,slot,acc);
         warpgroup_commit_batch();warpgroup_wait<0>();
         __syncwarp();
         if((tid&31)==0)arrive(&s.free[slot]);
       }
-      if(step>=3)wait(&s.product_free[step%3],((step-3)/3)%2);
+      if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
       #pragma unroll
       for(int j=0;j<16;++j){
-        int mn=GMMA::CLayout_64x32{}((tid-128)%128,j);
-        s.product[step%3][product_index(mn%64,mn/64)]=acc[j];
+        int mn=GMMA::CLayout_64x32{}(tid-128,j);
+        s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
       }
-      arrive(&s.product_ready[step%3]);
+      arrive(&s.product_ready[step%2]);
     }
   }
   __syncthreads();

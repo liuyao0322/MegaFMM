@@ -127,6 +127,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 110 | Measure dual-warpgroup seven-product pipeline | 0.8059 | 0.013946 | experiment |
 
+| 111 | Hoist canonical operand descriptors outside product loop | 0.8557 | 0.013164 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1216,3 +1218,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full SW benchmark and unchanged FP64 gates recorded. Compare candidate timing and numerical errors with100 after commit.
 - **Next:** Evaluate dual-warpgroup latency and tune operand supply if justified
 - **Archive:** trajectory/20261015_014728_iter-110/
+
+### Iter 111 — Hoist canonical operand descriptors outside product loop
+
+- **Hypothesis:** Invariant descriptor construction plus low-word slot offsets reduce issue overhead
+- **Changes:** Build slot-zero CuTe GMMA descriptors once per tensor warpgroup and add aligned slot offsets before K issue; restore single-warpgroup iter100 architecture
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013164 ms; mean speedup=0.8557x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012516 | 0.013083 | 0.9567 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009997 | 0.013245 | 0.7548 | 0.000754626 | 0 |
+
+- **Analysis:** Complete SW benchmark archived with unchanged original FP64 gates; inspect measurements after commit.
+- **Next:** Compare latency and generated instructions, then explore CTA concurrency
+- **Archive:** trajectory/20261015_014859_iter-111/
