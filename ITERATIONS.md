@@ -379,6 +379,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 236 | 384-worker last-CTA vector merge | 0.7005 | 0.015848 | experiment |
 
+| 237 | Direct atomic merge of two K partial outputs | 0.8257 | 0.013484 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -3470,3 +3472,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF15.8742 FP15.8208us; improves23521us but still slower22411us. Original gatesFAIL and expected approximate errors unchanged.235 sparse trace30bitexact checks: TCchain7.78us,fence.90,counter.64,merge7.82; traced/untraced126regs0stack; diagnostic timings are not standard full-call wins.
 - **Next:** Remove partial readback with direct FP32 atomic accumulation of two K partial outputs, per-call Dzero before publication; preserve explicit failure reporting
 - **Archive:** trajectory/20261015_051844_iter-236/
+
+### Iter 237 — Direct atomic merge of two K partial outputs
+
+- **Hypothesis:** Eliminate8MiB partial-C storage and slow readback epilogue by direct FP32 reduction into D
+- **Changes:** From234 initialize D on every invocation using pack workers, global publication before first TMA, local output-ready barrier orders zeroing before TC reductions; replace partial stores with red.global.add.f32;4MiBworkspace
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013484 ms; mean speedup=0.8257x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012325 | 0.013420 | 0.9184 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009930 | 0.013549 | 0.7329 | 0.000754625 | 0 |
+
+- **Analysis:** BF about13.42 FP13.5488us, improves split-K merge variants but slower224. Approximate eF retained and original gatesFAIL. FP32 global atomic addition flushes subnormal inputs/results per NVIDIA PTX documentation, an extra semantic limitation; not retained as equivalent baseline.
+- **Next:** Explore ordered two-CTA direct output handoff to preserve raw-transform overlap and avoid Dzero/atomic FTZ, otherwise return validated218/224 architecture
+- **Archive:** trajectory/20261015_051956_iter-237/
