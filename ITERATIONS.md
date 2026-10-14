@@ -277,6 +277,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 185 | TMA L2 promotion256B | 0.9161 | 0.012146 | experiment |
 
+| 186 | One leaf product per CTA with fused last-CTA recombination | 0.3470 | 0.032147 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2556,3 +2558,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about11.94us FP16 about12.35us, slower162; expected original precision failures retained/nonfinite0. Larger L2 promotion is counterproductive for current narrow tiles.
 - **Next:** Restore162 and reassess coarse parallelization: one product per CTA with fused last-CTA recombination, while preserving original precision acceptance.
 - **Archive:** trajectory/20261015_034008_iter-185/
+
+### Iter 186 — One leaf product per CTA with fused last-CTA recombination
+
+- **Hypothesis:** 224cooperative CTAs, each computing one128x64 leaf tile using two TC groups, increase parallelism and remove seven-product serialization.
+- **Changes:** New512thread kernel, twoK128operand slots98432sharedbytes,224pack workers perCTA, two64x64WGMMAgroups,7MiB global FP32 leaf results,32per-tile counters initialized before private invocation publication; last acqrel counter CTA recombines all outputs,12MiBworkspace. Original transform and FP32 recombination order retained.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.032147 ms; mean speedup=0.3470x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.012326 | 0.032000 | 0.3852 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_leaf_parallel_128x64x128 v0 | launch | 0.009975 | 0.032293 | 0.3089 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about32.0us FP16 about32.29us, much slower162 though original approximation errors retained/nonfinite0. Cannot infer source of regression without spill and instruction profiling. No numerical pass claimed.
+- **Next:** Profile register spills and instructions; compare forced min2 launch bound to a resource-compatible reduction in threads.
+- **Archive:** trajectory/20261015_034233_iter-186/
