@@ -43,12 +43,21 @@ the user's requests in this conversation:
   candidates in solution/ merely to preserve history.
 - When optimization resumes, follow AKO4ALL's bench -> iteration log -> Git commit
   protocol. The current reset is cleanup, not a new performance iteration.
-- Prior session ncu probe failed; do not repeat profiling probes automatically just
-  because of this cleanup. The user has not requested a new optimization loop.
+- Prior session ncu probe failed. Use analytical evidence and runtime statistics
+  without repeating the known failed probe unless new evidence warrants it.
 
 ## First implementation scope — latest user request
 
 - Implement the proposed unified shared-buffer, TMA/CUDA-Core/WGMMA warp-specialized first version.
 - Only test and benchmark M=N=K=1024 in this task, for BF16 and FP16.
 - Compare complete invocations against tuned cuBLASLt Dense, with original FP64 reference and unchanged numerical gates.
-- Deliver the first implementation and comparison; do not start an open-ended optimization loop.
+- The first implementation and comparison are complete. The latest user goal
+  supersedes the previous stopping instruction: use AKO4ALL to continuously optimize
+  the current kernel, while preserving 1024-only scope and numerical acceptance.
+
+## Active optimization goal — latest user request
+
+- User explicitly requested sustained AKO4ALL optimization. Continue beyond the first version.
+- Rank actual SW complete-call latency, retain failures, and preserve all fresh-input gates.
+- On every iteration: benchmark with iter-N label, immediately log, immediately commit.
+- Keep Auto on Dense until numerical and end-to-end performance acceptance.
