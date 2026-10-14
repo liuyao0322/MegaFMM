@@ -483,6 +483,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 288 | Explicit normal TMA cache hint | 1.0743 | 0.010292 | experiment |
 
+| 289 | Reorder final independent leaf products | 1.0728 | 0.010318 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4404,3 +4406,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.31456us FP16 10.27008us show no improvement over282; original FP64 gates unchanged FAIL. Reject as speed optimization.
 - **Next:** Reassess profiles/history and test leader-only primary PDL trigger on current K128 pipeline
 - **Archive:** trajectory/20261015_065006_iter-288/
+
+### Iter 289 — Reorder final independent leaf products
+
+- **Hypothesis:** Moving raw-A22/T4 ahead of S1/T1 and S4/B22 may reduce exposed operand delay
+- **Changes:** On282 change leaf order to P1,P2,P6,P7,P4,P5,P3 and regenerate epilogue preserving each output FP32 association and each leaf K order
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010318 ms; mean speedup=1.0728x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012304 | 0.010324 | 1.1918 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009836 | 0.010313 | 0.9538 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.32384us FP16 10.31296us do not improve282. Expected errors unchanged, both original FP64 gates FAIL. Reject order; no independent certification.
+- **Next:** Restore validated282 and refresh ordinary and Graph checkpoints before further directions
+- **Archive:** trajectory/20261015_065127_iter-289/
