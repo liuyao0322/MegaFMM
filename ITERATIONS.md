@@ -103,6 +103,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 98 | Compact two-stage operand shared storage | 0.7745 | 0.014399 | experiment |
 
+| 99 | Three compact operand stages with immediate retirement | 0.8297 | 0.013506 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -972,3 +974,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Expected original numerical failure remains; correctness of scheduling will be checked bitwise against97. Full-call retention requires paired measurement.
 - **Next:** Measure paired performance then test deeper prefetch in reclaimed space
 - **Archive:** trajectory/20261015_012249_iter-98/
+
+### Iter 99 — Three compact operand stages with immediate retirement
+
+- **Hypothesis:** A third slot lets TMA prefetch farther while TC still releases each K tile immediately after wait0
+- **Changes:** Stages3 with modulo phase indexing,163968shared; retain existing BK256,math and wait0 release rhythm
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013506 ms; mean speedup=0.8297x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012299 | 0.013423 | 0.9162 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010098 | 0.013589 | 0.7431 | 0.000754626 | 0 |
+
+- **Analysis:** Original FP64gate expected FAIL in this no-compensation experiment; compare exact output and full-call timing against97/98.
+- **Next:** Test fourth stage and compare contemporaneous complete invocations
+- **Archive:** trajectory/20261015_012441_iter-99/

@@ -10,7 +10,7 @@
 
 namespace megafmm::detail {
 namespace {
-constexpr int BM=64,BN=32,BK=256,Stages=2,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+constexpr int BM=64,BN=32,BK=256,Stages=3,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
 constexpr int Plane=512*512,Threads=512;
 constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
 using Barrier=cutlass::arch::ClusterBarrier;
@@ -22,7 +22,7 @@ template<class T> struct alignas(128) Shared {
   float product[2][Elements];
   uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
 };
-static_assert(sizeof(Shared<cute::half_t>)==114816,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==163968,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -175,7 +175,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     for(int step=0;step<7;++step){
       int p=product_for_step(step);
       float acc[16]={};
-      // Two fixed slots: expose their shared addresses to descriptor lowering.
+      // Three operand slots prefetch beyond the currently consumed K tile.
       #pragma unroll
       for(int q=0;q<512/BK;++q){
         int sequence=step*(512/BK)+q,slot=sequence%Stages;
