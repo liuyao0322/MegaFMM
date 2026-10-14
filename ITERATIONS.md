@@ -177,6 +177,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 135 | Two recombination consumer warps | 0.7529 | 0.014806 | experiment |
 
+| 136 | Partially unroll TC product loop by two | 0.8900 | 0.012540 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1660,3 +1662,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** 134 warp-leader product barriers did not improve first-run latency. Full135 benchmark archived for consumer bottleneck and resource assessment.
 - **Next:** Compare two versus four consumers and test partial TC product unrolling
 - **Archive:** trajectory/20261015_022616_iter-135/
+
+### Iter 136 — Partially unroll TC product loop by two
+
+- **Hypothesis:** Specialize repeating four-slot parity without fully unrolling seven products
+- **Changes:** Add pragma unroll2 to TC outer product loop on131; all arithmetic, warp allocation and shared synchronization unchanged
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.012540 ms; mean speedup=0.8900x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012315 | 0.012486 | 0.9863 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009995 | 0.012594 | 0.7937 | 0.000754626 | 0 |
+
+- **Analysis:** 131 NCU2.700M instructions,110regs,Tensor~15%; two-consumer135 regressed14.8us. Full136 benchmark archived for partial-unroll/code-size assessment.
+- **Next:** Compare with131 and collect same-invocation phase timing to guide remaining work
+- **Archive:** trajectory/20261015_022816_iter-136/
