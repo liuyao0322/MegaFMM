@@ -125,6 +125,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 109 | Two Tensor Core warpgroups per CTA | 1.0033 | 0.011174 | experiment |
 
+| 110 | Measure dual-warpgroup seven-product pipeline | 0.8059 | 0.013946 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -1198,3 +1200,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Full benchmark recorded; original FP64 gates remain unchanged. Inspect complete-call measurements and independent numerical behavior after commit.
 - **Next:** Compare with iter100 and validate pipeline synchronization before retention
 - **Archive:** trajectory/20261015_014634_iter-109/
+
+### Iter 110 — Measure dual-warpgroup seven-product pipeline
+
+- **Hypothesis:** Two independent tensor warpgroups overlap leaf execution
+- **Changes:** Accurate dual-warpgroup configuration metadata; explicitly select SW benchmark path; iter109 accidentally measured Dense and is invalid as kernel performance evidence
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.013946 ms; mean speedup=0.8059x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012408 | 0.013854 | 0.8956 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010054 | 0.014038 | 0.7162 | 0.000754626 | 0 |
+
+- **Analysis:** Full SW benchmark and unchanged FP64 gates recorded. Compare candidate timing and numerical errors with100 after commit.
+- **Next:** Evaluate dual-warpgroup latency and tune operand supply if justified
+- **Archive:** trajectory/20261015_014728_iter-110/
