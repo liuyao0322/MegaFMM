@@ -19,12 +19,12 @@ template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
   // Row-major P with an XOR permutation inside each 32-float row.
   // Both WGMMA fragment stores and row-major consumer loads use every bank once.
-  float product[3][Elements];
-  uint64_t ready[Stages],free[Stages],product_ready[3],product_free[3];
+  float product[2][Elements];
+  uint64_t ready[Stages],free[Stages],product_ready[2],product_free[2];
   uint64_t pack_ready;
 };
-static_assert(sizeof(Shared<cute::half_t>)==221312,"shared budget");
-__device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
+static_assert(sizeof(Shared<cute::half_t>)==213120,"shared budget");
+__device__ void wait(const uint64_t* b,int phase){if(!Barrier::test_wait(b,phase,1))Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
 __device__ __forceinline__ int product_index(int row,int col){
@@ -76,7 +76,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<3;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
+    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
     Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
@@ -162,13 +162,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
     float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
     for(int step=0;step<7;++step){
-      wait(&s.product_ready[step%3],(step/3)%2);
+      wait(&s.product_ready[step%2],(step/2)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
         int idx=((j&1) ? base_odd:base_even)+j*128;
-        current[j]=s.product[step%3][idx];
+        current[j]=s.product[step%2][idx];
       }
-      arrive(&s.product_free[step%3]);
+      arrive(&s.product_free[step%2]);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
         if(step==0)first[j]=current[j];
@@ -201,13 +201,13 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
         __syncwarp();
         if((tid&31)==0)arrive(&s.free[slot]);
       }
-      if(step>=3)wait(&s.product_free[step%3],((step-3)/3)%2);
+      if(step>=2)wait(&s.product_free[step%2],((step-2)/2)%2);
       #pragma unroll
       for(int j=0;j<16;++j){
         int mn=GMMA::CLayout_64x32{}(tid-128,j);
-        s.product[step%3][product_index(mn%64,mn/64)]=acc[j];
+        s.product[step%2][product_index(mn%64,mn/64)]=acc[j];
       }
-      arrive(&s.product_ready[step%3]);
+      arrive(&s.product_ready[step%2]);
     }
   }
   // CTA shared storage survives until all role threads return.

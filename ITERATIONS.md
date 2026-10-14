@@ -241,6 +241,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 167 | Three product slots | 0.9635 | 0.011551 | experiment |
 
+| 168 | Barrier test-wait fast path | 0.9697 | 0.011486 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2236,3 +2238,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about11.45us FP16 about11.63us, slightly slower than162. Expected errors and nonfinite0 retained. Extra buffer provides no useful gain on complete calls; config string stale claims2 slots so source sizes are authoritative.
 - **Next:** Restore162 and inspect host tensor-map construction and barrier wait implementation.
 - **Archive:** trajectory/20261015_032335_iter-167/
+
+### Iter 168 — Barrier test-wait fast path
+
+- **Hypothesis:** Nonblocking test before suspending wait avoids overhead for already-ready barriers.
+- **Changes:** Restore162; wait helper tests phase first then uses CUTLASS wait only if incomplete, preserving acquire and compiler memory fence.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011486 ms; mean speedup=0.9697x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012262 | 0.011439 | 1.0720 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.010005 | 0.011534 | 0.8674 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 about11.44us and FP16 about11.53us, flat versus162 with no substantial reduction. Expected original numerical failures preserved. NVIDIA PTX documents try_wait suspension and test_wait nonblocking; reference https://docs.nvidia.com/cuda/archive/12.0.0/parallel-thread-execution/index.html.
+- **Next:** Restore162; aggregate pack publication to19 warp leaders with full-warp ordering.
+- **Archive:** trajectory/20261015_032426_iter-168/
