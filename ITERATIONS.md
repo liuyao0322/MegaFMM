@@ -489,6 +489,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 291 | Validated iter282 Graph refresh | 1.0361 | 0.009996 | experiment |
 
+| 292 | Leader-only primary PDL trigger on K128 | 1.0766 | 0.010333 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4458,3 +4460,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Graph BF16 9.99264us vs Dense11.28384us; FP16 9.99872us vs Dense9.42848us still slower. Original FP64 gates FAIL unchanged. Independent implementation checks and paired ordinary performance support selected282; sustained goal remains active.
 - **Next:** Archive checkpoint291 and continue current K128 primary scheduling or improved cross-CTA reuse protocols
 - **Archive:** trajectory/20261015_065327_iter-291/
+
+### Iter 292 — Leader-only primary PDL trigger on K128
+
+- **Hypothesis:** One trigger per primary CTA might start secondary scheduling earlier on the smaller K128 pipeline
+- **Changes:** On282 only thread0 calls cudaTriggerProgrammaticLaunchCompletion; primary publication fence and secondary dependency wait unchanged
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010333 ms; mean speedup=1.0766x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012340 | 0.010334 | 1.1941 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009908 | 0.010332 | 0.9590 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.3344us FP16 10.33152us regress versus282 paired10.2728/10.2384. Original FP64 gates FAIL unchanged. Fresh full282NCU still60regs0local and wait stall ratio1.56 exceeds longscoreboard1.09; investigate MMA completion batching.
+- **Next:** Test full-leaf completion group across four independently ready K128 tiles
+- **Archive:** trajectory/20261015_065517_iter-292/

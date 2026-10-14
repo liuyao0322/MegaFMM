@@ -2688,7 +2688,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
 }
 template<class T> __global__ __launch_bounds__(512,1)
 void sw_transform_pdl(const T* A,const T* B,T* packed){
-  cudaTriggerProgrammaticLaunchCompletion();
+  if(threadIdx.x==0)cudaTriggerProgrammaticLaunchCompletion();
   for(int i=2*(blockIdx.x*512+threadIdx.x);i<Plane;i+=2*512*128){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
