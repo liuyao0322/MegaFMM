@@ -76,7 +76,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
-    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],256);}
+    for(int j=0;j<2;++j){Barrier::init(&s.product_ready[j],128);Barrier::init(&s.product_free[j],128);}
     Barrier::init(&s.pack_ready,608);
     cutlass::arch::fence_barrier_init();
   }
@@ -154,10 +154,10 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }
     asm volatile("fence.proxy.async.global;" ::: "memory");
     arrive(&s.pack_ready);
-    if(worker<256){
-    constexpr int Chunks=8;
-    unsigned row=unsigned(worker)/BN,col=unsigned(worker)%BN;
-    int base=product_index(row,col);
+    if(worker>=480){
+    constexpr int Chunks=16;
+    unsigned row=unsigned(worker-480)/BN,col=unsigned(worker-480)%BN;
+    int base_even=product_index(row,col),base_odd=product_index(row+4,col)-128;
     float* out=D+(m0+row)*1024+n0+col;
     float first[Chunks],second[Chunks],current[Chunks];
     #pragma unroll
@@ -165,21 +165,21 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       wait(&s.product_ready[step%2],(step/2)%2);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
-        int idx=base+j*256;
+        int idx=((j&1) ? base_odd:base_even)+j*128;
         current[j]=s.product[step%2][idx];
       }
       arrive(&s.product_free[step%2]);
       #pragma unroll
       for(int j=0;j<Chunks;++j){
         if(step==0)first[j]=current[j];
-        else if(step==1)out[j*8192]=__fadd_rn(first[j],current[j]);
+        else if(step==1)out[j*4096]=__fadd_rn(first[j],current[j]);
         else if(step==2)first[j]=__fadd_rn(first[j],current[j]);
         else if(step==3)second[j]=__fadd_rn(first[j],current[j]);
         else if(step==4){
-          out[j*8192+512*1024+512]=__fadd_rn(second[j],current[j]);
+          out[j*4096+512*1024+512]=__fadd_rn(second[j],current[j]);
           first[j]=__fadd_rn(first[j],current[j]);
-        }else if(step==5)out[j*8192+512]=__fadd_rn(first[j],current[j]);
-        else out[j*8192+512*1024]=__fsub_rn(second[j],current[j]);
+        }else if(step==5)out[j*4096+512]=__fadd_rn(first[j],current[j]);
+        else out[j*4096+512*1024]=__fsub_rn(second[j],current[j]);
       }
     }
     }

@@ -233,6 +233,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 163 | Eight consumer warps with constant eight-row chunk offsets | 0.9714 | 0.011482 | experiment |
 
+| 164 | Choose P consumers from shorter transform workers | 0.9745 | 0.011466 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2164,3 +2166,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** Baseline numerical errors preserved and original gates FAIL. Launch11.383/11.582us does not improve selected16211.337/11.542us. More consumer warps alone do not recover remaining FP16 gap.
 - **Next:** Assign128consumers to pack workers with shorter one-trip input transformation
 - **Archive:** trajectory/20261015_031605_iter-163/
+
+### Iter 164 — Choose P consumers from shorter transform workers
+
+- **Hypothesis:** Workers with one transform loop trip can begin raw-product consumption sooner
+- **Changes:** From162 select worker480..607 as128 P consumers; their pack loop executes once instead of twice; preserve ownership, arithmetic and barriers
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011466 ms; mean speedup=0.9745x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012337 | 0.011366 | 1.0854 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009989 | 0.011567 | 0.8636 | 0.000754626 | 0 |
+
+- **Analysis:** Baseline errors preserved and gates FAIL. Launch11.366/11.567us remains flat versus162; early consumer arrival is not a measured improvement.
+- **Next:** Refresh cumulative phase diagnostics on162 and test statically specialized sequential product pairs
+- **Archive:** trajectory/20261015_031646_iter-164/
