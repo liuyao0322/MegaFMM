@@ -2689,7 +2689,7 @@ template<class T> __device__ __forceinline__ void tensor_chain(Shared<T>& s,int 
 template<class T> __global__ __launch_bounds__(512,1)
 void sw_transform_pdl(const T* A,const T* B,T* packed){
   cudaTriggerProgrammaticLaunchCompletion();
-  for(int i=2*(blockIdx.x*512+threadIdx.x);i<Plane;i+=2*512*128){
+  for(int i=2*(blockIdx.x*512+threadIdx.x);i<Plane;i+=2*512*256){
     int row=i/512,col=i%512,at=row*1024+col;
     auto av=reinterpret_cast<const uint32_t*>(A);
     auto bv=reinterpret_cast<const uint32_t*>(B);
@@ -2735,8 +2735,6 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;
   if(tid==32){
     asm volatile("prefetch.tensormap [%0]; prefetch.tensormap [%1]; prefetch.tensormap [%2]; prefetch.tensormap [%3];" :: "l"(&amap),"l"(&bmap),"l"(&smap),"l"(&tmap) : "memory");
-    SM90_TMA_LOAD_2D::PREFETCH::copy(&bmap,m0,0);
-    SM90_TMA_LOAD_3D::PREFETCH::copy(&amap,0,n0,0);
   }
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
@@ -2837,11 +2835,11 @@ void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,v
   config.dynamicSmemBytes=sizeof(Shared<cute::half_t>);config.stream=stream;
   config.attrs=&attribute;config.numAttrs=1;
   if(state.dtype==DType::BF16){
-    sw_transform_pdl<cute::bfloat16_t><<<128,512,0,stream>>>(static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace));
+    sw_transform_pdl<cute::bfloat16_t><<<256,512,0,stream>>>(static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace));
     check(cudaPeekAtLastError(),"SW PDL transform launch");
     check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::bfloat16_t>,a,b,s,t,static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),static_cast<cute::bfloat16_t*>(workspace),D),"SW PDL compute launch");
   }else{
-    sw_transform_pdl<cute::half_t><<<128,512,0,stream>>>(static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace));
+    sw_transform_pdl<cute::half_t><<<256,512,0,stream>>>(static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace));
     check(cudaPeekAtLastError(),"SW PDL transform launch");
     check(cudaLaunchKernelEx(&config,sw_cooperative_hilo<cute::half_t>,a,b,s,t,static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),static_cast<cute::half_t*>(workspace),D),"SW PDL compute launch");
   }

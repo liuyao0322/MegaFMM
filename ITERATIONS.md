@@ -507,6 +507,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 300 | Reject first-K128-only raw prefetch | 1.0598 | 0.010406 | experiment |
 
+| 301 | Reject doubled transform worker population | 1.0706 | 0.010312 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4618,3 +4620,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.44672 us and FP16 10.36448 us versus Dense12.27616/9.78848 us; no improvement over282. All original errors unchanged and both gates fail. Raw Dense BF16 group2 35.0896us outlier retained. Cluster299 NCU shows124regs versus60 but zero local sectors; lower dynamic instructions did not reduce time, so no cluster speed claim.
 - **Next:** Review history and current profiles; investigate primary geometry and reduced-stage supply separately
 - **Archive:** trajectory/20261015_070850_iter-300/
+
+### Iter 301 — Reject doubled transform worker population
+
+- **Hypothesis:** One paired transform per worker and two resident primary blocks per SM can reduce front cost
+- **Changes:** Selected282 primary256x512 instead128x512, adjust full-coverage stride, unchanged compute kernel
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010312 ms; mean speedup=1.0706x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012258 | 0.010321 | 1.1877 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009824 | 0.010304 | 0.9534 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.32128 us FP16 10.30368 us versus Dense12.25824/9.82400 us. No win over selected282. Expected finite approximate errors and both original gates fail. New primary geometry does not close FP16 gap.
+- **Next:** Test warp-leader readiness polling with explicit warp rendezvous
+- **Archive:** trajectory/20261015_070951_iter-301/
