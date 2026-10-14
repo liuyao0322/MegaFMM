@@ -293,6 +293,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 193 | Reuse retired operands for full TMA reduction tiles | 0.7107 | 0.015616 | experiment |
 
+| 194 | Vectorize P exchange and fixed-offset recombination | 0.9725 | 0.011436 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -2698,3 +2700,19 @@ No >=3percent all-mode gain over87 is established. Four-element64bit IO regresse
 - **Analysis:** BF16 about15.97us FP16 about15.26us, mixed against192 and slower162. Expected approximation errors/nonfinite0 retained, FP32 sum order remains nondeterministic. Reclaimed16384sharedbytes but no occupancy class change.
 - **Next:** Return162 and inspect prior vector consumer mappings before pursuing a distinct vector output epilogue.
 - **Archive:** trajectory/20261015_035258_iter-193/
+
+### Iter 194 — Vectorize P exchange and fixed-offset recombination
+
+- **Hypothesis:** Paired shared exchange and fixed output offsets reduce epilogue address and memory instructions on the selected asynchronous architecture
+- **Changes:** Restored iter162; pair-preserving row XOR layout; float2 TC stores, consumer loads, arithmetic and fixed chunk output stores
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.011436 ms; mean speedup=0.9725x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012264 | 0.011328 | 1.0826 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009955 | 0.011544 | 0.8624 | 0.000754626 | 0 |
+
+- **Analysis:** Valid finite approximate output with unchanged original precision failures. BF16 solution 11.328 us versus Dense 12.264 us; FP16 11.544 us versus Dense 9.955 us. No material improvement over iter162 and FP16 remains slower.
+- **Next:** Restore selected iter162 and investigate a different source of producer or tensor execution latency
+- **Archive:** trajectory/20261015_035421_iter-194/
