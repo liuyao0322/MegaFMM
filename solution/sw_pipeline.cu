@@ -64,7 +64,8 @@ template<class T>__device__ __forceinline__ void tensor_chain(Shared<T>& s,int t
  using namespace cute;
  constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
  constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_32,Int<BK>>{});
- auto a=make_tensor(make_smem_ptr(s.b[0]),la),b=make_tensor(make_smem_ptr(s.a[0]),lb);
+ auto a=make_tensor(make_smem_ptr(s.b[0]),la);
+ auto b=make_tensor(make_smem_ptr(s.a[0]),lb);
  auto da_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(tiled_divide(a,Shape<_64,_16>{}));
  auto db_tiles=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(tiled_divide(b,Shape<_32,_16>{}));
  int mn=GMMA::CLayout_64x32{}(tid,0);

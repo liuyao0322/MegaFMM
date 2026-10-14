@@ -519,6 +519,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 306 | CTA-local shared transform first build | 0.0000 | 0.000000 | experiment |
 
+| 307 | Local transform PTX register naming build failure | 0.0000 | 0.000000 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4724,3 +4726,17 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Compile failure: one auto declaration combines different CuTe A and B tensor types. No timing or correctness result valid. Proxy fences and local barrier accounting are implemented but not validated.
 - **Next:** Split CuTe auto declarations and rerun the same architecture
 - **Archive:** trajectory/20261015_071702_iter-306/
+
+### Iter 307 — Local transform PTX register naming build failure
+
+- **Hypothesis:** Retain seven leaf accumulator arrays across K blocks
+- **Changes:** Separate CuTe tensor declarations after306
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** PTX assembly fails: register array names ending in digits p0<16> do not produce generated references p00 etc. No runtime or numerical evidence; build log retained.
+- **Next:** Use explicit112 scalar register declarations and rerun unchanged design
+- **Archive:** trajectory/20261015_071728_iter-307/
