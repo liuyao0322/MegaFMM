@@ -491,6 +491,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 292 | Leader-only primary PDL trigger on K128 | 1.0766 | 0.010333 | experiment |
 
+| 293 | One completion group per K128 leaf | 1.0618 | 0.010404 | experiment |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -4476,3 +4478,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** BF16 10.3344us FP16 10.33152us regress versus282 paired10.2728/10.2384. Original FP64 gates FAIL unchanged. Fresh full282NCU still60regs0local and wait stall ratio1.56 exceeds longscoreboard1.09; investigate MMA completion batching.
 - **Next:** Test full-leaf completion group across four independently ready K128 tiles
 - **Archive:** trajectory/20261015_065517_iter-292/
+
+### Iter 293 — One completion group per K128 leaf
+
+- **Hypothesis:** Four independently ready K128 tiles can retain short first-ready latency while reducing MMA commits and full waits
+- **Changes:** On282 one WGMMA commit/wait0 per four-block leaf; remove subsequent same-accumulator fences; release all four operand slots immediately after completion
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010404 ms; mean speedup=1.0618x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012313 | 0.010465 | 1.1766 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009796 | 0.010343 | 0.9471 | 0.000754626 | 0 |
+
+- **Analysis:** BF16 10.46528us FP16 10.34272us regress versus282. Original FP64 gates unchanged FAIL and finite expected errors. Holding slots until full-leaf completion does not improve full call; rejected without independent certification.
+- **Next:** Try two K128 blocks per completion group to retain earlier slot release
+- **Archive:** trajectory/20261015_065621_iter-293/
