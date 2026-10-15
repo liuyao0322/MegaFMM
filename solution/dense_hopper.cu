@@ -11,16 +11,17 @@
 namespace megafmm::detail {
 namespace {
 using namespace cute;
-template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0>
+template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0,int K=64,bool DirectStore=false>
 struct Candidate {
-  using Tile=Shape<Int<M>,Int<N>,_64>;
+  using Tile=Shape<Int<M>,Int<N>,Int<K>>;
   using Cluster=Shape<Int<ClusterM>,_1,_1>;
   using Epilogue=typename cutlass::epilogue::collective::CollectiveBuilder<
       cutlass::arch::Sm90,cutlass::arch::OpClassTensorOp,Tile,Cluster,
       cutlass::epilogue::collective::EpilogueTileAuto,float,float,
       float,cutlass::layout::RowMajor,4,float,cutlass::layout::RowMajor,4,
-      cute::conditional_t<Schedule==0,cutlass::epilogue::TmaWarpSpecializedCooperative,
-                          cutlass::epilogue::TmaWarpSpecialized>>::CollectiveOp;
+      cute::conditional_t<DirectStore,cutlass::epilogue::NoSmemWarpSpecialized,
+        cute::conditional_t<Schedule==0,cutlass::epilogue::TmaWarpSpecializedCooperative,
+                            cutlass::epilogue::TmaWarpSpecialized>>>::CollectiveOp;
   using Mainloop=typename cutlass::gemm::collective::CollectiveBuilder<
       cutlass::arch::Sm90,cutlass::arch::OpClassTensorOp,
       T,cutlass::layout::RowMajor,8,T,cutlass::layout::RowMajor,8,float,Tile,Cluster,
@@ -90,6 +91,13 @@ bool dispatch(int id,const Problem& p,const void* A,const void* B,const float* C
     case 21:return Candidate<T,128,256,1>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,2);
     case 22:return Candidate<T,128,128,2>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,2);
     case 23:return Candidate<T,256,128,1>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,1);
+    case 26:return Candidate<T,64,32,1,1,3,128>::run(p,A,B,C,D,workspace,sm_count,stream,operation,1);
+    case 27:return Candidate<T,64,64,1,1,3,128>::run(p,A,B,C,D,workspace,sm_count,stream,operation,1);
+    case 28:return Candidate<T,64,64,1,1,2,256>::run(p,A,B,C,D,workspace,sm_count,stream,operation,1);
+    case 29:return Candidate<T,128,64,1,0,0,128>::run(p,A,B,C,D,workspace,sm_count,stream,operation,1);
+    case 30:return Candidate<T,128,128,1,0,0,128>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 31:return Candidate<T,128,256,1,0,0,128,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 32:return Candidate<T,128,128,1,0,0,128,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     default:return false;
   }
 }
@@ -114,7 +122,7 @@ const char* hopper_candidate_name(int id) {
       "128x256x64_c1_sw8","128x128x64_c2_sw4","128x128x64_c2_sw8",
       "64x32x64_basic_s3","64x64x64_basic_s3","128x128x64_pingpong_s3",
       "256x128x64_c1_sw8","128x256x64_c2_sw8","128x256x64_pingpong_s3_sw8",
-      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64"};
+      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8"};
   return id>=0 && id<HopperCandidateCount ? names[id]:"invalid";
 }
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C,float* D,

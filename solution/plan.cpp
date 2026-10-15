@@ -513,7 +513,7 @@ size_t Plan::workspace_bytes() const { return impl_->bytes; }
 const Problem& Plan::problem() const { return impl_->problem; }
 std::string Plan::algorithm_name() const {
   if(impl_->strategy && !impl_->empty && !impl_->scale)
-    return impl_->hopper_selected>=24 ? "tuned_wmma_dense" : impl_->hopper_selected==4 ? "tuned_simt_small" : impl_->hopper_selected>=5 && impl_->hopper_selected<=8 ? "tuned_padded_hopper" : impl_->hopper_selected>=0 ? "tuned_hopper_dense" : "tuned_dense_cublaslt";
+    return (impl_->hopper_selected==24 || impl_->hopper_selected==25) ? "tuned_wmma_dense" : impl_->hopper_selected==4 ? "tuned_simt_small" : impl_->hopper_selected>=5 && impl_->hopper_selected<=8 ? "tuned_padded_hopper" : impl_->hopper_selected>=0 ? "tuned_hopper_dense" : "tuned_dense_cublaslt";
   return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw_multisize ? "sw_multisize_wmma" : impl_->sw ? "sw_cooperative_hilo_64x32x256" : "dense_cublaslt";
 }
 std::string Plan::lt_algorithm_config(const void* A, const void* B, const float* C0,

@@ -593,6 +593,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 343 | Direct WMMA candidates and sustained winner confirmation | 1.0419 | 1.267525 | measured |
 
+| 344 | Larger-K Hopper pipelines and direct output epilogues | 1.0899 | 0.046659 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5532,3 +5534,31 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Completed the full 14-shape BF16/FP16 benchmark under the original accuracy gates. Direct WMMA was slower on preliminary 512-cube measurements and is not a demonstrated winner. Sustained confirmation rejects the previously unstable 4096-cube selection. Independent repeated certification and forced-candidate validation remain required.
 - **Next:** Validate new candidates and API behavior, profile the small WMMA path, then test larger-K Hopper configurations and repeat independent acceptance.
 - **Archive:** trajectory/20261015_164606_iter-343/
+
+### Iter 344 — Larger-K Hopper pipelines and direct output epilogues
+
+- **Hypothesis:** Increasing K tile depth reduces TMA/barrier loop overhead; a direct output epilogue frees shared memory for deeper mainloops.
+- **Changes:** Add seven K128/K256 candidates spanning narrow basic, cooperative, and direct-store epilogues; retain sustained confirmation and original numerical gates; expand forced tests to multiple K tiles.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 14 rows; arithmetic mean of row median latency=0.046659 ms; mean speedup=1.0899x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005692 | 0.005056 | 1.1258 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005781 | 0.005096 | 1.1345 | 6.44261e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.011921 | 0.007999 | 1.4903 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009576 | 0.008015 | 1.1947 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.032847 | 0.029942 | 1.0970 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.032383 | 0.030930 | 1.0470 | 2.45816e-06 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.239651 | 0.212279 | 1.1289 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232797 | 0.233351 | 0.9976 | 4.87674e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_dense_cublaslt v0 | launch | 0.025328 | 0.025491 | 0.9936 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.025426 | 0.025547 | 0.9953 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026911 | 0.025211 | 1.0675 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.026730 | 0.026773 | 0.9984 | 6.43463e-07 | 1 |
+| 514,770,258 | bf16 | tuned_dense_cublaslt v0 | launch | 0.008728 | 0.008836 | 0.9877 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_dense_cublaslt v0 | launch | 0.008705 | 0.008698 | 1.0009 | 3.40967e-07 | 1 |
+
+- **Analysis:** Completed seven-shape BF16/FP16 screening with full 100-call five-group timing and fresh FP64 accuracy trials. This is a candidate screening iteration, not independent all-shape acceptance. Candidate ranking, repeated acceptance and sanitizer evidence must be assessed before declaring new stable wins.
+- **Next:** Run forced candidate regression and repeat the full 14-shape acceptance suite without rebuilding between sweeps; profile winning new candidates.
+- **Archive:** trajectory/20261015_165802_iter-344/
