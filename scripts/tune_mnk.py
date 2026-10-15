@@ -38,7 +38,7 @@ def binary_digest():
 binary_sha256 = binary_digest()
 source_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
 source_sha256 = {str(f.relative_to(ROOT)): hashlib.sha256(f.read_bytes()).hexdigest()
-                 for f in list((ROOT / 'solution').glob('*')) + [ROOT / 'include/megafmm/gemm.h'] if f.is_file()}
+                 for f in list((ROOT / 'solution').glob('*')) + [ROOT / 'include/megafmm/gemm.h', ROOT / 'bench/benchmark.cu', ROOT / 'bench/shapes.json', Path(__file__)] if f.is_file()}
 observations = {}
 processes = []
 pattern = re.compile(r'TIME shape=(\d+),(\d+),(\d+) dtype=(\w+) group=(\d+) case=(dense|solution) event_ms=([\deE.+-]+)')

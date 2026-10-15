@@ -1,0 +1,60 @@
+{
+  "iteration": 343,
+  "source_commit": "7679b693e2e8f1cbcf4a5f5a3501a28a26bdf59a",
+  "candidate_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+  ],
+  "checks": {
+    "forced_candidates": "pass, both dtypes, fresh input, exact FP64 integer data, dual streams and Graph, in-place and padding",
+    "api": "pass original-input FP64 gates",
+    "wmma_memcheck": "0 errors",
+    "wmma_racecheck": "0 errors, 0 warnings"
+  },
+  "profile": {
+    "candidate": 25,
+    "shape": [
+      512,
+      512,
+      512
+    ],
+    "dtype": "fp16",
+    "ncu_duration_us": 13.47,
+    "registers": 126,
+    "achieved_occupancy_percent": 6.25,
+    "note": "Profiler duration is diagnostic, not ordinary benchmark performance."
+  },
+  "files_sha256": {
+    "results/mnk343_candidates.log": "352741c93eabd4c6a9846733fcd672c715838d417ed4129880d2bec8429429c4",
+    "results/mnk343_api.log": "bf6f0327c75ce525df0afe03aeba74876356af23872c073b524c22c441676760",
+    "results/mnk343_wmma_memcheck.log": "280a124e15fc541ea28f3d190864e28a53ea1ff59920195e4b781778515087f8",
+    "results/mnk343_wmma_racecheck.log": "5b6fa5c7a643293e8623ec00191d5453cb4533680315f354d1f3159d5e48f4f5",
+    "results/mnk343_wmma512.txt": "99e70fad81e974a440f4dccef78ff058c9b5450dacc44f0a76ef626767017daf",
+    "tests/test_tuning_candidates.cu": "3ece4ef19311549a1392e6a217d101f11f991f03749fc94bce2d99d893c5d8a4",
+    "research/mnk_tuning/profile_candidate.cu": "90b742de740badc78fa70493b6edfdddc8c16f8a5e897ad9b2d7a3161f4377c3"
+  }
+}
