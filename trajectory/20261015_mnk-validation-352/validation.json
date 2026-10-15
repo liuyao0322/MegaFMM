@@ -20,5 +20,29 @@
     "solution/dense_hopper.cu": "f77ca68fcdcfe6619de66564e77ece2a3c3aa7a8d2fa3129401f64b777f80a75",
     "solution/tuning_check.cu": "8b109a5756a8c95fd38ec8c7ec4dc76cb8f8e1000906e39dd122795c55786a5f"
   },
-  "notes": "Six-shape12row original FP64 gates pass. All62forced candidates and API pass; beta-zero candidates explicitly reject nonzero beta. Only candidate61 adds provisional rectangle gain1024x8192x512 BF1.0904/FP1.0601. Not yet independently certified; latest full acceptance351 thirteenof28."
+  "notes": "Six-shape12row original FP64 gates pass. All62forced candidates and API pass; beta-zero candidates explicitly reject nonzero beta. Only candidate61 adds provisional rectangle gain1024x8192x512 BF1.0904/FP1.0601. Not yet independently certified; latest full acceptance351 thirteenof28.",
+  "profiles": {
+    "candidate61_8192_fp16": {
+      "registers": 168,
+      "shared_bytes": 231424,
+      "block_register_limit": 1,
+      "tensor_utilization_percent_elapsed": 92.354028,
+      "L2_hit_percent": 78.920196,
+      "replay_ms": 1.524928
+    },
+    "candidate61_8192x1024x512_fp16": {
+      "tensor_utilization_percent_elapsed": 41.801184,
+      "L2_hit_percent": 87.420555,
+      "replay_us": 25.568
+    },
+    "candidate60_8192_fp16": {
+      "registers": 168,
+      "shared_bytes": 100352,
+      "block_shared_limit": 2,
+      "block_register_limit": 1,
+      "actual_occupancy_percent": 14.062698,
+      "replay_ms": 4.359168
+    },
+    "notes": "Replay durations are diagnostic; candidate60 increased launch workers cannot create two resident blocks due register allocation. Candidate61 offers no proof all remaining routes exhausted."
+  }
 }
