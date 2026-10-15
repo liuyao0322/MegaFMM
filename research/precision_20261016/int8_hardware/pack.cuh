@@ -11,17 +11,18 @@
 #include "pow2.cuh"
 
 namespace int8_research {
-constexpr int H=512, Plane=H*H, BK=128, BM=64, BN=32, Stages=8;
-constexpr size_t HighBytes=7*Plane*2, QuantBytes=9*Plane;
-// Seven main planes per side, nine INT8 planes per side, integer scale metadata.
+constexpr int H=512, Plane=H*H, BK=128, BM=64, BN=32, Stages=4;
+constexpr size_t HighBytes=11*Plane*2, QuantBytes=0;
+// Seven native main planes followed by four scaled native residual planes.
+// Historical integer metadata remains allocated but is neither read nor written.
 constexpr size_t PartialBytes=2*1024*32*sizeof(float);
 constexpr size_t WorkBytes=2*HighBytes+2*QuantBytes+(9*32+9*64+1024)*sizeof(int)+PartialBytes;
 void check(cudaError_t e,const char* where){if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));}
 struct Work {
- void *ha,*hb;int8_t *qa,*qb;int *ea,*eb,*inside;float* partial;
+ void *ha,*hb,*qa,*qb;int *ea,*eb,*inside;float* partial;
  explicit Work(void* w){
   auto p=static_cast<char*>(w);ha=p;p+=HighBytes;hb=p;p+=HighBytes;
-  qa=reinterpret_cast<int8_t*>(p);p+=QuantBytes;qb=reinterpret_cast<int8_t*>(p);p+=QuantBytes;
+  qa=static_cast<char*>(ha)+7*Plane*2;qb=static_cast<char*>(hb)+7*Plane*2;
   ea=reinterpret_cast<int*>(p);p+=9*32*sizeof(int);eb=reinterpret_cast<int*>(p);p+=9*64*sizeof(int);
   inside=reinterpret_cast<int*>(p);p+=1024*sizeof(int);partial=reinterpret_cast<float*>(p);
  }
@@ -100,91 +101,11 @@ template<class T,bool SideA,bool Balance,bool FastBalance=false> __device__ __fo
  }
 }
 
-template<class T,bool SideA,bool Balance,int PlaneId> __device__ __forceinline__
-void pack_plane(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,int* __restrict__ exp,const int* __restrict__ inside){
- constexpr int Rows=SideA?64:128,Cols=SideA?128:32,Size=Rows*Cols,PerThread=Size/256;
- constexpr int ColTiles=512/Cols,Tiles=(512/Rows)*ColTiles;
- constexpr int plane=PlaneId;
- int tile=blockIdx.x%Tiles,r0=(tile/ColTiles)*Rows,c0=(tile%ColTiles)*Cols,tid=threadIdx.x;
- constexpr int RawPlane=SideA?3:2;
- constexpr bool quant=plane>=4 || plane==(SideA?2:3) || plane==RawPlane;
- constexpr int qp=plane==RawPlane?8:plane>=4?plane-4:3;
- float vh[PerThread],vl[PerThread],hi=0,lo=0;
- auto load_values=[&](auto fast,float scale0,float scale1){
-  #pragma unroll
-  for(int j=0;j<PerThread;++j){
-   int i=tid+256*j,r=r0+i/Cols,c=c0+i%Cols;
-   float element_scale0=scale0,element_scale1=scale1;
-   if constexpr(!SideA&&Balance&&decltype(fast)::value){
-    // Each B warp visits rows warp+8*j; lane j owns that row's factors.
-    element_scale0=__shfl_sync(0xffffffff,scale0,j);
-    element_scale1=__shfl_sync(0xffffffff,scale1,j);
-   }
-   float v=value<T,SideA,Balance,decltype(fast)::value>(X,inside,r,c,plane,element_scale0,element_scale1);
-   T h=T(v);high[plane*Plane+r*512+c]=h;
-   vh[j]=float(h);vl[j]=__fsub_rn(v,float(h));
-   hi=fmaxf(hi,fabsf(vh[j]));lo=fmaxf(lo,fabsf(vl[j]));
-  }
- };
- if constexpr(SideA&&Balance){
-  // Cols=128 and the per-thread stride256 keep c invariant over the element loop.
-  int c=c0+tid%Cols,e0=-inside[c],e1=-inside[c+512];
-  if(e0>=-126&&e0<=127&&e1>=-126&&e1<=127)
-   load_values(std::true_type{},__int_as_float((e0+127)<<23),__int_as_float((e1+127)<<23));
-  else load_values(std::false_type{},0,0);
- }else if constexpr(!SideA&&Balance){
-  // Sixteen K rows per warp. Cache two factors per lane, rather than arrays
-  // per thread, so register usage does not grow by 32 persistent factors.
-  int row=r0+tid/32+8*(tid%16),e0=inside[row],e1=inside[row+512];
-  bool normal=__all_sync(0xffffffff,e0>=-126&&e0<=127&&e1>=-126&&e1<=127);
-  if(normal)load_values(std::true_type{},__int_as_float((e0+127)<<23),__int_as_float((e1+127)<<23));
-  else load_values(std::false_type{},0,0);
- }else load_values(std::false_type{},0,0);
- if(!quant){asm volatile("fence.proxy.async.global;" ::: "memory");return;}
- __shared__ float maxima[2][8];__shared__ int exponents[2];
- for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
- if((tid&31)==0){maxima[0][tid/32]=hi;maxima[1][tid/32]=lo;}__syncthreads();
- if(tid<2){
-  // Relative residual scales make each two-sided correction pair share
-  // one exponent. Both lanes independently use the same high maximum.
-  float peak=0;for(int j=0;j<8;++j)peak=fmaxf(peak,maxima[0][j]);
-  constexpr int LowBits=(std::is_same_v<T, cute::half_t> ? 11 : 8);
-  int e=(peak>0?int(ceilf(log2f(peak/127.f))):0)-(tid?LowBits:0);
-  exponents[tid]=e;if(!tid || qp<4)exp[(qp+(tid?4:0))*Tiles+tile]=e;
- }
- __syncthreads();
- // B's INT8 form is physically transposed so both integer MMA operands are K major.
- // A36-byte B row has9 words, coprime with32 shared banks.
- constexpr int TransposeStride=Cols+4;
- __shared__ int8_t transpose[SideA?1:2][SideA?1:Rows*TransposeStride];
- auto store_quant=[&](int j,int qh,int ql){
-  int i=tid+256*j,r=r0+i/Cols,c=c0+i%Cols;
-  qh=max(-127,min(127,qh));ql=max(-127,min(127,ql));
-  if constexpr(SideA){q[qp*Plane+r*512+c]=int8_t(qh);if(qp<4)q[(qp+4)*Plane+r*512+c]=int8_t(ql);}
-  else{int at=(i/Cols)*TransposeStride+i%Cols;transpose[0][at]=int8_t(qh);if(qp<4)transpose[1][at]=int8_t(ql);}
- };
- int eh=exponents[0],el=exponents[1];
- if(eh>=-127&&eh<=126&&el>=-127&&el<=126){
-  float sh=__int_as_float((127-eh)<<23),sl=__int_as_float((127-el)<<23);
-  #pragma unroll
-  for(int j=0;j<PerThread;++j)store_quant(j,__float2int_rn(__fmul_rn(vh[j],sh)),__float2int_rn(__fmul_rn(vl[j],sl)));
- }else{
-  #pragma unroll
-  for(int j=0;j<PerThread;++j)store_quant(j,__float2int_rn(scale_pow2(vh[j],-eh)),__float2int_rn(scale_pow2(vl[j],-el)));
- }
- if constexpr(!SideA){
-  __syncthreads();
-  for(int i=tid;i<Size;i+=256){
-   int c=i/Rows,r=i%Rows;
-   q[qp*Plane+(c0+c)*512+r0+r]=transpose[0][r*TransposeStride+c];
-   if(qp<4)q[(qp+4)*Plane+(c0+c)*512+r0+r]=transpose[1][r*TransposeStride+c];
-  }
- }
- asm volatile("fence.proxy.async.global;" ::: "memory");
-}
-
-// Keep only two FP32 transformed planes live. All phases share one scratch area.
-template<bool SideA> struct PairPackShared {float values[2][SideA?8192:4096];float maxima[8];int exponent;float maxima_second[8];int exponent_second;int8_t transpose[SideA?1:2][SideA?1:128*36];};
+// Paired FP32 transforms stay shared. Native correction B is MN-major and
+// correction A is K-major, so neither side needs a physical transpose.
+template<bool SideA> struct PairPackShared {
+ float values[2][SideA?8192:4096];
+};
 static __device__ __noinline__ float pair_general_pow2(float x,int e){return ldexpf(x,e);}
 __device__ __forceinline__ float pair_pow2(float x,int e){
  if(e>=-126&&e<=127)return __fmul_rn(x,__int_as_float((e+127)<<23));
@@ -192,117 +113,33 @@ __device__ __forceinline__ float pair_pow2(float x,int e){
 }
 
 template<class T,bool SideA,int NativePlane,int QP> __device__ __forceinline__
-void pair_store(int which,T* high,int8_t* q,int* exp,
+void pair_store(int which,T* high,T* q,int* exp,
  PairPackShared<SideA>& s,int tile,int r0,int c0){
  constexpr int Rows=SideA?64:128,Cols=SideA?128:32,Size=Rows*Cols,PT=Size/256;
- constexpr int Tiles=(512/Rows)*(512/Cols),Bits=(std::is_same_v<T,cute::half_t> ? 11 : 8);
- int tid=threadIdx.x;float hi=0;
- #pragma unroll 4
- for(int j=0;j<PT;++j){int i=tid+256*j;T h=T(s.values[which][i]);high[NativePlane*Plane+(r0+i/Cols)*512+c0+i%Cols]=h;hi=fmaxf(hi,fabsf(float(h)));}
- for(int step=16;step;step/=2)hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,step));
- if((tid&31)==0)s.maxima[tid/32]=hi;__syncthreads();
- if(tid==0){float peak=0;for(int w=0;w<8;++w)peak=fmaxf(peak,s.maxima[w]);
-  int e=peak>0?int(ceilf(log2f(peak/127.f))):0;s.exponent=e;exp[QP*Tiles+tile]=e;
-  if constexpr(QP<4)exp[(QP+4)*Tiles+tile]=e-Bits;
- }
- __syncthreads();int eh=s.exponent,el=eh-Bits;
- auto quantize=[&](auto fast,float sh,float sl){
-  #pragma unroll 4
-  for(int j=0;j<PT;++j){
-   int i=tid+256*j;float v=s.values[which][i],h=float(T(v));
-   int qh;if constexpr(decltype(fast)::value)qh=__float2int_rn(__fmul_rn(h,sh));else qh=__float2int_rn(pair_pow2(h,-eh));
-   qh=max(-127,min(127,qh));int ql=0;
-   if constexpr(QP<4){float low=__fsub_rn(v,h);
-    if constexpr(decltype(fast)::value)ql=__float2int_rn(__fmul_rn(low,sl));else ql=__float2int_rn(pair_pow2(low,-el));
-    ql=max(-127,min(127,ql));
-   }
-   if constexpr(SideA){q[QP*Plane+(r0+i/Cols)*512+c0+i%Cols]=int8_t(qh);if constexpr(QP<4)q[(QP+4)*Plane+(r0+i/Cols)*512+c0+i%Cols]=int8_t(ql);}
-   else{int at=(i/Cols)*36+i%Cols;s.transpose[0][at]=int8_t(qh);if constexpr(QP<4)s.transpose[1][at]=int8_t(ql);}
-  }
- };
- if(eh>=-127&&eh<=126&&el>=-127&&el<=126)
-  quantize(std::true_type{},__int_as_float((127-eh)<<23),__int_as_float((127-el)<<23));
- else quantize(std::false_type{},0,0);
- if constexpr(!SideA){
-  __syncthreads();
-  for(int i=tid;i<Size;i+=256){int c=i/Rows,r=i%Rows;
-   q[QP*Plane+(c0+c)*512+r0+r]=s.transpose[0][r*36+c];
-   if constexpr(QP<4)q[(QP+4)*Plane+(c0+c)*512+r0+r]=s.transpose[1][r*36+c];
-  }
- }
- // The next transformed plane reuses maxima/exponent and both transpose arrays.
- __syncthreads();
-}
-
-template<class T,bool SideA,int QP> __device__ __forceinline__
-void pair_quant_store(int which,int eh,int8_t* q,
- PairPackShared<SideA>& s,int r0,int c0){
- constexpr int Rows=SideA?64:128,Cols=SideA?128:32,Size=Rows*Cols,PT=Size/256;
- constexpr int Bits=(std::is_same_v<T,cute::half_t> ? 11 : 8);
- int tid=threadIdx.x,el=eh-Bits;
- auto quantize=[&](auto fast,float sh,float sl){
-  #pragma unroll 4
-  for(int j=0;j<PT;++j){
-   int i=tid+256*j;float v=s.values[which][i],h=float(T(v));
-   int qh;if constexpr(decltype(fast)::value)qh=__float2int_rn(__fmul_rn(h,sh));else qh=__float2int_rn(pair_pow2(h,-eh));
-   qh=max(-127,min(127,qh));int ql=0;
-   if constexpr(QP<4){float low=__fsub_rn(v,h);
-    if constexpr(decltype(fast)::value)ql=__float2int_rn(__fmul_rn(low,sl));else ql=__float2int_rn(pair_pow2(low,-el));
-    ql=max(-127,min(127,ql));
-   }
-   if constexpr(SideA){q[QP*Plane+(r0+i/Cols)*512+c0+i%Cols]=int8_t(qh);if constexpr(QP<4)q[(QP+4)*Plane+(r0+i/Cols)*512+c0+i%Cols]=int8_t(ql);}
-   else{int at=(i/Cols)*36+i%Cols;s.transpose[0][at]=int8_t(qh);if constexpr(QP<4)s.transpose[1][at]=int8_t(ql);}
-  }
- };
- if(eh>=-127&&eh<=126&&el>=-127&&el<=126)
-  quantize(std::true_type{},__int_as_float((127-eh)<<23),__int_as_float((127-el)<<23));
- else quantize(std::false_type{},0,0);
- if constexpr(!SideA){
-  __syncthreads();
-  for(int i=tid;i<Size;i+=256){int c=i/Rows,r=i%Rows;
-   q[QP*Plane+(c0+c)*512+r0+r]=s.transpose[0][r*36+c];
-   if constexpr(QP<4)q[(QP+4)*Plane+(c0+c)*512+r0+r]=s.transpose[1][r*36+c];
-  }
- }
- // The next transformed plane reuses maxima/exponent and both transpose arrays.
- __syncthreads();
-}
-
-template<class T,bool SideA,int NP0,int QP0,int NP1,int QP1> __device__ __forceinline__
-void pair_store_both(T* high,int8_t* q,int* exp,
- PairPackShared<SideA>& s,int tile,int r0,int c0){
- constexpr int Rows=SideA?64:128,Cols=SideA?128:32,PT=Rows*Cols/256;
- constexpr int Tiles=(512/Rows)*(512/Cols),Bits=(std::is_same_v<T,cute::half_t> ? 11 : 8);
- int tid=threadIdx.x;float hi0=0,hi1=0;
+ int tid=threadIdx.x;
  #pragma unroll 4
  for(int j=0;j<PT;++j){
   int i=tid+256*j,at=(r0+i/Cols)*512+c0+i%Cols;
-  T h0=T(s.values[0][i]),h1=T(s.values[1][i]);
-  high[NP0*Plane+at]=h0;high[NP1*Plane+at]=h1;
-  hi0=fmaxf(hi0,fabsf(float(h0)));hi1=fmaxf(hi1,fabsf(float(h1)));
+  float v=s.values[which][i];T native=T(v);float high_value=float(native);
+  high[NativePlane*Plane+at]=native;
+  // Correction highs already reside in their seven native main planes.
+  // RN residual * 2^significand_bits stays finite whenever v/native are finite.
+  if constexpr(QP<4){
+   constexpr float scale=(std::is_same_v<T,cute::half_t> ? 2048.f : 256.f);
+   q[QP*Plane+at]=T(__fmul_rn(__fsub_rn(v,high_value),scale));
+  }
  }
- for(int step=16;step;step/=2){
-  hi0=fmaxf(hi0,__shfl_xor_sync(0xffffffff,hi0,step));
-  hi1=fmaxf(hi1,__shfl_xor_sync(0xffffffff,hi1,step));
- }
- if((tid&31)==0){s.maxima[tid/32]=hi0;s.maxima_second[tid/32]=hi1;}
- __syncthreads();
- if(tid==0){
-  float peak0=0,peak1=0;
-  for(int w=0;w<8;++w){peak0=fmaxf(peak0,s.maxima[w]);peak1=fmaxf(peak1,s.maxima_second[w]);}
-  int e0=peak0>0?int(ceilf(log2f(peak0/127.f))):0;
-  int e1=peak1>0?int(ceilf(log2f(peak1/127.f))):0;
-  s.exponent=e0;s.exponent_second=e1;
-  exp[QP0*Tiles+tile]=e0;exp[(QP0+4)*Tiles+tile]=e0-Bits;
-  exp[QP1*Tiles+tile]=e1;exp[(QP1+4)*Tiles+tile]=e1-Bits;
- }
- __syncthreads();
- pair_quant_store<T,SideA,QP0>(0,s.exponent,q,s,r0,c0);
- pair_quant_store<T,SideA,QP1>(1,s.exponent_second,q,s,r0,c0);
+
+}
+template<class T,bool SideA,int NP0,int QP0,int NP1,int QP1>
+__device__ __forceinline__ void pair_store_both(T* high,T* q,int* exp,
+ PairPackShared<SideA>& s,int tile,int r0,int c0){
+ pair_store<T,SideA,NP0,QP0>(0,high,q,exp,s,tile,r0,c0);
+ pair_store<T,SideA,NP1,QP1>(1,high,q,exp,s,tile,r0,c0);
 }
 
 template<class T,bool SideA,bool Balance,int Group> __device__ __forceinline__
-void pack_pair(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,int* __restrict__ exp,
+void pack_pair(const T* __restrict__ X,T* __restrict__ high,T* __restrict__ q,int* __restrict__ exp,
  const int* __restrict__ inside,PairPackShared<SideA>& s){
  constexpr int Rows=SideA?64:128,Cols=SideA?128:32,PT=Rows*Cols/256,Tiles=(512/Rows)*(512/Cols);
  int tile=blockIdx.x%Tiles,tid=threadIdx.x,r0=tile/(512/Cols)*Rows,c0=tile%(512/Cols)*Cols;
@@ -347,7 +184,7 @@ void pack_pair(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__
 }
 
 template<class T,bool SideA,bool Balance> __global__ __launch_bounds__(256,1)
-void pack(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,int* __restrict__ exp,const int* __restrict__ inside){
+void pack(const T* __restrict__ X,T* __restrict__ high,T* __restrict__ q,int* __restrict__ exp,const int* __restrict__ inside){
  extern __shared__ __align__(128) unsigned char scratch_buffer[];
  auto& scratch=*reinterpret_cast<PairPackShared<SideA>*>(scratch_buffer);
  int group=blockIdx.x/(SideA?32:64);
@@ -360,7 +197,7 @@ void pack(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,in
 // so pack_pair's blockIdx modulo Tiles still selects the original tile.
 template<class T,bool Balance> __global__ __launch_bounds__(256,1)
 void pack_joint(const T* __restrict__ A,const T* __restrict__ B,
- T* __restrict__ ha,T* __restrict__ hb,int8_t* __restrict__ qa,int8_t* __restrict__ qb,
+ T* __restrict__ ha,T* __restrict__ hb,T* __restrict__ qa,T* __restrict__ qb,
  int* __restrict__ ea,int* __restrict__ eb,const int* __restrict__ inside){
  extern __shared__ __align__(128) unsigned char scratch_buffer[];
  if(blockIdx.x<192){
@@ -384,7 +221,7 @@ static_assert(sizeof(PairPackShared<true>)>=sizeof(PairPackShared<false>));
 // all8column exponents before the barrier permits inside reads/scratch reuse.
 template<class T> __global__ __launch_bounds__(256,1)
 void preprocess_cooperative_columns(const T* __restrict__ A,const T* __restrict__ B,
- T* __restrict__ ha,T* __restrict__ hb,int8_t* __restrict__ qa,int8_t* __restrict__ qb,
+ T* __restrict__ ha,T* __restrict__ hb,T* __restrict__ qa,T* __restrict__ qb,
  int* __restrict__ ea,int* __restrict__ eb,int* __restrict__ inside,float* __restrict__ partial){
  constexpr bool Balance=true;
  extern __shared__ __align__(128) unsigned char scratch_buffer[];
@@ -445,12 +282,12 @@ template<class T> void init_cooperative_preprocess(){
 
 template<class T,bool Balance> void preprocess(const T* A,const T* B,Work w,cudaStream_t stream){
  if constexpr(Balance){
-  T* ha=static_cast<T*>(w.ha);T* hb=static_cast<T*>(w.hb);
-  void* args[]={&A,&B,&ha,&hb,&w.qa,&w.qb,&w.ea,&w.eb,&w.inside,&w.partial};
+  T* ha=static_cast<T*>(w.ha);T* hb=static_cast<T*>(w.hb);T* qa=static_cast<T*>(w.qa);T* qb=static_cast<T*>(w.qb);
+  void* args[]={&A,&B,&ha,&hb,&qa,&qb,&w.ea,&w.eb,&w.inside,&w.partial};
   check(cudaLaunchCooperativeKernel(reinterpret_cast<const void*>(preprocess_cooperative_columns<T>),dim3(288),dim3(256),args,sizeof(PairPackShared<true>),stream),"cooperative preprocess launch");
  }else{
   pack_joint<T,false><<<288,256,sizeof(PairPackShared<true>),stream>>>(
-   A,B,static_cast<T*>(w.ha),static_cast<T*>(w.hb),w.qa,w.qb,w.ea,w.eb,w.inside);
+   A,B,static_cast<T*>(w.ha),static_cast<T*>(w.hb),static_cast<T*>(w.qa),static_cast<T*>(w.qb),w.ea,w.eb,w.inside);
  }
  check(cudaPeekAtLastError(),"INT8 preprocess");
 }

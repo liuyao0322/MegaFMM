@@ -1,0 +1,10 @@
+research/precision_20261016/int8_hardware/pack.cuh(128): error: expected a ">"
+     constexpr float scale=std::is_same_v<T,cute::half_t>?2048.f:256.f;
+                                                        ^
+
+research/precision_20261016/int8_hardware/corrected.cuh(88): error: expected a ">"
+     constexpr float inverse=std::is_same_v<T,cute::half_t>?(1.f/2048.f):(1.f/256.f);
+                                                          ^
+
+2 errors detected in the compilation of "research/precision_20261016/int8_hardware/compare.cu".
+srun: error: g08: task 0: Exited with exit code 2

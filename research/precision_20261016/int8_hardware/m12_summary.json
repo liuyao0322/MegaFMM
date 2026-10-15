@@ -1,0 +1,134 @@
+{
+  "scope": "72 fresh matrix configurations, three paired numerical arms; FP32 bmm/add with TF32 disabled, not exact Hopper WGMMA rounding or hardware acceptance",
+  "configurations": 72,
+  "paired_arm_rows": 216,
+  "summary": [
+    {
+      "dtype": "float16",
+      "arm": "int8_k128",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "nonfinite_correction_operand_observations": 0,
+      "max_ef": 7.18331684761451e-05,
+      "worst_pattern": "cancellation",
+      "worst_seed": 7301
+    },
+    {
+      "dtype": "float16",
+      "arm": "bf16_low_unscaled",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "nonfinite_correction_operand_observations": 0,
+      "max_ef": 3.258275360842277e-05,
+      "worst_pattern": "cancellation",
+      "worst_seed": 7301
+    },
+    {
+      "dtype": "float16",
+      "arm": "native_low_scaled",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "nonfinite_correction_operand_observations": 0,
+      "max_ef": 3.185864852280279e-05,
+      "worst_pattern": "cancellation",
+      "worst_seed": 7301
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "int8_k128",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "nonfinite_correction_operand_observations": 0,
+      "max_ef": 0.0005302382657628115,
+      "worst_pattern": "tiny_cancellation",
+      "worst_seed": 7301
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "bf16_low_unscaled",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "nonfinite_correction_operand_observations": 0,
+      "max_ef": 1.56241045545137e-05,
+      "worst_pattern": "tiny_cancellation",
+      "worst_seed": 7301
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "native_low_scaled",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "nonfinite_correction_operand_observations": 0,
+      "max_ef": 1.5624097948708668e-05,
+      "worst_pattern": "tiny_cancellation",
+      "worst_seed": 7301
+    }
+  ],
+  "paired": [
+    {
+      "dtype": "float16",
+      "paired_configurations": 36,
+      "unscaled_lower_error_configurations": 36,
+      "baseline_to_unscaled_ef_ratio_min": 1.4874833236463836,
+      "baseline_to_unscaled_ef_ratio_max": 22.01819138959538,
+      "max_absolute_ef_difference_native_vs_bf16": 9.262226702267162e-07
+    },
+    {
+      "dtype": "bfloat16",
+      "paired_configurations": 36,
+      "unscaled_lower_error_configurations": 36,
+      "baseline_to_unscaled_ef_ratio_min": 5.543665613076801,
+      "baseline_to_unscaled_ef_ratio_max": 34.55879464438684,
+      "max_absolute_ef_difference_native_vs_bf16": 6.605805031261293e-12
+    }
+  ],
+  "same_input_controls": [
+    {
+      "dtype": "torch.float16",
+      "seed": 7301,
+      "int8_and_bf16_match_m11": true
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 7301,
+      "int8_and_bf16_match_m11": true
+    }
+  ],
+  "scalar_range_controls": [
+    {
+      "dtype": "torch.float16",
+      "native_positive_finite_bins": 31744,
+      "power": 11,
+      "sampled_transforms": 253952,
+      "finite_native_high": 253948,
+      "excluded_nonfinite_native_high": 4,
+      "scaled_low_nonfinite": 0,
+      "scope": "all nonnegative finite native bins and signed midpoint-neighbor transforms; not exhaustive FP32 interior"
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "native_positive_finite_bins": 32640,
+      "power": 8,
+      "sampled_transforms": 261120,
+      "finite_native_high": 261116,
+      "excluded_nonfinite_native_high": 4,
+      "scaled_low_nonfinite": 0,
+      "scope": "all nonnegative finite native bins and signed midpoint-neighbor transforms; not exhaustive FP32 interior"
+    }
+  ],
+  "fixed16_vs_native8_range_control": {
+    "finite_transform": true,
+    "finite_native_high": true,
+    "fixed16_overflow": true,
+    "native8_finite": true
+  },
+  "range_limit": "Native p11/8 scale avoids fixed16 finite-high residual overflow; no underflow or arbitrary transform/native-high finiteness theorem. Midpoint-neighbor sampling is not exhaustive FP32 interior.",
+  "hardware_accepted": false,
+  "performance_accepted": false
+}

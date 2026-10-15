@@ -3,12 +3,14 @@
   "goal_achieved": false,
   "production_unchanged": true,
   "working_candidate": "f13",
-  "working_global_candidate": "p39",
+  "working_global_candidate": "p45",
   "compact_pow2_equivalence_cases": 1048576,
-  "retained_global_candidate": "p39 ordinary and Graph research reference, own ordinary/Graph78, fresh9-pattern stress108/864calls, scoped tools36/72calls each. p33/p27 remain historical validated fallbacks. No production performance winner.",
+  "retained_global_candidate": "p45 ordinary and Graph research reference, own ordinary/Graph78, fresh9-pattern stress108/864calls, scoped tools36/72calls each. p39/p33/p27 remain historical validated fallbacks. No production performance winner.",
   "compile_stopped_candidates": [
     "F12: no numerical or latency measurement",
-    "P28 initial compile-only preflight: missing read-to-reuse hardware fence, superseded before device execution"
+    "P28 initial compile-only preflight: missing read-to-reuse hardware fence, superseded before device execution",
+    "P43 initial host descriptor preflight: invalid256Bfast box, no matrix invocation",
+    "P45 initial syntax compile-only preflight: no candidate binary/device execution"
   ],
   "candidates": {
     "f6": {
@@ -449,8 +451,8 @@
       },
       "equal_per_column_exponents": 79872,
       "additional_alternating_checks_passed": 6,
-      "retained": true,
-      "retained_for": "ordinary and Graph research reference; own fresh validation only"
+      "retained": false,
+      "retained_for": "historical fully validated ordinary and Graph fallback"
     },
     "p40": {
       "checks": 78,
@@ -490,6 +492,156 @@
       "additional_alternating_checks_passed": 6,
       "retained": false,
       "validation_scope": "own ordinary78 plus ordinaryABBA312; no fresh stress/sanitizer acceptance or certificate transfer"
+    },
+    "p43": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 38.3243198395,
+        "fp16": 38.14984035475
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": false,
+      "label": "p43",
+      "ordinary_checks": 78,
+      "inside_exponent_checks": 79872,
+      "max_ef": {
+        "bf16": 1.57936996661e-05,
+        "fp16": 2.24105833948e-05
+      },
+      "initial_full_call_us": {
+        "bf16": 38.3243198395,
+        "fp16": 38.14984035475
+      },
+      "ordinary_abba": [
+        {
+          "dtype": "bf16",
+          "old_candidate": "p39",
+          "new_candidate": "p43",
+          "old_group_median_us": 36.39439964275,
+          "new_group_median_us": 38.289439678125,
+          "relative_reduction": -0.052069550644517903
+        },
+        {
+          "dtype": "fp16",
+          "old_candidate": "p39",
+          "new_candidate": "p43",
+          "old_group_median_us": 36.285400390375,
+          "new_group_median_us": 39.182199955,
+          "relative_reduction": -0.07983374948215816
+        }
+      ],
+      "cooperative_init": [
+        {
+          "dtype": "fp16",
+          "supported": "1",
+          "sm_count": "132",
+          "active_blocks_per_sm": "3",
+          "grid": "288",
+          "shared_bytes": "65540"
+        },
+        {
+          "dtype": "bf16",
+          "supported": "1",
+          "sm_count": "132",
+          "active_blocks_per_sm": "3",
+          "grid": "288",
+          "shared_bytes": "65540"
+        }
+      ],
+      "independent_graph_timing": false,
+      "scoped_sanitizers": false,
+      "fresh_stress_configurations": 108,
+      "fresh_stress_calls": 864,
+      "stress_scope": "two independent streams/workspaces, ordinary/Graph interleaving, 128float guards each side; not independent Graph timing or sanitizer acceptance",
+      "stress_seed_formula": "43871+trial*347+stream*197+pattern*59",
+      "stress_max_ef": {
+        "bf16": 1.49794769963e-05,
+        "fp16": 2.16290563921e-05
+      },
+      "stress_tiny_max_ef": {
+        "bf16": 7.1849759695e-06,
+        "fp16": 1.4666535366e-06
+      }
+    },
+    "p44": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 38.103280067499995,
+        "fp16": 38.3559999465
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": false,
+      "label": "p44",
+      "ordinary_checks": 78,
+      "inside_exponent_checks": 79872,
+      "max_ef": {
+        "bf16": 1.57936996661e-05,
+        "fp16": 2.24105833948e-05
+      },
+      "initial_full_call_us": {
+        "bf16": 38.103280067499995,
+        "fp16": 38.3559999465
+      },
+      "ordinary_abba": [
+        {
+          "dtype": "bf16",
+          "old_candidate": "p39",
+          "new_candidate": "p44",
+          "old_group_median_us": 36.195359706875,
+          "new_group_median_us": 38.1653199195,
+          "relative_reduction": -0.054425766965117806
+        },
+        {
+          "dtype": "fp16",
+          "old_candidate": "p39",
+          "new_candidate": "p44",
+          "old_group_median_us": 36.231320381125,
+          "new_group_median_us": 38.204240799000004,
+          "relative_reduction": -0.05445345069187191
+        }
+      ],
+      "cooperative_init": [
+        {
+          "dtype": "fp16",
+          "supported": "1",
+          "sm_count": "132",
+          "active_blocks_per_sm": "3",
+          "grid": "288",
+          "shared_bytes": "65536"
+        },
+        {
+          "dtype": "bf16",
+          "supported": "1",
+          "sm_count": "132",
+          "active_blocks_per_sm": "3",
+          "grid": "288",
+          "shared_bytes": "65536"
+        }
+      ],
+      "independent_graph_timing": false,
+      "scoped_sanitizers": false,
+      "fresh_stress_configurations": 0
+    },
+    "p45": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 35.3092794415,
+        "fp16": 35.395359039249996
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": true,
+      "retained_for": "ordinary and Graph research reference; own fresh validation only",
+      "validation_scope": "own ordinary/Graph78, each independentABBA312; fresh9-pattern108configurations/864calls, scoped tools36/72calls each",
+      "numerical_algorithm_changed": "native T correction high aliases + p11FP16/p8BF16 scaled low, all eight correction dots; two maps/eleven planes per side"
     },
     "p35": {
       "checks": 78,
@@ -612,6 +764,21 @@
       "hardware_accepted": false
     },
     "m11_bf16_low_scale16": {
+      "fresh_configurations": 72,
+      "passes": 72,
+      "hardware_accepted": false
+    },
+    "m12_int8_k128": {
+      "fresh_configurations": 72,
+      "passes": 72,
+      "hardware_accepted": false
+    },
+    "m12_bf16_low_unscaled": {
+      "fresh_configurations": 72,
+      "passes": 72,
+      "hardware_accepted": false
+    },
+    "m12_native_low_scaled": {
       "fresh_configurations": 72,
       "passes": 72,
       "hardware_accepted": false
@@ -2476,6 +2643,371 @@
     "hardware_accepted": false,
     "performance_accepted": false
   },
+  "m12_numerical_screen": {
+    "scope": "72 fresh matrix configurations, three paired numerical arms; FP32 bmm/add with TF32 disabled, not exact Hopper WGMMA rounding or hardware acceptance",
+    "configurations": 72,
+    "paired_arm_rows": 216,
+    "summary": [
+      {
+        "dtype": "float16",
+        "arm": "int8_k128",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "nonfinite_correction_operand_observations": 0,
+        "max_ef": 7.18331684761451e-05,
+        "worst_pattern": "cancellation",
+        "worst_seed": 7301
+      },
+      {
+        "dtype": "float16",
+        "arm": "bf16_low_unscaled",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "nonfinite_correction_operand_observations": 0,
+        "max_ef": 3.258275360842277e-05,
+        "worst_pattern": "cancellation",
+        "worst_seed": 7301
+      },
+      {
+        "dtype": "float16",
+        "arm": "native_low_scaled",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "nonfinite_correction_operand_observations": 0,
+        "max_ef": 3.185864852280279e-05,
+        "worst_pattern": "cancellation",
+        "worst_seed": 7301
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "int8_k128",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "nonfinite_correction_operand_observations": 0,
+        "max_ef": 0.0005302382657628115,
+        "worst_pattern": "tiny_cancellation",
+        "worst_seed": 7301
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "bf16_low_unscaled",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "nonfinite_correction_operand_observations": 0,
+        "max_ef": 1.56241045545137e-05,
+        "worst_pattern": "tiny_cancellation",
+        "worst_seed": 7301
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "native_low_scaled",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "nonfinite_correction_operand_observations": 0,
+        "max_ef": 1.5624097948708668e-05,
+        "worst_pattern": "tiny_cancellation",
+        "worst_seed": 7301
+      }
+    ],
+    "paired": [
+      {
+        "dtype": "float16",
+        "paired_configurations": 36,
+        "unscaled_lower_error_configurations": 36,
+        "baseline_to_unscaled_ef_ratio_min": 1.4874833236463836,
+        "baseline_to_unscaled_ef_ratio_max": 22.01819138959538,
+        "max_absolute_ef_difference_native_vs_bf16": 9.262226702267162e-07
+      },
+      {
+        "dtype": "bfloat16",
+        "paired_configurations": 36,
+        "unscaled_lower_error_configurations": 36,
+        "baseline_to_unscaled_ef_ratio_min": 5.543665613076801,
+        "baseline_to_unscaled_ef_ratio_max": 34.55879464438684,
+        "max_absolute_ef_difference_native_vs_bf16": 6.605805031261293e-12
+      }
+    ],
+    "same_input_controls": [
+      {
+        "dtype": "torch.float16",
+        "seed": 7301,
+        "int8_and_bf16_match_m11": true
+      },
+      {
+        "dtype": "torch.bfloat16",
+        "seed": 7301,
+        "int8_and_bf16_match_m11": true
+      }
+    ],
+    "scalar_range_controls": [
+      {
+        "dtype": "torch.float16",
+        "native_positive_finite_bins": 31744,
+        "power": 11,
+        "sampled_transforms": 253952,
+        "finite_native_high": 253948,
+        "excluded_nonfinite_native_high": 4,
+        "scaled_low_nonfinite": 0,
+        "scope": "all nonnegative finite native bins and signed midpoint-neighbor transforms; not exhaustive FP32 interior"
+      },
+      {
+        "dtype": "torch.bfloat16",
+        "native_positive_finite_bins": 32640,
+        "power": 8,
+        "sampled_transforms": 261120,
+        "finite_native_high": 261116,
+        "excluded_nonfinite_native_high": 4,
+        "scaled_low_nonfinite": 0,
+        "scope": "all nonnegative finite native bins and signed midpoint-neighbor transforms; not exhaustive FP32 interior"
+      }
+    ],
+    "fixed16_vs_native8_range_control": {
+      "finite_transform": true,
+      "finite_native_high": true,
+      "fixed16_overflow": true,
+      "native8_finite": true
+    },
+    "range_limit": "Native p11/8 scale avoids fixed16 finite-high residual overflow; no underflow or arbitrary transform/native-high finiteness theorem. Midpoint-neighbor sampling is not exhaustive FP32 interior.",
+    "hardware_accepted": false,
+    "performance_accepted": false
+  },
+  "bf16_correction_hardware": {
+    "status": "native_main_bf16_correction_accuracy_passed_performance_rejected",
+    "goal_achieved": false,
+    "scope": "original contiguous1024cubed inputs, bothdtypes, original FP64/gates, seven main and all eight correction dots; each candidate has only its own listed evidence",
+    "candidates": [
+      {
+        "label": "p43",
+        "ordinary_checks": 78,
+        "inside_exponent_checks": 79872,
+        "max_ef": {
+          "bf16": 1.57936996661e-05,
+          "fp16": 2.24105833948e-05
+        },
+        "initial_full_call_us": {
+          "bf16": 38.3243198395,
+          "fp16": 38.14984035475
+        },
+        "ordinary_abba": [
+          {
+            "dtype": "bf16",
+            "old_candidate": "p39",
+            "new_candidate": "p43",
+            "old_group_median_us": 36.39439964275,
+            "new_group_median_us": 38.289439678125,
+            "relative_reduction": -0.052069550644517903
+          },
+          {
+            "dtype": "fp16",
+            "old_candidate": "p39",
+            "new_candidate": "p43",
+            "old_group_median_us": 36.285400390375,
+            "new_group_median_us": 39.182199955,
+            "relative_reduction": -0.07983374948215816
+          }
+        ],
+        "cooperative_init": [
+          {
+            "dtype": "fp16",
+            "supported": "1",
+            "sm_count": "132",
+            "active_blocks_per_sm": "3",
+            "grid": "288",
+            "shared_bytes": "65540"
+          },
+          {
+            "dtype": "bf16",
+            "supported": "1",
+            "sm_count": "132",
+            "active_blocks_per_sm": "3",
+            "grid": "288",
+            "shared_bytes": "65540"
+          }
+        ],
+        "performance_accepted": false,
+        "retained": false,
+        "independent_graph_timing": false,
+        "scoped_sanitizers": false,
+        "fresh_stress_configurations": 108,
+        "fresh_stress_calls": 864,
+        "stress_scope": "two independent streams/workspaces, ordinary/Graph interleaving, 128float guards each side; not independent Graph timing or sanitizer acceptance",
+        "stress_seed_formula": "43871+trial*347+stream*197+pattern*59",
+        "stress_max_ef": {
+          "bf16": 1.49794769963e-05,
+          "fp16": 2.16290563921e-05
+        },
+        "stress_tiny_max_ef": {
+          "bf16": 7.1849759695e-06,
+          "fp16": 1.4666535366e-06
+        }
+      },
+      {
+        "label": "p44",
+        "ordinary_checks": 78,
+        "inside_exponent_checks": 79872,
+        "max_ef": {
+          "bf16": 1.57936996661e-05,
+          "fp16": 2.24105833948e-05
+        },
+        "initial_full_call_us": {
+          "bf16": 38.103280067499995,
+          "fp16": 38.3559999465
+        },
+        "ordinary_abba": [
+          {
+            "dtype": "bf16",
+            "old_candidate": "p39",
+            "new_candidate": "p44",
+            "old_group_median_us": 36.195359706875,
+            "new_group_median_us": 38.1653199195,
+            "relative_reduction": -0.054425766965117806
+          },
+          {
+            "dtype": "fp16",
+            "old_candidate": "p39",
+            "new_candidate": "p44",
+            "old_group_median_us": 36.231320381125,
+            "new_group_median_us": 38.204240799000004,
+            "relative_reduction": -0.05445345069187191
+          }
+        ],
+        "cooperative_init": [
+          {
+            "dtype": "fp16",
+            "supported": "1",
+            "sm_count": "132",
+            "active_blocks_per_sm": "3",
+            "grid": "288",
+            "shared_bytes": "65536"
+          },
+          {
+            "dtype": "bf16",
+            "supported": "1",
+            "sm_count": "132",
+            "active_blocks_per_sm": "3",
+            "grid": "288",
+            "shared_bytes": "65536"
+          }
+        ],
+        "performance_accepted": false,
+        "retained": false,
+        "independent_graph_timing": false,
+        "scoped_sanitizers": false,
+        "fresh_stress_configurations": 0
+      }
+    ],
+    "printed_standard_errors_equal_p43_p44": true,
+    "compile_descriptor_preflight": "separately frozen initialP43 rank3 256Bfast box failed host encoding; no candidate matrix execution or latency",
+    "retained": "P39 remains fully validated ordinary/Graph research reference; production unchanged",
+    "limitations": "No P43/P44 independent Graph timing or sanitizer acceptance; P44 has no fresh stress. FP32bmm M11 model is not hardware proof or performance."
+  },
+  "p45_validation": {
+    "status": "p45_accuracy_scoped_tools_validated_production_performance_target_unachieved",
+    "goal_achieved": false,
+    "ordinary_original_input_fp64_checks": 78,
+    "graph_original_input_fp64_checks": 78,
+    "graph_same_deterministic_configurations": true,
+    "graph_process_provenance": "p45_graph.log is an exact copy of existing own p45_graph_abba_b0.log; no extra independent Graph sample",
+    "equal_per_column_exponents_per_mode": 79872,
+    "independent_stress_configurations": 108,
+    "independent_stress_calls": 864,
+    "sanitizer_cases_per_tool": 36,
+    "sanitizer_calls_per_tool": 72,
+    "sanitizers": [
+      "memcheck",
+      "racecheck",
+      "synccheck"
+    ],
+    "sanitizer_kernel_scope": "kns=int8_research",
+    "stress_dense_control": "historical cuBLAS GemmEx; ordinary and Graph compare use production tuned Dense gate",
+    "stress_output_guards": "128 floats before and after each output; two independent streams/workspaces",
+    "graph_timing_us": {
+      "bf16": 35.3156003955,
+      "fp16": 35.784319877499996
+    },
+    "cooperative_preprocessing": "288CTAs, one unconditional grid.sync barrier; actual supported/resident capacity checked outside run in every validation process",
+    "stress_seed_formula": "45937+trial*347+stream*197+pattern*59",
+    "research_retention": "P45 ordinary and Graph research reference with its own complete evidence; production performance target remains unachieved",
+    "independent_ordinary_comparison": [
+      {
+        "dtype": "bf16",
+        "old_candidate": "p39",
+        "new_candidate": "p45",
+        "old_group_median_us": 36.347279071624996,
+        "new_group_median_us": 35.141319751750004,
+        "relative_reduction": 0.033178805970553116
+      },
+      {
+        "dtype": "fp16",
+        "old_candidate": "p39",
+        "new_candidate": "p45",
+        "old_group_median_us": 36.082159996,
+        "new_group_median_us": 35.192919731125,
+        "relative_reduction": 0.0246448733937652
+      }
+    ],
+    "independent_graph_comparison": [
+      {
+        "dtype": "bf16",
+        "old_candidate": "p39",
+        "new_candidate": "p45",
+        "old_group_median_us": 36.48167991625,
+        "new_group_median_us": 35.38911914825,
+        "relative_reduction": 0.02994820333132031
+      },
+      {
+        "dtype": "fp16",
+        "old_candidate": "p39",
+        "new_candidate": "p45",
+        "old_group_median_us": 36.355000496,
+        "new_group_median_us": 35.666519641875,
+        "relative_reduction": 0.018937720938850044
+      }
+    ],
+    "limitations": "Only contiguous non-transposed1024^3, alpha1 beta0, FP16/BF16; no arbitrary-range proof, no production integration, no transfer to later modified candidates."
+  },
+  "p45_independent_performance": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p39",
+      "new_candidate": "p45",
+      "old_group_median_us": 36.347279071624996,
+      "new_group_median_us": 35.141319751750004,
+      "relative_reduction": 0.033178805970553116
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p39",
+      "new_candidate": "p45",
+      "old_group_median_us": 36.082159996,
+      "new_group_median_us": 35.192919731125,
+      "relative_reduction": 0.0246448733937652
+    }
+  ],
+  "p45_graph_performance": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p39",
+      "new_candidate": "p45",
+      "old_group_median_us": 36.48167991625,
+      "new_group_median_us": 35.38911914825,
+      "relative_reduction": 0.02994820333132031
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p39",
+      "new_candidate": "p45",
+      "old_group_median_us": 36.355000496,
+      "new_group_median_us": 35.666519641875,
+      "relative_reduction": 0.018937720938850044
+    }
+  ],
   "p39_validation": {
     "status": "p39_accuracy_and_scoped_synchronization_validated_performance_rejected",
     "goal_achieved": false,
@@ -2832,6 +3364,6 @@
     ],
     "scope": "Full original-input FP64 matrix gates; printed eF equality is not a bitwise-output claim. Host eligibility diagnostics outside timing. No production integration. Unlocked clocks, no confidence interval."
   },
-  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11 is numerical only. No transfer to later changes.",
+  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11/M12 are numerical only. P43 owns fresh9-pattern108/864stress without tools/independent Graph timing; P44 ordinaryABBA only. P45 owns ordinary/Graph78, fresh108/864stress and36/72tools; none transfers to later changes.",
   "remaining": "Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration."
 }

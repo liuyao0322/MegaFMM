@@ -1,0 +1,130 @@
+{
+  "status": "native_main_bf16_correction_accuracy_passed_performance_rejected",
+  "goal_achieved": false,
+  "scope": "original contiguous1024cubed inputs, bothdtypes, original FP64/gates, seven main and all eight correction dots; each candidate has only its own listed evidence",
+  "candidates": [
+    {
+      "label": "p43",
+      "ordinary_checks": 78,
+      "inside_exponent_checks": 79872,
+      "max_ef": {
+        "bf16": 1.57936996661e-05,
+        "fp16": 2.24105833948e-05
+      },
+      "initial_full_call_us": {
+        "bf16": 38.3243198395,
+        "fp16": 38.14984035475
+      },
+      "ordinary_abba": [
+        {
+          "dtype": "bf16",
+          "old_candidate": "p39",
+          "new_candidate": "p43",
+          "old_group_median_us": 36.39439964275,
+          "new_group_median_us": 38.289439678125,
+          "relative_reduction": -0.052069550644517903
+        },
+        {
+          "dtype": "fp16",
+          "old_candidate": "p39",
+          "new_candidate": "p43",
+          "old_group_median_us": 36.285400390375,
+          "new_group_median_us": 39.182199955,
+          "relative_reduction": -0.07983374948215816
+        }
+      ],
+      "cooperative_init": [
+        {
+          "dtype": "fp16",
+          "supported": "1",
+          "sm_count": "132",
+          "active_blocks_per_sm": "3",
+          "grid": "288",
+          "shared_bytes": "65540"
+        },
+        {
+          "dtype": "bf16",
+          "supported": "1",
+          "sm_count": "132",
+          "active_blocks_per_sm": "3",
+          "grid": "288",
+          "shared_bytes": "65540"
+        }
+      ],
+      "performance_accepted": false,
+      "retained": false,
+      "independent_graph_timing": false,
+      "scoped_sanitizers": false,
+      "fresh_stress_configurations": 108,
+      "fresh_stress_calls": 864,
+      "stress_scope": "two independent streams/workspaces, ordinary/Graph interleaving, 128float guards each side; not independent Graph timing or sanitizer acceptance",
+      "stress_seed_formula": "43871+trial*347+stream*197+pattern*59",
+      "stress_max_ef": {
+        "bf16": 1.49794769963e-05,
+        "fp16": 2.16290563921e-05
+      },
+      "stress_tiny_max_ef": {
+        "bf16": 7.1849759695e-06,
+        "fp16": 1.4666535366e-06
+      }
+    },
+    {
+      "label": "p44",
+      "ordinary_checks": 78,
+      "inside_exponent_checks": 79872,
+      "max_ef": {
+        "bf16": 1.57936996661e-05,
+        "fp16": 2.24105833948e-05
+      },
+      "initial_full_call_us": {
+        "bf16": 38.103280067499995,
+        "fp16": 38.3559999465
+      },
+      "ordinary_abba": [
+        {
+          "dtype": "bf16",
+          "old_candidate": "p39",
+          "new_candidate": "p44",
+          "old_group_median_us": 36.195359706875,
+          "new_group_median_us": 38.1653199195,
+          "relative_reduction": -0.054425766965117806
+        },
+        {
+          "dtype": "fp16",
+          "old_candidate": "p39",
+          "new_candidate": "p44",
+          "old_group_median_us": 36.231320381125,
+          "new_group_median_us": 38.204240799000004,
+          "relative_reduction": -0.05445345069187191
+        }
+      ],
+      "cooperative_init": [
+        {
+          "dtype": "fp16",
+          "supported": "1",
+          "sm_count": "132",
+          "active_blocks_per_sm": "3",
+          "grid": "288",
+          "shared_bytes": "65536"
+        },
+        {
+          "dtype": "bf16",
+          "supported": "1",
+          "sm_count": "132",
+          "active_blocks_per_sm": "3",
+          "grid": "288",
+          "shared_bytes": "65536"
+        }
+      ],
+      "performance_accepted": false,
+      "retained": false,
+      "independent_graph_timing": false,
+      "scoped_sanitizers": false,
+      "fresh_stress_configurations": 0
+    }
+  ],
+  "printed_standard_errors_equal_p43_p44": true,
+  "compile_descriptor_preflight": "separately frozen initialP43 rank3 256Bfast box failed host encoding; no candidate matrix execution or latency",
+  "retained": "P39 remains fully validated ordinary/Graph research reference; production unchanged",
+  "limitations": "No P43/P44 independent Graph timing or sanitizer acceptance; P44 has no fresh stress. FP32bmm M11 model is not hardware proof or performance."
+}
