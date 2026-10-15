@@ -23,7 +23,7 @@ template<class T>
 void candidate(int id,megafmm::DType dtype,int sms) {
   using namespace megafmm;
   Problem p;p.dtype=dtype;p.alpha=0.5f;p.beta=-0.25f;
-  if(id<4) {p.m=129;p.n=256;p.k=128;p.lda=136;p.ldb=264;p.ldc=p.ldd=264;}
+  if(id<4 || id>=9) {p.m=129;p.n=256;p.k=128;p.lda=136;p.ldb=264;p.ldc=p.ldd=264;}
   else {p.m=id==4?17:129;p.n=id==4?23:137;p.k=id==4?19:65;
         p.trans_a=p.trans_b=true;p.lda=p.m+3;p.ldb=p.k+5;p.ldc=p.ldd=p.n+7;}
   const size_t ac=(p.trans_a?p.k:p.m)*p.lda,bc=(p.trans_b?p.n:p.k)*p.ldb,dc=p.m*p.ldd;
@@ -31,7 +31,7 @@ void candidate(int id,megafmm::DType dtype,int sms) {
   Buffer da(ac*2),db(bc*2),out0(dc*4),out1(dc*4);
   Buffer work0(detail::hopper_workspace(p,id)),work1(detail::hopper_workspace(p,id));
   Execution execution[2];void* outputs[]={out0.p,out1.p};void* workspaces[]={work0.p,work1.p};
-  const int base=id>=5?id-5:id;
+  const int base=id>=5 && id<=8?id-5:id;
   detail::hopper_dense(base,p,nullptr,nullptr,nullptr,nullptr,nullptr,sms,nullptr,2);
   // Capture only after one setup; both executions bind distinct output/scratch.
   check(cudaStreamBeginCapture(execution[0].stream,cudaStreamCaptureModeThreadLocal));

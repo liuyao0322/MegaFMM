@@ -28,7 +28,7 @@ struct Candidate {
   using Kernel=cutlass::gemm::kernel::GemmUniversal<Shape<int,int,int,int>,Mainloop,Epilogue>;
   using Gemm=cutlass::gemm::device::GemmUniversalAdapter<Kernel>;
   static bool run(const Problem& p,const void* A,const void* B,const float* C,float* D,
-                  void* workspace,int sm_count,cudaStream_t stream,int operation) {
+                  void* workspace,int sm_count,cudaStream_t stream,int operation,int swizzle=1) {
     if(operation==2) {
       auto e=cudaFuncSetAttribute(cutlass::device_kernel<Kernel>,
           cudaFuncAttributeMaxDynamicSharedMemorySize,Kernel::SharedStorageSize);
@@ -46,6 +46,7 @@ struct Candidate {
        D,typename Kernel::StrideD{p.ldd,Int<1>{},int64_t(0)}},
       {0,sm_count}
     };
+    args.scheduler.max_swizzle_size=swizzle;
     args.epilogue.thread.alpha=p.alpha;args.epilogue.thread.beta=p.beta;
     if(Gemm::can_implement(args)!=cutlass::Status::kSuccess) return false;
     // The persistent scheduler has zero workspace. No counters or values are
@@ -67,6 +68,12 @@ bool dispatch(int id,const Problem& p,const void* A,const void* B,const float* C
     case 1:return Candidate<T,128,128,1>::run(p,A,B,C,D,workspace,sm_count,stream,operation);
     case 2:return Candidate<T,128,256,1>::run(p,A,B,C,D,workspace,sm_count,stream,operation);
     case 3:return Candidate<T,128,128,2>::run(p,A,B,C,D,workspace,sm_count,stream,operation);
+    case 9:return Candidate<T,128,128,1>::run(p,A,B,C,D,workspace,sm_count,stream,operation,4);
+    case 10:return Candidate<T,128,128,1>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 11:return Candidate<T,128,256,1>::run(p,A,B,C,D,workspace,sm_count,stream,operation,4);
+    case 12:return Candidate<T,128,256,1>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 13:return Candidate<T,128,128,2>::run(p,A,B,C,D,workspace,sm_count,stream,operation,4);
+    case 14:return Candidate<T,128,128,2>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     default:return false;
   }
 }
@@ -86,12 +93,14 @@ template<class T> __global__ void small_gemm(Problem p,const T* A,const T* B,con
 }
 }
 const char* hopper_candidate_name(int id) {
-  static const char* names[]={"128x64x64_c1","128x128x64_c1","128x256x64_c1","128x128x64_c2","simt_small","pad_128x64x64_c1","pad_128x128x64_c1","pad_128x256x64_c1","pad_128x128x64_c2"};
+  static const char* names[]={"128x64x64_c1","128x128x64_c1","128x256x64_c1","128x128x64_c2","simt_small","pad_128x64x64_c1","pad_128x128x64_c1","pad_128x256x64_c1","pad_128x128x64_c2",
+      "128x128x64_c1_sw4","128x128x64_c1_sw8","128x256x64_c1_sw4",
+      "128x256x64_c1_sw8","128x128x64_c2_sw4","128x128x64_c2_sw8"};
   return id>=0 && id<HopperCandidateCount ? names[id]:"invalid";
 }
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C,float* D,
                   void* workspace,int sm_count,cudaStream_t stream,int operation) {
-  if(id>=5 && id<HopperCandidateCount)
+  if(id>=5 && id<=8)
     return padded_hopper(id-5,p,A,B,C,D,workspace,sm_count,stream,operation);
   if(id==4) {
     if(p.m*p.n>4096 || p.k>256) return false;

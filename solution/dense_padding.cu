@@ -32,7 +32,7 @@ __global__ void unpack(Problem p,const float* packed,float* D,int64_t np) {
 }
 }
 size_t hopper_workspace(const Problem& p,int id) {
-  if(id<5 || id>=HopperCandidateCount || p.m<=0 || p.n<=0 || p.k<=0 ||
+  if(id<5 || id>8 || p.m<=0 || p.n<=0 || p.k<=0 ||
       std::max({p.m,p.n,p.k})>32768) return 0;
   if(!p.trans_a && !p.trans_b && p.k%8==0 && p.n%8==0 && p.lda%8==0 &&
       p.ldb%8==0 && p.ldd%4==0 && (p.beta==0 || p.ldc%4==0)) return 0;

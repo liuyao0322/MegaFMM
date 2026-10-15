@@ -6,6 +6,7 @@ still validates and times candidates against pointers on the current device.
 """
 import argparse
 import csv
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -31,10 +32,19 @@ shapes = a.shapes or ';'.join(','.join(map(str, s)) for group in
 dest = a.output_dir or ROOT / 'results' / f'mnk_acceptance_{time.strftime("%Y%m%d_%H%M%S")}'
 dest = dest.resolve()
 dest.mkdir(parents=True, exist_ok=True)
+def binary_digest():
+    return hashlib.sha256((ROOT / 'build/megafmm_bench').read_bytes()).hexdigest()
+
+binary_sha256 = binary_digest()
+source_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+source_sha256 = {str(f.relative_to(ROOT)): hashlib.sha256(f.read_bytes()).hexdigest()
+                 for f in list((ROOT / 'solution').glob('*')) + [ROOT / 'include/megafmm/gemm.h'] if f.is_file()}
 observations = {}
 processes = []
 pattern = re.compile(r'TIME shape=(\d+),(\d+),(\d+) dtype=(\w+) group=(\d+) case=(dense|solution) event_ms=([\deE.+-]+)')
 for repeat in range(a.repeats):
+    if binary_digest() != binary_sha256:
+        raise RuntimeError('benchmark binary changed during acceptance; do not combine different builds')
     csv_path = dest / f'run{repeat}.csv'
     log_path = dest / f'run{repeat}.log'
     cmd = ['bash', 'scripts/on_gpu.sh', './build/megafmm_bench',
@@ -92,6 +102,7 @@ for key, rows in observations.items():
 expected = 2 * len(shapes.split(';'))
 wins = sum(e['status'] == 'stable_win' for e in entries)
 report = {
+    'binary_sha256': binary_sha256, 'source_commit': source_commit, 'source_sha256': source_sha256,
     'schema_version': 1, 'shapes': shapes, 'mode': 'graph' if a.graph else 'launch',
     'rotate_inputs': a.rotate_inputs, 'repeats_required': a.repeats,
     'trials': spec['trials'], 'groups': spec['groups'],

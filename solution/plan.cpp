@@ -492,7 +492,7 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
           const size_t required=detail::hopper_workspace(p,id);
           if(required<=policy.workspace_limit) impl->bytes=std::max(impl->bytes,required);
         }
-        for(int id=0;id<4;++id)
+        for(int id=0;id<detail::HopperCandidateCount;++id) if(id!=4 && !(id>=5 && id<=8))
           detail::hopper_dense(id,p,nullptr,nullptr,nullptr,nullptr,nullptr,impl->sm_count,nullptr,2);
       }
     }

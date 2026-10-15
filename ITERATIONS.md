@@ -585,6 +585,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 339 | Add padded Hopper candidates for boundary and general layouts | 1.0729 | 0.040910 | measured |
 
+| 340 | Add per-MNK scheduler swizzle candidates for cache reuse | 1.0436 | 1.267120 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5356,3 +5358,45 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Full-count nine-shape two-dtype benchmark, with complete packing costs and original FP64 gates; no threshold relaxation. Registry requires every repeated paired group to exceed configured margin and rejects fallback as a custom win
 - **Next:** Inspect boundary gains; run complete 14-shape independent repeated acceptance, fixed-candidate profiling, and Tuned API Graph plus sanitizer checks
 - **Archive:** trajectory/20261015_161818_iter-339/
+
+### Iter 340 — Add per-MNK scheduler swizzle candidates for cache reuse
+
+- **Hypothesis:** Large matrices exceed L2 capacity and default CTA raster order reloads operands; swizzle4 and8 may reduce full-call latency without changing arithmetic
+- **Changes:** Add six runtime scheduler variants of existing Hopper cores, preserve all old candidates and zero-workspace semantics, extend candidate tests and freeze binary/source hashes in repeated acceptance
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 28 rows; arithmetic mean of row median latency=1.267120 ms; mean speedup=1.0436x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_dense_cublaslt v0 | launch | 0.005661 | 0.005656 | 1.0008 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.005713 | 0.005703 | 1.0019 | 6.44261e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.012116 | 0.008139 | 1.4886 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009646 | 0.008098 | 1.1913 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.032401 | 0.030883 | 1.0492 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.033008 | 0.030665 | 1.0764 | 2.45816e-06 | 1 |
+| 4096,4096,4096 | bf16 | tuned_hopper_dense v0 | launch | 0.227336 | 0.214060 | 1.0620 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.230470 | 0.230498 | 0.9999 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.632485 | 1.630689 | 1.0011 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.732198 | 1.710705 | 1.0126 | 9.68937e-06 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.790748 | 12.756293 | 1.0027 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.276791 | 13.290154 | 0.9990 | 1.93317e-05 | 1 |
+| 8192,4096,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.845651 | 0.932956 | 0.9064 | 8.55058e-06 | 1 |
+| 8192,4096,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.904361 | 0.896350 | 1.0089 | 9.68961e-06 | 1 |
+| 4096,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.829136 | 0.845639 | 0.9805 | 8.55119e-06 | 1 |
+| 4096,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.895326 | 0.907105 | 0.9870 | 9.68981e-06 | 1 |
+| 8192,8192,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.878776 | 0.875627 | 1.0036 | 4.02534e-06 | 1 |
+| 8192,8192,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.898415 | 0.904203 | 0.9936 | 4.87776e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_dense_cublaslt v0 | launch | 0.026257 | 0.026166 | 1.0035 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.025552 | 0.024786 | 1.0309 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027780 | 0.025910 | 1.0722 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.026749 | 0.026735 | 1.0005 | 6.43463e-07 | 1 |
+| 1025,1537,769 | bf16 | tuned_hopper_dense v0 | launch | 0.038922 | 0.034995 | 1.1122 | 6.19792e-07 | 1 |
+| 1025,1537,769 | fp16 | tuned_hopper_dense v0 | launch | 0.036652 | 0.034144 | 1.0734 | 9.7026e-07 | 1 |
+| 514,770,258 | bf16 | tuned_dense_cublaslt v0 | launch | 0.008884 | 0.008908 | 0.9972 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_dense_cublaslt v0 | launch | 0.008896 | 0.008925 | 0.9968 | 3.40967e-07 | 1 |
+| 1,1,1 | bf16 | tuned_hopper_dense v0 | launch | 0.002904 | 0.002685 | 1.0816 | 0 | 1 |
+| 1,1,1 | fp16 | tuned_hopper_dense v0 | launch | 0.002912 | 0.002676 | 1.0879 | 0 | 1 |
+
+- **Analysis:** Full14-shape two-dtype run with two rotating input sets and unchanged100x5 timing plus3 FP64 trials. On16384 BF16 sw8 cuts128x256 core from17to18ms to about12.6ms but does not yet stably beat cuBLAS. Prior339 independent3-sweep registry verifies9of28 stable custom wins, all28 precision pass; artifacts archived with forced-candidate memcheck0errors
+- **Next:** Inspect every row; test shallower small tiles and alternate raster orders, then repeat all-size stability verification and validate every new candidate
+- **Archive:** trajectory/20261015_162649_iter-340/

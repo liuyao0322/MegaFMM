@@ -14,7 +14,7 @@ int main(int argc,char** argv) {try {
   check(cudaMalloc(&a,size_t(n)*n*2));check(cudaMalloc(&b,size_t(n)*n*2));check(cudaMalloc(&d,size_t(n)*n*4));
   const size_t bytes=megafmm::detail::hopper_workspace(p,id);if(bytes)check(cudaMalloc(&w,bytes));
   check(cudaMemset(a,0,size_t(n)*n*2));check(cudaMemset(b,0,size_t(n)*n*2));
-  megafmm::detail::hopper_dense(id>=5?id-5:id,p,nullptr,nullptr,nullptr,nullptr,nullptr,prop.multiProcessorCount,nullptr,2);
+  megafmm::detail::hopper_dense(id>=5 && id<=8?id-5:id,p,nullptr,nullptr,nullptr,nullptr,nullptr,prop.multiProcessorCount,nullptr,2);
   for(int i=0;i<5;++i)
     if(!megafmm::detail::hopper_dense(id,p,a,b,nullptr,static_cast<float*>(d),w,prop.multiProcessorCount,nullptr,1))
       throw std::runtime_error("fixed candidate does not support shape");

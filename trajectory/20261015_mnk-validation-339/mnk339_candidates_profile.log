@@ -1,0 +1,46 @@
+srun: Job 107488 step creation temporarily disabled, retrying (Requested nodes are busy)
+srun: Step created for job 107488
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 44%] Built target megafmm
+gmake[2]: Warning: File 'CMakeFiles/test_correctness.dir/compiler_depend.make' has modification time 0.0036 s in the future
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake[2]: Warning: File 'CMakeFiles/test_multisize.dir/compiler_depend.make' has modification time 0.0071 s in the future
+gmake[2]: Warning: File 'CMakeFiles/test_sw1024.dir/compiler_depend.make' has modification time 0.0015 s in the future
+gmake[2]: Warning: File 'CMakeFiles/megafmm_bench.dir/compiler_depend.make' has modification time 0.00093 s in the future
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+[ 55%] Built target test_correctness
+[ 72%] Built target test_sw1024
+[ 83%] Built target test_multisize
+[ 88%] Built target megafmm_bench
+[ 94%] Building CUDA object CMakeFiles/test_tuning_candidates.dir/tests/test_tuning_candidates.cu.o
+[100%] Linking CXX executable test_tuning_candidates
+[100%] Built target test_tuning_candidates
+PASS candidate=128x64x64_c1 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x64x64_c1 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x128x64_c1 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x128x64_c1 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x256x64_c1 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x256x64_c1 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x128x64_c2 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x128x64_c2 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=simt_small dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=simt_small dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=pad_128x64x64_c1 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=pad_128x64x64_c1 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=pad_128x128x64_c1 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=pad_128x128x64_c1 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=pad_128x256x64_c1 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=pad_128x256x64_c1 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=pad_128x128x64_c2 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=pad_128x128x64_c2 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+==WARNING== Note: Running with uncontrolled GPU caches. Profiling results may be inconsistent.
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 1634239 (/share/home/liuyao/workspace/MegaFMM/research/mnk_tuning/profile_candidate)
+==PROF== Profiling "device_kernel" - 0: 0%....50%....100% - 10 passes
+fixed_candidate=128x64x64_c1 shape=1024 dtype=fp16
+==PROF== Disconnected from process 1634239
+==PROF== Report: /share/home/liuyao/workspace/MegaFMM/results/mnk339_fixed_1024.ncu-rep
