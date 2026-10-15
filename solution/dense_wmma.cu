@@ -177,20 +177,20 @@ __global__ __launch_bounds__(128) void direct_mma(Problem p,const T* A,const T* 
   }
 }
 struct SmallProblem {int m,n,k,lda,ldb,ldc,ldd;float alpha,beta;};
-template<class T,int BK,int Copy>
+template<class T,int BK,int Copy,int LoadK=BK>
 __device__ __forceinline__ void load_even(T* sa,T* sb,SmallProblem p,const T* A,const T* B,
                                          int r0,int c0,int q) {
   constexpr int AS=BK+8,BS=40,W=Copy/2;
   #pragma unroll
-  for(int i=threadIdx.x;i<32*BK/W;i+=128) {
-    const int r=i/(BK/W),c=i%(BK/W)*W;
+  for(int i=threadIdx.x;i<32*LoadK/W;i+=128) {
+    const int r=i/(LoadK/W),c=i%(LoadK/W)*W;
     const bool valid=r0+r<p.m && q+c<p.k;
     const int offset=(r0+r)*p.lda+q+c;
     if constexpr(Copy==16) copy16(sa+r*AS+c,valid?A+offset:A,valid);
     else copy4(sa+r*AS+c,valid?A+offset:A,valid);
   }
   #pragma unroll
-  for(int i=threadIdx.x;i<BK*32/W;i+=128) {
+  for(int i=threadIdx.x;i<LoadK*32/W;i+=128) {
     const int r=i/(32/W),c=i%(32/W)*W;
     const bool valid=q+r<p.k && c0+c<p.n;
     const int offset=(q+r)*p.ldb+c0+c;
@@ -200,6 +200,11 @@ __device__ __forceinline__ void load_even(T* sa,T* sb,SmallProblem p,const T* A,
   asm volatile("cp.async.commit_group;" ::: "memory");
 }
 template<class T,int BK,int Copy>
+__device__ __forceinline__ void load_even_tile(T* sa,T* sb,SmallProblem p,const T* A,const T* B,int r0,int c0,int q) {
+  if(p.k-q<=16)load_even<T,BK,Copy,16>(sa,sb,p,A,B,r0,c0,q);
+  else load_even<T,BK,Copy>(sa,sb,p,A,B,r0,c0,q);
+}
+template<class T,int BK,int Copy>
 __global__ __launch_bounds__(128) void even_mma(SmallProblem p,const T* A,const T* B,const float* C,float* D) {
   constexpr int AS=BK+8,BS=40;
   __shared__ __align__(32) T sa[2][32*AS];
@@ -207,13 +212,14 @@ __global__ __launch_bounds__(128) void even_mma(SmallProblem p,const T* A,const 
   const int lane=threadIdx.x%32,warp=threadIdx.x/32,wm=warp/2,wn=warp%2;
   const int r0=int(blockIdx.y)*32,c0=int(blockIdx.x)*32;
   float acc[2][4]={{0,0,0,0},{0,0,0,0}};
-  load_even<T,BK,Copy>(sa[0],sb[0],p,A,B,r0,c0,0);ready(Copy);
+  load_even_tile<T,BK,Copy>(sa[0],sb[0],p,A,B,r0,c0,0);ready(Copy);
   int slot=0;
   for(int q=0;q<p.k;q+=BK,slot^=1) {
     const bool next=q+BK<p.k;
-    if(next)load_even<T,BK,Copy>(sa[slot^1],sb[slot^1],p,A,B,r0,c0,q+BK);
+    if(next)load_even_tile<T,BK,Copy>(sa[slot^1],sb[slot^1],p,A,B,r0,c0,q+BK);
     #pragma unroll
     for(int kk=0;kk<BK;kk+=16) {
+      if(kk && q+kk>=p.k)continue;
       uint32_t a[4];
       unsigned ap=unsigned(__cvta_generic_to_shared(sa[slot]+(wm*16+lane%16)*AS+kk+(lane/16)*8));
       asm volatile("ldmatrix.sync.aligned.m8n8.x4.shared.b16 {%0,%1,%2,%3},[%4];" : "=r"(a[0]),"=r"(a[1]),"=r"(a[2]),"=r"(a[3]) : "r"(ap));
@@ -231,12 +237,15 @@ __global__ __launch_bounds__(128) void even_mma(SmallProblem p,const T* A,const 
   #pragma unroll
   for(int j=0;j<2;++j) {
     #pragma unroll
-    for(int i=0;i<4;++i) {
-      int r=r0+wm*16+lane/4+(i/2)*8,c=c0+wn*16+j*8+(lane%4)*2+i%2;
+    for(int pair=0;pair<2;++pair) {
+      const int r=r0+wm*16+lane/4+pair*8,c=c0+wn*16+j*8+(lane%4)*2;
       if(r<p.m && c<p.n) {
-        float value=p.alpha*acc[j][i];
-        if(p.beta!=0)value=fmaf(p.beta,C[r*p.ldc+c],value);
-        D[r*p.ldd+c]=value;
+        float2 value=make_float2(p.alpha*acc[j][pair*2],p.alpha*acc[j][pair*2+1]);
+        if(p.beta!=0) {
+          float2 prior=*reinterpret_cast<const float2*>(C+r*p.ldc+c);
+          value.x=fmaf(p.beta,prior.x,value.x);value.y=fmaf(p.beta,prior.y,value.y);
+        }
+        *reinterpret_cast<float2*>(D+r*p.ldd+c)=value;
       }
     }
   }
@@ -274,7 +283,8 @@ bool mma_even_dense(int bk,const Problem& p,const void* A,const void* B,const fl
   if(operation==2)return true;
   if(p.trans_a || p.trans_b || p.m<=0 || p.n<=0 || p.k<=0 || p.m>2048 || p.n>2048 || p.k>2048 ||
      p.n%2 || p.k%2 || p.lda%2 || p.ldb%2 || p.lda>(1<<20) || p.ldb>(1<<20) ||
-     p.ldc>(1<<20) || p.ldd>(1<<20) || reinterpret_cast<uintptr_t>(A)%4 || reinterpret_cast<uintptr_t>(B)%4)return false;
+     p.ldc>(1<<20) || p.ldd>(1<<20) || p.ldd%2 || reinterpret_cast<uintptr_t>(D)%8 ||
+     (p.beta!=0 && (p.ldc%2 || reinterpret_cast<uintptr_t>(C)%8)) || reinterpret_cast<uintptr_t>(A)%4 || reinterpret_cast<uintptr_t>(B)%4)return false;
   if(operation==0)return true;
   SmallProblem q{int(p.m),int(p.n),int(p.k),int(p.lda),int(p.ldb),int(p.ldc),int(p.ldd),p.alpha,p.beta};
   const bool wide=p.k%8==0 && p.n%8==0 && p.lda%8==0 && p.ldb%8==0 &&

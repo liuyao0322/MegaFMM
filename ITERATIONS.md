@@ -599,6 +599,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 346 | Narrow-index even MMA and two-dimensional Hopper clusters | 1.0751 | 1.670428 | measured |
 
+| 347 | Trim final K staging and vectorize even MMA output | 1.1260 | 0.014666 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5640,3 +5642,29 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Nine-shape two-dtype screening completed under full timing and original FP64 gates. Even-layout boundary candidates reduce approximately13.8us to10.0us but still lose to cuBLASLt8.8us. Cluster variants show no clear stable win on8192-cube. Existing512/1024/2048 gains remain provisional for this changed pool; no additional certified wins are claimed.
 - **Next:** Close forced validation and profile the narrow-index boundary path. Investigate final-K-tile overcomputation and output vector stores if supported by the profile; independently certify any new winner.
 - **Archive:** trajectory/20261015_172923_iter-346/
+
+### Iter 347 — Trim final K staging and vectorize even MMA output
+
+- **Hypothesis:** A short final K tile should stage and compute only one16-element fragment; paired output stores reduce scalar-store instructions and excess sectors.
+- **Changes:** Use a16-wide staged tail for remainingK<=16, predicate redundant MMA fragments, and store float2 pairs under explicit eight-byte output/source alignment checks; add K2-tail and vector-alignment validation.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 12 rows; arithmetic mean of row median latency=0.014666 ms; mean speedup=1.1260x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005671 | 0.005055 | 1.1220 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005717 | 0.005083 | 1.1248 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_dense_cublaslt v0 | launch | 0.008766 | 0.008750 | 1.0018 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_dense_cublaslt v0 | launch | 0.008676 | 0.008684 | 0.9990 | 3.40967e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.011854 | 0.008073 | 1.4684 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009544 | 0.008081 | 1.1810 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.031531 | 0.029220 | 1.0791 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.032193 | 0.030927 | 1.0409 | 2.45816e-06 | 1 |
+| 1025,1537,769 | bf16 | tuned_padded_hopper v0 | launch | 0.037540 | 0.033566 | 1.1184 | 6.19792e-07 | 1 |
+| 1025,1537,769 | fp16 | tuned_padded_hopper v0 | launch | 0.036227 | 0.033480 | 1.0820 | 9.7026e-07 | 1 |
+| 1,1,1 | bf16 | tuned_simt_small v0 | launch | 0.002890 | 0.002507 | 1.1529 | 0 | 1 |
+| 1,1,1 | fp16 | tuned_simt_small v0 | launch | 0.002924 | 0.002560 | 1.1419 | 0 | 1 |
+
+- **Analysis:** Completed six-shape two-dtype screening with full100-call five-group timing and original fresh-input FP64 checks. This iteration targets only the restricted small even MMA family; large Hopper code is unchanged. New boundary results require forced-candidate validation and repeated timing before any additional stable-win claim.
+- **Next:** Validate short-K and paired-output execution under Graph,dual streams,memcheck andracecheck; inspect boundary timing and profile if it still falls short.
+- **Archive:** trajectory/20261015_173737_iter-347/
