@@ -1,0 +1,12 @@
+{
+  "scope": "Exhaust signed INT8 and scale shifts for P36's exact cap-at-eight identity.\n\nq is integral in[-128,127]. For shift>=8, |q*2^-shift|<=.5 and the only\nhalf tie (-128,8) rounds to even zero. All capped products are exact binary FP32.\nThis is scalar arithmetic proof/control, not packed GPU or matrix acceptance.\n",
+  "signed_int8_values": 256,
+  "shifts_inclusive": [
+    0,
+    300
+  ],
+  "checks": 77056,
+  "errors": 0,
+  "hardware_accepted": false,
+  "nonnegative_shift_reason": "common=max of four integer exponents"
+}

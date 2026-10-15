@@ -1,6 +1,8 @@
 #pragma once
 #include "pack.cuh"
 #include "megafmm/gemm.h"
+#include <vector>
+#include <cstdio>
 
 namespace int8_research {
 using Barrier=cutlass::arch::ClusterBarrier;
@@ -17,6 +19,28 @@ __host__ __device__ constexpr int qb_plane(int term){return term<2?8-term:(term-
 // Five correction groups retain all eight original integer dots.
 __host__ __device__ constexpr int first_term(int group){return group<2?group:2+2*(group-2);}
 static_assert(2*128*127*127<4194304,"paired integer bound");
+static_assert(2*512*127*127<16777216,"common-scale exact FP32 integer bound");
+
+
+void diagnose_uniform_scales(const char* dtype,int pattern,int trial,Work w,cudaStream_t stream,int stream_id=0){
+ std::vector<int> ea(9*32),eb(9*64);
+ check(cudaMemcpyAsync(ea.data(),w.ea,ea.size()*sizeof(int),cudaMemcpyDeviceToHost,stream),"diagnostic A exponents");
+ check(cudaMemcpyAsync(eb.data(),w.eb,eb.size()*sizeof(int),cudaMemcpyDeviceToHost,stream),"diagnostic B exponents");
+ check(cudaStreamSynchronize(stream),"diagnostic metadata ready");
+ int eligible=0,paired=0,exceptional=0;
+ for(int by=0;by<8;++by)for(int bx=0;bx<16;++bx)for(int g=0;g<5;++g){
+  int term=first_term(g),ap=qa_plane(term),bp=qb_plane(term);
+  int ex[2][4];bool bounded=true,same=true;
+  for(int half=0;half<2;++half)for(int k=0;k<4;++k){
+   ex[half][k]=ea[ap*32+(bx*32/64)*4+k]+eb[bp*64+k*16+by*2+half];
+   bounded=bounded&&ex[half][k]>=-126&&ex[half][k]<=103;
+   if(k)same=same&&ex[half][k]==ex[half][0];
+  }
+  bool use=same&&bounded;eligible+=use;paired+=use&&g>=2;exceptional+=!bounded;
+ }
+ printf("SCALE_ELIGIBILITY dtype=%s pattern=%d trial=%d stream=%d groups=640 eligible=%d paired_eligible=%d fallback=%d exceptional=%d diagnostic_only=1\n",
+  dtype,pattern,trial,stream_id,eligible,paired,640-eligible,exceptional);
+}
 
 template<class T> __device__ __forceinline__ void float_mma(uint64_t a,uint64_t b,float* d,cute::GMMA::ScaleOut scale){
  using namespace cute;
@@ -51,6 +75,14 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
  int meta_e0=ae+eb[bp*64+kk*16+m0/32],meta_e1=ae+eb[bp*64+kk*16+m0/32+1];
  float meta_s0=(meta_e0>=-126&&meta_e0<=127)?__int_as_float((meta_e0+127)<<23):0.f;
  float meta_s1=(meta_e1>=-126&&meta_e1<=127)?__int_as_float((meta_e1+127)<<23):0.f;
+ // Each four-lane group owns its four K128 exponents. Compute agreement
+ // once before any MMA, instead of eight exponent broadcasts in every step.
+ bool meta_common=meta_e0>=-126&&meta_e0<=103&&meta_e1>=-126&&meta_e1<=103;
+ #pragma unroll
+ for(int delta=1;delta<4;++delta){
+  int other0=__shfl_xor_sync(0xffffffff,meta_e0,delta),other1=__shfl_xor_sync(0xffffffff,meta_e1,delta);
+  meta_common=meta_common&&(meta_e0==other0)&&(meta_e1==other1);
+ }
  float c[4][16]={};
  #pragma unroll 1
  for(int step=0;step<12;++step){
@@ -82,6 +114,44 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
    asm volatile("bar.warp.sync 0xffffffff;" ::: "memory");
    if((tid&31)==0)Barrier::arrive(&s.free[(step*4+3)%Stages]);
   }else{
+   int owner=(step-7)*4;
+   bool common=__shfl_sync(0xffffffff,int(meta_common),owner)!=0;
+   if(common){
+    int e0=__shfl_sync(0xffffffff,meta_e0,owner),e1=__shfl_sync(0xffffffff,meta_e1,owner);
+    uint32_t integer[16]={};
+    #pragma unroll
+    for(int j=0;j<16;++j)warpgroup_fence_operand(integer[j]);
+    warpgroup_arrive();
+    #pragma unroll 1
+    for(int k=0;k<4;++k){
+     int seq=step*4+k,slot=seq%Stages;
+     Barrier::wait(&s.ready[slot],seq/Stages%2);asm volatile("" ::: "memory");
+     uint64_t offset=slot*24576/16;
+    #pragma unroll
+    for(int inner=0;inner<4;++inner)
+     integer_mma(uint64_t(daq(0,0,inner))+offset,uint64_t(dbq(0,0,inner))+offset,integer,(k==0&&inner==0)?GMMA::ScaleOut::Zero:GMMA::ScaleOut::One);
+    if(step>=9){
+     // The second B64x128 plane occupies bytes8192..16383; the
+     // second A32x128 plane occupies bytes20480..24575 in this slot.
+     // Accumulate before wait/rescale, with the same INT32 fragment.
+     #pragma unroll
+     for(int inner=0;inner<4;++inner)
+      integer_mma(uint64_t(daq(0,0,inner))+offset+8192/16,uint64_t(dbq(0,0,inner))+offset+4096/16,integer,GMMA::ScaleOut::One);
+    }
+     warpgroup_commit_batch();warpgroup_wait<0>();
+     asm volatile("bar.warp.sync 0xffffffff;" ::: "memory");
+     if((tid&31)==0)Barrier::arrive(&s.free[slot]);
+    }
+    #pragma unroll
+    for(int j=0;j<16;++j)warpgroup_fence_operand(integer[j]);
+    float s0=__int_as_float((e0+127)<<23),s1=__int_as_float((e1+127)<<23);
+    #pragma unroll
+    for(int j=0;j<16;++j){
+     int mn=GMMA::CLayout_64x32{}(tid-128,j);
+     float x=__fmul_rn(float(static_cast<int32_t>(integer[j])),(mn%64)<32?s0:s1);
+     d[j]=__fadd_rn(d[j],x);
+    }
+   }else{
    #pragma unroll 1
    for(int k=0;k<4;++k){
     int seq=step*4+k,slot=seq%Stages;
@@ -125,6 +195,7 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
     }
     asm volatile("bar.warp.sync 0xffffffff;" ::: "memory");
     if((tid&31)==0)Barrier::arrive(&s.free[slot]);
+   }
    }
   }
   // Product/term is uniform across all16outputs; select before the vector loop.

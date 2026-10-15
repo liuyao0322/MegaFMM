@@ -1,0 +1,47 @@
+{
+  "status": "p33_accuracy_and_scoped_synchronization_validated_performance_rejected",
+  "goal_achieved": false,
+  "ordinary_original_input_fp64_checks": 78,
+  "graph_original_input_fp64_checks": 78,
+  "graph_same_deterministic_configurations": true,
+  "graph_process_provenance": "p33_graph.log is an exact copy of existing own p33_graph_abba_b0.log; no extra independent Graph sample",
+  "equal_per_column_exponents_per_mode": 79872,
+  "independent_stress_configurations": 108,
+  "independent_stress_calls": 864,
+  "sanitizer_cases_per_tool": 36,
+  "sanitizer_calls_per_tool": 72,
+  "sanitizers": [
+    "memcheck",
+    "racecheck",
+    "synccheck"
+  ],
+  "sanitizer_kernel_scope": "kns=int8_research",
+  "stress_dense_control": "historical cuBLAS GemmEx; ordinary and Graph compare use production tuned Dense gate",
+  "stress_output_guards": "128 floats before and after each output; two independent streams/workspaces",
+  "graph_timing_us": {
+    "bf16": 37.43744182575,
+    "fp16": 37.82184028625
+  },
+  "cooperative_preprocessing": "288CTAs, one unconditional grid.sync barrier; actual supported/resident capacity checked outside run in every validation process",
+  "stress_seed_formula": "35317+trial*347+stream*197+pattern*59",
+  "research_retention": "P33 ordinary full-call research candidate; independent Graph comparison against P27 recorded separately",
+  "independent_graph_comparison": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p27",
+      "new_candidate": "p33",
+      "old_group_median_us": 37.084560394375,
+      "new_group_median_us": 37.312440395625,
+      "relative_reduction": -0.006144875355851953
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p27",
+      "new_candidate": "p33",
+      "old_group_median_us": 37.37383985525,
+      "new_group_median_us": 37.47687911975,
+      "relative_reduction": -0.0027569889767569133
+    }
+  ],
+  "limitations": "Only contiguous non-transposed1024^3, alpha1 beta0, FP16/BF16; no arbitrary-range proof, no production integration, no transfer to later modified candidates."
+}

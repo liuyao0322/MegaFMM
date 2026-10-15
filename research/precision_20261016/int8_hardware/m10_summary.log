@@ -1,0 +1,71 @@
+{
+  "scope": "60fresh matrix configurations,3paired numerical arms; not hardware/synchronization/performance acceptance",
+  "configurations": 60,
+  "paired_arm_rows": 180,
+  "summary": [
+    {
+      "dtype": "float16",
+      "arm": "baseline_k128",
+      "configurations": 30,
+      "passes": 30,
+      "nonfinite": 0,
+      "saturated_low_values": 0,
+      "max_ef": 7.081979220375381e-05,
+      "max_absolute_integer": 143213
+    },
+    {
+      "dtype": "float16",
+      "arm": "exactwide_k512",
+      "configurations": 30,
+      "passes": 30,
+      "nonfinite": 0,
+      "saturated_low_values": 0,
+      "max_ef": 7.247325495893311e-05,
+      "max_absolute_integer": 212009
+    },
+    {
+      "dtype": "float16",
+      "arm": "requantized_k512",
+      "configurations": 30,
+      "passes": 30,
+      "nonfinite": 0,
+      "saturated_low_values": 0,
+      "max_ef": 7.255244125667899e-05,
+      "max_absolute_integer": 212009
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "baseline_k128",
+      "configurations": 30,
+      "passes": 30,
+      "nonfinite": 0,
+      "saturated_low_values": 0,
+      "max_ef": 0.000517546354127434,
+      "max_absolute_integer": 128815
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "exactwide_k512",
+      "configurations": 30,
+      "passes": 30,
+      "nonfinite": 0,
+      "saturated_low_values": 0,
+      "max_ef": 0.0005307496568541584,
+      "max_absolute_integer": 211324
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "requantized_k512",
+      "configurations": 30,
+      "passes": 30,
+      "nonfinite": 0,
+      "saturated_low_values": 0,
+      "max_ef": 0.0005316912497874737,
+      "max_absolute_integer": 211324
+    }
+  ],
+  "double_rounding_negative_control": "RN(RN(1.49)/2)=0 vs RN(1.49/2)=1",
+  "same_input_controls": "first uniform seed5201 per dtype: baselineK128 and exactwideK512 exactly match M9 eF and max integer",
+  "hardware_accepted": false,
+  "performance_accepted": false
+}

@@ -1,0 +1,199 @@
+{
+  "status": "accuracy_validated_performance_rejected",
+  "goal_achieved": false,
+  "retained_ordinary": "p33",
+  "retained_graph": "p27",
+  "candidates": {
+    "p31": {
+      "ordinary_checks": 78,
+      "equal_per_column_exponents": 79872,
+      "all_printed_ef_equal_p30": true,
+      "full_call_us": {
+        "bf16": 41.76848030075,
+        "fp16": 42.214399338
+      },
+      "consumer_registers": 198,
+      "static_bf16_instructions": 3327,
+      "static_shfl": 20,
+      "metadata_diagnostics": [
+        {
+          "dtype": "bf16",
+          "configurations": 39,
+          "groups": 24960,
+          "eligible": 15044,
+          "paired_eligible": 7468,
+          "fallback": 9916,
+          "exceptional": 0
+        },
+        {
+          "dtype": "fp16",
+          "configurations": 39,
+          "groups": 24960,
+          "eligible": 14162,
+          "paired_eligible": 6574,
+          "fallback": 10798,
+          "exceptional": 0
+        }
+      ],
+      "performance_accepted": false,
+      "extra_validation": "fresh9-pattern stress108/864calls only; no full Graph78 or sanitizer claim"
+    },
+    "p32": {
+      "ordinary_checks": 78,
+      "equal_per_column_exponents": 79872,
+      "all_printed_ef_equal_p30": true,
+      "full_call_us": {
+        "bf16": 39.054799079999995,
+        "fp16": 39.0963993075
+      },
+      "consumer_registers": 198,
+      "static_bf16_instructions": 3343,
+      "static_shfl": 22,
+      "metadata_diagnostics": [
+        {
+          "dtype": "bf16",
+          "configurations": 39,
+          "groups": 24960,
+          "eligible": 15044,
+          "paired_eligible": 7468,
+          "fallback": 9916,
+          "exceptional": 0
+        },
+        {
+          "dtype": "fp16",
+          "configurations": 39,
+          "groups": 24960,
+          "eligible": 14162,
+          "paired_eligible": 6574,
+          "fallback": 10798,
+          "exceptional": 0
+        }
+      ],
+      "performance_accepted": false,
+      "extra_validation": "ordinary78 only; no Graph/stress/sanitizer claim"
+    },
+    "p33": {
+      "ordinary_checks": 78,
+      "equal_per_column_exponents": 79872,
+      "all_printed_ef_equal_p30": true,
+      "full_call_us": {
+        "bf16": 36.80055999775,
+        "fp16": 37.329199791
+      },
+      "consumer_registers": 198,
+      "static_bf16_instructions": 3319,
+      "static_shfl": 22,
+      "metadata_diagnostics": [
+        {
+          "dtype": "bf16",
+          "configurations": 39,
+          "groups": 24960,
+          "eligible": 15044,
+          "paired_eligible": 7468,
+          "fallback": 9916,
+          "exceptional": 0
+        },
+        {
+          "dtype": "fp16",
+          "configurations": 39,
+          "groups": 24960,
+          "eligible": 14162,
+          "paired_eligible": 6574,
+          "fallback": 10798,
+          "exceptional": 0
+        }
+      ],
+      "performance_accepted": false,
+      "extra_validation": "own full Graph78, fresh9-pattern stress108/864calls, scoped tools36/72calls each"
+    },
+    "p34": {
+      "ordinary_checks": 78,
+      "equal_per_column_exponents": 79872,
+      "all_printed_ef_equal_p30": true,
+      "full_call_us": {
+        "bf16": 37.51040077225,
+        "fp16": 37.58088016525
+      },
+      "consumer_registers": 196,
+      "static_bf16_instructions": 3271,
+      "static_shfl": 22,
+      "metadata_diagnostics": [
+        {
+          "dtype": "bf16",
+          "configurations": 39,
+          "groups": 24960,
+          "eligible": 7576,
+          "paired_eligible": 0,
+          "fallback": 17384,
+          "exceptional": 0
+        },
+        {
+          "dtype": "fp16",
+          "configurations": 39,
+          "groups": 24960,
+          "eligible": 7588,
+          "paired_eligible": 0,
+          "fallback": 17372,
+          "exceptional": 0
+        }
+      ],
+      "performance_accepted": false,
+      "extra_validation": "ordinary78 only; no Graph/stress/sanitizer claim"
+    }
+  },
+  "ordinary_p30_vs_p33": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p30",
+      "new_candidate": "p33",
+      "old_group_median_us": 37.977079868375,
+      "new_group_median_us": 37.034359932,
+      "relative_reduction": 0.024823391889065127
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p30",
+      "new_candidate": "p33",
+      "old_group_median_us": 37.846160411750006,
+      "new_group_median_us": 37.013679504375006,
+      "relative_reduction": 0.021996442923614024
+    }
+  ],
+  "graph_p27_vs_p33": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p27",
+      "new_candidate": "p33",
+      "old_group_median_us": 37.084560394375,
+      "new_group_median_us": 37.312440395625,
+      "relative_reduction": -0.006144875355851953
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p27",
+      "new_candidate": "p33",
+      "old_group_median_us": 37.37383985525,
+      "new_group_median_us": 37.47687911975,
+      "relative_reduction": -0.0027569889767569133
+    }
+  ],
+  "ordinary_p33_vs_p34": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p33",
+      "new_candidate": "p34",
+      "old_group_median_us": 37.073319435125,
+      "new_group_median_us": 37.427839755875,
+      "relative_reduction": -0.009562680821456393
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p33",
+      "new_candidate": "p34",
+      "old_group_median_us": 37.087639808625,
+      "new_group_median_us": 37.411639690375,
+      "relative_reduction": -0.008736060947039492
+    }
+  ],
+  "scope": "Full original-input FP64 matrix gates; printed eF equality is not a bitwise-output claim. Host eligibility diagnostics outside timing. No production integration. Unlocked clocks, no confidence interval."
+}

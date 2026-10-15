@@ -3,9 +3,9 @@
   "goal_achieved": false,
   "production_unchanged": true,
   "working_candidate": "f13",
-  "working_global_candidate": "p30",
+  "working_global_candidate": "p33",
   "compact_pow2_equivalence_cases": 1048576,
-  "retained_global_candidate": "p30 ordinary full-call only; p27 Graph replay remains faster. Each has own ordinary/Graph78, fresh stress84/672calls and scoped sanitizers28/56calls per tool. No production performance winner.",
+  "retained_global_candidate": "p33 ordinary full-call only, own ordinary/Graph78, fresh9-pattern stress108/864calls, scoped tools36/72calls each; p27 remains Graph reference with its own historical84/672stress and28/56tools. No production performance winner.",
   "compile_stopped_candidates": [
     "F12: no numerical or latency measurement",
     "P28 initial compile-only preflight: missing read-to-reuse hardware fence, superseded before device execution"
@@ -374,8 +374,96 @@
       },
       "equal_per_column_exponents": 79872,
       "additional_alternating_checks_passed": 6,
+      "retained": false,
+      "retained_for": "historical fully validated ordinary fallback"
+    },
+    "p31": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 41.76848030075,
+        "fp16": 42.214399338
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": false
+    },
+    "p32": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 39.054799079999995,
+        "fp16": 39.0963993075
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": false
+    },
+    "p33": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 36.80055999775,
+        "fp16": 37.329199791
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
       "retained": true,
-      "retained_for": "ordinary full-call research reference; Graph regression explicitly rejected"
+      "retained_for": "ordinary full-call research reference; own validation and Graph regression recorded separately"
+    },
+    "p34": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 37.51040077225,
+        "fp16": 37.58088016525
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": false
+    },
+    "p35": {
+      "checks": 78,
+      "failures": 0,
+      "equal_per_column_exponents": 79872,
+      "performance_accepted": false,
+      "retained": false,
+      "full_call_us": {
+        "bf16": 68.2704792025,
+        "fp16": 68.420639038
+      },
+      "numerical_algorithm_changed": "doubleRN existingK128 INT8 into commonK512; seven main/eight correction dots retained",
+      "validation_scope": "ordinary78 only; no ABBA/Graph/stress/sanitizer transfer"
+    },
+    "p36": {
+      "checks": 78,
+      "failures": 0,
+      "equal_per_column_exponents": 79872,
+      "performance_accepted": false,
+      "retained": false,
+      "full_call_us": {
+        "bf16": 44.8072004315,
+        "fp16": 44.58527946475
+      },
+      "numerical_algorithm_changed": "doubleRN existingK128 INT8 into commonK512; seven main/eight correction dots retained",
+      "validation_scope": "ordinary78 only; no ABBA/Graph/stress/sanitizer transfer"
+    },
+    "p37": {
+      "checks": 78,
+      "failures": 0,
+      "equal_per_column_exponents": 79872,
+      "performance_accepted": false,
+      "retained": false,
+      "full_call_us": {
+        "bf16": 43.084397316,
+        "fp16": 42.980401992750004
+      },
+      "numerical_algorithm_changed": "doubleRN existingK128 INT8 into commonK512; seven main/eight correction dots retained",
+      "validation_scope": "ordinary78 only; no ABBA/Graph/stress/sanitizer transfer"
     }
   },
   "numerical_models": {
@@ -429,6 +517,21 @@
       "hardware_accepted": false
     },
     "m9_quant_k512": {
+      "fresh_configurations": 60,
+      "passes": 60,
+      "hardware_accepted": false
+    },
+    "m10_baseline_k128": {
+      "fresh_configurations": 60,
+      "passes": 60,
+      "hardware_accepted": false
+    },
+    "m10_exactwide_k512": {
+      "fresh_configurations": 60,
+      "passes": 60,
+      "hardware_accepted": false
+    },
+    "m10_requantized_k512": {
       "fresh_configurations": 60,
       "passes": 60,
       "hardware_accepted": false
@@ -788,6 +891,326 @@
       "relative_reduction": -0.0202710367556187
     }
   ],
-  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. No transfer to later changes.",
+  "p33_validation": {
+    "status": "p33_accuracy_and_scoped_synchronization_validated_performance_rejected",
+    "goal_achieved": false,
+    "ordinary_original_input_fp64_checks": 78,
+    "graph_original_input_fp64_checks": 78,
+    "graph_same_deterministic_configurations": true,
+    "graph_process_provenance": "p33_graph.log is an exact copy of existing own p33_graph_abba_b0.log; no extra independent Graph sample",
+    "equal_per_column_exponents_per_mode": 79872,
+    "independent_stress_configurations": 108,
+    "independent_stress_calls": 864,
+    "sanitizer_cases_per_tool": 36,
+    "sanitizer_calls_per_tool": 72,
+    "sanitizers": [
+      "memcheck",
+      "racecheck",
+      "synccheck"
+    ],
+    "sanitizer_kernel_scope": "kns=int8_research",
+    "stress_dense_control": "historical cuBLAS GemmEx; ordinary and Graph compare use production tuned Dense gate",
+    "stress_output_guards": "128 floats before and after each output; two independent streams/workspaces",
+    "graph_timing_us": {
+      "bf16": 37.43744182575,
+      "fp16": 37.82184028625
+    },
+    "cooperative_preprocessing": "288CTAs, one unconditional grid.sync barrier; actual supported/resident capacity checked outside run in every validation process",
+    "stress_seed_formula": "35317+trial*347+stream*197+pattern*59",
+    "research_retention": "P33 ordinary full-call research candidate; independent Graph comparison against P27 recorded separately",
+    "independent_graph_comparison": [
+      {
+        "dtype": "bf16",
+        "old_candidate": "p27",
+        "new_candidate": "p33",
+        "old_group_median_us": 37.084560394375,
+        "new_group_median_us": 37.312440395625,
+        "relative_reduction": -0.006144875355851953
+      },
+      {
+        "dtype": "fp16",
+        "old_candidate": "p27",
+        "new_candidate": "p33",
+        "old_group_median_us": 37.37383985525,
+        "new_group_median_us": 37.47687911975,
+        "relative_reduction": -0.0027569889767569133
+      }
+    ],
+    "limitations": "Only contiguous non-transposed1024^3, alpha1 beta0, FP16/BF16; no arbitrary-range proof, no production integration, no transfer to later modified candidates."
+  },
+  "requantized_hardware": {
+    "status": "ordinary_accuracy_passed_performance_rejected",
+    "goal_achieved": false,
+    "candidates": {
+      "p35": {
+        "ordinary_checks": 78,
+        "equal_per_column_exponents": 79872,
+        "full_call_us": {
+          "bf16": 68.2704792025,
+          "fp16": 68.420639038
+        },
+        "max_ef": {
+          "bf16": 0.000509574742196,
+          "fp16": 6.56771967941e-05
+        },
+        "complete_preprocess_diagnostic_us": {
+          "bf16": 48.944320679,
+          "fp16": 49.211521149
+        },
+        "correctness_metadata_groups": 49920,
+        "all_correctness_groups_eligible": true,
+        "timing_metadata": "two final pattern=-1 rows explicitly excluded: older standalone probes overwrite workspace",
+        "performance_accepted": false,
+        "validation_scope": "ordinary78 only; no ABBA/full Graph/fresh stress/scoped tools claim"
+      },
+      "p36": {
+        "ordinary_checks": 78,
+        "equal_per_column_exponents": 79872,
+        "full_call_us": {
+          "bf16": 44.8072004315,
+          "fp16": 44.58527946475
+        },
+        "max_ef": {
+          "bf16": 0.000509574742196,
+          "fp16": 6.56771967941e-05
+        },
+        "complete_preprocess_diagnostic_us": {
+          "bf16": 25.951999664,
+          "fp16": 26.020479202
+        },
+        "correctness_metadata_groups": 49920,
+        "all_correctness_groups_eligible": true,
+        "timing_metadata": "actual complete prep rerun after all timings; both rows640eligible",
+        "performance_accepted": false,
+        "validation_scope": "ordinary78 only; no ABBA/full Graph/fresh stress/scoped tools claim"
+      },
+      "p37": {
+        "ordinary_checks": 78,
+        "equal_per_column_exponents": 79872,
+        "full_call_us": {
+          "bf16": 43.084397316,
+          "fp16": 42.980401992750004
+        },
+        "max_ef": {
+          "bf16": 0.000509574742196,
+          "fp16": 6.56771967941e-05
+        },
+        "complete_preprocess_diagnostic_us": {
+          "bf16": 24.17247963,
+          "fp16": 24.335998535
+        },
+        "correctness_metadata_groups": 49920,
+        "all_correctness_groups_eligible": true,
+        "timing_metadata": "actual complete prep rerun after all timings; both rows640eligible",
+        "performance_accepted": false,
+        "validation_scope": "ordinary78 only; no ABBA/full Graph/fresh stress/scoped tools claim"
+      }
+    },
+    "p36_p37_all_printed_ef_equal_p35": true,
+    "bitwise_output_equality_claimed": false,
+    "cpu_cap8_scalar_checks": 77056,
+    "cpu_cap8_errors": 0,
+    "retained": "P33 ordinary and P27 Graph, each with their own previously recorded validation; no transfer to P35/P36"
+  },
+  "uniform_scale_ablation": {
+    "status": "accuracy_validated_performance_rejected",
+    "goal_achieved": false,
+    "retained_ordinary": "p33",
+    "retained_graph": "p27",
+    "candidates": {
+      "p31": {
+        "ordinary_checks": 78,
+        "equal_per_column_exponents": 79872,
+        "all_printed_ef_equal_p30": true,
+        "full_call_us": {
+          "bf16": 41.76848030075,
+          "fp16": 42.214399338
+        },
+        "consumer_registers": 198,
+        "static_bf16_instructions": 3327,
+        "static_shfl": 20,
+        "metadata_diagnostics": [
+          {
+            "dtype": "bf16",
+            "configurations": 39,
+            "groups": 24960,
+            "eligible": 15044,
+            "paired_eligible": 7468,
+            "fallback": 9916,
+            "exceptional": 0
+          },
+          {
+            "dtype": "fp16",
+            "configurations": 39,
+            "groups": 24960,
+            "eligible": 14162,
+            "paired_eligible": 6574,
+            "fallback": 10798,
+            "exceptional": 0
+          }
+        ],
+        "performance_accepted": false,
+        "extra_validation": "fresh9-pattern stress108/864calls only; no full Graph78 or sanitizer claim"
+      },
+      "p32": {
+        "ordinary_checks": 78,
+        "equal_per_column_exponents": 79872,
+        "all_printed_ef_equal_p30": true,
+        "full_call_us": {
+          "bf16": 39.054799079999995,
+          "fp16": 39.0963993075
+        },
+        "consumer_registers": 198,
+        "static_bf16_instructions": 3343,
+        "static_shfl": 22,
+        "metadata_diagnostics": [
+          {
+            "dtype": "bf16",
+            "configurations": 39,
+            "groups": 24960,
+            "eligible": 15044,
+            "paired_eligible": 7468,
+            "fallback": 9916,
+            "exceptional": 0
+          },
+          {
+            "dtype": "fp16",
+            "configurations": 39,
+            "groups": 24960,
+            "eligible": 14162,
+            "paired_eligible": 6574,
+            "fallback": 10798,
+            "exceptional": 0
+          }
+        ],
+        "performance_accepted": false,
+        "extra_validation": "ordinary78 only; no Graph/stress/sanitizer claim"
+      },
+      "p33": {
+        "ordinary_checks": 78,
+        "equal_per_column_exponents": 79872,
+        "all_printed_ef_equal_p30": true,
+        "full_call_us": {
+          "bf16": 36.80055999775,
+          "fp16": 37.329199791
+        },
+        "consumer_registers": 198,
+        "static_bf16_instructions": 3319,
+        "static_shfl": 22,
+        "metadata_diagnostics": [
+          {
+            "dtype": "bf16",
+            "configurations": 39,
+            "groups": 24960,
+            "eligible": 15044,
+            "paired_eligible": 7468,
+            "fallback": 9916,
+            "exceptional": 0
+          },
+          {
+            "dtype": "fp16",
+            "configurations": 39,
+            "groups": 24960,
+            "eligible": 14162,
+            "paired_eligible": 6574,
+            "fallback": 10798,
+            "exceptional": 0
+          }
+        ],
+        "performance_accepted": false,
+        "extra_validation": "own full Graph78, fresh9-pattern stress108/864calls, scoped tools36/72calls each"
+      },
+      "p34": {
+        "ordinary_checks": 78,
+        "equal_per_column_exponents": 79872,
+        "all_printed_ef_equal_p30": true,
+        "full_call_us": {
+          "bf16": 37.51040077225,
+          "fp16": 37.58088016525
+        },
+        "consumer_registers": 196,
+        "static_bf16_instructions": 3271,
+        "static_shfl": 22,
+        "metadata_diagnostics": [
+          {
+            "dtype": "bf16",
+            "configurations": 39,
+            "groups": 24960,
+            "eligible": 7576,
+            "paired_eligible": 0,
+            "fallback": 17384,
+            "exceptional": 0
+          },
+          {
+            "dtype": "fp16",
+            "configurations": 39,
+            "groups": 24960,
+            "eligible": 7588,
+            "paired_eligible": 0,
+            "fallback": 17372,
+            "exceptional": 0
+          }
+        ],
+        "performance_accepted": false,
+        "extra_validation": "ordinary78 only; no Graph/stress/sanitizer claim"
+      }
+    },
+    "ordinary_p30_vs_p33": [
+      {
+        "dtype": "bf16",
+        "old_candidate": "p30",
+        "new_candidate": "p33",
+        "old_group_median_us": 37.977079868375,
+        "new_group_median_us": 37.034359932,
+        "relative_reduction": 0.024823391889065127
+      },
+      {
+        "dtype": "fp16",
+        "old_candidate": "p30",
+        "new_candidate": "p33",
+        "old_group_median_us": 37.846160411750006,
+        "new_group_median_us": 37.013679504375006,
+        "relative_reduction": 0.021996442923614024
+      }
+    ],
+    "graph_p27_vs_p33": [
+      {
+        "dtype": "bf16",
+        "old_candidate": "p27",
+        "new_candidate": "p33",
+        "old_group_median_us": 37.084560394375,
+        "new_group_median_us": 37.312440395625,
+        "relative_reduction": -0.006144875355851953
+      },
+      {
+        "dtype": "fp16",
+        "old_candidate": "p27",
+        "new_candidate": "p33",
+        "old_group_median_us": 37.37383985525,
+        "new_group_median_us": 37.47687911975,
+        "relative_reduction": -0.0027569889767569133
+      }
+    ],
+    "ordinary_p33_vs_p34": [
+      {
+        "dtype": "bf16",
+        "old_candidate": "p33",
+        "new_candidate": "p34",
+        "old_group_median_us": 37.073319435125,
+        "new_group_median_us": 37.427839755875,
+        "relative_reduction": -0.009562680821456393
+      },
+      {
+        "dtype": "fp16",
+        "old_candidate": "p33",
+        "new_candidate": "p34",
+        "old_group_median_us": 37.087639808625,
+        "new_group_median_us": 37.411639690375,
+        "relative_reduction": -0.008736060947039492
+      }
+    ],
+    "scope": "Full original-input FP64 matrix gates; printed eF equality is not a bitwise-output claim. Host eligibility diagnostics outside timing. No production integration. Unlocked clocks, no confidence interval."
+  },
+  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary. No transfer to later changes.",
   "remaining": "Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration."
 }

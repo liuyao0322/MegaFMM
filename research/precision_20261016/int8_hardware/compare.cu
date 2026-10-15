@@ -53,6 +53,7 @@ template<class T> int compare(megafmm::DType dtype,bool balance,bool quick,bool 
   else extended_fill<<<512,256,0,stream.s>>>(a.as<T>(),b.as<T>(),ad.as<double>(),bd.as<double>(),pat-6,1901901+trial*271+pat*29);
   double one=1,zero=0;check(cublasDgemm(blas.h,CUBLAS_OP_N,CUBLAS_OP_N,N,N,N,&one,bd.as<double>(),N,ad.as<double>(),N,&zero,ref.as<double>(),N));
   runs[0]();runs[3]();
+  int8_research::diagnose_uniform_scales(dt,pat,trial,int8_research::Work(workspace.p),stream.s);
   int inside_errors=0;
   if(balance){using CT=std::conditional_t<std::is_same_v<T,__half>,cute::half_t,cute::bfloat16_t>;
    int8_research::inside_scale<CT><<<1024,256,0,stream.s>>>(static_cast<const CT*>(a.p),static_cast<const CT*>(b.p),reference_inside.as<int>());
@@ -93,6 +94,8 @@ template<class T> int compare(megafmm::DType dtype,bool balance,bool quick,bool 
   [&]{if(balance)int8_research::pack<CT,false,true><<<3*64,256,sizeof(int8_research::PairPackShared<false>),stream.s>>>(static_cast<const CT*>(b.p),static_cast<CT*>(w.hb),w.qb,w.eb,w.inside);else int8_research::pack<CT,false,false><<<3*64,256,sizeof(int8_research::PairPackShared<false>),stream.s>>>(static_cast<const CT*>(b.p),static_cast<CT*>(w.hb),w.qb,w.eb,w.inside);}
  };
  for(int j=0;j<4;++j){for(int warm=0;warm<20;++warm)components[j]();printf("PREP_STAGE dtype=%s balance=%d stage=%d us=%.9f diagnostic_only=1\n",dt,balance,j,time_calls(components[j],stream.s));}
+ // Recomputed metadata for the timing input, after every accepted timing arm.
+ int8_research::diagnose_uniform_scales(dt,-1,-1,int8_research::Work(workspace.p),stream.s);
  printf("SUMMARY dtype=%s balance=%d checks=%d failures=%d\n",dt,balance,quick?1:39,failures);fflush(stdout);
  return failures;
 }
