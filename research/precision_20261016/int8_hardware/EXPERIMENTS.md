@@ -45,3 +45,13 @@ Production `solution/` unchanged; these are standalone research candidates, not 
 - Balanced preprocessing BF16/FP16=71.715/71.859us, down from~92us. A38.0/38.1us improves, B23.3/23.2us regresses from~17.8us. Template-local shared allocations raise B shared usage to41344bytes; A registers143/144. Do not attribute net gain solely to arithmetic count.
 - Detailed complete-call aggregates in`p6_balanced.json`; performance still fails the currentSW target. Compiler unreachable-loop warnings refer to constant raw-plane early returns, not a failed build.
 - Next isolated change applies P5's proven uniform-branch hoisting to INT8 quantization factors in the packer.
+
+## P7 — hoist quantization scale construction and validate hardware
+
+- Hoist quantization exponent checks and exact normal-range scale construction outside the packer's per-element loop; retain general exponent fallback. No representation, threshold, floating-point addition order or production change.
+- All72 ordinary checks pass with identical printed eF toP1. Full-call BF16/FP16=94.593/94.380us versus currentSW10.192/10.023us. Preprocess58.200/57.815us, included in the full time. **Reject performance**, approximately9.3–9.4x slower than currentSW.
+- Graph72/72 passes, full-call91.183/89.846us versus currentSW9.839/9.896us. Same seeds/configurations as ordinary; these are not72 additional independent numerical configurations.
+- Separate fresh extended dual-stream/Graph stress:72cases,576 interleaved calls, original-input FP64 gate and128-float output guards all pass. Independent input seed set from compare.
+- CUDA12.8 memcheck/racecheck/synccheck:each24cases/48calls, filtered to`kns=int8_research`; all0errors and racecheck0warnings. Do not describe this instrumentation scope as the full72case/576call stress.
+- Audit verifies all P1–P7 source/result/binary identities, primitive18exact checks,1,048,576power-of-two equivalence cases, and all five production file hashes. Status explicitly`accuracy_validated_performance_rejected`; overall goal remains active.
+- Evidence and limitations in`HARDWARE_REPORT.md`. Next work targets repeated inside-scale work in the packer, followed by consumer scheduling; no promotion based solely on numerical success.

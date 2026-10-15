@@ -95,13 +95,20 @@ void pack_plane(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict_
  __syncthreads();
  // B's INT8 form is physically transposed so both integer MMA operands are K major.
  __shared__ int8_t transpose[SideA?1:2][SideA?1:Size];
- #pragma unroll
- for(int j=0;j<PerThread;++j){
+ auto store_quant=[&](int j,int qh,int ql){
   int i=tid+256*j,r=r0+i/Cols,c=c0+i%Cols;
-  int qh=__float2int_rn(scale_pow2(vh[j],-exponents[0]));qh=max(-127,min(127,qh));
-  int ql=__float2int_rn(scale_pow2(vl[j],-exponents[1]));ql=max(-127,min(127,ql));
+  qh=max(-127,min(127,qh));ql=max(-127,min(127,ql));
   if constexpr(SideA){q[qp*Plane+r*512+c]=int8_t(qh);if(qp<4)q[(qp+4)*Plane+r*512+c]=int8_t(ql);}
   else{transpose[0][i]=int8_t(qh);if(qp<4)transpose[1][i]=int8_t(ql);}
+ };
+ int eh=exponents[0],el=exponents[1];
+ if(eh>=-127&&eh<=126&&el>=-127&&el<=126){
+  float sh=__int_as_float((127-eh)<<23),sl=__int_as_float((127-el)<<23);
+  #pragma unroll
+  for(int j=0;j<PerThread;++j)store_quant(j,__float2int_rn(__fmul_rn(vh[j],sh)),__float2int_rn(__fmul_rn(vl[j],sl)));
+ }else{
+  #pragma unroll
+  for(int j=0;j<PerThread;++j)store_quant(j,__float2int_rn(scale_pow2(vh[j],-eh)),__float2int_rn(scale_pow2(vl[j],-el)));
  }
  if constexpr(!SideA){
   __syncthreads();
