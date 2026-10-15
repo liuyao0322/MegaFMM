@@ -1,0 +1,58 @@
+"""Freeze M11's paired numerical screen, independently of hardware acceptance."""
+import hashlib
+import json
+from pathlib import Path
+
+h = Path(__file__).resolve().parent
+repo = h.parents[2]
+rows = json.loads((h / 'bf16_correction_model.json').read_text())['rows']
+assert len(rows) == 216
+keys = {(x['dtype'], x['pattern'], x['seed']) for x in rows}
+assert len(keys) == 72 and {x['seed'] for x in rows} == {6301, 6302, 6303}
+log = (h / 'bf16_correction_model.log').read_text().splitlines()
+controls = [json.loads(x.removeprefix('CONTROL ')) for x in log if x.startswith('CONTROL ')]
+assert len(controls) == 2 and all(x['baseline_matches_m9'] for x in controls)
+negative = [json.loads(x.removeprefix('RANGE_NEGATIVE_CONTROL ')) for x in log if x.startswith('RANGE_NEGATIVE_CONTROL ')]
+assert len(negative) == 1 and all(negative[0].values())
+arms = ['int8_k128', 'bf16_low_unscaled', 'bf16_low_scale16']
+summary = []
+for dt in ['float16', 'bfloat16']:
+    for arm in arms:
+        r = [x for x in rows if x['dtype'] == dt and x['arm'] == arm]
+        assert len(r) == 36 and len({(x['pattern'], x['seed']) for x in r}) == 36
+        assert all(x['floor'] == (1e-4 if dt == 'float16' else 1e-3) for x in r)
+        worst = max(r, key=lambda x: x['ef'])
+        summary.append(dict(dtype=dt, arm=arm, configurations=36,
+            passes=sum(x['pass_fixed_floor'] for x in r),
+            nonfinite=sum(x['nonfinite'] for x in r),
+            nonfinite_correction_operand_observations=sum(x['nonfinite_correction_operands'] for x in r),
+            max_ef=worst['ef'], worst_pattern=worst['pattern'], worst_seed=worst['seed']))
+paired = []
+for dt in ['float16', 'bfloat16']:
+    ratios = []
+    scale_differences = []
+    for key in sorted(k for k in keys if k[0] == dt):
+        r = {x['arm']: x for x in rows if (x['dtype'], x['pattern'], x['seed']) == key}
+        assert set(r) == set(arms)
+        assert r['int8_k128']['saturated_low_values'] == 0
+        assert r['int8_k128']['max_absolute_integer'] < 2**22
+        ratios.append(r['int8_k128']['ef'] / r['bf16_low_unscaled']['ef'])
+        scale_differences.append(abs(r['bf16_low_scale16']['ef'] - r['bf16_low_unscaled']['ef']))
+    paired.append(dict(dtype=dt, paired_configurations=len(ratios),
+        unscaled_lower_error_configurations=sum(x > 1 for x in ratios),
+        baseline_to_unscaled_ef_ratio_min=min(ratios),
+        baseline_to_unscaled_ef_ratio_max=max(ratios),
+        max_absolute_ef_difference_scaled_vs_unscaled=max(scale_differences)))
+out = dict(scope='72 fresh matrix configurations, three paired numerical arms; FP32 bmm/add with TF32 disabled, not exact Hopper WGMMA rounding or hardware acceptance',
+    configurations=72, paired_arm_rows=216, summary=summary, paired=paired,
+    same_input_controls=controls, fixed_scale16_overflow_negative_control=negative[0],
+    range_limit='Finite FP32 transform 2^127+2^119 and finite native BF16 high 2^127 produce residual 2^119; scaling by 2^16 overflows BF16. Sampled passes are not arbitrary-range proof.',
+    hardware_accepted=False, performance_accepted=False)
+(h / 'm11_summary.json').write_text(json.dumps(out, indent=2) + '\n')
+files = ['bf16_correction_model.py', 'bf16_correction_model.json', 'bf16_correction_model.log',
+    'summarize_bf16_correction_model.py', 'm11_summary.json', 'BF16_CORRECTION_DESIGN.md',
+    'wide_quant_model.py', 'paired_column_model.py', 'alternating_inside_model.py',
+    'global_k128_model.py', '../ablate.py']
+(h / 'm11_manifest.json').write_text(json.dumps({str((h / f).relative_to(repo)):
+    hashlib.sha256((h / f).read_bytes()).hexdigest() for f in files}, indent=2) + '\n')
+print(json.dumps(out, indent=2))

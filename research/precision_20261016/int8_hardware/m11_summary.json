@@ -1,0 +1,111 @@
+{
+  "scope": "72 fresh matrix configurations, three paired numerical arms; FP32 bmm/add with TF32 disabled, not exact Hopper WGMMA rounding or hardware acceptance",
+  "configurations": 72,
+  "paired_arm_rows": 216,
+  "summary": [
+    {
+      "dtype": "float16",
+      "arm": "int8_k128",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "nonfinite_correction_operand_observations": 0,
+      "max_ef": 7.133222799417221e-05,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 6301
+    },
+    {
+      "dtype": "float16",
+      "arm": "bf16_low_unscaled",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "nonfinite_correction_operand_observations": 0,
+      "max_ef": 3.1729852815888784e-05,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 6301
+    },
+    {
+      "dtype": "float16",
+      "arm": "bf16_low_scale16",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "nonfinite_correction_operand_observations": 0,
+      "max_ef": 3.1729852815888784e-05,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 6301
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "int8_k128",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "nonfinite_correction_operand_observations": 0,
+      "max_ef": 0.0005153219406080708,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 6301
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "bf16_low_unscaled",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "nonfinite_correction_operand_observations": 0,
+      "max_ef": 1.5429189582492487e-05,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 6301
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "bf16_low_scale16",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "nonfinite_correction_operand_observations": 0,
+      "max_ef": 1.5429189582492487e-05,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 6301
+    }
+  ],
+  "paired": [
+    {
+      "dtype": "float16",
+      "paired_configurations": 36,
+      "unscaled_lower_error_configurations": 36,
+      "baseline_to_unscaled_ef_ratio_min": 1.5041703433109033,
+      "baseline_to_unscaled_ef_ratio_max": 20.455039798048876,
+      "max_absolute_ef_difference_scaled_vs_unscaled": 0.0
+    },
+    {
+      "dtype": "bfloat16",
+      "paired_configurations": 36,
+      "unscaled_lower_error_configurations": 36,
+      "baseline_to_unscaled_ef_ratio_min": 5.671777824560543,
+      "baseline_to_unscaled_ef_ratio_max": 33.94837626936216,
+      "max_absolute_ef_difference_scaled_vs_unscaled": 6.569249732000593e-12
+    }
+  ],
+  "same_input_controls": [
+    {
+      "dtype": "torch.float16",
+      "seed": 6301,
+      "baseline_matches_m9": true
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 6301,
+      "baseline_matches_m9": true
+    }
+  ],
+  "fixed_scale16_overflow_negative_control": {
+    "finite_transform": true,
+    "finite_native_high": true,
+    "scaled_low_bf16_nonfinite": true
+  },
+  "range_limit": "Finite FP32 transform 2^127+2^119 and finite native BF16 high 2^127 produce residual 2^119; scaling by 2^16 overflows BF16. Sampled passes are not arbitrary-range proof.",
+  "hardware_accepted": false,
+  "performance_accepted": false
+}

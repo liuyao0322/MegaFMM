@@ -1,0 +1,28 @@
+{
+  "scope": "actual H100 sm90a CUDA12.4 exhaustive nonnegative finite native input values; arithmetic only, no matrix/performance/synchronization acceptance",
+  "cases": 64384,
+  "errors": 0,
+  "rows": [
+    {
+      "dtype": "fp16",
+      "cases": "31744",
+      "fast": "31743",
+      "fallback": "0",
+      "zeros": "1",
+      "errors": "0",
+      "first_error_code": "65536"
+    },
+    {
+      "dtype": "bf16",
+      "cases": "32640",
+      "fast": "31488",
+      "fallback": "1151",
+      "zeros": "1",
+      "errors": "0",
+      "first_error_code": "65536"
+    }
+  ],
+  "input_domain": "Quantizer high maxima after native FP16/BF16 conversion, initialized at +0; not arbitrary FP32 transformed values or low residual maxima",
+  "unchanged_fallback": "peak bits below0x04800000, nonfinite/negative exceptional patterns; zero explicitly0",
+  "note": "Matches original compiled ceil(log2(peak/127.f)) on every finite nonnegative native value. Actual matrix maximum selection/quantization and new GPU implementation still require independent gates."
+}

@@ -452,6 +452,45 @@
       "retained": true,
       "retained_for": "ordinary and Graph research reference; own fresh validation only"
     },
+    "p40": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 36.158159256000005,
+        "fp16": 35.98871898675
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": false,
+      "validation_scope": "own ordinary78 plus ordinaryABBA312; no fresh stress/sanitizer acceptance or certificate transfer; additionally own GraphABBA312, no independent own stress/tools"
+    },
+    "p41": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 36.09343910225,
+        "fp16": 36.16303920725
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": false,
+      "validation_scope": "own ordinary78 plus ordinaryABBA312; no fresh stress/sanitizer acceptance or certificate transfer"
+    },
+    "p42": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 36.3675193785,
+        "fp16": 36.180241585000005
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": false,
+      "validation_scope": "own ordinary78 plus ordinaryABBA312; no fresh stress/sanitizer acceptance or certificate transfer"
+    },
     "p35": {
       "checks": 78,
       "failures": 0,
@@ -561,6 +600,65 @@
       "fresh_configurations": 60,
       "passes": 60,
       "hardware_accepted": false
+    },
+    "m11_int8_k128": {
+      "fresh_configurations": 72,
+      "passes": 72,
+      "hardware_accepted": false
+    },
+    "m11_bf16_low_unscaled": {
+      "fresh_configurations": 72,
+      "passes": 72,
+      "hardware_accepted": false
+    },
+    "m11_bf16_low_scale16": {
+      "fresh_configurations": 72,
+      "passes": 72,
+      "hardware_accepted": false
+    },
+    "nonnegative_max_arithmetic": {
+      "scope": "CPU bit-pattern reduction only, no GPU/matrix/performance/synchronization acceptance",
+      "proof": "For binary32 with sign0 and no NaN, unsigned bits order exponent then fraction in the same order as value, including positive subnormals, +0 and +inf. Existing local maxima start at +0 and fmax absolute values, so the proposed full-warp inputs lie in this domain. This does not permit replacing arbitrary signed/NaN-valued float reductions.",
+      "seed": 41173,
+      "generated_warps": 32768,
+      "generated_values": 1048576,
+      "bitwise_errors": 0,
+      "signed_negative_control": {
+        "values": [
+          -1.0,
+          0.0
+        ],
+        "invalid_unsigned_bit_max": -1.0,
+        "correct_float_max": 0.0
+      }
+    },
+    "native_quant_exponent_arithmetic": {
+      "scope": "actual H100 sm90a CUDA12.4 exhaustive nonnegative finite native input values; arithmetic only, no matrix/performance/synchronization acceptance",
+      "cases": 64384,
+      "errors": 0,
+      "rows": [
+        {
+          "dtype": "fp16",
+          "cases": "31744",
+          "fast": "31743",
+          "fallback": "0",
+          "zeros": "1",
+          "errors": "0",
+          "first_error_code": "65536"
+        },
+        {
+          "dtype": "bf16",
+          "cases": "32640",
+          "fast": "31488",
+          "fallback": "1151",
+          "zeros": "1",
+          "errors": "0",
+          "first_error_code": "65536"
+        }
+      ],
+      "input_domain": "Quantizer high maxima after native FP16/BF16 conversion, initialized at +0; not arbitrary FP32 transformed values or low residual maxima",
+      "unchanged_fallback": "peak bits below0x04800000, nonfinite/negative exceptional patterns; zero explicitly0",
+      "note": "Matches original compiled ceil(log2(peak/127.f)) on every finite nonnegative native value. Actual matrix maximum selection/quantization and new GPU implementation still require independent gates."
     },
     "uniform_scale_arithmetic": {
       "scope": "CPU restoration arithmetic only; not matrix or hardware acceptance",
@@ -2187,6 +2285,197 @@
     ],
     "limitations": "Only contiguous non-transposed1024^3, alpha1 beta0, FP16/BF16; no arbitrary-range proof, no production integration, no transfer to later modified candidates."
   },
+  "p40_p42_local_controls": {
+    "p40": {
+      "ordinary": [
+        {
+          "dtype": "bf16",
+          "old_candidate": "p39",
+          "new_candidate": "p40",
+          "old_group_median_us": 36.285039901625,
+          "new_group_median_us": 35.977359771625004,
+          "relative_reduction": 0.008479531256798123
+        },
+        {
+          "dtype": "fp16",
+          "old_candidate": "p39",
+          "new_candidate": "p40",
+          "old_group_median_us": 36.168639183125,
+          "new_group_median_us": 36.13119936,
+          "relative_reduction": 0.0010351460262423284
+        }
+      ],
+      "graph": [
+        {
+          "dtype": "bf16",
+          "old_candidate": "p39",
+          "new_candidate": "p40",
+          "old_group_median_us": 36.535560608000004,
+          "new_group_median_us": 36.053719520625,
+          "relative_reduction": 0.013188276828288159
+        },
+        {
+          "dtype": "fp16",
+          "old_candidate": "p39",
+          "new_candidate": "p40",
+          "old_group_median_us": 36.632599830625,
+          "new_group_median_us": 36.381880760125,
+          "relative_reduction": 0.006844151702560697
+        }
+      ]
+    },
+    "p41": {
+      "ordinary": [
+        {
+          "dtype": "bf16",
+          "old_candidate": "p39",
+          "new_candidate": "p41",
+          "old_group_median_us": 36.106039524124995,
+          "new_group_median_us": 36.128799438499996,
+          "relative_reduction": -0.0006303630826025586
+        },
+        {
+          "dtype": "fp16",
+          "old_candidate": "p39",
+          "new_candidate": "p41",
+          "old_group_median_us": 36.154920101125,
+          "new_group_median_us": 35.961880207,
+          "relative_reduction": 0.0053392427250584795
+        }
+      ]
+    },
+    "p42": {
+      "ordinary": [
+        {
+          "dtype": "bf16",
+          "old_candidate": "p39",
+          "new_candidate": "p42",
+          "old_group_median_us": 36.237079620375,
+          "new_group_median_us": 36.190320014875,
+          "relative_reduction": 0.001290380074494446
+        },
+        {
+          "dtype": "fp16",
+          "old_candidate": "p39",
+          "new_candidate": "p42",
+          "old_group_median_us": 36.32491970075,
+          "new_group_median_us": 36.322319030749995,
+          "relative_reduction": 7.159465241579621e-05
+        }
+      ]
+    }
+  },
+  "m11_numerical_screen": {
+    "scope": "72 fresh matrix configurations, three paired numerical arms; FP32 bmm/add with TF32 disabled, not exact Hopper WGMMA rounding or hardware acceptance",
+    "configurations": 72,
+    "paired_arm_rows": 216,
+    "summary": [
+      {
+        "dtype": "float16",
+        "arm": "int8_k128",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "nonfinite_correction_operand_observations": 0,
+        "max_ef": 7.133222799417221e-05,
+        "worst_pattern": "cancellation_k_bands",
+        "worst_seed": 6301
+      },
+      {
+        "dtype": "float16",
+        "arm": "bf16_low_unscaled",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "nonfinite_correction_operand_observations": 0,
+        "max_ef": 3.1729852815888784e-05,
+        "worst_pattern": "cancellation_k_bands",
+        "worst_seed": 6301
+      },
+      {
+        "dtype": "float16",
+        "arm": "bf16_low_scale16",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "nonfinite_correction_operand_observations": 0,
+        "max_ef": 3.1729852815888784e-05,
+        "worst_pattern": "cancellation_k_bands",
+        "worst_seed": 6301
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "int8_k128",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "nonfinite_correction_operand_observations": 0,
+        "max_ef": 0.0005153219406080708,
+        "worst_pattern": "cancellation_k_bands",
+        "worst_seed": 6301
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "bf16_low_unscaled",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "nonfinite_correction_operand_observations": 0,
+        "max_ef": 1.5429189582492487e-05,
+        "worst_pattern": "cancellation_k_bands",
+        "worst_seed": 6301
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "bf16_low_scale16",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "nonfinite_correction_operand_observations": 0,
+        "max_ef": 1.5429189582492487e-05,
+        "worst_pattern": "cancellation_k_bands",
+        "worst_seed": 6301
+      }
+    ],
+    "paired": [
+      {
+        "dtype": "float16",
+        "paired_configurations": 36,
+        "unscaled_lower_error_configurations": 36,
+        "baseline_to_unscaled_ef_ratio_min": 1.5041703433109033,
+        "baseline_to_unscaled_ef_ratio_max": 20.455039798048876,
+        "max_absolute_ef_difference_scaled_vs_unscaled": 0.0
+      },
+      {
+        "dtype": "bfloat16",
+        "paired_configurations": 36,
+        "unscaled_lower_error_configurations": 36,
+        "baseline_to_unscaled_ef_ratio_min": 5.671777824560543,
+        "baseline_to_unscaled_ef_ratio_max": 33.94837626936216,
+        "max_absolute_ef_difference_scaled_vs_unscaled": 6.569249732000593e-12
+      }
+    ],
+    "same_input_controls": [
+      {
+        "dtype": "torch.float16",
+        "seed": 6301,
+        "baseline_matches_m9": true
+      },
+      {
+        "dtype": "torch.bfloat16",
+        "seed": 6301,
+        "baseline_matches_m9": true
+      }
+    ],
+    "fixed_scale16_overflow_negative_control": {
+      "finite_transform": true,
+      "finite_native_high": true,
+      "scaled_low_bf16_nonfinite": true
+    },
+    "range_limit": "Finite FP32 transform 2^127+2^119 and finite native BF16 high 2^127 produce residual 2^119; scaling by 2^16 overflows BF16. Sampled passes are not arbitrary-range proof.",
+    "hardware_accepted": false,
+    "performance_accepted": false
+  },
   "p39_validation": {
     "status": "p39_accuracy_and_scoped_synchronization_validated_performance_rejected",
     "goal_achieved": false,
@@ -2543,6 +2832,6 @@
     ],
     "scope": "Full original-input FP64 matrix gates; printed eF equality is not a bitwise-output claim. Host eligibility diagnostics outside timing. No production integration. Unlocked clocks, no confidence interval."
   },
-  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. No transfer to later changes.",
+  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11 is numerical only. No transfer to later changes.",
   "remaining": "Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration."
 }

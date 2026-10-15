@@ -1,0 +1,16 @@
+{
+  "scope": "CPU bit-pattern reduction only, no GPU/matrix/performance/synchronization acceptance",
+  "proof": "For binary32 with sign0 and no NaN, unsigned bits order exponent then fraction in the same order as value, including positive subnormals, +0 and +inf. Existing local maxima start at +0 and fmax absolute values, so the proposed full-warp inputs lie in this domain. This does not permit replacing arbitrary signed/NaN-valued float reductions.",
+  "seed": 41173,
+  "generated_warps": 32768,
+  "generated_values": 1048576,
+  "bitwise_errors": 0,
+  "signed_negative_control": {
+    "values": [
+      -1.0,
+      0.0
+    ],
+    "invalid_unsigned_bit_max": -1.0,
+    "correct_float_max": 0.0
+  }
+}
