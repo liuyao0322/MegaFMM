@@ -571,6 +571,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 332 | Row-interleave four S and T planes for coordinated TMA access | 1.0826 | 0.010096 | measured |
 
+| 333 | Stripe transformed planes in64-element segments | 1.0791 | 0.010120 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5186,3 +5188,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Fresh original FP64 errors unchanged and gates FAIL; ordinary BF16 about10.140us FP16 about10.051us, a small signal requiring paired comparison
 - **Next:** Archive binary then compare against331 with identical full launch and Graph trials
 - **Archive:** trajectory/20261015_090046_iter-332/
+
+### Iter 333 — Stripe transformed planes in64-element segments
+
+- **Hypothesis:** Improve cross-plane locality at128byte granularity while retaining contiguous TMA boxes and identical GMMA shared layout
+- **Changes:** Pack four planes per64element stripe; transformed S uses4D strides and transformed T uses4D64x1xBKx1 box; no arithmetic or barrier changes
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010120 ms; mean speedup=1.0791x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012182 | 0.010105 | 1.2055 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009656 | 0.010135 | 0.9527 | 0.000754626 | 0 |
+
+- **Analysis:** Original FP64 errors unchanged and gates FAIL; ordinary BF16 about10.105us FP16 about10.135us; no both-dtype improvement established
+- **Next:** Archive binary then test selective on-chip S3/T3 fusion from331 baseline
+- **Archive:** trajectory/20261015_090144_iter-333/

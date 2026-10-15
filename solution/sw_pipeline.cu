@@ -2722,7 +2722,7 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
         else if(j==6) asm("sub.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(bbits[3]),"r"(bbits[1]));
         else asm("cvt.rn.f16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
       }
-      reinterpret_cast<uint32_t*>(packed)[((j/4)*4*Plane+(row*4+j%4)*512+col)/2]=word;
+      reinterpret_cast<uint32_t*>(packed)[((j/4)*4*Plane+row*2048+(col/64*4+j%4)*64+col%64)/2]=word;
     }
   }
   asm volatile("fence.proxy.async.global;" ::: "memory");
@@ -2761,7 +2761,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       // LHS is B_leaf^T, M-contiguous original B data.
       if(blo){
         int plane=p==3?3:p-4;
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
+        SM90_TMA_LOAD_4D::copy(&tmap,&s.ready[slot],0,op,m0%64,m0/64,k0,plane);
       }else{
         int col=p==2?512:0,row=p==1 || p==2?512:0;
         SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
@@ -2788,7 +2788,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
     // Expose K/64 as an outer tensor dimension. The shared box still packs
     // (64 K elements, BM rows, BK/64 chunks), matching the existing GMMA layout.
     uint64_t dims[4]={64,transformed ? 512ULL:1024ULL,transformed ? 8ULL:16ULL,4};
-    uint64_t strides[3]={transformed ? 4096ULL:2048ULL,128,1024};
+    uint64_t strides[3]={transformed ? 4096ULL:2048ULL,transformed ? 512ULL:128ULL,128};
     uint32_t box[4]={64,BN,BK/64,1},element_strides[4]={1,1,1,1};
     auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
         transformed ? 4:3,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
@@ -2796,8 +2796,17 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
     if(result!=CUDA_SUCCESS)throw std::runtime_error("SW A tensor map status "+std::to_string(int(result)));
     return;
   }
+  if(transformed){
+    uint64_t dims[4]={64,8,512,4},strides[3]={512,4096,128};
+    uint32_t box[4]={64,1,BK,1},element_strides[4]={1,1,1,1};
+    auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
+        4,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
+        CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+    if(result!=CUDA_SUCCESS)throw std::runtime_error("SW striped T tensor map status "+std::to_string(int(result)));
+    return;
+  }
   uint64_t dims[3]={transformed ? 512ULL:1024ULL,transformed ? 512ULL:1024ULL,4};
-  uint64_t strides[2]={transformed ? 4096ULL:dims[0]*2,1024};
+  uint64_t strides[2]={dims[0]*2,dims[0]*dims[1]*2};
   uint32_t box[3]={uint32_t(BM),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};
   auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
       transformed ? 3:2,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
