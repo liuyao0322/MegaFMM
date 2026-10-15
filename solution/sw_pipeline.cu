@@ -18,9 +18,11 @@ using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
   uint64_t ready[Stages],free[Stages];
+  alignas(128) T difference[ASize+BSize];
+  uint64_t difference_ready;
 
 };
-static_assert(sizeof(Shared<cute::half_t>)==196736,"shared budget");
+static_assert(sizeof(Shared<cute::half_t>)==221440,"shared budget");
 __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
 __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
 
@@ -2714,6 +2716,7 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
     }
     #pragma unroll
     for(int j=0;j<8;++j){
+      if(j==2 || j==6)continue; // S3/T3 formed on-chip for P7.
       uint32_t word;
       if constexpr(std::is_same_v<T,cute::bfloat16_t>)
         asm("cvt.rn.bf16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
@@ -2722,7 +2725,7 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
         else if(j==6) asm("sub.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(bbits[3]),"r"(bbits[1]));
         else asm("cvt.rn.f16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
       }
-      reinterpret_cast<uint32_t*>(packed)[((j/4)*4*Plane+row*2048+(col/64*4+j%4)*64+col%64)/2]=word;
+      reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=word;
     }
   }
   asm volatile("fence.proxy.async.global;" ::: "memory");
@@ -2742,15 +2745,47 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
   }
   if(tid==0){
     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+    Barrier::init(&s.difference_ready,1);
     cutlass::arch::fence_barrier_init();
   }
   __syncthreads();
   constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
   constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_32,Int<BK>>{});
-  if(tid==0){
+  if(tid<128){
     for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
       int p=product_for_step(step);
       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
+      if(p==6){
+        T* op=s.operand[slot];
+        if(tid==0){
+          if(sequence>=Stages)wait(&s.free[slot],((sequence-Stages)/Stages)%2);
+          TxBarrier::arrive_and_expect_tx(&s.difference_ready,4*(ASize+BSize));
+          // Identical swizzled boxes allow elementwise physical subtraction:
+          // LHS=T3^T=(B22-B12)^T, RHS=S3^T=(A11-A21)^T.
+          SM90_TMA_LOAD_2D::copy(&bmap,&s.difference_ready,0,op,m0+512,k0+512);
+          SM90_TMA_LOAD_2D::copy(&bmap,&s.difference_ready,0,s.difference,m0+512,k0);
+          SM90_TMA_LOAD_3D::copy(&amap,&s.difference_ready,0,op+ASize,0,n0,k0/64);
+          SM90_TMA_LOAD_3D::copy(&amap,&s.difference_ready,0,s.difference+ASize,0,n0+512,k0/64);
+        }
+        wait(&s.difference_ready,q%2);
+        for(int i=tid;i<(ASize+BSize)/2;i+=128){
+          uint32_t a=reinterpret_cast<uint32_t*>(op)[i];
+          uint32_t b=reinterpret_cast<uint32_t*>(s.difference)[i],word;
+          if constexpr(std::is_same_v<T,cute::half_t>){
+            asm("sub.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(a),"r"(b));
+          }else{
+            float x=__fsub_rn(float(T::bitcast(uint16_t(a))),float(T::bitcast(uint16_t(b))));
+            float y=__fsub_rn(float(T::bitcast(uint16_t(a>>16))),float(T::bitcast(uint16_t(b>>16))));
+            asm("cvt.rn.bf16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(x),"f"(y));
+          }
+          reinterpret_cast<uint32_t*>(op)[i]=word;
+        }
+        asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
+        asm volatile("bar.sync 1,128;" ::: "memory");
+        if(tid==0)arrive(&s.ready[slot]);
+        continue;
+      }
+      if(tid!=0)continue;
       // Raw P1/P2 can run while the primary transforms S/T. This wait
       // guarantees completion and visibility even if no overlap is scheduled.
       if(sequence==8)cudaGridDependencySynchronize();
@@ -2761,7 +2796,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
       // LHS is B_leaf^T, M-contiguous original B data.
       if(blo){
         int plane=p==3?3:p-4;
-        SM90_TMA_LOAD_4D::copy(&tmap,&s.ready[slot],0,op,m0%64,m0/64,k0,plane);
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
       }else{
         int col=p==2?512:0,row=p==1 || p==2?512:0;
         SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
@@ -2788,21 +2823,12 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
     // Expose K/64 as an outer tensor dimension. The shared box still packs
     // (64 K elements, BM rows, BK/64 chunks), matching the existing GMMA layout.
     uint64_t dims[4]={64,transformed ? 512ULL:1024ULL,transformed ? 8ULL:16ULL,4};
-    uint64_t strides[3]={transformed ? 4096ULL:2048ULL,transformed ? 512ULL:128ULL,128};
+    uint64_t strides[3]={transformed ? 1024ULL:2048ULL,128,512ULL*512*2};
     uint32_t box[4]={64,BN,BK/64,1},element_strides[4]={1,1,1,1};
     auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
         transformed ? 4:3,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
         CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
     if(result!=CUDA_SUCCESS)throw std::runtime_error("SW A tensor map status "+std::to_string(int(result)));
-    return;
-  }
-  if(transformed){
-    uint64_t dims[4]={64,8,512,4},strides[3]={512,4096,128};
-    uint32_t box[4]={64,1,BK,1},element_strides[4]={1,1,1,1};
-    auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
-        4,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
-        CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
-    if(result!=CUDA_SUCCESS)throw std::runtime_error("SW striped T tensor map status "+std::to_string(int(result)));
     return;
   }
   uint64_t dims[3]={transformed ? 512ULL:1024ULL,transformed ? 512ULL:1024ULL,4};
