@@ -615,6 +615,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 354 | Test source-free clusters and a nine-warp two-worker kernel | 1.1124 | 0.327931 | completed |
 
+| 355 | Test deeper nine-warp pipelines and native160-wide MMA | 0.0000 | 0.000000 | failed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5852,3 +5854,17 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal six-shape twelve-row run completed. Research preflight established90registers, zero spills and two-block capacity for the nine-warp FP16 tile; this does not establish benchmark performance or complete numerical acceptance. Per-shape scores and full validation follow. Latest independently certified full suite remains353 sixteenof28.
 - **Next:** Inspect results, force all77 candidates and original API checks, run CUDA12.8 memcheck/racecheck, and profile measured bottlenecks before another iteration.
 - **Archive:** trajectory/20261015_190625_iter-354/
+
+### Iter 355 — Test deeper nine-warp pipelines and native160-wide MMA
+
+- **Hypothesis:** Removing output staging permits three input buffers while retaining two CTA residency; a wider MMA tile may reduce the measured instruction and latency cost.
+- **Changes:** Added direct-store two/three-stage and native160-wide/64-wide nine-warp variants, source-free epilogue trait and CUTLASS extended shape support.
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Formal benchmark stopped with exit2 and archived trajectory. Failure detail and any completed precision/timing rows must be inspected after closing this iteration. No performance or acceptance claim is made. Latest full independent certification remains353 sixteenof28.
+- **Next:** Diagnose the compile/runtime/numerical failure, then repair only the identified cause and rerun the unchanged original contract.
+- **Archive:** trajectory/20261015_191619_iter-355/

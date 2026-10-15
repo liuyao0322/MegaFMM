@@ -31,6 +31,8 @@
 #pragma once
 
 #include "cutlass/cutlass.h"
+#include <type_traits>
+#include "cutlass/epilogue/thread/scale_type.h"
 #include "cutlass/workspace.h"
 #include "cutlass/fast_math.h"
 #include "cutlass/kernel_hardware_info.hpp"
@@ -54,6 +56,13 @@ namespace cutlass::gemm::kernel {
 // Adapted from vendored CUTLASS3.5.1 cooperative kernel. Changes limited to
 // nine warps, one source-free producer and two consumer groups; no register
 // reconfiguration. Restricted to source-free epilogues; upstream license retained.
+template<class E,class=void>
+struct NineWarpSourceFree : std::bool_constant<cute::is_void_v<typename E::ElementC>> {};
+template<class E>
+struct NineWarpSourceFree<E,std::void_t<decltype(E::ThreadEpilogueOp::kScale)>>
+    : std::bool_constant<cute::is_void_v<typename E::ElementC> ||
+        E::ThreadEpilogueOp::kScale == cutlass::epilogue::thread::ScaleType::OnlyAlphaScaling> {};
+
 template <class ProblemShape_,class CollectiveMainloop_,class CollectiveEpilogue_,
           class TileScheduler_=void>
 class NineWarpGemm
@@ -82,7 +91,7 @@ public:
 
   // Epilogue derived types
   using CollectiveEpilogue = CollectiveEpilogue_;
-  static_assert(cute::is_void_v<typename CollectiveEpilogue::ElementC>, "NineWarpGemm requires source-free epilogue");
+  static_assert(NineWarpSourceFree<CollectiveEpilogue>::value, "NineWarpGemm requires source-free epilogue");
   using ElementC = typename CollectiveEpilogue::ElementC;
   using StrideC  = typename CollectiveEpilogue::StrideC;
   using ElementD = typename CollectiveEpilogue::ElementD;

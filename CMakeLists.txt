@@ -9,6 +9,7 @@ set(MEGAFMM_CUTLASS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/cutlass" CACHE 
 if(NOT EXISTS "${MEGAFMM_CUTLASS_DIR}/include/cute/tensor.hpp")
   message(FATAL_ERROR "SW v1 needs CUTLASS 3.5.1 headers; set MEGAFMM_CUTLASS_DIR")
 endif()
+target_compile_definitions(megafmm PRIVATE CUTE_SM90_EXTENDED_MMA_SHAPES_ENABLED)
 target_include_directories(megafmm PUBLIC include PRIVATE solution "${MEGAFMM_CUTLASS_DIR}/include")
 target_link_libraries(megafmm PUBLIC CUDA::cudart CUDA::cublasLt CUDA::cublas CUDA::cuda_driver)
 target_compile_options(megafmm PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:--expt-relaxed-constexpr> $<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_90a,code=sm_90a>)
