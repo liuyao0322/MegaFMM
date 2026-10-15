@@ -123,3 +123,15 @@ Production `solution/` unchanged; these are standalone research candidates, not 
 - Complete BF16/FP16 calls63.512/63.246us versus currentSW10.334/10.104us. This is a modest measured reduction from P9 65.711/65.457us and P11 66.192/66.433us; no independent cross-process performance certification or claim of production competitiveness.
 - FP16 partial/finalize/A/B diagnostics4.812/2.812/11.060/18.325us. Full-call timing includes every launch, descriptor encoding, workspace traffic, packer and main kernel. The workspace is12,328,320bytes (+262144 from P9).
 - Retain frozenP12 as the current global-packing research source/binary. P10 remains rejected by fresh hardware counterexamples. No P7 Graph/dual-stream/sanitizer validation transfers to P12; production unchanged and complete accuracy/performance objective remains active.
+
+## Frozen P12 B-packer profile (diagnostic only)
+
+- Standalone driver runs only one balanced BF16 B pack after exact inside setup, using frozenP12 headers. NCU17passes, caches/clocks left uncontrolled, profiled28.86us versus ordinary component~18us; not a performance acceptance measurement.60regs,0stack/spill,41.32KB shared in this separately compiled driver.
+- DRAM1.29%,memory14.06%,compute11.42%,issue-active24.85%,eligible warps0.36 per scheduler. No-instruction-fetch wait7.7cycles,37.31% of average20.74-cycle issue gap. Kernel startup and code jumps can both contribute; cannot attribute all of this to one source line.
+- One selected B kernel has25,464 static SASS instructions,2,160 MUFU.EX2 and3,345 BRA. Static presence does not measure which rare exponent branches execute. Frozen driver/source/binary/NCU/SASS identities in profile_b_p12_manifest.json. Readable details export has trailing whitespace removed; raw NCU report is unchanged.
+
+## P13 — warp-distributed B inside factors
+
+- Each B warp visits16 K rows. Cache the row-specific exponent/factor pair in lanes0..15 (duplicated in16..31), guard all16 rows once with warp-all, and shuffle the two factors for each element iteration. General exponents retain the original per-element path. Per-column exponent computation, numerical representation, metadata and main kernel unchanged.
+-78/78 FP64 checks pass, all printed eF values identical toP12,79,872 per-column exponents equal the original reduction. CompleteBF16/FP16 54.909/54.805us vsSW10.341/10.104us. FP16 B packing diagnostic9.480us vsP12 18.325us, A10.822us.
+- B register usage rises60→122 BF16 /59→118 FP16,0stack/spill, shared41344bytes. The simpler common path still reduces measured full latency. No independent performance certification or Graph/dual-stream/sanitizer transfer. RetainP13 as next research base; still performance-rejected versusSW.

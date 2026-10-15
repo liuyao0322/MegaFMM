@@ -79,8 +79,13 @@ template<class T,bool SideA,bool Balance,bool FastBalance=false> __device__ __fo
     x1=scale_pow2(x1,-ex[c+512]);x3=scale_pow2(x3,-ex[c+512]);
    }
   }else{
-   x0=scale_pow2(x0,ex[r]);x1=scale_pow2(x1,ex[r]);
-   x2=scale_pow2(x2,ex[r+512]);x3=scale_pow2(x3,ex[r+512]);
+   if constexpr(FastBalance){
+    x0=__fmul_rn(x0,scale0);x1=__fmul_rn(x1,scale0);
+    x2=__fmul_rn(x2,scale1);x3=__fmul_rn(x3,scale1);
+   }else{
+    x0=scale_pow2(x0,ex[r]);x1=scale_pow2(x1,ex[r]);
+    x2=scale_pow2(x2,ex[r+512]);x3=scale_pow2(x3,ex[r+512]);
+   }
   }
  }
  if constexpr(SideA){
@@ -108,7 +113,13 @@ void pack_plane(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict_
   #pragma unroll
   for(int j=0;j<PerThread;++j){
    int i=tid+256*j,r=r0+i/Cols,c=c0+i%Cols;
-   float v=value<T,SideA,Balance,decltype(fast)::value>(X,inside,r,c,plane,scale0,scale1);
+   float element_scale0=scale0,element_scale1=scale1;
+   if constexpr(!SideA&&Balance&&decltype(fast)::value){
+    // Each B warp visits rows warp+8*j; lane j owns that row's factors.
+    element_scale0=__shfl_sync(0xffffffff,scale0,j);
+    element_scale1=__shfl_sync(0xffffffff,scale1,j);
+   }
+   float v=value<T,SideA,Balance,decltype(fast)::value>(X,inside,r,c,plane,element_scale0,element_scale1);
    T h=T(v);high[plane*Plane+r*512+c]=h;
    vh[j]=float(h);vl[j]=__fsub_rn(v,float(h));
    hi=fmaxf(hi,fabsf(vh[j]));lo=fmaxf(lo,fabsf(vl[j]));
@@ -119,6 +130,13 @@ void pack_plane(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict_
   int c=c0+tid%Cols,e0=-inside[c],e1=-inside[c+512];
   if(e0>=-126&&e0<=127&&e1>=-126&&e1<=127)
    load_values(std::true_type{},__int_as_float((e0+127)<<23),__int_as_float((e1+127)<<23));
+  else load_values(std::false_type{},0,0);
+ }else if constexpr(!SideA&&Balance){
+  // Sixteen K rows per warp. Cache two factors per lane, rather than arrays
+  // per thread, so register usage does not grow by 32 persistent factors.
+  int row=r0+tid/32+8*(tid%16),e0=inside[row],e1=inside[row+512];
+  bool normal=__all_sync(0xffffffff,e0>=-126&&e0<=127&&e1>=-126&&e1<=127);
+  if(normal)load_values(std::true_type{},__int_as_float((e0+127)<<23),__int_as_float((e1+127)<<23));
   else load_values(std::false_type{},0,0);
  }else load_values(std::false_type{},0,0);
  if(!quant){asm volatile("fence.proxy.async.global;" ::: "memory");return;}

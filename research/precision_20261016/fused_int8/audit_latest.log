@@ -3,7 +3,7 @@
   "goal_achieved": false,
   "production_unchanged": true,
   "working_candidate": "f13",
-  "retained_global_candidate": "p12, 78 ordinary FP64 checks and 79872 exact per-column exponents; p10 rejected by fresh hardware",
+  "retained_global_candidate": "p13, 78 ordinary FP64 checks and 79872 exact per-column exponents; p10 rejected by fresh hardware",
   "compile_stopped_candidates": [
     "F12: no numerical or latency measurement"
   ],
@@ -151,6 +151,18 @@
       "full_call_us": {
         "bf16": 63.51191902175,
         "fp16": 63.2461595535
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": false
+    },
+    "p13": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 54.9091997145,
+        "fp16": 54.80496025075
       },
       "equal_per_column_exponents": 79872,
       "additional_alternating_checks_passed": 6,

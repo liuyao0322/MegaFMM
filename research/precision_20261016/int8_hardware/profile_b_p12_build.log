@@ -1,0 +1,57 @@
+research/precision_20261016/int8_hardware/p12/pack.cuh(126): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true, PlaneId=0]" at line 166
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true]" at line 12 of research/precision_20261016/int8_hardware/profile_b_p12.cu
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+research/precision_20261016/int8_hardware/p12/pack.cuh(126): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true, PlaneId=1]" at line 167
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true]" at line 12 of research/precision_20261016/int8_hardware/profile_b_p12.cu
+
+research/precision_20261016/int8_hardware/p12/pack.cuh(126): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true, PlaneId=0]" at line 166
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true]" at line 12 of research/precision_20261016/int8_hardware/profile_b_p12.cu
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+research/precision_20261016/int8_hardware/p12/pack.cuh(126): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true, PlaneId=1]" at line 167
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true]" at line 12 of research/precision_20261016/int8_hardware/profile_b_p12.cu
+
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN13int8_research4packIN7cutlass10bfloat16_tELb0ELb1EEEvPKT_PS3_PaPiPKi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research4packIN7cutlass10bfloat16_tELb0ELb1EEEvPKT_PS3_PaPiPKi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 60 registers, 41320 bytes smem
+ptxas info    : Compiling entry function '_ZN13int8_research14inside_partialIN7cutlass10bfloat16_tEEEvPKT_S5_Pf' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research14inside_partialIN7cutlass10bfloat16_tEEEvPKT_S5_Pf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, 1536 bytes smem
+ptxas info    : Compiling entry function '_ZN13int8_research15inside_finalizeEPKfPi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research15inside_finalizeEPKfPi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers
+ptxas info    : Compiling entry function '_ZN49_GLOBAL__N__e20c7ba0_16_profile_b_p12_cu_e4aa1a0b4fillI6__halfEEvPT_S3_PdS4_im' for 'sm_90a'
+ptxas info    : Function properties for _ZN49_GLOBAL__N__e20c7ba0_16_profile_b_p12_cu_e4aa1a0b4fillI6__halfEEvPT_S3_PdS4_im
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 30 registers
+ptxas info    : Compiling entry function '_ZN49_GLOBAL__N__e20c7ba0_16_profile_b_p12_cu_e4aa1a0b4fillI13__nv_bfloat16EEvPT_S3_PdS4_im' for 'sm_90a'
+ptxas info    : Function properties for _ZN49_GLOBAL__N__e20c7ba0_16_profile_b_p12_cu_e4aa1a0b4fillI13__nv_bfloat16EEvPT_S3_PdS4_im
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 30 registers
+ptxas info    : Compiling entry function '_ZN49_GLOBAL__N__e20c7ba0_16_profile_b_p12_cu_e4aa1a0b13measure_errorEPKfPKdPNS_6MetricE' for 'sm_90a'
+ptxas info    : Function properties for _ZN49_GLOBAL__N__e20c7ba0_16_profile_b_p12_cu_e4aa1a0b13measure_errorEPKfPKdPNS_6MetricE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 25 registers, 6144 bytes smem
