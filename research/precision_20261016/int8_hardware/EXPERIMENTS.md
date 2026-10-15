@@ -38,3 +38,10 @@ Production `solution/` unchanged; these are standalone research candidates, not 
 - Precompute exponent sums and normal power-of-two factors in lane registers; one common/exceptional branch per correction-K block, not per output element. Exceptional exponents retain the exact prior operation. Keep separate RN multiply/add, no new FMA rounding.
 - Full72/72 checks pass, printed eF unchanged. Complete BF16/FP16 medians129.031/128.861us. Registers166,0stack/spill. Improvement is substantial within the rejected prototype, but still~13x currentSW; overall target not met.
 - Next candidate specializes the packer's uniform plane selection before the element loop; no numerical representation or gate changes.
+
+## P6 — compile-time packer plane bodies
+
+- Dispatch each CTA to a compile-time plane body before its element loop. Numerical operations and full gate unchanged. Full72/72 checks pass with identical printed eF.
+- Balanced preprocessing BF16/FP16=71.715/71.859us, down from~92us. A38.0/38.1us improves, B23.3/23.2us regresses from~17.8us. Template-local shared allocations raise B shared usage to41344bytes; A registers143/144. Do not attribute net gain solely to arithmetic count.
+- Detailed complete-call aggregates in`p6_balanced.json`; performance still fails the currentSW target. Compiler unreachable-loop warnings refer to constant raw-plane early returns, not a failed build.
+- Next isolated change applies P5's proven uniform-branch hoisting to INT8 quantization factors in the packer.

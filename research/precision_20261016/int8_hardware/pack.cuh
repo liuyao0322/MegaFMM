@@ -42,7 +42,7 @@ template<class T> __global__ void inside_scale(const T* A,const T* B,int* expone
  }
 }
 
-template<class T,bool SideA,bool Balance> __device__ float value(const T* X,const int* ex,int r,int c,int plane){
+template<class T,bool SideA,bool Balance> __device__ __forceinline__ float value(const T* X,const int* ex,int r,int c,int plane){
  int at=r*1024+c;
  float x0=float(X[at]),x1=float(X[at+512]),x2=float(X[at+512*1024]),x3=float(X[at+512*1024+512]);
  if constexpr(Balance){
@@ -65,14 +65,15 @@ template<class T,bool SideA,bool Balance> __device__ float value(const T* X,cons
  }
 }
 
-template<class T,bool SideA,bool Balance> __global__ __launch_bounds__(256,1)
-void pack(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,int* __restrict__ exp,const int* __restrict__ inside){
+template<class T,bool SideA,bool Balance,int PlaneId> __device__ __forceinline__
+void pack_plane(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,int* __restrict__ exp,const int* __restrict__ inside){
  constexpr int Rows=SideA?64:128,Cols=SideA?128:32,Size=Rows*Cols,PerThread=Size/256;
  constexpr int ColTiles=512/Cols,Tiles=(512/Rows)*ColTiles;
- int plane=blockIdx.x/Tiles,tile=blockIdx.x%Tiles,r0=(tile/ColTiles)*Rows,c0=(tile%ColTiles)*Cols,tid=threadIdx.x;
+ constexpr int plane=PlaneId;
+ int tile=blockIdx.x%Tiles,r0=(tile/ColTiles)*Rows,c0=(tile%ColTiles)*Cols,tid=threadIdx.x;
  constexpr int RawPlane=SideA?3:2;
- bool quant=plane>=4 || plane==(SideA?2:3) || plane==RawPlane;
- int qp=plane==RawPlane?8:plane>=4?plane-4:3;
+ constexpr bool quant=plane>=4 || plane==(SideA?2:3) || plane==RawPlane;
+ constexpr int qp=plane==RawPlane?8:plane>=4?plane-4:3;
  float vh[PerThread],vl[PerThread],hi=0,lo=0;
  #pragma unroll
  for(int j=0;j<PerThread;++j){
@@ -111,6 +112,20 @@ void pack(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,in
   }
  }
  asm volatile("fence.proxy.async.global;" ::: "memory");
+}
+
+template<class T,bool SideA,bool Balance> __global__ __launch_bounds__(256,1)
+void pack(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,int* __restrict__ exp,const int* __restrict__ inside){
+ int plane=blockIdx.x/(SideA?32:64);
+ switch(plane){
+  case 0:pack_plane<T,SideA,Balance,0>(X,high,q,exp,inside);break;
+  case 1:pack_plane<T,SideA,Balance,1>(X,high,q,exp,inside);break;
+  case 2:pack_plane<T,SideA,Balance,2>(X,high,q,exp,inside);break;
+  case 3:pack_plane<T,SideA,Balance,3>(X,high,q,exp,inside);break;
+  case 4:pack_plane<T,SideA,Balance,4>(X,high,q,exp,inside);break;
+  case 5:pack_plane<T,SideA,Balance,5>(X,high,q,exp,inside);break;
+  default:pack_plane<T,SideA,Balance,6>(X,high,q,exp,inside);break;
+ }
 }
 
 template<class T,bool Balance> void preprocess(const T* A,const T* B,Work w,cudaStream_t stream){
