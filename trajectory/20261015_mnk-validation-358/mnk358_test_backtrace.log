@@ -1,0 +1,27 @@
+[New LWP 1721904]
+[New LWP 1721909]
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x00007f1a9d0bd000 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+
+Thread 3 (Thread 0x7f1a9a6a6000 (LWP 1721909) "cuda-EvtHandlr"):
+#0  0x00007f1a9cb1a26f in __GI___poll (fds=0x7f1888000c20, nfds=11, timeout=100) at ../sysdeps/unix/sysv/linux/poll.c:29
+#1  0x00007f1a9cf5f217 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#2  0x00007f1a9d04455a in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#3  0x00007f1a9cf4f243 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#4  0x00007f1a9caa71f5 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442
+
+Thread 2 (Thread 0x7f1a9c7ff000 (LWP 1721904) "cuda00001800007"):
+#0  0x00007f1a9cb1a26f in __GI___poll (fds=0x55955a96f350, nfds=3, timeout=-1) at ../sysdeps/unix/sysv/linux/poll.c:29
+#1  0x00007f1a9cf5f217 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#2  0x00007f1a9d04455a in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#3  0x00007f1a9cf4f243 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#4  0x00007f1a9caa71f5 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442
+
+Thread 1 (Thread 0x7f1ac05fd000 (LWP 1721903) "test_tuning_can"):
+#0  0x00007f1a9d0bd000 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#1  0x00007f1a9ce746c3 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#2  0x00007f1a9ceb551b in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#3  0x00007f1a9db47a58 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#4  0x00007f1a9db47e88 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+[Inferior 1 (process 1721903) detached]
