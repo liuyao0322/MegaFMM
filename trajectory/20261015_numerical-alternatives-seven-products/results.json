@@ -1,0 +1,110 @@
+{
+  "scope": "CPU numerical diagnostic only: 1024 cubed; float64 leaf dots and recombination; not production GPU precision or performance acceptance; BF16-to-FP16 range only verified on bounded uniform inputs",
+  "rows": [
+    {
+      "input_dtype": "bf16",
+      "seed": 1,
+      "variant": "Winograd_current",
+      "relative_frobenius": 0.00604070535714811,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "bf16",
+      "seed": 1,
+      "variant": "Classic_Strassen",
+      "relative_frobenius": 0.004391014624945209,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "bf16",
+      "seed": 1,
+      "variant": "Winograd_FP16_all_operands",
+      "relative_frobenius": 0.0003176548200026719,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "bf16",
+      "seed": 2,
+      "variant": "Winograd_current",
+      "relative_frobenius": 0.00603645036032092,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "bf16",
+      "seed": 2,
+      "variant": "Classic_Strassen",
+      "relative_frobenius": 0.00439334889005922,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "bf16",
+      "seed": 2,
+      "variant": "Winograd_FP16_all_operands",
+      "relative_frobenius": 0.00031677554482909437,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "bf16",
+      "seed": 3,
+      "variant": "Winograd_current",
+      "relative_frobenius": 0.006021314530669714,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "bf16",
+      "seed": 3,
+      "variant": "Classic_Strassen",
+      "relative_frobenius": 0.004405144508155707,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "bf16",
+      "seed": 3,
+      "variant": "Winograd_FP16_all_operands",
+      "relative_frobenius": 0.0003166997187145296,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "fp16",
+      "seed": 1,
+      "variant": "Winograd_current",
+      "relative_frobenius": 0.0007532899100240498,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "fp16",
+      "seed": 1,
+      "variant": "Classic_Strassen",
+      "relative_frobenius": 0.0005493980719732007,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "fp16",
+      "seed": 2,
+      "variant": "Winograd_current",
+      "relative_frobenius": 0.0007540337857390769,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "fp16",
+      "seed": 2,
+      "variant": "Classic_Strassen",
+      "relative_frobenius": 0.0005490372694363243,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "fp16",
+      "seed": 3,
+      "variant": "Winograd_current",
+      "relative_frobenius": 0.0007521352481617971,
+      "nonfinite": 0
+    },
+    {
+      "input_dtype": "fp16",
+      "seed": 3,
+      "variant": "Classic_Strassen",
+      "relative_frobenius": 0.000550011751507911,
+      "nonfinite": 0
+    }
+  ]
+}
