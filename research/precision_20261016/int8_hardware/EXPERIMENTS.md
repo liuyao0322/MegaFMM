@@ -1,6 +1,6 @@
 # INT8 hardware experiments
 
-Production `solution/` unchanged; these are standalone research candidates, not production iteration371. Full original-input FP64 gate remains fixed, with fresh deterministic inputs in launch/Graph modes. Every timing row includes preprocessing and tensor-map setup. Sanitizer/NCU runs are excluded from ordinary latency evidence.
+Production `solution/` unchanged; these are standalone research candidates, not production iteration371. Full original-input FP64 gate remains fixed, with fresh deterministic inputs in launch/Graph modes. Every ordinary timing row includes preprocessing and tensor-map setup; Graph replay is separately labeled and does not repeat host descriptor encoding. Sanitizer/NCU runs are excluded from ordinary latency evidence.
 
 ## P1 — first complete INT8 candidate
 
@@ -207,3 +207,17 @@ P17独立ABBA复测（P13→P17→P17→P13，四个新进程）共312次精度�
 - Initial preflight compilation failed on a variable-template ternary parser ambiguity. Add explicit parentheses/spaces, preserving the intended dtype11/8bits. No device execution of the failed build; source/error in p20_preflight/ and its manifest.
 - All78/78 ordinary fixed original-input FP64 checks and79,872 exact per-column comparisons pass. MaxBF16/FP16 eF5.09551e-4/6.56759e-5, nonfinite0. Unlike address-only changes, P20 changes scale/rounding, so printed eF need not equalP17. FullBF16/FP16 calls51.368/50.994us versusSW10.321/10.130us. This improves the research candidate but still fails the production latency target by about5x.
 - Consumer194regs vsP17 196,0stack/spill; balanced B114regs/46,464B shared,0stack/spill. Only ordinary precision/latency established here; new P20 dual-stream/Graph/sanitizer and independent ordinary performance checks are pending, with no transfer fromP7.
+
+
+## P20 independent correctness and synchronization validation
+
+-78/78 Graph original-input checks pass with the production tunedDense-dependent gate. Same deterministic configurations as ordinary, not78additional independent inputs;79,872 inside exponents agree in each mode. Graph complete replay medians45.998/45.762us (BF16/FP16), reported separately from ordinary calls and excluding repeat host descriptor encoding.
+- Fresh extended dual-stream/Graph stress covers7patterns including alternating inside mismatch,3trials,2streams,2dtypes:84configurations,672interleaved calls. All original-input FP64 error checks and128-float guards pass. As in the historical stress, its dense control is cuBLASGemmEx, whereas ordinary/Graph compare uses the production tunedDense gate.
+- CUDA12.8 memcheck/racecheck/synccheck each covers28configurations/56calls and onlykns=int8_research. All pass with0errors; racecheck0warnings/0hazards. Instrumented timings excluded. Exact scope and identities inp20_validation.json/p20_validation_manifest.json. These are P20's own checks, not inheritedP7 results.
+
+
+## P20 independent ordinary ABBA repeat
+
+- Four new processesP17→P20→P20→P17; all ordinary full-call arms and controls preserved.10groups per dtype/candidate. BF16 old/new medians53.792/51.089us, FP16 53.606/51.111us, relative reductions5.025%/4.654%. GPU clocks unlocked, no confidence interval or cross-machine claim.
+-312original-input FP64 checks and319,488inside-exponent comparisons pass; still78 deterministic numerical configurations. Sources/binaries and analysis frozen inp20_abba_manifest.json; runscript and analyze_abba.py reproduce the report.
+- KeepP20 as the current research candidate; no production changes. Consumer scheduling and packing remain too expensive for the~10us target. The measured relative gain does not change the full performance rejection.

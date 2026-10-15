@@ -1,0 +1,25 @@
+{
+  "status": "p20_accuracy_and_scoped_synchronization_validated_performance_rejected",
+  "goal_achieved": false,
+  "ordinary_original_input_fp64_checks": 78,
+  "graph_original_input_fp64_checks": 78,
+  "graph_same_deterministic_configurations": true,
+  "equal_per_column_exponents_per_mode": 79872,
+  "independent_stress_configurations": 84,
+  "independent_stress_calls": 672,
+  "sanitizer_cases_per_tool": 28,
+  "sanitizer_calls_per_tool": 56,
+  "sanitizers": [
+    "memcheck",
+    "racecheck",
+    "synccheck"
+  ],
+  "sanitizer_kernel_scope": "kns=int8_research",
+  "stress_dense_control": "historical cuBLAS GemmEx; ordinary and Graph compare use production tuned Dense gate",
+  "stress_output_guards": "128 floats before and after each output; two independent streams/workspaces",
+  "graph_timing_us": {
+    "bf16": 45.9980793,
+    "fp16": 45.762157439999996
+  },
+  "limitations": "Only contiguous non-transposed1024^3, alpha1 beta0, FP16/BF16; no arbitrary-range proof, no production integration, no transfer to later modified candidates."
+}

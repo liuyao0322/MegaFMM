@@ -307,6 +307,49 @@
     "F11 pack subphases, one BF16 uniform case"
   ],
   "probe_scope": "one P5 K128 tile, fresh uniform CPU inputs, two dtypes; not full-call acceptance",
-  "validations_not_transferred": "Graph/dual-stream/sanitizers remain specifically P7 in ../int8_hardware/audit.json. F8 and later measured fusion candidates have ordinary72-case precision only.",
+  "p20_validation": {
+    "status": "p20_accuracy_and_scoped_synchronization_validated_performance_rejected",
+    "goal_achieved": false,
+    "ordinary_original_input_fp64_checks": 78,
+    "graph_original_input_fp64_checks": 78,
+    "graph_same_deterministic_configurations": true,
+    "equal_per_column_exponents_per_mode": 79872,
+    "independent_stress_configurations": 84,
+    "independent_stress_calls": 672,
+    "sanitizer_cases_per_tool": 28,
+    "sanitizer_calls_per_tool": 56,
+    "sanitizers": [
+      "memcheck",
+      "racecheck",
+      "synccheck"
+    ],
+    "sanitizer_kernel_scope": "kns=int8_research",
+    "stress_dense_control": "historical cuBLAS GemmEx; ordinary and Graph compare use production tuned Dense gate",
+    "stress_output_guards": "128 floats before and after each output; two independent streams/workspaces",
+    "graph_timing_us": {
+      "bf16": 45.9980793,
+      "fp16": 45.762157439999996
+    },
+    "limitations": "Only contiguous non-transposed1024^3, alpha1 beta0, FP16/BF16; no arbitrary-range proof, no production integration, no transfer to later modified candidates."
+  },
+  "p20_independent_performance": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p17",
+      "new_candidate": "p20",
+      "old_group_median_us": 53.792040348,
+      "new_group_median_us": 51.08891868575,
+      "relative_reduction": 0.05025133169819429
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p17",
+      "new_candidate": "p20",
+      "old_group_median_us": 53.605799198125,
+      "new_group_median_us": 51.110920906000004,
+      "relative_reduction": 0.04654120131488049
+    }
+  ],
+  "validations_not_transferred": "P20 has its own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. No transfer to later changes.",
   "remaining": "Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration."
 }

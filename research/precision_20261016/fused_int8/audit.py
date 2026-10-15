@@ -83,6 +83,8 @@ assert 'cases=1048576 exponents=-300..300 errors=0' in (h/'p14_pow2.log').read_t
 out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved=False,production_unchanged=True,
     working_candidate=current,working_global_candidate=global_current,compact_pow2_equivalence_cases=1048576,retained_global_candidate='p20, 78 ordinary FP64 checks and 79872 exact per-column exponents; p10 rejected by fresh hardware',compile_stopped_candidates=['F12: no numerical or latency measurement'],candidates=candidates,numerical_models=models,
     diagnostic_traces=['F9 role-level, one BF16 uniform case','F11 pack subphases, one BF16 uniform case'],probe_scope='one P5 K128 tile, fresh uniform CPU inputs, two dtypes; not full-call acceptance',
-    validations_not_transferred='Graph/dual-stream/sanitizers remain specifically P7 in ../int8_hardware/audit.json. F8 and later measured fusion candidates have ordinary72-case precision only.',
+    p20_validation=json.loads((h/'p20_validation.json').read_text()),
+    p20_independent_performance=json.loads((h/'p20_abba.json').read_text())['summary'],
+    validations_not_transferred='P20 has its own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. No transfer to later changes.',
     remaining='Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration.')
 (r/'audit.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out,ensure_ascii=False,indent=2))
