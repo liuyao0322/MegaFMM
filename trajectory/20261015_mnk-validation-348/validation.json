@@ -1,0 +1,29 @@
+{
+  "iteration": 348,
+  "source_commit": "ed2e71aa0e117ddc369522b065bf922420a8b39f",
+  "forced_candidates": 46,
+  "api_original_fp64": "pass",
+  "warp_memcheck_errors": 0,
+  "warp_racecheck_errors": 0,
+  "warp_racecheck_warnings": 0,
+  "boundary_id43": {
+    "registers": 56,
+    "issued_warp_instructions": 4127768,
+    "ncu_duration_us": 13.15,
+    "ordinary_tuning_us": [
+      10.114,
+      10.294
+    ],
+    "achieved_occupancy_percent": 19.53,
+    "shared_excess_wavefronts_percent": 14
+  },
+  "conclusion": "XOR cuts shared excess but adds instructions and loses to nonswizzled9.3us; smaller tiles11.2\u201311.8us also lose. No new certified win.",
+  "files_sha256": {
+    "results/mnk348_candidates.log": "d07e48b8c7086af72de526f04fad7a85df9c20a784e87b629f7dd06189696514",
+    "results/mnk348_api.log": "bf6f0327c75ce525df0afe03aeba74876356af23872c073b524c22c441676760",
+    "results/mnk348_warp_memcheck.log": "ad50a3106db9a763d9b8640a0bd737f74e81e4feaf7a38fc24bd941ff5a19c62",
+    "results/mnk348_warp_racecheck.log": "aa5529a66180918ac0438463b3cad5f1ebade3bc208798f8b941782f86ab4bf6",
+    "results/mnk348_swizzle_boundary.txt": "47b7455eeaee02b1ecf917949a28d08584d620a8327ca753a9fbf490cd7003e8",
+    "tests/test_tuning_candidates.cu": "b35429a0dfe6af362bc2822448984fab37c51052c1d9560e1056b65b16fbe059"
+  }
+}
