@@ -196,7 +196,7 @@ void pair_store(int which,T* high,int8_t* q,int* exp,
  constexpr int Rows=SideA?64:128,Cols=SideA?128:32,Size=Rows*Cols,PT=Size/256;
  constexpr int Tiles=(512/Rows)*(512/Cols),Bits=(std::is_same_v<T,cute::half_t> ? 11 : 8);
  int tid=threadIdx.x;float hi=0;
- #pragma unroll 1
+ #pragma unroll 4
  for(int j=0;j<PT;++j){int i=tid+256*j;T h=T(s.values[which][i]);high[NativePlane*Plane+(r0+i/Cols)*512+c0+i%Cols]=h;hi=fmaxf(hi,fabsf(float(h)));}
  for(int step=16;step;step/=2)hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,step));
  if((tid&31)==0)s.maxima[tid/32]=hi;__syncthreads();
@@ -206,7 +206,7 @@ void pair_store(int which,T* high,int8_t* q,int* exp,
  }
  __syncthreads();int eh=s.exponent,el=eh-Bits;
  auto quantize=[&](auto fast,float sh,float sl){
-  #pragma unroll 1
+  #pragma unroll 4
   for(int j=0;j<PT;++j){
    int i=tid+256*j;float v=s.values[which][i],h=float(T(v));
    int qh;if constexpr(decltype(fast)::value)qh=__float2int_rn(__fmul_rn(h,sh));else qh=__float2int_rn(pair_pow2(h,-eh));
@@ -239,7 +239,7 @@ void pack_pair(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__
  constexpr int Rows=SideA?64:128,Cols=SideA?128:32,PT=Rows*Cols/256,Tiles=(512/Rows)*(512/Cols);
  int tile=blockIdx.x%Tiles,tid=threadIdx.x,r0=tile/(512/Cols)*Rows,c0=tile%(512/Cols)*Cols;
  auto load=[&](auto fast,float sf0,float sf1){
-  #pragma unroll 1
+  #pragma unroll 4
   for(int j=0;j<PT;++j){
    int i=tid+256*j,r=r0+i/Cols,c=c0+i%Cols,at=r*1024+c;
    float a=float(X[at]),b=float(X[at+512]),cc=float(X[at+512*1024]),d=float(X[at+512*1024+512]);
