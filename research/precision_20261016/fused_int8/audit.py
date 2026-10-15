@@ -41,8 +41,8 @@ for arm in ['adaptive_unpaired','relative_unpaired','relative_paired']:
     models['m8_'+arm]=dict(fresh_configurations=48,passes=48,hardware_accepted=False)
 abba=json.loads((h/'p17_abba.json').read_text())
 assert abba['correctness_checks']==312 and abba['independent_numerical_configurations']==78
-for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24']:
-    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24'] else 72
+for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25']:
+    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25'] else 72
     assert len(j['checks'])==count and all(x['pass']=='1' and int(x['nonfinite'])==0 for x in j['checks'])
     assert all(g['speedup_vs_sw']<1 for z in j['summaries'] for g in z['groups'])
     candidates[label]=dict(checks=count,failures=0,performance_accepted=False,full_call_us={s['dtype']:s['corrected_us'] for s in j['summaries']})
@@ -61,7 +61,7 @@ for granularity,passes in [('K128',0),('column',6)]:
     rows=[x for x in m7 if x['inside_granularity']==granularity]
     assert len(rows)==6 and sum(x['pass_fixed_floor'] for x in rows)==passes
 models['alternating_inside']=dict(fresh_configurations=6,paired_variants=2,coarse_passes=0,column_passes=6)
-for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24']:
+for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25']:
     rows=[dict(re.findall(r'(\w+)=([^ ]+)',line)) for line in (h/(label+'_balanced.log')).read_text().splitlines() if line.startswith('INSIDE_EQUAL ')]
     assert len(rows)==78 and all(x['errors']=='0' and x['elements']=='1024' for x in rows)
     j=json.loads((h/(label+'_balanced.json')).read_text())
