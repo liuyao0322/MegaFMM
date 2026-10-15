@@ -1,5 +1,18 @@
 # Hints
 
+## Precision research goal — user request 2026-10-16
+
+- Resume work on precision with the order explicitly requested by the user:
+  investigate related research, ablate error sources, then design targeted fixes
+  while attempting to preserve complete-call performance.
+- Start from the actual current source, not historical README version labels.
+- Preserve the original FP64 reference, fresh inputs, fixed dtype-specific gates,
+  and complete-call timing. Keep failed experiments and source identities.
+- Isolate numerical models and prototypes under research/precision_20261016;
+  promote a production change only with measured accuracy and latency evidence.
+- The accepted pause of the previous MNK speed-only goal does not prohibit this
+  newly requested precision study; do not resume unrelated MNK optimization.
+
 ## Multi-size design handoff — 2026-10-15
 
 - User asked how to generalize the 1024-specific implementation, then requested a design document for another agent to continue. The handoff is `research/size_generalization/DESIGN.md`.
