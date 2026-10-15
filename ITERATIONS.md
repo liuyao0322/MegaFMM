@@ -611,6 +611,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 352 | Test shallow pipelines, multiple persistent workers and source-free epilogues | 1.0932 | 0.327055 | completed |
 
+| 353 | Tune source-free raster order and narrow ping-pong kernels | 1.1165 | 0.324896 | completed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5796,3 +5798,29 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal six-shape twelve-row run completed and archived. Early 4096 FP16 source-free short-ranking gain failed independent long-batch confirmation and was correctly rejected. Detailed results and forced candidate validation follow; iter351 remains the latest full independent 13/28 certification.
 - **Next:** Assess all per-shape results, force all62 candidates and sanitizer checks, profile resource limits before choosing the next direction.
 - **Archive:** trajectory/20261015_182619_iter-352/
+
+### Iter 353 — Tune source-free raster order and narrow ping-pong kernels
+
+- **Hypothesis:** Source-free epilogues with shape-specific raster and swizzle improve cache reuse, while64x256 ping-pong tiles avoid oversized per-warp accumulators.
+- **Changes:** Added source-free raster/swizzle variants and64x256 ping-pong auto/S3/cluster2 variants; bounded measured-negative56-60 above2048.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 12 rows; arithmetic mean of row median latency=0.324896 ms; mean speedup=1.1165x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005680 | 0.005066 | 1.1212 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005699 | 0.005062 | 1.1258 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008727 | 0.006700 | 1.3026 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008652 | 0.006645 | 1.3021 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.237200 | 0.218307 | 1.0865 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232615 | 0.232590 | 1.0001 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.643555 | 1.629153 | 1.0088 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.743156 | 1.698498 | 1.0263 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026116 | 0.024116 | 1.0829 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026059 | 0.023880 | 1.0912 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027597 | 0.024258 | 1.1377 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.027231 | 0.024477 | 1.1125 | 6.43463e-07 | 1 |
+
+- **Analysis:** Formal six-shape twelve-row run completed. Original numerical gates and detailed performance will be reviewed after closing this iteration. Latest independent whole-suite certification remains351 thirteenof28; no later result is certified yet.
+- **Next:** Force all70 candidates and API/sanitizer validation, inspect per-shape scores and profile the best new configurations before continuing.
+- **Archive:** trajectory/20261015_183330_iter-353/
