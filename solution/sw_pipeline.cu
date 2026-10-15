@@ -2722,7 +2722,7 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
         else if(j==6) asm("sub.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(bbits[3]),"r"(bbits[1]));
         else asm("cvt.rn.f16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
       }
-      reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=word;
+      reinterpret_cast<uint32_t*>(packed)[((j/4)*4*Plane+(row*4+j%4)*512+col)/2]=word;
     }
   }
   asm volatile("fence.proxy.async.global;" ::: "memory");
@@ -2788,7 +2788,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
     // Expose K/64 as an outer tensor dimension. The shared box still packs
     // (64 K elements, BM rows, BK/64 chunks), matching the existing GMMA layout.
     uint64_t dims[4]={64,transformed ? 512ULL:1024ULL,transformed ? 8ULL:16ULL,4};
-    uint64_t strides[3]={transformed ? 1024ULL:2048ULL,128,512ULL*512*2};
+    uint64_t strides[3]={transformed ? 4096ULL:2048ULL,128,1024};
     uint32_t box[4]={64,BN,BK/64,1},element_strides[4]={1,1,1,1};
     auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
         transformed ? 4:3,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
@@ -2797,7 +2797,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
     return;
   }
   uint64_t dims[3]={transformed ? 512ULL:1024ULL,transformed ? 512ULL:1024ULL,4};
-  uint64_t strides[2]={dims[0]*2,dims[0]*dims[1]*2};
+  uint64_t strides[2]={transformed ? 4096ULL:dims[0]*2,1024};
   uint32_t box[3]={uint32_t(BM),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};
   auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
       transformed ? 3:2,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
