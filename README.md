@@ -8,7 +8,7 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 七乘法仍未通过原始精度门槛；达标且更快的直接输入稠密原型仅作为研究对照。
 [INT8 补偿硬件验证](research/precision_20261016/int8_hardware/HARDWARE_REPORT.md)已通过本轮精度、Graph、双流和限定范围 sanitizer，
 P7完整调用约94 μs；后续P9普通调用降至约65 μs且72项精度通过，仍远慢于当前 SW 约10 μs。尚未进入生产；精度与性能同时达标的目标仍在进行。
-[片上融合后续](research/precision_20261016/fused_int8/REPORT.md)修正布局后也通过72项普通精度，但约0.7ms，已拒绝性能验收。
+[片上融合后续](research/precision_20261016/fused_int8/REPORT.md)修正布局后通过72项普通精度；继续移出逐元素缩放判断后，F13完整调用约224–240 μs，仍拒绝性能验收。
 下方 iter282 等标签为历史检查点，实际起点和文件哈希以新报告为准。
 
 **当前保留 iter282（1bdfb29）的七乘法、无补偿实验内核。持续优化目标尚未完成。**

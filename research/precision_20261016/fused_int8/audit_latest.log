@@ -1,0 +1,153 @@
+{
+  "status": "progress_accuracy_validated_performance_rejected",
+  "goal_achieved": false,
+  "production_unchanged": true,
+  "working_candidate": "f13",
+  "compile_stopped_candidates": [
+    "F12: no numerical or latency measurement"
+  ],
+  "candidates": {
+    "f6": {
+      "checks": 72,
+      "failures": 66,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 731.4956207275,
+        "fp16": 724.7870483397501
+      },
+      "max_ef": {
+        "bf16": 129.941552176,
+        "fp16": 129.928539369
+      }
+    },
+    "f7": {
+      "checks": 72,
+      "failures": 60,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 732.55078125025,
+        "fp16": 724.2944030765
+      },
+      "max_ef": {
+        "bf16": 0.0506761254416,
+        "fp16": 0.00617059830993
+      }
+    },
+    "f8": {
+      "checks": 72,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 731.99224853525,
+        "fp16": 720.1025848385
+      },
+      "max_ef": {
+        "bf16": 0.000509385609333,
+        "fp16": 6.31255707396e-05
+      }
+    },
+    "f9": {
+      "checks": 72,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 715.2552642825001,
+        "fp16": 701.238723755
+      },
+      "max_ef": {
+        "bf16": 0.000509385609333,
+        "fp16": 6.31255707396e-05
+      }
+    },
+    "f10": {
+      "checks": 72,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 395.75126647975003,
+        "fp16": 379.154800415
+      },
+      "max_ef": {
+        "bf16": 0.000509385609333,
+        "fp16": 6.31255707396e-05
+      }
+    },
+    "f11": {
+      "checks": 72,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 245.42936325075001,
+        "fp16": 228.8055992125
+      },
+      "max_ef": {
+        "bf16": 0.000509385609333,
+        "fp16": 6.31255707396e-05
+      }
+    },
+    "f13": {
+      "checks": 72,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 239.51519775399998,
+        "fp16": 224.2548828125
+      },
+      "max_ef": {
+        "bf16": 0.000509385609333,
+        "fp16": 6.31255707396e-05
+      }
+    },
+    "p8": {
+      "checks": 72,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 77.41544151325,
+        "fp16": 76.75103759775
+      }
+    },
+    "p9": {
+      "checks": 72,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 65.71072006225,
+        "fp16": 65.45672035225
+      }
+    }
+  },
+  "numerical_models": {
+    "tile_inside_adaptive": {
+      "cases": 42,
+      "pass_fixed_floor": 42
+    },
+    "tile_inside_interleave": {
+      "cases": 42,
+      "pass_fixed_floor": 42
+    },
+    "tile_inside_paired": {
+      "cases": 42,
+      "pass_fixed_floor": 39
+    },
+    "tile_inside_paired_extra": {
+      "cases": 42,
+      "pass_fixed_floor": 42
+    },
+    "bound_scale_model": {
+      "cases": 42,
+      "pass_fixed_floor": 36
+    },
+    "global_k128_model": {
+      "cases": 42,
+      "pass_fixed_floor": 42
+    }
+  },
+  "diagnostic_traces": [
+    "F9 role-level, one BF16 uniform case",
+    "F11 pack subphases, one BF16 uniform case"
+  ],
+  "probe_scope": "one P5 K128 tile, fresh uniform CPU inputs, two dtypes; not full-call acceptance",
+  "validations_not_transferred": "Graph/dual-stream/sanitizers remain specifically P7 in ../int8_hardware/audit.json. F8 and later measured fusion candidates have ordinary72-case precision only.",
+  "remaining": "Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration."
+}

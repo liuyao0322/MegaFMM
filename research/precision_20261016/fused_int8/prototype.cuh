@@ -92,7 +92,7 @@ template<class T,int Prod,bool Fast> __device__ void pack_leaf_impl(Shared& s,Sl
  for(int i=tid;i<4096;i+=128){int r=i/128,k=i%128;
   float v=transformed<T,Prod,true,Fast>(s,r,k,a0,a1);T h=T(v);ha[Traits<T>::ah_index(r,k)]=h;peak[0]=fmaxf(peak[0],fabsf(float(h)));peak[2]=fmaxf(peak[2],fabsf(__fsub_rn(v,float(h))));
  }
- for(int i=tid;i<8192;i+=128){int n=i%64,k=i/64;
+ for(int j=0;j<64;++j){int n=tid/8+(j%4)*16,k=tid%8+(j/4)*8;
   float v=transformed<T,Prod,false,Fast>(s,n,k,b0,b1);T h=T(v);hb[Traits<T>::bh_index(n,k)]=h;peak[1]=fmaxf(peak[1],fabsf(float(h)));peak[3]=fmaxf(peak[3],fabsf(__fsub_rn(v,float(h))));
  }
  reduce4(s,peak,tid);
@@ -113,7 +113,7 @@ template<class T,int Prod,bool Fast> __device__ void pack_leaf_impl(Shared& s,Sl
   qah[Traits<T>::aq()(r,k)]=int8_t(max(-127,min(127,__float2int_rn(qscale(h,eah,shA)))));
   qal[Traits<T>::aq()(r,k)]=int8_t(max(-127,min(127,__float2int_rn(qscale(l,eal,slA)))));
  }
- for(int i=tid;i<8192;i+=128){int n=i%64,k=i/64;float h=float(hb[Traits<T>::bh_index(n,k)]);
+ for(int j=0;j<64;++j){int n=tid/8+(j%4)*16,k=tid%8+(j/4)*8;float h=float(hb[Traits<T>::bh_index(n,k)]);
   float l=__fsub_rn(transformed<T,Prod,false,Fast>(s,n,k,b0,b1),h);
   qbh[Traits<T>::bq()(n,k)]=int8_t(max(-127,min(127,__float2int_rn(qscale(h,ebh,shB)))));
   qbl[Traits<T>::bq()(n,k)]=int8_t(max(-127,min(127,__float2int_rn(qscale(l,ebl,slB)))));

@@ -68,3 +68,22 @@ F6/F7两种dtype均0stack、0spill、124registers/thread。F7对齐修正大幅�
 - FrozenF11 adds eight timestamps per pack, retaining the role trace. One uniformBF16 FP64 check passes with the same eF5.52481148267e-5; instrumented kernel255.563us versus ordinary complete245.429us,122regs,0stack/spill. Perturbed diagnostic, not performance acceptance.
 - Median same-CTA sums: nativeA pack42.784us,nativeB51.936us,maximum reduction2.688us,exponent selection5.024us,A quantization48.192us,B quantization68.800us,publish/sync1.120us. Pack total220.608us; wrapper envelope225.760us. Individual phase medians need not sum to the median total.
 - Second-pass quantization includes raw reloads and recomputation of transformed residuals. NextF12 retains first-pass residuals in per-thread registers; native high values still come from shared storage. Explicitly verify register/stack/spill effects and original precision before assessing complete-call speed.
+
+## F12 — residual register cache: compile stopped, no runtime verdict
+
+- Retained32 A and64 B first-pass FP32 residuals per producer thread and fully unrolled their first/second passes. Native high values remain in shared memory.
+- Total compilation exceeded15minutes; ptxas consumed one CPU core continuously for more than13minutes, with a17,940,697-byte generated PTX. The agent stopped only owned step107488.2025, session9600 terminal137; allocation retained. This is an intentionally stopped compilation, not evidence of numerical failure, spilling, or runtime latency.
+- Exact proposed sources, empty compiler output and the explicit decision are frozen in compile_stopped_f12 with its manifest. No F12 binary or timing/accuracy assertion. Next measured candidate starts from F11, without the cache/unrolling.
+- During F13 setup, an assertion found three matching B loops rather than the two pack-only loops; shell setup inadvertently began compiling unchanged F12. Owned step107488.2026 was stopped after seconds, session26437 terminal137. f13_setup_aborted.log retained. The corrected setup restricts replacement to pack_leaf_impl and uses fail-fast shell behavior.
+
+## CPU CuTe access enumeration for the next packing candidate
+
+- build_layout_access.sh compiles a CPU-only diagnostic against the repository CuTe layouts; every element coordinate is in range, unique and covered exactly once.
+- At the source scalar-access granularity, native A/B and INT8 A have one distinct32-bit word per bank per warp instruction. Current INT8 B has four; assigning each128-thread group to16 N x8 K subtiles reduces both B layouts to one distinct word per bank.
+- This enumerates addresses, not device instruction vectorization or measured bank-conflict stalls. F13 changes only the two B pack loop mappings from frozenF11. It still requires full72-case numerical and complete-call latency measurements.
+
+## F13 — B native/INT8 packing thread mapping
+
+- Start from frozenF11 (no F12 register cache). Change both B pack passes to N16/K8 subtiles, covering all8192 elements exactly once; no numerical representation or consumer change. CUDA12.4 compile completed normally.124regs,0stack/spill.
+- All72 ordinary original-input FP64 checks pass; every printed eF identical toF11. Complete calls BF16 239.515us/currentSW10.123us, FP16 224.255us/currentSW9.969us.
+- Only a small difference from F11 245.429/228.806us, without independent performance certification. CPU address enumeration alone did not predict a large latency reduction. Still performance-rejected, and slower than globalP9. No Graph/dual-stream/sanitizer claims.

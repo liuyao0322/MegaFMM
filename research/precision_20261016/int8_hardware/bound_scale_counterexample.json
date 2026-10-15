@@ -1,0 +1,81 @@
+{
+  "scope": "CPU scalar-block counterexample for M5, not a hardware acceptance result.\n\nEach original 512x512 quadrant is constant, so scalar products times K model\nthese matrices. FP16 inputs and separate FP32 transform/multiply/add rounding\nare explicit. The independent GPU model still decides its full42-case screen.\n",
+  "shape": [
+    1024,
+    1024,
+    1024
+  ],
+  "dtype": "FP16",
+  "inside_exponents": [
+    0,
+    0
+  ],
+  "rows": [
+    {
+      "quantization": "a_priori_bound",
+      "original_a_quadrants": [
+        0.75,
+        -0.74609375,
+        0.75,
+        -0.74609375
+      ],
+      "original_b_quadrants": [
+        0.75,
+        -0.74951171875,
+        0.75,
+        -0.74951171875
+      ],
+      "output_quadrants": [
+        1.5,
+        -1.5,
+        1.5,
+        -1.5
+      ],
+      "reference_quadrants": [
+        1.5,
+        -1.4990234375,
+        1.5,
+        -1.4990234375
+      ],
+      "ef": 0.00046050585717895325,
+      "pass_fixed_floor": false,
+      "S1": 0.00390625,
+      "S1_high_integer": 0,
+      "S1_high_scale": 0.015625,
+      "T1_residual": 0.00048828125
+    },
+    {
+      "quantization": "adaptive",
+      "original_a_quadrants": [
+        0.75,
+        -0.74609375,
+        0.75,
+        -0.74609375
+      ],
+      "original_b_quadrants": [
+        0.75,
+        -0.74951171875,
+        0.75,
+        -0.74951171875
+      ],
+      "output_quadrants": [
+        1.5,
+        -1.4990234375,
+        1.5,
+        -1.4990234375
+      ],
+      "reference_quadrants": [
+        1.5,
+        -1.4990234375,
+        1.5,
+        -1.4990234375
+      ],
+      "ef": 0.0,
+      "pass_fixed_floor": true,
+      "S1": 0.00390625,
+      "S1_high_integer": 64,
+      "S1_high_scale": 6.103515625e-05,
+      "T1_residual": 0.00048828125
+    }
+  ]
+}
