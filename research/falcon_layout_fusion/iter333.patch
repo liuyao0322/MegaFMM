@@ -2,50 +2,23 @@ diff --git a/solution/plan.cpp b/solution/plan.cpp
 index 98601a0..4c2c9b6 100644
 --- a/solution/plan.cpp
 +++ b/solution/plan.cpp
-@@ -364,7 +364,7 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
-                                       float* D, void* workspace) const {
-   validate_binding(*impl_, A, B, C0, D, workspace);
-   if (impl_->empty || impl_->scale) return "none";
+@@ -367 +367 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
 -  if (impl_->sw) return "sw_two_kernel_pdl;warp_roles=1tma+4wgmma;transform_kernel=128x512;shared_carveout=100percent_both;smem=196736;operand_stages=8;bk=128;workspace=4194304;st=compact4planes_balanced_async_p1p2;pack_conversion=fp32_to_pair_rn;FP16_S3T3=direct_packed_rn;publication=programmatic_dependent_launch_grid_dependency_wait;terminal_cta_barrier=off;recombine=private_static_ptx;accum_init=first_mma_overwrite;product_order=1_2_6_7_5_3_4;product_slots=0;product_layout=registers;leaf=Btrans_Atrans;lhs=MN128;rhs=K128;output=transposed_fragment;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;descriptor_prefetch=warp1_before_init_barrier;alpha=1;beta=0";
 +  if (impl_->sw) return "sw_two_kernel_pdl;warp_roles=1tma+4wgmma;transform_kernel=128x512;shared_carveout=100percent_both;smem=196736;operand_stages=8;bk=128;workspace=4194304;st=64element_striped4planes_async_p1p2;pack_conversion=fp32_to_pair_rn;FP16_S3T3=direct_packed_rn;publication=programmatic_dependent_launch_grid_dependency_wait;terminal_cta_barrier=off;recombine=private_static_ptx;accum_init=first_mma_overwrite;product_order=1_2_6_7_5_3_4;product_slots=0;product_layout=registers;leaf=Btrans_Atrans;lhs=MN128;rhs=K128;output=transposed_fragment;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;descriptor_prefetch=warp1_before_init_barrier;alpha=1;beta=0";
-   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
- }
- const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }
 diff --git a/solution/sw_pipeline.cu b/solution/sw_pipeline.cu
 index 9065fdc..0801654 100644
 --- a/solution/sw_pipeline.cu
 +++ b/solution/sw_pipeline.cu
-@@ -2722,7 +2722,7 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
-         else if(j==6) asm("sub.rn.f16x2 %0,%1,%2;" : "=r"(word) : "r"(bbits[3]),"r"(bbits[1]));
-         else asm("cvt.rn.f16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
-       }
+@@ -2725 +2725 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
 -      reinterpret_cast<uint32_t*>(packed)[(j*Plane+i)/2]=word;
 +      reinterpret_cast<uint32_t*>(packed)[((j/4)*4*Plane+row*2048+(col/64*4+j%4)*64+col%64)/2]=word;
-     }
-   }
-   asm volatile("fence.proxy.async.global;" ::: "memory");
-@@ -2761,7 +2761,7 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
-       // LHS is B_leaf^T, M-contiguous original B data.
-       if(blo){
-         int plane=p==3?3:p-4;
+@@ -2764 +2764 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
 -        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,op,m0,k0,plane);
 +        SM90_TMA_LOAD_4D::copy(&tmap,&s.ready[slot],0,op,m0%64,m0/64,k0,plane);
-       }else{
-         int col=p==2?512:0,row=p==1 || p==2?512:0;
-         SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,op,m0+col,k0+row);
-@@ -2788,7 +2788,7 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
-     // Expose K/64 as an outer tensor dimension. The shared box still packs
-     // (64 K elements, BM rows, BK/64 chunks), matching the existing GMMA layout.
-     uint64_t dims[4]={64,transformed ? 512ULL:1024ULL,transformed ? 8ULL:16ULL,4};
+@@ -2791 +2791 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
 -    uint64_t strides[3]={transformed ? 1024ULL:2048ULL,128,512ULL*512*2};
 +    uint64_t strides[3]={transformed ? 4096ULL:2048ULL,transformed ? 512ULL:128ULL,128};
-     uint32_t box[4]={64,BN,BK/64,1},element_strides[4]={1,1,1,1};
-     auto result=cuTensorMapEncodeTiled(&map,dtype==DType::BF16 ? CU_TENSOR_MAP_DATA_TYPE_BFLOAT16:CU_TENSOR_MAP_DATA_TYPE_FLOAT16,
-         transformed ? 4:3,const_cast<void*>(ptr),dims,strides,box,element_strides,CU_TENSOR_MAP_INTERLEAVE_NONE,
-@@ -2796,6 +2796,15 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
-     if(result!=CUDA_SUCCESS)throw std::runtime_error("SW A tensor map status "+std::to_string(int(result)));
-     return;
-   }
+@@ -2798,0 +2799,9 @@ void encode(CUtensorMap& map,const void* ptr,DType dtype,bool is_a,bool transfor
 +  if(transformed){
 +    uint64_t dims[4]={64,8,512,4},strides[3]={512,4096,128};
 +    uint32_t box[4]={64,1,BK,1},element_strides[4]={1,1,1,1};
@@ -55,6 +28,3 @@ index 9065fdc..0801654 100644
 +    if(result!=CUDA_SUCCESS)throw std::runtime_error("SW striped T tensor map status "+std::to_string(int(result)));
 +    return;
 +  }
-   uint64_t dims[3]={transformed ? 512ULL:1024ULL,transformed ? 512ULL:1024ULL,4};
-   uint64_t strides[2]={dims[0]*2,dims[0]*dims[1]*2};
-   uint32_t box[3]={uint32_t(BM),uint32_t(is_a ? BM:BK),1},element_strides[3]={1,1,1};

@@ -82,7 +82,7 @@
 ## 复现与恢复
 
 - 正式迭代331–336均遵循bench → 立即log → 立即commit，失败334也保留记录。
-- `iter332.patch`、`iter333.patch`、`iter335.patch`提供相对于331的最小源码差异。
+- `iter332.patch`、`iter333.patch`、`iter335.patch`提供相对于331的无上下文源码差异（应用时使用git apply --unidiff-zero）。
 - `prepare_checks.py`从固定Git提交生成baseline/candidate头文件；各check目录保存验证器源码、run.sh和日志。
 - `compare.py`默认运行四版本对称比较；传入 `iter331 iter332` 运行独立两版本ABBA。
 - `profile.sh`保存完整采集参数。必须先确认allocation仍RUNNING，并通过scripts/on_gpu.sh执行。

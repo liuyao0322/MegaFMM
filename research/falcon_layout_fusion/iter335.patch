@@ -2,57 +2,29 @@ diff --git a/solution/plan.cpp b/solution/plan.cpp
 index 98601a0..ab092b7 100644
 --- a/solution/plan.cpp
 +++ b/solution/plan.cpp
-@@ -364,7 +364,7 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
-                                       float* D, void* workspace) const {
-   validate_binding(*impl_, A, B, C0, D, workspace);
-   if (impl_->empty || impl_->scale) return "none";
+@@ -367 +367 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
 -  if (impl_->sw) return "sw_two_kernel_pdl;warp_roles=1tma+4wgmma;transform_kernel=128x512;shared_carveout=100percent_both;smem=196736;operand_stages=8;bk=128;workspace=4194304;st=compact4planes_balanced_async_p1p2;pack_conversion=fp32_to_pair_rn;FP16_S3T3=direct_packed_rn;publication=programmatic_dependent_launch_grid_dependency_wait;terminal_cta_barrier=off;recombine=private_static_ptx;accum_init=first_mma_overwrite;product_order=1_2_6_7_5_3_4;product_slots=0;product_layout=registers;leaf=Btrans_Atrans;lhs=MN128;rhs=K128;output=transposed_fragment;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;descriptor_prefetch=warp1_before_init_barrier;alpha=1;beta=0";
 +  if (impl_->sw) return "sw_two_kernel_pdl;warp_roles=1tma+3diff+4wgmma;transform_kernel=128x512;shared_carveout=100percent_both;smem=221440;operand_stages=8;bk=128;workspace=4194304;st=global6planes_onchip_S3T3_async_p1p2;pack_conversion=fp32_to_pair_rn;FP16_S3T3=direct_packed_rn;publication=programmatic_dependent_launch_grid_dependency_wait;terminal_cta_barrier=off;recombine=private_static_ptx;accum_init=first_mma_overwrite;product_order=1_2_6_7_5_3_4;product_slots=0;product_layout=registers;leaf=Btrans_Atrans;lhs=MN128;rhs=K128;output=transposed_fragment;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;descriptor_prefetch=warp1_before_init_barrier;alpha=1;beta=0";
-   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
- }
- const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }
 diff --git a/solution/sw_pipeline.cu b/solution/sw_pipeline.cu
 index 9065fdc..50eef7c 100644
 --- a/solution/sw_pipeline.cu
 +++ b/solution/sw_pipeline.cu
-@@ -17,10 +17,13 @@ using Barrier=cutlass::arch::ClusterBarrier;
- using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
- template<class T> struct alignas(128) Shared {
-   T operand[Stages][ASize+BSize];
+@@ -19,0 +20,2 @@ template<class T> struct alignas(128) Shared {
 +  // Both TMA destinations start on the same1024-byte swizzle phase.
 +  alignas(128) T difference[ASize+BSize];
-   uint64_t ready[Stages],free[Stages];
+@@ -20,0 +23 @@ template<class T> struct alignas(128) Shared {
 +  uint64_t difference_ready;
- 
- };
+@@ -23 +26 @@ template<class T> struct alignas(128) Shared {
 -static_assert(sizeof(Shared<cute::half_t>)==196736,"shared budget");
 +static_assert(sizeof(Shared<cute::half_t>)==221440,"shared budget");
- __device__ void wait(const uint64_t* b,int phase){Barrier::wait(b,phase);asm volatile("" ::: "memory");}
- __device__ void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
- 
-@@ -2714,6 +2717,7 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
-     }
-     #pragma unroll
-     for(int j=0;j<8;++j){
+@@ -2716,0 +2720 @@ void sw_transform_pdl(const T* A,const T* B,T* packed){
 +      if(j==2 || j==6)continue; // S3/T3 formed on-chip for P7.
-       uint32_t word;
-       if constexpr(std::is_same_v<T,cute::bfloat16_t>)
-         asm("cvt.rn.bf16x2.f32 %0,%2,%1;" : "=r"(word) : "f"(values[j][0]),"f"(values[j][1]));
-@@ -2742,15 +2746,47 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
-   }
-   if(tid==0){
-     for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}
+@@ -2744,0 +2749 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
 +    Barrier::init(&s.difference_ready,1);
-     cutlass::arch::fence_barrier_init();
-   }
-   __syncthreads();
-   constexpr auto la=tile_to_shape(GMMA::Layout_MN_SW128_Atom<T>{},Shape<_64,Int<BK>>{});
-   constexpr auto lb=tile_to_shape(GMMA::Layout_K_SW128_Atom<T>{},Shape<_32,Int<BK>>{});
+@@ -2750 +2755 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
 -  if(tid==0){
 +  if(tid<128){
-     for(int step=0;step<7;++step)for(int q=0;q<512/BK;++q){
-       int p=product_for_step(step);
-       int sequence=step*(512/BK)+q,slot=sequence%Stages,k0=q*BK;
+@@ -2753,0 +2759,31 @@ void sw_cooperative_hilo(const __grid_constant__ CUtensorMap amap,
 +      if(p==6){
 +        T* op=s.operand[slot];
 +        if(tid==0){
@@ -84,6 +56,3 @@ index 9065fdc..50eef7c 100644
 +        continue;
 +      }
 +      if(tid!=0)continue;
-       // Raw P1/P2 can run while the primary transforms S/T. This wait
-       // guarantees completion and visibility even if no overlap is scheduled.
-       if(sequence==8)cudaGridDependencySynchronize();
