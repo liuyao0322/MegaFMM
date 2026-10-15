@@ -577,6 +577,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 335 | Align selective difference scratch with operand swizzle phase | 0.6011 | 0.018174 | regression |
 
+| 336 | Restore frozen iter330 baseline after bounded Falcon experiments | 1.0721 | 0.010110 | retained-baseline |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5240,3 +5242,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Fresh numerical errors restored to baseline and no nonfinite; original gates stillFAIL. Complete-call BF16 about18.774us FP16 about17.573us, substantially slower; corrected implementation needs independent bitwise and synchronization checks before negative performance interpretation
 - **Next:** Archive binary; run paired launch/Graph comparison and independent checks; profile request counts and instruction overhead; reject slow candidates
 - **Archive:** trajectory/20261015_090349_iter-335/
+
+### Iter 336 — Restore frozen iter330 baseline after bounded Falcon experiments
+
+- **Hypothesis:** Retain established layout and fusion boundary when alternatives add cost or yield only0.1percent-scale gains
+- **Changes:** Restore entire solution verbatim from6d4167b; no hand reconstruction
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010110 ms; mean speedup=1.0721x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012071 | 0.010170 | 1.1869 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009622 | 0.010050 | 0.9574 | 0.000754626 | 0 |
+
+- **Analysis:** 332 improves only0.15percent BF16 and0.11percent FP16 in independent repeat;333 regresses FP16;335 passes72 bitwise checks,3quick sanitizers and256 two-stream Graph calls but is75to84percent slower. All original numerical gates remainFAIL. No meaningful new speedup or precision solution established
+- **Next:** Archive paired timing, profiling, validation and limitations; keep broader precision goal active and FP8 correction stopped
+- **Archive:** trajectory/20261015_090843_iter-336/
