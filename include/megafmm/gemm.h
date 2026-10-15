@@ -10,7 +10,7 @@ enum class DType { BF16, FP16 };
 // Experimental forced SW: specialized contiguous 1024^3 pipeline, otherwise
 // one-level Winograd with logical even padding, transpose/stride/alpha/beta.
 // Auto remains independently tuned Dense; SW precision is not certified.
-enum class Algorithm { Auto, Dense, SWPipeline=3 };
+enum class Algorithm { Auto, Dense, SWPipeline=3, Tuned=4 };
 struct Problem {
   int64_t m=0, n=0, k=0;
   int64_t lda=0, ldb=0, ldc=0, ldd=0;

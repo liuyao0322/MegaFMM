@@ -290,6 +290,9 @@ struct Plan::Impl {
   Problem problem;
   bool empty = false, scale = false, sw_multisize = false;
   size_t bytes = 0;
+  bool strategy = false;
+  int hopper_selected = -1, sm_count = 0;
+  std::array<float,5> strategy_ms{{NAN,NAN,NAN,NAN,NAN}};
   cublasLtHandle_t handle = nullptr;
   std::unique_ptr<LtOp> dense;
   std::shared_ptr<detail::SWState> sw;
@@ -349,9 +352,70 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     detail::run_sw_pipeline(*plan.sw,A,B,D,workspace,stream);
     return;
   }
+  if (plan.hopper_selected>=0 && detail::hopper_dense(plan.hopper_selected,plan.problem,
+      A,B,C0,D,workspace,plan.sm_count,stream,true)) return;
   lt_check(execute_lt(plan.handle, *plan.dense,
       bound_candidate(*plan.dense, A, B, C0, D), A, B, C0, D,
       plan.bytes ? workspace : nullptr, stream), "run dense GEMM");
+}
+// Rank complete invocations rather than kernel-only timings. Candidates compete
+// against the same independently tuned Lt pool. Alternate sweep direction to
+// reduce clock/order bias; require a 3% median gain AND all five paired wins.
+void tune_strategy(Plan::Impl& plan,const void* A,const void* B,const float* C,
+                   float* D,void* workspace,cudaStream_t stream) {
+  plan.hopper_selected=-1;
+  plan.strategy_ms.fill(NAN);
+  if(!plan.sm_count) return;
+  bool eligible[5]={true,false,false,false,false};
+  for(int id=0;id<4;++id)
+    eligible[id+1]=detail::hopper_dense(id,plan.problem,A,B,C,D,workspace,plan.sm_count,stream,false);
+  if(std::none_of(eligible+1,eligible+5,[](bool x){return x;})) return;
+  const size_t bytes=matrix_bytes(plan.problem.m,plan.problem.n,plan.problem.ldd,4);
+  float* reference=nullptr;
+  cudaEvent_t start=nullptr,stop=nullptr;
+  auto launch=[&](int id) {
+    if(id==0) lt_check(execute_lt(plan.handle,*plan.dense,
+        bound_candidate(*plan.dense,A,B,C,D),A,B,C,D,workspace,stream),"strategy dense");
+    else if(!detail::hopper_dense(id-1,plan.problem,A,B,C,D,workspace,plan.sm_count,stream,true))
+      throw std::runtime_error("strategy candidate binding changed during tuning");
+  };
+  try {
+    cuda_check(cudaMalloc(reinterpret_cast<void**>(&reference),bytes),"strategy reference allocation");
+    launch(0);
+    cuda_check(cudaMemcpyAsync(reference,D,bytes,cudaMemcpyDeviceToDevice,stream),"strategy reference copy");
+    for(int id=1;id<5;++id) if(eligible[id]) {
+      launch(id);
+      eligible[id]=detail::dense_agreement(plan.problem,D,reference,stream);
+    }
+    cuda_check(cudaEventCreate(&start),"strategy start event");
+    cuda_check(cudaEventCreate(&stop),"strategy stop event");
+    std::array<std::array<float,5>,5> times{};
+    constexpr int repetitions=20;
+    for(int round=0;round<5;++round) for(int index=0;index<5;++index) {
+      const int id=round%2 ? 4-index:index;
+      if(!eligible[id]) continue;
+      for(int w=0;w<4;++w) launch(id);
+      cuda_check(cudaEventRecord(start,stream),"strategy record start");
+      for(int rep=0;rep<repetitions;++rep) launch(id);
+      cuda_check(cudaEventRecord(stop,stream),"strategy record stop");
+      cuda_check(cudaEventSynchronize(stop),"strategy wait");
+      cuda_check(cudaEventElapsedTime(&times[id][round],start,stop),"strategy elapsed");
+      times[id][round]/=repetitions;
+    }
+    for(int id=0;id<5;++id) if(eligible[id]) {
+      auto sorted=times[id];std::sort(sorted.begin(),sorted.end());plan.strategy_ms[id]=sorted[2];
+    }
+    float best=plan.strategy_ms[0]*0.97f;
+    for(int id=1;id<5;++id) if(eligible[id] && plan.strategy_ms[id]<best) {
+      bool stable=true;
+      for(int r=0;r<5;++r) stable=stable && times[id][r]<times[0][r];
+      if(stable) {best=plan.strategy_ms[id];plan.hopper_selected=id-1;}
+    }
+  } catch(...) {
+    if(start) cudaEventDestroy(start);if(stop) cudaEventDestroy(stop);
+    if(reference) cudaFree(reference);throw;
+  }
+  cudaEventDestroy(start);cudaEventDestroy(stop);cudaFree(reference);
 }
 }  // namespace
 
@@ -362,6 +426,8 @@ Plan& Plan::operator=(Plan&&) noexcept = default;
 size_t Plan::workspace_bytes() const { return impl_->bytes; }
 const Problem& Plan::problem() const { return impl_->problem; }
 std::string Plan::algorithm_name() const {
+  if(impl_->strategy && !impl_->empty && !impl_->scale)
+    return impl_->hopper_selected>=0 ? "tuned_hopper_dense" : "tuned_dense_cublaslt";
   return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw_multisize ? "sw_multisize_wmma" : impl_->sw ? "sw_cooperative_hilo_64x32x256" : "dense_cublaslt";
 }
 std::string Plan::lt_algorithm_config(const void* A, const void* B, const float* C0,
@@ -370,12 +436,22 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
   if (impl_->empty || impl_->scale) return "none";
   if (impl_->sw_multisize) return "sw_multisize_wmma;tile=16x16;warps=4;leaf_terms=7;levels=1;padding=logical_even;transforms=fp32_to_input_rn;accum=fp32;workspace=0;residual_correction=off";
   if (impl_->sw) return "sw_two_kernel_pdl;warp_roles=1tma+4wgmma;transform_kernel=128x512;shared_carveout=100percent_both;smem=196736;operand_stages=8;bk=128;workspace=4194304;st=compact4planes_balanced_async_p1p2;pack_conversion=fp32_to_pair_rn;FP16_S3T3=direct_packed_rn;publication=programmatic_dependent_launch_grid_dependency_wait;terminal_cta_barrier=off;recombine=private_static_ptx;accum_init=first_mma_overwrite;product_order=1_2_6_7_5_3_4;product_slots=0;product_layout=registers;leaf=Btrans_Atrans;lhs=MN128;rhs=K128;output=transposed_fragment;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;descriptor_prefetch=warp1_before_init_barrier;alpha=1;beta=0";
+  if(impl_->strategy) {
+    std::string info="mnk_strategy;selection=";
+    const bool bound=impl_->hopper_selected>=0 && detail::hopper_dense(impl_->hopper_selected,
+        impl_->problem,A,B,C0,D,workspace,impl_->sm_count,nullptr,false);
+    info+=bound ? detail::hopper_candidate_name(impl_->hopper_selected):"dense_cublaslt";
+    info+=";rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5";
+    info+=";dense_ms="+std::to_string(impl_->strategy_ms[0]);
+    for(int id=0;id<4;++id) info+=";"+std::string(detail::hopper_candidate_name(id))+"_ms="+std::to_string(impl_->strategy_ms[id+1]);
+    return info+";fallback="+describe_lt(*impl_->dense,bound_candidate(*impl_->dense,A,B,C0,D));
+  }
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
 const char* dtype_name(DType dtype) { return dtype == DType::BF16 ? "bf16" : "fp16"; }
 std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   validate_problem(p);
-  if (policy.algorithm != Algorithm::Auto && policy.algorithm != Algorithm::Dense && policy.algorithm != Algorithm::SWPipeline)
+  if (policy.algorithm != Algorithm::Auto && policy.algorithm != Algorithm::Dense && policy.algorithm != Algorithm::SWPipeline && policy.algorithm != Algorithm::Tuned)
     throw std::invalid_argument("unsupported algorithm: old SW implementations have been removed");
   if (policy.heuristic_candidates < 1 || policy.heuristic_candidates > 128)
     throw std::invalid_argument("heuristic_candidates must be between 1 and 128");
@@ -404,6 +480,13 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     lt_check(cublasLtCreate(&impl->handle), "create cuBLASLt handle");
     impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);
     impl->bytes = impl->dense->scratch_bytes();
+    impl->strategy=policy.algorithm==Algorithm::Tuned;
+    if(impl->strategy) {
+      int device;cudaDeviceProp prop{};
+      cuda_check(cudaGetDevice(&device),"strategy device");
+      cuda_check(cudaGetDeviceProperties(&prop,device),"strategy properties");
+      if(prop.major==9 && prop.minor==0) impl->sm_count=prop.multiProcessorCount;
+    }
   }
   return std::make_unique<Plan>(std::move(impl));
 }
@@ -430,6 +513,7 @@ void tune(Plan& plan, const void* A, const void* B, const float* C0,
     if (!impl.scale && !impl.sw && !impl.sw_multisize)
       tune_lt(impl.handle, *impl.dense, A, B, original_c, D,
               impl.bytes ? workspace : nullptr, stream);
+    if(impl.strategy) tune_strategy(impl,A,B,original_c,D,workspace,stream);
     run_internal(impl, A, B, original_c, D, workspace, stream);
     cuda_check(cudaStreamSynchronize(stream), "finish explicit plan tuning");
   } catch (...) {

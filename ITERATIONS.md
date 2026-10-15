@@ -579,6 +579,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 336 | Restore frozen iter330 baseline after bounded Falcon experiments | 1.0721 | 0.010110 | retained-baseline |
 
+| 337 | MNK empirical strategy with four Hopper dense candidates | 1.0638 | 0.045353 | baseline |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5258,3 +5260,33 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 332 improves only0.15percent BF16 and0.11percent FP16 in independent repeat;333 regresses FP16;335 passes72 bitwise checks,3quick sanitizers and256 two-stream Graph calls but is75to84percent slower. All original numerical gates remainFAIL. No meaningful new speedup or precision solution established
 - **Next:** Archive paired timing, profiling, validation and limitations; keep broader precision goal active and FP8 correction stopped
 - **Archive:** trajectory/20261015_090843_iter-336/
+
+### Iter 337 — MNK empirical strategy with four Hopper dense candidates
+
+- **Hypothesis:** Precision-valid TMA WGMMA tile and cluster candidates may beat independent cuBLASLt on some shapes; use stable paired tuning instead of one global configuration
+- **Changes:** Add explicit Tuned policy, four CUTLASS Hopper candidates per dtype, numerical agreement screening, five alternating 20-call ranking rounds, 3percent median threshold and all-round wins; preserve Auto Dense
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 16 rows; arithmetic mean of row median latency=0.045353 ms; mean speedup=1.0638x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_dense_cublaslt v0 | launch | 0.005661 | 0.005667 | 0.9989 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.005756 | 0.005738 | 1.0032 | 6.44261e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.012176 | 0.008173 | 1.4897 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009726 | 0.008131 | 1.1961 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.031529 | 0.029084 | 1.0841 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.032386 | 0.029449 | 1.0997 | 2.45816e-06 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.225335 | 0.221918 | 1.0154 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232985 | 0.232883 | 1.0004 | 4.87674e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.029538 | 0.028328 | 1.0427 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.025340 | 0.025272 | 1.0027 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026923 | 0.025095 | 1.0729 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.025163 | 0.025157 | 1.0002 | 6.43463e-07 | 1 |
+| 1025,1537,769 | bf16 | tuned_dense_cublaslt v0 | launch | 0.038385 | 0.038350 | 1.0009 | 3.64508e-07 | 1 |
+| 1025,1537,769 | fp16 | tuned_dense_cublaslt v0 | launch | 0.036567 | 0.036625 | 0.9984 | 9.33344e-07 | 1 |
+| 1,1,1 | bf16 | tuned_dense_cublaslt v0 | launch | 0.002903 | 0.002882 | 1.0072 | 0 | 1 |
+| 1,1,1 | fp16 | tuned_dense_cublaslt v0 | launch | 0.002918 | 0.002895 | 1.0080 | 0 | 1 |
+
+- **Analysis:** First full-count eight-shape two-dtype benchmark; original FP64 gate and actual selected route recorded per row. Any cuBLAS fallback is coverage only and never a custom-kernel win; candidate initialize currently repeats function-attribute setup per launch, motivating host-overhead investigation
+- **Next:** Inspect per-candidate times and selections; profile the baseline then remove repeated launch setup and address tiny or boundary shapes with distinct kernels
+- **Archive:** trajectory/20261015_161326_iter-337/
