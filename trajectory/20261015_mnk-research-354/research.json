@@ -1,0 +1,44 @@
+{
+  "source_version": "353",
+  "input_mode": "zero diagnostics matching fixed-candidate harness; not ordinary acceptance timing",
+  "lt_profile": {
+    "kernel": "sm90_xmma_gemm_f16f32_f16f32_f32_nn_n_tilesize128x256x64_warpgroupsize2x1x1_execute_segment_k_off_kernel__5x_cublas",
+    "shape": [
+      8192,
+      8192,
+      8192
+    ],
+    "dtype": "fp16",
+    "route": "tuned_dense_cublaslt",
+    "block_threads": 384,
+    "cluster_size": 2,
+    "registers": 168,
+    "shared_bytes": 231424,
+    "tensor_percent_elapsed": 91.963987,
+    "issued_warp_instructions": 172388638,
+    "replay_ms": 1.535296,
+    "notes": "Tuning outside capture. Similar core tile to custom61, but cluster2. Does not prove a physical floor."
+  },
+  "regbudget_probe": {
+    "status": "compile failure",
+    "release_flags": true,
+    "error": "C7600 register allocation failed with80-register target",
+    "production_changed": false
+  },
+  "ninewarp_probe": {
+    "shape": [
+      129,
+      256,
+      520
+    ],
+    "dtype": "fp16",
+    "block_threads": 288,
+    "registers": 90,
+    "local_bytes": 0,
+    "shared_bytes": 100352,
+    "blocks_per_SM_limit": 2,
+    "all_ones_integer_tail_pass": true,
+    "production_acceptance": false,
+    "notes": "No register reconfiguration; producer moved to final single warp, consumer groups first256threads, source-free only. Current formal354 tests this as candidate76."
+  }
+}
