@@ -601,6 +601,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 347 | Trim final K staging and vectorize even MMA output | 1.1260 | 0.014666 | measured |
 
+| 348 | XOR shared layouts and smaller warp-MMA tiles | 1.1182 | 0.014722 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5668,3 +5670,29 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Completed six-shape two-dtype screening with full100-call five-group timing and original fresh-input FP64 checks. This iteration targets only the restricted small even MMA family; large Hopper code is unchanged. New boundary results require forced-candidate validation and repeated timing before any additional stable-win claim.
 - **Next:** Validate short-K and paired-output execution under Graph,dual streams,memcheck andracecheck; inspect boundary timing and profile if it still falls short.
 - **Archive:** trajectory/20261015_173737_iter-347/
+
+### Iter 348 — XOR shared layouts and smaller warp-MMA tiles
+
+- **Hypothesis:** Measured shared-bank excess and few eligible warps suggest XOR shared layouts plus more small output CTAs may improve the boundary kernel.
+- **Changes:** Add swizzled32x32,16x32 and32x16 output candidates atBK64, with power-of-two shared pitches and segment-preserving XOR mapping. Preserve the existing non-swizzled baselines and eligibility gates; expand forced tests for the new candidates.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 12 rows; arithmetic mean of row median latency=0.014722 ms; mean speedup=1.1182x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005652 | 0.005032 | 1.1232 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005676 | 0.005049 | 1.1241 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_dense_cublaslt v0 | launch | 0.008789 | 0.008780 | 1.0010 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_dense_cublaslt v0 | launch | 0.008627 | 0.008640 | 0.9985 | 3.40967e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.011886 | 0.008011 | 1.4836 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009581 | 0.008021 | 1.1945 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.032146 | 0.029861 | 1.0765 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.032287 | 0.031144 | 1.0367 | 2.45816e-06 | 1 |
+| 1025,1537,769 | bf16 | tuned_padded_hopper v0 | launch | 0.037576 | 0.033578 | 1.1191 | 6.19792e-07 | 1 |
+| 1025,1537,769 | fp16 | tuned_padded_hopper v0 | launch | 0.036122 | 0.033515 | 1.0778 | 9.7026e-07 | 1 |
+| 1,1,1 | bf16 | tuned_simt_small v0 | launch | 0.002720 | 0.002496 | 1.0900 | 0 | 1 |
+| 1,1,1 | fp16 | tuned_simt_small v0 | launch | 0.002775 | 0.002539 | 1.0929 | 0 | 1 |
+
+- **Analysis:** Stall reassessment reviewed345–347, reprofiled the boundary candidate and checked official NVIDIA efficient-GEMM guidance. Completed six-shape two-dtype full timing and original FP64 screening. This is a targeted candidate experiment; no independent stable-win certification is inferred from short ranking or this single sweep.
+- **Next:** Inspect per-candidate boundary measurements, force-check all46 candidates and run warp memcheck/racecheck before profiling or certifying a winner.
+- **Archive:** trajectory/20261015_174544_iter-348/

@@ -177,56 +177,62 @@ __global__ __launch_bounds__(128) void direct_mma(Problem p,const T* A,const T* 
   }
 }
 struct SmallProblem {int m,n,k,lda,ldb,ldc,ldd;float alpha,beta;};
-template<class T,int BK,int Copy,int LoadK=BK>
+template<int Stride,bool Swizzle>
+__device__ __forceinline__ int shared_offset(int r,int c) {
+  int i=r*Stride+c;
+  if constexpr(Swizzle)i^=(r&7)<<3;
+  return i;
+}
+template<class T,int BK,int Copy,int LoadK=BK,int BM=32,int BN=32,bool Swizzle=false>
 __device__ __forceinline__ void load_even(T* sa,T* sb,SmallProblem p,const T* A,const T* B,
                                          int r0,int c0,int q) {
-  constexpr int AS=BK+8,BS=40,W=Copy/2;
+  constexpr int AS=Swizzle?BK:BK+8,BS=Swizzle?BN:BN+8,W=Copy/2;
   #pragma unroll
-  for(int i=threadIdx.x;i<32*LoadK/W;i+=128) {
+  for(int i=threadIdx.x;i<BM*LoadK/W;i+=128) {
     const int r=i/(LoadK/W),c=i%(LoadK/W)*W;
     const bool valid=r0+r<p.m && q+c<p.k;
     const int offset=(r0+r)*p.lda+q+c;
-    if constexpr(Copy==16) copy16(sa+r*AS+c,valid?A+offset:A,valid);
-    else copy4(sa+r*AS+c,valid?A+offset:A,valid);
+    if constexpr(Copy==16) copy16(sa+shared_offset<AS,Swizzle>(r,c),valid?A+offset:A,valid);
+    else copy4(sa+shared_offset<AS,Swizzle>(r,c),valid?A+offset:A,valid);
   }
   #pragma unroll
-  for(int i=threadIdx.x;i<LoadK*32/W;i+=128) {
-    const int r=i/(32/W),c=i%(32/W)*W;
+  for(int i=threadIdx.x;i<LoadK*BN/W;i+=128) {
+    const int r=i/(BN/W),c=i%(BN/W)*W;
     const bool valid=q+r<p.k && c0+c<p.n;
     const int offset=(q+r)*p.ldb+c0+c;
-    if constexpr(Copy==16) copy16(sb+r*BS+c,valid?B+offset:B,valid);
-    else copy4(sb+r*BS+c,valid?B+offset:B,valid);
+    if constexpr(Copy==16) copy16(sb+shared_offset<BS,Swizzle>(r,c),valid?B+offset:B,valid);
+    else copy4(sb+shared_offset<BS,Swizzle>(r,c),valid?B+offset:B,valid);
   }
   asm volatile("cp.async.commit_group;" ::: "memory");
 }
-template<class T,int BK,int Copy>
+template<class T,int BK,int Copy,int BM=32,int BN=32,bool Swizzle=false>
 __device__ __forceinline__ void load_even_tile(T* sa,T* sb,SmallProblem p,const T* A,const T* B,int r0,int c0,int q) {
-  if(p.k-q<=16)load_even<T,BK,Copy,16>(sa,sb,p,A,B,r0,c0,q);
-  else load_even<T,BK,Copy>(sa,sb,p,A,B,r0,c0,q);
+  if(p.k-q<=16)load_even<T,BK,Copy,16,BM,BN,Swizzle>(sa,sb,p,A,B,r0,c0,q);
+  else load_even<T,BK,Copy,BK,BM,BN,Swizzle>(sa,sb,p,A,B,r0,c0,q);
 }
-template<class T,int BK,int Copy>
+template<class T,int BK,int Copy,int BM=32,int BN=32,bool Swizzle=false>
 __global__ __launch_bounds__(128) void even_mma(SmallProblem p,const T* A,const T* B,const float* C,float* D) {
-  constexpr int AS=BK+8,BS=40;
-  __shared__ __align__(32) T sa[2][32*AS];
+  constexpr int AS=Swizzle?BK:BK+8,BS=Swizzle?BN:BN+8,Cols=4/(BM/16),WN=BN/Cols,ACC=WN/8;
+  __shared__ __align__(32) T sa[2][BM*AS];
   __shared__ __align__(32) T sb[2][BK*BS];
-  const int lane=threadIdx.x%32,warp=threadIdx.x/32,wm=warp/2,wn=warp%2;
-  const int r0=int(blockIdx.y)*32,c0=int(blockIdx.x)*32;
-  float acc[2][4]={{0,0,0,0},{0,0,0,0}};
-  load_even_tile<T,BK,Copy>(sa[0],sb[0],p,A,B,r0,c0,0);ready(Copy);
+  const int lane=threadIdx.x%32,warp=threadIdx.x/32,wm=warp/Cols,wn=warp%Cols;
+  const int r0=int(blockIdx.y)*BM,c0=int(blockIdx.x)*BN;
+  float acc[ACC][4]={};
+  load_even_tile<T,BK,Copy,BM,BN,Swizzle>(sa[0],sb[0],p,A,B,r0,c0,0);ready(Copy);
   int slot=0;
   for(int q=0;q<p.k;q+=BK,slot^=1) {
     const bool next=q+BK<p.k;
-    if(next)load_even_tile<T,BK,Copy>(sa[slot^1],sb[slot^1],p,A,B,r0,c0,q+BK);
+    if(next)load_even_tile<T,BK,Copy,BM,BN,Swizzle>(sa[slot^1],sb[slot^1],p,A,B,r0,c0,q+BK);
     #pragma unroll
     for(int kk=0;kk<BK;kk+=16) {
       if(kk && q+kk>=p.k)continue;
       uint32_t a[4];
-      unsigned ap=unsigned(__cvta_generic_to_shared(sa[slot]+(wm*16+lane%16)*AS+kk+(lane/16)*8));
+      unsigned ap=unsigned(__cvta_generic_to_shared(sa[slot]+shared_offset<AS,Swizzle>(wm*16+lane%16,kk+(lane/16)*8)));
       asm volatile("ldmatrix.sync.aligned.m8n8.x4.shared.b16 {%0,%1,%2,%3},[%4];" : "=r"(a[0]),"=r"(a[1]),"=r"(a[2]),"=r"(a[3]) : "r"(ap));
       #pragma unroll
-      for(int j=0;j<2;++j) {
+      for(int j=0;j<ACC;++j) {
         uint32_t b[2];
-        unsigned bp=unsigned(__cvta_generic_to_shared(sb[slot]+(kk+lane%16)*BS+wn*16+j*8));
+        unsigned bp=unsigned(__cvta_generic_to_shared(sb[slot]+shared_offset<BS,Swizzle>(kk+lane%16,wn*WN+j*8)));
         asm volatile("ldmatrix.sync.aligned.m8n8.x2.trans.shared.b16 {%0,%1},[%2];" : "=r"(b[0]),"=r"(b[1]) : "r"(bp));
         using Mma=std::conditional_t<std::is_same_v<T,__half>,cute::SM80_16x8x16_F32F16F16F32_TN,cute::SM80_16x8x16_F32BF16BF16F32_TN>;
         Mma::fma(acc[j][0],acc[j][1],acc[j][2],acc[j][3],a[0],a[1],a[2],a[3],b[0],b[1],acc[j][0],acc[j][1],acc[j][2],acc[j][3]);
@@ -235,10 +241,10 @@ __global__ __launch_bounds__(128) void even_mma(SmallProblem p,const T* A,const 
     if(next)ready(Copy);
   }
   #pragma unroll
-  for(int j=0;j<2;++j) {
+  for(int j=0;j<ACC;++j) {
     #pragma unroll
     for(int pair=0;pair<2;++pair) {
-      const int r=r0+wm*16+lane/4+pair*8,c=c0+wn*16+j*8+(lane%4)*2;
+      const int r=r0+wm*16+lane/4+pair*8,c=c0+wn*WN+j*8+(lane%4)*2;
       if(r<p.m && c<p.n) {
         float2 value=make_float2(p.alpha*acc[j][pair*2],p.alpha*acc[j][pair*2+1]);
         if(p.beta!=0) {
@@ -289,13 +295,22 @@ bool mma_even_dense(int bk,const Problem& p,const void* A,const void* B,const fl
   SmallProblem q{int(p.m),int(p.n),int(p.k),int(p.lda),int(p.ldb),int(p.ldc),int(p.ldd),p.alpha,p.beta};
   const bool wide=p.k%8==0 && p.n%8==0 && p.lda%8==0 && p.ldb%8==0 &&
        reinterpret_cast<uintptr_t>(A)%16==0 && reinterpret_cast<uintptr_t>(B)%16==0;
-  dim3 grid(unsigned((p.n+31)/32),unsigned((p.m+31)/32));
-  #define EVEN_LAUNCH(T,K) do { \
-    if(wide)even_mma<T,K,16><<<grid,128,0,stream>>>(q,static_cast<const T*>(A),static_cast<const T*>(B),C,D); \
-    else even_mma<T,K,4><<<grid,128,0,stream>>>(q,static_cast<const T*>(A),static_cast<const T*>(B),C,D); \
+  const int bm=bk==128?16:32,bn=bk==129?16:32;
+  dim3 grid(unsigned((p.n+bn-1)/bn),unsigned((p.m+bm-1)/bm));
+  #define EVEN_LAUNCH(T,K,M,N,S) do { \
+    if(wide)even_mma<T,K,16,M,N,S><<<grid,128,0,stream>>>(q,static_cast<const T*>(A),static_cast<const T*>(B),C,D); \
+    else even_mma<T,K,4,M,N,S><<<grid,128,0,stream>>>(q,static_cast<const T*>(A),static_cast<const T*>(B),C,D); \
   } while(0)
-  if(p.dtype==DType::BF16) {if(bk==32)EVEN_LAUNCH(__nv_bfloat16,32);else EVEN_LAUNCH(__nv_bfloat16,64);}
-  else {if(bk==32)EVEN_LAUNCH(__half,32);else EVEN_LAUNCH(__half,64);}
+  #define EVEN_DISPATCH(T) do { \
+    if(bk==128)EVEN_LAUNCH(T,64,16,32,true); \
+    else if(bk==129)EVEN_LAUNCH(T,64,32,16,true); \
+    else if(bk==256)EVEN_LAUNCH(T,64,32,32,true); \
+    else if(bk==32)EVEN_LAUNCH(T,32,32,32,false); \
+    else EVEN_LAUNCH(T,64,32,32,false); \
+  } while(0)
+  if(p.dtype==DType::BF16)EVEN_DISPATCH(__nv_bfloat16);
+  else EVEN_DISPATCH(__half);
+  #undef EVEN_DISPATCH
   #undef EVEN_LAUNCH
   auto e=cudaPeekAtLastError();if(e!=cudaSuccess)throw std::runtime_error(cudaGetErrorString(e));
   return true;
