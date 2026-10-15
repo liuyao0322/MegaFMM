@@ -88,3 +88,23 @@ Production `solution/` unchanged; these are standalone research candidates, not 
 - Follow up the failed F3 representation by using low exponent=high exponent minus11(FP16) or8(BF16), one bit finer than F3. Keep the same42configurations/seeds as a controlled ablation. Paired exact integer sums still share one rescaling per pair.
 - All42pass fixed floors, zero nonfinite and zero low-part saturation in tested inputs. MaxFP16/BF16 eF=7.28217401e-5/5.30492964e-4, essentially the adaptive model's errors. This is not an independent42-case sample or a hardware result. F3's39/42failure remains preserved, not replaced.
 - Representation is supported for subsequent hardware testing, not promoted. It still needs exceptional/subnormal-range behavior, real WGMMA original-input checks and full latency. Source identity in`m4_manifest.json`.
+
+## M5 — a priori transform bounds for quantization: rejected
+
+- Propagate original-quadrant maxima through positive upward-rounded FP32 transform bounds, derive native-high and residual-cell bounds, then choose INT8 scales without actual transformed maxima. Same42 numerical configurations as F1/M4; adaptive representation and interleaved arithmetic otherwise retained.
+-36/42 fixed-floor passes; all six cancellation cases fail, maxFP16/BF16 eF2.85228e-4/2.12624e-3. No high/low saturation and no nonfinite: the failure is lost resolution, not clipping.
+- CPU constant-block counterexample has S1=1/256 quantized high integer0 with coarse upper-bound scale1/64, discarding its T1 residual cross term. FP16 model eF4.60506e-4; adaptive scale is exact for this construction. Original rounded-input reference retained. No hardware/performance claim for M5.
+
+## M6 / P10 — global K128 inside, coalesced partial reduction
+
+- M6 screen uses globally shared K128 inside and P9 quantization tiles A64x128/B128x32, with adaptive high/low scales and leaf-then-recombine FP32 model.42/42 fixed-floor passes, maxFP16/BF16 eF7.33055e-5/5.30556e-4. This screen changes both tile sizes and inside scope from F1/F2; do not attribute the full difference to a single variable.
+- P10 replaces the strided per-column reduction with256 coalesced partial-max CTAs, storing512floats in existing workspace. Each packing CTA reduces the32partials for each of its two K halves, constructs powers once, and uses invariant factors for both A and B common paths. Exceptional exponent paths retained; corrected consumer unchanged.
+- Preflight inspection found the component-timing harness still launched the old1024-CTA reduction. The first compilation step107488.2031 was stopped before any device execution, terminal137; log retained as p10_preflight_stopped_build.log. The diagnostic grid was updated to8x32 with the actual invocation, then rebuilt.
+- Ordinary72 original FP64 checks all pass, every printed eF equals P9 on these configurations. Complete BF16/FP16 calls54.794/54.421us versus SW10.234/10.021us. FP16 preparation diagnostic30.257us, individual inside/A/B stages3.768/13.135/11.697us; individual stage times are diagnostics, not additive substitutes for full calls.
+- Despite lower latency than P9, coarser inside is not accepted. M7 introduces within-slab alternating imbalance, which the prior fixed patterns did not cover; model rejects the coarser scale. Full precision/performance goal remains active.
+
+## M7 — adversarial within-slab imbalance (fresh numerical inputs)
+
+- Fresh seeds2701–2703, two dtypes, six configurations each measured with globalK128 and per-column inside. Alternating K columns reverse which original K half has a2^-12 factor, with reciprocal B scaling. FP64 reference always uses the original rounded A/B, and both variants use identical numerical operations and quantization tile sizes.
+- K128 passes0/6 fixed floors; maxFP16/BF16 eF2.11315e-2/1.55680e-1. Column passes6/6, max6.70704e-6/5.54585e-5. Zero nonfinite and saturation. This identifies scale granularity as the cause and invalidates treating P10's old72-case pass as a general improvement.
+- Fresh hardware comparison uses different seeds2801/3072/3343, frozenP9/P10 device sources with only host dispatch stripped to avoid compiling unrelated unbalanced variants, and the unchanged production Dense gate. Actual fresh hardware result: P9 passes6/6, P10 fails6/6. Maximum P10FP16/BF16 eF2.09349e-2/1.54619e-1, versus P9 6.65145e-6/5.55399e-5. All nonfinite0. No timing or sanitizer acceptance inferred from this diagnostic. Frozen source/log/binary identities in alternating_hardware_manifest.json. Working headers, compare driver and compare binary restored to frozenP9; P10 failure and old timings remain archived.

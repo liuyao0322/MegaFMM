@@ -1,0 +1,263 @@
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=true, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=true]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=true]" at line 216 of research/precision_20261016/int8_hardware/corrected.cuh
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=true, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=true]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=true]" at line 216 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=true]" at line 216 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=true]" at line 216 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=false, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=false]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=false]" at line 217 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=false, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=false]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=false]" at line 217 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=false, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=false]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=false]" at line 217 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=false, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=false]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=false]" at line 217 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=true, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=true]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=true]" at line 220 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=true, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=true]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=true]" at line 220 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=true, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=true]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=true]" at line 220 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=true, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=true]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=true]" at line 220 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=false, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=false]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=false]" at line 221 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=false, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=false]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=false]" at line 221 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=false, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=false]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=false]" at line 221 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=false, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=false]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=false]" at line 221 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=true, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=true]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=true]" at line 216 of research/precision_20261016/int8_hardware/corrected.cuh
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=true, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=true]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=true]" at line 216 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=true]" at line 216 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=true]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=true]" at line 216 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=false, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=false]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=false]" at line 217 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=false, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=false]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=false]" at line 217 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=false, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=false]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=false]" at line 217 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=false, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=false]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=false]" at line 217 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=true, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=true]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=true]" at line 220 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=true, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=true]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=true]" at line 220 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=true, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=true]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=true]" at line 220 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=true, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=true]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=true]" at line 220 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=false, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=false]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=false]" at line 221 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=false, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=true, Balance=false]" at line 157
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=false]" at line 221 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=false, PlaneId=0]" at line 145
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=false]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=false]" at line 221 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(105): warning #128-D: loop is not reachable
+   for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
+   ^
+          detected during:
+            instantiation of "void int8_research::pack_plane<T,SideA,Balance,PlaneId>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=false, PlaneId=1]" at line 146
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::half_t, SideA=false, Balance=false]" at line 158
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::half_t, Balance=false]" at line 221 of research/precision_20261016/int8_hardware/corrected.cuh
+
+srun: Job step aborted: Waiting up to 122 seconds for job step to finish.
+slurmstepd-g08: error: *** STEP 107488.2031 ON g08 CANCELLED AT 2026-10-16T03:13:08 ***
+srun: error: g08: task 0: Killed

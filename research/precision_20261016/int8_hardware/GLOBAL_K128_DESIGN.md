@@ -1,9 +1,12 @@
 # M6/P10 proposal: globally shared K128 inside scales
 
-Status: numerical model passes42/42 fixed-floor cases, maximum FP16 eF7.33055e-5
-and BF16 eF5.30556e-4. P10 kernel implementation is under test; no measured
-performance or hardware acceptance claim yet. P9 remains the fastest measured accuracy-passing
-FMM prototype (~65us), and production sources remain unchanged.
+Status: REJECTED as a replacement. M6 passed42/42 old fixed-floor cases; P10
+passed72/72 old hardware cases at54.794/54.421us. New within-slab alternating
+imbalance M7 passes0/6 with coarse K128 inside, while per-column inside passes6/6.
+Fresh hardware also confirms P9 passes6/6 and P10 passes0/6 on alternating
+imbalance. The old72-case pass does not establish replacement acceptance.
+P9 remains the retained FMM prototype (~65us), production unchanged.
+
 
 ## Why test this direction
 

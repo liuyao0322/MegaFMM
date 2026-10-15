@@ -3,6 +3,7 @@
   "goal_achieved": false,
   "production_unchanged": true,
   "working_candidate": "f13",
+  "retained_global_candidate": "p9; p10 rejected by fresh alternating-input hardware",
   "compile_stopped_candidates": [
     "F12: no numerical or latency measurement"
   ],
@@ -114,7 +115,22 @@
       "full_call_us": {
         "bf16": 65.71072006225,
         "fp16": 65.45672035225
-      }
+      },
+      "fresh_alternating_checks": 6,
+      "fresh_alternating_passes": 6,
+      "retained": true
+    },
+    "p10": {
+      "checks": 72,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 54.793999672,
+        "fp16": 54.421279907249996
+      },
+      "fresh_alternating_checks": 6,
+      "fresh_alternating_passes": 0,
+      "retained": false
     }
   },
   "numerical_models": {
@@ -141,6 +157,12 @@
     "global_k128_model": {
       "cases": 42,
       "pass_fixed_floor": 42
+    },
+    "alternating_inside": {
+      "fresh_configurations": 6,
+      "paired_variants": 2,
+      "coarse_passes": 0,
+      "column_passes": 6
     }
   },
   "diagnostic_traces": [

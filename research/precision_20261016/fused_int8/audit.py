@@ -7,7 +7,7 @@ r=Path(__file__).resolve().parent
 repo=r.parents[2]
 h=r.parent/'int8_hardware'
 def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
-for path in list(h.glob('p*_manifest.json'))+list(r.glob('f*_manifest.json'))+[h/'tile_inside_adaptive_manifest.json',h/'f2_f3_manifest.json',h/'m4_manifest.json',r/'probe_manifest.json',r/'profile_manifest.json',r/'trace_f9_manifest.json',r/'trace_f11_manifest.json',r/'compile_stopped_f12_manifest.json',r/'layout_access_manifest.json',h/'m5_manifest.json',h/'m6_manifest.json']:
+for path in list(h.glob('p*_manifest.json'))+list(r.glob('f*_manifest.json'))+[h/'tile_inside_adaptive_manifest.json',h/'f2_f3_manifest.json',h/'m4_manifest.json',r/'probe_manifest.json',r/'profile_manifest.json',r/'trace_f9_manifest.json',r/'trace_f11_manifest.json',r/'compile_stopped_f12_manifest.json',r/'layout_access_manifest.json',h/'m5_manifest.json',h/'m6_manifest.json',h/'m7_manifest.json',h/'alternating_hardware_manifest.json']:
     for name,sha in json.loads(path.read_text()).items():assert digest(repo/name)==sha,(path,name)
 for name,sha in json.loads((r.parent/'source_manifest.json').read_text())['production_unchanged_sha256'].items():
     assert digest(repo/name)==sha,name
@@ -33,11 +33,29 @@ for name,passes in [('tile_inside_adaptive',42),('tile_inside_interleave',42),('
     rows=json.loads((h/(name+'.json')).read_text())['rows'];assert len(rows)==42
     assert sum(bool(x['pass_fixed_floor']) for x in rows)==passes
     models[name]=dict(cases=42,pass_fixed_floor=passes)
-for label in ['p8','p9']:
+for label in ['p8','p9','p10']:
     j=json.loads((h/(label+'_balanced.json')).read_text());assert len(j['checks'])==72 and all(x['pass']=='1' for x in j['checks'])
     candidates[label]=dict(checks=72,failures=0,performance_accepted=False,full_call_us={s['dtype']:s['corrected_us'] for s in j['summaries']})
+fresh=json.loads((h/'alternating_hardware.json').read_text())
+assert len(fresh['checks'])==12
+for label,passes in [('p9',6),('p10',0)]:
+    rows=[x for x in fresh['checks'] if x['candidate']==label]
+    assert len(rows)==6 and sum(x['pass']=='1' for x in rows)==passes
+    assert all(int(x['nonfinite'])==0 for x in rows)
+    candidates[label]['fresh_alternating_checks']=6
+    candidates[label]['fresh_alternating_passes']=passes
+    candidates[label]['retained']=label=='p9'
+m7=json.loads((h/'alternating_inside_model.json').read_text())['rows']
+assert len(m7)==12
+for granularity,passes in [('K128',0),('column',6)]:
+    rows=[x for x in m7 if x['inside_granularity']==granularity]
+    assert len(rows)==6 and sum(x['pass_fixed_floor'] for x in rows)==passes
+models['alternating_inside']=dict(fresh_configurations=6,paired_variants=2,coarse_passes=0,column_passes=6)
+for name in ['pack.cuh','corrected.cuh','compare.cu','pow2.cuh']:
+    assert digest(h/name)==digest(h/'p9'/name),name
+assert digest(h/'bin/compare')==digest(h/'bin/compare_p9')
 out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved=False,production_unchanged=True,
-    working_candidate=current,compile_stopped_candidates=['F12: no numerical or latency measurement'],candidates=candidates,numerical_models=models,
+    working_candidate=current,retained_global_candidate='p9; p10 rejected by fresh alternating-input hardware',compile_stopped_candidates=['F12: no numerical or latency measurement'],candidates=candidates,numerical_models=models,
     diagnostic_traces=['F9 role-level, one BF16 uniform case','F11 pack subphases, one BF16 uniform case'],probe_scope='one P5 K128 tile, fresh uniform CPU inputs, two dtypes; not full-call acceptance',
     validations_not_transferred='Graph/dual-stream/sanitizers remain specifically P7 in ../int8_hardware/audit.json. F8 and later measured fusion candidates have ordinary72-case precision only.',
     remaining='Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration.')
