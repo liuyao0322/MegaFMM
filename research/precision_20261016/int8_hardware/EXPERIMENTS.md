@@ -11,3 +11,9 @@ Production `solution/` unchanged; these are standalone research candidates, not 
 - 168registers/thread,32byte stack frame,0spill stores/loads for the corrected kernel; producer up to149registers,0spill. No sanitizer acceptance yet.
 - Baseline source snapshot and logs in`p1/`; identities in`p1_manifest.json`. NCU one first BF16 corrected kernel, clocks/caches uncontrolled; all profiler-run timing arms excluded. Initial shared/tmp lock failure preserved, resolved by private TMPDIR; no other user's lock changed.
 - Next change: replace common-range scalar `ldexpf` with exact power-of-two multiplication, retaining general exponent fallback and an independent GPU equivalence check. This is an implementation cost change, not a new numerical representation.
+
+## P2 — normal-range power-of-two multiply
+
+- Independent1,048,576-case GPU equivalence check against `ldexpf`, exponents−300..300, including normal/subnormal extrema and signed zeros:0errors. Fallback retained outside the range in which a single normal scale is representable.
+- Full72/72 precision checks pass; every printed error metric identical toP1. Complete-call BF16/FP16 medians159.533/159.497us; preprocess92.460/92.860us. **No performance improvement**; the initial ldexp-dominant hypothesis is unsupported. P1/P2 timings are separate processes with unlocked clocks, not a paired source-to-source significance result.
+- Snapshots and identities in`p2/` and`p2_manifest.json`. Next action is separate kernel timing and stage waits, not further math-function optimization. The overall FMM accuracy+performance goal remains unmet.

@@ -76,7 +76,7 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
     #pragma unroll
     for(int j=0;j<16;++j){
      int mn=GMMA::CLayout_64x32{}(tid-128,j);
-     float x=ldexpf(float(static_cast<int32_t>(integer[j])),aexp+((mn%64)<32?bexp0:bexp1));
+     float x=scale_pow2(float(static_cast<int32_t>(integer[j])),aexp+((mn%64)<32?bexp0:bexp1));
      d[j]=__fadd_rn(d[j],x);
     }
    }

@@ -7,6 +7,7 @@
 #include <cutlass/arch/barrier.h>
 #include <stdexcept>
 #include <type_traits>
+#include "pow2.cuh"
 
 namespace int8_research {
 constexpr int H=512, Plane=H*H, BK=128, BM=64, BN=32, Stages=8;
@@ -46,11 +47,11 @@ template<class T,bool SideA,bool Balance> __device__ float value(const T* X,cons
  float x0=float(X[at]),x1=float(X[at+512]),x2=float(X[at+512*1024]),x3=float(X[at+512*1024+512]);
  if constexpr(Balance){
   if constexpr(SideA){
-   x0=ldexpf(x0,-ex[c]);x2=ldexpf(x2,-ex[c]);
-   x1=ldexpf(x1,-ex[c+512]);x3=ldexpf(x3,-ex[c+512]);
+   x0=scale_pow2(x0,-ex[c]);x2=scale_pow2(x2,-ex[c]);
+   x1=scale_pow2(x1,-ex[c+512]);x3=scale_pow2(x3,-ex[c+512]);
   }else{
-   x0=ldexpf(x0,ex[r]);x1=ldexpf(x1,ex[r]);
-   x2=ldexpf(x2,ex[r+512]);x3=ldexpf(x3,ex[r+512]);
+   x0=scale_pow2(x0,ex[r]);x1=scale_pow2(x1,ex[r]);
+   x2=scale_pow2(x2,ex[r+512]);x3=scale_pow2(x3,ex[r+512]);
   }
  }
  if constexpr(SideA){
@@ -96,8 +97,8 @@ void pack(const T* X,T* high,int8_t* q,int* exp,const int* inside){
  #pragma unroll
  for(int j=0;j<PerThread;++j){
   int i=tid+256*j,r=r0+i/Cols,c=c0+i%Cols;
-  int qh=__float2int_rn(ldexpf(vh[j],-exponents[0]));qh=max(-127,min(127,qh));
-  int ql=__float2int_rn(ldexpf(vl[j],-exponents[1]));ql=max(-127,min(127,ql));
+  int qh=__float2int_rn(scale_pow2(vh[j],-exponents[0]));qh=max(-127,min(127,qh));
+  int ql=__float2int_rn(scale_pow2(vl[j],-exponents[1]));ql=max(-127,min(127,ql));
   if constexpr(SideA){q[qp*Plane+r*512+c]=int8_t(qh);if(qp<4)q[(qp+4)*Plane+r*512+c]=int8_t(ql);}
   else{transpose[0][i]=int8_t(qh);if(qp<4)transpose[1][i]=int8_t(ql);}
  }
