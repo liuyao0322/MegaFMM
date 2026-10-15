@@ -199,10 +199,121 @@ void pack(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,in
  }
 }
 
+// Bulk producer: keep the four scaled input quadrants in registers, write the
+// three raw native planes, then overwrite those registers with S/T transforms.
+// A/B CTAs share one launch; all quantization block sizes/scales stay unchanged.
+template<class T,bool SideA,bool Balance> __device__ __forceinline__
+void bulk_pack_tile(const T* X,T* high,int8_t* q,int* exp,const int* inside,int tile){
+ constexpr int Rows=SideA?64:128,Cols=SideA?128:32,Size=Rows*Cols,Threads=512,PerThread=Size/Threads;
+ constexpr int Tiles=(512/Rows)*(512/Cols),RawPlane=SideA?3:2;
+ int tid=threadIdx.x,r0=tile/(512/Cols)*Rows,c0=tile%(512/Cols)*Cols;
+ float x0[PerThread],x1[PerThread],x2[PerThread],x3[PerThread];
+ auto load=[&](auto fast,float sf0,float sf1){
+  #pragma unroll
+  for(int j=0;j<PerThread;++j){
+   int i=tid+Threads*j,r=r0+i/Cols,c=c0+i%Cols,at=r*1024+c;
+   float a=float(X[at]),b=float(X[at+512]),cc=float(X[at+512*1024]),d=float(X[at+512*1024+512]);
+   if constexpr(Balance){
+    if constexpr(decltype(fast)::value){
+     float s0=sf0,s1=sf1;
+     if constexpr(!SideA){s0=__shfl_sync(0xffffffff,sf0,j);s1=__shfl_sync(0xffffffff,sf1,j);}
+     a=__fmul_rn(a,s0);d=__fmul_rn(d,s1);
+     if constexpr(SideA){b=__fmul_rn(b,s1);cc=__fmul_rn(cc,s0);}
+     else{b=__fmul_rn(b,s0);cc=__fmul_rn(cc,s1);}
+    }else{
+     int e0=SideA?-inside[c]:inside[r],e1=SideA?-inside[c+512]:inside[r+512];
+     a=scale_pow2_compact(a,e0);d=scale_pow2_compact(d,e1);
+     if constexpr(SideA){b=scale_pow2_compact(b,e1);cc=scale_pow2_compact(cc,e0);}
+     else{b=scale_pow2_compact(b,e0);cc=scale_pow2_compact(cc,e1);}
+    }
+   }
+   x0[j]=a;x1[j]=b;x2[j]=cc;x3[j]=d;
+   high[r*512+c]=T(a);high[Plane+r*512+c]=T(SideA?b:cc);
+   high[RawPlane*Plane+r*512+c]=T(d);
+  }
+ };
+ if constexpr(Balance){
+  int pos=SideA?c0+tid%Cols:r0+tid/32+16*(tid%8);
+  int e0=SideA?-inside[pos]:inside[pos],e1=SideA?-inside[pos+512]:inside[pos+512];
+  bool normal=e0>=-126&&e0<=127&&e1>=-126&&e1<=127;
+  if constexpr(!SideA)normal=__all_sync(0xffffffff,normal);
+  if(normal)load(std::true_type{},__int_as_float((e0+127)<<23),__int_as_float((e1+127)<<23));
+  else load(std::false_type{},0,0);
+ }else load(std::false_type{},0,0);
+ __shared__ float maxima[2][16];__shared__ int exponents[2];
+ __shared__ int8_t transpose[SideA?1:2][SideA?1:Size];
+ auto reduce=[&](float hi,float lo){
+  for(int step=16;step;step/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,step));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,step));}
+  if((tid&31)==0){maxima[0][tid/32]=hi;maxima[1][tid/32]=lo;}__syncthreads();
+  if(tid<2){float peak=0;for(int w=0;w<16;++w)peak=fmaxf(peak,maxima[tid][w]);exponents[tid]=peak>0?int(ceilf(log2f(peak/127.f))):0;}
+  __syncthreads();
+ };
+ auto store=[&](int j,int qh,int ql,int plane,bool low){
+  int i=tid+Threads*j,r=r0+i/Cols,c=c0+i%Cols;
+  if constexpr(SideA){q[plane*Plane+r*512+c]=int8_t(max(-127,min(127,qh)));if(low)q[(plane+4)*Plane+r*512+c]=int8_t(max(-127,min(127,ql)));}
+  else{transpose[0][i]=int8_t(max(-127,min(127,qh)));if(low)transpose[1][i]=int8_t(max(-127,min(127,ql)));}
+ };
+ auto finish=[&](int plane,bool low){
+  if constexpr(!SideA){
+   __syncthreads();
+   for(int i=tid;i<Size;i+=Threads){int c=i/Rows,r=i%Rows;
+    q[plane*Plane+(c0+c)*512+r0+r]=transpose[0][r*Cols+c];
+    if(low)q[(plane+4)*Plane+(c0+c)*512+r0+r]=transpose[1][r*Cols+c];
+   }
+  }
+  // Shared transpose and exponent storage are reused by the following plane.
+  __syncthreads();
+ };
+ // Raw high plane 8 is required once for the one-sided P2/P3 correction.
+ float peak=0;
+ #pragma unroll
+ for(int j=0;j<PerThread;++j)peak=fmaxf(peak,fabsf(float(T(x3[j]))));
+ reduce(peak,0);int er=exponents[0];if(tid==0)exp[8*Tiles+tile]=er;
+ if(er>=-127&&er<=126){float factor=__int_as_float((127-er)<<23);
+  #pragma unroll
+  for(int j=0;j<PerThread;++j)store(j,__float2int_rn(__fmul_rn(float(T(x3[j])),factor)),0,8,false);
+ }else{
+  #pragma unroll
+  for(int j=0;j<PerThread;++j)store(j,__float2int_rn(scale_pow2_compact(float(T(x3[j])),-er)),0,8,false);
+ }
+ finish(8,false);
+ #pragma unroll
+ for(int j=0;j<PerThread;++j){
+  float a=x0[j],b=x1[j],c=x2[j],d=x3[j];
+  if constexpr(SideA){float s1=__fadd_rn(c,d),s2=__fsub_rn(s1,a);x0[j]=s1;x1[j]=s2;x2[j]=__fsub_rn(a,c);x3[j]=__fsub_rn(b,s2);}
+  else{float t1=__fsub_rn(b,a),t2=__fsub_rn(d,t1);x0[j]=t1;x1[j]=t2;x2[j]=__fsub_rn(d,b);x3[j]=__fsub_rn(t2,c);}
+ }
+ #pragma unroll 1
+ for(int plane=0;plane<4;++plane){
+  float vh[PerThread],vl[PerThread],hi=0,lo=0;int native_plane=plane<3?plane+4:(SideA?2:3);
+  #pragma unroll
+  for(int j=0;j<PerThread;++j){
+   int i=tid+Threads*j,r=r0+i/Cols,c=c0+i%Cols;
+   float v=plane==0?x0[j]:plane==1?x1[j]:plane==2?x2[j]:x3[j];T h=T(v);
+   high[native_plane*Plane+r*512+c]=h;vh[j]=float(h);vl[j]=__fsub_rn(v,float(h));
+   hi=fmaxf(hi,fabsf(vh[j]));lo=fmaxf(lo,fabsf(vl[j]));
+  }
+  reduce(hi,lo);int eh=exponents[0],el=exponents[1];if(tid<2)exp[(plane+(tid?4:0))*Tiles+tile]=exponents[tid];
+  if(eh>=-127&&eh<=126&&el>=-127&&el<=126){float sh=__int_as_float((127-eh)<<23),sl=__int_as_float((127-el)<<23);
+   #pragma unroll
+   for(int j=0;j<PerThread;++j)store(j,__float2int_rn(__fmul_rn(vh[j],sh)),__float2int_rn(__fmul_rn(vl[j],sl)),plane,true);
+  }else{
+   #pragma unroll
+   for(int j=0;j<PerThread;++j)store(j,__float2int_rn(scale_pow2_compact(vh[j],-eh)),__float2int_rn(scale_pow2_compact(vl[j],-el)),plane,true);
+  }
+  finish(plane,true);
+ }
+ asm volatile("fence.proxy.async.global;" ::: "memory");
+}
+template<class T,bool Balance> __global__ __launch_bounds__(512,1)
+void bulk_pack(const T* A,const T* B,Work w){
+ if(blockIdx.x<32)bulk_pack_tile<T,true,Balance>(A,static_cast<T*>(w.ha),w.qa,w.ea,w.inside,blockIdx.x);
+ else bulk_pack_tile<T,false,Balance>(B,static_cast<T*>(w.hb),w.qb,w.eb,w.inside,blockIdx.x-32);
+}
+
 template<class T,bool Balance> void preprocess(const T* A,const T* B,Work w,cudaStream_t stream){
  if constexpr(Balance){inside_partial<<<dim3(8,32),256,0,stream>>>(A,B,w.partial);inside_finalize<<<128,256,0,stream>>>(w.partial,w.inside);}
- pack<T,true,Balance><<<7*32,256,0,stream>>>(A,static_cast<T*>(w.ha),w.qa,w.ea,w.inside);
- pack<T,false,Balance><<<7*64,256,0,stream>>>(B,static_cast<T*>(w.hb),w.qb,w.eb,w.inside);
+ bulk_pack<T,Balance><<<96,512,0,stream>>>(A,B,w);
  check(cudaPeekAtLastError(),"INT8 preprocess");
 }
 } // namespace int8_research

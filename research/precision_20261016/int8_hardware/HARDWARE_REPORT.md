@@ -110,3 +110,10 @@ python3 research/precision_20261016/int8_hardware/audit.py
 ```
 
 `validate.sh`保存当时三项sanitizer的精确命令及新内核过滤器，并检查P7源码身份以避免覆盖为后续候选。`bin/`及NCU二进制报告被忽略；首次重建后可将compare复制为compare_p7，再核对本地工具链生成的身份。冻结manifest验证的是归档运行本身，重新编译或重新计时不要求得到相同二进制/日志哈希。快照子目录的相对include按原研究目录设计，不能直接在多一层的pN目录原位编译。正式集成与性能不退化验收仍未完成。
+
+
+## P14–P16：三个未改善完整性能的实验
+
+P14把打包器少见指数的一般幂二路径移到独立device函数，入口静态指令数下降约一半；1,048,576项浮点等价检查及78项完整精度通过，但完整BF16/FP16调用54.869/54.974μs，与P13相当。P15将四个原始象限加载、逐列缩放后留在寄存器，复用生成全部变换平面，并将A/B打包合到一次launch；精度及逐列指数都通过，但大量spill使完整调用69.080/69.588μs。P16改为512threads，仍有spill，完整调用58.509/64.778μs。三者打印eF均与P13逐项相同；这些时延没有达到生产SW约10μs。
+
+P13继续作为最快研究参考。重评方向为共享内存B转置：先profile冻结P13，检查bank-conflict及wavefront指标，再尝试只改变内部暂存行距。依据为[NVIDIA共享内存指导](https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-and-memory-banks)和[Hopper资源限制](https://docs.nvidia.com/cuda/hopper-tuning-guide/index.html#occupancy)；不能把分析预测当成已测瓶颈。完整记录见[实验日志](EXPERIMENTS.md)。
