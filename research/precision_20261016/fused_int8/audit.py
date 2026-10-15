@@ -33,8 +33,8 @@ for name,passes in [('tile_inside_adaptive',42),('tile_inside_interleave',42),('
     rows=json.loads((h/(name+'.json')).read_text())['rows'];assert len(rows)==42
     assert sum(bool(x['pass_fixed_floor']) for x in rows)==passes
     models[name]=dict(cases=42,pass_fixed_floor=passes)
-for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18']:
-    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18'] else 72
+for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19']:
+    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19'] else 72
     assert len(j['checks'])==count and all(x['pass']=='1' and int(x['nonfinite'])==0 for x in j['checks'])
     assert all(g['speedup_vs_sw']<1 for z in j['summaries'] for g in z['groups'])
     candidates[label]=dict(checks=count,failures=0,performance_accepted=False,full_call_us={s['dtype']:s['corrected_us'] for s in j['summaries']})
@@ -53,7 +53,7 @@ for granularity,passes in [('K128',0),('column',6)]:
     rows=[x for x in m7 if x['inside_granularity']==granularity]
     assert len(rows)==6 and sum(x['pass_fixed_floor'] for x in rows)==passes
 models['alternating_inside']=dict(fresh_configurations=6,paired_variants=2,coarse_passes=0,column_passes=6)
-for label in ['p11','p12','p13','p14','p15','p16','p17','p18']:
+for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19']:
     rows=[dict(re.findall(r'(\w+)=([^ ]+)',line)) for line in (h/(label+'_balanced.log')).read_text().splitlines() if line.startswith('INSIDE_EQUAL ')]
     assert len(rows)==78 and all(x['errors']=='0' and x['elements']=='1024' for x in rows)
     j=json.loads((h/(label+'_balanced.json')).read_text())

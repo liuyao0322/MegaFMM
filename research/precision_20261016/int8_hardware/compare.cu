@@ -89,7 +89,7 @@ template<class T> int compare(megafmm::DType dtype,bool balance,bool quick,bool 
  std::function<void()> components[3]={
   [&]{int8_research::inside_partial<CT><<<dim3(8,32),256,0,stream.s>>>(static_cast<const CT*>(a.p),static_cast<const CT*>(b.p),w.partial);},
   [&]{int8_research::inside_finalize<<<128,256,0,stream.s>>>(w.partial,w.inside);},
-  [&]{if(balance)int8_research::bulk_pack<CT,true><<<96,512,0,stream.s>>>(static_cast<const CT*>(a.p),static_cast<const CT*>(b.p),w);else int8_research::bulk_pack<CT,false><<<96,512,0,stream.s>>>(static_cast<const CT*>(a.p),static_cast<const CT*>(b.p),w);}
+  [&]{if(balance)int8_research::bulk_pack<CT,true><<<96,256,0,stream.s>>>(static_cast<const CT*>(a.p),static_cast<const CT*>(b.p),w);else int8_research::bulk_pack<CT,false><<<96,256,0,stream.s>>>(static_cast<const CT*>(a.p),static_cast<const CT*>(b.p),w);}
  };
  for(int j=0;j<3;++j){for(int warm=0;warm<20;++warm)components[j]();printf("PREP_STAGE dtype=%s balance=%d stage=%d us=%.9f diagnostic_only=1\n",dt,balance,j,time_calls(components[j],stream.s));}
  printf("SUMMARY dtype=%s balance=%d checks=%d failures=%d\n",dt,balance,quick?1:39,failures);fflush(stdout);

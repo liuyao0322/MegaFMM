@@ -181,3 +181,13 @@ Production `solution/` unchanged; these are standalone research candidates, not 
 - P16 baseline with the temporary-lifetime change described above. Same512threads, all quantization and scale granularity unchanged. Balanced FP16 still128regs,512B stack,520B spill stores/552B spill loads; BF16 still128regs,384B stack,388B spill stores/412B spill loads. Static shared8576B. Fewer compiler-reported spills thanP16, but spills remain.
 - Full78/78 original-input FP64 checks and79,872 exact exponent comparisons pass; all printed eF equalP17. CompleteBF16/FP16 calls60.306/61.444us versusP16 58.509/64.778us; no improvement overP17 53.807/53.499us. Reject performance. Dtype-dependent effects prevent claiming a general latency reduction from this rematerialization alone.
 - FrozenP18 sources/build/results/binary identities preserved. Next controlled comparison can use256threads with the same rematerialization: the smaller block raises the per-thread register budget and completes the block-size × temporary-array-lifetime ablation. P17 remains the fastest measured research reference; no production change.
+
+
+P17独立ABBA复测（P13→P17→P17→P13，四个新进程）共312次精度检查通过，仍是78个确定性数值配置。两次进程共10个组的完整耗时中位数：BF16 P13/P17为54.571/54.378μs，FP16为54.810/54.042μs；降幅分别0.35%/1.40%，小于首轮约2%。GPU未锁时钟，没有统计置信区间，不宣称显著性。精度、hash及全部组保留于[p17_abba.json](p17_abba.json)及manifest；保留P17作为内部转置布局已修复的研究候选，整体性能目标继续拒绝。
+
+
+## P19 —256-thread rematerialized bulk pack: rejected
+
+- Same rematerialization asP18,256threads asP15; updates both actual preprocessing and balanced/unbalanced diagnostic launch branches before compilation. Runtime numerical algorithm unchanged. Balanced FP16255regs,1096B stack,1088B spill stores/1124B spill loads; BF16255regs,672B stack,664/664B spill stores/loads. Shared8448B. Register pressure still produces spills.
+- All78 fixed original-input FP64 checks and79,872 exponent comparisons pass; printed eF exactly equalsP17. FullBF16/FP16 calls65.606/74.240us. Reject performance and preserve frozenP19 manifest.
+- The completed two-axis comparison isP15(256, retained high/low),P16(512, retained),P18(512, rematerialized),P19(256, rematerialized). None beatsP17; thread-count changes are not a robust workaround for this bulk producer. Restore frozenP17 source/binary after archiving. Next algorithmic screen retains per-column scaling and pairs INT8 dots before scale restoration, seeking fewer correction waits/rescalings while preserving all eight integer dots.
