@@ -11,10 +11,10 @@
 namespace megafmm::detail {
 namespace {
 using namespace cute;
-template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0,int K=64,bool DirectStore=false>
+template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0,int K=64,bool DirectStore=false,int ClusterN=1>
 struct Candidate {
   using Tile=Shape<Int<M>,Int<N>,Int<K>>;
-  using Cluster=Shape<Int<ClusterM>,_1,_1>;
+  using Cluster=Shape<Int<ClusterM>,Int<ClusterN>,_1>;
   using Epilogue=typename cutlass::epilogue::collective::CollectiveBuilder<
       cutlass::arch::Sm90,cutlass::arch::OpClassTensorOp,Tile,Cluster,
       cutlass::epilogue::collective::EpilogueTileAuto,float,float,
@@ -98,6 +98,10 @@ bool dispatch(int id,const Problem& p,const void* A,const void* B,const float* C
     case 30:return Candidate<T,128,128,1,0,0,128>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 31:return Candidate<T,128,256,1,0,0,128,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 32:return Candidate<T,128,128,1,0,0,128,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 39:return Candidate<T,128,256,4>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 40:return Candidate<T,128,256,8>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 41:return Candidate<T,128,256,1,0,0,64,false,2>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 42:return Candidate<T,128,256,2,0,0,64,false,2>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     default:return false;
   }
 }
@@ -122,11 +126,12 @@ const char* hopper_candidate_name(int id) {
       "128x256x64_c1_sw8","128x128x64_c2_sw4","128x128x64_c2_sw8",
       "64x32x64_basic_s3","64x64x64_basic_s3","128x128x64_pingpong_s3",
       "256x128x64_c1_sw8","128x256x64_c2_sw8","128x256x64_pingpong_s3_sw8",
-      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64"};
+      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64","even_mma_32x32x32","even_mma_32x32x64","128x256x64_cm4_sw8","128x256x64_cm8_sw8","128x256x64_cn2_sw8","128x256x64_cm2cn2_sw8"};
   return id>=0 && id<HopperCandidateCount ? names[id]:"invalid";
 }
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C,float* D,
                   void* workspace,int sm_count,cudaStream_t stream,int operation) {
+  if(id==37 || id==38)return mma_even_dense(id==37?32:64,p,A,B,C,D,stream,operation);
   if(id>=33 && id<=36) {
     constexpr int codes[]={96,128,256,257};
     return wmma_dense(codes[id-33],p,A,B,C,D,stream,operation);

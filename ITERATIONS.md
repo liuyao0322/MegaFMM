@@ -597,6 +597,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 345 | Four-byte asynchronous staging and explicit warp MMA output | 1.0553 | 1.266034 | measured |
 
+| 346 | Narrow-index even MMA and two-dimensional Hopper clusters | 1.0751 | 1.670428 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5606,3 +5608,35 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Completed all14 shapes and both dtypes with full100-call five-group timing and fresh original-input FP64 checks. Explicit MMA improves the own-WMMA aligned512 route but does not beat the retained Hopper candidate there. All newly selected routes still require forced sanitizer validation and independent certification; do not transfer iter344 eleven-win certification to this changed pool.
 - **Next:** Inspect boundary measurements, finish forced candidate and sanitizer checks, profile the fixed new small kernel and a fixed large Hopper kernel before the next optimization.
 - **Archive:** trajectory/20261015_171836_iter-345/
+
+### Iter 346 — Narrow-index even MMA and two-dimensional Hopper clusters
+
+- **Hypothesis:** Dedicated 32-bit address calculations and compile-time copy widths reduce boundary-kernel instruction cost; larger or two-dimensional clusters may reduce Hopper operand traffic.
+- **Changes:** Add two restricted even-layout MMA candidates with checked 32-bit offsets; add cluster4,cluster8,clusterN2 and2x2 candidates; expand forced tests to cluster tails and unsupported fast-path bindings.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=1.670428 ms; mean speedup=1.0751x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005671 | 0.005037 | 1.1258 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005755 | 0.005087 | 1.1314 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_dense_cublaslt v0 | launch | 0.008752 | 0.008737 | 1.0018 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_dense_cublaslt v0 | launch | 0.008650 | 0.008635 | 1.0017 | 3.40967e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.011917 | 0.008000 | 1.4897 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009545 | 0.008077 | 1.1817 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.032302 | 0.029667 | 1.0888 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.032452 | 0.029701 | 1.0926 | 2.45816e-06 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.246455 | 0.224139 | 1.0996 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.233499 | 0.233400 | 1.0004 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.666960 | 1.640350 | 1.0162 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.724965 | 1.709769 | 1.0089 | 9.68937e-06 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.810640 | 12.746044 | 1.0051 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.315411 | 13.309080 | 1.0005 | 1.93317e-05 | 1 |
+| 8192,1024,512 | bf16 | tuned_dense_cublaslt v0 | launch | 0.025040 | 0.025164 | 0.9951 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.025287 | 0.025492 | 0.9920 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027327 | 0.025351 | 1.0779 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.027080 | 0.025969 | 1.0428 | 6.43463e-07 | 1 |
+
+- **Analysis:** Nine-shape two-dtype screening completed under full timing and original FP64 gates. Even-layout boundary candidates reduce approximately13.8us to10.0us but still lose to cuBLASLt8.8us. Cluster variants show no clear stable win on8192-cube. Existing512/1024/2048 gains remain provisional for this changed pool; no additional certified wins are claimed.
+- **Next:** Close forced validation and profile the narrow-index boundary path. Investigate final-K-tile overcomputation and output vector stores if supported by the profile; independently certify any new winner.
+- **Archive:** trajectory/20261015_172923_iter-346/

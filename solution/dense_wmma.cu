@@ -176,6 +176,71 @@ __global__ __launch_bounds__(128) void direct_mma(Problem p,const T* A,const T* 
     }
   }
 }
+struct SmallProblem {int m,n,k,lda,ldb,ldc,ldd;float alpha,beta;};
+template<class T,int BK,int Copy>
+__device__ __forceinline__ void load_even(T* sa,T* sb,SmallProblem p,const T* A,const T* B,
+                                         int r0,int c0,int q) {
+  constexpr int AS=BK+8,BS=40,W=Copy/2;
+  #pragma unroll
+  for(int i=threadIdx.x;i<32*BK/W;i+=128) {
+    const int r=i/(BK/W),c=i%(BK/W)*W;
+    const bool valid=r0+r<p.m && q+c<p.k;
+    const int offset=(r0+r)*p.lda+q+c;
+    if constexpr(Copy==16) copy16(sa+r*AS+c,valid?A+offset:A,valid);
+    else copy4(sa+r*AS+c,valid?A+offset:A,valid);
+  }
+  #pragma unroll
+  for(int i=threadIdx.x;i<BK*32/W;i+=128) {
+    const int r=i/(32/W),c=i%(32/W)*W;
+    const bool valid=q+r<p.k && c0+c<p.n;
+    const int offset=(q+r)*p.ldb+c0+c;
+    if constexpr(Copy==16) copy16(sb+r*BS+c,valid?B+offset:B,valid);
+    else copy4(sb+r*BS+c,valid?B+offset:B,valid);
+  }
+  asm volatile("cp.async.commit_group;" ::: "memory");
+}
+template<class T,int BK,int Copy>
+__global__ __launch_bounds__(128) void even_mma(SmallProblem p,const T* A,const T* B,const float* C,float* D) {
+  constexpr int AS=BK+8,BS=40;
+  __shared__ __align__(32) T sa[2][32*AS];
+  __shared__ __align__(32) T sb[2][BK*BS];
+  const int lane=threadIdx.x%32,warp=threadIdx.x/32,wm=warp/2,wn=warp%2;
+  const int r0=int(blockIdx.y)*32,c0=int(blockIdx.x)*32;
+  float acc[2][4]={{0,0,0,0},{0,0,0,0}};
+  load_even<T,BK,Copy>(sa[0],sb[0],p,A,B,r0,c0,0);ready(Copy);
+  int slot=0;
+  for(int q=0;q<p.k;q+=BK,slot^=1) {
+    const bool next=q+BK<p.k;
+    if(next)load_even<T,BK,Copy>(sa[slot^1],sb[slot^1],p,A,B,r0,c0,q+BK);
+    #pragma unroll
+    for(int kk=0;kk<BK;kk+=16) {
+      uint32_t a[4];
+      unsigned ap=unsigned(__cvta_generic_to_shared(sa[slot]+(wm*16+lane%16)*AS+kk+(lane/16)*8));
+      asm volatile("ldmatrix.sync.aligned.m8n8.x4.shared.b16 {%0,%1,%2,%3},[%4];" : "=r"(a[0]),"=r"(a[1]),"=r"(a[2]),"=r"(a[3]) : "r"(ap));
+      #pragma unroll
+      for(int j=0;j<2;++j) {
+        uint32_t b[2];
+        unsigned bp=unsigned(__cvta_generic_to_shared(sb[slot]+(kk+lane%16)*BS+wn*16+j*8));
+        asm volatile("ldmatrix.sync.aligned.m8n8.x2.trans.shared.b16 {%0,%1},[%2];" : "=r"(b[0]),"=r"(b[1]) : "r"(bp));
+        using Mma=std::conditional_t<std::is_same_v<T,__half>,cute::SM80_16x8x16_F32F16F16F32_TN,cute::SM80_16x8x16_F32BF16BF16F32_TN>;
+        Mma::fma(acc[j][0],acc[j][1],acc[j][2],acc[j][3],a[0],a[1],a[2],a[3],b[0],b[1],acc[j][0],acc[j][1],acc[j][2],acc[j][3]);
+      }
+    }
+    if(next)ready(Copy);
+  }
+  #pragma unroll
+  for(int j=0;j<2;++j) {
+    #pragma unroll
+    for(int i=0;i<4;++i) {
+      int r=r0+wm*16+lane/4+(i/2)*8,c=c0+wn*16+j*8+(lane%4)*2+i%2;
+      if(r<p.m && c<p.n) {
+        float value=p.alpha*acc[j][i];
+        if(p.beta!=0)value=fmaf(p.beta,C[r*p.ldc+c],value);
+        D[r*p.ldd+c]=value;
+      }
+    }
+  }
+}
 
 }
 bool wmma_dense(int bk,const Problem& p,const void* A,const void* B,const float* C,float* D,
@@ -201,6 +266,28 @@ bool wmma_dense(int bk,const Problem& p,const void* A,const void* B,const float*
     else direct_wmma<__half,64><<<grid,128,0,stream>>>(p,static_cast<const __half*>(A),static_cast<const __half*>(B),C,D);
   }
   auto e=cudaPeekAtLastError();if(e!=cudaSuccess) throw std::runtime_error(cudaGetErrorString(e));
+  return true;
+}
+
+bool mma_even_dense(int bk,const Problem& p,const void* A,const void* B,const float* C,float* D,
+                    cudaStream_t stream,int operation) {
+  if(operation==2)return true;
+  if(p.trans_a || p.trans_b || p.m<=0 || p.n<=0 || p.k<=0 || p.m>2048 || p.n>2048 || p.k>2048 ||
+     p.n%2 || p.k%2 || p.lda%2 || p.ldb%2 || p.lda>(1<<20) || p.ldb>(1<<20) ||
+     p.ldc>(1<<20) || p.ldd>(1<<20) || reinterpret_cast<uintptr_t>(A)%4 || reinterpret_cast<uintptr_t>(B)%4)return false;
+  if(operation==0)return true;
+  SmallProblem q{int(p.m),int(p.n),int(p.k),int(p.lda),int(p.ldb),int(p.ldc),int(p.ldd),p.alpha,p.beta};
+  const bool wide=p.k%8==0 && p.n%8==0 && p.lda%8==0 && p.ldb%8==0 &&
+       reinterpret_cast<uintptr_t>(A)%16==0 && reinterpret_cast<uintptr_t>(B)%16==0;
+  dim3 grid(unsigned((p.n+31)/32),unsigned((p.m+31)/32));
+  #define EVEN_LAUNCH(T,K) do { \
+    if(wide)even_mma<T,K,16><<<grid,128,0,stream>>>(q,static_cast<const T*>(A),static_cast<const T*>(B),C,D); \
+    else even_mma<T,K,4><<<grid,128,0,stream>>>(q,static_cast<const T*>(A),static_cast<const T*>(B),C,D); \
+  } while(0)
+  if(p.dtype==DType::BF16) {if(bk==32)EVEN_LAUNCH(__nv_bfloat16,32);else EVEN_LAUNCH(__nv_bfloat16,64);}
+  else {if(bk==32)EVEN_LAUNCH(__half,32);else EVEN_LAUNCH(__half,64);}
+  #undef EVEN_LAUNCH
+  auto e=cudaPeekAtLastError();if(e!=cudaSuccess)throw std::runtime_error(cudaGetErrorString(e));
   return true;
 }
 }
