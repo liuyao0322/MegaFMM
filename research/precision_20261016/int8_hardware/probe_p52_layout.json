@@ -1,0 +1,116 @@
+{
+  "scope": "Pre-MMA only, six own synthetic plane-distinguishing configurations: low index16bits, upper indexbits, fresh hasheduint16. Both native dtypes, all256CTAs/28sequences/two-slot reuse; every loaded high/required-low value plus output-coordinate bijection and shared/workspace/output guards. Candidate TMA producer copied verbatim; generic reads retire current slot without executing any MMA, so this is not a WGMMA wait-order, matrix, performance or sanitizer certificate.",
+  "configurations": 6,
+  "native_uint16_comparisons_including_cta_reuse": 692060160,
+  "unique_workspace_native_values_per_configuration": 5767168,
+  "bit_errors": 0,
+  "output_coordinate_checks": 6291456,
+  "consumer_runtime_capacity": [
+    {
+      "dtype": "bf16",
+      "sm_count": "132",
+      "active_blocks_per_sm": "2",
+      "grid": "256",
+      "shared_bytes": "82048"
+    },
+    {
+      "dtype": "fp16",
+      "sm_count": "132",
+      "active_blocks_per_sm": "2",
+      "grid": "256",
+      "shared_bytes": "82048"
+    }
+  ],
+  "rows": [
+    {
+      "dtype": "bf16",
+      "trial": "0",
+      "seed": "114067",
+      "ctas": "256",
+      "sequences": "28",
+      "slots": "2",
+      "native_comparisons": "115343360",
+      "a_errors": "0",
+      "b_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "bf16",
+      "trial": "1",
+      "seed": "114500",
+      "ctas": "256",
+      "sequences": "28",
+      "slots": "2",
+      "native_comparisons": "115343360",
+      "a_errors": "0",
+      "b_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "bf16",
+      "trial": "2",
+      "seed": "114933",
+      "ctas": "256",
+      "sequences": "28",
+      "slots": "2",
+      "native_comparisons": "115343360",
+      "a_errors": "0",
+      "b_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "fp16",
+      "trial": "0",
+      "seed": "114294",
+      "ctas": "256",
+      "sequences": "28",
+      "slots": "2",
+      "native_comparisons": "115343360",
+      "a_errors": "0",
+      "b_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "fp16",
+      "trial": "1",
+      "seed": "114727",
+      "ctas": "256",
+      "sequences": "28",
+      "slots": "2",
+      "native_comparisons": "115343360",
+      "a_errors": "0",
+      "b_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "fp16",
+      "trial": "2",
+      "seed": "115160",
+      "ctas": "256",
+      "sequences": "28",
+      "slots": "2",
+      "native_comparisons": "115343360",
+      "a_errors": "0",
+      "b_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    }
+  ]
+}

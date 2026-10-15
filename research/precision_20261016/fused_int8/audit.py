@@ -102,8 +102,8 @@ assert arithmetic['differing_scale_negative_control']['original']!=arithmetic['d
 models['uniform_scale_arithmetic']=dict(scope='CPU restoration arithmetic only; not matrix or hardware acceptance',generated_tuples_per_dot_count=20008,exponents_per_dot_count=230,bitwise_errors=0,hardware_accepted=False)
 abba=json.loads((h/'p17_abba.json').read_text())
 assert abba['correctness_checks']==312 and abba['independent_numerical_configurations']==78
-for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51']:
-    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51'] else 72
+for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52']:
+    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52'] else 72
     assert len(j['checks'])==count and all(x['pass']=='1' and int(x['nonfinite'])==0 for x in j['checks'])
     assert all(g['speedup_vs_sw']<1 for z in j['summaries'] for g in z['groups'])
     candidates[label]=dict(checks=count,failures=0,performance_accepted=False,full_call_us={s['dtype']:s['corrected_us'] for s in j['summaries']})
@@ -122,7 +122,7 @@ for granularity,passes in [('K128',0),('column',6)]:
     rows=[x for x in m7 if x['inside_granularity']==granularity]
     assert len(rows)==6 and sum(x['pass_fixed_floor'] for x in rows)==passes
 models['alternating_inside']=dict(fresh_configurations=6,paired_variants=2,coarse_passes=0,column_passes=6)
-for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51']:
+for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52']:
     rows=[dict(re.findall(r'(\w+)=([^ ]+)',line)) for line in (h/(label+'_balanced.log')).read_text().splitlines() if line.startswith('INSIDE_EQUAL ')]
     assert len(rows)==78 and all(x['errors']=='0' and x['elements']=='1024' for x in rows)
     j=json.loads((h/(label+'_balanced.json')).read_text())
@@ -261,6 +261,22 @@ assert all(json.loads((h/'p51_reproduction.json').read_text())['reproduced'].val
 native_pack_controls['p51'].update(validation=validation51,packing_edges=edges51)
 candidates['p51']['numerical_algorithm_changed']='geometry only A16x128/B32x32 packing,384CTA cooperative grid, diagnostics128A/256B; unchanged P47 consumer/RN/planes/inside'
 
+consumer52=json.loads((h/'p52_hardware.json').read_text())
+assert not consumer52['performance_accepted'] and consumer52['retained']=='P51' and not consumer52['goal_achieved']
+assert consumer52['ordinary_original_fp64_checks']==78 and consumer52['equal_inside_exponents']==79872
+assert consumer52['layout']['bit_errors']==0 and consumer52['layout']['configurations']==6
+assert not consumer52['fresh_stream_guard_acceptance'] and not consumer52['sanitizer_acceptance']
+for mode in ['ordinary','graph']:
+    data=json.loads((h/('p52_abba.json' if mode=='ordinary' else 'p52_graph_abba.json')).read_text())
+    assert data['correctness_checks']==312 and data['independent_numerical_configurations']==78
+    assert all(x['relative_reduction']<-.4 for x in data['summary'])
+for name in ['pack.cuh','compare.cu','pow2.cuh']:assert digest(h/'p52'/name)==digest(h/'p51'/name)
+candidates['p52']['validation_scope']='own six synthetic pre-MMA TMA layouts, standard78, independent ordinary/GraphABBA312 each and own two-kernel profile; rejected performance, no own fresh dual-stream or sanitizer certificate'
+candidates['p52']['numerical_algorithm_changed']='native m64n16k16/eight-value fragments, two actual40960Bslots/shared82048B/grid256; fullK512/all7+8dots/RN/planes/inside preserved'
+proposal53=json.loads((h/'p53_proposal_cpu.json').read_text())
+assert proposal53['gpu_executed'] is False and proposal53['run_kernel_count']==3
+assert all(proposal53['unchanged'].values())
+
 ordinary38=json.loads((h/'p38_abba.json').read_text())
 assert ordinary38['correctness_checks']==312 and ordinary38['independent_numerical_configurations']==78
 assert ordinary38['summary'][0]['relative_reduction']>0 and ordinary38['summary'][1]['relative_reduction']<0
@@ -282,7 +298,7 @@ assert int(profile13[bank_key]['value'])>500000
 assert int(profile17[bank_key]['value'])<2000
 assert 'cases=1048576 exponents=-300..300 errors=0' in (h/'p14_pow2.log').read_text()
 out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved=False,production_unchanged=True,
-    working_candidate=current,working_global_candidate=global_current,compact_pow2_equivalence_cases=1048576,retained_global_candidate='p51 ordinary and Graph research reference, own ordinary/Graph78, fresh12-pattern stress144/1152calls, scoped tools48/96calls each. p50/p47/p46/p45/p39/p33/p27 remain historical validated fallbacks. No production performance winner.',compile_stopped_candidates=['F12: no numerical or latency measurement','P28 initial compile-only preflight: missing read-to-reuse hardware fence, superseded before device execution','P43 initial host descriptor preflight: invalid256Bfast box, no matrix invocation','P45 initial syntax compile-only preflight: no candidate binary/device execution'],candidates=candidates,numerical_models=models,
+    working_candidate=current,working_global_candidate=global_current,compact_pow2_equivalence_cases=1048576,retained_global_candidate='p51 ordinary and Graph research reference, own ordinary/Graph78, fresh12-pattern stress144/1152calls, scoped tools48/96calls each. p50/p47/p46/p45/p39/p33/p27 remain historical validated fallbacks. No production performance winner.',compile_stopped_candidates=['F12: no numerical or latency measurement','P28 initial compile-only preflight: missing read-to-reuse hardware fence, superseded before device execution','P43 initial host descriptor preflight: invalid256Bfast box, no matrix invocation','P45 initial syntax compile-only preflight: no candidate binary/device execution','P52 initial host ternary compile-only preflight: no binary/device execution, whitespace-only retry subsequently measured'],candidates=candidates,numerical_models=models,
     diagnostic_traces=['F9 role-level, one BF16 uniform case','F11 pack subphases, one BF16 uniform case','P33 warp0 paths,10 cases, zero bitwise differences; other warp records excluded from interpretation'],p38_independent_performance=ordinary38['summary'],p33_phase_trace=trace33,probe_scope='one P5 K128 tile, fresh uniform CPU inputs, two dtypes; not full-call acceptance',
     p20_validation=json.loads((h/'p20_validation.json').read_text()),
     p20_independent_performance=json.loads((h/'p20_abba.json').read_text())['summary'],
@@ -298,7 +314,7 @@ out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved
     p30_independent_performance=ordinary30['summary'],p30_graph_regression=graph30['summary'],
     p33_validation=json.loads((h/'p33_validation.json').read_text()),
     p40_p42_local_controls=local_controls,m11_numerical_screen=m11_summary,m12_numerical_screen=m12_summary,m13_numerical_screen=m13_summary,m14_numerical_screen=m14_summary,
-    native_pack_controls=native_pack_controls,
+    native_pack_controls=native_pack_controls,p52_consumer_control=consumer52,p53_prepared_proposal=proposal53,
     p48_independent_performance=ordinary48['summary'],p48_graph_performance=graph48['summary'],p48_device_identity=static48,
     p47_pack_bits=pack47,p47_validation=validation47,p47_independent_performance=ordinary47['summary'],p47_graph_performance=graph47['summary'],
     p46_validation=validation46,p46_independent_performance=ordinary46['summary'],p46_graph_performance=graph46['summary'],
@@ -306,7 +322,7 @@ out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved
     p39_validation=validation39,p39_independent_performance=ordinary39['summary'],p39_graph_performance=graph39['summary'],
     requantized_hardware=json.loads((h/'requantized_hardware.json').read_text()),
     uniform_scale_ablation=json.loads((h/'uniform_ablation.json').read_text()),
-    validations_not_transferred='P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11/M12/M13/M14 are numerical only. P43 owns fresh9-pattern108/864stress without tools/independent Graph timing; P44 ordinaryABBA only. P45 owns ordinary/Graph78, fresh108/864stress and36/72tools; P46 owns its independent ordinary/GraphABBA, fresh108/864stress and36/72tools; P47 owns independent ordinary/GraphABBA, fresh108/864stress,36/72tools and separate54configurations of full native plane/exponent bit comparisons; P48 has only ordinary/GraphABBA and matching device code, no fresh stress/tools and is rejected; P49 has own ordinary/Graph ABBA and54fresh packing configurations but is rejected, no fresh stress/tools; P50 owns ordinary/Graph ABBA,54fresh packing configurations plus18edge packing configurations, fresh12-pattern144/1152stress and48/96tools per tool; P51 owns ordinary/Graph ABBA,54fresh packing configurations plus18edge32K packing configurations, fresh12-pattern144/1152stress and48/96tools per tool; none transfers to later changes.',
+    validations_not_transferred='P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11/M12/M13/M14 are numerical only. P43 owns fresh9-pattern108/864stress without tools/independent Graph timing; P44 ordinaryABBA only. P45 owns ordinary/Graph78, fresh108/864stress and36/72tools; P46 owns its independent ordinary/GraphABBA, fresh108/864stress and36/72tools; P47 owns independent ordinary/GraphABBA, fresh108/864stress,36/72tools and separate54configurations of full native plane/exponent bit comparisons; P48 has only ordinary/GraphABBA and matching device code, no fresh stress/tools and is rejected; P49 has own ordinary/Graph ABBA and54fresh packing configurations but is rejected, no fresh stress/tools; P50 owns ordinary/Graph ABBA,54fresh packing configurations plus18edge packing configurations, fresh12-pattern144/1152stress and48/96tools per tool; P51 owns ordinary/Graph ABBA,54fresh packing configurations plus18edge32K packing configurations, fresh12-pattern144/1152stress and48/96tools per tool; P52 owns six synthetic pre-MMA layouts, ordinary78 and independent ordinary/GraphABBA312 each plus ownprofile; rejected, no own fresh stress/tools. P53 only CPU prepared proposal/recombination model; none transfers to later changes.',
     remaining='Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration.')
 native=json.loads((r.parent/'fused_native/audit.json').read_text())
 assert native['goal_achieved']==False and native['production_unchanged'] and native['retained_candidate']=='P51'

@@ -1,0 +1,191 @@
+==WARNING== Note: Running with uncontrolled GPU caches. Profiling results may be inconsistent.
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 2082824 (/share/home/liuyao/workspace/MegaFMM/research/precision_20261016/int8_hardware/bin/compare_p52)
+==PROF== Profiling "void int8_research::preprocess_cooperative_columns<cutlass::bfloat16_t>(const T1 *, const T1 *, T1 *, T1 *, T1 *, T1 *, int *, int *, int *, float *)": 0%....50%....100% - 17 passes
+==PROF== Profiling "void int8_research::corrected<cutlass::bfloat16_t>(CUtensorMap_st, CUtensorMap_st, const int *, const int *, float *)": 0%....50%....100% - 17 passes
+COOPERATIVE_INIT dtype=fp16 supported=1 sm_count=132 active_blocks_per_sm=3 grid=384 shared_bytes=65536
+COOPERATIVE_INIT dtype=bf16 supported=1 sm_count=132 active_blocks_per_sm=3 grid=384 shared_bytes=65536
+CONSUMER_INIT dtype=bf16 sm_count=132 active_blocks_per_sm=2 grid=256 shared_bytes=82048
+CONSUMER_INIT dtype=fp16 sm_count=132 active_blocks_per_sm=2 grid=256 shared_bytes=82048
+NATIVE_CORRECTION dtype=bf16 pattern=0 trial=0 stream=0 low_scale_power=8 diagnostic_only=1
+INSIDE_EQUAL dtype=bf16 pattern=0 trial=0 elements=1024 errors=0
+CHECK dtype=bf16 balance=1 graph=0 pattern=0 trial=0 dense_ef=2.37201278804e-07 corrected_ef=7.12452019935e-06 gate=0.00100071160384 nonfinite=0 pass=1
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=0 method=0 us=75.819198608
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=0 method=1 us=63.485759735
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=0 method=2 us=34.565120697
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=0 method=3 us=65.296638489
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=1 method=3 us=66.500801086
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=1 method=2 us=32.379199982
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=1 method=1 us=61.729923248
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=1 method=0 us=67.694404602
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=2 method=3 us=63.804798126
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=2 method=2 us=30.327999115
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=2 method=1 us=68.199356079
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=2 method=0 us=68.249603271
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=3 method=0 us=64.676483154
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=3 method=1 us=60.899520874
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=3 method=2 us=36.138881683
+TIME dtype=bf16 balance=1 graph=0 group=0 arm=3 method=3 us=62.399360657
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=0 method=0 us=69.158081055
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=0 method=1 us=60.050559998
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=0 method=2 us=31.147840500
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=0 method=3 us=62.905597687
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=1 method=3 us=61.226558685
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=1 method=2 us=31.363521576
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=1 method=1 us=62.546237946
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=1 method=0 us=70.980155945
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=2 method=3 us=64.723518372
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=2 method=2 us=31.129920959
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=2 method=1 us=65.128959656
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=2 method=0 us=67.434555054
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=3 method=0 us=67.525436401
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=3 method=1 us=64.137603760
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=3 method=2 us=39.336639404
+TIME dtype=bf16 balance=1 graph=0 group=1 arm=3 method=3 us=57.271999359
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=0 method=0 us=66.454399109
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=0 method=1 us=61.647682190
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=0 method=2 us=32.147201538
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=0 method=3 us=64.564163208
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=1 method=3 us=68.131195068
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=1 method=2 us=32.723518372
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=1 method=1 us=67.532798767
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=1 method=0 us=73.002883911
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=2 method=3 us=62.567359924
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=2 method=2 us=31.309759140
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=2 method=1 us=68.472640991
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=2 method=0 us=71.978561401
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=3 method=0 us=71.115196228
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=3 method=1 us=66.882240295
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=3 method=2 us=33.063358307
+TIME dtype=bf16 balance=1 graph=0 group=2 arm=3 method=3 us=66.778877258
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=0 method=0 us=68.694084167
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=0 method=1 us=77.616958618
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=0 method=2 us=30.790081024
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=0 method=3 us=61.993598938
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=1 method=3 us=63.841918945
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=1 method=2 us=32.111999512
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=1 method=1 us=65.719680786
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=1 method=0 us=71.913917542
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=2 method=3 us=66.476478577
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=2 method=2 us=33.912002563
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=2 method=1 us=65.847038269
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=2 method=0 us=66.970878601
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=3 method=0 us=69.568321228
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=3 method=1 us=71.419517517
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=3 method=2 us=33.609920502
+TIME dtype=bf16 balance=1 graph=0 group=3 arm=3 method=3 us=81.608963013
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=0 method=0 us=67.675201416
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=0 method=1 us=65.624641418
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=0 method=2 us=32.561599731
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=0 method=3 us=65.055679321
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=1 method=3 us=67.939521790
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=1 method=2 us=35.140159607
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=1 method=1 us=67.397125244
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=1 method=0 us=68.352317810
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=2 method=3 us=65.706237793
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=2 method=2 us=33.640319824
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=2 method=1 us=69.773117065
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=2 method=0 us=69.893440247
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=3 method=0 us=72.272323608
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=3 method=1 us=65.883522034
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=3 method=2 us=32.909439087
+TIME dtype=bf16 balance=1 graph=0 group=4 arm=3 method=3 us=64.840637207
+COMPONENT dtype=bf16 balance=1 preprocess_us=55.113922119 diagnostic_only=1
+PREP_STAGE dtype=bf16 balance=1 stage=0 us=27.723199844 diagnostic_only=1
+PREP_STAGE dtype=bf16 balance=1 stage=1 us=29.227519989 diagnostic_only=1
+PREP_STAGE dtype=bf16 balance=1 stage=2 us=28.727039337 diagnostic_only=1
+PREP_STAGE dtype=bf16 balance=1 stage=3 us=30.176959991 diagnostic_only=1
+NATIVE_CORRECTION dtype=bf16 pattern=-1 trial=-1 stream=0 low_scale_power=8 diagnostic_only=1
+SUMMARY dtype=bf16 balance=1 checks=1 failures=0
+NATIVE_CORRECTION dtype=fp16 pattern=0 trial=0 stream=0 low_scale_power=11 diagnostic_only=1
+INSIDE_EQUAL dtype=fp16 pattern=0 trial=0 elements=1024 errors=0
+CHECK dtype=fp16 balance=1 graph=0 pattern=0 trial=0 dense_ef=1.24831814298e-06 corrected_ef=7.49128704274e-07 gate=0.000103744954429 nonfinite=0 pass=1
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=0 method=0 us=38.162559509
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=0 method=1 us=67.097923279
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=0 method=2 us=37.012161255
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=0 method=3 us=70.804801941
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=1 method=3 us=71.943359375
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=1 method=2 us=35.402240753
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=1 method=1 us=70.326080322
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=1 method=0 us=38.960319519
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=2 method=3 us=71.657279968
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=2 method=2 us=37.873920441
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=2 method=1 us=72.031036377
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=2 method=0 us=38.126079559
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=3 method=0 us=40.816001892
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=3 method=1 us=69.067520142
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=3 method=2 us=39.854400635
+TIME dtype=fp16 balance=1 graph=0 group=0 arm=3 method=3 us=65.864318848
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=0 method=0 us=41.719360352
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=0 method=1 us=70.116165161
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=0 method=2 us=35.746238708
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=0 method=3 us=70.575683594
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=1 method=3 us=67.622077942
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=1 method=2 us=36.472640991
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=1 method=1 us=71.119041443
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=1 method=0 us=40.437759399
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=2 method=3 us=66.715522766
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=2 method=2 us=36.654720306
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=2 method=1 us=67.867843628
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=2 method=0 us=37.755519867
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=3 method=0 us=37.270721436
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=3 method=1 us=72.302398682
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=3 method=2 us=32.742080688
+TIME dtype=fp16 balance=1 graph=0 group=1 arm=3 method=3 us=66.963836670
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=0 method=0 us=39.312000275
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=0 method=1 us=67.031997681
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=0 method=2 us=38.044799805
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=0 method=3 us=69.903999329
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=1 method=3 us=68.312637329
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=1 method=2 us=32.815681458
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=1 method=1 us=68.695999146
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=1 method=0 us=43.902076721
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=2 method=3 us=64.199043274
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=2 method=2 us=34.729919434
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=2 method=1 us=66.786560059
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=2 method=0 us=37.861759186
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=3 method=0 us=39.498561859
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=3 method=1 us=74.624320984
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=3 method=2 us=30.627840042
+TIME dtype=fp16 balance=1 graph=0 group=2 arm=3 method=3 us=64.807357788
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=0 method=0 us=37.944641113
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=0 method=1 us=67.843521118
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=0 method=2 us=32.388160706
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=0 method=3 us=65.800315857
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=1 method=3 us=74.447357178
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=1 method=2 us=31.690559387
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=1 method=1 us=66.997764587
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=1 method=0 us=39.001602173
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=2 method=3 us=65.929275513
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=2 method=2 us=36.369281769
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=2 method=1 us=65.690879822
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=2 method=0 us=37.399360657
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=3 method=0 us=48.057598114
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=3 method=1 us=62.742080688
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=3 method=2 us=31.268798828
+TIME dtype=fp16 balance=1 graph=0 group=3 arm=3 method=3 us=55.490879059
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=0 method=0 us=37.165439606
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=0 method=1 us=64.037117004
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=0 method=2 us=28.932479858
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=0 method=3 us=76.110084534
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=1 method=3 us=58.681278229
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=1 method=2 us=30.971519470
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=1 method=1 us=63.286079407
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=1 method=0 us=35.889598846
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=2 method=3 us=58.226242065
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=2 method=2 us=32.438720703
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=2 method=1 us=60.862716675
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=2 method=0 us=35.081920624
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=3 method=0 us=34.514881134
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=3 method=1 us=62.381759644
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=3 method=2 us=31.446079254
+TIME dtype=fp16 balance=1 graph=0 group=4 arm=3 method=3 us=57.940158844
+COMPONENT dtype=fp16 balance=1 preprocess_us=30.446399689 diagnostic_only=1
+PREP_STAGE dtype=fp16 balance=1 stage=0 us=26.347200394 diagnostic_only=1
+PREP_STAGE dtype=fp16 balance=1 stage=1 us=27.726079941 diagnostic_only=1
+PREP_STAGE dtype=fp16 balance=1 stage=2 us=27.222080231 diagnostic_only=1
+PREP_STAGE dtype=fp16 balance=1 stage=3 us=28.256320953 diagnostic_only=1
+NATIVE_CORRECTION dtype=fp16 pattern=-1 trial=-1 stream=0 low_scale_power=11 diagnostic_only=1
+SUMMARY dtype=fp16 balance=1 checks=1 failures=0
+==PROF== Disconnected from process 2082824
+==PROF== Report: /share/home/liuyao/workspace/MegaFMM/research/precision_20261016/int8_hardware/ncu/profile_p52.ncu-rep

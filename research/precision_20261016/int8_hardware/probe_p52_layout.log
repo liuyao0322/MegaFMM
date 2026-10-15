@@ -1,0 +1,10 @@
+COOPERATIVE_INIT dtype=fp16 supported=1 sm_count=132 active_blocks_per_sm=3 grid=384 shared_bytes=65536
+COOPERATIVE_INIT dtype=bf16 supported=1 sm_count=132 active_blocks_per_sm=3 grid=384 shared_bytes=65536
+CONSUMER_INIT dtype=bf16 sm_count=132 active_blocks_per_sm=2 grid=256 shared_bytes=82048
+CONSUMER_INIT dtype=fp16 sm_count=132 active_blocks_per_sm=2 grid=256 shared_bytes=82048
+CONSUMER_LAYOUT dtype=bf16 trial=0 seed=114067 ctas=256 sequences=28 slots=2 native_comparisons=115343360 a_errors=0 b_errors=0 shared_guard_errors=0 coverage_errors=0 workspace_guard_errors=0 pass=1
+CONSUMER_LAYOUT dtype=bf16 trial=1 seed=114500 ctas=256 sequences=28 slots=2 native_comparisons=115343360 a_errors=0 b_errors=0 shared_guard_errors=0 coverage_errors=0 workspace_guard_errors=0 pass=1
+CONSUMER_LAYOUT dtype=bf16 trial=2 seed=114933 ctas=256 sequences=28 slots=2 native_comparisons=115343360 a_errors=0 b_errors=0 shared_guard_errors=0 coverage_errors=0 workspace_guard_errors=0 pass=1
+CONSUMER_LAYOUT dtype=fp16 trial=0 seed=114294 ctas=256 sequences=28 slots=2 native_comparisons=115343360 a_errors=0 b_errors=0 shared_guard_errors=0 coverage_errors=0 workspace_guard_errors=0 pass=1
+CONSUMER_LAYOUT dtype=fp16 trial=1 seed=114727 ctas=256 sequences=28 slots=2 native_comparisons=115343360 a_errors=0 b_errors=0 shared_guard_errors=0 coverage_errors=0 workspace_guard_errors=0 pass=1
+CONSUMER_LAYOUT dtype=fp16 trial=2 seed=115160 ctas=256 sequences=28 slots=2 native_comparisons=115343360 a_errors=0 b_errors=0 shared_guard_errors=0 coverage_errors=0 workspace_guard_errors=0 pass=1

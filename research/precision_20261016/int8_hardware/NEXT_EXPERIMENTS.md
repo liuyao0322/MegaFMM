@@ -139,3 +139,26 @@ actualresidentcapacitymandatory, Bfactorlane%4 andcomponentdiagnosticgrids
 128A/256Brequiredforbounds/coverage. Consumer/pow2byteexactP50. IsolatedCPU
 generationonly atthischeckpoint; own54freshbit+18edge32Kpackingchecks mustpass
 beforefirstP51MMA. NoP51speed/precision/toolclaim orcertificate transfer.
+
+
+## P52 rejected; P53 premeasurement full-leaf parallelism
+
+P51 is the fully validated retained research reference. P52's own nativeN16
+layout/78originalgates pass, actual95registers/82048B/twoCTAperSM, yet independent
+ordinary/Graph calls regress41–42percent to~39us. Own two-kernelNCU/profile and
+all failure scope are inCONSUMER_N16_HARDWARE.md; no freshstress/tools. Restored
+four P51 sources/binary exactly and own new-process78gates passed.
+
+After P50/P51/P52 sub3percent results, reviewed ownP52profile, frozenhistory and
+fresh primary CUDA12.4 occupancy/stream-ordering plus PTX8.7WGMMA requirements.
+LEAF_PARALLEL_DESIGN.md prepares P53: preserve64x32/fullK512/nativep11p8/all15dots,
+oneleafperCTA,grid896,two49152Bslots,Shared98432B; append7MiBleafworkspace and
+same-streamFP32recombine, allthree kernels/costs in ordinary and Graph timing.
+ScalarCPU RN dependency model1048576bitchecks0errors with changed-order negative
+control34042differences. IsolatedCPUgenerator checks only; no P53 hardware claim.
+Own six newly seeded pre-MMA layouts/all896CTAs/four-sequence reuse, seven-plane
+coordinate coverage/guards and GPU recombination-vs-independentCPU oracle must
+pass before any new MMA. Then originalgates/exactinside/independent ordinary+
+GraphABBA; if retained, own new12pattern dualstream/guards/scopedthree tools.
+More occupancy is not guaranteed speed; source payload counts are not physical
+traffic, no floor established. Production/library unchanged, goalactive.

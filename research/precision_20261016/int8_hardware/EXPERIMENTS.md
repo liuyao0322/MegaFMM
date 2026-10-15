@@ -762,3 +762,47 @@ P52CONSUMER_N16_DESIGN.md/generate_consumer_n16.py preparedonly, isolatedCPU
 proposalkeepspack/compare/pow2byteexactP51; consumer64x16,2actual40960Bslots,
 82048BShared,grid256. OwnpreMMAlayout/TMAslotreusecheckmandatorybeforeanynew
 MMA. NoP52sourceapplication/build/measurement/certificate transfer.
+
+
+## P52 — native64x16 consumer/two actual TMA slots, premeasurement
+
+Applied frozenCONSUMER_N16_DESIGN.md/generator byteexactCPUexpectedhashes after
+P51completeacceptance. Onlycorrected.cuh changes: eightFP32values/fragment,
+2actual40960Bslots/82048BShared,grid256; unchangedproducer/compare/pow2,
+all15dots/nativep11p8/recombination/inside. OwnpreMMA syntheticTMA/layout
+probe coversbothdtypes,256CTAs*28sequences,verbatimTMAproducer,explicitgeneric
+readcurrent-slotretirement(noMMA),allrequiredhigh/lowbytes,outputcoordinate
+bijection/shared+workspace/outputguards. Compiling now; noP52MMAexecuted.
+
+P52 initial layoutprobe compile-only exit2 at host log_consumer_capacity's
+unspacedstd::is_same_v ternary. No candidatebinary/device/MMA execution.
+preflight_p52_01 preservesfourinitialsources/probe/buildlog/driver/original
+sourcehashmanifest(historicalpaths),p52_preflight_manifest resolvesarchivalpaths.
+Retrygenerator wrapsoriginalfrozengenerator, changingonlywhitespaceinhostternary;
+workingandfrozenP52resnapshot/sourceMFbeforebuildretry, no algorithm/layoutchange.
+
+P52 ownpre-MMA sixsyntheticconfigurations/all256CTAs/28sequences/twoslotreuse
+pass692060160uint16 comparisons includingCTAreuse,6291456outputcoordinates,
+zeroerrors/shared+workspace+outputguards.5767168uniquevalues/case; genericreads
+retirecurrentslotwithoutMMA, notWGMMAwait-ordercertificate. Standard78/79872
+pass, printedpercaseeFmatchesP51;95consumerregs,prep52/48regs,0stack/spill,
+noC7515/C7510,actual2CTA/SM82048B. Independentordinary BF16/FP16 P51->P52
+27.396560/27.492361->38.779400/39.038881us (-41.548/-41.999percent reduction),
+Graph27.612560/27.634480->39.062480/39.006280us (-41.466/-41.151percent).
+Eachmode312originalgates/319488expspass, unlocked/noCI. RejectP52; noownfresh
+dualstream/sanitizeracceptance. OwnfirstbalancedBF16NCU17passes/kernelprep
+16.832us/52regs/65536B/sharedlimit3;consumer29.376us/95regs/82048B/shared+reg
+limit2/issue32.668724percent,both0localRW. Profilertimingsexcluded. Nominal
+TMAwholegridpayloadratio5/3versusP51, notmeasuredphysicaltraffic; shape/ring/
+reusechangeconfounded,no uniqueattribution/floor. RestoredfourP51sourcesfrom
+2a1ae63 andbinbyteexactP51;ownnewprocess78/79872pass. Auditp52_hardware.py
+andp52_hardware_manifest.jsonfreezecompleteownscope.
+
+AfterP50/P51/P52sub3percent,reviewedownP52profile+failurehistory andfresh
+CUDA12.4occupancy/block/streamorderingandPTX8.7WGMMA primarysourcesbeforeP53.
+LEAF_PARALLEL_DESIGN.md preparesgrid896/fullK512oneleafCTA/N32/twoslot98432B,
+all7+8dotsandoriginalinput/RN/insideunchanged,append7MiBFP32leafworkspace
+andsame-streamrecombine. Allthree kernelsmustcountinfullordinary/Graphcost.
+CPUscalarRNmodelseed117089262144leaftuples1048576bitchecks0errors; changed
+ordernegativecontrol34042differences. IsolatedCPUgeneratedproposalonly;
+ownpre-MMAlayoutandGPUrecombineprobesmandatory,nocertificatetransfer.

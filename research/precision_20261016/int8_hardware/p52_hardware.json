@@ -1,0 +1,636 @@
+{
+  "candidate": "P52",
+  "goal_achieved": false,
+  "performance_accepted": false,
+  "retained": "P51",
+  "ordinary_original_fp64_checks": 78,
+  "equal_inside_exponents": 79872,
+  "independent_checks_per_mode": 312,
+  "independent_exact_exponents_per_mode": 319488,
+  "printed_per_case_ef_matches_p51": true,
+  "full_output_bit_equality_proven": false,
+  "layout": {
+    "scope": "Pre-MMA only, six own synthetic plane-distinguishing configurations: low index16bits, upper indexbits, fresh hasheduint16. Both native dtypes, all256CTAs/28sequences/two-slot reuse; every loaded high/required-low value plus output-coordinate bijection and shared/workspace/output guards. Candidate TMA producer copied verbatim; generic reads retire current slot without executing any MMA, so this is not a WGMMA wait-order, matrix, performance or sanitizer certificate.",
+    "configurations": 6,
+    "native_uint16_comparisons_including_cta_reuse": 692060160,
+    "unique_workspace_native_values_per_configuration": 5767168,
+    "bit_errors": 0,
+    "output_coordinate_checks": 6291456,
+    "consumer_runtime_capacity": [
+      {
+        "dtype": "bf16",
+        "sm_count": "132",
+        "active_blocks_per_sm": "2",
+        "grid": "256",
+        "shared_bytes": "82048"
+      },
+      {
+        "dtype": "fp16",
+        "sm_count": "132",
+        "active_blocks_per_sm": "2",
+        "grid": "256",
+        "shared_bytes": "82048"
+      }
+    ],
+    "rows": [
+      {
+        "dtype": "bf16",
+        "trial": "0",
+        "seed": "114067",
+        "ctas": "256",
+        "sequences": "28",
+        "slots": "2",
+        "native_comparisons": "115343360",
+        "a_errors": "0",
+        "b_errors": "0",
+        "shared_guard_errors": "0",
+        "coverage_errors": "0",
+        "workspace_guard_errors": "0",
+        "pass": "1"
+      },
+      {
+        "dtype": "bf16",
+        "trial": "1",
+        "seed": "114500",
+        "ctas": "256",
+        "sequences": "28",
+        "slots": "2",
+        "native_comparisons": "115343360",
+        "a_errors": "0",
+        "b_errors": "0",
+        "shared_guard_errors": "0",
+        "coverage_errors": "0",
+        "workspace_guard_errors": "0",
+        "pass": "1"
+      },
+      {
+        "dtype": "bf16",
+        "trial": "2",
+        "seed": "114933",
+        "ctas": "256",
+        "sequences": "28",
+        "slots": "2",
+        "native_comparisons": "115343360",
+        "a_errors": "0",
+        "b_errors": "0",
+        "shared_guard_errors": "0",
+        "coverage_errors": "0",
+        "workspace_guard_errors": "0",
+        "pass": "1"
+      },
+      {
+        "dtype": "fp16",
+        "trial": "0",
+        "seed": "114294",
+        "ctas": "256",
+        "sequences": "28",
+        "slots": "2",
+        "native_comparisons": "115343360",
+        "a_errors": "0",
+        "b_errors": "0",
+        "shared_guard_errors": "0",
+        "coverage_errors": "0",
+        "workspace_guard_errors": "0",
+        "pass": "1"
+      },
+      {
+        "dtype": "fp16",
+        "trial": "1",
+        "seed": "114727",
+        "ctas": "256",
+        "sequences": "28",
+        "slots": "2",
+        "native_comparisons": "115343360",
+        "a_errors": "0",
+        "b_errors": "0",
+        "shared_guard_errors": "0",
+        "coverage_errors": "0",
+        "workspace_guard_errors": "0",
+        "pass": "1"
+      },
+      {
+        "dtype": "fp16",
+        "trial": "2",
+        "seed": "115160",
+        "ctas": "256",
+        "sequences": "28",
+        "slots": "2",
+        "native_comparisons": "115343360",
+        "a_errors": "0",
+        "b_errors": "0",
+        "shared_guard_errors": "0",
+        "coverage_errors": "0",
+        "workspace_guard_errors": "0",
+        "pass": "1"
+      }
+    ]
+  },
+  "performance": {
+    "ordinary": [
+      {
+        "dtype": "bf16",
+        "old_candidate": "p51",
+        "new_candidate": "p52",
+        "old_group_median_us": 27.3965599535,
+        "new_group_median_us": 38.779400348625,
+        "relative_reduction": -0.4154842949058213
+      },
+      {
+        "dtype": "fp16",
+        "old_candidate": "p51",
+        "new_candidate": "p52",
+        "old_group_median_us": 27.492360591875,
+        "new_group_median_us": 39.038880825125005,
+        "relative_reduction": -0.4199901348835948
+      }
+    ],
+    "graph": [
+      {
+        "dtype": "bf16",
+        "old_candidate": "p51",
+        "new_candidate": "p52",
+        "old_group_median_us": 27.612559795375,
+        "new_group_median_us": 39.06247997275,
+        "relative_reduction": -0.4146634814818153
+      },
+      {
+        "dtype": "fp16",
+        "old_candidate": "p51",
+        "new_candidate": "p52",
+        "old_group_median_us": 27.634480476500002,
+        "new_group_median_us": 39.00627994525,
+        "relative_reduction": -0.4115076264386597
+      }
+    ]
+  },
+  "own_profile": {
+    "scope": "first two balanced BF16 P52 full kernels, frozen full comparison --quick; all profiler-process timing arms excluded from ordinary performance",
+    "kernels": [
+      {
+        "Kernel Name": {
+          "value": "void preprocess_cooperative_columns<bfloat16_t>(const T1 *, const T1 *, T1 *, T1 *, T1 *, T1 *, int *, int *, int *, float *)",
+          "unit": ""
+        },
+        "gpu__time_duration.sum": {
+          "value": "16.832000",
+          "unit": "us"
+        },
+        "launch__registers_per_thread": {
+          "value": "52",
+          "unit": "register/thread"
+        },
+        "launch__shared_mem_per_block_static": {
+          "value": "0",
+          "unit": "byte/block"
+        },
+        "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+          "value": "14.638310",
+          "unit": "%"
+        },
+        "dram__bytes.sum": {
+          "value": "6.093824",
+          "unit": "Mbyte"
+        },
+        "lts__t_sectors_op_read.sum": {
+          "value": "336603.000000",
+          "unit": "sector"
+        },
+        "lts__t_sectors_op_write.sum": {
+          "value": "541183.000000",
+          "unit": "sector"
+        },
+        "l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum": {
+          "value": "0",
+          "unit": "sector"
+        },
+        "l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum": {
+          "value": "0",
+          "unit": "sector"
+        },
+        "smsp__average_warps_issue_stalled_barrier_per_issue_active.ratio": {
+          "value": "17.649753",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_branch_resolving_per_issue_active.ratio": {
+          "value": "0.445715",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_dispatch_stall_per_issue_active.ratio": {
+          "value": "0.210732",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_drain_per_issue_active.ratio": {
+          "value": "0.320984",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_gmma_per_issue_active.ratio": {
+          "value": "0.000000",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_imc_miss_per_issue_active.ratio": {
+          "value": "1.314374",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_lg_throttle_per_issue_active.ratio": {
+          "value": "1.045312",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+          "value": "9.193682",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_math_pipe_throttle_per_issue_active.ratio": {
+          "value": "0.181351",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_membar_per_issue_active.ratio": {
+          "value": "0.187993",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio": {
+          "value": "0.433932",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_misc_per_issue_active.ratio": {
+          "value": "0.017497",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_no_instruction_per_issue_active.ratio": {
+          "value": "0.198115",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_not_selected_per_issue_active.ratio": {
+          "value": "0.615091",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_selected_per_issue_active.ratio": {
+          "value": "1.000878",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio": {
+          "value": "0.246523",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_sleeping_per_issue_active.ratio": {
+          "value": "0.000000",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_tex_throttle_per_issue_active.ratio": {
+          "value": "0",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_wait_per_issue_active.ratio": {
+          "value": "1.453452",
+          "unit": "inst"
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.avg": {
+          "value": "11.83",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.max": {
+          "value": "56",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.min": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": {
+          "value": "1562",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.avg": {
+          "value": "0.45",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.max": {
+          "value": "3",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.min": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": {
+          "value": "59",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.avg": {
+          "value": "20.56",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.max": {
+          "value": "83",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.min": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": {
+          "value": "2714",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.avg": {
+          "value": "15.96",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.max": {
+          "value": "51",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.min": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": {
+          "value": "2107",
+          "unit": ""
+        },
+        "launch__block_size": {
+          "value": "256",
+          "unit": ""
+        },
+        "launch__grid_size": {
+          "value": "384",
+          "unit": ""
+        },
+        "launch__occupancy_limit_barriers": {
+          "value": "32.000000",
+          "unit": "block"
+        },
+        "launch__occupancy_limit_blocks": {
+          "value": "32.000000",
+          "unit": "block"
+        },
+        "launch__occupancy_limit_registers": {
+          "value": "4.000000",
+          "unit": "block"
+        },
+        "launch__occupancy_limit_shared_mem": {
+          "value": "3.000000",
+          "unit": "block"
+        },
+        "launch__occupancy_limit_warps": {
+          "value": "8.000000",
+          "unit": "block"
+        },
+        "launch__shared_mem_per_block_allocated": {
+          "value": "66.560000",
+          "unit": "Kbyte/block"
+        },
+        "launch__shared_mem_per_block_driver": {
+          "value": "1.024000",
+          "unit": "Kbyte/block"
+        },
+        "launch__shared_mem_per_block_dynamic": {
+          "value": "65.536000",
+          "unit": "Kbyte/block"
+        },
+        "launch__waves_per_multiprocessor": {
+          "value": "0.97",
+          "unit": ""
+        }
+      },
+      {
+        "Kernel Name": {
+          "value": "void corrected<bfloat16_t>(CUtensorMap_st, CUtensorMap_st, const int *, const int *, float *)",
+          "unit": ""
+        },
+        "gpu__time_duration.sum": {
+          "value": "29.376000",
+          "unit": "us"
+        },
+        "launch__registers_per_thread": {
+          "value": "95",
+          "unit": "register/thread"
+        },
+        "launch__shared_mem_per_block_static": {
+          "value": "0",
+          "unit": "byte/block"
+        },
+        "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+          "value": "32.668724",
+          "unit": "%"
+        },
+        "dram__bytes.sum": {
+          "value": "12.494336",
+          "unit": "Mbyte"
+        },
+        "lts__t_sectors_op_read.sum": {
+          "value": "4913073.000000",
+          "unit": "sector"
+        },
+        "lts__t_sectors_op_write.sum": {
+          "value": "197211.000000",
+          "unit": "sector"
+        },
+        "l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum": {
+          "value": "0",
+          "unit": "sector"
+        },
+        "l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum": {
+          "value": "0",
+          "unit": "sector"
+        },
+        "smsp__average_warps_issue_stalled_barrier_per_issue_active.ratio": {
+          "value": "0.143158",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_branch_resolving_per_issue_active.ratio": {
+          "value": "0.093050",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_dispatch_stall_per_issue_active.ratio": {
+          "value": "0.095527",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_drain_per_issue_active.ratio": {
+          "value": "0.075632",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_gmma_per_issue_active.ratio": {
+          "value": "0.096988",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_imc_miss_per_issue_active.ratio": {
+          "value": "0.000000",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_lg_throttle_per_issue_active.ratio": {
+          "value": "0.028436",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+          "value": "3.676857",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_math_pipe_throttle_per_issue_active.ratio": {
+          "value": "0.115084",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_membar_per_issue_active.ratio": {
+          "value": "0.000000",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio": {
+          "value": "0.016657",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_misc_per_issue_active.ratio": {
+          "value": "0.000252",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_no_instruction_per_issue_active.ratio": {
+          "value": "0.060256",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_not_selected_per_issue_active.ratio": {
+          "value": "0.174942",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_selected_per_issue_active.ratio": {
+          "value": "1.000000",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio": {
+          "value": "0.082769",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_sleeping_per_issue_active.ratio": {
+          "value": "0.018925",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_tex_throttle_per_issue_active.ratio": {
+          "value": "0",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_wait_per_issue_active.ratio": {
+          "value": "1.701295",
+          "unit": "inst"
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.avg": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.max": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.min": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.avg": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.max": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.min": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.avg": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.max": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.min": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.avg": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.max": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.min": {
+          "value": "0",
+          "unit": ""
+        },
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": {
+          "value": "0",
+          "unit": ""
+        },
+        "launch__block_size": {
+          "value": "256",
+          "unit": ""
+        },
+        "launch__grid_size": {
+          "value": "256",
+          "unit": ""
+        },
+        "launch__occupancy_limit_barriers": {
+          "value": "32.000000",
+          "unit": "block"
+        },
+        "launch__occupancy_limit_blocks": {
+          "value": "32.000000",
+          "unit": "block"
+        },
+        "launch__occupancy_limit_registers": {
+          "value": "2.000000",
+          "unit": "block"
+        },
+        "launch__occupancy_limit_shared_mem": {
+          "value": "2.000000",
+          "unit": "block"
+        },
+        "launch__occupancy_limit_warps": {
+          "value": "8.000000",
+          "unit": "block"
+        },
+        "launch__shared_mem_per_block_allocated": {
+          "value": "83.072000",
+          "unit": "Kbyte/block"
+        },
+        "launch__shared_mem_per_block_driver": {
+          "value": "1.024000",
+          "unit": "Kbyte/block"
+        },
+        "launch__shared_mem_per_block_dynamic": {
+          "value": "82.048000",
+          "unit": "Kbyte/block"
+        },
+        "launch__waves_per_multiprocessor": {
+          "value": "0.97",
+          "unit": ""
+        }
+      }
+    ]
+  },
+  "fresh_stream_guard_acceptance": false,
+  "sanitizer_acceptance": false,
+  "preflight": "Initial host-print ternary compile failed2, no binary/device execution; spaced ternary retry succeeds, arithmetic/TMA unchanged. Original proposal and archival source/log hashes preserved.",
+  "nominal_transfer": {
+    "p51_bytes_per_cta": 1081344,
+    "p51_ctas": 128,
+    "p52_bytes_per_cta": 901120,
+    "p52_ctas": 256,
+    "whole_grid_byte_ratio": 1.6666666666666667,
+    "interpretation": "source/TMA box payload count, not measured physical traffic; all mathematical dot work retained. Shape/instruction count, ring depth and byte reuse change together, no unique causal attribution or floor."
+  },
+  "restore": "Four working sources restored from committedP51 and binary copied byte-exact; own fresh process78gates passes",
+  "scope": "contiguous1024^3 alpha1 beta0, original FP16/BF16 inputs/FP32output; originalFP64AB/gates, exact inside, seven main/eightcrossdots; no certificate transfer"
+}

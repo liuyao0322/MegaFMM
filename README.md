@@ -15,7 +15,7 @@ memcheck/racecheck/synccheck限定范围各48配置/96调用零错误，racechec
 未锁时钟，无置信区间；完整调用仍约为生产SW的2.7倍，未进入生产或改变Auto。
 [P51实现与消融](research/precision_20261016/int8_hardware/ALL_NATIVE_PACK_GRID_HARDWARE.md)、[自身验收](research/precision_20261016/int8_hardware/p51_validation.json)、
 [综合审计](research/precision_20261016/fused_int8/audit.json)及[后续消融](research/precision_20261016/int8_hardware/NEXT_EXPERIMENTS.md)保留确切范围与性能差距。
-P48缩小共享申请量未获完整收益。[原生融合N1/N2/N3](research/precision_20261016/fused_native/REPORT.md)各自布局和原始精度通过，完整调用约615/118/105μs，均慢于同轮P47，全部拒绝；没有将其他候选的双流或工具验收转移给它们。下一项[P52计算瓦片与TMA槽位实验](research/precision_20261016/int8_hardware/CONSUMER_N16_DESIGN.md)仅准备方案和生成器，尚未应用或测量。目标继续进行。
+P48缩小共享申请量未获完整收益。[原生融合N1/N2/N3](research/precision_20261016/fused_native/REPORT.md)各自布局和原始精度通过，完整调用约615/118/105μs，均慢于同轮P47，全部拒绝；没有将其他候选的双流或工具验收转移给它们。[P52计算瓦片与TMA槽位实验](research/precision_20261016/int8_hardware/CONSUMER_N16_HARDWARE.md)通过自身布局及78项原始精度，但独立普通/Graph耗时约39μs，比P51慢41%–42%，已拒绝并恢复P51，新进程78项复核通过。下一项[P53全K512叶乘积并行方案](research/precision_20261016/int8_hardware/LEAF_PARALLEL_DESIGN.md)已准备，保持64×32原生计算形状，额外7MiB中间叶结果和独立重组必须计入完整调用；CPU逐位重组模型通过，不构成GPU验收。目标继续进行。
 [片上融合后续](research/precision_20261016/fused_int8/REPORT.md)修正布局后通过72项普通精度；继续移出逐元素缩放判断后，F13完整调用约224–240 μs，仍拒绝性能验收。
 下方 iter282 等标签为历史检查点，实际起点和文件哈希以新报告为准。
 
