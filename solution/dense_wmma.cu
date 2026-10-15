@@ -257,6 +257,53 @@ __global__ __launch_bounds__(128) void even_mma(SmallProblem p,const T* A,const 
   }
 }
 
+template<class T>
+__device__ __forceinline__ uint32_t global_pair(const T* p,int index,bool valid) {
+  return valid?__ldg(reinterpret_cast<const uint32_t*>(p+index)):0;
+}
+// Each warp gathers the native m16n8k16 fragments directly from original input.
+// Four warp shuffles transpose two B register words; no shared staging is used.
+template<class T,int BM,int BN>
+__global__ __launch_bounds__(128) void register_mma(SmallProblem p,const T* A,const T* B,const float* C,float* D) {
+  constexpr int Cols=BN/8;
+  const int lane=threadIdx.x%32,warp=threadIdx.x/32,wm=warp/Cols,wn=warp%Cols;
+  const int r0=int(blockIdx.y)*BM+wm*16,c0=int(blockIdx.x)*BN+wn*8;
+  if(r0>=p.m || c0>=p.n)return; // Whole-warp return; remaining shuffles have32lanes.
+  const int ar=r0+lane/4,ak=(lane%4)*2,bc=c0+(lane%4)*2;
+  const int ai=ar*p.lda+ak,bi=(lane/4)*p.ldb+bc;
+  const bool row0=ar<p.m,row1=ar+8<p.m,column=bc<p.n;
+  const int source=(lane%4)*8+lane/8;
+  const unsigned select=(lane/4)%2?0x7632:0x5410;
+  float acc[4]={0,0,0,0};
+  #pragma unroll 1
+  for(int q=0;q<p.k;q+=16) {
+    const bool k0=q+ak<p.k,k1=q+ak+8<p.k;
+    uint32_t a0=global_pair(A,ai+q,row0&&k0);
+    uint32_t a1=global_pair(A,ai+8*p.lda+q,row1&&k0);
+    uint32_t a2=global_pair(A,ai+q+8,row0&&k1);
+    uint32_t a3=global_pair(A,ai+8*p.lda+q+8,row1&&k1);
+    uint32_t g0=global_pair(B,bi+q*p.ldb,column&&q+lane/4<p.k);
+    uint32_t g1=global_pair(B,bi+(q+8)*p.ldb,column&&q+lane/4+8<p.k);
+    uint32_t low0=__shfl_sync(0xffffffff,g0,source),high0=__shfl_sync(0xffffffff,g0,source+4);
+    uint32_t low1=__shfl_sync(0xffffffff,g1,source),high1=__shfl_sync(0xffffffff,g1,source+4);
+    uint32_t b0=__byte_perm(low0,high0,select),b1=__byte_perm(low1,high1,select);
+    using Mma=std::conditional_t<std::is_same_v<T,__half>,cute::SM80_16x8x16_F32F16F16F32_TN,cute::SM80_16x8x16_F32BF16BF16F32_TN>;
+    Mma::fma(acc[0],acc[1],acc[2],acc[3],a0,a1,a2,a3,b0,b1,acc[0],acc[1],acc[2],acc[3]);
+  }
+  #pragma unroll
+  for(int pair=0;pair<2;++pair) {
+    const int r=r0+lane/4+pair*8,c=c0+(lane%4)*2;
+    if(r<p.m && c<p.n) {
+      float2 value=make_float2(p.alpha*acc[pair*2],p.alpha*acc[pair*2+1]);
+      if(p.beta!=0) {
+        float2 prior=*reinterpret_cast<const float2*>(C+r*p.ldc+c);
+        value.x=fmaf(p.beta,prior.x,value.x);value.y=fmaf(p.beta,prior.y,value.y);
+      }
+      *reinterpret_cast<float2*>(D+r*p.ldd+c)=value;
+    }
+  }
+}
+
 }
 bool wmma_dense(int bk,const Problem& p,const void* A,const void* B,const float* C,float* D,
                  cudaStream_t stream,int operation) {
@@ -295,7 +342,7 @@ bool mma_even_dense(int bk,const Problem& p,const void* A,const void* B,const fl
   SmallProblem q{int(p.m),int(p.n),int(p.k),int(p.lda),int(p.ldb),int(p.ldc),int(p.ldd),p.alpha,p.beta};
   const bool wide=p.k%8==0 && p.n%8==0 && p.lda%8==0 && p.ldb%8==0 &&
        reinterpret_cast<uintptr_t>(A)%16==0 && reinterpret_cast<uintptr_t>(B)%16==0;
-  const int bm=bk==128?16:32,bn=bk==129?16:32;
+  const int bm=(bk==128 || bk==512)?16:32,bn=(bk==129 || bk==513)?16:32;
   dim3 grid(unsigned((p.n+bn-1)/bn),unsigned((p.m+bm-1)/bm));
   #define EVEN_LAUNCH(T,K,M,N,S) do { \
     if(wide)even_mma<T,K,16,M,N,S><<<grid,128,0,stream>>>(q,static_cast<const T*>(A),static_cast<const T*>(B),C,D); \
@@ -308,7 +355,15 @@ bool mma_even_dense(int bk,const Problem& p,const void* A,const void* B,const fl
     else if(bk==32)EVEN_LAUNCH(T,32,32,32,false); \
     else EVEN_LAUNCH(T,64,32,32,false); \
   } while(0)
-  if(p.dtype==DType::BF16)EVEN_DISPATCH(__nv_bfloat16);
+  if(bk==512 || bk==513) {
+    if(p.dtype==DType::BF16) {
+      if(bk==512)register_mma<__nv_bfloat16,16,32><<<grid,128,0,stream>>>(q,static_cast<const __nv_bfloat16*>(A),static_cast<const __nv_bfloat16*>(B),C,D);
+      else register_mma<__nv_bfloat16,32,16><<<grid,128,0,stream>>>(q,static_cast<const __nv_bfloat16*>(A),static_cast<const __nv_bfloat16*>(B),C,D);
+    } else {
+      if(bk==512)register_mma<__half,16,32><<<grid,128,0,stream>>>(q,static_cast<const __half*>(A),static_cast<const __half*>(B),C,D);
+      else register_mma<__half,32,16><<<grid,128,0,stream>>>(q,static_cast<const __half*>(A),static_cast<const __half*>(B),C,D);
+    }
+  } else if(p.dtype==DType::BF16)EVEN_DISPATCH(__nv_bfloat16);
   else EVEN_DISPATCH(__half);
   #undef EVEN_DISPATCH
   #undef EVEN_LAUNCH
