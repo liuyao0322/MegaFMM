@@ -151,6 +151,43 @@ benchmark 会报告实际路径、workspace、原始 FP64 精度和计时；未�
 `scripts/bench.sh <label>` 保留 AKO 的源码快照逻辑；正式迭代记录 `ITERATIONS.md`
 和对应 Git 版本。按用户最新指令持续 AKO4ALL 优化，目标仍在进行；每轮保存失败及有效结果，未通过精度或性能验收不宣布合格 winner。
 
+## 按 M/N/K 实测选优（进行中）
+
+新增显式 `Algorithm::Tuned`，benchmark 参数为 `--algorithm tuned`。Auto 和 Dense 的
+含义保持不变。Tuned 在 Plan 中保存与该问题尺寸、dtype、布局和当前设备对应的选择：
+
+1. 独立调优原有 cuBLASLt 候选池，作为可执行 fallback。
+2. 检查四种 Hopper dense 配置：128×64×64、128×128×64、128×256×64（单 CTA cluster），
+   以及 128×128×64（双 CTA cluster）；输入使用原始 BF16/FP16，FP32 累加和输出。
+3. 小输出（M×N≤4096、K≤256）加入直接 FP32 FMA 候选；非对齐或一般布局加入四种
+   pack→Hopper GEMM→unpack 候选。后者将所有打包、补零和写回成本纳入调用计时，scratch
+   受调用方 workspace_limit 限制。
+4. 在 tune 阶段逐候选检查输出与 Dense 的相对 Frobenius 差≤1e-5 且无 nonfinite。
+   这项检查不能替代 benchmark 的原始输入 FP64 精度门限。
+5. 按交替顺序进行五轮、每轮20次完整调用计时。候选中位数至少快3%，且五轮都比同轮
+   Dense 快，才被选中；否则保留 fallback。选优之外的正式 benchmark 继续使用100次×5组。
+
+`lt_algorithm_config()` 报告选择、各候选中位耗时及 fallback 的 Lt 配置。未通过约束或数值
+检查的候选耗时为 nan。调用前尚未 tune 时使用 Dense。run 只构造当前指针的 tensor maps
+并执行，不分配或进行 host 同步；绑定变化时重新检查可用条件，不复用输入计算值。
+
+稳定性验收必须独立重复，不能把 tune 内部胜出当作最终结论：
+
+```bash
+bash scripts/build.sh
+python3 scripts/tune_mnk.py --repeats 3 --output-dir results/mnk_acceptance
+```
+
+默认覆盖 bench/shapes.json 全部14种尺寸和两种 dtype，每轮100次、5组、3轮新输入精度检查，
+轮换两套输入。registry.json 记录每个尺寸/dtype 的实际路径、各组配对加速比、精度和选中配置。
+只有每次都采用自定义候选、精度全通过、全部配对组均至少快3%时才记 stable_win；fallback
+只算功能覆盖。该脚本仍有未解决尺寸时返回2，结果文件会保留。加 `--graph` 独立验收 Graph。
+registry 是测量证据，不会自动加载为不经复验的运行时缓存。
+
+当前目标仍是所有尺寸稳定超过独立调优的 cuBLASLt，尚未完成。iter337–339 在1024³、2048³
+和1025×1537×769上测得精度合格的自定义路径收益，但部分方阵、矩形及边界仍采用fallback。
+不要用这些局部结果宣称所有尺寸获胜，也不要沿用无补偿 SW 的误差来描述这些 dense 候选。
+
 ## 历史与清理记录
 
 - [架构清理记录](results/architecture_reset_20261014.json)：当前保留内容和验证结果。

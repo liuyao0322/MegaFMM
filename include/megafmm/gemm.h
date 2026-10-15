@@ -10,6 +10,8 @@ enum class DType { BF16, FP16 };
 // Experimental forced SW: specialized contiguous 1024^3 pipeline, otherwise
 // one-level Winograd with logical even padding, transpose/stride/alpha/beta.
 // Auto remains independently tuned Dense; SW precision is not certified.
+// Tuned empirically ranks precision-valid Hopper dense, tiny and padded
+// candidates against tuned cuBLASLt; requires explicit tune(), starts on Dense.
 enum class Algorithm { Auto, Dense, SWPipeline=3, Tuned=4 };
 struct Problem {
   int64_t m=0, n=0, k=0;

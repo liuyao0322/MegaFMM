@@ -35,3 +35,8 @@ target_compile_options(test_multisize PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencod
 add_test(NAME sw_multisize_implementation COMMAND test_multisize)
 
 add_test(NAME tuned_correctness COMMAND test_correctness --tuned)
+add_executable(test_tuning_candidates tests/test_tuning_candidates.cu)
+target_include_directories(test_tuning_candidates PRIVATE solution)
+target_link_libraries(test_tuning_candidates PRIVATE megafmm)
+target_compile_options(test_tuning_candidates PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_90a,code=sm_90a>)
+add_test(NAME tuning_candidates_correctness COMMAND test_tuning_candidates)
