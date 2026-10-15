@@ -43,7 +43,7 @@ F6/F7两种dtype均0stack、0spill、124registers/thread。F7对齐修正大幅�
 ## F9 producer/consumer trace — locate the actual long interval
 
 - Clone frozenF9; timestamp producer0 and consumer128 around raw/leaf waits and major work. One fresh uniformBF16 FP64 check passes with eF5.52481148267e-5, identical toF9. Diagnostic10warmup/20kernel calls=716.614us,122regs versus124untraced,0stack/spill. Stores and scheduling changes perturb timing; no complete-call verdict.
-- Median of same-CTA phase sums:producer pack687.072us,inside14.880us,raw issue+ready4.448us,slot-free wait2.112us,total710.976us. Consumer slot-ready wait685.344us,native main raw+leaf7.488us,correction0+1 16.000us,total711.664us. Raw and leaf main phase medians separately need not sum to the displayed combined median; inspect per-CTA rows for exact sums.
+- Median of same-CTA phase sums:producer pack687.072us,inside14.880us,raw issue+ready4.448us,slot-free wait2.112us,total710.976us. Consumer slot-ready wait685.344us,native main raw+leaf7.472us,correction0+1 15.968us,total711.664us. Raw and leaf main phase medians separately need not sum to the displayed combined median; inspect per-CTA rows for exact sums.
 - Roles overlap:median useful work overlap17.456us. Do not add producer and consumer durations. The dominant measured interval is producer packing, not exposed MMA time or host tensor-map setup. The trace does not yet separate pack first-pass/quantization details.
 - Next isolated candidateF10 hoists common inside exponents/factors out of pack element loops, retaining general exponent fallback. Frozen trace source/results/binary identity in`trace_f9_manifest.json`.
 
@@ -62,3 +62,9 @@ F6/F7两种dtype均0stack、0spill、124registers/thread。F7对齐修正大幅�
 - bf16: complete245.429us versus currentSW10.325us.
 - fp16: complete228.806us versus currentSW10.062us.
 - Large reduction within the fused prototype, still much slower than independent-packingP9 and currentSW. Do not transfer P7 Graph/sanitizer acceptance. Next diagnostic subdivides the measured producer pack interval into native packing, reduction and quantization, instead of guessing from the overall time.
+
+## F11 pack subphase trace
+
+- FrozenF11 adds eight timestamps per pack, retaining the role trace. One uniformBF16 FP64 check passes with the same eF5.52481148267e-5; instrumented kernel255.563us versus ordinary complete245.429us,122regs,0stack/spill. Perturbed diagnostic, not performance acceptance.
+- Median same-CTA sums: nativeA pack42.784us,nativeB51.936us,maximum reduction2.688us,exponent selection5.024us,A quantization48.192us,B quantization68.800us,publish/sync1.120us. Pack total220.608us; wrapper envelope225.760us. Individual phase medians need not sum to the median total.
+- Second-pass quantization includes raw reloads and recomputation of transformed residuals. NextF12 retains first-pass residuals in per-thread registers; native high values still come from shared storage. Explicitly verify register/stack/spill effects and original precision before assessing complete-call speed.
