@@ -1,0 +1,112 @@
+{
+  "research_only": true,
+  "production_unchanged": true,
+  "primary_reference": "https://docs.nvidia.com/cutlass/latest/media/docs/cpp/efficient_gemm.html#hopper-warp-specialization",
+  "hypothesis": "Two consumer groups own different output tiles, overlapping epilogue and math. Test source-free M128 N128/160/192 with CM1/2, unlike existing source-free M64N256 pingpong and non-source-free M128N128.",
+  "enabled_timing_mask": 63,
+  "large_random_fp64_acceptance": "unchecked",
+  "variants": [
+    {
+      "variant": 0,
+      "tile_m": 128,
+      "tile_n": 128,
+      "cluster_m": 1,
+      "schedule": "source-free TMA warp-specialized persistent pingpong",
+      "resource_lines": [
+        "tile=128x128 stages=0 threads=384 registers=168 shared=215040 local=0 block_limit=1 required_blocks=1",
+        "dtype=fp16",
+        "actual_stages=6 tile_k=64 inflight_groups=1 workers_per_sm=1",
+        "tile=128x128 stages=0 threads=384 registers=168 shared=215040 local=0 block_limit=1 required_blocks=1",
+        "dtype=bf16",
+        "actual_stages=6 tile_k=64 inflight_groups=1 workers_per_sm=1"
+      ],
+      "passed_both_dtype": true,
+      "precision_scope": "twelve exact original-input FP64 tails with alpha0.5/strides/padding, plus persistent12289x520 K8/K1032"
+    },
+    {
+      "variant": 1,
+      "tile_m": 128,
+      "tile_n": 128,
+      "cluster_m": 2,
+      "schedule": "source-free TMA warp-specialized persistent pingpong",
+      "resource_lines": [
+        "tile=128x128 stages=0 threads=384 registers=168 shared=215040 local=0 block_limit=1 required_blocks=1",
+        "dtype=fp16",
+        "actual_stages=6 tile_k=64 inflight_groups=1 workers_per_sm=1",
+        "tile=128x128 stages=0 threads=384 registers=168 shared=215040 local=0 block_limit=1 required_blocks=1",
+        "dtype=bf16",
+        "actual_stages=6 tile_k=64 inflight_groups=1 workers_per_sm=1"
+      ],
+      "passed_both_dtype": true,
+      "precision_scope": "twelve exact original-input FP64 tails with alpha0.5/strides/padding, plus persistent12289x520 K8/K1032"
+    },
+    {
+      "variant": 2,
+      "tile_m": 128,
+      "tile_n": 160,
+      "cluster_m": 1,
+      "schedule": "source-free TMA warp-specialized persistent pingpong",
+      "resource_lines": [
+        "tile=128x160 stages=0 threads=384 registers=168 shared=202752 local=0 block_limit=1 required_blocks=1",
+        "dtype=fp16",
+        "actual_stages=5 tile_k=64 inflight_groups=1 workers_per_sm=1",
+        "tile=128x160 stages=0 threads=384 registers=168 shared=202752 local=0 block_limit=1 required_blocks=1",
+        "dtype=bf16",
+        "actual_stages=5 tile_k=64 inflight_groups=1 workers_per_sm=1"
+      ],
+      "passed_both_dtype": true,
+      "precision_scope": "twelve exact original-input FP64 tails with alpha0.5/strides/padding, plus persistent12289x520 K8/K1032"
+    },
+    {
+      "variant": 3,
+      "tile_m": 128,
+      "tile_n": 160,
+      "cluster_m": 2,
+      "schedule": "source-free TMA warp-specialized persistent pingpong",
+      "resource_lines": [
+        "tile=128x160 stages=0 threads=384 registers=168 shared=202752 local=0 block_limit=1 required_blocks=1",
+        "dtype=fp16",
+        "actual_stages=5 tile_k=64 inflight_groups=1 workers_per_sm=1",
+        "tile=128x160 stages=0 threads=384 registers=168 shared=202752 local=0 block_limit=1 required_blocks=1",
+        "dtype=bf16",
+        "actual_stages=5 tile_k=64 inflight_groups=1 workers_per_sm=1"
+      ],
+      "passed_both_dtype": true,
+      "precision_scope": "twelve exact original-input FP64 tails with alpha0.5/strides/padding, plus persistent12289x520 K8/K1032"
+    },
+    {
+      "variant": 4,
+      "tile_m": 128,
+      "tile_n": 192,
+      "cluster_m": 1,
+      "schedule": "source-free TMA warp-specialized persistent pingpong",
+      "resource_lines": [
+        "tile=128x192 stages=0 threads=384 registers=168 shared=223232 local=0 block_limit=1 required_blocks=1",
+        "dtype=fp16",
+        "actual_stages=5 tile_k=64 inflight_groups=1 workers_per_sm=1",
+        "tile=128x192 stages=0 threads=384 registers=168 shared=223232 local=0 block_limit=1 required_blocks=1",
+        "dtype=bf16",
+        "actual_stages=5 tile_k=64 inflight_groups=1 workers_per_sm=1"
+      ],
+      "passed_both_dtype": true,
+      "precision_scope": "twelve exact original-input FP64 tails with alpha0.5/strides/padding, plus persistent12289x520 K8/K1032"
+    },
+    {
+      "variant": 5,
+      "tile_m": 128,
+      "tile_n": 192,
+      "cluster_m": 2,
+      "schedule": "source-free TMA warp-specialized persistent pingpong",
+      "resource_lines": [
+        "tile=128x192 stages=0 threads=384 registers=168 shared=223232 local=0 block_limit=1 required_blocks=1",
+        "dtype=fp16",
+        "actual_stages=5 tile_k=64 inflight_groups=1 workers_per_sm=1",
+        "tile=128x192 stages=0 threads=384 registers=168 shared=223232 local=0 block_limit=1 required_blocks=1",
+        "dtype=bf16",
+        "actual_stages=5 tile_k=64 inflight_groups=1 workers_per_sm=1"
+      ],
+      "passed_both_dtype": true,
+      "precision_scope": "twelve exact original-input FP64 tails with alpha0.5/strides/padding, plus persistent12289x520 K8/K1032"
+    }
+  ]
+}
