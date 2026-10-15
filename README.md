@@ -6,16 +6,17 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 **2026-10-16 精度研究：** [调研、误差消融与硬件对照](research/precision_20261016/REPORT.md)
 和[针对性方案设计](research/precision_20261016/DESIGN.md)。生产源码与研究起点一致，
 原七乘法仍未通过原始精度门槛；达标且更快的直接输入稠密原型保留为研究对照。
-[补偿路径硬件研究](research/precision_20261016/int8_hardware/HARDWARE_REPORT.md)的普通和Graph参考现统一为P46，P45/P39为完整验收历史回退。
-P46保留原始FP16/BF16输入、精确逐列平衡、七个主乘积和全部八个交叉修正点积；先通过M13成对筛选，再将主项与校正在同一叶乘积内执行，复用已加载高部。
-普通标准检查最大BF16/FP16 eF为1.61320e-5/2.16395e-5，略高于P45但仍通过原始门槛。
-独立普通ABBA同轮P45→P46为35.113→30.305μs / 35.120→30.274μs，降低13.69%/13.80%；Graph35.448→30.242μs / 35.434→30.249μs，降低14.69%/14.63%。
-自身普通/Graph各78项精度和每模式79,872个逐列指数检查，新种子九模式双流108配置/864调用及输出保护区全部通过；
-memcheck/racecheck/synccheck限定范围各36配置/72调用通过，零错误，racecheck零警告/零hazard。
-未锁时钟，无置信区间；完整调用仍约为生产SW的三倍，未进入生产或改变Auto。
-[P46硬件设计](research/precision_20261016/int8_hardware/LEAF_REUSE_HARDWARE.md)、[自身验收](research/precision_20261016/int8_hardware/p46_validation.json)、
+[补偿路径硬件研究](research/precision_20261016/int8_hardware/HARDWARE_REPORT.md)的普通和Graph参考现统一为P47，P46/P45/P39为完整验收历史回退。
+原始FP16/BF16输入、精确逐列平衡、七个主乘积和全部八个交叉修正点积保留。M13先筛选重组顺序，P46复用高部执行主项与修正，P47再直接写出原生高低部，移除不再需要的FP32暂存。
+普通标准检查最大BF16/FP16 eF为1.61320e-5/2.16395e-5；P47与P46打印误差逐项相同。
+独立普通ABBA同轮P46→P47为30.376→28.809μs / 30.354→28.813μs，降低5.16%/5.08%；Graph30.408→28.640μs / 30.545→28.853μs，降低5.81%/5.54%。
+此前P46相对同轮P45普通降低13.69%/13.80%、Graph14.69%/14.63%；这些是分别进行的对照。
+P47自身普通/Graph各78项精度和每模式79,872个指数检查、新种子九模式双流108配置/864调用及保护区全部通过；
+memcheck/racecheck/synccheck限定范围各36配置/72调用零错误，racecheck零警告/零hazard；另54组新输入对约3.11亿个高低部数值逐位比较零差异。
+未锁时钟，无置信区间；完整调用仍约为生产SW的2.8倍，未进入生产或改变Auto。
+[P47实现](research/precision_20261016/int8_hardware/DIRECT_NATIVE_PACK_HARDWARE.md)、[自身验收](research/precision_20261016/int8_hardware/p47_validation.json)、
 [综合审计](research/precision_20261016/fused_int8/audit.json)及[后续消融](research/precision_20261016/int8_hardware/NEXT_EXPERIMENTS.md)保留确切范围与性能差距。
-P40–P44的局部消融和失败成本、M11/M12/M13的独立数值筛选及范围反例完整保留；目标继续进行。
+失败候选、M11/M12/M13的独立数值筛选和范围反例完整保留；目标继续进行。
 [片上融合后续](research/precision_20261016/fused_int8/REPORT.md)修正布局后通过72项普通精度；继续移出逐元素缩放判断后，F13完整调用约224–240 μs，仍拒绝性能验收。
 下方 iter282 等标签为历史检查点，实际起点和文件哈希以新报告为准。
 

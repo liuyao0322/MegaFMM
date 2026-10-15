@@ -92,3 +92,10 @@ Next first model a corrected-native-leaf recombination: each transformed native 
 ## P46完成后的下一消融
 
 M13/P46已完成独立验证并保留P46，详见LEAF_REUSE_HARDWARE.md。普通降低13.69/13.80percent、Graph14.69/14.63percent，相对同轮P45；仍约30.3us、未进入生产。自身profile不证明下界。下一P47保持P46消费者及65,536B预处理共享请求，直接在每个元素变换后写原生高部/缩放低部，移除已失去跨线程用途的FP32暂存与barrier。DIRECT_NATIVE_PACK_DESIGN.md记录完整假设、原始资料和验收要求。共享请求量缩减单独后续消融；不能将P25/P26INT8量化时代的结果直接迁移。
+
+
+## P47完成后的下一消融
+
+P47自身完整精度/指数、独立ordinary+GraphABBA、新种子108/864双流保护区、三工具36/72各自通过，另54配置全11平面位比较零差异；已保留P47。普通相对同轮P46降低5.158/5.078percent BF16/FP16，Graph5.815/5.540percent，仍约28.8us未达生产性能。自身NCU/rawmetrics/源码生成身份完整归档，无物理下界结论。
+
+下一P48只修改cooperative函数attribute、occupancy查询和launch的动态共享request65536→288B，足够64A/8Bfloat最大值。P47设备计算和消费者逐字保留，其他诊断分配不混作实际cooperative字节；实际容量/完整成本必须实测。现有288CTA已能驻留，高capacity不等于更高有效并行或更快。独立候选需要自己所有精度/Graph/新种子工具证据。gen已准备但未应用，见COMPACT_NATIVE_SCRATCH_DESIGN.md。新inside列几何或消费者调度另做后续，不与容量消融合并。

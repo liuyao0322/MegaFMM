@@ -101,8 +101,8 @@ template<class T,bool SideA,bool Balance,bool FastBalance=false> __device__ __fo
  }
 }
 
-// Paired FP32 transforms stay shared. Native correction B is MN-major and
-// correction A is K-major, so neither side needs a physical transpose.
+// P47 keeps the historical shared allocation for an isolated staging control.
+// pack_pair writes native highs/lows directly; only inside maxima use scratch.
 template<bool SideA> struct PairPackShared {
  float values[2][SideA?8192:4096];
 };
@@ -112,30 +112,14 @@ __device__ __forceinline__ float pair_pow2(float x,int e){
  return pair_general_pow2(x,e);
 }
 
-template<class T,bool SideA,int NativePlane,int QP> __device__ __forceinline__
-void pair_store(int which,T* high,T* q,int* exp,
- PairPackShared<SideA>& s,int tile,int r0,int c0){
- constexpr int Rows=SideA?64:128,Cols=SideA?128:32,Size=Rows*Cols,PT=Size/256;
- int tid=threadIdx.x;
- #pragma unroll 4
- for(int j=0;j<PT;++j){
-  int i=tid+256*j,at=(r0+i/Cols)*512+c0+i%Cols;
-  float v=s.values[which][i];T native=T(v);float high_value=float(native);
-  high[NativePlane*Plane+at]=native;
-  // Correction highs already reside in their seven native main planes.
-  // RN residual * 2^significand_bits stays finite whenever v/native are finite.
-  if constexpr(QP<4){
-   constexpr float scale=(std::is_same_v<T,cute::half_t> ? 2048.f : 256.f);
-   q[QP*Plane+at]=T(__fmul_rn(__fsub_rn(v,high_value),scale));
-  }
+// Native corrections need no tile maxima or cross-thread transform exchange.
+template<class T,int NativePlane,int QP> __device__ __forceinline__
+void direct_native_store(float v,int at,T* high,T* q){
+ T native=T(v);high[NativePlane*Plane+at]=native;
+ if constexpr(QP<4){
+  constexpr float scale=(std::is_same_v<T,cute::half_t> ? 2048.f : 256.f);
+  q[QP*Plane+at]=T(__fmul_rn(__fsub_rn(v,float(native)),scale));
  }
-
-}
-template<class T,bool SideA,int NP0,int QP0,int NP1,int QP1>
-__device__ __forceinline__ void pair_store_both(T* high,T* q,int* exp,
- PairPackShared<SideA>& s,int tile,int r0,int c0){
- pair_store<T,SideA,NP0,QP0>(0,high,q,exp,s,tile,r0,c0);
- pair_store<T,SideA,NP1,QP1>(1,high,q,exp,s,tile,r0,c0);
 }
 
 template<class T,bool SideA,bool Balance,int Group> __device__ __forceinline__
@@ -159,14 +143,25 @@ void pack_pair(const T* __restrict__ X,T* __restrict__ high,T* __restrict__ q,in
      if constexpr(SideA){b=pair_pow2(b,e1);cc=pair_pow2(cc,e0);}else{b=pair_pow2(b,e0);cc=pair_pow2(cc,e1);}
     }
    }
+   int target=r*512+c;
    if constexpr(Group==2){
-    high[r*512+c]=T(a);high[Plane+r*512+c]=T(SideA?b:cc);s.values[0][i]=d;
+    direct_native_store<T,0,8>(a,target,high,q);
+    direct_native_store<T,1,8>(SideA?b:cc,target,high,q);
+    direct_native_store<T,(SideA?3:2),8>(d,target,high,q);
    }else if constexpr(SideA){
     float s1=__fadd_rn(cc,d),s2=__fsub_rn(s1,a);
-    if constexpr(Group==0){s.values[0][i]=s1;s.values[1][i]=s2;}else{s.values[0][i]=__fsub_rn(a,cc);s.values[1][i]=__fsub_rn(b,s2);}
+    if constexpr(Group==0){
+     direct_native_store<T,4,0>(s1,target,high,q);direct_native_store<T,5,1>(s2,target,high,q);
+    }else{
+     direct_native_store<T,6,2>(__fsub_rn(a,cc),target,high,q);direct_native_store<T,2,3>(__fsub_rn(b,s2),target,high,q);
+    }
    }else{
     float t1=__fsub_rn(b,a),t2=__fsub_rn(d,t1);
-    if constexpr(Group==0){s.values[0][i]=t1;s.values[1][i]=t2;}else{s.values[0][i]=__fsub_rn(d,b);s.values[1][i]=__fsub_rn(t2,cc);}
+    if constexpr(Group==0){
+     direct_native_store<T,4,0>(t1,target,high,q);direct_native_store<T,5,1>(t2,target,high,q);
+    }else{
+     direct_native_store<T,6,2>(__fsub_rn(d,b),target,high,q);direct_native_store<T,3,3>(__fsub_rn(t2,cc),target,high,q);
+    }
    }
   }
  };
@@ -176,10 +171,6 @@ void pack_pair(const T* __restrict__ X,T* __restrict__ high,T* __restrict__ q,in
   bool normal=e0>=-126&&e0<=127&&e1>=-126&&e1<=127;if constexpr(!SideA)normal=__all_sync(0xffffffff,normal);
   if(normal)load(std::true_type{},__int_as_float((e0+127)<<23),__int_as_float((e1+127)<<23));else load(std::false_type{},0,0);
  }else load(std::false_type{},0,0);
- __syncthreads();
- if constexpr(Group==0)pair_store_both<T,SideA,4,0,5,1>(high,q,exp,s,tile,r0,c0);
- else if constexpr(Group==1)pair_store_both<T,SideA,6,2,(SideA?2:3),3>(high,q,exp,s,tile,r0,c0);
- else pair_store<T,SideA,(SideA?3:2),8>(0,high,q,exp,s,tile,r0,c0);
  asm volatile("fence.proxy.async.global;" ::: "memory");
 }
 

@@ -26,7 +26,7 @@ may change compiled register pressure and latency. No pass or speed is assumed.
 
 Primary reread: NVIDIA CUDA12.4 [Best Practices §9.2.3 and §10.4](https://docs.nvidia.com/cuda/archive/12.4.0/cuda-c-best-practices-guide/index.html#shared-memory)
 describes shared memory as useful for reuse/reordering and discusses occupancy
-sensitivity via dynamic allocation. [§9.2.7.1](https://docs.nvidia.com/cuda/archive/12.4.0/cuda-c-best-practices-guide/index.html#register-pressure)
+sensitivity via dynamic allocation in [§10.4](https://docs.nvidia.com/cuda/archive/12.4.0/cuda-c-best-practices-guide/index.html#effects-of-shared-memory). [§9.2.7.1](https://docs.nvidia.com/cuda/archive/12.4.0/cuda-c-best-practices-guide/index.html#register-pressure)
 and [Programming Guide §5.2](https://docs.nvidia.com/cuda/archive/12.4.0/cuda-c-programming-guide/index.html#maximize-utilization)
 explain register/resident-warp tradeoffs. These motivate measuring resources and
 full calls; they do not establish a speedup or a physical floor for this kernel.
