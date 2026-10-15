@@ -1,0 +1,37 @@
+{
+  "status": "CPU prototype only, not production",
+  "source_baseline_commit": "b88c72f",
+  "observation": {
+    "shape": [
+      4096,
+      4096,
+      4096
+    ],
+    "dtype": "bf16",
+    "actual": "tuned_dense_cublaslt",
+    "short_dense_ms": "0.223125",
+    "new_pingpong_cm1_ms": "0.203586",
+    "new_pingpong_cm2_ms": "0.203770",
+    "last_confirmed_candidate": "128x256x32_beta0_cm2",
+    "last_confirmed_dense_ms": "0.223012",
+    "last_confirmed_custom_ms": "0.224686",
+    "confirmation_status": "failed"
+  },
+  "limitations": "Current telemetry does not retain every short-rank round or each confirmation attempt. Low overall short median does not prove that all initial short pairs won. Do not assert that the top-two cap alone caused fallback.",
+  "proposal": [
+    "Use short median only for nomination; preserve original numerical screens.",
+    "Confirm every nominated candidate in short-median order; remove arbitrary top-two cap.",
+    "Early reject on the first losing paired group, since it already makes the unchanged all-five-wins gate impossible.",
+    "Accept only five complete paired groups with every custom<dense and median(custom)<0.97*median(dense), as before.",
+    "Record every attempted candidate, completed groups and measured pairs, preserving evidence for partial rejects.",
+    "Keep external three-independent-sweep all15pairedgroups>=1.03 certification unchanged."
+  ],
+  "cpu_test_scope": [
+    "Ninth sustained winner after eight short-burst false positives, with exact failed-prefix measurement counts.",
+    "One losing pair rejects a fast median.",
+    "Five wins below only2percent are rejected; strict97percent boundary preserved.",
+    "Ratio-of-medians accepted and rejected counterexamples distinguish it from median-of-ratios.",
+    "Zero/negative/infinite/NaN and empty timing series rejected without sorting nonfinite values."
+  ],
+  "next": "After369GPUvalidation passes, integrate policy helper, deterministicCPUtest and per-attempt telemetry as370; formal bench -> immediate log -> immediate commit, then tests/sanitizers. No new stable win claimed."
+}
