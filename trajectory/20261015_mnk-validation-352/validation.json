@@ -1,0 +1,24 @@
+{
+  "iteration": 352,
+  "commit": "6501946",
+  "candidate_count": 62,
+  "ctest_passed": 5,
+  "ctest_failed": 0,
+  "memcheck_errors": 0,
+  "racecheck_errors": 0,
+  "racecheck_warnings": 0,
+  "binary_sha256": "c706b4dc79329ec0cecf5638c66f74a61fb859f17331cb72d8a0e22e96d33bff",
+  "solution_sha256": {
+    "solution/scale_output.cu": "32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708",
+    "solution/dense_padding.cu": "88cc8c81f2025c4965e416b790817fa30f51c0a8c4af701896cf32c8fe6e019a",
+    "solution/dense_wmma.cu": "fd3c6eb06343c7e59aba443cfc72c5bc6fef04ad81a9419773ec4b5303c2bced",
+    "solution/dense_ampere.cu": "b9a82afc6a640022c6e7a1081a87bab5c98e425965d08e8a150fb554128d0478",
+    "solution/internal.h": "4ea581cb3a7451a0bb0cdb18f60528dde506c62d8a7e78d4aff3c4ddcfdda92a",
+    "solution/plan.cpp": "e2d5bb4f89dc721d4635994c3d428ee73f36524fbf1d25f096091b106b1f32ba",
+    "solution/sw_pipeline.cu": "748e7ace9de0b6469d47922cb7cb531bbb56a9d55c9915b0194c0e0a72e916e7",
+    "solution/sw_multisize.cu": "6439b99b3f6cc2fac7a510eff4638d8be5cfd2cda1ca312b6a86bbe8a2c43641",
+    "solution/dense_hopper.cu": "f77ca68fcdcfe6619de66564e77ece2a3c3aa7a8d2fa3129401f64b777f80a75",
+    "solution/tuning_check.cu": "8b109a5756a8c95fd38ec8c7ec4dc76cb8f8e1000906e39dd122795c55786a5f"
+  },
+  "notes": "Six-shape12row original FP64 gates pass. All62forced candidates and API pass; beta-zero candidates explicitly reject nonzero beta. Only candidate61 adds provisional rectangle gain1024x8192x512 BF1.0904/FP1.0601. Not yet independently certified; latest full acceptance351 thirteenof28."
+}
