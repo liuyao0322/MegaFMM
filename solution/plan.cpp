@@ -300,6 +300,7 @@ struct Plan::Impl {
   int confirm_candidate = -1;
   float confirm_dense_ms = NAN, confirm_custom_ms = NAN;
   int hopper_selected = -1, sm_count = 0, strategy_input_sets = 1;
+  int strategy_fp64_rechecks = 0, strategy_fp64_accepted = 0;
   std::array<float,detail::HopperCandidateCount+1> strategy_ms{};
   cublasLtHandle_t handle = nullptr;
   std::unique_ptr<LtOp> dense;
@@ -374,6 +375,7 @@ void tune_strategy(Plan::Impl& plan,const void* A,const void* B,const float* C,
   plan.hopper_selected=-1;plan.strategy_confirmed=false;plan.confirm_candidate=-1;
   plan.confirm_dense_ms=plan.confirm_custom_ms=NAN;
   plan.strategy_ms.fill(NAN);
+  plan.strategy_fp64_rechecks=plan.strategy_fp64_accepted=0;
   if(!plan.sm_count) return;
   std::array<bool,detail::HopperCandidateCount> eligible{};
   for(int id=0;id<detail::HopperCandidateCount;++id)
@@ -429,6 +431,11 @@ void tune_strategy(Plan::Impl& plan,const void* A,const void* B,const float* C,
     for(int id=0;id<detail::HopperCandidateCount;++id) if(eligible[id]) {
       custom_launch(id,0);
       eligible[id]=detail::dense_agreement(p,D,reference,stream);
+      if(!eligible[id] && ((id>=81 && id<=89) || (id>=94 && id<=97))) {
+        ++plan.strategy_fp64_rechecks;
+        eligible[id]=detail::original_fp64_agreement(p,A,B,D,reference,stream);
+        if(eligible[id])++plan.strategy_fp64_accepted;
+      }
     }
     // Negative route IDs encode Lt indices. Re-rank the strongest eight Lt
     // candidates under the SAME working set and timing protocol as custom ones.
@@ -527,7 +534,8 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
     const bool bound=impl_->hopper_selected>=0 && detail::hopper_dense(impl_->hopper_selected,
         impl_->problem,A,B,C0,D,workspace,impl_->sm_count,nullptr,false);
     info+=bound ? detail::hopper_candidate_name(impl_->hopper_selected):"dense_cublaslt";
-    info+=";rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5";
+    info+=";rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5_or_original_fp64_gate";
+    info+=";fp64_rechecks="+std::to_string(impl_->strategy_fp64_rechecks)+";fp64_accepted="+std::to_string(impl_->strategy_fp64_accepted);
     info+=";input_sets="+std::to_string(impl_->strategy_input_sets)+";dense_rerank=top8";
     info+=";confirmation=5x100;confirmation_status="+std::string(impl_->confirm_candidate<0?"skipped":impl_->strategy_confirmed?"passed":"failed");
     if(impl_->confirm_candidate>=0) info+=";confirmed_candidate="+std::string(detail::hopper_candidate_name(impl_->confirm_candidate))+";confirmed_dense_ms="+std::to_string(impl_->confirm_dense_ms)+";confirmed_custom_ms="+std::to_string(impl_->confirm_custom_ms);

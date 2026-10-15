@@ -631,6 +631,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 362 | Measure explicit deterministic Split-K factors across large shapes | 1.0710 | 1.762598 | measured |
 
+| 363 | Recheck reduction candidates against original-input FP64 gate | 1.0930 | 2.141270 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -6072,3 +6074,31 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** 20/20 original FP64 gates pass. New SplitK scores lose on4096/8192 and all three large-K rectangles;16384 new scores NaN due screening and require forced precision diagnosis, not assumed slow. No new independent stablewin; last full certification35316/28.
 - **Next:** Force98/API/5CTest/CUDA12.8sanitizers, diagnose all four16384 SplitK candidates against full FP64 and Dense agreement, profile representative SplitK complete call before choosing next direction.
 - **Archive:** trajectory/20261015_203426_iter-362/
+
+### Iter 363 — Recheck reduction candidates against original-input FP64 gate
+
+- **Hypothesis:** An exact FP64 recheck can retain more accurate K-reduction results falsely rejected by the cheap Dense-distance screen without changing the original accuracy gate.
+- **Changes:** Keep cheap screen, add full original-rounded-input FP64 beta-zero reference for failed reduction candidates; preserve alpha/transpose/strides, finite checks and exact3*dense_error+floor gate. Add metadata counters, focused guard test and documentation; run path unchanged.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 14 rows; arithmetic mean of row median latency=2.141270 ms; mean speedup=1.0930x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005674 | 0.005027 | 1.1287 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005686 | 0.005056 | 1.1247 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008699 | 0.006696 | 1.2992 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008654 | 0.006628 | 1.3058 | 3.40967e-07 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.739185 | 12.766936 | 0.9978 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.301439 | 13.306096 | 0.9997 | 1.93317e-05 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.232852 | 0.232704 | 1.0006 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232825 | 0.232729 | 1.0004 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.624815 | 1.611623 | 1.0082 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.737676 | 1.708086 | 1.0173 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025290 | 0.023546 | 1.0740 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026087 | 0.024010 | 1.0865 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027696 | 0.024277 | 1.1408 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.027228 | 0.024361 | 1.1177 | 6.43463e-07 | 1 |
+
+- **Analysis:** Formal14/14 original FP64 checks pass. Both16384 dtypes report4rechecks/4accepted and all four previously-NaN SplitK scores now finite. Candidates remain slower and correctly fallback; no additional independent stablewinner. Latest certification35316/28.
+- **Next:** Run all98 candidate/API tests plus new FP64 guard under six relevantCTest and CUDA12.8memcheck/racecheck; verify rejected corrupted/nonfinite/stale outputs, then resource-preflight source-free TMA K128 as next performance axis.
+- **Archive:** trajectory/20261015_205550_iter-363/

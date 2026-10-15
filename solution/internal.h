@@ -15,6 +15,10 @@ size_t hopper_streamk_workspace(const Problem& p,int id,int sm_count);
 bool padded_hopper(int base,const Problem& p,const void* A,const void* B,const float* C,float* D,
                     void* workspace,int sm_count,cudaStream_t stream,int operation);
 bool dense_agreement(const Problem& p,const float* D,const float* reference,cudaStream_t stream);
+// Explicit-tuning fallback for beta-zero K-reduction candidates. Uses original
+// rounded inputs and the unchanged FP64-relative gate, not Dense agreement.
+bool original_fp64_agreement(const Problem& p,const void* A,const void* B,
+                             const float* D,const float* dense,cudaStream_t stream);
 const char* hopper_candidate_name(int id);
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C0,float* D,
                   void* workspace,int sm_count,cudaStream_t stream,int operation);

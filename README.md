@@ -169,8 +169,12 @@ benchmark 会报告实际路径、workspace、原始 FP64 精度和计时；未�
 3. 小输出（M×N≤4096、K≤256）加入直接 FP32 FMA 候选；非对齐或一般布局加入四种
    pack→Hopper GEMM→unpack 候选。后者将所有打包、补零和写回成本纳入调用计时，scratch
    受调用方 workspace_limit 限制。
-4. 在 tune 阶段逐候选检查输出与 Dense 的相对 Frobenius 差≤1e-5 且无 nonfinite。
-   这项检查不能替代 benchmark 的原始输入 FP64 精度门限。
+4. 在 tune 阶段先检查候选输出与 Dense 的相对 Frobenius 差≤1e-5 且无 nonfinite。
+   对未通过该检查的 beta=0 Stream-K/Split-K 候选，从当前已舍入的原始 A/B 计算完整
+   FP64 参考，按原有 `eF_candidate <= 3*eF_dense + floor` 门槛复核，避免更准确的归约
+   结果因求和顺序不同被误筛；保留 alpha、转置及 stride 语义。FP64 临时分配和同步只在
+   显式 tune 中发生，metadata 报告复核次数与通过数，run 路径不变。正式 benchmark
+   仍独立使用三组新输入执行原始 FP64 精度检查。
 5. 将 Lt 池中最快的八个候选与自定义候选一起重新计时，匹配 `Policy::tuning_input_sets`
    指定的输入工作集（1–4套，默认1套；benchmark 使用 `--rotate-inputs` 设置）。按交替
    顺序进行五轮、每轮20次完整调用计时，要求候选中位数快至少3%且五轮全部获胜。
