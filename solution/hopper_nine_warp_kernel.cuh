@@ -109,7 +109,9 @@ public:
 
   static constexpr uint32_t NumMmaWarpGroups = CUTE_STATIC_V(size(TiledMma{})) / NumThreadsPerWarpGroup;
   static constexpr uint32_t MaxThreadsPerBlock = CUTE_STATIC_V(size(TiledMma{})) + NumThreadsPerWarp;
-  static constexpr uint32_t MinBlocksPerMultiprocessor = 2;
+  // Wider accumulator fragments need more than the two-block register target.
+  // Preserve two-block occupancy for the 64/128-column variants.
+  static constexpr uint32_t MinBlocksPerMultiprocessor = size<1>(TileShape{}) > 128 ? 1 : 2;
 
   static_assert(NumMmaWarpGroups == 2, "NineWarpGemm needs two consumer groups");
   static_assert(cute::size(ClusterShape{}) == 1, "NineWarpGemm currently supports one-block clusters");

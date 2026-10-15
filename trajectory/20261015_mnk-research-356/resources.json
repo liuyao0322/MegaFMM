@@ -1,0 +1,36 @@
+{
+  "purpose": "Release isolated compile/resource preflight; not performance acceptance",
+  "cuda": "12.4",
+  "variants": {
+    "direct128_s2": {
+      "registers": 92,
+      "local_bytes": 0,
+      "shared_bytes": 65792,
+      "resident_block_limit": 2,
+      "exact_ones_tail_pass": true
+    },
+    "direct128_s3": {
+      "registers": 91,
+      "local_bytes": 0,
+      "shared_bytes": 98560,
+      "resident_block_limit": 2,
+      "exact_ones_tail_pass": true
+    },
+    "tma64_s3": {
+      "registers": 58,
+      "local_bytes": 0,
+      "shared_bytes": 108544,
+      "resident_block_limit": 2,
+      "exact_ones_tail_pass": true
+    },
+    "tma160_s2": {
+      "registers": 106,
+      "local_bytes": 0,
+      "shared_bytes": 108544,
+      "resident_block_limit": 1,
+      "exact_ones_tail_pass": false,
+      "note": "Preflight correctly refused launch because original test required two resident CTAs; forced production tests still required."
+    }
+  },
+  "diagnosis": "Only native160 two-block launch bound fails ptxas C7600 target96. Per-width minimum block bound permits wider fragment at one resident CTA."
+}

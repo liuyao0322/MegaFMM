@@ -617,6 +617,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 355 | Test deeper nine-warp pipelines and native160-wide MMA | 0.0000 | 0.000000 | failed |
 
+| 356 | Match nine-warp launch bounds to accumulator width | 1.1122 | 0.324593 | no-change |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5868,3 +5870,29 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal benchmark stopped with exit2 and archived trajectory. Failure detail and any completed precision/timing rows must be inspected after closing this iteration. No performance or acceptance claim is made. Latest full independent certification remains353 sixteenof28.
 - **Next:** Diagnose the compile/runtime/numerical failure, then repair only the identified cause and rerun the unchanged original contract.
 - **Archive:** trajectory/20261015_191619_iter-355/
+
+### Iter 356 — Match nine-warp launch bounds to accumulator width
+
+- **Hypothesis:** The native160 accumulator exceeds the two-CTA register target; retaining one CTA for this width permits testing while direct128 retains two-CTA residency.
+- **Changes:** Use one-block minimum only above128 columns and one persistent worker for160. Retain two-block bounds for direct128 S2/S3 and64 S3.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 12 rows; arithmetic mean of row median latency=0.324593 ms; mean speedup=1.1122x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005663 | 0.005040 | 1.1236 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005648 | 0.005063 | 1.1155 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008644 | 0.006702 | 1.2898 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008625 | 0.006665 | 1.2940 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.237098 | 0.218293 | 1.0861 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232620 | 0.232560 | 1.0003 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.651344 | 1.619776 | 1.0195 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.765225 | 1.704103 | 1.0359 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026499 | 0.024448 | 1.0839 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.025669 | 0.023895 | 1.0742 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026716 | 0.024175 | 1.1051 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.027292 | 0.024398 | 1.1186 | 6.43463e-07 | 1 |
+
+- **Analysis:** Diagnosed isolated native160 C7600 target96. Release probes direct128 S2/S3 and64 S3 have zero spills, two-block capacity and exact tail pass;160 uses106registers and one-block capacity. Formal six-shape run completed12rows; detailed performance and forced validation follow. Latest independently certified coverage remains353 sixteenof28.
+- **Next:** Inspect candidate scores, force all81 candidates and API/CTest, run CUDA12.8 sanitizers; reassess Stream-K after three iterations without new stable improvement.
+- **Archive:** trajectory/20261015_192358_iter-356/

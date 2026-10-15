@@ -130,7 +130,7 @@ bool dispatch(int id,const Problem& p,const void* A,const void* B,const float* C
     case 76:return Candidate<T,128,128,1,0,2,64,false,1,2,true,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 77:return Candidate<T,128,128,1,0,2,64,true,1,2,true,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 78:return Candidate<T,128,128,1,0,3,64,true,1,2,true,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
-    case 79:return Candidate<T,128,160,1,0,2,64,false,1,2,true,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 79:return Candidate<T,128,160,1,0,2,64,false,1,1,true,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 80:return Candidate<T,128,64,1,0,3,64,false,1,2,true,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     default:return false;
   }
