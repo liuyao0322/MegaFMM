@@ -241,3 +241,13 @@ iter366 加入交换访问方向的两个 source-free TMA 候选，按 `B^T A^T`
 全部12个未解决的大K组合仍选择 Lt fallback，没有新增稳定胜出；
 [逐组性能记录](trajectory/20261015_mnk-validation-366/performance.json) 与
 [完整验证记录](trajectory/20261015_mnk-validation-366/validation.json) 分别保存性能和正确性证据。
+
+
+iter367/368 分别测试消费者 WGMMA 窗口和每次展开8个 K 分块的主循环，候选池扩至110个。
+iter368 的20个尺寸/dtype组合全部通过原始 FP64 门槛，110个强制候选、6项相关测试及
+CUDA12.8内存/竞争检查全部通过，错误与竞争警告均为0。
+12个尚未解决的大K组合仍选择 cuBLASLt 回退，没有新增稳定胜出；最新独立三轮认证仍为16/28。
+循环展开降低了固定8192³ FP16诊断中的指令数，但未转化为正式性能收益，不能据此宣称加速。
+证据见 [iter368逐组性能](trajectory/20261015_mnk-validation-368/performance.json)、
+[完整验证](trajectory/20261015_mnk-validation-368/validation.json)与
+[性能剖析](trajectory/20261015_mnk-validation-368/profiling.json)。
