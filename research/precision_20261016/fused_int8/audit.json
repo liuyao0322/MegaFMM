@@ -836,6 +836,26 @@
       "passes": 72,
       "hardware_accepted": false
     },
+    "m14_full_k128": {
+      "fresh_configurations": 72,
+      "passes": 72,
+      "hardware_accepted": false
+    },
+    "m14_full_k64": {
+      "fresh_configurations": 72,
+      "passes": 72,
+      "hardware_accepted": false
+    },
+    "m14_chunk_k64": {
+      "fresh_configurations": 72,
+      "passes": 72,
+      "hardware_accepted": false
+    },
+    "m14_stream_k64": {
+      "fresh_configurations": 72,
+      "passes": 72,
+      "hardware_accepted": false
+    },
     "nonnegative_max_arithmetic": {
       "scope": "CPU bit-pattern reduction only, no GPU/matrix/performance/synchronization acceptance",
       "proof": "For binary32 with sign0 and no NaN, unsigned bits order exponent then fraction in the same order as value, including positive subnormals, +0 and +inf. Existing local maxima start at +0 and fmax absolute values, so the proposed full-warp inputs lie in this domain. This does not permit replacing arbitrary signed/NaN-valued float reductions.",
@@ -2887,6 +2907,171 @@
     "hardware_accepted": false,
     "performance_accepted": false
   },
+  "m14_numerical_screen": {
+    "scope": "M14: K64 native fusion numerical screen, not WGMMA or timing evidence.\n\nFour paired arms isolate K granularity and Winograd recombination: full K128\ncorrected leaves (M13 control), full K64 leaves, K64 chunk-output accumulation,\nand K64 streaming product accumulation with only four persistent output tiles.\nBoth original dtypes, exact column scaling, all seven main/eight cross dots.\n",
+    "configurations": 72,
+    "rows": 288,
+    "summary": [
+      {
+        "dtype": "float16",
+        "arm": "full_k128",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "max_ef": 3.08702026764631e-05,
+        "worst_pattern": "cancellation",
+        "worst_seed": 9302,
+        "max_output_delta_to_full_k128_ef": 0.0
+      },
+      {
+        "dtype": "float16",
+        "arm": "full_k64",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "max_ef": 2.3982852741044256e-05,
+        "worst_pattern": "cancellation_k_bands",
+        "worst_seed": 9302,
+        "max_output_delta_to_full_k128_ef": 3.209306620690188e-05
+      },
+      {
+        "dtype": "float16",
+        "arm": "chunk_k64",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "max_ef": 2.0311713706888977e-05,
+        "worst_pattern": "cancellation_k_bands",
+        "worst_seed": 9302,
+        "max_output_delta_to_full_k128_ef": 2.9970244611550748e-05
+      },
+      {
+        "dtype": "float16",
+        "arm": "stream_k64",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "max_ef": 2.0643853774473017e-05,
+        "worst_pattern": "cancellation_k_bands",
+        "worst_seed": 9302,
+        "max_output_delta_to_full_k128_ef": 3.019939757282437e-05
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "full_k128",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "max_ef": 1.5678783829543367e-05,
+        "worst_pattern": "cancellation_k_bands",
+        "worst_seed": 9302,
+        "max_output_delta_to_full_k128_ef": 0.0
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "full_k64",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "max_ef": 1.5461198392320167e-05,
+        "worst_pattern": "cancellation_k_bands",
+        "worst_seed": 9302,
+        "max_output_delta_to_full_k128_ef": 1.9386645552938193e-05
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "chunk_k64",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "max_ef": 8.881174636669727e-06,
+        "worst_pattern": "cancellation",
+        "worst_seed": 9301,
+        "max_output_delta_to_full_k128_ef": 1.5637230207569444e-05
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "stream_k64",
+        "configurations": 36,
+        "passes": 36,
+        "nonfinite": 0,
+        "max_ef": 9.444461192369855e-06,
+        "worst_pattern": "cancellation_k_bands",
+        "worst_seed": 9302,
+        "max_output_delta_to_full_k128_ef": 1.607004117008628e-05
+      }
+    ],
+    "paired": [
+      {
+        "dtype": "float16",
+        "arm": "full_k64",
+        "lower_error_cases": 36,
+        "equal_error_cases": 0,
+        "higher_error_cases": 0,
+        "max_ef_increase": -1.4425834639089038e-08,
+        "min_ef_change": -7.323305955294246e-06
+      },
+      {
+        "dtype": "float16",
+        "arm": "chunk_k64",
+        "lower_error_cases": 36,
+        "equal_error_cases": 0,
+        "higher_error_cases": 0,
+        "max_ef_increase": -2.1621923846293916e-08,
+        "min_ef_change": -1.0933126999224314e-05
+      },
+      {
+        "dtype": "float16",
+        "arm": "stream_k64",
+        "lower_error_cases": 33,
+        "equal_error_cases": 0,
+        "higher_error_cases": 3,
+        "max_ef_increase": 5.8186620532028e-09,
+        "min_ef_change": -1.063319785489177e-05
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "full_k64",
+        "lower_error_cases": 21,
+        "equal_error_cases": 0,
+        "higher_error_cases": 15,
+        "max_ef_increase": 9.66442437787813e-10,
+        "min_ef_change": -5.654507601500384e-07
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "chunk_k64",
+        "lower_error_cases": 36,
+        "equal_error_cases": 0,
+        "higher_error_cases": 0,
+        "max_ef_increase": -6.452640736312191e-10,
+        "min_ef_change": -7.000191962631914e-06
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "stream_k64",
+        "lower_error_cases": 33,
+        "equal_error_cases": 0,
+        "higher_error_cases": 3,
+        "max_ef_increase": 9.439703306288032e-09,
+        "min_ef_change": -6.234322637173512e-06
+      }
+    ],
+    "same_input_controls": [
+      {
+        "dtype": "torch.float16",
+        "seed": 9301,
+        "full_k128_matches_m13_leaf": true
+      },
+      {
+        "dtype": "torch.bfloat16",
+        "seed": 9301,
+        "full_k128_matches_m13_leaf": true
+      }
+    ],
+    "hardware_accepted": false,
+    "performance_accepted": false
+  },
   "p48_independent_performance": [
     {
       "dtype": "bf16",
@@ -4446,6 +4631,6 @@
     ],
     "scope": "Full original-input FP64 matrix gates; printed eF equality is not a bitwise-output claim. Host eligibility diagnostics outside timing. No production integration. Unlocked clocks, no confidence interval."
   },
-  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11/M12/M13 are numerical only. P43 owns fresh9-pattern108/864stress without tools/independent Graph timing; P44 ordinaryABBA only. P45 owns ordinary/Graph78, fresh108/864stress and36/72tools; P46 owns its independent ordinary/GraphABBA, fresh108/864stress and36/72tools; P47 owns independent ordinary/GraphABBA, fresh108/864stress,36/72tools and separate54configurations of full native plane/exponent bit comparisons; P48 has only ordinary/GraphABBA and matching device code, no fresh stress/tools and is rejected; none transfers to later changes.",
+  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11/M12/M13/M14 are numerical only. P43 owns fresh9-pattern108/864stress without tools/independent Graph timing; P44 ordinaryABBA only. P45 owns ordinary/Graph78, fresh108/864stress and36/72tools; P46 owns its independent ordinary/GraphABBA, fresh108/864stress and36/72tools; P47 owns independent ordinary/GraphABBA, fresh108/864stress,36/72tools and separate54configurations of full native plane/exponent bit comparisons; P48 has only ordinary/GraphABBA and matching device code, no fresh stress/tools and is rejected; none transfers to later changes.",
   "remaining": "Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration."
 }

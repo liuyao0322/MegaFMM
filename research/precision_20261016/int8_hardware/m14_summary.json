@@ -1,0 +1,165 @@
+{
+  "scope": "M14: K64 native fusion numerical screen, not WGMMA or timing evidence.\n\nFour paired arms isolate K granularity and Winograd recombination: full K128\ncorrected leaves (M13 control), full K64 leaves, K64 chunk-output accumulation,\nand K64 streaming product accumulation with only four persistent output tiles.\nBoth original dtypes, exact column scaling, all seven main/eight cross dots.\n",
+  "configurations": 72,
+  "rows": 288,
+  "summary": [
+    {
+      "dtype": "float16",
+      "arm": "full_k128",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "max_ef": 3.08702026764631e-05,
+      "worst_pattern": "cancellation",
+      "worst_seed": 9302,
+      "max_output_delta_to_full_k128_ef": 0.0
+    },
+    {
+      "dtype": "float16",
+      "arm": "full_k64",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "max_ef": 2.3982852741044256e-05,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 9302,
+      "max_output_delta_to_full_k128_ef": 3.209306620690188e-05
+    },
+    {
+      "dtype": "float16",
+      "arm": "chunk_k64",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "max_ef": 2.0311713706888977e-05,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 9302,
+      "max_output_delta_to_full_k128_ef": 2.9970244611550748e-05
+    },
+    {
+      "dtype": "float16",
+      "arm": "stream_k64",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "max_ef": 2.0643853774473017e-05,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 9302,
+      "max_output_delta_to_full_k128_ef": 3.019939757282437e-05
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "full_k128",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "max_ef": 1.5678783829543367e-05,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 9302,
+      "max_output_delta_to_full_k128_ef": 0.0
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "full_k64",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "max_ef": 1.5461198392320167e-05,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 9302,
+      "max_output_delta_to_full_k128_ef": 1.9386645552938193e-05
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "chunk_k64",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "max_ef": 8.881174636669727e-06,
+      "worst_pattern": "cancellation",
+      "worst_seed": 9301,
+      "max_output_delta_to_full_k128_ef": 1.5637230207569444e-05
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "stream_k64",
+      "configurations": 36,
+      "passes": 36,
+      "nonfinite": 0,
+      "max_ef": 9.444461192369855e-06,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 9302,
+      "max_output_delta_to_full_k128_ef": 1.607004117008628e-05
+    }
+  ],
+  "paired": [
+    {
+      "dtype": "float16",
+      "arm": "full_k64",
+      "lower_error_cases": 36,
+      "equal_error_cases": 0,
+      "higher_error_cases": 0,
+      "max_ef_increase": -1.4425834639089038e-08,
+      "min_ef_change": -7.323305955294246e-06
+    },
+    {
+      "dtype": "float16",
+      "arm": "chunk_k64",
+      "lower_error_cases": 36,
+      "equal_error_cases": 0,
+      "higher_error_cases": 0,
+      "max_ef_increase": -2.1621923846293916e-08,
+      "min_ef_change": -1.0933126999224314e-05
+    },
+    {
+      "dtype": "float16",
+      "arm": "stream_k64",
+      "lower_error_cases": 33,
+      "equal_error_cases": 0,
+      "higher_error_cases": 3,
+      "max_ef_increase": 5.8186620532028e-09,
+      "min_ef_change": -1.063319785489177e-05
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "full_k64",
+      "lower_error_cases": 21,
+      "equal_error_cases": 0,
+      "higher_error_cases": 15,
+      "max_ef_increase": 9.66442437787813e-10,
+      "min_ef_change": -5.654507601500384e-07
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "chunk_k64",
+      "lower_error_cases": 36,
+      "equal_error_cases": 0,
+      "higher_error_cases": 0,
+      "max_ef_increase": -6.452640736312191e-10,
+      "min_ef_change": -7.000191962631914e-06
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "stream_k64",
+      "lower_error_cases": 33,
+      "equal_error_cases": 0,
+      "higher_error_cases": 3,
+      "max_ef_increase": 9.439703306288032e-09,
+      "min_ef_change": -6.234322637173512e-06
+    }
+  ],
+  "same_input_controls": [
+    {
+      "dtype": "torch.float16",
+      "seed": 9301,
+      "full_k128_matches_m13_leaf": true
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 9301,
+      "full_k128_matches_m13_leaf": true
+    }
+  ],
+  "hardware_accepted": false,
+  "performance_accepted": false
+}
