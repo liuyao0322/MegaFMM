@@ -1,0 +1,64 @@
+{
+  "iteration": 363,
+  "commit": "8979dc9",
+  "formal_rows": 14,
+  "original_fp64_pass_rows": 14,
+  "relevant_ctest": {
+    "passed": 6,
+    "failed": 0,
+    "forced_candidates": 98,
+    "new_test": "tuning_precision_guard"
+  },
+  "sanitizer": "CUDA12.8 ComputeSanitizer2025.1",
+  "candidate_memcheck_errors": 0,
+  "candidate_racecheck_errors": 0,
+  "candidate_racecheck_warnings": 0,
+  "fp64_guard_memcheck_errors": 0,
+  "fp64_guard_racecheck_errors": 0,
+  "fp64_guard_racecheck_warnings": 0,
+  "large_shape_recheck_evidence": [
+    {
+      "dtype": "bf16",
+      "fp64_rechecks": 4,
+      "fp64_accepted": 4,
+      "new_scores_ms": {
+        "128x256x64_beta0_splitk2_ms": 13.994763,
+        "128x256x64_beta0_splitk4_ms": 14.850859,
+        "128x256x64_beta0_splitk2_cm2_ms": 13.968587,
+        "128x256x64_beta0_splitk4_cm2_ms": 14.903534
+      },
+      "selected_route": "tuned_dense_cublaslt",
+      "selected_complete_ms": 12.7669360352,
+      "original_gate_pass": true,
+      "eF": 1.79060023389e-05
+    },
+    {
+      "dtype": "fp16",
+      "fp64_rechecks": 4,
+      "fp64_accepted": 4,
+      "new_scores_ms": {
+        "128x256x64_beta0_splitk2_ms": 14.679625,
+        "128x256x64_beta0_splitk4_ms": 15.364102,
+        "128x256x64_beta0_splitk2_cm2_ms": 14.774626,
+        "128x256x64_beta0_splitk4_cm2_ms": 15.484921
+      },
+      "selected_route": "tuned_dense_cublaslt",
+      "selected_complete_ms": 13.3060961914,
+      "original_gate_pass": true,
+      "eF": 1.93317490711e-05
+    }
+  ],
+  "new_custom_stable_wins": 0,
+  "last_complete_independent_certification": {
+    "iteration": 353,
+    "stable_wins": 16,
+    "total": 28
+  },
+  "notes": [
+    "Previously falsely rejected reduction candidates now receive exact original-input FP64 recheck and finite timing scores.",
+    "All new SplitK candidates remain slower; dispatch correctly retains cuBLASLt.",
+    "Temporary FP64 reference allocations and synchronization occur only in explicit tune; run unchanged.",
+    "Guard tests verify accurate-but-disagreeing output accepted; corruption/nonfinite/stale inputs rejected; alpha/stride/transpose/zero-reference behavior.",
+    "No expanded-pool independent performance certification inferred."
+  ]
+}
