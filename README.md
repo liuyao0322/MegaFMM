@@ -16,7 +16,7 @@ memcheck/racecheck/synccheck限定范围各36配置/72调用零错误，racechec
 未锁时钟，无置信区间；完整调用仍约为生产SW的2.8倍，未进入生产或改变Auto。
 [P47实现](research/precision_20261016/int8_hardware/DIRECT_NATIVE_PACK_HARDWARE.md)、[自身验收](research/precision_20261016/int8_hardware/p47_validation.json)、
 [综合审计](research/precision_20261016/fused_int8/audit.json)及[后续消融](research/precision_20261016/int8_hardware/NEXT_EXPERIMENTS.md)保留确切范围与性能差距。
-失败候选、M11/M12/M13的独立数值筛选和范围反例完整保留；目标继续进行。
+P48仅缩小共享申请量未改善完整成本，已恢复P47；下一步先做K分块重组的M14数值筛选。失败候选、M11/M12/M13的独立数值筛选和范围反例完整保留；目标继续进行。
 [片上融合后续](research/precision_20261016/fused_int8/REPORT.md)修正布局后通过72项普通精度；继续移出逐元素缩放判断后，F13完整调用约224–240 μs，仍拒绝性能验收。
 下方 iter282 等标签为历史检查点，实际起点和文件哈希以新报告为准。
 

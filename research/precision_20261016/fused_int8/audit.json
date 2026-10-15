@@ -673,6 +673,19 @@
       "validation_scope": "own ordinary/Graph78, each independentABBA312; fresh9-pattern108configurations/864calls, scoped tools36/72calls each; separate54configuration full-plane bit comparison",
       "numerical_algorithm_changed": "storage-only direct native high/low writes; unchanged explicit RN transforms and P46 consumer; shared requests retained"
     },
+    "p48": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 28.78368091575,
+        "fp16": 28.922399520749998
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": false,
+      "validation_scope": "own ordinary78 plus independent ordinary/GraphABBA312 each; no own fresh stress or sanitizer certificate, rejected performance"
+    },
     "p35": {
       "checks": 78,
       "failures": 0,
@@ -2874,6 +2887,118 @@
     "hardware_accepted": false,
     "performance_accepted": false
   },
+  "p48_independent_performance": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p47",
+      "new_candidate": "p48",
+      "old_group_median_us": 28.776839971500003,
+      "new_group_median_us": 28.68664002425,
+      "relative_reduction": 0.003134463246810104
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p47",
+      "new_candidate": "p48",
+      "old_group_median_us": 28.717719793375,
+      "new_group_median_us": 28.740559578,
+      "relative_reduction": -0.0007953202687864813
+    }
+  ],
+  "p48_graph_performance": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p47",
+      "new_candidate": "p48",
+      "old_group_median_us": 28.655560731999998,
+      "new_group_median_us": 28.824959754875,
+      "relative_reduction": -0.0059115584740880855
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p47",
+      "new_candidate": "p48",
+      "old_group_median_us": 28.719639778125,
+      "new_group_median_us": 28.869559287999998,
+      "relative_reduction": -0.005220104118060176
+    }
+  ],
+  "p48_device_identity": {
+    "scope": "Static instruction counts only; never infer executed counts or latency.",
+    "tool_version": "cuobjdump: NVIDIA (R) fat binary listing tool\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Feb_27_16:19:38_PST_2024\nCuda compilation tools, release 12.4, V12.4.99\nBuild cuda_12.4.r12.4/compiler.33961263_0\n",
+    "rows": [
+      {
+        "candidate": "p47",
+        "function": "_ZN13int8_research30preprocess_cooperative_columnsIN7cutlass10bfloat16_tEEEvPKT_S5_PS3_S6_S6_S6_PiS7_S7_Pf",
+        "instructions": 3368,
+        "LDS": 9,
+        "STS": 2,
+        "BAR": 3
+      },
+      {
+        "candidate": "p47",
+        "function": "_ZN13int8_research30preprocess_cooperative_columnsIN7cutlass6half_tEEEvPKT_S5_PS3_S6_S6_S6_PiS7_S7_Pf",
+        "instructions": 3376,
+        "LDS": 9,
+        "STS": 2,
+        "BAR": 3
+      },
+      {
+        "candidate": "p47",
+        "function": "_ZN13int8_research9correctedIN7cutlass6half_tEEEv14CUtensorMap_stS3_PKiS5_Pf",
+        "instructions": 1600,
+        "LDS": 0,
+        "STS": 0,
+        "BAR": 1
+      },
+      {
+        "candidate": "p47",
+        "function": "_ZN13int8_research9correctedIN7cutlass10bfloat16_tEEEv14CUtensorMap_stS3_PKiS5_Pf",
+        "instructions": 1600,
+        "LDS": 0,
+        "STS": 0,
+        "BAR": 1
+      },
+      {
+        "candidate": "p48",
+        "function": "_ZN13int8_research30preprocess_cooperative_columnsIN7cutlass10bfloat16_tEEEvPKT_S5_PS3_S6_S6_S6_PiS7_S7_Pf",
+        "instructions": 3368,
+        "LDS": 9,
+        "STS": 2,
+        "BAR": 3
+      },
+      {
+        "candidate": "p48",
+        "function": "_ZN13int8_research30preprocess_cooperative_columnsIN7cutlass6half_tEEEvPKT_S5_PS3_S6_S6_S6_PiS7_S7_Pf",
+        "instructions": 3376,
+        "LDS": 9,
+        "STS": 2,
+        "BAR": 3
+      },
+      {
+        "candidate": "p48",
+        "function": "_ZN13int8_research9correctedIN7cutlass6half_tEEEv14CUtensorMap_stS3_PKiS5_Pf",
+        "instructions": 1600,
+        "LDS": 0,
+        "STS": 0,
+        "BAR": 1
+      },
+      {
+        "candidate": "p48",
+        "function": "_ZN13int8_research9correctedIN7cutlass10bfloat16_tEEEv14CUtensorMap_stS3_PKiS5_Pf",
+        "instructions": 1600,
+        "LDS": 0,
+        "STS": 0,
+        "BAR": 1
+      }
+    ],
+    "device_normalized_instruction_text_identical": {
+      "_ZN13int8_research30preprocess_cooperative_columnsIN7cutlass10bfloat16_tEEEvPKT_S5_PS3_S6_S6_S6_PiS7_S7_Pf": true,
+      "_ZN13int8_research30preprocess_cooperative_columnsIN7cutlass6half_tEEEvPKT_S5_PS3_S6_S6_S6_PiS7_S7_Pf": true,
+      "_ZN13int8_research9correctedIN7cutlass6half_tEEEv14CUtensorMap_stS3_PKiS5_Pf": true,
+      "_ZN13int8_research9correctedIN7cutlass10bfloat16_tEEEv14CUtensorMap_stS3_PKiS5_Pf": true
+    }
+  },
   "p47_pack_bits": {
     "scope": "same fresh inputs for frozen P46 and P47 preprocessors; all eleven native high/low planes on both sides and exact inside exponents, before MMA. Diagnostic only, no timing or original-input FP64 matrix acceptance; not separately sanitizer-instrumented.",
     "configurations": 54,
@@ -4321,6 +4446,6 @@
     ],
     "scope": "Full original-input FP64 matrix gates; printed eF equality is not a bitwise-output claim. Host eligibility diagnostics outside timing. No production integration. Unlocked clocks, no confidence interval."
   },
-  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11/M12/M13 are numerical only. P43 owns fresh9-pattern108/864stress without tools/independent Graph timing; P44 ordinaryABBA only. P45 owns ordinary/Graph78, fresh108/864stress and36/72tools; P46 owns its independent ordinary/GraphABBA, fresh108/864stress and36/72tools; P47 owns independent ordinary/GraphABBA, fresh108/864stress,36/72tools and separate54configurations of full native plane/exponent bit comparisons; none transfers to later changes.",
+  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11/M12/M13 are numerical only. P43 owns fresh9-pattern108/864stress without tools/independent Graph timing; P44 ordinaryABBA only. P45 owns ordinary/Graph78, fresh108/864stress and36/72tools; P46 owns its independent ordinary/GraphABBA, fresh108/864stress and36/72tools; P47 owns independent ordinary/GraphABBA, fresh108/864stress,36/72tools and separate54configurations of full native plane/exponent bit comparisons; P48 has only ordinary/GraphABBA and matching device code, no fresh stress/tools and is rejected; none transfers to later changes.",
   "remaining": "Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration."
 }
