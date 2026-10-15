@@ -39,3 +39,10 @@ F6/F7两种dtype均0stack、0spill、124registers/thread。F7对齐修正大幅�
 - fp16: complete701.239us versus currentSW10.004us.
 - A modest reduction within a severely rejected prototype; the end-to-end gap remains. No independent three-process performance acceptance, Graph, dual-stream or sanitizer result is claimed. This change does not establish consumer scale construction as the main fused-kernel bottleneck.
 - Next diagnosis must distinguish producer packing/reductions from consumer waits and polling, then hoist the producer's repeated inside/quantization scale decisions or reassess the fusion layout. M4's paired relative-scale model is supported numerically but has no implemented kernel yet.
+
+## F9 producer/consumer trace — locate the actual long interval
+
+- Clone frozenF9; timestamp producer0 and consumer128 around raw/leaf waits and major work. One fresh uniformBF16 FP64 check passes with eF5.52481148267e-5, identical toF9. Diagnostic10warmup/20kernel calls=716.614us,122regs versus124untraced,0stack/spill. Stores and scheduling changes perturb timing; no complete-call verdict.
+- Median of same-CTA phase sums:producer pack687.072us,inside14.880us,raw issue+ready4.448us,slot-free wait2.112us,total710.976us. Consumer slot-ready wait685.344us,native main raw+leaf7.488us,correction0+1 16.000us,total711.664us. Raw and leaf main phase medians separately need not sum to the displayed combined median; inspect per-CTA rows for exact sums.
+- Roles overlap:median useful work overlap17.456us. Do not add producer and consumer durations. The dominant measured interval is producer packing, not exposed MMA time or host tensor-map setup. The trace does not yet separate pack first-pass/quantization details.
+- Next isolated candidateF10 hoists common inside exponents/factors out of pack element loops, retaining general exponent fallback. Frozen trace source/results/binary identity in`trace_f9_manifest.json`.

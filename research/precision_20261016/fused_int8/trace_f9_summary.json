@@ -1,0 +1,3358 @@
+{
+  "scope": "Frozen F9, one uniform BF16 input. Globaltimer stores and extra registers perturb scheduling. Sum intervals within each CTA, then report medians. Role durations overlap and must not be added. Instrumented arithmetic checked against original-input FP64; not a full precision or complete-call performance acceptance.",
+  "median_us": {
+    "producer": {
+      "raw_free_wait": 0.48,
+      "raw_issue_ready": 4.448,
+      "inside": 14.879999999999999,
+      "slot_free_wait": 2.1120000000000005,
+      "pack": 687.0719999999999,
+      "publish": 0.6720000000000002,
+      "control_gaps": 1.376,
+      "total": 710.976
+    },
+    "consumer": {
+      "raw_ready_wait": 1.4720000000000002,
+      "raw_native": 2.08,
+      "raw_release": 0.064,
+      "slot_ready_wait": 685.344,
+      "native": 5.408000000000002,
+      "correction0": 10.880000000000003,
+      "correction1": 5.120000000000001,
+      "slot_release": 0.5120000000000002,
+      "control_gaps": 0.672,
+      "total": 711.664
+    }
+  },
+  "median_overlap_us": 17.456000000000003,
+  "per_cta": [
+    {
+      "cta": 0,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.384,
+        "inside": 14.848,
+        "slot_free_wait": 2.080000000000001,
+        "pack": 686.2080000000001,
+        "publish": 0.7680000000000002,
+        "control_gaps": 1.312,
+        "total": 710.112
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.3360000000000003,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.6400000000001,
+        "native": 5.248000000000002,
+        "correction0": 10.656000000000002,
+        "correction1": 5.056000000000001,
+        "slot_release": 0.5440000000000002,
+        "control_gaps": 0.736,
+        "total": 710.752
+      },
+      "useful_role_overlap_us": 17.344
+    },
+    {
+      "cta": 1,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.416,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 686.048,
+        "publish": 0.7680000000000002,
+        "control_gaps": 1.408,
+        "total": 710.144
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5680000000000003,
+        "raw_native": 2.3360000000000003,
+        "raw_release": 0.032,
+        "slot_ready_wait": 684.7360000000001,
+        "native": 5.120000000000002,
+        "correction0": 10.720000000000002,
+        "correction1": 5.120000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.672,
+        "total": 710.816
+      },
+      "useful_role_overlap_us": 17.312
+    },
+    {
+      "cta": 2,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.416,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.048000000000001,
+        "pack": 686.144,
+        "publish": 0.6720000000000002,
+        "control_gaps": 1.472,
+        "total": 710.144
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.3040000000000003,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.7040000000002,
+        "native": 5.472000000000002,
+        "correction0": 10.304000000000004,
+        "correction1": 5.088000000000001,
+        "slot_release": 0.6400000000000001,
+        "control_gaps": 0.736,
+        "total": 710.816
+      },
+      "useful_role_overlap_us": 17.28
+    },
+    {
+      "cta": 3,
+      "producer": {
+        "raw_free_wait": 0.44799999999999995,
+        "raw_issue_ready": 4.384,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 1.9840000000000009,
+        "pack": 686.144,
+        "publish": 0.8000000000000003,
+        "control_gaps": 1.44,
+        "total": 710.176
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.3040000000000003,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.8640000000003,
+        "native": 5.408000000000002,
+        "correction0": 10.208000000000004,
+        "correction1": 5.216,
+        "slot_release": 0.5440000000000003,
+        "control_gaps": 0.672,
+        "total": 710.816
+      },
+      "useful_role_overlap_us": 17.376
+    },
+    {
+      "cta": 4,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.416,
+        "inside": 14.879999999999999,
+        "slot_free_wait": 2.048000000000001,
+        "pack": 686.2079999999999,
+        "publish": 0.6720000000000003,
+        "control_gaps": 1.408,
+        "total": 710.112
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.3360000000000003,
+        "raw_release": 0.032,
+        "slot_ready_wait": 684.7040000000001,
+        "native": 4.992000000000003,
+        "correction0": 10.816000000000003,
+        "correction1": 5.120000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.8,
+        "total": 710.784
+      },
+      "useful_role_overlap_us": 17.344
+    },
+    {
+      "cta": 5,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.448,
+        "inside": 14.816,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 686.3680000000002,
+        "publish": 0.7040000000000003,
+        "control_gaps": 1.312,
+        "total": 710.144
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 2.3360000000000003,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.672,
+        "native": 4.992000000000003,
+        "correction0": 10.816000000000003,
+        "correction1": 5.152000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.736,
+        "total": 710.816
+      },
+      "useful_role_overlap_us": 17.472
+    },
+    {
+      "cta": 6,
+      "producer": {
+        "raw_free_wait": 0.44799999999999995,
+        "raw_issue_ready": 4.416,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 2.080000000000001,
+        "pack": 686.24,
+        "publish": 0.7360000000000002,
+        "control_gaps": 1.312,
+        "total": 710.144
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.3040000000000003,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.7360000000001,
+        "native": 5.440000000000002,
+        "correction0": 10.336000000000004,
+        "correction1": 5.216000000000001,
+        "slot_release": 0.5760000000000003,
+        "control_gaps": 0.608,
+        "total": 710.816
+      },
+      "useful_role_overlap_us": 17.312
+    },
+    {
+      "cta": 7,
+      "producer": {
+        "raw_free_wait": 0.384,
+        "raw_issue_ready": 4.416,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.1120000000000005,
+        "pack": 686.2079999999999,
+        "publish": 0.7680000000000002,
+        "control_gaps": 1.312,
+        "total": 710.144
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 2.3040000000000003,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.96,
+        "native": 5.248000000000002,
+        "correction0": 10.304000000000004,
+        "correction1": 5.248000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.64,
+        "total": 710.848
+      },
+      "useful_role_overlap_us": 17.248
+    },
+    {
+      "cta": 8,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.448,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.144000000000001,
+        "pack": 686.1759999999999,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.344,
+        "total": 710.144
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.3360000000000003,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.704,
+        "native": 5.312000000000002,
+        "correction0": 10.528000000000002,
+        "correction1": 5.120000000000001,
+        "slot_release": 0.5760000000000002,
+        "control_gaps": 0.672,
+        "total": 710.816
+      },
+      "useful_role_overlap_us": 17.344
+    },
+    {
+      "cta": 9,
+      "producer": {
+        "raw_free_wait": 0.41600000000000004,
+        "raw_issue_ready": 4.448,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.048000000000001,
+        "pack": 686.24,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.376,
+        "total": 710.144
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.3360000000000003,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.736,
+        "native": 5.216000000000002,
+        "correction0": 10.592000000000002,
+        "correction1": 5.152000000000001,
+        "slot_release": 0.5120000000000001,
+        "control_gaps": 0.704,
+        "total": 710.816
+      },
+      "useful_role_overlap_us": 17.408
+    },
+    {
+      "cta": 10,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.416,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.080000000000001,
+        "pack": 686.2080000000001,
+        "publish": 0.6720000000000002,
+        "control_gaps": 1.344,
+        "total": 710.144
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.4,
+        "raw_release": 0.0,
+        "slot_ready_wait": 684.5759999999999,
+        "native": 5.280000000000002,
+        "correction0": 10.592000000000004,
+        "correction1": 5.120000000000001,
+        "slot_release": 0.5440000000000003,
+        "control_gaps": 0.832,
+        "total": 710.816
+      },
+      "useful_role_overlap_us": 17.44
+    },
+    {
+      "cta": 11,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.416,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 686.2080000000001,
+        "publish": 0.7680000000000005,
+        "control_gaps": 1.312,
+        "total": 710.176
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.368,
+        "raw_release": 0.032,
+        "slot_ready_wait": 684.7040000000001,
+        "native": 5.120000000000002,
+        "correction0": 10.624000000000002,
+        "correction1": 5.184,
+        "slot_release": 0.4800000000000002,
+        "control_gaps": 0.832,
+        "total": 710.784
+      },
+      "useful_role_overlap_us": 17.536
+    },
+    {
+      "cta": 12,
+      "producer": {
+        "raw_free_wait": 0.384,
+        "raw_issue_ready": 4.416,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 686.2080000000001,
+        "publish": 0.7040000000000004,
+        "control_gaps": 1.44,
+        "total": 710.144
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.4000000000000004,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.9279999999999,
+        "native": 5.600000000000001,
+        "correction0": 10.112000000000002,
+        "correction1": 4.992000000000001,
+        "slot_release": 0.5760000000000003,
+        "control_gaps": 0.672,
+        "total": 710.816
+      },
+      "useful_role_overlap_us": 17.376
+    },
+    {
+      "cta": 13,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.352,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 1.8560000000000008,
+        "pack": 686.1760000000002,
+        "publish": 0.7680000000000002,
+        "control_gaps": 1.536,
+        "total": 710.144
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.4000000000000004,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.896,
+        "native": 5.6320000000000014,
+        "correction0": 10.144000000000002,
+        "correction1": 4.960000000000001,
+        "slot_release": 0.5440000000000003,
+        "control_gaps": 0.704,
+        "total": 710.816
+      },
+      "useful_role_overlap_us": 17.504
+    },
+    {
+      "cta": 14,
+      "producer": {
+        "raw_free_wait": 0.544,
+        "raw_issue_ready": 4.32,
+        "inside": 14.879999999999999,
+        "slot_free_wait": 2.048000000000001,
+        "pack": 686.3040000000001,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.408,
+        "total": 710.112
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.3360000000000003,
+        "raw_release": 0.032,
+        "slot_ready_wait": 684.9600000000002,
+        "native": 4.896000000000003,
+        "correction0": 10.880000000000003,
+        "correction1": 4.992000000000001,
+        "slot_release": 0.6080000000000002,
+        "control_gaps": 0.64,
+        "total": 710.752
+      },
+      "useful_role_overlap_us": 17.312
+    },
+    {
+      "cta": 15,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.416,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 1.9840000000000009,
+        "pack": 686.4000000000001,
+        "publish": 0.5760000000000003,
+        "control_gaps": 1.408,
+        "total": 710.144
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.3040000000000003,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.9920000000001,
+        "native": 5.024000000000003,
+        "correction0": 10.720000000000002,
+        "correction1": 4.992000000000001,
+        "slot_release": 0.6080000000000002,
+        "control_gaps": 0.64,
+        "total": 710.816
+      },
+      "useful_role_overlap_us": 17.248
+    },
+    {
+      "cta": 16,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.32,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 2.1440000000000006,
+        "pack": 686.2719999999999,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.376,
+        "total": 710.208
+      },
+      "consumer": {
+        "raw_ready_wait": 1.3760000000000001,
+        "raw_native": 2.208,
+        "raw_release": 0.032,
+        "slot_ready_wait": 684.4480000000001,
+        "native": 5.376000000000002,
+        "correction0": 11.008000000000003,
+        "correction1": 5.312,
+        "slot_release": 0.5440000000000003,
+        "control_gaps": 0.608,
+        "total": 710.912
+      },
+      "useful_role_overlap_us": 17.76
+    },
+    {
+      "cta": 17,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.224,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 2.1120000000000005,
+        "pack": 686.4,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.376,
+        "total": 710.208
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.176,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.608,
+        "native": 5.184000000000002,
+        "correction0": 11.040000000000003,
+        "correction1": 5.312,
+        "slot_release": 0.5760000000000003,
+        "control_gaps": 0.544,
+        "total": 710.912
+      },
+      "useful_role_overlap_us": 17.76
+    },
+    {
+      "cta": 18,
+      "producer": {
+        "raw_free_wait": 0.384,
+        "raw_issue_ready": 4.352,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 2.1120000000000005,
+        "pack": 686.368,
+        "publish": 0.7040000000000002,
+        "control_gaps": 1.312,
+        "total": 710.208
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.176,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.6719999999999,
+        "native": 5.504000000000002,
+        "correction0": 10.784000000000002,
+        "correction1": 5.12,
+        "slot_release": 0.5760000000000003,
+        "control_gaps": 0.608,
+        "total": 710.912
+      },
+      "useful_role_overlap_us": 17.536
+    },
+    {
+      "cta": 19,
+      "producer": {
+        "raw_free_wait": 0.44799999999999995,
+        "raw_issue_ready": 4.288,
+        "inside": 15.008,
+        "slot_free_wait": 2.0800000000000005,
+        "pack": 686.24,
+        "publish": 0.7680000000000002,
+        "control_gaps": 1.376,
+        "total": 710.208
+      },
+      "consumer": {
+        "raw_ready_wait": 1.344,
+        "raw_native": 2.208,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.672,
+        "native": 5.568000000000002,
+        "correction0": 10.688000000000002,
+        "correction1": 5.216,
+        "slot_release": 0.4480000000000002,
+        "control_gaps": 0.672,
+        "total": 710.88
+      },
+      "useful_role_overlap_us": 17.6
+    },
+    {
+      "cta": 20,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.256,
+        "inside": 15.04,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 686.3999999999999,
+        "publish": 0.6080000000000002,
+        "control_gaps": 1.472,
+        "total": 710.24
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.176,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.7040000000001,
+        "native": 5.504000000000002,
+        "correction0": 10.624000000000004,
+        "correction1": 5.312000000000001,
+        "slot_release": 0.41600000000000015,
+        "control_gaps": 0.672,
+        "total": 710.912
+      },
+      "useful_role_overlap_us": 17.728
+    },
+    {
+      "cta": 21,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.288,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 2.176,
+        "pack": 686.336,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.408,
+        "total": 710.24
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.176,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.64,
+        "native": 5.600000000000002,
+        "correction0": 10.592000000000004,
+        "correction1": 5.248000000000001,
+        "slot_release": 0.4800000000000002,
+        "control_gaps": 0.672,
+        "total": 710.88
+      },
+      "useful_role_overlap_us": 17.664
+    },
+    {
+      "cta": 22,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.256,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 686.368,
+        "publish": 0.6400000000000002,
+        "control_gaps": 1.344,
+        "total": 710.176
+      },
+      "consumer": {
+        "raw_ready_wait": 1.3760000000000001,
+        "raw_native": 2.144,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.576,
+        "native": 5.408000000000001,
+        "correction0": 10.976000000000004,
+        "correction1": 5.216000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.544,
+        "total": 710.848
+      },
+      "useful_role_overlap_us": 17.664
+    },
+    {
+      "cta": 23,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.288,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 2.080000000000001,
+        "pack": 686.464,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.344,
+        "total": 710.208
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.176,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.704,
+        "native": 5.248000000000002,
+        "correction0": 10.944000000000004,
+        "correction1": 5.216000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.608,
+        "total": 710.912
+      },
+      "useful_role_overlap_us": 17.632
+    },
+    {
+      "cta": 24,
+      "producer": {
+        "raw_free_wait": 0.544,
+        "raw_issue_ready": 4.224,
+        "inside": 15.008,
+        "slot_free_wait": 2.144000000000001,
+        "pack": 686.3039999999999,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.312,
+        "total": 710.176
+      },
+      "consumer": {
+        "raw_ready_wait": 1.3760000000000001,
+        "raw_native": 2.144,
+        "raw_release": 0.128,
+        "slot_ready_wait": 684.608,
+        "native": 5.440000000000002,
+        "correction0": 10.880000000000003,
+        "correction1": 5.216,
+        "slot_release": 0.6400000000000002,
+        "control_gaps": 0.416,
+        "total": 710.848
+      },
+      "useful_role_overlap_us": 17.6
+    },
+    {
+      "cta": 25,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.32,
+        "inside": 15.008,
+        "slot_free_wait": 1.9200000000000008,
+        "pack": 686.4,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.44,
+        "total": 710.208
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.112,
+        "raw_release": 0.128,
+        "slot_ready_wait": 684.576,
+        "native": 5.408000000000002,
+        "correction0": 10.944000000000003,
+        "correction1": 5.184,
+        "slot_release": 0.6400000000000002,
+        "control_gaps": 0.48,
+        "total": 710.912
+      },
+      "useful_role_overlap_us": 17.632
+    },
+    {
+      "cta": 26,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.256,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 2.0800000000000005,
+        "pack": 686.3039999999999,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.44,
+        "total": 710.208
+      },
+      "consumer": {
+        "raw_ready_wait": 1.3760000000000001,
+        "raw_native": 2.176,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.672,
+        "native": 5.536000000000002,
+        "correction0": 10.624000000000004,
+        "correction1": 5.312000000000001,
+        "slot_release": 0.4480000000000002,
+        "control_gaps": 0.672,
+        "total": 710.88
+      },
+      "useful_role_overlap_us": 17.632
+    },
+    {
+      "cta": 27,
+      "producer": {
+        "raw_free_wait": 0.44799999999999995,
+        "raw_issue_ready": 4.256,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.0800000000000005,
+        "pack": 686.4,
+        "publish": 0.6720000000000003,
+        "control_gaps": 1.408,
+        "total": 710.208
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.2079999999999997,
+        "raw_release": 0.032,
+        "slot_ready_wait": 684.6080000000001,
+        "native": 5.632000000000002,
+        "correction0": 10.528000000000004,
+        "correction1": 5.312000000000001,
+        "slot_release": 0.4800000000000002,
+        "control_gaps": 0.704,
+        "total": 710.912
+      },
+      "useful_role_overlap_us": 17.696
+    },
+    {
+      "cta": 28,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.256,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.1440000000000006,
+        "pack": 686.368,
+        "publish": 0.7040000000000003,
+        "control_gaps": 1.248,
+        "total": 710.176
+      },
+      "consumer": {
+        "raw_ready_wait": 1.312,
+        "raw_native": 2.208,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.8000000000002,
+        "native": 5.056000000000003,
+        "correction0": 11.104000000000003,
+        "correction1": 5.247999999999999,
+        "slot_release": 0.3840000000000001,
+        "control_gaps": 0.672,
+        "total": 710.848
+      },
+      "useful_role_overlap_us": 17.664
+    },
+    {
+      "cta": 29,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.32,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.048000000000001,
+        "pack": 686.3679999999999,
+        "publish": 0.7040000000000002,
+        "control_gaps": 1.312,
+        "total": 710.176
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.144,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.768,
+        "native": 5.088000000000003,
+        "correction0": 11.104000000000003,
+        "correction1": 5.215999999999999,
+        "slot_release": 0.4480000000000002,
+        "control_gaps": 0.608,
+        "total": 710.912
+      },
+      "useful_role_overlap_us": 17.536
+    },
+    {
+      "cta": 30,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.256,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 2.1440000000000006,
+        "pack": 686.368,
+        "publish": 0.7360000000000002,
+        "control_gaps": 1.248,
+        "total": 710.176
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.176,
+        "raw_release": 0.032,
+        "slot_ready_wait": 684.672,
+        "native": 5.184000000000003,
+        "correction0": 11.072000000000003,
+        "correction1": 5.183999999999999,
+        "slot_release": 0.6400000000000002,
+        "control_gaps": 0.512,
+        "total": 710.88
+      },
+      "useful_role_overlap_us": 17.6
+    },
+    {
+      "cta": 31,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.32,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 2.2720000000000007,
+        "pack": 686.208,
+        "publish": 0.7040000000000004,
+        "control_gaps": 1.312,
+        "total": 710.208
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.176,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.512,
+        "native": 5.344000000000002,
+        "correction0": 11.104000000000003,
+        "correction1": 5.119999999999999,
+        "slot_release": 0.6080000000000002,
+        "control_gaps": 0.544,
+        "total": 710.912
+      },
+      "useful_role_overlap_us": 17.504
+    },
+    {
+      "cta": 32,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.352,
+        "inside": 14.848,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 686.624,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.504,
+        "total": 710.4
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.2079999999999997,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.8960000000001,
+        "native": 5.152000000000002,
+        "correction0": 11.008000000000003,
+        "correction1": 5.280000000000001,
+        "slot_release": 0.3840000000000001,
+        "control_gaps": 0.704,
+        "total": 711.104
+      },
+      "useful_role_overlap_us": 17.696
+    },
+    {
+      "cta": 33,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.32,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 686.4960000000001,
+        "publish": 0.6080000000000002,
+        "control_gaps": 1.472,
+        "total": 710.4
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.1759999999999997,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.832,
+        "native": 5.184000000000002,
+        "correction0": 10.944000000000003,
+        "correction1": 5.376000000000001,
+        "slot_release": 0.3520000000000001,
+        "control_gaps": 0.704,
+        "total": 711.104
+      },
+      "useful_role_overlap_us": 17.6
+    },
+    {
+      "cta": 34,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.32,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 686.5600000000001,
+        "publish": 0.5760000000000003,
+        "control_gaps": 1.536,
+        "total": 710.4
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.144,
+        "raw_release": 0.128,
+        "slot_ready_wait": 684.896,
+        "native": 5.280000000000002,
+        "correction0": 10.656000000000004,
+        "correction1": 5.440000000000001,
+        "slot_release": 0.41600000000000015,
+        "control_gaps": 0.736,
+        "total": 711.136
+      },
+      "useful_role_overlap_us": 17.408
+    },
+    {
+      "cta": 35,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.288,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.048000000000001,
+        "pack": 686.4,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.536,
+        "total": 710.4
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.144,
+        "raw_release": 0.128,
+        "slot_ready_wait": 684.8959999999998,
+        "native": 5.312000000000002,
+        "correction0": 10.752000000000004,
+        "correction1": 5.312000000000001,
+        "slot_release": 0.41600000000000015,
+        "control_gaps": 0.704,
+        "total": 711.072
+      },
+      "useful_role_overlap_us": 17.344
+    },
+    {
+      "cta": 36,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.192,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.2400000000000007,
+        "pack": 686.4000000000001,
+        "publish": 0.7680000000000002,
+        "control_gaps": 1.376,
+        "total": 710.4
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.2399999999999998,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.152,
+        "native": 5.440000000000002,
+        "correction0": 10.496000000000002,
+        "correction1": 5.312000000000001,
+        "slot_release": 0.32000000000000006,
+        "control_gaps": 0.672,
+        "total": 711.104
+      },
+      "useful_role_overlap_us": 17.408
+    },
+    {
+      "cta": 37,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.224,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 2.080000000000001,
+        "pack": 686.4960000000001,
+        "publish": 0.7360000000000002,
+        "control_gaps": 1.408,
+        "total": 710.4
+      },
+      "consumer": {
+        "raw_ready_wait": 1.3760000000000001,
+        "raw_native": 2.272,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.0239999999999,
+        "native": 5.600000000000002,
+        "correction0": 10.496000000000002,
+        "correction1": 5.248,
+        "slot_release": 0.3520000000000001,
+        "control_gaps": 0.672,
+        "total": 711.104
+      },
+      "useful_role_overlap_us": 17.6
+    },
+    {
+      "cta": 38,
+      "producer": {
+        "raw_free_wait": 0.544,
+        "raw_issue_ready": 4.224,
+        "inside": 14.816,
+        "slot_free_wait": 2.144000000000001,
+        "pack": 686.4640000000002,
+        "publish": 0.6720000000000003,
+        "control_gaps": 1.472,
+        "total": 710.336
+      },
+      "consumer": {
+        "raw_ready_wait": 1.312,
+        "raw_native": 2.176,
+        "raw_release": 0.128,
+        "slot_ready_wait": 684.832,
+        "native": 5.088000000000002,
+        "correction0": 11.104000000000003,
+        "correction1": 5.344000000000001,
+        "slot_release": 0.41600000000000015,
+        "control_gaps": 0.608,
+        "total": 711.008
+      },
+      "useful_role_overlap_us": 17.568
+    },
+    {
+      "cta": 39,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.32,
+        "inside": 14.879999999999999,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 686.5600000000001,
+        "publish": 0.5760000000000002,
+        "control_gaps": 1.408,
+        "total": 710.368
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.1759999999999997,
+        "raw_release": 0.128,
+        "slot_ready_wait": 684.832,
+        "native": 4.992000000000003,
+        "correction0": 11.168000000000003,
+        "correction1": 5.408000000000001,
+        "slot_release": 0.3520000000000001,
+        "control_gaps": 0.64,
+        "total": 711.104
+      },
+      "useful_role_overlap_us": 17.568
+    },
+    {
+      "cta": 40,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.288,
+        "inside": 15.008,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 686.6240000000001,
+        "publish": 0.5760000000000003,
+        "control_gaps": 1.376,
+        "total": 710.4
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.1759999999999997,
+        "raw_release": 0.096,
+        "slot_ready_wait": 685.0239999999999,
+        "native": 5.184000000000001,
+        "correction0": 10.880000000000003,
+        "correction1": 5.280000000000001,
+        "slot_release": 0.3840000000000001,
+        "control_gaps": 0.672,
+        "total": 711.104
+      },
+      "useful_role_overlap_us": 17.568
+    },
+    {
+      "cta": 41,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.288,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 686.5600000000002,
+        "publish": 0.5440000000000003,
+        "control_gaps": 1.472,
+        "total": 710.4
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.1759999999999997,
+        "raw_release": 0.096,
+        "slot_ready_wait": 685.0239999999999,
+        "native": 5.216000000000002,
+        "correction0": 10.880000000000003,
+        "correction1": 5.248000000000001,
+        "slot_release": 0.3520000000000001,
+        "control_gaps": 0.704,
+        "total": 711.136
+      },
+      "useful_role_overlap_us": 17.504
+    },
+    {
+      "cta": 42,
+      "producer": {
+        "raw_free_wait": 0.384,
+        "raw_issue_ready": 4.32,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 2.0800000000000005,
+        "pack": 686.5920000000001,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.472,
+        "total": 710.4
+      },
+      "consumer": {
+        "raw_ready_wait": 1.3760000000000001,
+        "raw_native": 2.272,
+        "raw_release": 0.0,
+        "slot_ready_wait": 684.9920000000001,
+        "native": 5.440000000000002,
+        "correction0": 10.592000000000004,
+        "correction1": 5.344000000000001,
+        "slot_release": 0.32000000000000006,
+        "control_gaps": 0.8,
+        "total": 711.136
+      },
+      "useful_role_overlap_us": 17.6
+    },
+    {
+      "cta": 43,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.256,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 2.176000000000001,
+        "pack": 686.528,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.408,
+        "total": 710.4
+      },
+      "consumer": {
+        "raw_ready_wait": 1.344,
+        "raw_native": 2.272,
+        "raw_release": 0.0,
+        "slot_ready_wait": 684.9920000000001,
+        "native": 5.376000000000002,
+        "correction0": 10.592000000000004,
+        "correction1": 5.376000000000001,
+        "slot_release": 0.41600000000000015,
+        "control_gaps": 0.736,
+        "total": 711.104
+      },
+      "useful_role_overlap_us": 17.536
+    },
+    {
+      "cta": 44,
+      "producer": {
+        "raw_free_wait": 0.5760000000000001,
+        "raw_issue_ready": 4.256,
+        "inside": 14.847999999999999,
+        "slot_free_wait": 2.144000000000001,
+        "pack": 686.4639999999999,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.408,
+        "total": 710.336
+      },
+      "consumer": {
+        "raw_ready_wait": 1.312,
+        "raw_native": 2.208,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.8000000000001,
+        "native": 5.024000000000003,
+        "correction0": 11.168000000000003,
+        "correction1": 5.376000000000001,
+        "slot_release": 0.3840000000000001,
+        "control_gaps": 0.672,
+        "total": 711.04
+      },
+      "useful_role_overlap_us": 17.568
+    },
+    {
+      "cta": 45,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.352,
+        "inside": 14.847999999999999,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 686.4639999999999,
+        "publish": 0.7040000000000003,
+        "control_gaps": 1.472,
+        "total": 710.368
+      },
+      "consumer": {
+        "raw_ready_wait": 1.3760000000000001,
+        "raw_native": 2.208,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.736,
+        "native": 5.024000000000003,
+        "correction0": 11.200000000000003,
+        "correction1": 5.344000000000001,
+        "slot_release": 0.3840000000000001,
+        "control_gaps": 0.736,
+        "total": 711.104
+      },
+      "useful_role_overlap_us": 17.632
+    },
+    {
+      "cta": 46,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.224,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.0800000000000005,
+        "pack": 686.528,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.408,
+        "total": 710.336
+      },
+      "consumer": {
+        "raw_ready_wait": 1.3760000000000001,
+        "raw_native": 2.2079999999999997,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.96,
+        "native": 5.152000000000002,
+        "correction0": 10.944000000000004,
+        "correction1": 5.344000000000001,
+        "slot_release": 0.3840000000000001,
+        "control_gaps": 0.672,
+        "total": 711.104
+      },
+      "useful_role_overlap_us": 17.472
+    },
+    {
+      "cta": 47,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.288,
+        "inside": 14.879999999999999,
+        "slot_free_wait": 2.1120000000000005,
+        "pack": 686.4959999999999,
+        "publish": 0.7360000000000002,
+        "control_gaps": 1.344,
+        "total": 710.368
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.144,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.088,
+        "native": 5.088000000000003,
+        "correction0": 10.816000000000004,
+        "correction1": 5.440000000000001,
+        "slot_release": 0.3840000000000001,
+        "control_gaps": 0.672,
+        "total": 711.136
+      },
+      "useful_role_overlap_us": 17.344
+    },
+    {
+      "cta": 48,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.416,
+        "inside": 14.719999999999999,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.3279999999999,
+        "publish": 0.6400000000000001,
+        "control_gaps": 1.344,
+        "total": 711.04
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 1.984,
+        "raw_release": 0.096,
+        "slot_ready_wait": 686.08,
+        "native": 5.280000000000003,
+        "correction0": 10.784000000000002,
+        "correction1": 5.152000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.416,
+        "total": 711.776
+      },
+      "useful_role_overlap_us": 17.184
+    },
+    {
+      "cta": 49,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.416,
+        "inside": 14.688,
+        "slot_free_wait": 2.048000000000001,
+        "pack": 687.2959999999998,
+        "publish": 0.7040000000000002,
+        "control_gaps": 1.376,
+        "total": 711.04
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 1.984,
+        "raw_release": 0.096,
+        "slot_ready_wait": 685.9840000000002,
+        "native": 5.376000000000002,
+        "correction0": 10.784000000000002,
+        "correction1": 5.119999999999999,
+        "slot_release": 0.6080000000000003,
+        "control_gaps": 0.352,
+        "total": 711.744
+      },
+      "useful_role_overlap_us": 17.28
+    },
+    {
+      "cta": 50,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.448,
+        "inside": 14.783999999999999,
+        "slot_free_wait": 2.24,
+        "pack": 687.136,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.312,
+        "total": 711.072
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.8239999999999998,
+        "raw_release": 0.128,
+        "slot_ready_wait": 686.144,
+        "native": 5.440000000000001,
+        "correction0": 10.560000000000002,
+        "correction1": 4.992000000000001,
+        "slot_release": 0.6080000000000003,
+        "control_gaps": 0.544,
+        "total": 711.744
+      },
+      "useful_role_overlap_us": 16.8
+    },
+    {
+      "cta": 51,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.416,
+        "inside": 14.815999999999999,
+        "slot_free_wait": 2.176000000000001,
+        "pack": 687.1039999999999,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.376,
+        "total": 711.04
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.8239999999999998,
+        "raw_release": 0.128,
+        "slot_ready_wait": 686.0480000000001,
+        "native": 5.440000000000001,
+        "correction0": 10.656000000000002,
+        "correction1": 4.960000000000001,
+        "slot_release": 0.5760000000000003,
+        "control_gaps": 0.608,
+        "total": 711.744
+      },
+      "useful_role_overlap_us": 16.832
+    },
+    {
+      "cta": 52,
+      "producer": {
+        "raw_free_wait": 0.44799999999999995,
+        "raw_issue_ready": 4.352,
+        "inside": 14.847999999999999,
+        "slot_free_wait": 2.208000000000001,
+        "pack": 687.008,
+        "publish": 0.6720000000000002,
+        "control_gaps": 1.504,
+        "total": 711.04
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.952,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.856,
+        "native": 5.888000000000002,
+        "correction0": 10.464000000000004,
+        "correction1": 4.864000000000001,
+        "slot_release": 0.4800000000000002,
+        "control_gaps": 0.64,
+        "total": 711.712
+      },
+      "useful_role_overlap_us": 17.12
+    },
+    {
+      "cta": 53,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.448,
+        "inside": 14.783999999999999,
+        "slot_free_wait": 2.1760000000000006,
+        "pack": 687.136,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.408,
+        "total": 711.04
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 1.952,
+        "raw_release": 0.0,
+        "slot_ready_wait": 685.92,
+        "native": 5.792000000000002,
+        "correction0": 10.528000000000002,
+        "correction1": 4.864000000000001,
+        "slot_release": 0.4480000000000002,
+        "control_gaps": 0.704,
+        "total": 711.744
+      },
+      "useful_role_overlap_us": 17.088
+    },
+    {
+      "cta": 54,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.384,
+        "inside": 14.656,
+        "slot_free_wait": 2.1760000000000006,
+        "pack": 687.3280000000001,
+        "publish": 0.5760000000000003,
+        "control_gaps": 1.344,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 1.888,
+        "raw_release": 0.096,
+        "slot_ready_wait": 686.1120000000001,
+        "native": 5.312000000000003,
+        "correction0": 10.784000000000002,
+        "correction1": 5.088000000000001,
+        "slot_release": 0.4480000000000002,
+        "control_gaps": 0.544,
+        "total": 711.68
+      },
+      "useful_role_overlap_us": 16.992
+    },
+    {
+      "cta": 55,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.384,
+        "inside": 14.687999999999999,
+        "slot_free_wait": 2.1440000000000006,
+        "pack": 687.36,
+        "publish": 0.6080000000000002,
+        "control_gaps": 1.344,
+        "total": 711.04
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.888,
+        "raw_release": 0.096,
+        "slot_ready_wait": 686.1120000000001,
+        "native": 5.344000000000003,
+        "correction0": 10.752000000000002,
+        "correction1": 5.088000000000001,
+        "slot_release": 0.3840000000000001,
+        "control_gaps": 0.608,
+        "total": 711.776
+      },
+      "useful_role_overlap_us": 17.056
+    },
+    {
+      "cta": 56,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.448,
+        "inside": 14.719999999999999,
+        "slot_free_wait": 2.176000000000001,
+        "pack": 687.232,
+        "publish": 0.5760000000000003,
+        "control_gaps": 1.376,
+        "total": 711.04
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 1.92,
+        "raw_release": 0.0,
+        "slot_ready_wait": 686.08,
+        "native": 5.408000000000001,
+        "correction0": 10.592000000000002,
+        "correction1": 5.152000000000001,
+        "slot_release": 0.4480000000000002,
+        "control_gaps": 0.64,
+        "total": 711.776
+      },
+      "useful_role_overlap_us": 16.96
+    },
+    {
+      "cta": 57,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.448,
+        "inside": 14.783999999999999,
+        "slot_free_wait": 2.2400000000000007,
+        "pack": 687.0719999999999,
+        "publish": 0.6720000000000003,
+        "control_gaps": 1.312,
+        "total": 711.008
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 1.92,
+        "raw_release": 0.0,
+        "slot_ready_wait": 686.1440000000001,
+        "native": 5.344000000000002,
+        "correction0": 10.624000000000002,
+        "correction1": 5.088000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.64,
+        "total": 711.744
+      },
+      "useful_role_overlap_us": 16.896
+    },
+    {
+      "cta": 58,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.288,
+        "inside": 14.847999999999999,
+        "slot_free_wait": 2.2720000000000007,
+        "pack": 687.1679999999999,
+        "publish": 0.6400000000000002,
+        "control_gaps": 1.312,
+        "total": 711.008
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.92,
+        "raw_release": 0.032,
+        "slot_ready_wait": 686.048,
+        "native": 5.568000000000001,
+        "correction0": 10.592000000000002,
+        "correction1": 4.896000000000001,
+        "slot_release": 0.3840000000000001,
+        "control_gaps": 0.768,
+        "total": 711.712
+      },
+      "useful_role_overlap_us": 16.96
+    },
+    {
+      "cta": 59,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.448,
+        "inside": 14.815999999999999,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.0399999999997,
+        "publish": 0.6720000000000003,
+        "control_gaps": 1.472,
+        "total": 711.008
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 1.92,
+        "raw_release": 0.032,
+        "slot_ready_wait": 685.9520000000002,
+        "native": 5.600000000000001,
+        "correction0": 10.624000000000002,
+        "correction1": 4.960000000000001,
+        "slot_release": 0.32000000000000006,
+        "control_gaps": 0.8,
+        "total": 711.744
+      },
+      "useful_role_overlap_us": 17.056
+    },
+    {
+      "cta": 60,
+      "producer": {
+        "raw_free_wait": 0.544,
+        "raw_issue_ready": 4.384,
+        "inside": 14.687999999999999,
+        "slot_free_wait": 2.1760000000000006,
+        "pack": 687.232,
+        "publish": 0.5760000000000003,
+        "control_gaps": 1.376,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 1.8559999999999999,
+        "raw_release": 0.096,
+        "slot_ready_wait": 685.952,
+        "native": 5.184000000000003,
+        "correction0": 11.040000000000003,
+        "correction1": 5.056000000000001,
+        "slot_release": 0.41600000000000015,
+        "control_gaps": 0.64,
+        "total": 711.68
+      },
+      "useful_role_overlap_us": 16.96
+    },
+    {
+      "cta": 61,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.448,
+        "inside": 14.591999999999999,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 687.488,
+        "publish": 0.6080000000000002,
+        "control_gaps": 1.376,
+        "total": 711.04
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 1.8559999999999999,
+        "raw_release": 0.096,
+        "slot_ready_wait": 685.9520000000001,
+        "native": 5.184000000000002,
+        "correction0": 11.040000000000003,
+        "correction1": 4.992000000000001,
+        "slot_release": 0.4480000000000002,
+        "control_gaps": 0.672,
+        "total": 711.776
+      },
+      "useful_role_overlap_us": 17.088
+    },
+    {
+      "cta": 62,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.384,
+        "inside": 14.719999999999999,
+        "slot_free_wait": 2.1120000000000005,
+        "pack": 687.296,
+        "publish": 0.7040000000000002,
+        "control_gaps": 1.312,
+        "total": 711.04
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 1.952,
+        "raw_release": 0.0,
+        "slot_ready_wait": 686.0480000000001,
+        "native": 5.216000000000003,
+        "correction0": 10.848000000000003,
+        "correction1": 5.024000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.672,
+        "total": 711.68
+      },
+      "useful_role_overlap_us": 16.992
+    },
+    {
+      "cta": 63,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.448,
+        "inside": 14.719999999999999,
+        "slot_free_wait": 2.1120000000000005,
+        "pack": 687.232,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.376,
+        "total": 711.04
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 1.952,
+        "raw_release": 0.0,
+        "slot_ready_wait": 686.0480000000001,
+        "native": 5.216000000000003,
+        "correction0": 10.848000000000003,
+        "correction1": 4.960000000000001,
+        "slot_release": 0.5440000000000003,
+        "control_gaps": 0.704,
+        "total": 711.744
+      },
+      "useful_role_overlap_us": 16.992
+    },
+    {
+      "cta": 64,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.672000000000001,
+        "inside": 14.72,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 687.392,
+        "publish": 0.7360000000000002,
+        "control_gaps": 1.312,
+        "total": 711.328
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 1.984,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.9519999999999,
+        "native": 5.408000000000002,
+        "correction0": 10.912000000000003,
+        "correction1": 5.056,
+        "slot_release": 0.4480000000000002,
+        "control_gaps": 0.672,
+        "total": 712.032
+      },
+      "useful_role_overlap_us": 17.216
+    },
+    {
+      "cta": 65,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.640000000000001,
+        "inside": 14.752,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 687.3919999999998,
+        "publish": 0.7040000000000003,
+        "control_gaps": 1.312,
+        "total": 711.328
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.016,
+        "raw_release": 0.032,
+        "slot_ready_wait": 685.9520000000001,
+        "native": 5.408000000000002,
+        "correction0": 10.944000000000003,
+        "correction1": 4.992,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.672,
+        "total": 712.0
+      },
+      "useful_role_overlap_us": 17.216
+    },
+    {
+      "cta": 66,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.704,
+        "inside": 14.816,
+        "slot_free_wait": 2.080000000000001,
+        "pack": 687.2959999999999,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.344,
+        "total": 711.36
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5680000000000003,
+        "raw_native": 1.952,
+        "raw_release": 0.064,
+        "slot_ready_wait": 686.016,
+        "native": 5.600000000000002,
+        "correction0": 10.848000000000004,
+        "correction1": 4.800000000000001,
+        "slot_release": 0.5120000000000001,
+        "control_gaps": 0.672,
+        "total": 712.032
+      },
+      "useful_role_overlap_us": 17.12
+    },
+    {
+      "cta": 67,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.672,
+        "inside": 14.816,
+        "slot_free_wait": 2.080000000000001,
+        "pack": 687.2639999999999,
+        "publish": 0.6720000000000003,
+        "control_gaps": 1.376,
+        "total": 711.328
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 1.952,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.952,
+        "native": 5.536000000000002,
+        "correction0": 10.880000000000003,
+        "correction1": 4.864000000000001,
+        "slot_release": 0.5760000000000002,
+        "control_gaps": 0.64,
+        "total": 712.0
+      },
+      "useful_role_overlap_us": 17.184
+    },
+    {
+      "cta": 68,
+      "producer": {
+        "raw_free_wait": 0.44799999999999995,
+        "raw_issue_ready": 4.608,
+        "inside": 14.816,
+        "slot_free_wait": 2.176000000000001,
+        "pack": 687.296,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.376,
+        "total": 711.328
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 1.984,
+        "raw_release": 0.128,
+        "slot_ready_wait": 685.8560000000001,
+        "native": 5.8560000000000025,
+        "correction0": 10.688000000000004,
+        "correction1": 4.832,
+        "slot_release": 0.6080000000000002,
+        "control_gaps": 0.576,
+        "total": 712.0
+      },
+      "useful_role_overlap_us": 17.28
+    },
+    {
+      "cta": 69,
+      "producer": {
+        "raw_free_wait": 0.384,
+        "raw_issue_ready": 4.640000000000001,
+        "inside": 14.816,
+        "slot_free_wait": 2.2720000000000007,
+        "pack": 687.104,
+        "publish": 0.7040000000000004,
+        "control_gaps": 1.408,
+        "total": 711.328
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.984,
+        "raw_release": 0.128,
+        "slot_ready_wait": 685.888,
+        "native": 5.824000000000002,
+        "correction0": 10.720000000000004,
+        "correction1": 4.832,
+        "slot_release": 0.5760000000000002,
+        "control_gaps": 0.576,
+        "total": 712.032
+      },
+      "useful_role_overlap_us": 17.152
+    },
+    {
+      "cta": 70,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.64,
+        "inside": 14.816,
+        "slot_free_wait": 2.1440000000000006,
+        "pack": 687.296,
+        "publish": 0.6080000000000002,
+        "control_gaps": 1.312,
+        "total": 711.328
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 1.984,
+        "raw_release": 0.032,
+        "slot_ready_wait": 686.016,
+        "native": 5.280000000000002,
+        "correction0": 11.072000000000003,
+        "correction1": 4.928,
+        "slot_release": 0.4800000000000002,
+        "control_gaps": 0.768,
+        "total": 712.032
+      },
+      "useful_role_overlap_us": 17.056
+    },
+    {
+      "cta": 71,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.576,
+        "inside": 14.848,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.264,
+        "publish": 0.6400000000000001,
+        "control_gaps": 1.376,
+        "total": 711.328
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.016,
+        "raw_release": 0.0,
+        "slot_ready_wait": 685.984,
+        "native": 5.312000000000003,
+        "correction0": 11.040000000000003,
+        "correction1": 4.96,
+        "slot_release": 0.4480000000000002,
+        "control_gaps": 0.832,
+        "total": 712.0
+      },
+      "useful_role_overlap_us": 17.152
+    },
+    {
+      "cta": 72,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.672000000000001,
+        "inside": 14.784,
+        "slot_free_wait": 2.048000000000001,
+        "pack": 687.3600000000001,
+        "publish": 0.6720000000000002,
+        "control_gaps": 1.312,
+        "total": 711.328
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.984,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.8879999999999,
+        "native": 5.344000000000003,
+        "correction0": 11.104000000000003,
+        "correction1": 4.960000000000001,
+        "slot_release": 0.4800000000000001,
+        "control_gaps": 0.672,
+        "total": 712.0
+      },
+      "useful_role_overlap_us": 17.28
+    },
+    {
+      "cta": 73,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.640000000000001,
+        "inside": 14.784,
+        "slot_free_wait": 2.080000000000001,
+        "pack": 687.3600000000001,
+        "publish": 0.6720000000000003,
+        "control_gaps": 1.312,
+        "total": 711.296
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.984,
+        "raw_release": 0.032,
+        "slot_ready_wait": 685.856,
+        "native": 5.408000000000003,
+        "correction0": 11.136000000000003,
+        "correction1": 4.928000000000001,
+        "slot_release": 0.5120000000000001,
+        "control_gaps": 0.64,
+        "total": 712.0
+      },
+      "useful_role_overlap_us": 17.344
+    },
+    {
+      "cta": 74,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.5120000000000005,
+        "inside": 14.784,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.3599999999999,
+        "publish": 0.5760000000000003,
+        "control_gaps": 1.504,
+        "total": 711.36
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 1.952,
+        "raw_release": 0.096,
+        "slot_ready_wait": 685.8879999999999,
+        "native": 5.600000000000002,
+        "correction0": 10.848000000000004,
+        "correction1": 4.96,
+        "slot_release": 0.5440000000000002,
+        "control_gaps": 0.64,
+        "total": 712.0
+      },
+      "useful_role_overlap_us": 17.344
+    },
+    {
+      "cta": 75,
+      "producer": {
+        "raw_free_wait": 0.41600000000000004,
+        "raw_issue_ready": 4.5760000000000005,
+        "inside": 14.784,
+        "slot_free_wait": 2.208000000000001,
+        "pack": 687.232,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.44,
+        "total": 711.328
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.952,
+        "raw_release": 0.096,
+        "slot_ready_wait": 685.9519999999999,
+        "native": 5.504000000000002,
+        "correction0": 10.880000000000004,
+        "correction1": 4.992,
+        "slot_release": 0.5440000000000002,
+        "control_gaps": 0.608,
+        "total": 712.032
+      },
+      "useful_role_overlap_us": 17.216
+    },
+    {
+      "cta": 76,
+      "producer": {
+        "raw_free_wait": 0.5760000000000001,
+        "raw_issue_ready": 4.64,
+        "inside": 14.848,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.1680000000001,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.344,
+        "total": 711.296
+      },
+      "consumer": {
+        "raw_ready_wait": 1.3760000000000001,
+        "raw_native": 2.016,
+        "raw_release": 0.032,
+        "slot_ready_wait": 685.8240000000001,
+        "native": 5.152000000000002,
+        "correction0": 11.200000000000003,
+        "correction1": 5.151999999999999,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.672,
+        "total": 711.936
+      },
+      "useful_role_overlap_us": 17.312
+    },
+    {
+      "cta": 77,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.672,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.1360000000001,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.312,
+        "total": 711.328
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.048,
+        "raw_release": 0.032,
+        "slot_ready_wait": 685.696,
+        "native": 5.312000000000002,
+        "correction0": 11.200000000000003,
+        "correction1": 5.119999999999999,
+        "slot_release": 0.5440000000000003,
+        "control_gaps": 0.576,
+        "total": 712.032
+      },
+      "useful_role_overlap_us": 17.472
+    },
+    {
+      "cta": 78,
+      "producer": {
+        "raw_free_wait": 0.544,
+        "raw_issue_ready": 4.608,
+        "inside": 14.784,
+        "slot_free_wait": 2.2400000000000007,
+        "pack": 687.2639999999999,
+        "publish": 0.6400000000000002,
+        "control_gaps": 1.216,
+        "total": 711.296
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 1.856,
+        "raw_release": 0.128,
+        "slot_ready_wait": 685.824,
+        "native": 5.408000000000002,
+        "correction0": 11.104000000000003,
+        "correction1": 4.992000000000001,
+        "slot_release": 0.5120000000000001,
+        "control_gaps": 0.672,
+        "total": 711.968
+      },
+      "useful_role_overlap_us": 17.056
+    },
+    {
+      "cta": 79,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.672,
+        "inside": 14.784,
+        "slot_free_wait": 2.2080000000000006,
+        "pack": 687.2,
+        "publish": 0.6720000000000002,
+        "control_gaps": 1.28,
+        "total": 711.328
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 1.856,
+        "raw_release": 0.128,
+        "slot_ready_wait": 685.8559999999999,
+        "native": 5.472000000000002,
+        "correction0": 11.104000000000003,
+        "correction1": 4.928000000000001,
+        "slot_release": 0.4800000000000002,
+        "control_gaps": 0.672,
+        "total": 712.032
+      },
+      "useful_role_overlap_us": 17.056
+    },
+    {
+      "cta": 80,
+      "producer": {
+        "raw_free_wait": 0.41600000000000004,
+        "raw_issue_ready": 4.672000000000001,
+        "inside": 14.848,
+        "slot_free_wait": 1.9840000000000004,
+        "pack": 687.3919999999999,
+        "publish": 0.6400000000000002,
+        "control_gaps": 1.472,
+        "total": 711.424
+      },
+      "consumer": {
+        "raw_ready_wait": 1.568,
+        "raw_native": 1.9200000000000002,
+        "raw_release": 0.096,
+        "slot_ready_wait": 686.176,
+        "native": 5.408000000000002,
+        "correction0": 10.752000000000002,
+        "correction1": 4.992000000000001,
+        "slot_release": 0.6400000000000002,
+        "control_gaps": 0.544,
+        "total": 712.096
+      },
+      "useful_role_overlap_us": 17.024
+    },
+    {
+      "cta": 81,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.5760000000000005,
+        "inside": 14.88,
+        "slot_free_wait": 2.144000000000001,
+        "pack": 687.2959999999999,
+        "publish": 0.7040000000000004,
+        "control_gaps": 1.312,
+        "total": 711.424
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 1.952,
+        "raw_release": 0.096,
+        "slot_ready_wait": 686.0800000000002,
+        "native": 5.504000000000002,
+        "correction0": 10.784000000000002,
+        "correction1": 4.960000000000001,
+        "slot_release": 0.6720000000000003,
+        "control_gaps": 0.544,
+        "total": 712.064
+      },
+      "useful_role_overlap_us": 17.024
+    },
+    {
+      "cta": 82,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.704000000000001,
+        "inside": 14.816,
+        "slot_free_wait": 2.2080000000000006,
+        "pack": 687.296,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.28,
+        "total": 711.424
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 1.984,
+        "raw_release": 0.032,
+        "slot_ready_wait": 685.9200000000002,
+        "native": 5.440000000000002,
+        "correction0": 11.008000000000003,
+        "correction1": 4.864000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.768,
+        "total": 712.064
+      },
+      "useful_role_overlap_us": 17.088
+    },
+    {
+      "cta": 83,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.672000000000001,
+        "inside": 14.816,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.2959999999998,
+        "publish": 0.6720000000000003,
+        "control_gaps": 1.344,
+        "total": 711.392
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 1.984,
+        "raw_release": 0.032,
+        "slot_ready_wait": 685.8560000000001,
+        "native": 5.440000000000002,
+        "correction0": 10.976000000000003,
+        "correction1": 5.024,
+        "slot_release": 0.41600000000000015,
+        "control_gaps": 0.8,
+        "total": 712.064
+      },
+      "useful_role_overlap_us": 17.216
+    },
+    {
+      "cta": 84,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.6080000000000005,
+        "inside": 14.88,
+        "slot_free_wait": 2.080000000000001,
+        "pack": 687.2640000000001,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.44,
+        "total": 711.392
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 1.92,
+        "raw_release": 0.0,
+        "slot_ready_wait": 686.112,
+        "native": 5.7280000000000015,
+        "correction0": 10.496000000000002,
+        "correction1": 4.992000000000001,
+        "slot_release": 0.5440000000000002,
+        "control_gaps": 0.736,
+        "total": 712.064
+      },
+      "useful_role_overlap_us": 16.992
+    },
+    {
+      "cta": 85,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.6080000000000005,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 1.9200000000000008,
+        "pack": 687.424,
+        "publish": 0.6720000000000003,
+        "control_gaps": 1.408,
+        "total": 711.392
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.952,
+        "raw_release": 0.0,
+        "slot_ready_wait": 686.048,
+        "native": 5.600000000000001,
+        "correction0": 10.624000000000002,
+        "correction1": 4.960000000000001,
+        "slot_release": 0.5760000000000002,
+        "control_gaps": 0.8,
+        "total": 712.064
+      },
+      "useful_role_overlap_us": 17.088
+    },
+    {
+      "cta": 86,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.704000000000001,
+        "inside": 14.848,
+        "slot_free_wait": 2.144000000000001,
+        "pack": 687.296,
+        "publish": 0.6400000000000002,
+        "control_gaps": 1.312,
+        "total": 711.392
+      },
+      "consumer": {
+        "raw_ready_wait": 1.568,
+        "raw_native": 2.016,
+        "raw_release": 0.032,
+        "slot_ready_wait": 686.0480000000001,
+        "native": 5.280000000000002,
+        "correction0": 10.976000000000003,
+        "correction1": 4.928000000000001,
+        "slot_release": 0.6400000000000002,
+        "control_gaps": 0.608,
+        "total": 712.096
+      },
+      "useful_role_overlap_us": 17.024
+    },
+    {
+      "cta": 87,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.672000000000001,
+        "inside": 14.816,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 687.3600000000001,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.376,
+        "total": 711.36
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 1.984,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.984,
+        "native": 5.312000000000003,
+        "correction0": 10.976000000000003,
+        "correction1": 4.992000000000001,
+        "slot_release": 0.6400000000000002,
+        "control_gaps": 0.576,
+        "total": 712.064
+      },
+      "useful_role_overlap_us": 17.152
+    },
+    {
+      "cta": 88,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.640000000000001,
+        "inside": 14.848,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.328,
+        "publish": 0.6720000000000002,
+        "control_gaps": 1.344,
+        "total": 711.424
+      },
+      "consumer": {
+        "raw_ready_wait": 1.536,
+        "raw_native": 1.952,
+        "raw_release": 0.032,
+        "slot_ready_wait": 686.0799999999999,
+        "native": 5.504000000000003,
+        "correction0": 10.816000000000003,
+        "correction1": 4.928000000000001,
+        "slot_release": 0.5440000000000002,
+        "control_gaps": 0.704,
+        "total": 712.096
+      },
+      "useful_role_overlap_us": 16.992
+    },
+    {
+      "cta": 89,
+      "producer": {
+        "raw_free_wait": 0.41600000000000004,
+        "raw_issue_ready": 4.672000000000001,
+        "inside": 14.784,
+        "slot_free_wait": 1.9840000000000009,
+        "pack": 687.4559999999999,
+        "publish": 0.7040000000000003,
+        "control_gaps": 1.376,
+        "total": 711.392
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.952,
+        "raw_release": 0.032,
+        "slot_ready_wait": 686.0800000000002,
+        "native": 5.472000000000003,
+        "correction0": 10.816000000000003,
+        "correction1": 4.864000000000001,
+        "slot_release": 0.5120000000000001,
+        "control_gaps": 0.832,
+        "total": 712.064
+      },
+      "useful_role_overlap_us": 17.088
+    },
+    {
+      "cta": 90,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.6080000000000005,
+        "inside": 14.88,
+        "slot_free_wait": 2.144000000000001,
+        "pack": 687.2639999999998,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.376,
+        "total": 711.392
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 1.92,
+        "raw_release": 0.0,
+        "slot_ready_wait": 685.984,
+        "native": 5.568000000000002,
+        "correction0": 10.752000000000002,
+        "correction1": 5.024000000000001,
+        "slot_release": 0.5440000000000002,
+        "control_gaps": 0.768,
+        "total": 712.032
+      },
+      "useful_role_overlap_us": 17.024
+    },
+    {
+      "cta": 91,
+      "producer": {
+        "raw_free_wait": 0.44799999999999995,
+        "raw_issue_ready": 4.5760000000000005,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 1.9520000000000008,
+        "pack": 687.3599999999999,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.472,
+        "total": 711.36
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.92,
+        "raw_release": 0.0,
+        "slot_ready_wait": 685.952,
+        "native": 5.536000000000002,
+        "correction0": 10.752000000000002,
+        "correction1": 5.024000000000001,
+        "slot_release": 0.5440000000000002,
+        "control_gaps": 0.832,
+        "total": 712.064
+      },
+      "useful_role_overlap_us": 17.12
+    },
+    {
+      "cta": 92,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.6080000000000005,
+        "inside": 14.784,
+        "slot_free_wait": 2.080000000000001,
+        "pack": 687.3600000000001,
+        "publish": 0.6080000000000002,
+        "control_gaps": 1.408,
+        "total": 711.36
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 1.952,
+        "raw_release": 0.032,
+        "slot_ready_wait": 686.048,
+        "native": 5.248000000000002,
+        "correction0": 11.104000000000003,
+        "correction1": 4.991999999999999,
+        "slot_release": 0.6080000000000002,
+        "control_gaps": 0.576,
+        "total": 712.0
+      },
+      "useful_role_overlap_us": 17.056
+    },
+    {
+      "cta": 93,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.736000000000001,
+        "inside": 14.752,
+        "slot_free_wait": 2.0800000000000005,
+        "pack": 687.3599999999999,
+        "publish": 0.5760000000000003,
+        "control_gaps": 1.44,
+        "total": 711.392
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 1.984,
+        "raw_release": 0.032,
+        "slot_ready_wait": 686.0160000000001,
+        "native": 5.184000000000002,
+        "correction0": 11.136000000000003,
+        "correction1": 5.023999999999999,
+        "slot_release": 0.5440000000000002,
+        "control_gaps": 0.64,
+        "total": 712.064
+      },
+      "useful_role_overlap_us": 17.12
+    },
+    {
+      "cta": 94,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.672000000000001,
+        "inside": 14.816,
+        "slot_free_wait": 2.0800000000000005,
+        "pack": 687.4240000000001,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.344,
+        "total": 711.424
+      },
+      "consumer": {
+        "raw_ready_wait": 1.568,
+        "raw_native": 1.92,
+        "raw_release": 0.064,
+        "slot_ready_wait": 686.016,
+        "native": 5.248000000000003,
+        "correction0": 11.136000000000003,
+        "correction1": 4.928000000000001,
+        "slot_release": 0.5440000000000002,
+        "control_gaps": 0.672,
+        "total": 712.096
+      },
+      "useful_role_overlap_us": 17.088
+    },
+    {
+      "cta": 95,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.6080000000000005,
+        "inside": 14.784,
+        "slot_free_wait": 1.9840000000000009,
+        "pack": 687.3919999999999,
+        "publish": 0.7680000000000002,
+        "control_gaps": 1.344,
+        "total": 711.36
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5360000000000003,
+        "raw_native": 1.92,
+        "raw_release": 0.064,
+        "slot_ready_wait": 686.016,
+        "native": 5.312000000000003,
+        "correction0": 11.008000000000003,
+        "correction1": 4.992,
+        "slot_release": 0.4800000000000002,
+        "control_gaps": 0.736,
+        "total": 712.064
+      },
+      "useful_role_overlap_us": 17.12
+    },
+    {
+      "cta": 96,
+      "producer": {
+        "raw_free_wait": 0.41600000000000004,
+        "raw_issue_ready": 4.6080000000000005,
+        "inside": 14.783999999999999,
+        "slot_free_wait": 2.1120000000000005,
+        "pack": 686.976,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.472,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.144,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.9599999999999,
+        "native": 5.504000000000002,
+        "correction0": 11.104000000000003,
+        "correction1": 5.152,
+        "slot_release": 0.41600000000000015,
+        "control_gaps": 0.8,
+        "total": 711.648
+      },
+      "useful_role_overlap_us": 17.792
+    },
+    {
+      "cta": 97,
+      "producer": {
+        "raw_free_wait": 0.44799999999999995,
+        "raw_issue_ready": 4.6080000000000005,
+        "inside": 14.783999999999999,
+        "slot_free_wait": 2.080000000000001,
+        "pack": 686.848,
+        "publish": 0.7040000000000003,
+        "control_gaps": 1.504,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.536,
+        "raw_native": 2.112,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.9279999999999,
+        "native": 5.568000000000002,
+        "correction0": 11.072000000000003,
+        "correction1": 5.152,
+        "slot_release": 0.4800000000000002,
+        "control_gaps": 0.736,
+        "total": 711.648
+      },
+      "useful_role_overlap_us": 17.76
+    },
+    {
+      "cta": 98,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.5440000000000005,
+        "inside": 14.752,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.0399999999998,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.44,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.08,
+        "raw_release": 0.032,
+        "slot_ready_wait": 684.9279999999999,
+        "native": 5.504000000000002,
+        "correction0": 11.136000000000001,
+        "correction1": 5.312000000000001,
+        "slot_release": 0.5120000000000001,
+        "control_gaps": 0.64,
+        "total": 711.616
+      },
+      "useful_role_overlap_us": 17.92
+    },
+    {
+      "cta": 99,
+      "producer": {
+        "raw_free_wait": 0.44799999999999995,
+        "raw_issue_ready": 4.5760000000000005,
+        "inside": 14.783999999999999,
+        "slot_free_wait": 2.0480000000000005,
+        "pack": 686.944,
+        "publish": 0.6080000000000002,
+        "control_gaps": 1.568,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.112,
+        "raw_release": 0.032,
+        "slot_ready_wait": 684.9600000000002,
+        "native": 5.472000000000002,
+        "correction0": 11.136000000000001,
+        "correction1": 5.312000000000001,
+        "slot_release": 0.5440000000000002,
+        "control_gaps": 0.576,
+        "total": 711.616
+      },
+      "useful_role_overlap_us": 17.856
+    },
+    {
+      "cta": 100,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.448,
+        "inside": 14.847999999999999,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 686.816,
+        "publish": 0.6400000000000002,
+        "control_gaps": 1.632,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.112,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.8960000000001,
+        "native": 6.016000000000001,
+        "correction0": 10.720000000000002,
+        "correction1": 4.992,
+        "slot_release": 0.6400000000000001,
+        "control_gaps": 0.704,
+        "total": 711.648
+      },
+      "useful_role_overlap_us": 17.728
+    },
+    {
+      "cta": 101,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.5120000000000005,
+        "inside": 14.815999999999999,
+        "slot_free_wait": 2.112,
+        "pack": 686.912,
+        "publish": 0.7360000000000002,
+        "control_gaps": 1.408,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.112,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.9280000000001,
+        "native": 5.888000000000002,
+        "correction0": 10.912000000000003,
+        "correction1": 4.928,
+        "slot_release": 0.6720000000000002,
+        "control_gaps": 0.672,
+        "total": 711.648
+      },
+      "useful_role_overlap_us": 17.792
+    },
+    {
+      "cta": 102,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.448,
+        "inside": 14.783999999999999,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.1039999999999,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.344,
+        "total": 710.944
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.112,
+        "raw_release": 0.032,
+        "slot_ready_wait": 684.9599999999999,
+        "native": 5.344000000000002,
+        "correction0": 11.136000000000003,
+        "correction1": 5.343999999999999,
+        "slot_release": 0.4800000000000002,
+        "control_gaps": 0.704,
+        "total": 711.552
+      },
+      "useful_role_overlap_us": 17.952
+    },
+    {
+      "cta": 103,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.5760000000000005,
+        "inside": 14.783999999999999,
+        "slot_free_wait": 2.144000000000001,
+        "pack": 686.912,
+        "publish": 0.7040000000000004,
+        "control_gaps": 1.376,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.144,
+        "raw_release": 0.0,
+        "slot_ready_wait": 684.8639999999999,
+        "native": 5.408000000000002,
+        "correction0": 11.168000000000003,
+        "correction1": 5.311999999999999,
+        "slot_release": 0.5120000000000001,
+        "control_gaps": 0.704,
+        "total": 711.616
+      },
+      "useful_role_overlap_us": 17.952
+    },
+    {
+      "cta": 104,
+      "producer": {
+        "raw_free_wait": 0.544,
+        "raw_issue_ready": 4.448,
+        "inside": 14.752,
+        "slot_free_wait": 2.048000000000001,
+        "pack": 687.008,
+        "publish": 0.7360000000000004,
+        "control_gaps": 1.408,
+        "total": 710.944
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.08,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.9599999999999,
+        "native": 5.504000000000001,
+        "correction0": 11.136000000000003,
+        "correction1": 5.152000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.736,
+        "total": 711.552
+      },
+      "useful_role_overlap_us": 17.76
+    },
+    {
+      "cta": 105,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.5440000000000005,
+        "inside": 14.752,
+        "slot_free_wait": 2.1760000000000006,
+        "pack": 686.912,
+        "publish": 0.7040000000000002,
+        "control_gaps": 1.408,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.112,
+        "raw_release": 0.032,
+        "slot_ready_wait": 685.024,
+        "native": 5.440000000000001,
+        "correction0": 11.136000000000003,
+        "correction1": 5.184000000000001,
+        "slot_release": 0.4480000000000002,
+        "control_gaps": 0.768,
+        "total": 711.648
+      },
+      "useful_role_overlap_us": 17.728
+    },
+    {
+      "cta": 106,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.5120000000000005,
+        "inside": 14.847999999999999,
+        "slot_free_wait": 2.1120000000000005,
+        "pack": 686.9119999999999,
+        "publish": 0.7360000000000004,
+        "control_gaps": 1.408,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.08,
+        "raw_release": 0.096,
+        "slot_ready_wait": 685.024,
+        "native": 5.984000000000001,
+        "correction0": 10.688000000000002,
+        "correction1": 5.088000000000001,
+        "slot_release": 0.6720000000000002,
+        "control_gaps": 0.544,
+        "total": 711.616
+      },
+      "useful_role_overlap_us": 17.792
+    },
+    {
+      "cta": 107,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.48,
+        "inside": 14.847999999999999,
+        "slot_free_wait": 2.048000000000001,
+        "pack": 687.008,
+        "publish": 0.7680000000000002,
+        "control_gaps": 1.344,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.048,
+        "raw_release": 0.128,
+        "slot_ready_wait": 684.9920000000002,
+        "native": 5.984000000000001,
+        "correction0": 10.656000000000002,
+        "correction1": 5.024000000000001,
+        "slot_release": 0.6720000000000002,
+        "control_gaps": 0.672,
+        "total": 711.648
+      },
+      "useful_role_overlap_us": 17.824
+    },
+    {
+      "cta": 108,
+      "producer": {
+        "raw_free_wait": 0.544,
+        "raw_issue_ready": 4.416,
+        "inside": 14.752,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.008,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.44,
+        "total": 710.912
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.048,
+        "raw_release": 0.096,
+        "slot_ready_wait": 684.928,
+        "native": 5.280000000000003,
+        "correction0": 11.360000000000003,
+        "correction1": 5.151999999999999,
+        "slot_release": 0.6080000000000002,
+        "control_gaps": 0.64,
+        "total": 711.552
+      },
+      "useful_role_overlap_us": 17.76
+    },
+    {
+      "cta": 109,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.5760000000000005,
+        "inside": 14.752,
+        "slot_free_wait": 1.9840000000000009,
+        "pack": 687.2,
+        "publish": 0.5760000000000003,
+        "control_gaps": 1.344,
+        "total": 710.944
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.112,
+        "raw_release": 0.064,
+        "slot_ready_wait": 684.8960000000001,
+        "native": 5.216000000000003,
+        "correction0": 11.392000000000003,
+        "correction1": 5.151999999999999,
+        "slot_release": 0.6080000000000002,
+        "control_gaps": 0.704,
+        "total": 711.616
+      },
+      "useful_role_overlap_us": 17.92
+    },
+    {
+      "cta": 110,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.5440000000000005,
+        "inside": 14.847999999999999,
+        "slot_free_wait": 2.0800000000000005,
+        "pack": 687.072,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.344,
+        "total": 710.976
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.08,
+        "raw_release": 0.032,
+        "slot_ready_wait": 684.9280000000001,
+        "native": 5.280000000000002,
+        "correction0": 11.296000000000003,
+        "correction1": 5.312000000000001,
+        "slot_release": 0.5440000000000002,
+        "control_gaps": 0.672,
+        "total": 711.648
+      },
+      "useful_role_overlap_us": 17.952
+    },
+    {
+      "cta": 111,
+      "producer": {
+        "raw_free_wait": 0.41600000000000004,
+        "raw_issue_ready": 4.48,
+        "inside": 14.88,
+        "slot_free_wait": 2.144000000000001,
+        "pack": 686.8800000000001,
+        "publish": 0.7040000000000004,
+        "control_gaps": 1.44,
+        "total": 710.944
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.048,
+        "raw_release": 0.128,
+        "slot_ready_wait": 685.056,
+        "native": 5.888000000000002,
+        "correction0": 10.688000000000002,
+        "correction1": 5.152,
+        "slot_release": 0.6720000000000002,
+        "control_gaps": 0.512,
+        "total": 711.648
+      },
+      "useful_role_overlap_us": 17.76
+    },
+    {
+      "cta": 112,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.48,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 2.080000000000001,
+        "pack": 687.9360000000001,
+        "publish": 0.7360000000000002,
+        "control_gaps": 1.376,
+        "total": 712.0
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.08,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.6,
+        "native": 5.568000000000002,
+        "correction0": 11.424000000000003,
+        "correction1": 5.4079999999999995,
+        "slot_release": 0.3520000000000001,
+        "control_gaps": 0.736,
+        "total": 712.672
+      },
+      "useful_role_overlap_us": 18.368
+    },
+    {
+      "cta": 113,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.416,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 1.9200000000000008,
+        "pack": 688.1279999999999,
+        "publish": 0.6400000000000001,
+        "control_gaps": 1.44,
+        "total": 711.968
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.112,
+        "raw_release": 0.032,
+        "slot_ready_wait": 685.6640000000001,
+        "native": 5.504000000000002,
+        "correction0": 11.392000000000003,
+        "correction1": 5.4079999999999995,
+        "slot_release": 0.3520000000000001,
+        "control_gaps": 0.768,
+        "total": 712.672
+      },
+      "useful_role_overlap_us": 18.496
+    },
+    {
+      "cta": 114,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.448,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.144000000000001,
+        "pack": 687.9359999999999,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.408,
+        "total": 711.968
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.016,
+        "raw_release": 0.096,
+        "slot_ready_wait": 685.7280000000001,
+        "native": 5.856000000000002,
+        "correction0": 11.264000000000003,
+        "correction1": 5.248000000000001,
+        "slot_release": 0.4480000000000002,
+        "control_gaps": 0.544,
+        "total": 712.704
+      },
+      "useful_role_overlap_us": 18.144
+    },
+    {
+      "cta": 115,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.416,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 2.144000000000001,
+        "pack": 687.936,
+        "publish": 0.5760000000000003,
+        "control_gaps": 1.44,
+        "total": 712.0
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.048,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.7600000000001,
+        "native": 5.824000000000002,
+        "correction0": 11.264000000000003,
+        "correction1": 5.248000000000001,
+        "slot_release": 0.4480000000000002,
+        "control_gaps": 0.576,
+        "total": 712.672
+      },
+      "useful_role_overlap_us": 18.176
+    },
+    {
+      "cta": 116,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.384,
+        "inside": 15.008,
+        "slot_free_wait": 2.0800000000000005,
+        "pack": 687.9040000000002,
+        "publish": 0.7360000000000002,
+        "control_gaps": 1.376,
+        "total": 711.968
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.048,
+        "raw_release": 0.128,
+        "slot_ready_wait": 685.6,
+        "native": 6.528000000000001,
+        "correction0": 10.880000000000003,
+        "correction1": 4.928000000000001,
+        "slot_release": 0.4800000000000002,
+        "control_gaps": 0.64,
+        "total": 712.672
+      },
+      "useful_role_overlap_us": 18.272
+    },
+    {
+      "cta": 117,
+      "producer": {
+        "raw_free_wait": 0.41600000000000004,
+        "raw_issue_ready": 4.416,
+        "inside": 15.008,
+        "slot_free_wait": 2.144000000000001,
+        "pack": 687.808,
+        "publish": 0.7040000000000003,
+        "control_gaps": 1.472,
+        "total": 711.968
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.048,
+        "raw_release": 0.096,
+        "slot_ready_wait": 685.7279999999998,
+        "native": 6.336000000000002,
+        "correction0": 10.944000000000003,
+        "correction1": 4.896000000000001,
+        "slot_release": 0.5440000000000003,
+        "control_gaps": 0.64,
+        "total": 712.672
+      },
+      "useful_role_overlap_us": 18.112
+    },
+    {
+      "cta": 118,
+      "producer": {
+        "raw_free_wait": 0.544,
+        "raw_issue_ready": 4.384,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.9680000000001,
+        "publish": 0.6400000000000002,
+        "control_gaps": 1.376,
+        "total": 711.936
+      },
+      "consumer": {
+        "raw_ready_wait": 1.3760000000000001,
+        "raw_native": 2.048,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.6959999999999,
+        "native": 5.504000000000002,
+        "correction0": 11.456000000000003,
+        "correction1": 5.3759999999999994,
+        "slot_release": 0.3840000000000001,
+        "control_gaps": 0.672,
+        "total": 712.576
+      },
+      "useful_role_overlap_us": 18.176
+    },
+    {
+      "cta": 119,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.5440000000000005,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 688.0319999999999,
+        "publish": 0.7040000000000002,
+        "control_gaps": 1.312,
+        "total": 711.968
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.048,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.6639999999999,
+        "native": 5.568000000000002,
+        "correction0": 11.392000000000003,
+        "correction1": 5.4079999999999995,
+        "slot_release": 0.3520000000000001,
+        "control_gaps": 0.704,
+        "total": 712.672
+      },
+      "useful_role_overlap_us": 18.336
+    },
+    {
+      "cta": 120,
+      "producer": {
+        "raw_free_wait": 0.544,
+        "raw_issue_ready": 4.384,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.2720000000000007,
+        "pack": 687.808,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.312,
+        "total": 711.936
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4080000000000001,
+        "raw_native": 2.016,
+        "raw_release": 0.032,
+        "slot_ready_wait": 685.856,
+        "native": 5.696000000000002,
+        "correction0": 11.360000000000003,
+        "correction1": 5.312000000000001,
+        "slot_release": 0.5440000000000003,
+        "control_gaps": 0.384,
+        "total": 712.608
+      },
+      "useful_role_overlap_us": 18.112
+    },
+    {
+      "cta": 121,
+      "producer": {
+        "raw_free_wait": 0.44799999999999995,
+        "raw_issue_ready": 4.5120000000000005,
+        "inside": 14.943999999999999,
+        "slot_free_wait": 2.1120000000000005,
+        "pack": 687.9039999999999,
+        "publish": 0.6080000000000002,
+        "control_gaps": 1.44,
+        "total": 711.968
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.016,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.696,
+        "native": 5.696000000000002,
+        "correction0": 11.424000000000003,
+        "correction1": 5.312000000000001,
+        "slot_release": 0.5440000000000003,
+        "control_gaps": 0.448,
+        "total": 712.704
+      },
+      "useful_role_overlap_us": 18.208
+    },
+    {
+      "cta": 122,
+      "producer": {
+        "raw_free_wait": 0.512,
+        "raw_issue_ready": 4.448,
+        "inside": 14.975999999999999,
+        "slot_free_wait": 2.1120000000000005,
+        "pack": 687.8400000000001,
+        "publish": 0.6720000000000004,
+        "control_gaps": 1.44,
+        "total": 712.0
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.016,
+        "raw_release": 0.096,
+        "slot_ready_wait": 685.7599999999999,
+        "native": 6.112000000000001,
+        "correction0": 11.072000000000003,
+        "correction1": 5.056000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.608,
+        "total": 712.672
+      },
+      "useful_role_overlap_us": 18.112
+    },
+    {
+      "cta": 123,
+      "producer": {
+        "raw_free_wait": 0.41600000000000004,
+        "raw_issue_ready": 4.5120000000000005,
+        "inside": 15.04,
+        "slot_free_wait": 2.0800000000000005,
+        "pack": 687.8720000000001,
+        "publish": 0.6400000000000003,
+        "control_gaps": 1.408,
+        "total": 711.968
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 2.016,
+        "raw_release": 0.128,
+        "slot_ready_wait": 685.6639999999999,
+        "native": 6.048000000000001,
+        "correction0": 11.168000000000003,
+        "correction1": 5.056000000000001,
+        "slot_release": 0.5120000000000002,
+        "control_gaps": 0.64,
+        "total": 712.704
+      },
+      "useful_role_overlap_us": 18.112
+    },
+    {
+      "cta": 124,
+      "producer": {
+        "raw_free_wait": 0.544,
+        "raw_issue_ready": 4.416,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 2.016000000000001,
+        "pack": 688.032,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.408,
+        "total": 711.936
+      },
+      "consumer": {
+        "raw_ready_wait": 1.344,
+        "raw_native": 2.08,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.7280000000001,
+        "native": 5.120000000000002,
+        "correction0": 11.776000000000003,
+        "correction1": 5.4079999999999995,
+        "slot_release": 0.41600000000000015,
+        "control_gaps": 0.64,
+        "total": 712.576
+      },
+      "useful_role_overlap_us": 18.272
+    },
+    {
+      "cta": 125,
+      "producer": {
+        "raw_free_wait": 0.48,
+        "raw_issue_ready": 4.5120000000000005,
+        "inside": 14.879999999999999,
+        "slot_free_wait": 2.1120000000000005,
+        "pack": 688.0,
+        "publish": 0.5440000000000003,
+        "control_gaps": 1.408,
+        "total": 711.936
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4400000000000002,
+        "raw_native": 2.08,
+        "raw_release": 0.032,
+        "slot_ready_wait": 685.5680000000001,
+        "native": 5.184000000000001,
+        "correction0": 11.808000000000003,
+        "correction1": 5.504000000000001,
+        "slot_release": 0.32000000000000006,
+        "control_gaps": 0.736,
+        "total": 712.672
+      },
+      "useful_role_overlap_us": 18.4
+    },
+    {
+      "cta": 126,
+      "producer": {
+        "raw_free_wait": 0.44799999999999995,
+        "raw_issue_ready": 4.48,
+        "inside": 14.911999999999999,
+        "slot_free_wait": 2.112000000000001,
+        "pack": 687.936,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.472,
+        "total": 711.968
+      },
+      "consumer": {
+        "raw_ready_wait": 1.5040000000000002,
+        "raw_native": 2.016,
+        "raw_release": 0.064,
+        "slot_ready_wait": 685.5999999999999,
+        "native": 5.664000000000002,
+        "correction0": 11.424000000000003,
+        "correction1": 5.3759999999999994,
+        "slot_release": 0.4800000000000002,
+        "control_gaps": 0.576,
+        "total": 712.704
+      },
+      "useful_role_overlap_us": 18.24
+    },
+    {
+      "cta": 127,
+      "producer": {
+        "raw_free_wait": 0.448,
+        "raw_issue_ready": 4.48,
+        "inside": 15.008,
+        "slot_free_wait": 2.1760000000000006,
+        "pack": 687.8400000000001,
+        "publish": 0.6080000000000003,
+        "control_gaps": 1.408,
+        "total": 711.968
+      },
+      "consumer": {
+        "raw_ready_wait": 1.4720000000000002,
+        "raw_native": 1.952,
+        "raw_release": 0.096,
+        "slot_ready_wait": 685.5360000000001,
+        "native": 6.048000000000001,
+        "correction0": 11.104000000000003,
+        "correction1": 5.184,
+        "slot_release": 0.5440000000000003,
+        "control_gaps": 0.736,
+        "total": 712.672
+      },
+      "useful_role_overlap_us": 18.144
+    }
+  ]
+}
