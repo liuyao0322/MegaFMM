@@ -59,13 +59,11 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
    #pragma unroll
    for(int j=0;j<16;++j)warpgroup_fence_operand(d[j]);
    warpgroup_arrive();
-  }
-  #pragma unroll 1
-  for(int k=0;k<4;++k){
-   int seq=step*4+k,slot=seq%Stages;
-   Barrier::wait(&s.ready[slot],seq/Stages%2);asm volatile("" ::: "memory");
-   uint64_t offset=slot*24576/16;
-   if(step<7){
+   #pragma unroll 1
+   for(int k=0;k<4;++k){
+    int seq=step*4+k,slot=seq%Stages;
+    Barrier::wait(&s.ready[slot],seq/Stages%2);asm volatile("" ::: "memory");
+    uint64_t offset=slot*24576/16;
     #pragma unroll
     for(int inner=0;inner<8;++inner)
      float_mma<T>(uint64_t(dah(0,0,inner))+offset,uint64_t(dbh(0,0,inner))+offset,d,(k==0&&inner==0)?GMMA::ScaleOut::Zero:GMMA::ScaleOut::One);
@@ -77,7 +75,18 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
      asm volatile("bar.warp.sync 0xffffffff;" ::: "memory");
      if((tid&31)==0)Barrier::arrive(&s.free[(seq-1)%Stages]);
     }
-   }else{
+   }
+   warpgroup_wait<0>();
+   #pragma unroll
+   for(int j=0;j<16;++j)warpgroup_fence_operand(d[j]);
+   asm volatile("bar.warp.sync 0xffffffff;" ::: "memory");
+   if((tid&31)==0)Barrier::arrive(&s.free[(step*4+3)%Stages]);
+  }else{
+   #pragma unroll 1
+   for(int k=0;k<4;++k){
+    int seq=step*4+k,slot=seq%Stages;
+    Barrier::wait(&s.ready[slot],seq/Stages%2);asm volatile("" ::: "memory");
+    uint64_t offset=slot*24576/16;
     uint32_t integer[16]={};
     #pragma unroll
     for(int j=0;j<16;++j)warpgroup_fence_operand(integer[j]);
@@ -114,18 +123,9 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
       d[j]=__fadd_rn(d[j],x);
      }
     }
-   }
-   if(step>=7){
     asm volatile("bar.warp.sync 0xffffffff;" ::: "memory");
     if((tid&31)==0)Barrier::arrive(&s.free[slot]);
    }
-  }
-  if(step<7){
-   warpgroup_wait<0>();
-   #pragma unroll
-   for(int j=0;j<16;++j)warpgroup_fence_operand(d[j]);
-   asm volatile("bar.warp.sync 0xffffffff;" ::: "memory");
-   if((tid&31)==0)Barrier::arrive(&s.free[(step*4+3)%Stages]);
   }
   // Product/term is uniform across all16outputs; select before the vector loop.
   if(step<7){

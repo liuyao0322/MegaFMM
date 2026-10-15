@@ -1,0 +1,159 @@
+research/precision_20261016/int8_hardware/pack.cuh(216): warning #177-D: variable "ql" was declared but never referenced
+     qh=max(-127,min(127,qh));int ql=0;
+                                  ^
+          detected during:
+            instantiation of "void int8_research::pair_store<T,SideA,NativePlane,QP>(float (&)[<expression>], T *, int8_t *, int *, int8_research::PairPackShared &, int, int, int) [with T=cutlass::bfloat16_t, SideA=true, NativePlane=3, QP=8]" at line 280
+            instantiation of "void int8_research::pack_pair<T,SideA,Balance,Group>(const T *, T *, int8_t *, int *, const int *, int8_research::PairPackShared &) [with T=cutlass::bfloat16_t, SideA=true, Balance=true, Group=2]" at line 290
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=true]" at line 295
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=true]" at line 249 of research/precision_20261016/int8_hardware/corrected.cuh
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+research/precision_20261016/int8_hardware/pack.cuh(249): warning #177-D: variable "b" was declared but never referenced
+     float a=float(X[at]),b=float(X[at+512]),cc=float(X[at+512*1024]),d=float(X[at+512*1024+512]);
+                          ^
+          detected during:
+            instantiation of "void int8_research::pack_pair<T,SideA,Balance,Group>(const T *, T *, int8_t *, int *, const int *, int8_research::PairPackShared &) [with T=cutlass::bfloat16_t, SideA=true, Balance=false, Group=0]" at line 288
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=false]" at line 295
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=false]" at line 250 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(249): warning #177-D: variable "cc" was declared but never referenced
+     float a=float(X[at]),b=float(X[at+512]),cc=float(X[at+512*1024]),d=float(X[at+512*1024+512]);
+                                             ^
+          detected during:
+            instantiation of "void int8_research::pack_pair<T,SideA,Balance,Group>(const T *, T *, int8_t *, int *, const int *, int8_research::PairPackShared &) [with T=cutlass::bfloat16_t, SideA=false, Balance=false, Group=0]" at line 288
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=false]" at line 296
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=false]" at line 250 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(216): warning #177-D: variable "ql" was declared but never referenced
+     qh=max(-127,min(127,qh));int ql=0;
+                                  ^
+          detected during:
+            instantiation of "void int8_research::pair_store<T,SideA,NativePlane,QP>(float (&)[<expression>], T *, int8_t *, int *, int8_research::PairPackShared &, int, int, int) [with T=cutlass::bfloat16_t, SideA=true, NativePlane=3, QP=8]" at line 280
+            instantiation of "void int8_research::pack_pair<T,SideA,Balance,Group>(const T *, T *, int8_t *, int *, const int *, int8_research::PairPackShared &) [with T=cutlass::bfloat16_t, SideA=true, Balance=true, Group=2]" at line 290
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=true]" at line 295
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=true]" at line 249 of research/precision_20261016/int8_hardware/corrected.cuh
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+research/precision_20261016/int8_hardware/pack.cuh(249): warning #177-D: variable "b" was declared but never referenced
+     float a=float(X[at]),b=float(X[at+512]),cc=float(X[at+512*1024]),d=float(X[at+512*1024+512]);
+                          ^
+          detected during:
+            instantiation of "void int8_research::pack_pair<T,SideA,Balance,Group>(const T *, T *, int8_t *, int *, const int *, int8_research::PairPackShared &) [with T=cutlass::bfloat16_t, SideA=true, Balance=false, Group=0]" at line 288
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=true, Balance=false]" at line 295
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=false]" at line 250 of research/precision_20261016/int8_hardware/corrected.cuh
+
+research/precision_20261016/int8_hardware/pack.cuh(249): warning #177-D: variable "cc" was declared but never referenced
+     float a=float(X[at]),b=float(X[at+512]),cc=float(X[at+512*1024]),d=float(X[at+512*1024+512]);
+                                             ^
+          detected during:
+            instantiation of "void int8_research::pack_pair<T,SideA,Balance,Group>(const T *, T *, int8_t *, int *, const int *, int8_research::PairPackShared &) [with T=cutlass::bfloat16_t, SideA=false, Balance=false, Group=0]" at line 288
+            instantiation of "void int8_research::pack<T,SideA,Balance>(const T *, T *, int8_t *, int *, const int *) [with T=cutlass::bfloat16_t, SideA=false, Balance=false]" at line 296
+            instantiation of "void int8_research::preprocess<T,Balance>(const T *, const T *, int8_research::Work, cudaStream_t) [with T=cutlass::bfloat16_t, Balance=false]" at line 250 of research/precision_20261016/int8_hardware/corrected.cuh
+
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN18precision_research16direct_quadrantsIN7cutlass6half_tEEEv14CUtensorMap_stS3_Pf' for 'sm_90a'
+ptxas info    : Function properties for _ZN18precision_research16direct_quadrantsIN7cutlass6half_tEEEv14CUtensorMap_stS3_Pf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 90 registers
+ptxas info    : Compiling entry function '_ZN18precision_research16direct_quadrantsIN7cutlass10bfloat16_tEEEv14CUtensorMap_stS3_Pf' for 'sm_90a'
+ptxas info    : Function properties for _ZN18precision_research16direct_quadrantsIN7cutlass10bfloat16_tEEEv14CUtensorMap_stS3_Pf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 90 registers
+ptxas info    : Compiling entry function '_ZN13int8_research12inside_scaleIN7cutlass6half_tEEEvPKT_S5_Pi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research12inside_scaleIN7cutlass6half_tEEEvPKT_S5_Pi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, 128 bytes smem
+ptxas info    : Compiling entry function '_ZN13int8_research12inside_scaleIN7cutlass10bfloat16_tEEEvPKT_S5_Pi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research12inside_scaleIN7cutlass10bfloat16_tEEEvPKT_S5_Pi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, 128 bytes smem
+ptxas info    : Compiling entry function '_ZN13int8_research4packIN7cutlass6half_tELb0ELb0EEEvPKT_PS3_PaPiPKi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research4packIN7cutlass6half_tELb0ELb0EEEvPKT_PS3_PaPiPKi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 170 registers, 9344 bytes smem
+ptxas info    : Function properties for _ZN41_INTERNAL_aa3a25aa_10_compare_cu_e4aa1a0b13int8_research17pair_general_pow2Efi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN13int8_research4packIN7cutlass6half_tELb1ELb0EEEvPKT_PS3_PaPiPKi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research4packIN7cutlass6half_tELb1ELb0EEEvPKT_PS3_PaPiPKi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 252 registers, 9344 bytes smem
+ptxas info    : Function properties for _ZN41_INTERNAL_aa3a25aa_10_compare_cu_e4aa1a0b13int8_research17pair_general_pow2Efi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN13int8_research4packIN7cutlass6half_tELb0ELb1EEEvPKT_PS3_PaPiPKi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research4packIN7cutlass6half_tELb0ELb1EEEvPKT_PS3_PaPiPKi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 138 registers, 9344 bytes smem
+ptxas info    : Function properties for _ZN41_INTERNAL_aa3a25aa_10_compare_cu_e4aa1a0b13int8_research17pair_general_pow2Efi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN13int8_research4packIN7cutlass6half_tELb1ELb1EEEvPKT_PS3_PaPiPKi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research4packIN7cutlass6half_tELb1ELb1EEEvPKT_PS3_PaPiPKi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 243 registers, 9344 bytes smem
+ptxas info    : Function properties for _ZN41_INTERNAL_aa3a25aa_10_compare_cu_e4aa1a0b13int8_research17pair_general_pow2Efi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN13int8_research14inside_partialIN7cutlass6half_tEEEvPKT_S5_Pf' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research14inside_partialIN7cutlass6half_tEEEvPKT_S5_Pf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, 1536 bytes smem
+ptxas info    : Compiling entry function '_ZN13int8_research4packIN7cutlass10bfloat16_tELb0ELb0EEEvPKT_PS3_PaPiPKi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research4packIN7cutlass10bfloat16_tELb0ELb0EEEvPKT_PS3_PaPiPKi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 174 registers, 9344 bytes smem
+ptxas info    : Function properties for _ZN41_INTERNAL_aa3a25aa_10_compare_cu_e4aa1a0b13int8_research17pair_general_pow2Efi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN13int8_research4packIN7cutlass10bfloat16_tELb1ELb0EEEvPKT_PS3_PaPiPKi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research4packIN7cutlass10bfloat16_tELb1ELb0EEEvPKT_PS3_PaPiPKi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 252 registers, 9344 bytes smem
+ptxas info    : Function properties for _ZN41_INTERNAL_aa3a25aa_10_compare_cu_e4aa1a0b13int8_research17pair_general_pow2Efi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN13int8_research4packIN7cutlass10bfloat16_tELb0ELb1EEEvPKT_PS3_PaPiPKi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research4packIN7cutlass10bfloat16_tELb0ELb1EEEvPKT_PS3_PaPiPKi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 132 registers, 9344 bytes smem
+ptxas info    : Function properties for _ZN41_INTERNAL_aa3a25aa_10_compare_cu_e4aa1a0b13int8_research17pair_general_pow2Efi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN13int8_research4packIN7cutlass10bfloat16_tELb1ELb1EEEvPKT_PS3_PaPiPKi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research4packIN7cutlass10bfloat16_tELb1ELb1EEEvPKT_PS3_PaPiPKi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 254 registers, 9344 bytes smem
+ptxas info    : Function properties for _ZN41_INTERNAL_aa3a25aa_10_compare_cu_e4aa1a0b13int8_research17pair_general_pow2Efi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN13int8_research14inside_partialIN7cutlass10bfloat16_tEEEvPKT_S5_Pf' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research14inside_partialIN7cutlass10bfloat16_tEEEvPKT_S5_Pf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, 1536 bytes smem
+ptxas info    : Compiling entry function '_ZN13int8_research9correctedIN7cutlass6half_tEEEv14CUtensorMap_stS3_S3_S3_PKiS5_Pf' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research9correctedIN7cutlass6half_tEEEv14CUtensorMap_stS3_S3_S3_PKiS5_Pf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 196 registers
+ptxas info    : Compiling entry function '_ZN13int8_research9correctedIN7cutlass10bfloat16_tEEEv14CUtensorMap_stS3_S3_S3_PKiS5_Pf' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research9correctedIN7cutlass10bfloat16_tEEEv14CUtensorMap_stS3_S3_S3_PKiS5_Pf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 196 registers
+ptxas info    : Compiling entry function '_ZN13int8_research15inside_finalizeEPKfPi' for 'sm_90a'
+ptxas info    : Function properties for _ZN13int8_research15inside_finalizeEPKfPi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers
+ptxas info    : Compiling entry function '_ZN43_GLOBAL__N__aa3a25aa_10_compare_cu_e4aa1a0b4fillI6__halfEEvPT_S3_PdS4_im' for 'sm_90a'
+ptxas info    : Function properties for _ZN43_GLOBAL__N__aa3a25aa_10_compare_cu_e4aa1a0b4fillI6__halfEEvPT_S3_PdS4_im
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 30 registers
+ptxas info    : Compiling entry function '_ZN43_GLOBAL__N__aa3a25aa_10_compare_cu_e4aa1a0b4fillI13__nv_bfloat16EEvPT_S3_PdS4_im' for 'sm_90a'
+ptxas info    : Function properties for _ZN43_GLOBAL__N__aa3a25aa_10_compare_cu_e4aa1a0b4fillI13__nv_bfloat16EEvPT_S3_PdS4_im
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 30 registers
+ptxas info    : Compiling entry function '_ZN43_GLOBAL__N__aa3a25aa_10_compare_cu_e4aa1a0b13measure_errorEPKfPKdPNS_6MetricE' for 'sm_90a'
+ptxas info    : Function properties for _ZN43_GLOBAL__N__aa3a25aa_10_compare_cu_e4aa1a0b13measure_errorEPKfPKdPNS_6MetricE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 25 registers, 6144 bytes smem
+ptxas info    : Compiling entry function '_Z13extended_fillI6__halfEvPT_S2_PdS3_ii' for 'sm_90a'
+ptxas info    : Function properties for _Z13extended_fillI6__halfEvPT_S2_PdS3_ii
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 28 registers
+ptxas info    : Compiling entry function '_Z13extended_fillI13__nv_bfloat16EvPT_S2_PdS3_ii' for 'sm_90a'
+ptxas info    : Function properties for _Z13extended_fillI13__nv_bfloat16EvPT_S2_PdS3_ii
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers

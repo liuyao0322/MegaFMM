@@ -3,9 +3,9 @@
   "goal_achieved": false,
   "production_unchanged": true,
   "working_candidate": "f13",
-  "working_global_candidate": "p23",
+  "working_global_candidate": "p24",
   "compact_pow2_equivalence_cases": 1048576,
-  "retained_global_candidate": "p21, 78 ordinary FP64 checks and 79872 exact per-column exponents; p10 rejected by fresh hardware",
+  "retained_global_candidate": "p24, ordinary/Graph78, own fresh stress84/672calls and scoped sanitizer28/56calls per tool; p10 rejected by fresh hardware",
   "compile_stopped_candidates": [
     "F12: no numerical or latency measurement"
   ],
@@ -264,7 +264,7 @@
       },
       "equal_per_column_exponents": 79872,
       "additional_alternating_checks_passed": 6,
-      "retained": true
+      "retained": false
     },
     "p22": {
       "checks": 78,
@@ -289,6 +289,18 @@
       "equal_per_column_exponents": 79872,
       "additional_alternating_checks_passed": 6,
       "retained": false
+    },
+    "p24": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 49.27904033675,
+        "fp16": 49.27023983
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": true
     }
   },
   "numerical_models": {
@@ -386,6 +398,49 @@
       "relative_reduction": 0.04654120131488049
     }
   ],
-  "validations_not_transferred": "P20 has its own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. No transfer to later changes.",
+  "p24_validation": {
+    "status": "p24_accuracy_and_scoped_synchronization_validated_performance_rejected",
+    "goal_achieved": false,
+    "ordinary_original_input_fp64_checks": 78,
+    "graph_original_input_fp64_checks": 78,
+    "graph_same_deterministic_configurations": true,
+    "equal_per_column_exponents_per_mode": 79872,
+    "independent_stress_configurations": 84,
+    "independent_stress_calls": 672,
+    "sanitizer_cases_per_tool": 28,
+    "sanitizer_calls_per_tool": 56,
+    "sanitizers": [
+      "memcheck",
+      "racecheck",
+      "synccheck"
+    ],
+    "sanitizer_kernel_scope": "kns=int8_research",
+    "stress_dense_control": "historical cuBLAS GemmEx; ordinary and Graph compare use production tuned Dense gate",
+    "stress_output_guards": "128 floats before and after each output; two independent streams/workspaces",
+    "graph_timing_us": {
+      "bf16": 44.53528022775,
+      "fp16": 44.52272033675
+    },
+    "limitations": "Only contiguous non-transposed1024^3, alpha1 beta0, FP16/BF16; no arbitrary-range proof, no production integration, no transfer to later modified candidates."
+  },
+  "p24_independent_performance": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p20",
+      "new_candidate": "p24",
+      "old_group_median_us": 51.13367986675,
+      "new_group_median_us": 49.445079326625,
+      "relative_reduction": 0.033023254820019776
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p20",
+      "new_candidate": "p24",
+      "old_group_median_us": 50.964840412125,
+      "new_group_median_us": 48.995879649875,
+      "relative_reduction": 0.03863370799021604
+    }
+  ],
+  "validations_not_transferred": "P20 and P24 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. No transfer to later changes.",
   "remaining": "Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration."
 }
