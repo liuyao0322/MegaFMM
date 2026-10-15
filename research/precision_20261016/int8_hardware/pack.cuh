@@ -184,7 +184,7 @@ void pack_plane(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict_
 }
 
 // Keep only two FP32 transformed planes live. All phases share one scratch area.
-template<bool SideA> struct PairPackShared {float values[2][SideA?8192:4096];float maxima[8];int exponent;int8_t transpose[SideA?1:2][SideA?1:128*36];};
+template<bool SideA> struct PairPackShared {float values[2][SideA?8192:4096];float maxima[8];int exponent;float maxima_second[8];int exponent_second;int8_t transpose[SideA?1:2][SideA?1:128*36];};
 static __device__ __noinline__ float pair_general_pow2(float x,int e){return ldexpf(x,e);}
 __device__ __forceinline__ float pair_pow2(float x,int e){
  if(e>=-126&&e<=127)return __fmul_rn(x,__int_as_float((e+127)<<23));
@@ -234,6 +234,73 @@ void pair_store(int which,T* high,int8_t* q,int* exp,
  __syncthreads();
 }
 
+template<class T,bool SideA,int QP> __device__ __forceinline__
+void pair_quant_store(int which,int eh,int8_t* q,
+ PairPackShared<SideA>& s,int r0,int c0){
+ constexpr int Rows=SideA?64:128,Cols=SideA?128:32,Size=Rows*Cols,PT=Size/256;
+ constexpr int Bits=(std::is_same_v<T,cute::half_t> ? 11 : 8);
+ int tid=threadIdx.x,el=eh-Bits;
+ auto quantize=[&](auto fast,float sh,float sl){
+  #pragma unroll 4
+  for(int j=0;j<PT;++j){
+   int i=tid+256*j;float v=s.values[which][i],h=float(T(v));
+   int qh;if constexpr(decltype(fast)::value)qh=__float2int_rn(__fmul_rn(h,sh));else qh=__float2int_rn(pair_pow2(h,-eh));
+   qh=max(-127,min(127,qh));int ql=0;
+   if constexpr(QP<4){float low=__fsub_rn(v,h);
+    if constexpr(decltype(fast)::value)ql=__float2int_rn(__fmul_rn(low,sl));else ql=__float2int_rn(pair_pow2(low,-el));
+    ql=max(-127,min(127,ql));
+   }
+   if constexpr(SideA){q[QP*Plane+(r0+i/Cols)*512+c0+i%Cols]=int8_t(qh);if constexpr(QP<4)q[(QP+4)*Plane+(r0+i/Cols)*512+c0+i%Cols]=int8_t(ql);}
+   else{int at=(i/Cols)*36+i%Cols;s.transpose[0][at]=int8_t(qh);if constexpr(QP<4)s.transpose[1][at]=int8_t(ql);}
+  }
+ };
+ if(eh>=-127&&eh<=126&&el>=-127&&el<=126)
+  quantize(std::true_type{},__int_as_float((127-eh)<<23),__int_as_float((127-el)<<23));
+ else quantize(std::false_type{},0,0);
+ if constexpr(!SideA){
+  __syncthreads();
+  for(int i=tid;i<Size;i+=256){int c=i/Rows,r=i%Rows;
+   q[QP*Plane+(c0+c)*512+r0+r]=s.transpose[0][r*36+c];
+   if constexpr(QP<4)q[(QP+4)*Plane+(c0+c)*512+r0+r]=s.transpose[1][r*36+c];
+  }
+ }
+ // The next transformed plane reuses maxima/exponent and both transpose arrays.
+ __syncthreads();
+}
+
+template<class T,bool SideA,int NP0,int QP0,int NP1,int QP1> __device__ __forceinline__
+void pair_store_both(T* high,int8_t* q,int* exp,
+ PairPackShared<SideA>& s,int tile,int r0,int c0){
+ constexpr int Rows=SideA?64:128,Cols=SideA?128:32,PT=Rows*Cols/256;
+ constexpr int Tiles=(512/Rows)*(512/Cols),Bits=(std::is_same_v<T,cute::half_t> ? 11 : 8);
+ int tid=threadIdx.x;float hi0=0,hi1=0;
+ #pragma unroll 4
+ for(int j=0;j<PT;++j){
+  int i=tid+256*j,at=(r0+i/Cols)*512+c0+i%Cols;
+  T h0=T(s.values[0][i]),h1=T(s.values[1][i]);
+  high[NP0*Plane+at]=h0;high[NP1*Plane+at]=h1;
+  hi0=fmaxf(hi0,fabsf(float(h0)));hi1=fmaxf(hi1,fabsf(float(h1)));
+ }
+ for(int step=16;step;step/=2){
+  hi0=fmaxf(hi0,__shfl_xor_sync(0xffffffff,hi0,step));
+  hi1=fmaxf(hi1,__shfl_xor_sync(0xffffffff,hi1,step));
+ }
+ if((tid&31)==0){s.maxima[tid/32]=hi0;s.maxima_second[tid/32]=hi1;}
+ __syncthreads();
+ if(tid==0){
+  float peak0=0,peak1=0;
+  for(int w=0;w<8;++w){peak0=fmaxf(peak0,s.maxima[w]);peak1=fmaxf(peak1,s.maxima_second[w]);}
+  int e0=peak0>0?int(ceilf(log2f(peak0/127.f))):0;
+  int e1=peak1>0?int(ceilf(log2f(peak1/127.f))):0;
+  s.exponent=e0;s.exponent_second=e1;
+  exp[QP0*Tiles+tile]=e0;exp[(QP0+4)*Tiles+tile]=e0-Bits;
+  exp[QP1*Tiles+tile]=e1;exp[(QP1+4)*Tiles+tile]=e1-Bits;
+ }
+ __syncthreads();
+ pair_quant_store<T,SideA,QP0>(0,s.exponent,q,s,r0,c0);
+ pair_quant_store<T,SideA,QP1>(1,s.exponent_second,q,s,r0,c0);
+}
+
 template<class T,bool SideA,bool Balance,int Group> __device__ __forceinline__
 void pack_pair(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,int* __restrict__ exp,
  const int* __restrict__ inside,PairPackShared<SideA>& s){
@@ -273,8 +340,8 @@ void pack_pair(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__
   if(normal)load(std::true_type{},__int_as_float((e0+127)<<23),__int_as_float((e1+127)<<23));else load(std::false_type{},0,0);
  }else load(std::false_type{},0,0);
  __syncthreads();
- if constexpr(Group==0){pair_store<T,SideA,4,0>(0,high,q,exp,s,tile,r0,c0);pair_store<T,SideA,5,1>(1,high,q,exp,s,tile,r0,c0);}
- else if constexpr(Group==1){pair_store<T,SideA,6,2>(0,high,q,exp,s,tile,r0,c0);pair_store<T,SideA,(SideA?2:3),3>(1,high,q,exp,s,tile,r0,c0);}
+ if constexpr(Group==0)pair_store_both<T,SideA,4,0,5,1>(high,q,exp,s,tile,r0,c0);
+ else if constexpr(Group==1)pair_store_both<T,SideA,6,2,(SideA?2:3),3>(high,q,exp,s,tile,r0,c0);
  else pair_store<T,SideA,(SideA?3:2),8>(0,high,q,exp,s,tile,r0,c0);
  asm volatile("fence.proxy.async.global;" ::: "memory");
 }
