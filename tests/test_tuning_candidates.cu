@@ -26,6 +26,7 @@ void candidate(int id,megafmm::DType dtype,int sms) {
   if(id<4 || id>=9) {p.m=129;p.n=256;p.k=128;p.lda=136;p.ldb=264;p.ldc=p.ldd=264;}
   else {p.m=id==4?17:129;p.n=id==4?23:137;p.k=id==4?19:65;
         p.trans_a=p.trans_b=true;p.lda=p.m+3;p.ldb=p.k+5;p.ldc=p.ldd=p.n+7;}
+  if(id>=9) {p.m=769;p.n=1536;p.k=16;p.lda=24;p.ldb=1544;p.ldc=p.ldd=1544;}
   const size_t ac=(p.trans_a?p.k:p.m)*p.lda,bc=(p.trans_b?p.n:p.k)*p.ldb,dc=p.m*p.ldd;
   std::vector<T>a(ac),b(bc);std::vector<float>initial(dc),result(dc);
   Buffer da(ac*2),db(bc*2),out0(dc*4),out1(dc*4);

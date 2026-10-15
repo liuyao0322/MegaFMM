@@ -11,7 +11,7 @@
 namespace megafmm::detail {
 namespace {
 using namespace cute;
-template<class T,int M,int N,int ClusterM>
+template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0>
 struct Candidate {
   using Tile=Shape<Int<M>,Int<N>,_64>;
   using Cluster=Shape<Int<ClusterM>,_1,_1>;
@@ -19,16 +19,21 @@ struct Candidate {
       cutlass::arch::Sm90,cutlass::arch::OpClassTensorOp,Tile,Cluster,
       cutlass::epilogue::collective::EpilogueTileAuto,float,float,
       float,cutlass::layout::RowMajor,4,float,cutlass::layout::RowMajor,4,
-      cutlass::epilogue::TmaWarpSpecializedCooperative>::CollectiveOp;
+      cute::conditional_t<Schedule==0,cutlass::epilogue::TmaWarpSpecializedCooperative,
+                          cutlass::epilogue::TmaWarpSpecialized>>::CollectiveOp;
   using Mainloop=typename cutlass::gemm::collective::CollectiveBuilder<
       cutlass::arch::Sm90,cutlass::arch::OpClassTensorOp,
       T,cutlass::layout::RowMajor,8,T,cutlass::layout::RowMajor,8,float,Tile,Cluster,
-      cutlass::gemm::collective::StageCountAutoCarveout<int(sizeof(typename Epilogue::SharedStorage))>,
-      cutlass::gemm::KernelTmaWarpSpecializedCooperative>::CollectiveOp;
+      cute::conditional_t<Stages==0,
+        cutlass::gemm::collective::StageCountAutoCarveout<int(sizeof(typename Epilogue::SharedStorage))>,
+        cutlass::gemm::collective::StageCount<Stages>>,
+      cute::conditional_t<Schedule==0,cutlass::gemm::KernelTmaWarpSpecializedCooperative,
+        cute::conditional_t<Schedule==1,cutlass::gemm::KernelTmaWarpSpecialized,
+                            cutlass::gemm::KernelTmaWarpSpecializedPingpong>>>::CollectiveOp;
   using Kernel=cutlass::gemm::kernel::GemmUniversal<Shape<int,int,int,int>,Mainloop,Epilogue>;
   using Gemm=cutlass::gemm::device::GemmUniversalAdapter<Kernel>;
   static bool run(const Problem& p,const void* A,const void* B,const float* C,float* D,
-                  void* workspace,int sm_count,cudaStream_t stream,int operation,int swizzle=1) {
+                  void* workspace,int sm_count,cudaStream_t stream,int operation,int swizzle=1,int raster=0) {
     if(operation==2) {
       auto e=cudaFuncSetAttribute(cutlass::device_kernel<Kernel>,
           cudaFuncAttributeMaxDynamicSharedMemorySize,Kernel::SharedStorageSize);
@@ -47,6 +52,8 @@ struct Candidate {
       {0,sm_count}
     };
     args.scheduler.max_swizzle_size=swizzle;
+    using Raster=typename Kernel::TileScheduler::RasterOrderOptions;
+    if(raster) args.scheduler.raster_order=raster==1 ? Raster::AlongM:Raster::AlongN;
     args.epilogue.thread.alpha=p.alpha;args.epilogue.thread.beta=p.beta;
     if(Gemm::can_implement(args)!=cutlass::Status::kSuccess) return false;
     // The persistent scheduler has zero workspace. No counters or values are
@@ -74,6 +81,15 @@ bool dispatch(int id,const Problem& p,const void* A,const void* B,const float* C
     case 12:return Candidate<T,128,256,1>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 13:return Candidate<T,128,128,2>::run(p,A,B,C,D,workspace,sm_count,stream,operation,4);
     case 14:return Candidate<T,128,128,2>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 15:return Candidate<T,64,32,1,1,3>::run(p,A,B,C,D,workspace,sm_count,stream,operation);
+    case 16:return Candidate<T,64,64,1,1,3>::run(p,A,B,C,D,workspace,sm_count,stream,operation);
+    case 17:return Candidate<T,128,128,1,2,3>::run(p,A,B,C,D,workspace,sm_count,stream,operation);
+    case 18:return Candidate<T,256,128,1>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 19:return Candidate<T,128,256,2>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 20:return Candidate<T,128,256,1,2,3>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 21:return Candidate<T,128,256,1>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,2);
+    case 22:return Candidate<T,128,128,2>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,2);
+    case 23:return Candidate<T,256,128,1>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,1);
     default:return false;
   }
 }
@@ -95,7 +111,10 @@ template<class T> __global__ void small_gemm(Problem p,const T* A,const T* B,con
 const char* hopper_candidate_name(int id) {
   static const char* names[]={"128x64x64_c1","128x128x64_c1","128x256x64_c1","128x128x64_c2","simt_small","pad_128x64x64_c1","pad_128x128x64_c1","pad_128x256x64_c1","pad_128x128x64_c2",
       "128x128x64_c1_sw4","128x128x64_c1_sw8","128x256x64_c1_sw4",
-      "128x256x64_c1_sw8","128x128x64_c2_sw4","128x128x64_c2_sw8"};
+      "128x256x64_c1_sw8","128x128x64_c2_sw4","128x128x64_c2_sw8",
+      "64x32x64_basic_s3","64x64x64_basic_s3","128x128x64_pingpong_s3",
+      "256x128x64_c1_sw8","128x256x64_c2_sw8","128x256x64_pingpong_s3_sw8",
+      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM"};
   return id>=0 && id<HopperCandidateCount ? names[id]:"invalid";
 }
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C,float* D,
