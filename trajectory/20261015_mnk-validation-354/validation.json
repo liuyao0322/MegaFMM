@@ -1,0 +1,26 @@
+{
+  "iteration": 354,
+  "commit": "bd9b1ec",
+  "candidate_count": 77,
+  "ctest_passed": 5,
+  "ctest_failed": 0,
+  "memcheck_errors": 0,
+  "racecheck_errors": 0,
+  "racecheck_warnings": 0,
+  "sanitizer_tool": "CUDA12.8 ComputeSanitizer2025.1",
+  "binary_sha256": "97c5937b361987e314a75f809281a85287d317897234624ea00cb0ecff03171f",
+  "solution_sha256": {
+    "solution/scale_output.cu": "32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708",
+    "solution/dense_padding.cu": "88cc8c81f2025c4965e416b790817fa30f51c0a8c4af701896cf32c8fe6e019a",
+    "solution/dense_wmma.cu": "fd3c6eb06343c7e59aba443cfc72c5bc6fef04ad81a9419773ec4b5303c2bced",
+    "solution/dense_ampere.cu": "b9a82afc6a640022c6e7a1081a87bab5c98e425965d08e8a150fb554128d0478",
+    "solution/internal.h": "27e05ba27a2a087f4bfde65d22ad62ffa8fadf9638de6f9438a368be2acc298b",
+    "solution/hopper_nine_warp_kernel.cuh": "6a40e4a17227782139da81c9f734cdd2f5ed4a4955a0d29c7f6ac140c37f5482",
+    "solution/plan.cpp": "e2d5bb4f89dc721d4635994c3d428ee73f36524fbf1d25f096091b106b1f32ba",
+    "solution/sw_pipeline.cu": "748e7ace9de0b6469d47922cb7cb531bbb56a9d55c9915b0194c0e0a72e916e7",
+    "solution/sw_multisize.cu": "6439b99b3f6cc2fac7a510eff4638d8be5cfd2cda1ca312b6a86bbe8a2c43641",
+    "solution/dense_hopper.cu": "90385aacbdf8728133956dfe23a45bdd73e36826f2765c3c3f550f4a92b9227a",
+    "solution/tuning_check.cu": "8b109a5756a8c95fd38ec8c7ec4dc76cb8f8e1000906e39dd122795c55786a5f"
+  },
+  "notes": "All77forced candidates and original Tuned API pass, including odd cluster tails, fresh inputs, Graph/direct dualstream and beta rejection. Formal12rows pass originalFP64; newclusters and ninewarp offer no additional provisional shape wins. Candidate76 8192^3 ~2.45ms vs retained~1.6ms, despite two-block resource capacity. Latest full independent certification353 sixteenof28;12largeK unresolved."
+}
