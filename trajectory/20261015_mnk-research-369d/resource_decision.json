@@ -1,0 +1,60 @@
+{
+  "production_unchanged": true,
+  "research_only": true,
+  "precision_scope": "FP16 twelve exact original-AB FP64 K tails, alpha0.5, strides/padding and persistent reuse; no large random acceptance",
+  "variants": [
+    {
+      "variant": 0,
+      "cluster_m": 1,
+      "nine_warp": false,
+      "output": [
+        "tile=128x256 stages=0 threads=384 registers=168 shared=231424 local=0 block_limit=1 required_blocks=1",
+        "actual_stages=4 tile_k=64 inflight_groups=1 workers_per_sm=1",
+        "PASS twelve fresh non-symmetric original-AB FP64 references, alpha=0.5, strided tails/padding, K=1032/8/40/72/104/256/288/320/352/384/136/168 consumer/batch-tail coverage",
+        "PASS persistent pipeline reuse12289x520 K8/K1032 original-AB FP64 closed-form and padding",
+        "PASS resource preflight and exact all-ones tail computation; not production acceptance"
+      ],
+      "passed": true
+    },
+    {
+      "variant": 1,
+      "cluster_m": 2,
+      "nine_warp": false,
+      "output": [
+        "tile=128x256 stages=0 threads=384 registers=168 shared=231424 local=0 block_limit=1 required_blocks=1",
+        "actual_stages=4 tile_k=64 inflight_groups=1 workers_per_sm=1",
+        "PASS twelve fresh non-symmetric original-AB FP64 references, alpha=0.5, strided tails/padding, K=1032/8/40/72/104/256/288/320/352/384/136/168 consumer/batch-tail coverage",
+        "PASS persistent pipeline reuse12289x520 K8/K1032 original-AB FP64 closed-form and padding",
+        "PASS resource preflight and exact all-ones tail computation; not production acceptance"
+      ],
+      "passed": true
+    },
+    {
+      "variant": 2,
+      "cluster_m": 1,
+      "nine_warp": true,
+      "output": [
+        "tile=128x256 stages=0 threads=288 registers=154 shared=231424 local=0 block_limit=1 required_blocks=1",
+        "actual_stages=4 tile_k=64 inflight_groups=1 workers_per_sm=1",
+        "PASS twelve fresh non-symmetric original-AB FP64 references, alpha=0.5, strided tails/padding, K=1032/8/40/72/104/256/288/320/352/384/136/168 consumer/batch-tail coverage",
+        "PASS persistent pipeline reuse12289x520 K8/K1032 original-AB FP64 closed-form and padding",
+        "PASS resource preflight and exact all-ones tail computation; not production acceptance"
+      ],
+      "passed": true
+    },
+    {
+      "variant": 3,
+      "cluster_m": 2,
+      "nine_warp": true,
+      "output": [
+        "tile=128x256 stages=0 threads=288 registers=154 shared=231424 local=0 block_limit=1 required_blocks=1",
+        "actual_stages=4 tile_k=64 inflight_groups=1 workers_per_sm=1",
+        "PASS twelve fresh non-symmetric original-AB FP64 references, alpha=0.5, strided tails/padding, K=1032/8/40/72/104/256/288/320/352/384/136/168 consumer/batch-tail coverage",
+        "PASS persistent pipeline reuse12289x520 K8/K1032 original-AB FP64 closed-form and padding",
+        "PASS resource preflight and exact all-ones tail computation; not production acceptance"
+      ],
+      "passed": true
+    }
+  ],
+  "next": "Both BF16/FP16 exact tails and fresh fractional Base bitwise comparisons, then paired random timing."
+}
