@@ -3,9 +3,9 @@
   "goal_achieved": false,
   "production_unchanged": true,
   "working_candidate": "f13",
-  "working_global_candidate": "p17",
+  "working_global_candidate": "p20",
   "compact_pow2_equivalence_cases": 1048576,
-  "retained_global_candidate": "p17, 78 ordinary FP64 checks and 79872 exact per-column exponents; p10 rejected by fresh hardware",
+  "retained_global_candidate": "p20, 78 ordinary FP64 checks and 79872 exact per-column exponents; p10 rejected by fresh hardware",
   "compile_stopped_candidates": [
     "F12: no numerical or latency measurement"
   ],
@@ -216,7 +216,7 @@
       },
       "equal_per_column_exponents": 79872,
       "additional_alternating_checks_passed": 6,
-      "retained": true
+      "retained": false
     },
     "p18": {
       "checks": 78,
@@ -241,6 +241,18 @@
       "equal_per_column_exponents": 79872,
       "additional_alternating_checks_passed": 6,
       "retained": false
+    },
+    "p20": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 51.367919922,
+        "fp16": 50.994399071000004
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": true
     }
   },
   "numerical_models": {

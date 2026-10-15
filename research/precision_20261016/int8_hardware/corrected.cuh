@@ -14,6 +14,10 @@ __host__ __device__ constexpr int main_product(int step){return step<2?step:step
 __host__ __device__ constexpr int qa_plane(int term){return term<2?7+term:(term-2)/2+((term&1)?0:4);}
 __host__ __device__ constexpr int qb_plane(int term){return term<2?8-term:(term-2)/2+((term&1)?4:0);}
 
+// Five correction groups retain all eight original integer dots.
+__host__ __device__ constexpr int first_term(int group){return group<2?group:2+2*(group-2);}
+static_assert(2*128*127*127<4194304,"paired integer bound");
+
 template<class T> __device__ __forceinline__ void float_mma(uint64_t a,uint64_t b,float* d,cute::GMMA::ScaleOut scale){
  using namespace cute;
  if constexpr(std::is_same_v<T,cute::half_t>)
@@ -42,14 +46,14 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
  auto dbq=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(tiled_divide(bq,Shape<_32,_32>{}));
  // One correction/K metadata entry per lane, replicated in each consumer warp.
  // Subsequent iterations broadcast registers instead of chasing local/global loads.
- int lane=tid&31,term=lane/4,kk=lane%4,ap=qa_plane(term),bp=qb_plane(term);
+ int lane=tid&31,group=(lane/4)<5?lane/4:0,term=first_term(group),kk=lane%4,ap=qa_plane(term),bp=qb_plane(term);
  int ae=ea[ap*32+(n0/64)*4+kk];
  int meta_e0=ae+eb[bp*64+kk*16+m0/32],meta_e1=ae+eb[bp*64+kk*16+m0/32+1];
  float meta_s0=(meta_e0>=-126&&meta_e0<=127)?__int_as_float((meta_e0+127)<<23):0.f;
  float meta_s1=(meta_e1>=-126&&meta_e1<=127)?__int_as_float((meta_e1+127)<<23):0.f;
  float c[4][16]={};
  #pragma unroll 1
- for(int step=0;step<15;++step){
+ for(int step=0;step<12;++step){
   float d[16]={};
   #pragma unroll 1
   for(int k=0;k<4;++k){
@@ -74,6 +78,14 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
     #pragma unroll
     for(int inner=0;inner<4;++inner)
      integer_mma(uint64_t(daq(0,0,inner))+offset,uint64_t(dbq(0,0,inner))+offset,integer,inner?GMMA::ScaleOut::One:GMMA::ScaleOut::Zero);
+    if(step>=9){
+     // The second B64x128 plane occupies bytes8192..16383; the
+     // second A32x128 plane occupies bytes20480..24575 in this slot.
+     // Accumulate before wait/rescale, with the same INT32 fragment.
+     #pragma unroll
+     for(int inner=0;inner<4;++inner)
+      integer_mma(uint64_t(daq(0,0,inner))+offset+8192/16,uint64_t(dbq(0,0,inner))+offset+4096/16,integer,GMMA::ScaleOut::One);
+    }
     warpgroup_commit_batch();warpgroup_wait<0>();
     #pragma unroll
     for(int j=0;j<16;++j)warpgroup_fence_operand(integer[j]);
@@ -140,11 +152,11 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
     #pragma unroll
     for(int j=0;j<16;++j){c[2][j]=__fsub_rn(c[2][j],d[j]);}
    }
-   else if(term<4){
+   else if(term==2){
     #pragma unroll
     for(int j=0;j<16;++j){c[1][j]=__fadd_rn(c[1][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
    }
-   else if(term<6){
+   else if(term==3){
     #pragma unroll
     for(int j=0;j<16;++j){c[1][j]=__fadd_rn(c[1][j],d[j]);c[2][j]=__fadd_rn(c[2][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
    }
@@ -172,17 +184,22 @@ void corrected(const __grid_constant__ CUtensorMap high_a,const __grid_constant_
  if(tid==0){for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}cutlass::arch::fence_barrier_init();}
  __syncthreads();
  if(tid==0){
-  for(int step=0;step<15;++step)for(int k=0;k<4;++k){
+  for(int step=0;step<12;++step)for(int k=0;k<4;++k){
    int seq=step*4+k,slot=seq%Stages;
    if(seq>=Stages){Barrier::wait(&s.free[slot],((seq-Stages)/Stages)%2);asm volatile("" ::: "memory");}
-   TxBarrier::arrive_and_expect_tx(&s.ready[slot],step<7?24576:12288);
+   TxBarrier::arrive_and_expect_tx(&s.ready[slot],(step<7||step>=9)?24576:12288);
    if(step<7){
     int p=main_product(step);
     SM90_TMA_LOAD_3D::copy(&high_b,&s.ready[slot],0,s.operand[slot],m0,k*128,p);
     SM90_TMA_LOAD_4D::copy(&high_a,&s.ready[slot],0,s.operand[slot]+16384,0,n0,k*2,p);
    }else{
-    SM90_TMA_LOAD_3D::copy(&quant_b,&s.ready[slot],0,s.operand[slot],k*128,m0,qb_plane(step-7));
-    SM90_TMA_LOAD_3D::copy(&quant_a,&s.ready[slot],0,s.operand[slot]+16384,k*128,n0,qa_plane(step-7));
+    int term=first_term(step-7);
+    SM90_TMA_LOAD_3D::copy(&quant_b,&s.ready[slot],0,s.operand[slot],k*128,m0,qb_plane(term));
+    SM90_TMA_LOAD_3D::copy(&quant_a,&s.ready[slot],0,s.operand[slot]+16384,k*128,n0,qa_plane(term));
+    if(step>=9){
+     SM90_TMA_LOAD_3D::copy(&quant_b,&s.ready[slot],0,s.operand[slot]+8192,k*128,m0,qb_plane(term+1));
+     SM90_TMA_LOAD_3D::copy(&quant_a,&s.ready[slot],0,s.operand[slot]+20480,k*128,n0,qa_plane(term+1));
+    }
    }
   }
  }else if(tid>=128)consume<T>(s,tid,m0,n0,ea,eb,D);

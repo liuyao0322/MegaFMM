@@ -144,8 +144,11 @@ void pack_plane(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict_
  for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}
  if((tid&31)==0){maxima[0][tid/32]=hi;maxima[1][tid/32]=lo;}__syncthreads();
  if(tid<2){
-  float peak=0;for(int j=0;j<8;++j)peak=fmaxf(peak,maxima[tid][j]);
-  int e=peak>0?int(ceilf(log2f(peak/127.f))):0;
+  // Relative residual scales make each two-sided correction pair share
+  // one exponent. Both lanes independently use the same high maximum.
+  float peak=0;for(int j=0;j<8;++j)peak=fmaxf(peak,maxima[0][j]);
+  constexpr int LowBits=(std::is_same_v<T, cute::half_t> ? 11 : 8);
+  int e=(peak>0?int(ceilf(log2f(peak/127.f))):0)-(tid?LowBits:0);
   exponents[tid]=e;if(!tid || qp<4)exp[(qp+(tid?4:0))*Tiles+tile]=e;
  }
  __syncthreads();
