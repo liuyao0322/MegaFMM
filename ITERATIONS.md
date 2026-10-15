@@ -629,6 +629,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 361 | Test two-block clusters in wide nine-warp GEMM | 1.1113 | 0.328963 | measured |
 
+| 362 | Measure explicit deterministic Split-K factors across large shapes | 1.0710 | 1.762598 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -6036,3 +6038,37 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal twelve-row benchmark completed with original FP64 and complete-call timing gates; no independent certification inferred. Need inspect scores and extend measurements to remaining large-K shapes.
 - **Next:** Force all94/API/CTest/CUDA12.8 sanitizers, then measure16384 and three large-K rectangles with frozen binary; profile/reassess measured non-winners before next axis.
 - **Archive:** trajectory/20261015_201630_iter-361/
+
+### Iter 362 — Measure explicit deterministic Split-K factors across large shapes
+
+- **Hypothesis:** Explicit2/4 K splits may reduce scheduling tails enough to offset complete-call reduction costs.
+- **Changes:** Add94..97 SplitK2/4 CM1/CM2,total98; shared argument builder selects deterministic SplitK and identical workspace/run parameters with every-call barrier reset. Formal scope expanded to10shapes20rows.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 20 rows; arithmetic mean of row median latency=1.762598 ms; mean speedup=1.0710x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005675 | 0.005016 | 1.1314 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005636 | 0.005052 | 1.1155 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008650 | 0.006698 | 1.2914 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008625 | 0.006627 | 1.3016 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.243586 | 0.220490 | 1.1047 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.233375 | 0.233548 | 0.9993 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.620069 | 1.640253 | 0.9877 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.746819 | 1.702668 | 1.0259 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025048 | 0.023579 | 1.0623 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026100 | 0.023955 | 1.0896 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027959 | 0.024340 | 1.1487 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.028429 | 0.024681 | 1.1519 | 6.43463e-07 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.761963 | 12.746610 | 1.0012 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.309048 | 13.308577 | 1.0000 | 1.93317e-05 | 1 |
+| 8192,4096,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.870556 | 0.865518 | 1.0058 | 8.55058e-06 | 1 |
+| 8192,4096,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.906128 | 0.903363 | 1.0031 | 9.68961e-06 | 1 |
+| 4096,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.832954 | 0.838662 | 0.9932 | 8.55119e-06 | 1 |
+| 4096,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.907061 | 0.887243 | 1.0223 | 9.68981e-06 | 1 |
+| 8192,8192,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.871269 | 0.888285 | 0.9808 | 4.02534e-06 | 1 |
+| 8192,8192,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.900076 | 0.896787 | 1.0037 | 4.87776e-06 | 1 |
+
+- **Analysis:** 20/20 original FP64 gates pass. New SplitK scores lose on4096/8192 and all three large-K rectangles;16384 new scores NaN due screening and require forced precision diagnosis, not assumed slow. No new independent stablewin; last full certification35316/28.
+- **Next:** Force98/API/5CTest/CUDA12.8sanitizers, diagnose all four16384 SplitK candidates against full FP64 and Dense agreement, profile representative SplitK complete call before choosing next direction.
+- **Archive:** trajectory/20261015_203426_iter-362/

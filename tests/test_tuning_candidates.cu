@@ -57,7 +57,7 @@ void candidate(int id,megafmm::DType dtype,int sms,int layout=0) {
   }
   if(id>=81 && detail::hopper_workspace(p,id,sms)>0 &&
       detail::hopper_dense(id,p,da.p,db.p,static_cast<float*>(out0.p),static_cast<float*>(out0.p),nullptr,sms,nullptr,0))
-    throw std::runtime_error("Stream-K accepted missing reduction workspace");
+    throw std::runtime_error("K-reduction candidate accepted missing workspace");
   // Capture only after one setup; both executions bind distinct output/scratch.
   check(cudaStreamBeginCapture(execution[0].stream,cudaStreamCaptureModeThreadLocal));
   if(!detail::hopper_dense(id,p,da.p,db.p,static_cast<float*>(out0.p),static_cast<float*>(out0.p),work0.p,sms,execution[0].stream,1))
