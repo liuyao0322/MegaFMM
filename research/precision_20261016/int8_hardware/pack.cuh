@@ -182,24 +182,118 @@ void pack_plane(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict_
  asm volatile("fence.proxy.async.global;" ::: "memory");
 }
 
+// Keep only two FP32 transformed planes live. All phases share one scratch area.
+struct PairPackShared {float maxima[8];int exponent;int8_t transpose[2][128*36];};
+static __device__ __noinline__ float pair_general_pow2(float x,int e){return ldexpf(x,e);}
+__device__ __forceinline__ float pair_pow2(float x,int e){
+ if(e>=-126&&e<=127)return __fmul_rn(x,__int_as_float((e+127)<<23));
+ return pair_general_pow2(x,e);
+}
+
+template<class T,bool SideA,int NativePlane,int QP> __device__ __forceinline__
+void pair_store(float (&v)[(SideA?8192:4096)/256],T* high,int8_t* q,int* exp,
+ PairPackShared& s,int tile,int r0,int c0){
+ constexpr int Rows=SideA?64:128,Cols=SideA?128:32,Size=Rows*Cols,PT=Size/256;
+ constexpr int Tiles=(512/Rows)*(512/Cols),Bits=(std::is_same_v<T,cute::half_t> ? 11 : 8);
+ int tid=threadIdx.x;float hi=0;
+ #pragma unroll
+ for(int j=0;j<PT;++j){int i=tid+256*j;T h=T(v[j]);high[NativePlane*Plane+(r0+i/Cols)*512+c0+i%Cols]=h;hi=fmaxf(hi,fabsf(float(h)));}
+ for(int step=16;step;step/=2)hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,step));
+ if((tid&31)==0)s.maxima[tid/32]=hi;__syncthreads();
+ if(tid==0){float peak=0;for(int w=0;w<8;++w)peak=fmaxf(peak,s.maxima[w]);
+  int e=peak>0?int(ceilf(log2f(peak/127.f))):0;s.exponent=e;exp[QP*Tiles+tile]=e;
+  if constexpr(QP<4)exp[(QP+4)*Tiles+tile]=e-Bits;
+ }
+ __syncthreads();int eh=s.exponent,el=eh-Bits;
+ // Recompute cast/residual rather than extending both temporary arrays' lifetime.
+ #pragma unroll
+ for(int j=0;j<PT;++j)asm volatile("" : "+f"(v[j]));
+ auto quantize=[&](auto fast,float sh,float sl){
+  #pragma unroll
+  for(int j=0;j<PT;++j){
+   int i=tid+256*j;float h=float(T(v[j]));
+   int qh;if constexpr(decltype(fast)::value)qh=__float2int_rn(__fmul_rn(h,sh));else qh=__float2int_rn(pair_pow2(h,-eh));
+   qh=max(-127,min(127,qh));int ql=0;
+   if constexpr(QP<4){float low=__fsub_rn(v[j],h);
+    if constexpr(decltype(fast)::value)ql=__float2int_rn(__fmul_rn(low,sl));else ql=__float2int_rn(pair_pow2(low,-el));
+    ql=max(-127,min(127,ql));
+   }
+   if constexpr(SideA){q[QP*Plane+(r0+i/Cols)*512+c0+i%Cols]=int8_t(qh);if constexpr(QP<4)q[(QP+4)*Plane+(r0+i/Cols)*512+c0+i%Cols]=int8_t(ql);}
+   else{int at=(i/Cols)*36+i%Cols;s.transpose[0][at]=int8_t(qh);if constexpr(QP<4)s.transpose[1][at]=int8_t(ql);}
+  }
+ };
+ if(eh>=-127&&eh<=126&&el>=-127&&el<=126)
+  quantize(std::true_type{},__int_as_float((127-eh)<<23),__int_as_float((127-el)<<23));
+ else quantize(std::false_type{},0,0);
+ if constexpr(!SideA){
+  __syncthreads();
+  for(int i=tid;i<Size;i+=256){int c=i/Rows,r=i%Rows;
+   q[QP*Plane+(c0+c)*512+r0+r]=s.transpose[0][r*36+c];
+   if constexpr(QP<4)q[(QP+4)*Plane+(c0+c)*512+r0+r]=s.transpose[1][r*36+c];
+  }
+ }
+ // The next transformed plane reuses maxima/exponent and both transpose arrays.
+ __syncthreads();
+}
+
+template<class T,bool SideA,bool Balance,int Group> __device__ __forceinline__
+void pack_pair(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,int* __restrict__ exp,
+ const int* __restrict__ inside,PairPackShared& s){
+ constexpr int Rows=SideA?64:128,Cols=SideA?128:32,PT=Rows*Cols/256,Tiles=(512/Rows)*(512/Cols);
+ int tile=blockIdx.x%Tiles,tid=threadIdx.x,r0=tile/(512/Cols)*Rows,c0=tile%(512/Cols)*Cols;
+ float v0[PT],v1[PT];
+ auto load=[&](auto fast,float sf0,float sf1){
+  #pragma unroll
+  for(int j=0;j<PT;++j){
+   int i=tid+256*j,r=r0+i/Cols,c=c0+i%Cols,at=r*1024+c;
+   float a=float(X[at]),b=float(X[at+512]),cc=float(X[at+512*1024]),d=float(X[at+512*1024+512]);
+   if constexpr(Balance){
+    if constexpr(decltype(fast)::value){
+     float f0=sf0,f1=sf1;if constexpr(!SideA){f0=__shfl_sync(0xffffffff,sf0,j);f1=__shfl_sync(0xffffffff,sf1,j);}
+     a=__fmul_rn(a,f0);d=__fmul_rn(d,f1);
+     if constexpr(SideA){b=__fmul_rn(b,f1);cc=__fmul_rn(cc,f0);}else{b=__fmul_rn(b,f0);cc=__fmul_rn(cc,f1);}
+    }else{
+     int e0=SideA?-inside[c]:inside[r],e1=SideA?-inside[c+512]:inside[r+512];
+     a=pair_pow2(a,e0);d=pair_pow2(d,e1);
+     if constexpr(SideA){b=pair_pow2(b,e1);cc=pair_pow2(cc,e0);}else{b=pair_pow2(b,e0);cc=pair_pow2(cc,e1);}
+    }
+   }
+   if constexpr(Group==2){
+    high[r*512+c]=T(a);high[Plane+r*512+c]=T(SideA?b:cc);v0[j]=d;
+   }else if constexpr(SideA){
+    float s1=__fadd_rn(cc,d),s2=__fsub_rn(s1,a);
+    if constexpr(Group==0){v0[j]=s1;v1[j]=s2;}else{v0[j]=__fsub_rn(a,cc);v1[j]=__fsub_rn(b,s2);}
+   }else{
+    float t1=__fsub_rn(b,a),t2=__fsub_rn(d,t1);
+    if constexpr(Group==0){v0[j]=t1;v1[j]=t2;}else{v0[j]=__fsub_rn(d,b);v1[j]=__fsub_rn(t2,cc);}
+   }
+  }
+ };
+ if constexpr(Balance){
+  int pos=SideA?c0+tid%Cols:r0+tid/32+8*(tid%16);
+  int e0=SideA?-inside[pos]:inside[pos],e1=SideA?-inside[pos+512]:inside[pos+512];
+  bool normal=e0>=-126&&e0<=127&&e1>=-126&&e1<=127;if constexpr(!SideA)normal=__all_sync(0xffffffff,normal);
+  if(normal)load(std::true_type{},__int_as_float((e0+127)<<23),__int_as_float((e1+127)<<23));else load(std::false_type{},0,0);
+ }else load(std::false_type{},0,0);
+ if constexpr(Group==0){pair_store<T,SideA,4,0>(v0,high,q,exp,s,tile,r0,c0);pair_store<T,SideA,5,1>(v1,high,q,exp,s,tile,r0,c0);}
+ else if constexpr(Group==1){pair_store<T,SideA,6,2>(v0,high,q,exp,s,tile,r0,c0);pair_store<T,SideA,(SideA?2:3),3>(v1,high,q,exp,s,tile,r0,c0);}
+ else pair_store<T,SideA,(SideA?3:2),8>(v0,high,q,exp,s,tile,r0,c0);
+ asm volatile("fence.proxy.async.global;" ::: "memory");
+}
+
 template<class T,bool SideA,bool Balance> __global__ __launch_bounds__(256,1)
 void pack(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,int* __restrict__ exp,const int* __restrict__ inside){
- int plane=blockIdx.x/(SideA?32:64);
- switch(plane){
-  case 0:pack_plane<T,SideA,Balance,0>(X,high,q,exp,inside);break;
-  case 1:pack_plane<T,SideA,Balance,1>(X,high,q,exp,inside);break;
-  case 2:pack_plane<T,SideA,Balance,2>(X,high,q,exp,inside);break;
-  case 3:pack_plane<T,SideA,Balance,3>(X,high,q,exp,inside);break;
-  case 4:pack_plane<T,SideA,Balance,4>(X,high,q,exp,inside);break;
-  case 5:pack_plane<T,SideA,Balance,5>(X,high,q,exp,inside);break;
-  default:pack_plane<T,SideA,Balance,6>(X,high,q,exp,inside);break;
- }
+ __shared__ PairPackShared scratch;
+ int group=blockIdx.x/(SideA?32:64);
+ if(group==0)pack_pair<T,SideA,Balance,0>(X,high,q,exp,inside,scratch);
+ else if(group==1)pack_pair<T,SideA,Balance,1>(X,high,q,exp,inside,scratch);
+ else pack_pair<T,SideA,Balance,2>(X,high,q,exp,inside,scratch);
 }
 
 template<class T,bool Balance> void preprocess(const T* A,const T* B,Work w,cudaStream_t stream){
  if constexpr(Balance){inside_partial<<<dim3(8,32),256,0,stream>>>(A,B,w.partial);inside_finalize<<<128,256,0,stream>>>(w.partial,w.inside);}
- pack<T,true,Balance><<<7*32,256,0,stream>>>(A,static_cast<T*>(w.ha),w.qa,w.ea,w.inside);
- pack<T,false,Balance><<<7*64,256,0,stream>>>(B,static_cast<T*>(w.hb),w.qb,w.eb,w.inside);
+ pack<T,true,Balance><<<3*32,256,0,stream>>>(A,static_cast<T*>(w.ha),w.qa,w.ea,w.inside);
+ pack<T,false,Balance><<<3*64,256,0,stream>>>(B,static_cast<T*>(w.hb),w.qb,w.eb,w.inside);
  check(cudaPeekAtLastError(),"INT8 preprocess");
 }
 } // namespace int8_research

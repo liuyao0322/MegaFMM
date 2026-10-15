@@ -221,3 +221,18 @@ P17独立ABBA复测（P13→P17→P17→P13，四个新进程）共312次精度�
 - Four new processesP17→P20→P20→P17; all ordinary full-call arms and controls preserved.10groups per dtype/candidate. BF16 old/new medians53.792/51.089us, FP16 53.606/51.111us, relative reductions5.025%/4.654%. GPU clocks unlocked, no confidence interval or cross-machine claim.
 -312original-input FP64 checks and319,488inside-exponent comparisons pass; still78 deterministic numerical configurations. Sources/binaries and analysis frozen inp20_abba_manifest.json; runscript and analyze_abba.py reproduce the report.
 - KeepP20 as the current research candidate; no production changes. Consumer scheduling and packing remain too expensive for the~10us target. The measured relative gain does not change the full performance rejection.
+
+
+## P20 profile before the next producer experiment
+
+- One fresh BF16 frozenP20 invocation, select A pack/B pack/corrected kernels, NCU17passes per kernel; clocks/cache controlnone. Profiler durations21.184/14.080/22.112us are diagnostics, not ordinary performance acceptance. Each kernel has zero measured local-load/store sectors on this input.
+- A159regs, issueactive26.66percent, no-instruction/issue-active ratio2.926; B114regs,44.74percent, no-instruction ratio1.496. Corrected194regs,33.92percent, wait/issue-active ratio1.139. Stall ratios are neither time fractions nor proof that all wait comes from one synchronization instruction.
+- A/B L2 read sectors256,783/245,655, writes283,565/283,919. The source graph for a tile reads14original quadrants across seven independent plane CTAs after dead-load elimination. Grouping(S1,S2),(S3,S4),(raw0,raw1,raw3) needs10quadrants, not28→12; compare actual counts later. All outputs and scales remain the same.
+- Sources, raw report, units and metrics are frozen inprofile_p20_manifest.json.
+
+## P21 — reuse two transformed planes and one scratch area
+
+- Three CTA groups per A/B tile: first two S/T planes; last two S/T planes; three raw native planes including raw-high quantization. Keep two FP32 transform arrays rather than four original quadrants. One common shared scratch area reuses maxima/exponent and padded B transpose buffers, with an ending block barrier before the next plane. Existing A/B two launches remain, grids96/192CTAs instead224/448. Consumer and numerical representation unchanged.
+- The general exponent fallback is outlined using the same normal-multiply/general-ldexp construction validated inP14; no change to common pow2.cuh or consumer. High/low casts are recomputed after maxima reduction to limit lifetimes. Balanced A254/243regs (BF16/FP16), B132/138regs;9,344B static shared;0stack/spill. Higher B registers remove the old two-CTA register occupancy allowance, so input reuse alone is not a latency proof.
+-78/78 original-input FP64 checks pass,79,872 exact exponents match the old reduction, every printed eF equalsP20. CompleteBF16/FP16 calls50.288/50.100us versusSW10.300/10.077us. FP16 A/B component diagnostics8.265/8.830us. Approximately1–2percent change versusP20 needs independent repeat; still~5x too slow for production.
+- P21 source/results/binary frozen; current research base only. No transfer ofP20 Graph/stream/sanitizer evidence to this scratch-reusing producer. Next isolated experiment addresses excessive native K-slab waits in the unchanged consumer.
