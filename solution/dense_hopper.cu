@@ -157,12 +157,11 @@ bool dispatch(int id,const Problem& p,const void* A,const void* B,const float* C
     case 82:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 83:return Candidate<T,128,128,1,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 84:return Candidate<T,128,128,2,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
-    case 85:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,1,0);
-    case 86:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,4,0);
-    case 87:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,1);
-    case 88:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,2);
-    case 89:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,1);
-    case 90:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,2);
+    case 85:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,4,0);
+    case 86:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,1);
+    case 87:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,2);
+    case 88:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,1);
+    case 89:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,2);
     default:return false;
   }
 }
@@ -172,12 +171,11 @@ template<class T> size_t stream_workspace(int id,const Problem& p,int sm_count) 
     case 82:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count);
     case 83:return Candidate<T,128,128,1,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count);
     case 84:return Candidate<T,128,128,2,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count);
-    case 85:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count,1,0);
-    case 86:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count,4,0);
-    case 87:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count,8,1);
-    case 88:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count,8,2);
-    case 89:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count,8,1);
-    case 90:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count,8,2);
+    case 85:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count,4,0);
+    case 86:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count,8,1);
+    case 87:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count,8,2);
+    case 88:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count,8,1);
+    case 89:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count,8,2);
     default:return 0;
   }
 }
@@ -197,7 +195,7 @@ template<class T> __global__ void small_gemm(Problem p,const T* A,const T* B,con
 }
 }
 size_t hopper_streamk_workspace(const Problem& p,int id,int sm_count) {
-  if(id<81 || id>90)return 0;
+  if(id<81 || id>89)return 0;
   if(sm_count<=0)throw std::invalid_argument("Stream-K workspace requires captured SM count");
   if(p.dtype==DType::BF16)return stream_workspace<cutlass::bfloat16_t>(id,p,sm_count);
   return stream_workspace<cutlass::half_t>(id,p,sm_count);
@@ -208,7 +206,7 @@ const char* hopper_candidate_name(int id) {
       "128x256x64_c1_sw8","128x128x64_c2_sw4","128x128x64_c2_sw8",
       "64x32x64_basic_s3","64x64x64_basic_s3","128x128x64_pingpong_s3",
       "256x128x64_c1_sw8","128x256x64_c2_sw8","128x256x64_pingpong_s3_sw8",
-      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64","even_mma_32x32x32","even_mma_32x32x64","128x256x64_cm4_sw8","128x256x64_cm8_sw8","128x256x64_cn2_sw8","128x256x64_cm2cn2_sw8","even_mma_swizzle_32x32x64","even_mma_swizzle_16x32x64","even_mma_swizzle_32x16x64","register_mma_16x32x16","register_mma_32x16x16","even_mma_32x32x128","even_mma_16x64x128","ampere_32x64x32","ampere_32x64x64","ampere_64x64x32","ampere_64x64x64","ampere_64x32x64","ampere_32x128x32_w32x32","64x128x64_basic_s3_sw8","64x256x64_basic_s2_sw8","128x128x64_direct_s3_2cta_sw8","64x256x64_direct_s2_2cta_sw8","128x128x64_beta0_s2_2cta_sw8","128x256x64_beta0_auto_sw8","128x256x64_beta0_sw1","128x256x64_beta0_sw4","128x256x64_beta0_rasterM","128x256x64_beta0_rasterN","128x128x64_beta0_auto_sw8","64x256x64_beta0_pingpong","64x256x64_beta0_pingpong_s3","64x256x64_beta0_pingpong_c2","128x256x64_beta0_cm2","128x256x64_beta0_cn2","128x256x64_beta0_cm2cn2","128x256x64_beta0_cm4","128x256x64_beta0_cm2_rasterM","128x256x64_beta0_cm2_rasterN","128x128x64_beta0_ninewarp_2workers","128x128x64_ninewarp_direct_s2","128x128x64_ninewarp_direct_s3","128x160x64_ninewarp_s2","128x64x64_ninewarp_s3","128x256x64_beta0_streamk","128x256x64_beta0_streamk_cm2","128x128x64_beta0_streamk","128x128x64_beta0_streamk_cm2","128x256x64_beta0_streamk_sw1","128x256x64_beta0_streamk_sw4","128x256x64_beta0_streamk_rasterM","128x256x64_beta0_streamk_rasterN","128x256x64_beta0_streamk_cm2_rasterM","128x256x64_beta0_streamk_cm2_rasterN"};
+      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64","even_mma_32x32x32","even_mma_32x32x64","128x256x64_cm4_sw8","128x256x64_cm8_sw8","128x256x64_cn2_sw8","128x256x64_cm2cn2_sw8","even_mma_swizzle_32x32x64","even_mma_swizzle_16x32x64","even_mma_swizzle_32x16x64","register_mma_16x32x16","register_mma_32x16x16","even_mma_32x32x128","even_mma_16x64x128","ampere_32x64x32","ampere_32x64x64","ampere_64x64x32","ampere_64x64x64","ampere_64x32x64","ampere_32x128x32_w32x32","64x128x64_basic_s3_sw8","64x256x64_basic_s2_sw8","128x128x64_direct_s3_2cta_sw8","64x256x64_direct_s2_2cta_sw8","128x128x64_beta0_s2_2cta_sw8","128x256x64_beta0_auto_sw8","128x256x64_beta0_sw1","128x256x64_beta0_sw4","128x256x64_beta0_rasterM","128x256x64_beta0_rasterN","128x128x64_beta0_auto_sw8","64x256x64_beta0_pingpong","64x256x64_beta0_pingpong_s3","64x256x64_beta0_pingpong_c2","128x256x64_beta0_cm2","128x256x64_beta0_cn2","128x256x64_beta0_cm2cn2","128x256x64_beta0_cm4","128x256x64_beta0_cm2_rasterM","128x256x64_beta0_cm2_rasterN","128x128x64_beta0_ninewarp_2workers","128x128x64_ninewarp_direct_s2","128x128x64_ninewarp_direct_s3","128x160x64_ninewarp_s2","128x64x64_ninewarp_s3","128x256x64_beta0_streamk","128x256x64_beta0_streamk_cm2","128x128x64_beta0_streamk","128x128x64_beta0_streamk_cm2","128x256x64_beta0_streamk_sw4","128x256x64_beta0_streamk_rasterM","128x256x64_beta0_streamk_rasterN","128x256x64_beta0_streamk_cm2_rasterM","128x256x64_beta0_streamk_cm2_rasterN"};
   return id>=0 && id<HopperCandidateCount ? names[id]:"invalid";
 }
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C,float* D,

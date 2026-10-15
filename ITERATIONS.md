@@ -623,6 +623,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 358 | Test Stream-K raster and swizzle for input reuse | 1.1132 | 0.328092 | no-change |
 
+| 359 | Remove Stream-K swizzle-one edge liveness failure | 1.1168 | 0.329471 | no-change |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5952,3 +5954,29 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal six-shape twelve-row run completed and archived; original complete-call numerical/timing contract preserved. Detailed scores and forced validation follow; latest independent full-suite certification remains35316/28.
 - **Next:** Force all91 candidates and API/CTest/CUDA12.8 sanitizers. Reassess from measured profiles and history before further kernel changes if no new improvement.
 - **Archive:** trajectory/20261015_194154_iter-358/
+
+### Iter 359 — Remove Stream-K swizzle-one edge liveness failure
+
+- **Hypothesis:** The isolated swizzle1 variant hangs on257x520x1032 even with serialized execution; removing it preserves the remaining validated schedule choices.
+- **Changes:** Remove unsafe oldid85 swizzle1; renumber86..90 to85..89 and reduce candidate count to90. Preserve all original precision and timing gates.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 12 rows; arithmetic mean of row median latency=0.329471 ms; mean speedup=1.1168x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005656 | 0.005004 | 1.1303 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005652 | 0.005055 | 1.1183 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008760 | 0.006685 | 1.3104 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008646 | 0.006663 | 1.2976 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.245026 | 0.223429 | 1.0967 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232653 | 0.232534 | 1.0005 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.649892 | 1.662886 | 0.9922 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.794926 | 1.714547 | 1.0469 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025479 | 0.023812 | 1.0700 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026954 | 0.024241 | 1.1119 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026825 | 0.024264 | 1.1055 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.027503 | 0.024527 | 1.1214 | 6.43463e-07 | 1 |
+
+- **Analysis:** Formal six-shape twelve-row benchmark completed after removing the isolated failing variant. Full forced and sanitizer validation must be rerun; latest independent full-suite certification remains35316/28. User requested regular quantitative reports; requirement persisted in HINTS.
+- **Next:** Force all90 candidates with bounded runtime, API/CTest and CUDA12.8 memcheck/racecheck before new experiments. Inspect precision values for user report.
+- **Archive:** trajectory/20261015_195133_iter-359/
