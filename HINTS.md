@@ -1,5 +1,11 @@
 # Hints
 
+## Multi-size design handoff — 2026-10-15
+
+- User asked how to generalize the 1024-specific implementation, then requested a design document for another agent to continue. The handoff is `research/size_generalization/DESIGN.md`.
+- This handoff turn is documentation only; no new size implementation or GPU benchmark has been performed. The document proposes the scope for the next implementation task, rather than reporting new support or results.
+- When that task is started, the proposed aligned multi-size scope supersedes the older 1024-only experiment scope for that task. Preserve original accuracy gates, Auto=Dense until acceptance, and the stopped status of FP8 residual correction.
+
 ## Current user directives — 2026-10-14 architecture reset
 
 These directives supersede the previous experiment-specific instructions to preserve
