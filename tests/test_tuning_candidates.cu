@@ -96,13 +96,18 @@ void candidate(int id,megafmm::DType dtype,int sms,int layout=0) {
 }
 }
 int main(int argc,char** argv){try{
-  int first=0;
+  int first=0,last=megafmm::detail::HopperCandidateCount;
   bool only_wmma=false;
   if(argc==2 && std::string(argv[1])=="--wmma") {first=24;only_wmma=true;}
   else if(argc==2 && std::string(argv[1])=="--new") first=33;
-  else if(argc!=1) throw std::runtime_error("usage: test_tuning_candidates [--wmma|--new]");
+  else if(argc==3 && std::string(argv[1])=="--candidate") {
+    first=std::stoi(argv[2]);
+    if(first<0 || first>=megafmm::detail::HopperCandidateCount)throw std::runtime_error("candidate out of range");
+    last=first+1;
+  }
+  else if(argc!=1) throw std::runtime_error("usage: test_tuning_candidates [--wmma|--new|--candidate ID]");
   int device;cudaDeviceProp prop;check(cudaGetDevice(&device));check(cudaGetDeviceProperties(&prop,device));
-  for(int id=first;id<megafmm::detail::HopperCandidateCount;++id) {
+  for(int id=first;id<last;++id) {
     if(only_wmma && id!=24 && id!=25 && (id<33 || (id>38 && id<43))) continue;
     candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount);
     candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount);
