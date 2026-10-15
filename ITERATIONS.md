@@ -633,6 +633,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 363 | Recheck reduction candidates against original-input FP64 gate | 1.0930 | 2.141270 | measured |
 
+| 364 | Measure source-free TMA with K128 and exact precision-guard boundaries | 1.0658 | 1.765012 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -6102,3 +6104,37 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal14/14 original FP64 checks pass. Both16384 dtypes report4rechecks/4accepted and all four previously-NaN SplitK scores now finite. Candidates remain slower and correctly fallback; no additional independent stablewinner. Latest certification35316/28.
 - **Next:** Run all98 candidate/API tests plus new FP64 guard under six relevantCTest and CUDA12.8memcheck/racecheck; verify rejected corrupted/nonfinite/stale outputs, then resource-preflight source-free TMA K128 as next performance axis.
 - **Archive:** trajectory/20261015_205550_iter-363/
+
+### Iter 364 — Measure source-free TMA with K128 and exact precision-guard boundaries
+
+- **Hypothesis:** Larger K chunks reduce loop/TMA command count, but reduced pipeline depth may offset that gain; measure across all unresolved large shapes.
+- **Changes:** Add98/99 K128 TMA beta-zero CM1/CM2,total100 after resource/tailpreflight. Match benchmark zero-reference denominator and add original floor/3*dense-error boundary tests.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 20 rows; arithmetic mean of row median latency=1.765012 ms; mean speedup=1.0658x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005677 | 0.005036 | 1.1274 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005683 | 0.005065 | 1.1221 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008696 | 0.006695 | 1.2988 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008624 | 0.006621 | 1.3024 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.237335 | 0.217521 | 1.0911 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.233538 | 0.233377 | 1.0007 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.662701 | 1.644217 | 1.0112 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.756660 | 1.726263 | 1.0176 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025122 | 0.023588 | 1.0650 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026012 | 0.023933 | 1.0869 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027279 | 0.024219 | 1.1264 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026805 | 0.024295 | 1.1033 | 6.43463e-07 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.752478 | 12.732032 | 1.0016 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.310065 | 13.317416 | 0.9994 | 1.93317e-05 | 1 |
+| 8192,4096,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.874628 | 0.867796 | 1.0079 | 8.55058e-06 | 1 |
+| 8192,4096,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.909880 | 0.906983 | 1.0032 | 9.68961e-06 | 1 |
+| 4096,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.824714 | 0.837569 | 0.9847 | 8.55119e-06 | 1 |
+| 4096,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.906291 | 0.905526 | 1.0008 | 9.68981e-06 | 1 |
+| 8192,8192,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.855099 | 0.894283 | 0.9562 | 4.02534e-06 | 1 |
+| 8192,8192,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.905482 | 0.897814 | 1.0085 | 4.87776e-06 | 1 |
+
+- **Analysis:** Formal20/20 original FP64 gates pass. K128 loses on4096/8192/16384, selected routes preserve faster old/custom or Lt paths. Full scores and remaining rectangular results need structured review; no new independent certification inferred. Last complete35316/28.
+- **Next:** Validate100forced/API/sixCTest plus guard/candidate CUDA12.8sanitizers. Profile representative K128 complete call versus prior K64 evidence before choosing next pipeline direction.
+- **Archive:** trajectory/20261015_211419_iter-364/

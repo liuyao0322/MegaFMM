@@ -36,6 +36,11 @@ template<class T>void test(megafmm::DType dtype,bool transpose){
   set_values(8,8*(1+2e-5f));
   require(!detail::dense_agreement(p,static_cast<float*>(dd.p),static_cast<float*>(dr.p),nullptr),"fixture did not reproduce cheap-screen rejection");
   require(gate(),"FP64 guard rejected exact output when Dense disagrees");
+  const float floor=dtype==DType::BF16?1e-3f:1e-4f;
+  set_values(8*(1+0.75f*floor),8);require(gate(),"FP64 guard rejected error below floor");
+  set_values(8*(1+1.5f*floor),8);require(!gate(),"FP64 guard accepted error above floor");
+  set_values(8*(1+floor+4e-5f),8*(1+2e-5f));require(gate(),"FP64 guard omitted three-times-Dense allowance");
+  set_values(8*(1+floor+8e-5f),8*(1+2e-5f));require(!gate(),"FP64 guard exceeded original three-times-Dense gate");
   set_values(8.08f,8);
   require(!gate(),"FP64 guard accepted one-percent corruption");
   set_values(std::numeric_limits<float>::quiet_NaN(),8);

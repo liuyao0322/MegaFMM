@@ -4,6 +4,7 @@
 #include <cublas_v2.h>
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <stdexcept>
 namespace megafmm::detail {
 namespace {
@@ -75,8 +76,8 @@ bool original_fp64_agreement_typed(const Problem& p,const void* A,const void* B,
   check(cudaStreamSynchronize(stream));
   for(const auto& n:host)
     if(n.nonfinite || !std::isfinite(n.error) || !std::isfinite(n.reference) || n.error<0 || n.reference<0)return false;
-  const double candidate_error=std::sqrt(host[0].error/std::max(host[0].reference,1e-300));
-  const double dense_error=std::sqrt(host[1].error/std::max(host[1].reference,1e-300));
+  const double candidate_error=std::sqrt(host[0].error/std::max(host[0].reference,std::numeric_limits<double>::min()));
+  const double dense_error=std::sqrt(host[1].error/std::max(host[1].reference,std::numeric_limits<double>::min()));
   const double floor=p.dtype==DType::BF16?1e-3:1e-4;
   return std::isfinite(candidate_error) && std::isfinite(dense_error) && candidate_error<=3*dense_error+floor;
 }
