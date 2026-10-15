@@ -1,0 +1,22 @@
+{
+  "status": "source inspection and370 partial timing evidence only; no371 code edits or GPU experiment",
+  "source_findings": {
+    "tune_dense_output": "solution/plan.cpp dense_launch usesD",
+    "tune_custom_output": "solution/plan.cpp custom_launch usesD",
+    "benchmark_outputs": "bench/benchmark.cu separate dd and sd buffers",
+    "existing_tune_reference": "FP32 reference allocation remains available after all eligibility precision checks"
+  },
+  "2048_both_dtypes_bytes": {
+    "two_rotating_input_sets": 33554432,
+    "one_output": 16777216,
+    "tune_active_inputs_and_one_output": 50331648,
+    "benchmark_active_inputs_and_two_outputs": 67108864
+  },
+  "370_4096_bf16_partial": {
+    "confirmed_after_attempt": 8,
+    "selected_candidate": 110,
+    "median_speedup": 1.07551508341,
+    "min_external5": 1.0036499061983393
+  },
+  "potential_followup": "After370formal/log/commit, validate370. Investigate using the already allocated reference as separate dense timing output AFTER all numerical eligibility checks. Preserve dimensions/strides/alpha/beta, no output reuse in run. Need independent originalFP64/alias/Graph coverage; no performance benefit claimed."
+}
