@@ -2,7 +2,7 @@
 from pathlib import Path
 import subprocess
 s=subprocess.check_output(['git','show','6d4167b:solution/sw_pipeline.cu'],text=True)
-s=s.replace('  uint64_t ready[Stages],free[Stages];','  uint64_t ready[Stages],free[Stages];\n  alignas(128) T difference[ASize+BSize];\n  uint64_t difference_ready;')
+s=s.replace('  uint64_t ready[Stages],free[Stages];','  // Both TMA destinations start on the same1024-byte swizzle phase.\n  alignas(128) T difference[ASize+BSize];\n  uint64_t ready[Stages],free[Stages];\n  uint64_t difference_ready;')
 s=s.replace('==196736,"shared budget"','==221440,"shared budget"')
 s=s.replace('    for(int j=0;j<8;++j){\n      uint32_t word;', '    for(int j=0;j<8;++j){\n      if(j==2 || j==6)continue; // S3/T3 formed on-chip for P7.\n      uint32_t word;')
 s=s.replace('    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}','    for(int j=0;j<Stages;++j){Barrier::init(&s.ready[j],1);Barrier::init(&s.free[j],4);}\n    Barrier::init(&s.difference_ready,1);')

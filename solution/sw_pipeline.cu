@@ -17,8 +17,9 @@ using Barrier=cutlass::arch::ClusterBarrier;
 using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
 template<class T> struct alignas(128) Shared {
   T operand[Stages][ASize+BSize];
-  uint64_t ready[Stages],free[Stages];
+  // Both TMA destinations start on the same1024-byte swizzle phase.
   alignas(128) T difference[ASize+BSize];
+  uint64_t ready[Stages],free[Stages];
   uint64_t difference_ready;
 
 };

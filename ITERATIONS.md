@@ -575,6 +575,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 334 | Selective on-chip S3 T3 subtraction first prototype | 0.5998 | 0.018149 | invalid |
 
+| 335 | Align selective difference scratch with operand swizzle phase | 0.6011 | 0.018174 | regression |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5222,3 +5224,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** INVALID output eF about1.22 for both dtypes; exclude all timings as performance evidence. Suspect unequal128B-swizzle base phase because scratch starts128bytes past1024alignment. Must correct scratch placement before assessing fusion cost
 - **Next:** Move scratch before barrier arrays to match operand swizzle phase; rebenchmark as335
 - **Archive:** trajectory/20261015_090245_iter-334/
+
+### Iter 335 — Align selective difference scratch with operand swizzle phase
+
+- **Hypothesis:** Identical1024byte swizzle phase makes physical paired subtraction correct without remapping
+- **Changes:** Move difference scratch before barrier arrays; shared budget unchanged221440bytes; all other334 code retained
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.018174 ms; mean speedup=0.6011x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012310 | 0.018774 | 0.6557 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009605 | 0.017573 | 0.5466 | 0.000754626 | 0 |
+
+- **Analysis:** Fresh numerical errors restored to baseline and no nonfinite; original gates stillFAIL. Complete-call BF16 about18.774us FP16 about17.573us, substantially slower; corrected implementation needs independent bitwise and synchronization checks before negative performance interpretation
+- **Next:** Archive binary; run paired launch/Graph comparison and independent checks; profile request counts and instruction overhead; reject slow candidates
+- **Archive:** trajectory/20261015_090349_iter-335/
