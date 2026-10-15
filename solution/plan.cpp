@@ -292,7 +292,7 @@ struct Plan::Impl {
   size_t bytes = 0;
   bool strategy = false;
   int hopper_selected = -1, sm_count = 0;
-  std::array<float,5> strategy_ms{{NAN,NAN,NAN,NAN,NAN}};
+  std::array<float,6> strategy_ms{{NAN,NAN,NAN,NAN,NAN,NAN}};
   cublasLtHandle_t handle = nullptr;
   std::unique_ptr<LtOp> dense;
   std::shared_ptr<detail::SWState> sw;
@@ -366,10 +366,10 @@ void tune_strategy(Plan::Impl& plan,const void* A,const void* B,const float* C,
   plan.hopper_selected=-1;
   plan.strategy_ms.fill(NAN);
   if(!plan.sm_count) return;
-  bool eligible[5]={true,false,false,false,false};
-  for(int id=0;id<4;++id)
+  bool eligible[6]={true,false,false,false,false,false};
+  for(int id=0;id<5;++id)
     eligible[id+1]=detail::hopper_dense(id,plan.problem,A,B,C,D,workspace,plan.sm_count,stream,false);
-  if(std::none_of(eligible+1,eligible+5,[](bool x){return x;})) return;
+  if(std::none_of(eligible+1,eligible+6,[](bool x){return x;})) return;
   const size_t bytes=matrix_bytes(plan.problem.m,plan.problem.n,plan.problem.ldd,4);
   float* reference=nullptr;
   cudaEvent_t start=nullptr,stop=nullptr;
@@ -383,16 +383,16 @@ void tune_strategy(Plan::Impl& plan,const void* A,const void* B,const float* C,
     cuda_check(cudaMalloc(reinterpret_cast<void**>(&reference),bytes),"strategy reference allocation");
     launch(0);
     cuda_check(cudaMemcpyAsync(reference,D,bytes,cudaMemcpyDeviceToDevice,stream),"strategy reference copy");
-    for(int id=1;id<5;++id) if(eligible[id]) {
+    for(int id=1;id<6;++id) if(eligible[id]) {
       launch(id);
       eligible[id]=detail::dense_agreement(plan.problem,D,reference,stream);
     }
     cuda_check(cudaEventCreate(&start),"strategy start event");
     cuda_check(cudaEventCreate(&stop),"strategy stop event");
-    std::array<std::array<float,5>,5> times{};
+    std::array<std::array<float,5>,6> times{};
     constexpr int repetitions=20;
-    for(int round=0;round<5;++round) for(int index=0;index<5;++index) {
-      const int id=round%2 ? 4-index:index;
+    for(int round=0;round<5;++round) for(int index=0;index<6;++index) {
+      const int id=round%2 ? 5-index:index;
       if(!eligible[id]) continue;
       for(int w=0;w<4;++w) launch(id);
       cuda_check(cudaEventRecord(start,stream),"strategy record start");
@@ -402,11 +402,11 @@ void tune_strategy(Plan::Impl& plan,const void* A,const void* B,const float* C,
       cuda_check(cudaEventElapsedTime(&times[id][round],start,stop),"strategy elapsed");
       times[id][round]/=repetitions;
     }
-    for(int id=0;id<5;++id) if(eligible[id]) {
+    for(int id=0;id<6;++id) if(eligible[id]) {
       auto sorted=times[id];std::sort(sorted.begin(),sorted.end());plan.strategy_ms[id]=sorted[2];
     }
     float best=plan.strategy_ms[0]*0.97f;
-    for(int id=1;id<5;++id) if(eligible[id] && plan.strategy_ms[id]<best) {
+    for(int id=1;id<6;++id) if(eligible[id] && plan.strategy_ms[id]<best) {
       bool stable=true;
       for(int r=0;r<5;++r) stable=stable && times[id][r]<times[0][r];
       if(stable) {best=plan.strategy_ms[id];plan.hopper_selected=id-1;}
@@ -443,7 +443,7 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
     info+=bound ? detail::hopper_candidate_name(impl_->hopper_selected):"dense_cublaslt";
     info+=";rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5";
     info+=";dense_ms="+std::to_string(impl_->strategy_ms[0]);
-    for(int id=0;id<4;++id) info+=";"+std::string(detail::hopper_candidate_name(id))+"_ms="+std::to_string(impl_->strategy_ms[id+1]);
+    for(int id=0;id<5;++id) info+=";"+std::string(detail::hopper_candidate_name(id))+"_ms="+std::to_string(impl_->strategy_ms[id+1]);
     return info+";fallback="+describe_lt(*impl_->dense,bound_candidate(*impl_->dense,A,B,C0,D));
   }
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
@@ -485,7 +485,11 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
       int device;cudaDeviceProp prop{};
       cuda_check(cudaGetDevice(&device),"strategy device");
       cuda_check(cudaGetDeviceProperties(&prop,device),"strategy properties");
-      if(prop.major==9 && prop.minor==0) impl->sm_count=prop.multiProcessorCount;
+      if(prop.major==9 && prop.minor==0) {
+        impl->sm_count=prop.multiProcessorCount;
+        for(int id=0;id<4;++id)
+          detail::hopper_dense(id,p,nullptr,nullptr,nullptr,nullptr,nullptr,impl->sm_count,nullptr,2);
+      }
     }
   }
   return std::make_unique<Plan>(std::move(impl));

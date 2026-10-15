@@ -581,6 +581,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 337 | MNK empirical strategy with four Hopper dense candidates | 1.0638 | 0.045353 | baseline |
 
+| 338 | Hoist Hopper launch setup and add tiny SIMT candidate | 1.0675 | 0.045346 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5290,3 +5292,33 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** First full-count eight-shape two-dtype benchmark; original FP64 gate and actual selected route recorded per row. Any cuBLAS fallback is coverage only and never a custom-kernel win; candidate initialize currently repeats function-attribute setup per launch, motivating host-overhead investigation
 - **Next:** Inspect per-candidate times and selections; profile the baseline then remove repeated launch setup and address tiny or boundary shapes with distinct kernels
 - **Archive:** trajectory/20261015_161326_iter-337/
+
+### Iter 338 — Hoist Hopper launch setup and add tiny SIMT candidate
+
+- **Hypothesis:** Repeated function-attribute setup adds complete-call host cost; tiny GEMMs benefit from a simple one-launch dot kernel rather than Tensor Core setup
+- **Changes:** Prepare shared-memory attributes at Plan creation, rebuild current-pointer params without repeated adapter initialize, add FP32 FMA small-output candidate supporting transposes strides alpha beta
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 16 rows; arithmetic mean of row median latency=0.045346 ms; mean speedup=1.0675x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_dense_cublaslt v0 | launch | 0.005668 | 0.005665 | 1.0006 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.005759 | 0.005741 | 1.0031 | 6.44261e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.012188 | 0.008170 | 1.4919 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009718 | 0.008137 | 1.1943 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.031165 | 0.028771 | 1.0832 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.032612 | 0.029552 | 1.1036 | 2.45816e-06 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.224252 | 0.223908 | 1.0015 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232749 | 0.232190 | 1.0024 | 4.87674e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026800 | 0.026599 | 1.0075 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.025596 | 0.025591 | 1.0002 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026291 | 0.025462 | 1.0326 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.025446 | 0.025451 | 0.9998 | 6.43463e-07 | 1 |
+| 1025,1537,769 | bf16 | tuned_dense_cublaslt v0 | launch | 0.038432 | 0.038361 | 1.0019 | 3.64508e-07 | 1 |
+| 1025,1537,769 | fp16 | tuned_dense_cublaslt v0 | launch | 0.036575 | 0.036573 | 1.0000 | 9.33344e-07 | 1 |
+| 1,1,1 | bf16 | tuned_hopper_dense v0 | launch | 0.002895 | 0.002678 | 1.0808 | 0 | 1 |
+| 1,1,1 | fp16 | tuned_hopper_dense v0 | launch | 0.002898 | 0.002690 | 1.0772 | 0 | 1 |
+
+- **Analysis:** Full-count eight-shape two-dtype run with unchanged FP64 gates and five-round stable tuning. NCU337 retuning under profiler selected fallback with CUDA12.8; exclude that capture from custom-kernel performance explanation and use a fixed-candidate harness next
+- **Next:** Inspect gains and tiny path; add aligned padding candidates for boundary sizes and run independent repeated acceptance and API Graph checks
+- **Archive:** trajectory/20261015_161602_iter-338/
