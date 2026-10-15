@@ -43,8 +43,10 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
  // One correction/K metadata entry per lane, replicated in each consumer warp.
  // Subsequent iterations broadcast registers instead of chasing local/global loads.
  int lane=tid&31,term=lane/4,kk=lane%4,ap=qa_plane(term),bp=qb_plane(term);
- int meta_a=ea[ap*32+(n0/64)*4+kk];
- int meta_b0=eb[bp*64+kk*16+m0/32],meta_b1=eb[bp*64+kk*16+m0/32+1];
+ int ae=ea[ap*32+(n0/64)*4+kk];
+ int meta_e0=ae+eb[bp*64+kk*16+m0/32],meta_e1=ae+eb[bp*64+kk*16+m0/32+1];
+ float meta_s0=(meta_e0>=-126&&meta_e0<=127)?__int_as_float((meta_e0+127)<<23):0.f;
+ float meta_s1=(meta_e1>=-126&&meta_e1<=127)?__int_as_float((meta_e1+127)<<23):0.f;
  float c[4][16]={};
  #pragma unroll 1
  for(int step=0;step<15;++step){
@@ -76,13 +78,22 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
     #pragma unroll
     for(int j=0;j<16;++j)warpgroup_fence_operand(integer[j]);
     int owner=(step-7)*4+k;
-    int aexp=__shfl_sync(0xffffffff,meta_a,owner);
-    int bexp0=__shfl_sync(0xffffffff,meta_b0,owner),bexp1=__shfl_sync(0xffffffff,meta_b1,owner);
-    #pragma unroll
-    for(int j=0;j<16;++j){
-     int mn=GMMA::CLayout_64x32{}(tid-128,j);
-     float x=scale_pow2(float(static_cast<int32_t>(integer[j])),aexp+((mn%64)<32?bexp0:bexp1));
-     d[j]=__fadd_rn(d[j],x);
+    int e0=__shfl_sync(0xffffffff,meta_e0,owner),e1=__shfl_sync(0xffffffff,meta_e1,owner);
+    float s0=__shfl_sync(0xffffffff,meta_s0,owner),s1=__shfl_sync(0xffffffff,meta_s1,owner);
+    if(e0>=-126&&e0<=127&&e1>=-126&&e1<=127){
+     #pragma unroll
+     for(int j=0;j<16;++j){
+      int mn=GMMA::CLayout_64x32{}(tid-128,j);
+      float x=__fmul_rn(float(static_cast<int32_t>(integer[j])),(mn%64)<32?s0:s1);
+      d[j]=__fadd_rn(d[j],x);
+     }
+    }else{
+     #pragma unroll
+     for(int j=0;j<16;++j){
+      int mn=GMMA::CLayout_64x32{}(tid-128,j);
+      float x=scale_pow2(float(static_cast<int32_t>(integer[j])),(mn%64)<32?e0:e1);
+      d[j]=__fadd_rn(d[j],x);
+     }
     }
    }
    asm volatile("bar.warp.sync 0xffffffff;" ::: "memory");

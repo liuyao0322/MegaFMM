@@ -32,3 +32,9 @@ Production `solution/` unchanged; these are standalone research candidates, not 
 - Replace operand-plane table lookup with an equivalent arithmetic mapping. Preload32correction/K metadata entries one per lane, broadcast from warp registers on demand. Corrected kernel stack32->0bytes, registers168->162, no spill.
 - Full72/72 precision checks pass with identical printed eF toP1. Complete BF16/FP16 medians149.670/148.159us; improves this prototype but far above currentSW~10us. No production promotion.
 - Next isolated change: hoist power-of-two exponent validation and scale construction outside the per-output-element loop. Preserve general exponent fallback and separate RN multiply/add.
+
+## P5 — validate/build scale once per correction-K entry
+
+- Precompute exponent sums and normal power-of-two factors in lane registers; one common/exceptional branch per correction-K block, not per output element. Exceptional exponents retain the exact prior operation. Keep separate RN multiply/add, no new FMA rounding.
+- Full72/72 checks pass, printed eF unchanged. Complete BF16/FP16 medians129.031/128.861us. Registers166,0stack/spill. Improvement is substantial within the rejected prototype, but still~13x currentSW; overall target not met.
+- Next candidate specializes the packer's uniform plane selection before the element loop; no numerical representation or gate changes.
