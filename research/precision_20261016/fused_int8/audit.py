@@ -7,7 +7,7 @@ r=Path(__file__).resolve().parent
 repo=r.parents[2]
 h=r.parent/'int8_hardware'
 def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
-for path in list(h.glob('p*_manifest.json'))+list(r.glob('f*_manifest.json'))+[h/'tile_inside_adaptive_manifest.json',h/'f2_f3_manifest.json',h/'m4_manifest.json',r/'probe_manifest.json',r/'profile_manifest.json',r/'trace_f9_manifest.json',r/'trace_f11_manifest.json',r/'compile_stopped_f12_manifest.json',r/'layout_access_manifest.json',h/'m5_manifest.json',h/'m6_manifest.json',h/'m7_manifest.json',h/'m8_manifest.json',h/'alternating_hardware_manifest.json']:
+for path in list(h.glob('p*_manifest.json'))+list(r.glob('f*_manifest.json'))+[h/'tile_inside_adaptive_manifest.json',h/'f2_f3_manifest.json',h/'m4_manifest.json',r/'probe_manifest.json',r/'profile_manifest.json',r/'trace_f9_manifest.json',r/'trace_f11_manifest.json',r/'compile_stopped_f12_manifest.json',r/'layout_access_manifest.json',h/'m5_manifest.json',h/'m6_manifest.json',h/'m7_manifest.json',h/'m8_manifest.json',h/'m9_manifest.json',h/'alternating_hardware_manifest.json']:
     for name,sha in json.loads(path.read_text()).items():assert digest(repo/name)==sha,(path,name)
 for name,sha in json.loads((r.parent/'source_manifest.json').read_text())['production_unchanged_sha256'].items():
     assert digest(repo/name)==sha,name
@@ -39,10 +39,17 @@ for arm in ['adaptive_unpaired','relative_unpaired','relative_paired']:
     rows=[x for x in m8 if x['arm']==arm]
     assert len(rows)==48 and all(x['pass_fixed_floor'] and x['nonfinite']==0 and x['saturated_low_values']==0 for x in rows)
     models['m8_'+arm]=dict(fresh_configurations=48,passes=48,hardware_accepted=False)
+m9=json.loads((h/'wide_quant_model.json').read_text())['rows']
+assert len(m9)==180 and len({(x['dtype'],x['pattern'],x['seed']) for x in m9})==60
+assert all(x['pass_fixed_floor'] and x['nonfinite']==0 and x['saturated_low_values']==0 for x in m9)
+assert (h/'wide_quant_model.log').read_text().count('CONTROL ')==2
+for width in [128,256,512]:
+    rows=[x for x in m9 if x['quant_k']==width];assert len(rows)==60
+    models['m9_quant_k'+str(width)]=dict(fresh_configurations=60,passes=60,hardware_accepted=False)
 abba=json.loads((h/'p17_abba.json').read_text())
 assert abba['correctness_checks']==312 and abba['independent_numerical_configurations']==78
-for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26']:
-    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26'] else 72
+for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27']:
+    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27'] else 72
     assert len(j['checks'])==count and all(x['pass']=='1' and int(x['nonfinite'])==0 for x in j['checks'])
     assert all(g['speedup_vs_sw']<1 for z in j['summaries'] for g in z['groups'])
     candidates[label]=dict(checks=count,failures=0,performance_accepted=False,full_call_us={s['dtype']:s['corrected_us'] for s in j['summaries']})
@@ -61,14 +68,14 @@ for granularity,passes in [('K128',0),('column',6)]:
     rows=[x for x in m7 if x['inside_granularity']==granularity]
     assert len(rows)==6 and sum(x['pass_fixed_floor'] for x in rows)==passes
 models['alternating_inside']=dict(fresh_configurations=6,paired_variants=2,coarse_passes=0,column_passes=6)
-for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26']:
+for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27']:
     rows=[dict(re.findall(r'(\w+)=([^ ]+)',line)) for line in (h/(label+'_balanced.log')).read_text().splitlines() if line.startswith('INSIDE_EQUAL ')]
     assert len(rows)==78 and all(x['errors']=='0' and x['elements']=='1024' for x in rows)
     j=json.loads((h/(label+'_balanced.json')).read_text())
     added=[x for x in j['checks'] if x['pattern']=='12'];assert len(added)==6 and all(x['pass']=='1' for x in added)
     candidates[label]['equal_per_column_exponents']=79872
     candidates[label]['additional_alternating_checks_passed']=6
-    candidates[label]['retained']=label=='p26'
+    candidates[label]['retained']=label=='p27'
 global_frozen=sorted((p for p in h.glob('p[0-9]*') if p.is_dir() and re.fullmatch(r'p[0-9]+',p.name)),key=lambda p:int(p.name[1:]))
 global_matching=[p.name for p in global_frozen if all((p/name).exists() and digest(h/name)==digest(p/name) for name in ['pack.cuh','corrected.cuh','compare.cu','pow2.cuh'])]
 assert global_matching,'Global working source must match a measured frozen candidate'
@@ -81,7 +88,7 @@ assert int(profile13[bank_key]['value'])>500000
 assert int(profile17[bank_key]['value'])<2000
 assert 'cases=1048576 exponents=-300..300 errors=0' in (h/'p14_pow2.log').read_text()
 out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved=False,production_unchanged=True,
-    working_candidate=current,working_global_candidate=global_current,compact_pow2_equivalence_cases=1048576,retained_global_candidate='p26, ordinary/Graph78, own fresh stress84/672calls and scoped sanitizer28/56calls per tool; p10 rejected by fresh hardware',compile_stopped_candidates=['F12: no numerical or latency measurement'],candidates=candidates,numerical_models=models,
+    working_candidate=current,working_global_candidate=global_current,compact_pow2_equivalence_cases=1048576,retained_global_candidate='p27, ordinary/Graph78, own fresh stress84/672calls and scoped sanitizer28/56calls per tool; p10 rejected by fresh hardware',compile_stopped_candidates=['F12: no numerical or latency measurement'],candidates=candidates,numerical_models=models,
     diagnostic_traces=['F9 role-level, one BF16 uniform case','F11 pack subphases, one BF16 uniform case'],probe_scope='one P5 K128 tile, fresh uniform CPU inputs, two dtypes; not full-call acceptance',
     p20_validation=json.loads((h/'p20_validation.json').read_text()),
     p20_independent_performance=json.loads((h/'p20_abba.json').read_text())['summary'],
@@ -89,6 +96,8 @@ out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved
     p24_independent_performance=json.loads((h/'p24_abba.json').read_text())['summary'],
     p26_validation=json.loads((h/'p26_validation.json').read_text()),
     p26_independent_performance=json.loads((h/'p26_abba.json').read_text())['summary'],
-    validations_not_transferred='P20, P24 and P26 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. No transfer to later changes.',
+    p27_validation=json.loads((h/'p27_validation.json').read_text()),
+    p27_independent_performance=json.loads((h/'p27_abba.json').read_text())['summary'],
+    validations_not_transferred='P20, P24, P26 and P27 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. No transfer to later changes.',
     remaining='Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration.')
 (r/'audit.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out,ensure_ascii=False,indent=2))

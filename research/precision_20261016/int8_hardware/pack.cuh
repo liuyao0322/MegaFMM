@@ -288,10 +288,33 @@ void pack(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,in
  else pack_pair<T,SideA,Balance,2>(X,high,q,exp,inside,scratch);
 }
 
+// B occupies0..191, A192..287.192 is divisible by both tile counts,
+// so pack_pair's blockIdx modulo Tiles still selects the original tile.
+template<class T,bool Balance> __global__ __launch_bounds__(256,1)
+void pack_joint(const T* __restrict__ A,const T* __restrict__ B,
+ T* __restrict__ ha,T* __restrict__ hb,int8_t* __restrict__ qa,int8_t* __restrict__ qb,
+ int* __restrict__ ea,int* __restrict__ eb,const int* __restrict__ inside){
+ extern __shared__ __align__(128) unsigned char scratch_buffer[];
+ if(blockIdx.x<192){
+  auto& s=*reinterpret_cast<PairPackShared<false>*>(scratch_buffer);
+  int group=blockIdx.x/64;
+  if(group==0)pack_pair<T,false,Balance,0>(B,hb,qb,eb,inside,s);
+  else if(group==1)pack_pair<T,false,Balance,1>(B,hb,qb,eb,inside,s);
+  else pack_pair<T,false,Balance,2>(B,hb,qb,eb,inside,s);
+ }else{
+  auto& s=*reinterpret_cast<PairPackShared<true>*>(scratch_buffer);
+  int group=(blockIdx.x-192)/32;
+  if(group==0)pack_pair<T,true,Balance,0>(A,ha,qa,ea,inside,s);
+  else if(group==1)pack_pair<T,true,Balance,1>(A,ha,qa,ea,inside,s);
+  else pack_pair<T,true,Balance,2>(A,ha,qa,ea,inside,s);
+ }
+}
+static_assert(sizeof(PairPackShared<true>)>=sizeof(PairPackShared<false>));
+
 template<class T,bool Balance> void preprocess(const T* A,const T* B,Work w,cudaStream_t stream){
  if constexpr(Balance){inside_partial<<<dim3(8,32),256,0,stream>>>(A,B,w.partial);inside_finalize<<<128,256,0,stream>>>(w.partial,w.inside);}
- pack<T,true,Balance><<<3*32,256,sizeof(PairPackShared<true>),stream>>>(A,static_cast<T*>(w.ha),w.qa,w.ea,w.inside);
- pack<T,false,Balance><<<3*64,256,sizeof(PairPackShared<false>),stream>>>(B,static_cast<T*>(w.hb),w.qb,w.eb,w.inside);
+ pack_joint<T,Balance><<<288,256,sizeof(PairPackShared<true>),stream>>>(
+  A,B,static_cast<T*>(w.ha),static_cast<T*>(w.hb),w.qa,w.qb,w.ea,w.eb,w.inside);
  check(cudaPeekAtLastError(),"INT8 preprocess");
 }
 } // namespace int8_research

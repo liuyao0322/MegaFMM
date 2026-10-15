@@ -232,6 +232,7 @@ void encode(CUtensorMap& map,const void* ptr,megafmm::DType dt,bool side_a,bool 
  if(e!=CUDA_SUCCESS)throw std::runtime_error("INT8 research tensor map "+std::to_string(int(e)));
 }
 template<class T,bool Balance> void init_shared_packer(){
+ check(cudaFuncSetAttribute(pack_joint<T,Balance>,cudaFuncAttributeMaxDynamicSharedMemorySize,sizeof(PairPackShared<true>)),"joint pack dynamic shared");
  check(cudaFuncSetAttribute(pack<T,true,Balance>,cudaFuncAttributeMaxDynamicSharedMemorySize,sizeof(PairPackShared<true>)),"pair A dynamic shared");
  check(cudaFuncSetAttribute(pack<T,false,Balance>,cudaFuncAttributeMaxDynamicSharedMemorySize,sizeof(PairPackShared<false>)),"pair B dynamic shared");
 }

@@ -1,6 +1,6 @@
 # INT8 一阶补偿：硬件精度通过，性能未通过
 
-**当前保留P26独立研究原型：原始输入精度及自身Graph/双流/scoped sanitizer检查通过；独立ABBA复测普通完整调用BF16/FP16为47.666/47.134μs，仍约为生产SW的4.7倍，不进入生产，整体目标尚未完成。** P26保留P24的整数配对与原生流水修复，将两平面暂存放入共享内存并采用四路展开；七个主乘积和全部八个整数点积保留。
+**当前保留P27独立研究原型：原始输入精度及自身Graph/双流/scoped sanitizer检查通过；独立ABBA复测普通完整调用BF16/FP16为41.020/40.848μs，仍约为生产SW的四倍，不进入生产，整体目标尚未完成。** P27保留P26的数值算法和共享暂存，把A/B打包合到一次launch；七个主乘积和全部八个整数点积保留。
 
 早期P7将[数值模型](../int8_inside_full_model.json)落实为H100内核，完整调用约94μs，其自身的精度、Graph、双流和sanitizer验收作为历史证据保留。下文资源、计时和验收表按具体版本解释，不能转移到其他候选；P20和P24各自的验收在末节及对应validation.json。
 
@@ -169,3 +169,17 @@ P25把两个FP32临时平面从寄存器移到显式共享内存，同时把生�
 P26独立ABBA（P24→P26→P26→P24）每dtype每候选10个组，BF1649.417→47.666μs，FP1649.096→47.134μs，降幅3.54%/4.00%；312项重复精度检查通过，仍78个确定性配置，时钟未锁定且无置信区间。自身Graph78项通过，重放42.487/41.977μs，单独报告；不同新种子的双流84配置/672次交错普通/Graph调用及输出guards通过。三种限定范围sanitizer各28配置/56调用，均零错误，racecheck零警告/零hazard。详见[p26_abba.json](p26_abba.json)、[p26_validation.json](p26_validation.json)。
 
 当前保留P26为最新完整验收研究参考，生产仍不变。下一实验拟只合并A/B打包launch，另有扩大整数补偿K尺度的数值筛选；这两者均不能继承P26的同步或性能证据。逐列inside缩放与原始FP64参考保持。
+
+
+## P27：合并A/B打包launch，保留全部数值计算
+
+P27将P26的96个A CTA和192个B CTA合到一次288-CTA launch，B位于逻辑块0..191、A位于192..287，保持原有group/tile映射；所有cast、残差、量化尺度和消费者不变。联合打包器56寄存器、0stack/spill，每CTA动态共享65,576B。78项原始FP64精度及79,872项逐列指数对照通过，打印eF与P26逐项相同；最大BF16/FP16 eF仍为5.09551e-4/6.56759e-5。首轮普通完整调用40.621/40.858μs，完整预处理20.551/20.448μs。旧的A/B单核stage probes保留为诊断，不能相加充当联合打包耗时。
+
+独立ABBA（P26→P27→P27→P26）每dtype每候选10个组：BF1647.690→41.020μs，FP1647.040→40.848μs，分别降低13.99%/13.16%；四进程共312项精度检查及319,488项指数比较通过，仍为78个确定性配置。未锁时钟，无置信区间。合并同时改变launch次数和CTA调度，不能把全部收益只归因于节省一次launch。见[p27_abba.json](p27_abba.json)。
+
+P27自身Graph78项通过，重放37.297/37.284μs，与普通时间分列且不重复host编码。独立新种子的双流84配置/672交错普通/Graph调用、128float前后guards全部通过；memcheck/racecheck/synccheck各28配置/56调用，仅instrument int8_research，零错误，racecheck零警告/零hazard。普通/Graph使用生产tunedDense gate，独立压力测试沿用历史cuBLASGemmEx控制，均参考原始舍入输入FP64 AB。见[p27_validation.json](p27_validation.json)。
+
+P27为最新完整验收研究参考，仍约慢四倍，不进入生产。独立[M9数值筛选](WIDE_QUANT_DESIGN.md)保持逐列inside，只扩大整数补偿的量化K尺度，在60个新输入配置的三个配对臂上全部通过固定floor；它尚无硬件、同步或耗时结论。下一硬件实验须以P27自身profile和这些数值边界为依据。
+
+
+P27自身四核profile分别覆盖inside partial/finalize、联合打包和消费者，均无实测local读写。联合打包56寄存器、65,576B动态共享，资源允许至多3CTA/SM、issueactive53.16%；消费者196寄存器/196,736B动态共享，只允许1CTA/SM、issueactive35.71%。归约存在较高memory-dependency相关stall ratio；这些不是时间占比，也不证明单一瓶颈或性能下界。所有profile进程内的计时臂排除出普通性能结论。[原始单位指标](profile_p27_stats.json)及manifest保存完整身份，[下一轮控制实验](NEXT_EXPERIMENTS.md)区分双整数累加器、合作式精确归约融合与M9宽K数值算法，均尚未实施。
