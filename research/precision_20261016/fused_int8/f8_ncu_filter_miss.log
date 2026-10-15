@@ -1,0 +1,20 @@
+==PROF== Connected to process 1938786 (/share/home/liuyao/workspace/MegaFMM/research/precision_20261016/fused_int8/bin/profile_compare)
+CHECK dtype=bf16 balance=1 graph=0 pattern=0 trial=0 dense_ef=2.37201278804e-07 corrected_ef=5.52481148267e-05 gate=0.00100071160384 nonfinite=0 pass=1
+CHECK dtype=fp16 balance=1 graph=0 pattern=0 trial=0 dense_ef=1.24831814298e-06 corrected_ef=6.80412463054e-06 gate=0.000103744954429 nonfinite=0 pass=1
+==PROF== Disconnected from process 1938786
+==WARNING== No kernels were profiled.
+Available Kernels:
+1. Kernel2
+2. fill
+3. kernel
+4. measure_error
+5. sm90_xmma_gemm_bf16f32_bf16f32_f32_nn_n_tilesize128x128x64_warpgroupsize1x1x1_execute_segment_k_off_kernel__5x_cublas
+6. sm90_xmma_gemm_bf16f32_bf16f32_f32_nn_n_tilesize64x128x64_warpgroupsize1x1x1_execute_segment_k_off_kernel__5x_cublas
+7. sm90_xmma_gemm_f16f32_f16f32_f32_nn_n_tilesize128x128x64_warpgroupsize1x1x1_execute_segment_k_off_kernel__5x_cublas
+8. sm90_xmma_gemm_f16f32_f16f32_f32_nn_n_tilesize128x64x64_warpgroupsize1x1x1_execute_segment_k_off_kernel__5x_cublas
+9. sm90_xmma_gemm_f16f32_f16f32_f32_nn_n_tilesize64x128x64_warpgroupsize1x1x1_execute_segment_k_off_kernel__5x_cublas
+10. sm90_xmma_gemm_f16f32_f16f32_f32_nn_n_tilesize64x128x64_warpgroupsize1x1x1_execute_segment_k_on_kernel__5x_cublas
+11. sm90_xmma_gemm_f64f64_f64f64_f64_nn_n_tilesize128x64x32_stage3_warpsize4x2x1_tensor16x8x16_execute_kernel__5x_cublas
+12. splitKreduce_kernel
+13. sw_cooperative_hilo
+14. sw_transform_pdl

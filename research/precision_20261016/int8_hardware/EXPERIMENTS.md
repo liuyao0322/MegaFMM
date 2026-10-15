@@ -76,3 +76,15 @@ Production `solution/` unchanged; these are standalone research candidates, not 
 - A output tile32rows and B output tile64columns define each output CTA. Select two independent inside powers perK128, for the two original K halves, from all four local raw A/B quadrants. Quantize with local32x128 A and128x64 B scales, instead of the global packer's64x128/128x32 blocks.
 - 7patterns x3fresh seeds1701–1703 x2dtypes=42cases:all pass fixed floors, no nonfinite or low-part saturation. FP32 batched leaves approximate native accumulation; correction integer dots are exactly representable. Model has no performance/synchronization claim.
 - This screen retains leaf-then-output recombination. Interleaving K and main/correction accumulation for an on-chip design is a separate numerical change and needs its own test. Evidence in`tile_inside_adaptive*`; manifest identifies the pre-interleaving script.
+
+## F2/F3 — interleaving and pair-scale numerical ablations
+
+- F2 keeps adaptive low scales but interleaves K128, native product, associated correction and output updates to match a fused schedule. All42cases pass fixed floors; maxFP16/BF16 eF=7.2822e-5/5.3049e-4. No saturation or nonfinite.
+- F3 additionally fixes low exponent=high exponent minus10(FP16) or7(BF16), so paired cross terms share an output scale. Exact paired integer dot sums precede a single FP32 rescaling.39/42 pass the conservative fixed-floor screen; three FP16 cancellation cases fail, max1.20305e-4>1e-4. BF16max9.32634e-4. No saturation. Fixed-floor failure is not a measured original Dense-dependent hardware gate failure, but lacks sufficient numerical margin to pursue this simplification. Retain the failed evidence and use F2 adaptive scaling.
+- F4: an initial paired fused source failed NVCC parsing at a conditional constexpr declaration, before any hardware execution. Source/build log frozen in`../fused_int8/f4_compile_failed`. No F4 accuracy or latency result. F5 returns to independently adaptive low scales and separate cross-term rescalings.
+
+## M4 — recover one bit in relative low scales (model only)
+
+- Follow up the failed F3 representation by using low exponent=high exponent minus11(FP16) or8(BF16), one bit finer than F3. Keep the same42configurations/seeds as a controlled ablation. Paired exact integer sums still share one rescaling per pair.
+- All42pass fixed floors, zero nonfinite and zero low-part saturation in tested inputs. MaxFP16/BF16 eF=7.28217401e-5/5.30492964e-4, essentially the adaptive model's errors. This is not an independent42-case sample or a hardware result. F3's39/42failure remains preserved, not replaced.
+- Representation is supported for subsequent hardware testing, not promoted. It still needs exceptional/subnormal-range behavior, real WGMMA original-input checks and full latency. Source identity in`m4_manifest.json`.

@@ -1,0 +1,14 @@
+research/precision_20261016/fused_int8/probe.cu(45): error: expected a ">"
+   CUtensorMap ma,mb;encode(ma,da,std::is_same_v<T,cute::half_t>?megafmm::DType::FP16:megafmm::DType::BF16,true);encode(mb,db,std::is_same_v<T,cute::half_t>?megafmm::DType::FP16:megafmm::DType::BF16,false);
+                                                               ^
+
+research/precision_20261016/fused_int8/probe.cu(45): error: expected a ">"
+   CUtensorMap ma,mb;encode(ma,da,std::is_same_v<T,cute::half_t>?megafmm::DType::FP16:megafmm::DType::BF16,true);encode(mb,db,std::is_same_v<T,cute::half_t>?megafmm::DType::FP16:megafmm::DType::BF16,false);
+                                                                                                                                                           ^
+
+research/precision_20261016/fused_int8/probe.cu(66): error: expected a ">"
+   printf("PROBE dtype=%s product=%d raw_errors=%d high_errors=%d exponent_errors=%d quant_errors=%d integer_errors=%d native_ef=%.12g\n",std::is_same_v<T,cute::half_t>?"fp16":"bf16",Prod,raw,high,exp,qerror,integer,sqrt(e2/den));fflush(
+                                                                                                                                                                       ^
+
+3 errors detected in the compilation of "research/precision_20261016/fused_int8/probe.cu".
+srun: error: g08: task 0: Exited with exit code 2

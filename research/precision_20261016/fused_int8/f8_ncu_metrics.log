@@ -1,0 +1,63 @@
+[1938866] profile_compare@127.0.0.1
+  void kernel<bfloat16_t>(CUtensorMap_st, CUtensorMap_st, float *) (16, 8, 1)x(256, 1, 1), Context 1, Stream 13, Device 0, CC 9.0
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz         2.62
+    SM Frequency                    Ghz         1.57
+    Elapsed Cycles                cycle      1462647
+    Memory Throughput                 %         9.81
+    DRAM Throughput                   %         0.14
+    Duration                         us       933.47
+    L1/TEX Cache Throughput           %        10.14
+    L2 Cache Throughput               %         0.40
+    SM Active Cycles              cycle   1414800.52
+    Compute (SM) Throughput           %        16.97
+    ----------------------- ----------- ------------
+
+    OPT   This kernel grid is too small to fill the available resources on this device, resulting in only 1.0 full
+          waves across all SMs. Look at Launch Statistics for more details.
+
+    Section: Warp State Statistics
+    ---------------------------------------- ----------- ------------
+    Metric Name                              Metric Unit Metric Value
+    ---------------------------------------- ----------- ------------
+    Warp Cycles Per Issued Instruction             cycle        11.36
+    Warp Cycles Per Executed Instruction           cycle        11.37
+    Avg. Active Threads Per Warp                                31.94
+    Avg. Not Predicated Off Threads Per Warp                    31.16
+    ---------------------------------------- ----------- ------------
+
+    WRN   The optional metric smsp__pcsamp_sample_count could not be found. Collecting it as an additional metric could
+          enable the rule to provide more guidance.
+    ----- --------------------------------------------------------------------------------------------------------------
+    OPT   Est. Local Speedup: 44.43%
+          On average, each warp of this workload spends 5.0 cycles being stalled waiting for a scoreboard dependency on
+          a L1TEX (local, global, surface, texture) operation. Find the instruction producing the data being waited
+          upon to identify the culprit. To reduce the number of cycles waiting on L1TEX data accesses verify the
+          memory access patterns are optimal for the target architecture, attempt to increase cache hit rates by
+          increasing data locality (coalescing), or by changing the cache configuration. Consider moving frequently
+          used data to shared memory. This stall type represents about 44.4% of the total average of 11.4 cycles
+          between issuing two instructions.
+    ----- --------------------------------------------------------------------------------------------------------------
+    INF   Check the Warp Stall Sampling (All Samples) table for the top stall locations in your source based on
+          sampling data. The Kernel Profiling Guide
+          (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-reference) provides more details
+          on each stall reason.
+
+    Section: Instruction Statistics
+    ---------------------------------------- ----------- ------------
+    Metric Name                              Metric Unit Metric Value
+    ---------------------------------------- ----------- ------------
+    Avg. Executed Instructions Per Scheduler        inst    248101.31
+    Executed Instructions                           inst    130997494
+    Avg. Issued Instructions Per Scheduler          inst    248241.55
+    Issued Instructions                             inst    131071539
+    ---------------------------------------- ----------- ------------
+
+    OPT   Est. Local Speedup: 49.78%
+          This kernel executes 55808 fused and 12667392 non-fused FP32 instructions. By converting pairs of non-fused
+          instructions to their fused (https://docs.nvidia.com/cuda/floating-point/#cuda-and-floating-point),
+          higher-throughput equivalent, the achieved FP32 performance could be increased by up to 50% (relative to its
+          current performance). Check the Source page to identify where this kernel executes FP32 instructions.
