@@ -591,6 +591,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 342 | Match tuning working set and rerank the strongest cuBLASLt candidates | 1.0482 | 1.271215 | measured |
 
+| 343 | Direct WMMA candidates and sustained winner confirmation | 1.0419 | 1.267525 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5488,3 +5490,45 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Full14-shape bothdtype two-input100x5 benchmark and3 FP64 trials, unchanged independent reference. Matching working set preserves1024 gains but does not eliminate4096 FP16 short-rank to sustained-timing mismatch; no claim that policy reliability is solved. All numerical outcomes remain recorded per row
 - **Next:** Add independent five100-call confirmation for shortlisted winners and direct cp.async WMMA small-GEMM candidates; rerun forced correctness sanitizers and independent all-size acceptance
 - **Archive:** trajectory/20261015_163807_iter-342/
+
+### Iter 343 — Direct WMMA candidates and sustained winner confirmation
+
+- **Hypothesis:** Long alternating holdout batches reject unstable winners; a direct shared-memory WMMA path may improve small and irregular matrices.
+- **Changes:** Add double-buffered WMMA candidates; confirm shortlisted candidates with five alternating 100-call batches on rotating inputs; prune slow shallow Hopper schedules for large matrices.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 28 rows; arithmetic mean of row median latency=1.267525 ms; mean speedup=1.0419x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_dense_cublaslt v0 | launch | 0.005658 | 0.005656 | 1.0003 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005711 | 0.005529 | 1.0329 | 6.44261e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.012015 | 0.008019 | 1.4982 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009541 | 0.008026 | 1.1888 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.031767 | 0.029057 | 1.0933 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.032402 | 0.030871 | 1.0496 | 2.45816e-06 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.241143 | 0.240143 | 1.0042 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232322 | 0.232045 | 1.0012 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.621783 | 1.667947 | 0.9723 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.701415 | 1.732950 | 0.9818 | 9.68937e-06 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.795541 | 12.747510 | 1.0038 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.304589 | 13.282803 | 1.0016 | 1.93317e-05 | 1 |
+| 8192,4096,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.864843 | 0.880297 | 0.9824 | 8.55058e-06 | 1 |
+| 8192,4096,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.889856 | 0.898848 | 0.9900 | 9.68961e-06 | 1 |
+| 4096,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.824969 | 0.833368 | 0.9899 | 8.55119e-06 | 1 |
+| 4096,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.898977 | 0.891935 | 1.0079 | 9.68981e-06 | 1 |
+| 8192,8192,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.861638 | 0.898770 | 0.9587 | 4.02534e-06 | 1 |
+| 8192,8192,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.895226 | 0.901978 | 0.9925 | 4.87776e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_dense_cublaslt v0 | launch | 0.025276 | 0.025458 | 0.9928 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.025696 | 0.025841 | 0.9944 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027569 | 0.025778 | 1.0695 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.026896 | 0.026931 | 0.9987 | 6.43463e-07 | 1 |
+| 1025,1537,769 | bf16 | tuned_padded_hopper v0 | launch | 0.037927 | 0.034066 | 1.1133 | 6.19792e-07 | 1 |
+| 1025,1537,769 | fp16 | tuned_padded_hopper v0 | launch | 0.036375 | 0.033845 | 1.0747 | 9.7026e-07 | 1 |
+| 514,770,258 | bf16 | tuned_dense_cublaslt v0 | launch | 0.008833 | 0.008854 | 0.9977 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_dense_cublaslt v0 | launch | 0.008859 | 0.008867 | 0.9991 | 3.40967e-07 | 1 |
+| 1,1,1 | bf16 | tuned_simt_small v0 | launch | 0.002909 | 0.002662 | 1.0928 | 0 | 1 |
+| 1,1,1 | fp16 | tuned_simt_small v0 | launch | 0.002904 | 0.002660 | 1.0917 | 0 | 1 |
+
+- **Analysis:** Completed the full 14-shape BF16/FP16 benchmark under the original accuracy gates. Direct WMMA was slower on preliminary 512-cube measurements and is not a demonstrated winner. Sustained confirmation rejects the previously unstable 4096-cube selection. Independent repeated certification and forced-candidate validation remain required.
+- **Next:** Validate new candidates and API behavior, profile the small WMMA path, then test larger-K Hopper configurations and repeat independent acceptance.
+- **Archive:** trajectory/20261015_164606_iter-343/

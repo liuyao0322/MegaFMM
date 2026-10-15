@@ -20,13 +20,14 @@ template<class T>T rounded(float x);
 template<>__half rounded(float x){return __float2half_rn(x);}
 template<>__nv_bfloat16 rounded(float x){return __float2bfloat16_rn(x);}
 template<class T>
-void candidate(int id,megafmm::DType dtype,int sms) {
+void candidate(int id,megafmm::DType dtype,int sms,bool irregular=false) {
   using namespace megafmm;
   Problem p;p.dtype=dtype;p.alpha=0.5f;p.beta=-0.25f;
   if(id<4 || id>=9) {p.m=129;p.n=256;p.k=128;p.lda=136;p.ldb=264;p.ldc=p.ldd=264;}
   else {p.m=id==4?17:129;p.n=id==4?23:137;p.k=id==4?19:65;
         p.trans_a=p.trans_b=true;p.lda=p.m+3;p.ldb=p.k+5;p.ldc=p.ldd=p.n+7;}
   if(id>=9) {p.m=769;p.n=1536;p.k=16;p.lda=24;p.ldb=1544;p.ldc=p.ldd=1544;}
+  if(irregular) {p.m=129;p.n=137;p.k=65;p.trans_a=p.trans_b=true;p.lda=132;p.ldb=70;p.ldc=p.ldd=144;}
   const size_t ac=(p.trans_a?p.k:p.m)*p.lda,bc=(p.trans_b?p.n:p.k)*p.ldb,dc=p.m*p.ldd;
   std::vector<T>a(ac),b(bc);std::vector<float>initial(dc),result(dc);
   Buffer da(ac*2),db(bc*2),out0(dc*4),out1(dc*4);
@@ -75,11 +76,18 @@ void candidate(int id,megafmm::DType dtype,int sms) {
   printf("PASS candidate=%s dtype=%s fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked\n",detail::hopper_candidate_name(id),dtype_name(dtype));
 }
 }
-int main(){try{
+int main(int argc,char** argv){try{
+  int first=0;
+  if(argc==2 && std::string(argv[1])=="--wmma") first=24;
+  else if(argc!=1) throw std::runtime_error("usage: test_tuning_candidates [--wmma]");
   int device;cudaDeviceProp prop;check(cudaGetDevice(&device));check(cudaGetDeviceProperties(&prop,device));
-  for(int id=0;id<megafmm::detail::HopperCandidateCount;++id) {
+  for(int id=first;id<megafmm::detail::HopperCandidateCount;++id) {
     candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount);
     candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount);
+    if(id>=24) {
+      candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount,true);
+      candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount,true);
+    }
   }
   return 0;
 }catch(const std::exception& e){fprintf(stderr,"ERROR %s\n",e.what());return 1;}}

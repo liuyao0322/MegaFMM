@@ -296,7 +296,9 @@ struct Plan::Impl {
   Problem problem;
   bool empty = false, scale = false, sw_multisize = false;
   size_t bytes = 0;
-  bool strategy = false;
+  bool strategy = false, strategy_confirmed = false;
+  int confirm_candidate = -1;
+  float confirm_dense_ms = NAN, confirm_custom_ms = NAN;
   int hopper_selected = -1, sm_count = 0, strategy_input_sets = 1;
   std::array<float,detail::HopperCandidateCount+1> strategy_ms{};
   cublasLtHandle_t handle = nullptr;
@@ -369,7 +371,8 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
 // reduce clock/order bias; require a 3% median gain AND all five paired wins.
 void tune_strategy(Plan::Impl& plan,const void* A,const void* B,const float* C,
                    float* D,void* workspace,cudaStream_t stream) {
-  plan.hopper_selected=-1;
+  plan.hopper_selected=-1;plan.strategy_confirmed=false;plan.confirm_candidate=-1;
+  plan.confirm_dense_ms=plan.confirm_custom_ms=NAN;
   plan.strategy_ms.fill(NAN);
   if(!plan.sm_count) return;
   std::array<bool,detail::HopperCandidateCount> eligible{};
@@ -461,11 +464,41 @@ void tune_strategy(Plan::Impl& plan,const void* A,const void* B,const float* C,
     lt.selected_tuning_ms=medians[baseline];lt.strategy_reranked=true;
     lt.strategy_input_sets=plan.strategy_input_sets;
     plan.strategy_ms[0]=medians[baseline];
-    float best=medians[baseline]*0.97f;
-    for(size_t r=lt_pool.size();r<routes.size();++r) if(medians[r]<best) {
+    std::vector<size_t> shortlist;
+    for(size_t r=lt_pool.size();r<routes.size();++r) if(medians[r]<medians[baseline]*0.97f) {
       bool stable=true;
       for(int round=0;round<5;++round) stable=stable && times[r][round]<times[baseline][round];
-      if(stable) {best=medians[r];plan.hopper_selected=routes[r];}
+      if(stable) shortlist.push_back(r);
+    }
+    std::sort(shortlist.begin(),shortlist.end(),[&](size_t x,size_t y){return medians[x]<medians[y];});
+    if(shortlist.size()>2) shortlist.resize(2);
+    // Independently confirm short-burst winners using full100-call batches.
+    // This exposes sustained-power/cache behavior missed by twenty-call ranking.
+    for(size_t candidate:shortlist) {
+      std::array<float,5> dense_holdout{},custom_holdout{};
+      for(int warm=0;warm<20;++warm) {
+        launch(baseline,warm%plan.strategy_input_sets);
+        launch(candidate,warm%plan.strategy_input_sets);
+      }
+      cuda_check(cudaStreamSynchronize(stream),"strategy holdout warmup");
+      for(int round=0;round<5;++round) for(int order=0;order<2;++order) {
+        const bool custom=round%2 ? order==0:order==1;
+        const size_t route=custom?candidate:baseline;
+        cuda_check(cudaEventRecord(start,stream),"strategy holdout start");
+        for(int rep=0;rep<100;++rep) launch(route,rep%plan.strategy_input_sets);
+        cuda_check(cudaEventRecord(stop,stream),"strategy holdout stop");
+        cuda_check(cudaEventSynchronize(stop),"strategy holdout wait");
+        float elapsed=0;
+        cuda_check(cudaEventElapsedTime(&elapsed,start,stop),"strategy holdout elapsed");
+        (custom?custom_holdout:dense_holdout)[round]=elapsed/100;
+      }
+      bool stable=true;
+      for(int round=0;round<5;++round) stable=stable && custom_holdout[round]<dense_holdout[round];
+      auto d=dense_holdout,c=custom_holdout;std::sort(d.begin(),d.end());std::sort(c.begin(),c.end());
+      plan.confirm_candidate=routes[candidate];plan.confirm_dense_ms=d[2];plan.confirm_custom_ms=c[2];
+      if(stable && c[2]<d[2]*0.97f) {
+        plan.hopper_selected=routes[candidate];plan.strategy_confirmed=true;break;
+      }
     }
   } catch(...) {cleanup();throw;}
   cleanup();
@@ -480,7 +513,7 @@ size_t Plan::workspace_bytes() const { return impl_->bytes; }
 const Problem& Plan::problem() const { return impl_->problem; }
 std::string Plan::algorithm_name() const {
   if(impl_->strategy && !impl_->empty && !impl_->scale)
-    return impl_->hopper_selected>=0 ? "tuned_hopper_dense" : "tuned_dense_cublaslt";
+    return impl_->hopper_selected>=24 ? "tuned_wmma_dense" : impl_->hopper_selected==4 ? "tuned_simt_small" : impl_->hopper_selected>=5 && impl_->hopper_selected<=8 ? "tuned_padded_hopper" : impl_->hopper_selected>=0 ? "tuned_hopper_dense" : "tuned_dense_cublaslt";
   return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw_multisize ? "sw_multisize_wmma" : impl_->sw ? "sw_cooperative_hilo_64x32x256" : "dense_cublaslt";
 }
 std::string Plan::lt_algorithm_config(const void* A, const void* B, const float* C0,
@@ -496,6 +529,8 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
     info+=bound ? detail::hopper_candidate_name(impl_->hopper_selected):"dense_cublaslt";
     info+=";rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5";
     info+=";input_sets="+std::to_string(impl_->strategy_input_sets)+";dense_rerank=top8";
+    info+=";confirmation=5x100;confirmation_status="+std::string(impl_->confirm_candidate<0?"skipped":impl_->strategy_confirmed?"passed":"failed");
+    if(impl_->confirm_candidate>=0) info+=";confirmed_candidate="+std::string(detail::hopper_candidate_name(impl_->confirm_candidate))+";confirmed_dense_ms="+std::to_string(impl_->confirm_dense_ms)+";confirmed_custom_ms="+std::to_string(impl_->confirm_custom_ms);
     info+=";dense_ms="+std::to_string(impl_->strategy_ms[0]);
     for(int id=0;id<detail::HopperCandidateCount;++id) info+=";"+std::string(detail::hopper_candidate_name(id))+"_ms="+std::to_string(impl_->strategy_ms[id+1]);
     return info+";fallback="+describe_lt(*impl_->dense,bound_candidate(*impl_->dense,A,B,C0,D));
