@@ -33,8 +33,8 @@ for name,passes in [('tile_inside_adaptive',42),('tile_inside_interleave',42),('
     rows=json.loads((h/(name+'.json')).read_text())['rows'];assert len(rows)==42
     assert sum(bool(x['pass_fixed_floor']) for x in rows)==passes
     models[name]=dict(cases=42,pass_fixed_floor=passes)
-for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16']:
-    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16'] else 72
+for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17']:
+    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17'] else 72
     assert len(j['checks'])==count and all(x['pass']=='1' and int(x['nonfinite'])==0 for x in j['checks'])
     assert all(g['speedup_vs_sw']<1 for z in j['summaries'] for g in z['groups'])
     candidates[label]=dict(checks=count,failures=0,performance_accepted=False,full_call_us={s['dtype']:s['corrected_us'] for s in j['summaries']})
@@ -53,22 +53,27 @@ for granularity,passes in [('K128',0),('column',6)]:
     rows=[x for x in m7 if x['inside_granularity']==granularity]
     assert len(rows)==6 and sum(x['pass_fixed_floor'] for x in rows)==passes
 models['alternating_inside']=dict(fresh_configurations=6,paired_variants=2,coarse_passes=0,column_passes=6)
-for label in ['p11','p12','p13','p14','p15','p16']:
+for label in ['p11','p12','p13','p14','p15','p16','p17']:
     rows=[dict(re.findall(r'(\w+)=([^ ]+)',line)) for line in (h/(label+'_balanced.log')).read_text().splitlines() if line.startswith('INSIDE_EQUAL ')]
     assert len(rows)==78 and all(x['errors']=='0' and x['elements']=='1024' for x in rows)
     j=json.loads((h/(label+'_balanced.json')).read_text())
     added=[x for x in j['checks'] if x['pattern']=='12'];assert len(added)==6 and all(x['pass']=='1' for x in added)
     candidates[label]['equal_per_column_exponents']=79872
     candidates[label]['additional_alternating_checks_passed']=6
-    candidates[label]['retained']=label=='p13'
+    candidates[label]['retained']=label=='p17'
 global_frozen=sorted((p for p in h.glob('p[0-9]*') if p.is_dir() and re.fullmatch(r'p[0-9]+',p.name)),key=lambda p:int(p.name[1:]))
 global_matching=[p.name for p in global_frozen if all((p/name).exists() and digest(h/name)==digest(p/name) for name in ['pack.cuh','corrected.cuh','compare.cu','pow2.cuh'])]
 assert global_matching,'Global working source must match a measured frozen candidate'
 global_current=global_matching[-1]
 assert digest(h/'bin/compare')==digest(h/'bin'/('compare_'+global_current))
+profile13=json.loads((h/'profile_b_p13_stats.json').read_text())['metrics']
+profile17=json.loads((h/'profile_b_p17_stats.json').read_text())['metrics']
+bank_key='l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum'
+assert int(profile13[bank_key]['value'])>500000
+assert int(profile17[bank_key]['value'])<2000
 assert 'cases=1048576 exponents=-300..300 errors=0' in (h/'p14_pow2.log').read_text()
 out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved=False,production_unchanged=True,
-    working_candidate=current,working_global_candidate=global_current,compact_pow2_equivalence_cases=1048576,retained_global_candidate='p13, 78 ordinary FP64 checks and 79872 exact per-column exponents; p10 rejected by fresh hardware',compile_stopped_candidates=['F12: no numerical or latency measurement'],candidates=candidates,numerical_models=models,
+    working_candidate=current,working_global_candidate=global_current,compact_pow2_equivalence_cases=1048576,retained_global_candidate='p17, 78 ordinary FP64 checks and 79872 exact per-column exponents; p10 rejected by fresh hardware',compile_stopped_candidates=['F12: no numerical or latency measurement'],candidates=candidates,numerical_models=models,
     diagnostic_traces=['F9 role-level, one BF16 uniform case','F11 pack subphases, one BF16 uniform case'],probe_scope='one P5 K128 tile, fresh uniform CPU inputs, two dtypes; not full-call acceptance',
     validations_not_transferred='Graph/dual-stream/sanitizers remain specifically P7 in ../int8_hardware/audit.json. F8 and later measured fusion candidates have ordinary72-case precision only.',
     remaining='Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration.')
