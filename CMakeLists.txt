@@ -46,3 +46,8 @@ target_include_directories(test_tuning_precision PRIVATE solution)
 target_link_libraries(test_tuning_precision PRIVATE megafmm)
 target_compile_options(test_tuning_precision PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_90a,code=sm_90a>)
 add_test(NAME tuning_precision_guard COMMAND test_tuning_precision)
+
+# Host-only deterministic regression tests for sustained candidate selection.
+add_executable(test_tuning_confirmation tests/test_tuning_confirmation.cpp)
+target_include_directories(test_tuning_confirmation PRIVATE solution)
+add_test(NAME tuning_confirmation_policy COMMAND test_tuning_confirmation)

@@ -1,5 +1,6 @@
 #include "megafmm/gemm.h"
 #include "internal.h"
+#include "tuning_confirmation.h"
 #include <cublasLt.h>
 #include <algorithm>
 #include <array>
@@ -298,6 +299,8 @@ struct Plan::Impl {
   size_t bytes = 0;
   bool strategy = false, strategy_confirmed = false;
   int confirm_candidate = -1;
+  int confirm_attempts = 0, confirm_groups = 0;
+  std::string confirm_trace;
   float confirm_dense_ms = NAN, confirm_custom_ms = NAN;
   int hopper_selected = -1, sm_count = 0, strategy_input_sets = 1;
   int strategy_fp64_rechecks = 0, strategy_fp64_accepted = 0;
@@ -374,6 +377,7 @@ void tune_strategy(Plan::Impl& plan,const void* A,const void* B,const float* C,
                    float* D,void* workspace,cudaStream_t stream) {
   plan.hopper_selected=-1;plan.strategy_confirmed=false;plan.confirm_candidate=-1;
   plan.confirm_dense_ms=plan.confirm_custom_ms=NAN;
+  plan.confirm_attempts=plan.confirm_groups=0;plan.confirm_trace.clear();
   plan.strategy_ms.fill(NAN);
   plan.strategy_fp64_rechecks=plan.strategy_fp64_accepted=0;
   if(!plan.sm_count) return;
@@ -471,40 +475,46 @@ void tune_strategy(Plan::Impl& plan,const void* A,const void* B,const float* C,
     lt.selected_tuning_ms=medians[baseline];lt.strategy_reranked=true;
     lt.strategy_input_sets=plan.strategy_input_sets;
     plan.strategy_ms[0]=medians[baseline];
+    // Short batches nominate candidates; only sustained batches accept them.
+    // Do not discard a fast median for one noisy short round or a top-two cap.
     std::vector<size_t> shortlist;
-    for(size_t r=lt_pool.size();r<routes.size();++r) if(medians[r]<medians[baseline]*0.97f) {
-      bool stable=true;
-      for(int round=0;round<5;++round) stable=stable && times[r][round]<times[baseline][round];
-      if(stable) shortlist.push_back(r);
-    }
+    for(size_t r=lt_pool.size();r<routes.size();++r)
+      if(medians[r]<medians[baseline]*0.97f)shortlist.push_back(r);
     std::sort(shortlist.begin(),shortlist.end(),[&](size_t x,size_t y){return medians[x]<medians[y];});
-    if(shortlist.size()>2) shortlist.resize(2);
-    // Independently confirm short-burst winners using full100-call batches.
-    // This exposes sustained-power/cache behavior missed by twenty-call ranking.
-    for(size_t candidate:shortlist) {
-      std::array<float,5> dense_holdout{},custom_holdout{};
-      for(int warm=0;warm<20;++warm) {
-        launch(baseline,warm%plan.strategy_input_sets);
-        launch(candidate,warm%plan.strategy_input_sets);
+    auto warm=[&](size_t candidate) {
+      for(int w=0;w<20;++w) {
+        launch(baseline,w%plan.strategy_input_sets);
+        launch(candidate,w%plan.strategy_input_sets);
       }
       cuda_check(cudaStreamSynchronize(stream),"strategy holdout warmup");
-      for(int round=0;round<5;++round) for(int order=0;order<2;++order) {
+    };
+    auto measure=[&](size_t candidate,int round) {
+      float elapsed_ms[2]{};
+      for(int order=0;order<2;++order) {
         const bool custom=round%2 ? order==0:order==1;
         const size_t route=custom?candidate:baseline;
         cuda_check(cudaEventRecord(start,stream),"strategy holdout start");
-        for(int rep=0;rep<100;++rep) launch(route,rep%plan.strategy_input_sets);
+        for(int rep=0;rep<100;++rep)launch(route,rep%plan.strategy_input_sets);
         cuda_check(cudaEventRecord(stop,stream),"strategy holdout stop");
         cuda_check(cudaEventSynchronize(stop),"strategy holdout wait");
-        float elapsed=0;
-        cuda_check(cudaEventElapsedTime(&elapsed,start,stop),"strategy holdout elapsed");
-        (custom?custom_holdout:dense_holdout)[round]=elapsed/100;
+        cuda_check(cudaEventElapsedTime(&elapsed_ms[custom],start,stop),"strategy holdout elapsed");
+        elapsed_ms[custom]/=100;
       }
-      bool stable=true;
-      for(int round=0;round<5;++round) stable=stable && custom_holdout[round]<dense_holdout[round];
-      auto d=dense_holdout,c=custom_holdout;std::sort(d.begin(),d.end());std::sort(c.begin(),c.end());
-      plan.confirm_candidate=routes[candidate];plan.confirm_dense_ms=d[2];plan.confirm_custom_ms=c[2];
-      if(stable && c[2]<d[2]*0.97f) {
-        plan.hopper_selected=routes[candidate];plan.strategy_confirmed=true;break;
+      return std::pair<float,float>{elapsed_ms[0],elapsed_ms[1]};
+    };
+    const auto confirmation=detail::confirm_ranked_candidates(shortlist,warm,measure);
+    plan.confirm_attempts=int(confirmation.attempts.size());
+    for(const auto& attempt:confirmation.attempts) {
+      const int id=routes[attempt.route];
+      plan.confirm_candidate=id;plan.confirm_groups=int(attempt.groups.size());
+      plan.confirm_dense_ms=attempt.dense_median;plan.confirm_custom_ms=attempt.custom_median;
+      if(!plan.confirm_trace.empty())plan.confirm_trace+='|';
+      plan.confirm_trace+=std::to_string(id)+":"+std::to_string(attempt.groups.size())+":"+
+          (attempt.accepted?"pass":attempt.groups.size()<5?"early_fail":"median_or_pair_fail");
+      for(auto pair:attempt.groups)
+        plan.confirm_trace+=":"+std::to_string(pair.first)+","+std::to_string(pair.second);
+      if(attempt.accepted) {
+        plan.hopper_selected=id;plan.strategy_confirmed=true;
       }
     }
   } catch(...) {cleanup();throw;}
@@ -537,6 +547,8 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
     info+=";rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5_or_original_fp64_gate";
     info+=";fp64_rechecks="+std::to_string(impl_->strategy_fp64_rechecks)+";fp64_accepted="+std::to_string(impl_->strategy_fp64_accepted);
     info+=";input_sets="+std::to_string(impl_->strategy_input_sets)+";dense_rerank=top8";
+    info+=";nomination=median3percent;confirmation_coverage=ranked_until_pass;confirmation_attempts="+std::to_string(impl_->confirm_attempts)+";confirmation_groups="+std::to_string(impl_->confirm_groups);
+    info+=";confirmation_trace="+impl_->confirm_trace;
     info+=";confirmation=5x100;confirmation_status="+std::string(impl_->confirm_candidate<0?"skipped":impl_->strategy_confirmed?"passed":"failed");
     if(impl_->confirm_candidate>=0) info+=";confirmed_candidate="+std::string(detail::hopper_candidate_name(impl_->confirm_candidate))+";confirmed_dense_ms="+std::to_string(impl_->confirm_dense_ms)+";confirmed_custom_ms="+std::to_string(impl_->confirm_custom_ms);
     info+=";dense_ms="+std::to_string(impl_->strategy_ms[0]);

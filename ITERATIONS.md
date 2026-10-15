@@ -645,6 +645,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 369 | Source-free M128 pingpong candidates for epilogue overlap | 1.0787 | 1.761118 | measured |
 
+| 370 | Broaden sustained confirmation beyond the top two nominees | 1.1077 | 1.261785 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -6318,3 +6320,45 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal20rows all pass unchanged original FP64 gate. Research performance is not certification. Eleven of twelve unresolved large-K combinations retain Lt fallback;8192x4096x8192 BF16 selects existing K32 but its minimum paired speedup is about1.0153, below the stable3percent gate. New110/111 are selected on all four short-K rectangle rows (previously certified shapes), with median gains1.1382/1.1460/1.1788/1.1573; this requires fresh complete three-sweep certification of the new source.4096 BF16 new candidates score0.203586/0.203770ms in short ranking but are not selected; missing short per-round telemetry prevents attributing the fallback solely to the top-two holdout cap. Full per-row outcomes are recorded below; latest independent certification remains35316/28.
 - **Next:** Validate all112 candidates/API/six relevant CTests and CUDA12.8 sanitizers. Then instrument and broaden sustained confirmation coverage with early rejection while retaining original precision and final acceptance gates; do not infer stable wins from fallback timing.
 - **Archive:** trajectory/20261015_235236_iter-369/
+
+### Iter 370 — Broaden sustained confirmation beyond the top two nominees
+
+- **Hypothesis:** Short-burst ranking and a fixed top-two confirmation cap can omit sustained winners; confirm all median-qualified nominees in rank order with early rejection while preserving the final five-pair and median gates.
+- **Changes:** Add a host confirmation helper and deterministic regression CTest; remove the short-pair prefilter and top-two nomination cap; confirm ranked nominees until first sustained pass; reject at first failed pair; record every attempt and paired duration, resetting telemetry on retune; keep original FP64 checks and allocation-free run unchanged.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 28 rows; arithmetic mean of row median latency=1.261785 ms; mean speedup=1.1077x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005622 | 0.005022 | 1.1194 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005651 | 0.005043 | 1.1205 | 6.44261e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.011866 | 0.008053 | 1.4735 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009564 | 0.008035 | 1.1903 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.033255 | 0.029028 | 1.1456 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.033083 | 0.030440 | 1.0868 | 2.45816e-06 | 1 |
+| 4096,4096,4096 | bf16 | tuned_hopper_dense v0 | launch | 0.236200 | 0.219616 | 1.0755 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.233258 | 0.233096 | 1.0007 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.655367 | 1.652687 | 1.0016 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.710033 | 1.703963 | 1.0036 | 9.68937e-06 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.751340 | 12.729729 | 1.0017 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.308285 | 13.349580 | 0.9969 | 1.93317e-05 | 1 |
+| 8192,4096,8192 | bf16 | tuned_hopper_dense v0 | launch | 0.922315 | 0.842315 | 1.0950 | 8.55058e-06 | 1 |
+| 8192,4096,8192 | fp16 | tuned_hopper_dense v0 | launch | 0.879347 | 0.854572 | 1.0290 | 9.68961e-06 | 1 |
+| 4096,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.817035 | 0.838523 | 0.9744 | 8.55119e-06 | 1 |
+| 4096,8192,8192 | fp16 | tuned_hopper_dense v0 | launch | 0.946870 | 0.859701 | 1.1014 | 9.68981e-06 | 1 |
+| 8192,8192,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.868514 | 0.879257 | 0.9878 | 4.02534e-06 | 1 |
+| 8192,8192,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.897791 | 0.902345 | 0.9950 | 4.87776e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025125 | 0.022154 | 1.1341 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026342 | 0.022760 | 1.1574 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.028385 | 0.023564 | 1.2046 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.027200 | 0.023342 | 1.1653 | 6.43463e-07 | 1 |
+| 1025,1537,769 | bf16 | tuned_padded_hopper v0 | launch | 0.037898 | 0.034062 | 1.1126 | 6.19792e-07 | 1 |
+| 1025,1537,769 | fp16 | tuned_padded_hopper v0 | launch | 0.036487 | 0.034091 | 1.0703 | 9.7026e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008858 | 0.006810 | 1.3007 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008876 | 0.006849 | 1.2958 | 3.40967e-07 | 1 |
+| 1,1,1 | bf16 | tuned_simt_small v0 | launch | 0.002919 | 0.002666 | 1.0947 | 0 | 1 |
+| 1,1,1 | fp16 | tuned_simt_small v0 | launch | 0.002896 | 0.002681 | 1.0803 | 0 | 1 |
+
+- **Analysis:** Full14-shape28-row formal protocol uses100 calls x5 groups,3 fresh original-input FP64 checks and2 rotating inputs. This is one formal sweep, not independent certification. Preliminary4096BF selection occurred at the eighth attempt but its external minimum pair was only1.00365 despite median1.07552; preserve this failure. Current independently certified369 result remains15/28. Detailed telemetry analysis follows this mandatory log and commit.
+- **Next:** Inspect all per-candidate traces; run seven relevant CTests and CUDA12.8 guard/candidate memcheck and racecheck; investigate separate tuning outputs to match benchmark working-set footprint; require fresh three-sweep evidence before certifying new stable wins.
+- **Archive:** trajectory/20261016_004537_iter-370/
