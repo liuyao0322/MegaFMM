@@ -313,37 +313,38 @@ void pack_joint(const T* __restrict__ A,const T* __restrict__ B,
 static_assert(sizeof(PairPackShared<true>)>=sizeof(PairPackShared<false>));
 
 
-// All288CTAs participate in both grid barriers. Scratch is reused only after
-// the grid has published partial maxima and then finalized all1024 exponents.
+// All288CTAs participate in the grid barrier. The first128CTAs each finish
+// all8column exponents before the barrier permits inside reads/scratch reuse.
 template<class T> __global__ __launch_bounds__(256,1)
-void preprocess_cooperative(const T* __restrict__ A,const T* __restrict__ B,
+void preprocess_cooperative_columns(const T* __restrict__ A,const T* __restrict__ B,
  T* __restrict__ ha,T* __restrict__ hb,int8_t* __restrict__ qa,int8_t* __restrict__ qb,
  int* __restrict__ ea,int* __restrict__ eb,int* __restrict__ inside,float* __restrict__ partial){
  constexpr bool Balance=true;
  extern __shared__ __align__(128) unsigned char scratch_buffer[];
  auto grid=cooperative_groups::this_grid();
- if(blockIdx.x<256){
-
- int slab=blockIdx.x%8,chunk=blockIdx.x/8,tid=threadIdx.x,lane=tid%32,warp=tid/32;
- float am=0;int k=slab*128+tid%128;
- for(int row=tid/128;row<32;row+=2)
-  am=fmaxf(am,fabsf(float(A[(chunk*32+row)*1024+k])));
- float* aa=reinterpret_cast<float*>(scratch_buffer);float* bb=aa+256;aa[tid]=am;
- for(int kr=warp;kr<128;kr+=8){
-  float bm=fabsf(float(B[(slab*128+kr)*1024+chunk*32+lane]));
-  for(int step=16;step;step/=2)bm=fmaxf(bm,__shfl_xor_sync(0xffffffff,bm,step));
-  if(lane==0)bb[kr]=bm;
- }
- __syncthreads();
- if(tid<128){int at=chunk*1024+slab*128+tid;partial[at]=fmaxf(aa[tid],aa[tid+128]);partial[1024*32+at]=bb[tid];}
- }
- grid.sync();
  if(blockIdx.x<128){
-
- int tid=threadIdx.x,k=blockIdx.x*8+tid/32,lane=tid%32;
- float am=partial[lane*1024+k],bm=partial[1024*32+lane*1024+k];
- for(int step=16;step;step/=2){am=fmaxf(am,__shfl_xor_sync(0xffffffff,am,step));bm=fmaxf(bm,__shfl_xor_sync(0xffffffff,bm,step));}
- if(lane==0)inside[k]=(am>0&&bm>0)?__float2int_rn(.5f*(log2f(am)-log2f(bm))):0;
+  int tid=threadIdx.x,lane=tid%32,warp=tid/32,k0=blockIdx.x*8;
+  float am=0;
+  #pragma unroll 4
+  for(int row=tid/8;row<1024;row+=32)
+   am=fmaxf(am,fabsf(float(A[row*1024+k0+tid%8])));
+  am=fmaxf(am,__shfl_xor_sync(0xffffffff,am,8));
+  am=fmaxf(am,__shfl_xor_sync(0xffffffff,am,16));
+  float* ma=reinterpret_cast<float*>(scratch_buffer);float* mb=ma+64;
+  if(lane<8)ma[warp*8+lane]=am;
+  float bm=0;
+  #pragma unroll 4
+  for(int col=lane;col<1024;col+=32)
+   bm=fmaxf(bm,fabsf(float(B[(k0+warp)*1024+col])));
+  for(int step=16;step;step/=2)bm=fmaxf(bm,__shfl_xor_sync(0xffffffff,bm,step));
+  if(lane==0)mb[warp]=bm;
+  __syncthreads();
+  if(tid<8){
+   float x=0,y=mb[tid];
+   #pragma unroll
+   for(int w=0;w<8;++w)x=fmaxf(x,ma[w*8+tid]);
+   inside[k0+tid]=(x>0&&y>0)?__float2int_rn(.5f*(log2f(x)-log2f(y))):0;
+  }
  }
  grid.sync();
 
@@ -364,12 +365,12 @@ void preprocess_cooperative(const T* __restrict__ A,const T* __restrict__ B,
 
 template<class T> void init_cooperative_preprocess(){
  constexpr size_t smem=sizeof(PairPackShared<true>);
- check(cudaFuncSetAttribute(preprocess_cooperative<T>,cudaFuncAttributeMaxDynamicSharedMemorySize,smem),"cooperative shared");
+ check(cudaFuncSetAttribute(preprocess_cooperative_columns<T>,cudaFuncAttributeMaxDynamicSharedMemorySize,smem),"cooperative shared");
  int device=0,supported=0,sms=0,active=0;
  check(cudaGetDevice(&device),"cooperative device");
  check(cudaDeviceGetAttribute(&supported,cudaDevAttrCooperativeLaunch,device),"cooperative support");
  check(cudaDeviceGetAttribute(&sms,cudaDevAttrMultiProcessorCount,device),"cooperative SM count");
- check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&active,preprocess_cooperative<T>,256,smem),"cooperative occupancy");
+ check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&active,preprocess_cooperative_columns<T>,256,smem),"cooperative occupancy");
  printf("COOPERATIVE_INIT dtype=%s supported=%d sm_count=%d active_blocks_per_sm=%d grid=288 shared_bytes=%zu\n",
   (std::is_same_v<T,cute::half_t> ? "fp16" : "bf16"),supported,sms,active,smem);
  if(!supported||active*sms<288)throw std::runtime_error("Cooperative preprocess requires resident capacity for288CTAs");
@@ -379,7 +380,7 @@ template<class T,bool Balance> void preprocess(const T* A,const T* B,Work w,cuda
  if constexpr(Balance){
   T* ha=static_cast<T*>(w.ha);T* hb=static_cast<T*>(w.hb);
   void* args[]={&A,&B,&ha,&hb,&w.qa,&w.qb,&w.ea,&w.eb,&w.inside,&w.partial};
-  check(cudaLaunchCooperativeKernel(reinterpret_cast<const void*>(preprocess_cooperative<T>),dim3(288),dim3(256),args,sizeof(PairPackShared<true>),stream),"cooperative preprocess launch");
+  check(cudaLaunchCooperativeKernel(reinterpret_cast<const void*>(preprocess_cooperative_columns<T>),dim3(288),dim3(256),args,sizeof(PairPackShared<true>),stream),"cooperative preprocess launch");
  }else{
   pack_joint<T,false><<<288,256,sizeof(PairPackShared<true>),stream>>>(
    A,B,static_cast<T*>(w.ha),static_cast<T*>(w.hb),w.qa,w.qb,w.ea,w.eb,w.inside);
