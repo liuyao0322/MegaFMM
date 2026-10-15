@@ -613,6 +613,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 353 | Tune source-free raster order and narrow ping-pong kernels | 1.1165 | 0.324896 | completed |
 
+| 354 | Test source-free clusters and a nine-warp two-worker kernel | 1.1124 | 0.327931 | completed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5824,3 +5826,29 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal six-shape twelve-row run completed. Original numerical gates and detailed performance will be reviewed after closing this iteration. Latest independent whole-suite certification remains351 thirteenof28; no later result is certified yet.
 - **Next:** Force all70 candidates and API/sanitizer validation, inspect per-shape scores and profile the best new configurations before continuing.
 - **Archive:** trajectory/20261015_183330_iter-353/
+
+### Iter 354 — Test source-free clusters and a nine-warp two-worker kernel
+
+- **Hypothesis:** The profiled cuBLASLt winner uses cluster2; source-free clusters may improve reuse. A single producer warp with two consumer groups removes register over-allocation and permits two resident CTAs.
+- **Changes:** Added six source-free cluster/raster variants and a licensed CUTLASS cooperative-kernel adaptation with288threads, static registers, source-free epilogue and two persistent workers. Extended cluster-tail tests.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 12 rows; arithmetic mean of row median latency=0.327931 ms; mean speedup=1.1124x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005645 | 0.005039 | 1.1203 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005635 | 0.005038 | 1.1185 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008652 | 0.006674 | 1.2964 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008643 | 0.006643 | 1.3010 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.242484 | 0.218244 | 1.1111 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.231843 | 0.231794 | 1.0002 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.640669 | 1.641902 | 0.9992 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.726196 | 1.723233 | 1.0017 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025002 | 0.023518 | 1.0631 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026561 | 0.024514 | 1.0835 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027346 | 0.024147 | 1.1325 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.027391 | 0.024430 | 1.1212 | 6.43463e-07 | 1 |
+
+- **Analysis:** Formal six-shape twelve-row run completed. Research preflight established90registers, zero spills and two-block capacity for the nine-warp FP16 tile; this does not establish benchmark performance or complete numerical acceptance. Per-shape scores and full validation follow. Latest independently certified full suite remains353 sixteenof28.
+- **Next:** Inspect results, force all77 candidates and original API checks, run CUDA12.8 memcheck/racecheck, and profile measured bottlenecks before another iteration.
+- **Archive:** trajectory/20261015_190625_iter-354/

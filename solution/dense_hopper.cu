@@ -1,4 +1,5 @@
 #include "internal.h"
+#include "hopper_nine_warp_kernel.cuh"
 #include <cutlass/cutlass.h>
 #include <cutlass/gemm/collective/collective_builder.hpp>
 #include <cutlass/epilogue/collective/collective_builder.hpp>
@@ -11,7 +12,7 @@
 namespace megafmm::detail {
 namespace {
 using namespace cute;
-template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0,int K=64,bool DirectStore=false,int ClusterN=1,int Workers=1,bool ZeroBeta=false>
+template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0,int K=64,bool DirectStore=false,int ClusterN=1,int Workers=1,bool ZeroBeta=false,bool NineWarp=false>
 struct Candidate {
   using Tile=Shape<Int<M>,Int<N>,Int<K>>;
   using Cluster=Shape<Int<ClusterM>,Int<ClusterN>,_1>;
@@ -31,7 +32,9 @@ struct Candidate {
       cute::conditional_t<Schedule==0,cutlass::gemm::KernelTmaWarpSpecializedCooperative,
         cute::conditional_t<Schedule==1,cutlass::gemm::KernelTmaWarpSpecialized,
                             cutlass::gemm::KernelTmaWarpSpecializedPingpong>>>::CollectiveOp;
-  using Kernel=cutlass::gemm::kernel::GemmUniversal<Shape<int,int,int,int>,Mainloop,Epilogue>;
+  using Kernel=cute::conditional_t<NineWarp,
+      cutlass::gemm::kernel::NineWarpGemm<Shape<int,int,int,int>,Mainloop,Epilogue>,
+      cutlass::gemm::kernel::GemmUniversal<Shape<int,int,int,int>,Mainloop,Epilogue>>;
   using Gemm=cutlass::gemm::device::GemmUniversalAdapter<Kernel>;
   static bool run(const Problem& p,const void* A,const void* B,const float* C,float* D,
                   void* workspace,int sm_count,cudaStream_t stream,int operation,int swizzle=1,int raster=0) {
@@ -117,6 +120,13 @@ bool dispatch(int id,const Problem& p,const void* A,const void* B,const float* C
     case 67:return Candidate<T,64,256,1,2,0,64,false,1,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 68:return Candidate<T,64,256,1,2,3,64,false,1,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 69:return Candidate<T,64,256,2,2,0,64,false,1,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 70:return Candidate<T,128,256,2,0,0,64,false,1,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 71:return Candidate<T,128,256,1,0,0,64,false,2,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 72:return Candidate<T,128,256,2,0,0,64,false,2,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 73:return Candidate<T,128,256,4,0,0,64,false,1,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 74:return Candidate<T,128,256,2,0,0,64,false,1,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,1);
+    case 75:return Candidate<T,128,256,2,0,0,64,false,1,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8,2);
+    case 76:return Candidate<T,128,128,1,0,2,64,false,1,2,true,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     default:return false;
   }
 }
@@ -141,7 +151,7 @@ const char* hopper_candidate_name(int id) {
       "128x256x64_c1_sw8","128x128x64_c2_sw4","128x128x64_c2_sw8",
       "64x32x64_basic_s3","64x64x64_basic_s3","128x128x64_pingpong_s3",
       "256x128x64_c1_sw8","128x256x64_c2_sw8","128x256x64_pingpong_s3_sw8",
-      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64","even_mma_32x32x32","even_mma_32x32x64","128x256x64_cm4_sw8","128x256x64_cm8_sw8","128x256x64_cn2_sw8","128x256x64_cm2cn2_sw8","even_mma_swizzle_32x32x64","even_mma_swizzle_16x32x64","even_mma_swizzle_32x16x64","register_mma_16x32x16","register_mma_32x16x16","even_mma_32x32x128","even_mma_16x64x128","ampere_32x64x32","ampere_32x64x64","ampere_64x64x32","ampere_64x64x64","ampere_64x32x64","ampere_32x128x32_w32x32","64x128x64_basic_s3_sw8","64x256x64_basic_s2_sw8","128x128x64_direct_s3_2cta_sw8","64x256x64_direct_s2_2cta_sw8","128x128x64_beta0_s2_2cta_sw8","128x256x64_beta0_auto_sw8","128x256x64_beta0_sw1","128x256x64_beta0_sw4","128x256x64_beta0_rasterM","128x256x64_beta0_rasterN","128x128x64_beta0_auto_sw8","64x256x64_beta0_pingpong","64x256x64_beta0_pingpong_s3","64x256x64_beta0_pingpong_c2"};
+      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64","even_mma_32x32x32","even_mma_32x32x64","128x256x64_cm4_sw8","128x256x64_cm8_sw8","128x256x64_cn2_sw8","128x256x64_cm2cn2_sw8","even_mma_swizzle_32x32x64","even_mma_swizzle_16x32x64","even_mma_swizzle_32x16x64","register_mma_16x32x16","register_mma_32x16x16","even_mma_32x32x128","even_mma_16x64x128","ampere_32x64x32","ampere_32x64x64","ampere_64x64x32","ampere_64x64x64","ampere_64x32x64","ampere_32x128x32_w32x32","64x128x64_basic_s3_sw8","64x256x64_basic_s2_sw8","128x128x64_direct_s3_2cta_sw8","64x256x64_direct_s2_2cta_sw8","128x128x64_beta0_s2_2cta_sw8","128x256x64_beta0_auto_sw8","128x256x64_beta0_sw1","128x256x64_beta0_sw4","128x256x64_beta0_rasterM","128x256x64_beta0_rasterN","128x128x64_beta0_auto_sw8","64x256x64_beta0_pingpong","64x256x64_beta0_pingpong_s3","64x256x64_beta0_pingpong_c2","128x256x64_beta0_cm2","128x256x64_beta0_cn2","128x256x64_beta0_cm2cn2","128x256x64_beta0_cm4","128x256x64_beta0_cm2_rasterM","128x256x64_beta0_cm2_rasterN","128x128x64_beta0_ninewarp_2workers"};
   return id>=0 && id<HopperCandidateCount ? names[id]:"invalid";
 }
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C,float* D,

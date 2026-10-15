@@ -28,7 +28,7 @@ void candidate(int id,megafmm::DType dtype,int sms,int layout=0) {
         p.trans_a=p.trans_b=true;p.lda=p.m+3;p.ldb=p.k+5;p.ldc=p.ldd=p.n+7;}
   if(id>=9) {p.m=769;p.n=1536;p.k=16;p.lda=24;p.ldb=1544;p.ldc=p.ldd=1544;}
   if(id>=26) {p.m=129;p.n=256;p.k=520;p.lda=528;p.ldb=264;p.ldc=p.ldd=264;}
-  if(id>=39 && id<=42) {p.m=1025;p.n=520;p.k=128;p.lda=136;p.ldb=528;p.ldc=p.ldd=528;}
+  if((id>=39 && id<=42) || (id>=70 && id<=75)) {p.m=1025;p.n=520;p.k=128;p.lda=136;p.ldb=528;p.ldc=p.ldd=528;}
   if(layout==1) {p.m=129;p.n=137;p.k=65;p.trans_a=p.trans_b=true;p.lda=132;p.ldb=70;p.ldc=p.ldd=144;}
   if(layout==2) {p.m=129;p.n=138;p.k=66;p.lda=68;p.ldb=140;p.ldc=p.ldd=144;}
   if(layout==3) {p.m=3;p.n=6;p.k=2;p.lda=4;p.ldb=8;p.ldc=p.ldd=8;}
