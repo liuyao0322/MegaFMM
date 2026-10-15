@@ -114,7 +114,7 @@ public:
   static constexpr uint32_t MinBlocksPerMultiprocessor = size<1>(TileShape{}) > 128 ? 1 : 2;
 
   static_assert(NumMmaWarpGroups == 2, "NineWarpGemm needs two consumer groups");
-  static_assert(cute::size(ClusterShape{}) == 1, "NineWarpGemm currently supports one-block clusters");
+  static_assert(cute::size(ClusterShape{}) <= 2, "NineWarpGemm supports at most two-block clusters");
 
   // 1 stage ordered sequence between mainloop and epilogue producer load threads
   using LoadWarpOrderBarrier = cutlass::OrderedSequenceBarrier<1,2>;

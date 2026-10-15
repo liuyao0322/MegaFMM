@@ -627,6 +627,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 360 | Widen nine-warp source-free kernels to 128x256 | 1.1156 | 0.325011 | measured |
 
+| 361 | Test two-block clusters in wide nine-warp GEMM | 1.1113 | 0.328963 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -6008,3 +6010,29 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal twelve-row benchmark completed. Original FP64 and full-call timing gates preserved; expanded pool requires forced and sanitizer validation. No independent certification inferred; latest certified count remains35316/28.
 - **Next:** Inspect per-candidate large-K scores, force all92 candidates and API/CTest, run CUDA12.8 memcheck/racecheck, and profile the new wide kernel before deciding next axis.
 - **Archive:** trajectory/20261015_200501_iter-360/
+
+### Iter 361 — Test two-block clusters in wide nine-warp GEMM
+
+- **Hypothesis:** Two-block TMA multicast may improve input reuse in the high-Tensor-activity wide nine-warp kernel.
+- **Changes:** Add92CM2 and93CN2 nine-warp128x256S4 candidates,total94; permit at most two-block clusters after resource and exact-tail preflight.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 12 rows; arithmetic mean of row median latency=0.328963 ms; mean speedup=1.1113x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005653 | 0.005037 | 1.1222 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005642 | 0.005035 | 1.1206 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008688 | 0.006702 | 1.2963 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008651 | 0.006664 | 1.2982 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.244268 | 0.224253 | 1.0893 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.233543 | 0.232897 | 1.0028 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.633476 | 1.658850 | 0.9847 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.717476 | 1.711190 | 1.0037 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026286 | 0.024106 | 1.0905 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.025908 | 0.024120 | 1.0741 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027425 | 0.024219 | 1.1324 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.027453 | 0.024487 | 1.1212 | 6.43463e-07 | 1 |
+
+- **Analysis:** Formal twelve-row benchmark completed with original FP64 and complete-call timing gates; no independent certification inferred. Need inspect scores and extend measurements to remaining large-K shapes.
+- **Next:** Force all94/API/CTest/CUDA12.8 sanitizers, then measure16384 and three large-K rectangles with frozen binary; profile/reassess measured non-winners before next axis.
+- **Archive:** trajectory/20261015_201630_iter-361/
