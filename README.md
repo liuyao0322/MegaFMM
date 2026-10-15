@@ -49,6 +49,11 @@ solution/
   plan.cpp             Dense 规划、cuBLASLt 调优、指针检查和执行
   scale_output.cu      alpha=0 或 K=0 时的 FP32 输出处理
   sw_pipeline.cu       1024³ PDL 双kernel SW、统一 S/T workspace、TMA/WGMMA 流水
+  dense_hopper.cu     TMA/WGMMA dense 候选与分发
+  dense_ampere.cu     偶数边界尺寸的 SM80 Tensor Core dense 候选
+  dense_wmma.cu       WMMA/显式 MMA 候选
+  dense_padding.cu    打包、补零、dense 叶乘法与写回
+  tuning_check.cu     调优阶段的数值筛选
   sw_multisize.cu      多尺寸单层 Winograd、WMMA 七乘法、逻辑补零与融合输出
   internal.h           内部声明
 include/megafmm/gemm.h  Problem、Policy、Plan 和 run/tune 接口
@@ -159,7 +164,8 @@ benchmark 会报告实际路径、workspace、原始 FP64 精度和计时；未�
 1. 独立调优原有 cuBLASLt 候选池，作为可执行 fallback。
 2. 检查 Hopper dense 配置及其 cluster、swizzle、raster 和流水变体；输入使用原始
    BF16/FP16，FP32 累加和输出。配置覆盖窄 tile、大 tile 与不同 K 分块；实际可用候选
-   由尺寸、布局、指针对齐和 shared-memory 限制决定。
+   由尺寸、布局、指针对齐和 shared-memory 限制决定。另有 SM80 指令集的 CUTLASS dense
+   候选处理偶数但未按8元素对齐的尺寸，运行目标仍为H100。
 3. 小输出（M×N≤4096、K≤256）加入直接 FP32 FMA 候选；非对齐或一般布局加入四种
    pack→Hopper GEMM→unpack 候选。后者将所有打包、补零和写回成本纳入调用计时，scratch
    受调用方 workspace_limit 限制。
@@ -188,22 +194,23 @@ python3 scripts/tune_mnk.py --repeats 3 --output-dir results/mnk_acceptance
 只算功能覆盖。该脚本仍有未解决尺寸时返回2，结果文件会保留。加 `--graph` 独立验收 Graph。
 registry 是测量证据，不会自动加载为不经复验的运行时缓存。
 
-当前目标仍是所有尺寸稳定超过独立调优的 cuBLASLt，尚未完成。iter344 的三次独立全套
-验收中，28个尺寸/dtype组合全部通过原始输入 FP64 精度门槛，**11/28个组合**的全部15组
+当前目标仍是所有尺寸稳定超过独立调优的 cuBLASLt，尚未完成。iter351 的三次独立全套
+验收中，28个尺寸/dtype组合全部通过原始输入 FP64 精度门槛，**13/28个组合**的全部15组
 配对计时均快至少3%。下面给出这些组合的配对组中位加速比（括号内为最差组）：
 
 | M×N×K | BF16 | FP16 |
 |---|---:|---:|
-| 512³ | 1.124×（1.115×） | 1.124×（1.109×） |
-| 1024³ | 1.494×（1.483×） | 1.194×（1.191×） |
-| 2048³ | 1.092×（1.078×） | 1.049×（1.044×） |
-| 1024×8192×512 | 1.071×（1.064×） | 未认证 |
-| 1025×1537×769 | 1.113×（1.109×） | 1.077×（1.075×） |
-| 1³ | 1.085×（1.068×） | 1.091×（1.074×） |
+| 512³ | 1.124×（1.119×） | 1.125×（1.121×） |
+| 1024³ | 1.492×（1.483×） | 1.197×（1.193×） |
+| 2048³ | 1.092×（1.071×） | 1.114×（1.073×） |
+| 1024×8192×512 | 1.068×（1.064×） | 未认证 |
+| 1025×1537×769 | 1.113×（1.108×） | 1.078×（1.076×） |
+| 514×770×258 | 1.294×（1.288×） | 1.300×（1.293×） |
+| 1³ | 1.086×（1.075×） | 1.093×（1.083×） |
 
-完整证据见 [iter344验收记录](trajectory/20261015_mnk-validation-344/acceptance/registry.json)。
-其他17个组合仍未解决；fallback与偶发计时优势不计作自定义内核获胜。证据只认证对应版本，
-新候选和选择策略改动仍须重新验收。此前iter339的9/28认证记录继续保留。
+完整证据见 [iter351验收记录](trajectory/20261015_mnk-validation-351/acceptance/registry.json)。
+其他15个组合仍未解决；fallback与偶发计时优势不计作自定义内核获胜。证据只认证对应版本，
+新候选和选择策略改动仍须重新验收。此前iter344的11/28、iter339的9/28认证记录继续保留。
 
 ## 历史与清理记录
 
