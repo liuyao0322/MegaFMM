@@ -224,3 +224,12 @@ registry 是测量证据，不会自动加载为不经复验的运行时缓存�
 - [Dense 冒烟测试](results/architecture_reset_dense_smoke_20261014.csv)：BF16/FP16 原门限检查。
 - [ITERATIONS.md](ITERATIONS.md) 和 `trajectory/` 保留历史上下文；历史源码和已提交报告可从 Git 查看。
 - 当前 `results/` 中的旧报告已被移除，旧迭代中的文件路径不代表当前文件仍存在。
+
+
+iter364/365 后续分别测量了 source-free TMA 的 K=128 与 K=32 分块，候选池扩至102个。
+iter365 的10种尺寸、两种 dtype 共20个组合均通过三组新输入的原始 FP64 精度检查；
+102个强制候选和6项相关测试通过，CUDA12.8内存与竞争检查均为0错误、0警告。
+这些验证不等于新增稳定性能认证。[逐组性能记录](trajectory/20261015_mnk-validation-365/performance.json)
+中，8192×4096×8192 BF16 的新候选虽有1.0317×的中位数比值，但五组配对加速比为
+0.975、1.023、0.992、1.059、1.108，不能计为稳定胜出。最新独立三轮认证仍为上述16/28。
+完整正确性与剖析证据见 [iter365验证](trajectory/20261015_mnk-validation-365/validation.json)。
