@@ -46,3 +46,11 @@ F6/F7两种dtype均0stack、0spill、124registers/thread。F7对齐修正大幅�
 - Median of same-CTA phase sums:producer pack687.072us,inside14.880us,raw issue+ready4.448us,slot-free wait2.112us,total710.976us. Consumer slot-ready wait685.344us,native main raw+leaf7.488us,correction0+1 16.000us,total711.664us. Raw and leaf main phase medians separately need not sum to the displayed combined median; inspect per-CTA rows for exact sums.
 - Roles overlap:median useful work overlap17.456us. Do not add producer and consumer durations. The dominant measured interval is producer packing, not exposed MMA time or host tensor-map setup. The trace does not yet separate pack first-pass/quantization details.
 - Next isolated candidateF10 hoists common inside exponents/factors out of pack element loops, retaining general exponent fallback. Frozen trace source/results/binary identity in`trace_f9_manifest.json`.
+
+## F10 — producer inside-scale construction before element loops
+
+- Cache the two inside exponents and four inverse/direct normal power-of-two factors once per leaf pack, selecting a uniform producer fast path before any named barriers. Per-element transforms use separate RN multiplies. Both exponents outside[-126,126] retain the prior general path. Quantization scale handling is unchanged.
+- All72ordinary original-input FP64 checks pass, every printed eF identical toF9.
+- bf16: complete395.751us versus currentSW10.120us.
+- fp16: complete379.155us versus currentSW9.946us.
+- This supports repeated inside scaling as a large packer cost, but still fails end-to-end performance badly. No Graph/dual-stream/sanitizer acceptance claimed. Next isolated change hoists quantization scale validation/factor construction from its element loops.

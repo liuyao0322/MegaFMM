@@ -38,13 +38,13 @@ template<class T> struct Traits {
 
 template<class T> __device__ __forceinline__ float raw_a(Shared& s,int p,int r,int k){return float(reinterpret_cast<T*>(s.a[p])[Traits<T>::ah_index(r,k)]);}
 template<class T> __device__ __forceinline__ float raw_b(Shared& s,int p,int n,int k){return float(reinterpret_cast<T*>(s.b[p])[Traits<T>::bh_index(n,k)]);}
-template<class T,int Prod,bool SideA> __device__ __forceinline__ float transformed(Shared& s,int r,int k){
+template<class T,int Prod,bool SideA,bool Fast=false> __device__ __forceinline__ float transformed(Shared& s,int r,int k,float scale0=0,float scale1=0){
  float x[4];
  #pragma unroll
  for(int j=0;j<4;++j){
   float v=SideA?raw_a<T>(s,j,r,k):raw_b<T>(s,j,r,k);
-  int e=s.inside[SideA?j%2:j/2];
-  x[j]=int8_research::scale_pow2(v,SideA?-e:e);
+  if constexpr(Fast)x[j]=__fmul_rn(v,(SideA?j%2:j/2)?scale1:scale0);
+  else{int e=s.inside[SideA?j%2:j/2];x[j]=int8_research::scale_pow2(v,SideA?-e:e);}
  }
  if constexpr(SideA){
   if constexpr(Prod==3)return x[3];
@@ -86,14 +86,14 @@ template<class T> __device__ void choose_inside(Shared& s,int tid){
  }
  producer_sync();
 }
-template<class T,int Prod> __device__ void pack_leaf(Shared& s,Slot& slot,int tid){
+template<class T,int Prod,bool Fast> __device__ void pack_leaf_impl(Shared& s,Slot& slot,int tid,float a0,float a1,float b0,float b1){
  float peak[4]={};
  auto ha=reinterpret_cast<T*>(slot.bytes+16384);auto hb=reinterpret_cast<T*>(slot.bytes);
  for(int i=tid;i<4096;i+=128){int r=i/128,k=i%128;
-  float v=transformed<T,Prod,true>(s,r,k);T h=T(v);ha[Traits<T>::ah_index(r,k)]=h;peak[0]=fmaxf(peak[0],fabsf(float(h)));peak[2]=fmaxf(peak[2],fabsf(__fsub_rn(v,float(h))));
+  float v=transformed<T,Prod,true,Fast>(s,r,k,a0,a1);T h=T(v);ha[Traits<T>::ah_index(r,k)]=h;peak[0]=fmaxf(peak[0],fabsf(float(h)));peak[2]=fmaxf(peak[2],fabsf(__fsub_rn(v,float(h))));
  }
  for(int i=tid;i<8192;i+=128){int n=i%64,k=i/64;
-  float v=transformed<T,Prod,false>(s,n,k);T h=T(v);hb[Traits<T>::bh_index(n,k)]=h;peak[1]=fmaxf(peak[1],fabsf(float(h)));peak[3]=fmaxf(peak[3],fabsf(__fsub_rn(v,float(h))));
+  float v=transformed<T,Prod,false,Fast>(s,n,k,b0,b1);T h=T(v);hb[Traits<T>::bh_index(n,k)]=h;peak[1]=fmaxf(peak[1],fabsf(float(h)));peak[3]=fmaxf(peak[3],fabsf(__fsub_rn(v,float(h))));
  }
  reduce4(s,peak,tid);
  if(tid<4){float a=0;for(int w=0;w<4;++w)a=fmaxf(a,s.maxima[tid][w]);int e=a>0?int(ceilf(log2f(a/127.f))):0;
@@ -103,16 +103,27 @@ template<class T,int Prod> __device__ void pack_leaf(Shared& s,Slot& slot,int ti
  auto qbh=reinterpret_cast<int8_t*>(slot.bytes+24576),qal=reinterpret_cast<int8_t*>(slot.bytes+32768);
  auto qbl=reinterpret_cast<int8_t*>(slot.bytes+36864),qah=reinterpret_cast<int8_t*>(slot.bytes+45056);
  for(int i=tid;i<4096;i+=128){int r=i/128,k=i%128;float h=float(ha[Traits<T>::ah_index(r,k)]);
-  float l=__fsub_rn(transformed<T,Prod,true>(s,r,k),h);
+  float l=__fsub_rn(transformed<T,Prod,true,Fast>(s,r,k,a0,a1),h);
   qah[Traits<T>::aq()(r,k)]=int8_t(max(-127,min(127,__float2int_rn(int8_research::scale_pow2(h,-slot.eah)))));
   qal[Traits<T>::aq()(r,k)]=int8_t(max(-127,min(127,__float2int_rn(int8_research::scale_pow2(l,-slot.eal)))));
  }
  for(int i=tid;i<8192;i+=128){int n=i%64,k=i/64;float h=float(hb[Traits<T>::bh_index(n,k)]);
-  float l=__fsub_rn(transformed<T,Prod,false>(s,n,k),h);
+  float l=__fsub_rn(transformed<T,Prod,false,Fast>(s,n,k,b0,b1),h);
   qbh[Traits<T>::bq()(n,k)]=int8_t(max(-127,min(127,__float2int_rn(int8_research::scale_pow2(h,-slot.ebh)))));
   qbl[Traits<T>::bq()(n,k)]=int8_t(max(-127,min(127,__float2int_rn(int8_research::scale_pow2(l,-slot.ebl)))));
  }
  asm volatile("fence.proxy.async.shared::cta;" ::: "memory");producer_sync();
+}
+
+// Both sides use the same two exponents for every element of this leaf tile.
+// The guard is uniform over all128 producer threads before named barriers.
+template<class T,int Prod> __device__ void pack_leaf(Shared& s,Slot& slot,int tid){
+ int e0=s.inside[0],e1=s.inside[1];
+ if(e0>=-126&&e0<=126&&e1>=-126&&e1<=126){
+  float a0=__int_as_float((127-e0)<<23),a1=__int_as_float((127-e1)<<23);
+  float b0=__int_as_float((127+e0)<<23),b1=__int_as_float((127+e1)<<23);
+  pack_leaf_impl<T,Prod,true>(s,slot,tid,a0,a1,b0,b1);
+ }else pack_leaf_impl<T,Prod,false>(s,slot,tid,0,0,0,0);
 }
 
 template<class T> __device__ __forceinline__ void native_mma(uint64_t a,uint64_t b,float* d,cute::GMMA::ScaleOut scale){
