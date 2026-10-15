@@ -48,8 +48,8 @@ for width in [128,256,512]:
     models['m9_quant_k'+str(width)]=dict(fresh_configurations=60,passes=60,hardware_accepted=False)
 abba=json.loads((h/'p17_abba.json').read_text())
 assert abba['correctness_checks']==312 and abba['independent_numerical_configurations']==78
-for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27']:
-    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27'] else 72
+for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29']:
+    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29'] else 72
     assert len(j['checks'])==count and all(x['pass']=='1' and int(x['nonfinite'])==0 for x in j['checks'])
     assert all(g['speedup_vs_sw']<1 for z in j['summaries'] for g in z['groups'])
     candidates[label]=dict(checks=count,failures=0,performance_accepted=False,full_call_us={s['dtype']:s['corrected_us'] for s in j['summaries']})
@@ -68,14 +68,27 @@ for granularity,passes in [('K128',0),('column',6)]:
     rows=[x for x in m7 if x['inside_granularity']==granularity]
     assert len(rows)==6 and sum(x['pass_fixed_floor'] for x in rows)==passes
 models['alternating_inside']=dict(fresh_configurations=6,paired_variants=2,coarse_passes=0,column_passes=6)
-for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27']:
+for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29']:
     rows=[dict(re.findall(r'(\w+)=([^ ]+)',line)) for line in (h/(label+'_balanced.log')).read_text().splitlines() if line.startswith('INSIDE_EQUAL ')]
     assert len(rows)==78 and all(x['errors']=='0' and x['elements']=='1024' for x in rows)
     j=json.loads((h/(label+'_balanced.json')).read_text())
     added=[x for x in j['checks'] if x['pattern']=='12'];assert len(added)==6 and all(x['pass']=='1' for x in added)
     candidates[label]['equal_per_column_exponents']=79872
     candidates[label]['additional_alternating_checks_passed']=6
-    candidates[label]['retained']=label=='p27'
+    candidates[label]['retained']=label in ['p27','p29']
+for label in ['p28','p29']:
+    reference=json.loads((h/'p27_balanced.json').read_text())['checks']
+    rows=json.loads((h/(label+'_balanced.json')).read_text())['checks']
+    assert all(all(a[k]==b[k] for k in ['dtype','pattern','trial','corrected_ef']) for a,b in zip(rows,reference))
+assert json.loads((h/'p28_preflight/manifest.json').read_text())['device_executed'] is False
+ordinary29=json.loads((h/'p29_abba.json').read_text())
+graph29=json.loads((h/'p29_graph_abba.json').read_text())
+for result in [ordinary29,graph29]:
+    assert result['correctness_checks']==312 and result['independent_numerical_configurations']==78
+assert all(x['relative_reduction']>0.03 for x in ordinary29['summary'])
+assert all(x['relative_reduction']<0 for x in graph29['summary'])
+candidates['p27']['retained_for']='Graph replay research reference'
+candidates['p29']['retained_for']='ordinary full-call research reference; Graph regression explicitly rejected'
 global_frozen=sorted((p for p in h.glob('p[0-9]*') if p.is_dir() and re.fullmatch(r'p[0-9]+',p.name)),key=lambda p:int(p.name[1:]))
 global_matching=[p.name for p in global_frozen if all((p/name).exists() and digest(h/name)==digest(p/name) for name in ['pack.cuh','corrected.cuh','compare.cu','pow2.cuh'])]
 assert global_matching,'Global working source must match a measured frozen candidate'
@@ -88,7 +101,7 @@ assert int(profile13[bank_key]['value'])>500000
 assert int(profile17[bank_key]['value'])<2000
 assert 'cases=1048576 exponents=-300..300 errors=0' in (h/'p14_pow2.log').read_text()
 out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved=False,production_unchanged=True,
-    working_candidate=current,working_global_candidate=global_current,compact_pow2_equivalence_cases=1048576,retained_global_candidate='p27, ordinary/Graph78, own fresh stress84/672calls and scoped sanitizer28/56calls per tool; p10 rejected by fresh hardware',compile_stopped_candidates=['F12: no numerical or latency measurement'],candidates=candidates,numerical_models=models,
+    working_candidate=current,working_global_candidate=global_current,compact_pow2_equivalence_cases=1048576,retained_global_candidate='p29 ordinary full-call only; p27 Graph replay remains faster. Each has own ordinary/Graph78, fresh stress84/672calls and scoped sanitizers28/56calls per tool. No production performance winner.',compile_stopped_candidates=['F12: no numerical or latency measurement','P28 initial compile-only preflight: missing read-to-reuse hardware fence, superseded before device execution'],candidates=candidates,numerical_models=models,
     diagnostic_traces=['F9 role-level, one BF16 uniform case','F11 pack subphases, one BF16 uniform case'],probe_scope='one P5 K128 tile, fresh uniform CPU inputs, two dtypes; not full-call acceptance',
     p20_validation=json.loads((h/'p20_validation.json').read_text()),
     p20_independent_performance=json.loads((h/'p20_abba.json').read_text())['summary'],
@@ -98,6 +111,8 @@ out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved
     p26_independent_performance=json.loads((h/'p26_abba.json').read_text())['summary'],
     p27_validation=json.loads((h/'p27_validation.json').read_text()),
     p27_independent_performance=json.loads((h/'p27_abba.json').read_text())['summary'],
-    validations_not_transferred='P20, P24, P26 and P27 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. No transfer to later changes.',
+    p29_validation=json.loads((h/'p29_validation.json').read_text()),
+    p29_independent_performance=ordinary29['summary'],p29_graph_regression=graph29['summary'],
+    validations_not_transferred='P20, P24, P26, P27 and P29 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. No transfer to later changes.',
     remaining='Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration.')
 (r/'audit.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out,ensure_ascii=False,indent=2))

@@ -237,6 +237,7 @@ template<class T,bool Balance> void init_shared_packer(){
  check(cudaFuncSetAttribute(pack<T,false,Balance>,cudaFuncAttributeMaxDynamicSharedMemorySize,sizeof(PairPackShared<false>)),"pair B dynamic shared");
 }
 void init(){
+ init_cooperative_preprocess<cute::half_t>();init_cooperative_preprocess<cute::bfloat16_t>();
  init_shared_packer<cute::half_t,true>();init_shared_packer<cute::half_t,false>();
  init_shared_packer<cute::bfloat16_t,true>();init_shared_packer<cute::bfloat16_t,false>();
  for(auto dtype:{megafmm::DType::BF16,megafmm::DType::FP16}){
