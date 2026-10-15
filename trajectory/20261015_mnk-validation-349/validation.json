@@ -1,0 +1,30 @@
+{
+  "iteration": 349,
+  "source_commit": "0f84bd5a370ae3637fe516cf78267785ada2ab6b",
+  "forced_candidates": 48,
+  "api_original_fp64": "pass",
+  "warp_memcheck_errors": 0,
+  "warp_racecheck_errors": 0,
+  "warp_racecheck_warnings": 0,
+  "boundary_id47": {
+    "registers": 32,
+    "issued_warp_instructions": 2906409,
+    "ncu_duration_us": 17.5,
+    "ordinary_tuning_us": [
+      13.512,
+      13.73
+    ],
+    "achieved_occupancy_percent": 37.07,
+    "eligible_warps_per_scheduler": 0.37,
+    "global_excess_sectors_percent": 64
+  },
+  "conclusion": "Lower instruction count and higher occupancy lose to staging because global accesses and eligibility deteriorate. No new certified win.",
+  "files_sha256": {
+    "results/mnk349_candidates.log": "88f64dba1474ead752fb745bb42031c68d1f34278ce1f9e3c287d4cd53884b70",
+    "results/mnk349_api.log": "bf6f0327c75ce525df0afe03aeba74876356af23872c073b524c22c441676760",
+    "results/mnk349_warp_memcheck.log": "0395b5fa1a0ade29b94b568234769238ac6168e37b3c925bcfad6d99253ba6e1",
+    "results/mnk349_warp_racecheck.log": "074e16d865edf1b7459155ead30f8b12603bd847a0e46dee6cd853ee30e1c538",
+    "results/mnk349_register_boundary.txt": "0bd9fe194af5b7f42ab230f2102238509e2096c3aa6f42f2bb286c2e4a3fa258",
+    "tests/test_tuning_candidates.cu": "b35429a0dfe6af362bc2822448984fab37c51052c1d9560e1056b65b16fbe059"
+  }
+}
