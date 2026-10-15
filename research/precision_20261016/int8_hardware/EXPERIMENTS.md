@@ -62,3 +62,11 @@ Production `solution/` unchanged; these are standalone research candidates, not 
 - Full72/72 ordinary FP64 checks pass; every printed eF equalsP7. Complete BF16/FP16=77.415/76.751us, currentSW10.181/9.994us. Preprocessing41.269/41.198us; A11.255/11.087us, B17.036/17.111us, inside9.320/9.943us. Still reject performance.
 - Source/binary/results frozen in`p8/` and`p8_manifest.json`. Graph/dual-stream/sanitizer evidence in the hardware report is specificallyP7, not silently transferred toP8.
 - Next isolated experiment moves consumer product/term selection outside its16-output loops, preserving the scalar addition order.
+
+## P9 — select recombination branch before output loops
+
+- Move main-product and correction-term branch selection outside each16-output loop, preserving every scalar add/subtract and all barriers. Full72/72 ordinary checks pass, printed eF identical toP8.
+- bf16: complete 65.711us versus currentSW10.230us.
+- fp16: complete 65.457us versus currentSW10.024us.
+- Corrected kernel registers166->196,0stack/spill. This isolated change does not address the end-to-end gap. P7 sanitizer/Graph acceptance is not transferred toP9.
+- Next: screen a structurally fused design numerically, using local K128 inside scales and CTA-local quantization, before implementing a new on-chip producer/consumer pipeline.

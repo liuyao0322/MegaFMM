@@ -99,27 +99,58 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
    asm volatile("bar.warp.sync 0xffffffff;" ::: "memory");
    if((tid&31)==0)Barrier::arrive(&s.free[slot]);
   }
+  // Product/term is uniform across all16outputs; select before the vector loop.
   if(step<7){
    int p=main_product(step);
-   #pragma unroll
-   for(int j=0;j<16;++j){
-    if(p==0){c[0][j]=c[1][j]=c[2][j]=c[3][j]=d[j];}
-    else if(p==1)c[0][j]=__fadd_rn(c[0][j],d[j]);
-    else if(p==5){c[1][j]=__fadd_rn(c[1][j],d[j]);c[2][j]=__fadd_rn(c[2][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
-    else if(p==6){c[2][j]=__fadd_rn(c[2][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
-    else if(p==4){c[1][j]=__fadd_rn(c[1][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
-    else if(p==2)c[1][j]=__fadd_rn(c[1][j],d[j]);
-    else c[2][j]=__fsub_rn(c[2][j],d[j]);
+   if(p==0){
+    #pragma unroll
+    for(int j=0;j<16;++j){c[0][j]=c[1][j]=c[2][j]=c[3][j]=d[j];}
+   }
+   else if(p==1){
+    #pragma unroll
+    for(int j=0;j<16;++j){c[0][j]=__fadd_rn(c[0][j],d[j]);}
+   }
+   else if(p==5){
+    #pragma unroll
+    for(int j=0;j<16;++j){c[1][j]=__fadd_rn(c[1][j],d[j]);c[2][j]=__fadd_rn(c[2][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
+   }
+   else if(p==6){
+    #pragma unroll
+    for(int j=0;j<16;++j){c[2][j]=__fadd_rn(c[2][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
+   }
+   else if(p==4){
+    #pragma unroll
+    for(int j=0;j<16;++j){c[1][j]=__fadd_rn(c[1][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
+   }
+   else if(p==2){
+    #pragma unroll
+    for(int j=0;j<16;++j){c[1][j]=__fadd_rn(c[1][j],d[j]);}
+   }
+   else{
+    #pragma unroll
+    for(int j=0;j<16;++j){c[2][j]=__fsub_rn(c[2][j],d[j]);}
    }
   }else{
    int term=step-7;
-   #pragma unroll
-   for(int j=0;j<16;++j){
-    if(term==0)c[1][j]=__fadd_rn(c[1][j],d[j]);
-    else if(term==1)c[2][j]=__fsub_rn(c[2][j],d[j]);
-    else if(term<4){c[1][j]=__fadd_rn(c[1][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
-    else if(term<6){c[1][j]=__fadd_rn(c[1][j],d[j]);c[2][j]=__fadd_rn(c[2][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
-    else{c[2][j]=__fadd_rn(c[2][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
+   if(term==0){
+    #pragma unroll
+    for(int j=0;j<16;++j){c[1][j]=__fadd_rn(c[1][j],d[j]);}
+   }
+   else if(term==1){
+    #pragma unroll
+    for(int j=0;j<16;++j){c[2][j]=__fsub_rn(c[2][j],d[j]);}
+   }
+   else if(term<4){
+    #pragma unroll
+    for(int j=0;j<16;++j){c[1][j]=__fadd_rn(c[1][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
+   }
+   else if(term<6){
+    #pragma unroll
+    for(int j=0;j<16;++j){c[1][j]=__fadd_rn(c[1][j],d[j]);c[2][j]=__fadd_rn(c[2][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
+   }
+   else{
+    #pragma unroll
+    for(int j=0;j<16;++j){c[2][j]=__fadd_rn(c[2][j],d[j]);c[3][j]=__fadd_rn(c[3][j],d[j]);}
    }
   }
  }
