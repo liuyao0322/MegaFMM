@@ -1,0 +1,65 @@
+{
+  "status": "p46_accuracy_scoped_tools_validated_production_performance_target_unachieved",
+  "goal_achieved": false,
+  "ordinary_original_input_fp64_checks": 78,
+  "graph_original_input_fp64_checks": 78,
+  "graph_same_deterministic_configurations": true,
+  "graph_process_provenance": "p46_graph.log is an exact copy of existing own p46_graph_abba_b0.log; no extra independent Graph sample",
+  "equal_per_column_exponents_per_mode": 79872,
+  "independent_stress_configurations": 108,
+  "independent_stress_calls": 864,
+  "sanitizer_cases_per_tool": 36,
+  "sanitizer_calls_per_tool": 72,
+  "sanitizers": [
+    "memcheck",
+    "racecheck",
+    "synccheck"
+  ],
+  "sanitizer_kernel_scope": "kns=int8_research",
+  "stress_dense_control": "historical cuBLAS GemmEx; ordinary and Graph compare use production tuned Dense gate",
+  "stress_output_guards": "128 floats before and after each output; two independent streams/workspaces",
+  "graph_timing_us": {
+    "bf16": 30.1358394625,
+    "fp16": 30.2508001325
+  },
+  "cooperative_preprocessing": "288CTAs, one unconditional grid.sync barrier; actual supported/resident capacity checked outside run in every validation process",
+  "stress_seed_formula": "46943+trial*347+stream*197+pattern*59",
+  "research_retention": "P46 ordinary and Graph research reference with its own complete evidence; production performance target remains unachieved",
+  "independent_ordinary_comparison": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p45",
+      "new_candidate": "p46",
+      "old_group_median_us": 35.11308002475,
+      "new_group_median_us": 30.305040121125,
+      "relative_reduction": 0.13693016677078673
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p45",
+      "new_candidate": "p46",
+      "old_group_median_us": 35.120119571625,
+      "new_group_median_us": 30.273880004875,
+      "relative_reduction": 0.13799040623613013
+    }
+  ],
+  "independent_graph_comparison": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p45",
+      "new_candidate": "p46",
+      "old_group_median_us": 35.44780015925,
+      "new_group_median_us": 30.242239475375,
+      "relative_reduction": 0.1468514452374733
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p45",
+      "new_candidate": "p46",
+      "old_group_median_us": 35.434360027249994,
+      "new_group_median_us": 30.248760223375,
+      "relative_reduction": 0.1463438255943419
+    }
+  ],
+  "limitations": "Only contiguous non-transposed1024^3, alpha1 beta0, FP16/BF16; no arbitrary-range proof, no production integration, no transfer to later modified candidates."
+}

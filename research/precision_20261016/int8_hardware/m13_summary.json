@@ -1,0 +1,57 @@
+{
+  "scope": "M13: isolate FP32 recombination order for native-high operand reuse.\n\nBoth arms share seven native main products and all eight scaled native residual\ncross terms. TF32-disabled FP32 bmm/add is a numerical screen, not exact Hopper\nWGMMA accumulation or a latency measurement. Original rounded-input FP64 AB.\n",
+  "configurations": 72,
+  "rows": 144,
+  "summary": [
+    {
+      "dtype": "float16",
+      "arm": "native_low_scaled",
+      "configurations": 36,
+      "passes": 36,
+      "max_ef": 3.0599898187570465e-05,
+      "nonfinite": 0,
+      "max_paired_output_delta_ef": 3.2923421262384694e-06
+    },
+    {
+      "dtype": "float16",
+      "arm": "native_leaf_scaled",
+      "configurations": 36,
+      "passes": 36,
+      "max_ef": 3.076806854517693e-05,
+      "nonfinite": 0,
+      "max_paired_output_delta_ef": 3.2923421262384694e-06
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "native_low_scaled",
+      "configurations": 36,
+      "passes": 36,
+      "max_ef": 1.5291497533935535e-05,
+      "nonfinite": 0,
+      "max_paired_output_delta_ef": 3.300451745699049e-06
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "native_leaf_scaled",
+      "configurations": 36,
+      "passes": 36,
+      "max_ef": 1.5627714438858942e-05,
+      "nonfinite": 0,
+      "max_paired_output_delta_ef": 3.300451745699049e-06
+    }
+  ],
+  "same_input_controls": [
+    {
+      "dtype": "torch.float16",
+      "seed": 8301,
+      "native_arm_matches_m12": true
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 8301,
+      "native_arm_matches_m12": true
+    }
+  ],
+  "hardware_accepted": false,
+  "performance_accepted": false
+}

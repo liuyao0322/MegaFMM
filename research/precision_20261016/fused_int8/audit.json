@@ -3,9 +3,9 @@
   "goal_achieved": false,
   "production_unchanged": true,
   "working_candidate": "f13",
-  "working_global_candidate": "p45",
+  "working_global_candidate": "p46",
   "compact_pow2_equivalence_cases": 1048576,
-  "retained_global_candidate": "p45 ordinary and Graph research reference, own ordinary/Graph78, fresh9-pattern stress108/864calls, scoped tools36/72calls each. p39/p33/p27 remain historical validated fallbacks. No production performance winner.",
+  "retained_global_candidate": "p46 ordinary and Graph research reference, own ordinary/Graph78, fresh9-pattern stress108/864calls, scoped tools36/72calls each. p45/p39/p33/p27 remain historical validated fallbacks. No production performance winner.",
   "compile_stopped_candidates": [
     "F12: no numerical or latency measurement",
     "P28 initial compile-only preflight: missing read-to-reuse hardware fence, superseded before device execution",
@@ -638,10 +638,25 @@
       },
       "equal_per_column_exponents": 79872,
       "additional_alternating_checks_passed": 6,
+      "retained": false,
+      "retained_for": "historical fully validated ordinary and Graph fallback",
+      "validation_scope": "own ordinary/Graph78, each independentABBA312; fresh9-pattern108configurations/864calls, scoped tools36/72calls each",
+      "numerical_algorithm_changed": "native T correction high aliases + p11FP16/p8BF16 scaled low, all eight correction dots; two maps/eleven planes per side"
+    },
+    "p46": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 30.68503952,
+        "fp16": 30.4968008995
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
       "retained": true,
       "retained_for": "ordinary and Graph research reference; own fresh validation only",
       "validation_scope": "own ordinary/Graph78, each independentABBA312; fresh9-pattern108configurations/864calls, scoped tools36/72calls each",
-      "numerical_algorithm_changed": "native T correction high aliases + p11FP16/p8BF16 scaled low, all eight correction dots; two maps/eleven planes per side"
+      "numerical_algorithm_changed": "early corrected-leaf recombination; reuse loaded native highs, all seven main/eight cross dots, native p11/8 lows unchanged"
     },
     "p35": {
       "checks": 78,
@@ -779,6 +794,16 @@
       "hardware_accepted": false
     },
     "m12_native_low_scaled": {
+      "fresh_configurations": 72,
+      "passes": 72,
+      "hardware_accepted": false
+    },
+    "m13_native_low_scaled": {
+      "fresh_configurations": 72,
+      "passes": 72,
+      "hardware_accepted": false
+    },
+    "m13_native_leaf_scaled": {
       "fresh_configurations": 72,
       "passes": 72,
       "hardware_accepted": false
@@ -2777,6 +2802,164 @@
     "hardware_accepted": false,
     "performance_accepted": false
   },
+  "m13_numerical_screen": {
+    "scope": "M13: isolate FP32 recombination order for native-high operand reuse.\n\nBoth arms share seven native main products and all eight scaled native residual\ncross terms. TF32-disabled FP32 bmm/add is a numerical screen, not exact Hopper\nWGMMA accumulation or a latency measurement. Original rounded-input FP64 AB.\n",
+    "configurations": 72,
+    "rows": 144,
+    "summary": [
+      {
+        "dtype": "float16",
+        "arm": "native_low_scaled",
+        "configurations": 36,
+        "passes": 36,
+        "max_ef": 3.0599898187570465e-05,
+        "nonfinite": 0,
+        "max_paired_output_delta_ef": 3.2923421262384694e-06
+      },
+      {
+        "dtype": "float16",
+        "arm": "native_leaf_scaled",
+        "configurations": 36,
+        "passes": 36,
+        "max_ef": 3.076806854517693e-05,
+        "nonfinite": 0,
+        "max_paired_output_delta_ef": 3.2923421262384694e-06
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "native_low_scaled",
+        "configurations": 36,
+        "passes": 36,
+        "max_ef": 1.5291497533935535e-05,
+        "nonfinite": 0,
+        "max_paired_output_delta_ef": 3.300451745699049e-06
+      },
+      {
+        "dtype": "bfloat16",
+        "arm": "native_leaf_scaled",
+        "configurations": 36,
+        "passes": 36,
+        "max_ef": 1.5627714438858942e-05,
+        "nonfinite": 0,
+        "max_paired_output_delta_ef": 3.300451745699049e-06
+      }
+    ],
+    "same_input_controls": [
+      {
+        "dtype": "torch.float16",
+        "seed": 8301,
+        "native_arm_matches_m12": true
+      },
+      {
+        "dtype": "torch.bfloat16",
+        "seed": 8301,
+        "native_arm_matches_m12": true
+      }
+    ],
+    "hardware_accepted": false,
+    "performance_accepted": false
+  },
+  "p46_validation": {
+    "status": "p46_accuracy_scoped_tools_validated_production_performance_target_unachieved",
+    "goal_achieved": false,
+    "ordinary_original_input_fp64_checks": 78,
+    "graph_original_input_fp64_checks": 78,
+    "graph_same_deterministic_configurations": true,
+    "graph_process_provenance": "p46_graph.log is an exact copy of existing own p46_graph_abba_b0.log; no extra independent Graph sample",
+    "equal_per_column_exponents_per_mode": 79872,
+    "independent_stress_configurations": 108,
+    "independent_stress_calls": 864,
+    "sanitizer_cases_per_tool": 36,
+    "sanitizer_calls_per_tool": 72,
+    "sanitizers": [
+      "memcheck",
+      "racecheck",
+      "synccheck"
+    ],
+    "sanitizer_kernel_scope": "kns=int8_research",
+    "stress_dense_control": "historical cuBLAS GemmEx; ordinary and Graph compare use production tuned Dense gate",
+    "stress_output_guards": "128 floats before and after each output; two independent streams/workspaces",
+    "graph_timing_us": {
+      "bf16": 30.1358394625,
+      "fp16": 30.2508001325
+    },
+    "cooperative_preprocessing": "288CTAs, one unconditional grid.sync barrier; actual supported/resident capacity checked outside run in every validation process",
+    "stress_seed_formula": "46943+trial*347+stream*197+pattern*59",
+    "research_retention": "P46 ordinary and Graph research reference with its own complete evidence; production performance target remains unachieved",
+    "independent_ordinary_comparison": [
+      {
+        "dtype": "bf16",
+        "old_candidate": "p45",
+        "new_candidate": "p46",
+        "old_group_median_us": 35.11308002475,
+        "new_group_median_us": 30.305040121125,
+        "relative_reduction": 0.13693016677078673
+      },
+      {
+        "dtype": "fp16",
+        "old_candidate": "p45",
+        "new_candidate": "p46",
+        "old_group_median_us": 35.120119571625,
+        "new_group_median_us": 30.273880004875,
+        "relative_reduction": 0.13799040623613013
+      }
+    ],
+    "independent_graph_comparison": [
+      {
+        "dtype": "bf16",
+        "old_candidate": "p45",
+        "new_candidate": "p46",
+        "old_group_median_us": 35.44780015925,
+        "new_group_median_us": 30.242239475375,
+        "relative_reduction": 0.1468514452374733
+      },
+      {
+        "dtype": "fp16",
+        "old_candidate": "p45",
+        "new_candidate": "p46",
+        "old_group_median_us": 35.434360027249994,
+        "new_group_median_us": 30.248760223375,
+        "relative_reduction": 0.1463438255943419
+      }
+    ],
+    "limitations": "Only contiguous non-transposed1024^3, alpha1 beta0, FP16/BF16; no arbitrary-range proof, no production integration, no transfer to later modified candidates."
+  },
+  "p46_independent_performance": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p45",
+      "new_candidate": "p46",
+      "old_group_median_us": 35.11308002475,
+      "new_group_median_us": 30.305040121125,
+      "relative_reduction": 0.13693016677078673
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p45",
+      "new_candidate": "p46",
+      "old_group_median_us": 35.120119571625,
+      "new_group_median_us": 30.273880004875,
+      "relative_reduction": 0.13799040623613013
+    }
+  ],
+  "p46_graph_performance": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p45",
+      "new_candidate": "p46",
+      "old_group_median_us": 35.44780015925,
+      "new_group_median_us": 30.242239475375,
+      "relative_reduction": 0.1468514452374733
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p45",
+      "new_candidate": "p46",
+      "old_group_median_us": 35.434360027249994,
+      "new_group_median_us": 30.248760223375,
+      "relative_reduction": 0.1463438255943419
+    }
+  ],
   "bf16_correction_hardware": {
     "status": "native_main_bf16_correction_accuracy_passed_performance_rejected",
     "goal_achieved": false,
@@ -3364,6 +3547,6 @@
     ],
     "scope": "Full original-input FP64 matrix gates; printed eF equality is not a bitwise-output claim. Host eligibility diagnostics outside timing. No production integration. Unlocked clocks, no confidence interval."
   },
-  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11/M12 are numerical only. P43 owns fresh9-pattern108/864stress without tools/independent Graph timing; P44 ordinaryABBA only. P45 owns ordinary/Graph78, fresh108/864stress and36/72tools; none transfers to later changes.",
+  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11/M12/M13 are numerical only. P43 owns fresh9-pattern108/864stress without tools/independent Graph timing; P44 ordinaryABBA only. P45 owns ordinary/Graph78, fresh108/864stress and36/72tools; P46 owns its independent ordinary/GraphABBA, fresh108/864stress and36/72tools; none transfers to later changes.",
   "remaining": "Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration."
 }

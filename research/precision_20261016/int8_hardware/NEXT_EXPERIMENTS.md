@@ -87,3 +87,8 @@ P43/P44 improve hardwareaccuracy but regress againstP39. M12's72fresh configurat
 OwnP45two-kernelNCU, primary re-search/read and failedhistoryreview are complete before another hardwarecandidate. Fullprofile/timing exclusion and EmuGEMM/Twill/CUTLASS applicability are inEXPERIMENTS.md andLITERATURE_UPDATE_P45.md. P45's lower registers/plane bytes do not establish a physical floor or causal decomposition of runtime.
 
 Next first model a corrected-native-leaf recombination: each transformed native main product is combined with its one/two scaled cross terms, then enters the existing seven-product Winograd recombination. Preserve all eight correctiondots and exact original gate; this changes FP32 addition order, so require its own paired numerical screen and same-inputP45-style control. Only then implement separate hardware reuse from frozenP45: use the same loaded high operands for its main and correction dots, keeping eleven-plane storage/descriptors for the first control. Model extra FP32accumulator pressure, all ready/free/fence lifetimes, bytes and28K128producersteps/88TMAcommands perCTA versus48/120 before drawing performance conclusions. Counts are source hypotheses, not dynamic or measured savings. Own precision/ordinary+Graph/freshstreams/scopedchecks remain mandatory ifretained. No M13/P46 implementation or numerical/hardware/performance claim at this checkpoint.
+
+
+## P46完成后的下一消融
+
+M13/P46已完成独立验证并保留P46，详见LEAF_REUSE_HARDWARE.md。普通降低13.69/13.80percent、Graph14.69/14.63percent，相对同轮P45；仍约30.3us、未进入生产。自身profile不证明下界。下一P47保持P46消费者及65,536B预处理共享请求，直接在每个元素变换后写原生高部/缩放低部，移除已失去跨线程用途的FP32暂存与barrier。DIRECT_NATIVE_PACK_DESIGN.md记录完整假设、原始资料和验收要求。共享请求量缩减单独后续消融；不能将P25/P26INT8量化时代的结果直接迁移。
