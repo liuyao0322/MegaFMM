@@ -20,5 +20,23 @@
     "solution/dense_hopper.cu": "ed6bf539e0e595f723b5272acc96dc985d3507fb4c8403fdda8702cd19a81019",
     "solution/tuning_check.cu": "8b109a5756a8c95fd38ec8c7ec4dc76cb8f8e1000906e39dd122795c55786a5f"
   },
-  "notes": "Forced candidates and API tests pass; experimental SW1024 original precision failure remains outside this passing CTest subset. Independent full-suite acceptance pending."
+  "notes": "Forced candidates and API tests pass; experimental SW1024 original precision failure remains outside this passing CTest subset. Independent full-suite acceptance pending.",
+  "profile": {
+    "candidate": 52,
+    "shape": [
+      514,
+      770,
+      258
+    ],
+    "dtype": "fp16",
+    "registers": 94,
+    "local_load_sectors": 0,
+    "local_store_sectors": 0,
+    "issued_warp_instructions": 955556,
+    "achieved_occupancy_percent": 6.239184,
+    "eligible_warps_per_scheduler": 0.215917,
+    "replay_duration_us": 8.768,
+    "duration_is_diagnostic_not_ordinary_timing": true,
+    "notes": "117 CTAs on132 SMs, low whole-device occupancy with one wave; instruction count materially reduced vs candidate38. Global excess sectors75%, shared excess wavefronts48%; not a bandwidth-saturation claim."
+  }
 }
