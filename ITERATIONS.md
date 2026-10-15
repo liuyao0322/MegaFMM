@@ -619,6 +619,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 356 | Match nine-warp launch bounds to accumulator width | 1.1122 | 0.324593 | no-change |
 
+| 357 | Add Stream-K scheduling with caller-owned scratch | 1.1077 | 0.327048 | no-change |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5896,3 +5898,29 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Diagnosed isolated native160 C7600 target96. Release probes direct128 S2/S3 and64 S3 have zero spills, two-block capacity and exact tail pass;160 uses106registers and one-block capacity. Formal six-shape run completed12rows; detailed performance and forced validation follow. Latest independently certified coverage remains353 sixteenof28.
 - **Next:** Inspect candidate scores, force all81 candidates and API/CTest, run CUDA12.8 sanitizers; reassess Stream-K after three iterations without new stable improvement.
 - **Archive:** trajectory/20261015_192358_iter-356/
+
+### Iter 357 — Add Stream-K scheduling with caller-owned scratch
+
+- **Hypothesis:** Splitting selected output tiles along K can reduce wave-tail imbalance of the unresolved large-K problems after cluster and occupancy experiments failed.
+- **Changes:** Add four source-free Stream-K128x128/128x256 CM1/CM2 candidates; share scheduler arguments across workspace sizing and execution; reset scratch barriers on every caller-stream invocation; respect workspace budget and actual SM count. Add forced Graph/dual-stream tail tests and missing-scratch rejection.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 12 rows; arithmetic mean of row median latency=0.327048 ms; mean speedup=1.1077x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005659 | 0.005012 | 1.1291 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005659 | 0.005053 | 1.1197 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008666 | 0.006682 | 1.2970 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008629 | 0.006663 | 1.2950 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.237322 | 0.219712 | 1.0802 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232674 | 0.232658 | 1.0001 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.657260 | 1.626260 | 1.0191 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.718293 | 1.726346 | 0.9953 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025249 | 0.023649 | 1.0677 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026001 | 0.024012 | 1.0829 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026505 | 0.024176 | 1.0963 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.027030 | 0.024352 | 1.1100 | 6.43463e-07 | 1 |
+
+- **Analysis:** Formal six-shape twelve-row run completed and archived. Complete-call timings include scratch initialization and reduction. Detailed score inspection and forced implementation/sanitizer validation follow; latest independent full-suite certification remains35316/28.
+- **Next:** Force all85 candidates, API/CTest and CUDA12.8 memcheck/racecheck; inspect complete scores and profile any promising Stream-K result before changing parameters.
+- **Archive:** trajectory/20261015_193123_iter-357/

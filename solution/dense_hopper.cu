@@ -12,7 +12,7 @@
 namespace megafmm::detail {
 namespace {
 using namespace cute;
-template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0,int K=64,bool DirectStore=false,int ClusterN=1,int Workers=1,bool ZeroBeta=false,bool NineWarp=false>
+template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0,int K=64,bool DirectStore=false,int ClusterN=1,int Workers=1,bool ZeroBeta=false,bool NineWarp=false,bool StreamK=false>
 struct Candidate {
   static_assert(!NineWarp || ZeroBeta,"Nine-warp candidates require beta-zero eligibility");
   using Tile=Shape<Int<M>,Int<N>,Int<K>>;
@@ -35,19 +35,11 @@ struct Candidate {
                             cutlass::gemm::KernelTmaWarpSpecializedPingpong>>>::CollectiveOp;
   using Kernel=cute::conditional_t<NineWarp,
       cutlass::gemm::kernel::NineWarpGemm<Shape<int,int,int,int>,Mainloop,Epilogue>,
-      cutlass::gemm::kernel::GemmUniversal<Shape<int,int,int,int>,Mainloop,Epilogue>>;
+      cutlass::gemm::kernel::GemmUniversal<Shape<int,int,int,int>,Mainloop,Epilogue,
+          cute::conditional_t<StreamK,cutlass::gemm::StreamKScheduler,void>>>;
   using Gemm=cutlass::gemm::device::GemmUniversalAdapter<Kernel>;
-  static bool run(const Problem& p,const void* A,const void* B,const float* C,float* D,
-                  void* workspace,int sm_count,cudaStream_t stream,int operation,int swizzle=1,int raster=0) {
-    if(operation==2) {
-      auto e=cudaFuncSetAttribute(cutlass::device_kernel<Kernel>,
-          cudaFuncAttributeMaxDynamicSharedMemorySize,Kernel::SharedStorageSize);
-      if(e==cudaSuccess) e=cudaFuncSetAttribute(cutlass::device_kernel<Kernel>,
-          cudaFuncAttributePreferredSharedMemoryCarveout,100);
-      if(e!=cudaSuccess) throw std::runtime_error(std::string("Hopper setup: ")+cudaGetErrorString(e));
-      return true;
-    }
-    if constexpr(ZeroBeta) {if(p.beta!=0)return false;}
+  static typename Gemm::Arguments arguments(const Problem& p,const void* A,const void* B,
+      const float* C,float* D,int sm_count,int swizzle=8,int raster=0) {
     typename Gemm::Arguments args{
       cutlass::gemm::GemmUniversalMode::kGemm,
       {int(p.m),int(p.n),int(p.k),1},
@@ -61,11 +53,40 @@ struct Candidate {
     using Raster=typename Kernel::TileScheduler::RasterOrderOptions;
     if(raster) args.scheduler.raster_order=raster==1 ? Raster::AlongM:Raster::AlongN;
     args.epilogue.thread.alpha=p.alpha;args.epilogue.thread.beta=p.beta;
+    if constexpr(StreamK) {
+      args.scheduler.decomposition_mode=Kernel::TileScheduler::DecompositionMode::StreamK;
+    }
+    return args;
+  }
+  static size_t workspace_bytes(const Problem& p,int sm_count) {
+    return Gemm::get_workspace_size(arguments(p,nullptr,nullptr,nullptr,nullptr,sm_count));
+  }
+  static bool run(const Problem& p,const void* A,const void* B,const float* C,float* D,
+                  void* workspace,int sm_count,cudaStream_t stream,int operation,int swizzle=1,int raster=0) {
+    if(operation==2) {
+      auto e=cudaFuncSetAttribute(cutlass::device_kernel<Kernel>,
+          cudaFuncAttributeMaxDynamicSharedMemorySize,Kernel::SharedStorageSize);
+      if(e==cudaSuccess) e=cudaFuncSetAttribute(cutlass::device_kernel<Kernel>,
+          cudaFuncAttributePreferredSharedMemoryCarveout,100);
+      if(e!=cudaSuccess) throw std::runtime_error(std::string("Hopper setup: ")+cudaGetErrorString(e));
+      return true;
+    }
+    if constexpr(ZeroBeta) {if(p.beta!=0)return false;}
+    auto args=arguments(p,A,B,C,D,sm_count,swizzle,raster);
     if(Gemm::can_implement(args)!=cutlass::Status::kSuccess) return false;
-    // The persistent scheduler has zero workspace. No counters or values are
-    // retained between invocations. Hardware information is captured at setup.
-    if(Gemm::get_workspace_size(args)!=0) return false;
+    // Ordinary persistent candidates need no scratch; Stream-K gets caller
+    // scratch sized from the same scheduler arguments and captured SM count.
+    const size_t required=Gemm::get_workspace_size(args);
+    if constexpr(StreamK) {if(required && !workspace)return false;}
+    else if(required) return false;
     if(operation==0) return true;
+    if constexpr(StreamK) {
+      // Every invocation owns its scratch and resets reduction barriers on the
+      // caller stream. This memset and the final reduction are timed in run().
+      const auto status=Kernel::initialize_workspace(args,workspace,stream);
+      if(status!=cutlass::Status::kSuccess)
+        throw std::runtime_error(std::string("Stream-K scratch: ")+cutlassGetStatusString(status));
+    }
     auto params=Kernel::to_underlying_arguments(args,workspace);
     auto status=Gemm::run(params,stream);
     if(status!=cutlass::Status::kSuccess)
@@ -132,7 +153,20 @@ bool dispatch(int id,const Problem& p,const void* A,const void* B,const float* C
     case 78:return Candidate<T,128,128,1,0,3,64,true,1,2,true,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 79:return Candidate<T,128,160,1,0,2,64,false,1,1,true,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 80:return Candidate<T,128,64,1,0,3,64,false,1,2,true,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 81:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 82:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 83:return Candidate<T,128,128,1,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 84:return Candidate<T,128,128,2,0,0,64,false,1,1,true,false,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     default:return false;
+  }
+}
+template<class T> size_t stream_workspace(int id,const Problem& p,int sm_count) {
+  switch(id) {
+    case 81:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count);
+    case 82:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count);
+    case 83:return Candidate<T,128,128,1,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count);
+    case 84:return Candidate<T,128,128,2,0,0,64,false,1,1,true,false,true>::workspace_bytes(p,sm_count);
+    default:return 0;
   }
 }
 template<class T> __global__ void small_gemm(Problem p,const T* A,const T* B,const float* C,float* D) {
@@ -150,13 +184,19 @@ template<class T> __global__ void small_gemm(Problem p,const T* A,const T* B,con
   }
 }
 }
+size_t hopper_streamk_workspace(const Problem& p,int id,int sm_count) {
+  if(id<81 || id>84)return 0;
+  if(sm_count<=0)throw std::invalid_argument("Stream-K workspace requires captured SM count");
+  if(p.dtype==DType::BF16)return stream_workspace<cutlass::bfloat16_t>(id,p,sm_count);
+  return stream_workspace<cutlass::half_t>(id,p,sm_count);
+}
 const char* hopper_candidate_name(int id) {
   static const char* names[]={"128x64x64_c1","128x128x64_c1","128x256x64_c1","128x128x64_c2","simt_small","pad_128x64x64_c1","pad_128x128x64_c1","pad_128x256x64_c1","pad_128x128x64_c2",
       "128x128x64_c1_sw4","128x128x64_c1_sw8","128x256x64_c1_sw4",
       "128x256x64_c1_sw8","128x128x64_c2_sw4","128x128x64_c2_sw8",
       "64x32x64_basic_s3","64x64x64_basic_s3","128x128x64_pingpong_s3",
       "256x128x64_c1_sw8","128x256x64_c2_sw8","128x256x64_pingpong_s3_sw8",
-      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64","even_mma_32x32x32","even_mma_32x32x64","128x256x64_cm4_sw8","128x256x64_cm8_sw8","128x256x64_cn2_sw8","128x256x64_cm2cn2_sw8","even_mma_swizzle_32x32x64","even_mma_swizzle_16x32x64","even_mma_swizzle_32x16x64","register_mma_16x32x16","register_mma_32x16x16","even_mma_32x32x128","even_mma_16x64x128","ampere_32x64x32","ampere_32x64x64","ampere_64x64x32","ampere_64x64x64","ampere_64x32x64","ampere_32x128x32_w32x32","64x128x64_basic_s3_sw8","64x256x64_basic_s2_sw8","128x128x64_direct_s3_2cta_sw8","64x256x64_direct_s2_2cta_sw8","128x128x64_beta0_s2_2cta_sw8","128x256x64_beta0_auto_sw8","128x256x64_beta0_sw1","128x256x64_beta0_sw4","128x256x64_beta0_rasterM","128x256x64_beta0_rasterN","128x128x64_beta0_auto_sw8","64x256x64_beta0_pingpong","64x256x64_beta0_pingpong_s3","64x256x64_beta0_pingpong_c2","128x256x64_beta0_cm2","128x256x64_beta0_cn2","128x256x64_beta0_cm2cn2","128x256x64_beta0_cm4","128x256x64_beta0_cm2_rasterM","128x256x64_beta0_cm2_rasterN","128x128x64_beta0_ninewarp_2workers","128x128x64_ninewarp_direct_s2","128x128x64_ninewarp_direct_s3","128x160x64_ninewarp_s2","128x64x64_ninewarp_s3"};
+      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64","even_mma_32x32x32","even_mma_32x32x64","128x256x64_cm4_sw8","128x256x64_cm8_sw8","128x256x64_cn2_sw8","128x256x64_cm2cn2_sw8","even_mma_swizzle_32x32x64","even_mma_swizzle_16x32x64","even_mma_swizzle_32x16x64","register_mma_16x32x16","register_mma_32x16x16","even_mma_32x32x128","even_mma_16x64x128","ampere_32x64x32","ampere_32x64x64","ampere_64x64x32","ampere_64x64x64","ampere_64x32x64","ampere_32x128x32_w32x32","64x128x64_basic_s3_sw8","64x256x64_basic_s2_sw8","128x128x64_direct_s3_2cta_sw8","64x256x64_direct_s2_2cta_sw8","128x128x64_beta0_s2_2cta_sw8","128x256x64_beta0_auto_sw8","128x256x64_beta0_sw1","128x256x64_beta0_sw4","128x256x64_beta0_rasterM","128x256x64_beta0_rasterN","128x128x64_beta0_auto_sw8","64x256x64_beta0_pingpong","64x256x64_beta0_pingpong_s3","64x256x64_beta0_pingpong_c2","128x256x64_beta0_cm2","128x256x64_beta0_cn2","128x256x64_beta0_cm2cn2","128x256x64_beta0_cm4","128x256x64_beta0_cm2_rasterM","128x256x64_beta0_cm2_rasterN","128x128x64_beta0_ninewarp_2workers","128x128x64_ninewarp_direct_s2","128x128x64_ninewarp_direct_s3","128x160x64_ninewarp_s2","128x64x64_ninewarp_s3","128x256x64_beta0_streamk","128x256x64_beta0_streamk_cm2","128x128x64_beta0_streamk","128x128x64_beta0_streamk_cm2"};
   return id>=0 && id<HopperCandidateCount ? names[id]:"invalid";
 }
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C,float* D,

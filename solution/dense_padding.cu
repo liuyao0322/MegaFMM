@@ -31,7 +31,8 @@ __global__ void unpack(Problem p,const float* packed,float* D,int64_t np) {
     D[(i/p.n)*p.ldd+i%p.n]=packed[(i/p.n)*np+i%p.n];
 }
 }
-size_t hopper_workspace(const Problem& p,int id) {
+size_t hopper_workspace(const Problem& p,int id,int sm_count) {
+  if(id>=81)return hopper_streamk_workspace(p,id,sm_count);
   if(id<5 || id>8 || p.m<=0 || p.n<=0 || p.k<=0 ||
       std::max({p.m,p.n,p.k})>32768) return 0;
   if(!p.trans_a && !p.trans_b && p.k%8==0 && p.n%8==0 && p.lda%8==0 &&

@@ -377,7 +377,7 @@ void tune_strategy(Plan::Impl& plan,const void* A,const void* B,const float* C,
   if(!plan.sm_count) return;
   std::array<bool,detail::HopperCandidateCount> eligible{};
   for(int id=0;id<detail::HopperCandidateCount;++id)
-    eligible[id]=detail::hopper_workspace(plan.problem,id)<=plan.bytes &&
+    eligible[id]=detail::hopper_workspace(plan.problem,id,plan.sm_count)<=plan.bytes &&
         detail::hopper_dense(id,plan.problem,A,B,C,D,workspace,plan.sm_count,stream,0);
   if(std::none_of(eligible.begin(),eligible.end(),[](bool x){return x;})) return;
   auto& lt=*plan.dense;
@@ -581,7 +581,7 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
       if(prop.major==9 && prop.minor==0) {
         impl->sm_count=prop.multiProcessorCount;
         for(int id=5;id<detail::HopperCandidateCount;++id) {
-          const size_t required=detail::hopper_workspace(p,id);
+          const size_t required=detail::hopper_workspace(p,id,impl->sm_count);
           if(required<=policy.workspace_limit) impl->bytes=std::max(impl->bytes,required);
         }
         for(int id=0;id<detail::HopperCandidateCount;++id) if(id!=4 && !(id>=5 && id<=8))
