@@ -5,6 +5,7 @@
 #include <cutlass/epilogue/collective/collective_builder.hpp>
 #include <cutlass/gemm/kernel/gemm_universal.hpp>
 #include <cutlass/gemm/device/gemm_universal_adapter.h>
+#include "hopper_inflight_mainloop.cuh"
 #include <cuda_bf16.h>
 #include <cuda_fp16.h>
 #include <stdexcept>
@@ -12,7 +13,7 @@
 namespace megafmm::detail {
 namespace {
 using namespace cute;
-template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0,int K=64,bool DirectStore=false,int ClusterN=1,int Workers=1,bool ZeroBeta=false,bool NineWarp=false,bool StreamK=false,int Splits=1,bool Swapped=false>
+template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0,int K=64,bool DirectStore=false,int ClusterN=1,int Workers=1,bool ZeroBeta=false,bool NineWarp=false,bool StreamK=false,int Splits=1,bool Swapped=false,int MmaInflight=1>
 struct Candidate {
   static_assert(!NineWarp || ZeroBeta,"Nine-warp candidates require beta-zero eligibility");
   static_assert(Splits>=1 && (StreamK || Splits==1),"K splits require the reduction scheduler");
@@ -27,7 +28,7 @@ struct Candidate {
       cute::conditional_t<DirectStore,cutlass::epilogue::NoSmemWarpSpecialized,
         cute::conditional_t<Schedule==0,cutlass::epilogue::TmaWarpSpecializedCooperative,
                             cutlass::epilogue::TmaWarpSpecialized>>>::CollectiveOp;
-  using Mainloop=typename cutlass::gemm::collective::CollectiveBuilder<
+  using BaseMainloop=typename cutlass::gemm::collective::CollectiveBuilder<
       cutlass::arch::Sm90,cutlass::arch::OpClassTensorOp,
       T,Layout,8,T,Layout,8,float,Tile,Cluster,
       cute::conditional_t<Stages==0,
@@ -36,6 +37,9 @@ struct Candidate {
       cute::conditional_t<Schedule==0,cutlass::gemm::KernelTmaWarpSpecializedCooperative,
         cute::conditional_t<Schedule==1,cutlass::gemm::KernelTmaWarpSpecialized,
                             cutlass::gemm::KernelTmaWarpSpecializedPingpong>>>::CollectiveOp;
+  static_assert(MmaInflight>=1 && (MmaInflight==1 || (ZeroBeta && !NineWarp && !StreamK && Schedule==0)),"Custom MMA windows require ordinary cooperative beta-zero kernels");
+  using Mainloop=cute::conditional_t<MmaInflight==1,BaseMainloop,
+      cutlass::gemm::collective::InflightMainloop<BaseMainloop,MmaInflight>>;
   using Kernel=cute::conditional_t<NineWarp,
       cutlass::gemm::kernel::NineWarpGemm<Shape<int,int,int,int>,Mainloop,Epilogue>,
       cutlass::gemm::kernel::GemmUniversal<Shape<int,int,int,int>,Mainloop,Epilogue,
@@ -200,6 +204,8 @@ bool dispatch(int id,const Problem& p,const void* A,const void* B,const float* C
     case 101:return Candidate<T,128,256,2,0,0,32,false,1,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 102:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,false,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 103:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,false,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 104:return Candidate<T,128,256,1,0,0,32,false,1,1,true,false,false,1,false,3>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 105:return Candidate<T,128,256,2,0,0,32,false,1,1,true,false,false,1,false,3>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     default:return false;
   }
 }
@@ -248,7 +254,7 @@ const char* hopper_candidate_name(int id) {
       "128x256x64_c1_sw8","128x128x64_c2_sw4","128x128x64_c2_sw8",
       "64x32x64_basic_s3","64x64x64_basic_s3","128x128x64_pingpong_s3",
       "256x128x64_c1_sw8","128x256x64_c2_sw8","128x256x64_pingpong_s3_sw8",
-      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64","even_mma_32x32x32","even_mma_32x32x64","128x256x64_cm4_sw8","128x256x64_cm8_sw8","128x256x64_cn2_sw8","128x256x64_cm2cn2_sw8","even_mma_swizzle_32x32x64","even_mma_swizzle_16x32x64","even_mma_swizzle_32x16x64","register_mma_16x32x16","register_mma_32x16x16","even_mma_32x32x128","even_mma_16x64x128","ampere_32x64x32","ampere_32x64x64","ampere_64x64x32","ampere_64x64x64","ampere_64x32x64","ampere_32x128x32_w32x32","64x128x64_basic_s3_sw8","64x256x64_basic_s2_sw8","128x128x64_direct_s3_2cta_sw8","64x256x64_direct_s2_2cta_sw8","128x128x64_beta0_s2_2cta_sw8","128x256x64_beta0_auto_sw8","128x256x64_beta0_sw1","128x256x64_beta0_sw4","128x256x64_beta0_rasterM","128x256x64_beta0_rasterN","128x128x64_beta0_auto_sw8","64x256x64_beta0_pingpong","64x256x64_beta0_pingpong_s3","64x256x64_beta0_pingpong_c2","128x256x64_beta0_cm2","128x256x64_beta0_cn2","128x256x64_beta0_cm2cn2","128x256x64_beta0_cm4","128x256x64_beta0_cm2_rasterM","128x256x64_beta0_cm2_rasterN","128x128x64_beta0_ninewarp_2workers","128x128x64_ninewarp_direct_s2","128x128x64_ninewarp_direct_s3","128x160x64_ninewarp_s2","128x64x64_ninewarp_s3","128x256x64_beta0_streamk","128x256x64_beta0_streamk_cm2","128x128x64_beta0_streamk","128x128x64_beta0_streamk_cm2","128x256x64_beta0_streamk_sw4","128x256x64_beta0_streamk_rasterM","128x256x64_beta0_streamk_rasterN","128x256x64_beta0_streamk_cm2_rasterM","128x256x64_beta0_streamk_cm2_rasterN","128x256x64_ninewarp_tma_s4","128x256x64_ninewarp_direct_s4","128x256x64_ninewarp_tma_s4_cm2","128x256x64_ninewarp_tma_s4_cn2","128x256x64_beta0_splitk2","128x256x64_beta0_splitk4","128x256x64_beta0_splitk2_cm2","128x256x64_beta0_splitk4_cm2","128x256x128_beta0_auto","128x256x128_beta0_cm2","128x256x32_beta0_auto","128x256x32_beta0_cm2","128x256x64_beta0_swapped","128x256x64_beta0_swapped_cm2"};
+      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64","even_mma_32x32x32","even_mma_32x32x64","128x256x64_cm4_sw8","128x256x64_cm8_sw8","128x256x64_cn2_sw8","128x256x64_cm2cn2_sw8","even_mma_swizzle_32x32x64","even_mma_swizzle_16x32x64","even_mma_swizzle_32x16x64","register_mma_16x32x16","register_mma_32x16x16","even_mma_32x32x128","even_mma_16x64x128","ampere_32x64x32","ampere_32x64x64","ampere_64x64x32","ampere_64x64x64","ampere_64x32x64","ampere_32x128x32_w32x32","64x128x64_basic_s3_sw8","64x256x64_basic_s2_sw8","128x128x64_direct_s3_2cta_sw8","64x256x64_direct_s2_2cta_sw8","128x128x64_beta0_s2_2cta_sw8","128x256x64_beta0_auto_sw8","128x256x64_beta0_sw1","128x256x64_beta0_sw4","128x256x64_beta0_rasterM","128x256x64_beta0_rasterN","128x128x64_beta0_auto_sw8","64x256x64_beta0_pingpong","64x256x64_beta0_pingpong_s3","64x256x64_beta0_pingpong_c2","128x256x64_beta0_cm2","128x256x64_beta0_cn2","128x256x64_beta0_cm2cn2","128x256x64_beta0_cm4","128x256x64_beta0_cm2_rasterM","128x256x64_beta0_cm2_rasterN","128x128x64_beta0_ninewarp_2workers","128x128x64_ninewarp_direct_s2","128x128x64_ninewarp_direct_s3","128x160x64_ninewarp_s2","128x64x64_ninewarp_s3","128x256x64_beta0_streamk","128x256x64_beta0_streamk_cm2","128x128x64_beta0_streamk","128x128x64_beta0_streamk_cm2","128x256x64_beta0_streamk_sw4","128x256x64_beta0_streamk_rasterM","128x256x64_beta0_streamk_rasterN","128x256x64_beta0_streamk_cm2_rasterM","128x256x64_beta0_streamk_cm2_rasterN","128x256x64_ninewarp_tma_s4","128x256x64_ninewarp_direct_s4","128x256x64_ninewarp_tma_s4_cm2","128x256x64_ninewarp_tma_s4_cn2","128x256x64_beta0_splitk2","128x256x64_beta0_splitk4","128x256x64_beta0_splitk2_cm2","128x256x64_beta0_splitk4_cm2","128x256x128_beta0_auto","128x256x128_beta0_cm2","128x256x32_beta0_auto","128x256x32_beta0_cm2","128x256x64_beta0_swapped","128x256x64_beta0_swapped_cm2","128x256x32_beta0_inflight3","128x256x32_beta0_inflight3_cm2"};
   static_assert(sizeof(names)/sizeof(names[0])==HopperCandidateCount,"Candidate metadata count mismatch");
   return id>=0 && id<HopperCandidateCount ? names[id]:"invalid";
 }

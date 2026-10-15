@@ -639,6 +639,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 366 | Measure operand-swapped direct-output TMA GEMM | 1.0677 | 1.762829 | measured |
 
+| 367 | K32 consumer window three candidates | 1.0712 | 1.762258 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -6210,3 +6212,37 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal20/20 original FP64 gates pass. All12 unresolved large-K combinations choose Lt fallback; no new stable custom wins. Best new8192 BF/FP1.599/1.708ms versus same-phase Lt1.426/1.615;16384 BF/FP12.936/13.416 versus Lt12.783/13.128.4096BF short0.197ms advantage fails independent confirmation. Latest independent35316/28 unchanged.
 - **Next:** Validate104forced/API/sixCTest and guard/candidate CUDA12.8 memcheck/racecheck. Profile1028192FP16, review364-366 history and official PTX wait-group semantics, then preflight private consumer window3 with matching MMA tail on K32 for a distinct pipeline axis.
 - **Archive:** trajectory/20261015_215628_iter-366/
+
+### Iter 367 — K32 consumer window three candidates
+
+- **Hypothesis:** Allow three committed WGMMA groups to overlap in K32 mainloops while preserving producer and release ordering.
+- **Changes:** Added private consumer mainloop adaptation and candidates 104/105; retained existing defaults and added short-K tail coverage.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 20 rows; arithmetic mean of row median latency=1.762258 ms; mean speedup=1.0712x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005652 | 0.005032 | 1.1232 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005697 | 0.005068 | 1.1243 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008677 | 0.006674 | 1.3002 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008622 | 0.006621 | 1.3022 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.245370 | 0.223217 | 1.0992 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.230604 | 0.230553 | 1.0002 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.656096 | 1.634044 | 1.0135 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.735010 | 1.720109 | 1.0087 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025493 | 0.023812 | 1.0706 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.025975 | 0.024333 | 1.0675 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026901 | 0.024229 | 1.1103 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026907 | 0.024354 | 1.1048 | 6.43463e-07 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.763611 | 12.736406 | 1.0021 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.289633 | 13.319763 | 0.9977 | 1.93317e-05 | 1 |
+| 8192,4096,8192 | bf16 | tuned_hopper_dense v0 | launch | 0.879731 | 0.836685 | 1.0514 | 8.55058e-06 | 1 |
+| 8192,4096,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.942395 | 0.883607 | 1.0665 | 9.68961e-06 | 1 |
+| 4096,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.850831 | 0.837629 | 1.0158 | 8.55119e-06 | 1 |
+| 4096,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.904409 | 0.898146 | 1.0070 | 9.68981e-06 | 1 |
+| 8192,8192,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.869995 | 0.884436 | 0.9837 | 4.02534e-06 | 1 |
+| 8192,8192,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.897232 | 0.920439 | 0.9748 | 4.87776e-06 | 1 |
+
+- **Analysis:** Formal benchmark completed 20 rows. No new stable win is claimed; latest independent certification remains 16/28. At 8192 cubed candidates measured 1.636760/1.676926 ms for BF16/FP16 versus cuBLASLt 1.460307/1.621064 ms. At 16384 cubed BF16 best new candidate measured 12.777552 ms versus 12.675695 ms. Detailed error and paired-group review follows closure.
+- **Next:** Validate all 106 candidates, relevant CTests and sanitizer checks; profile candidate 104 before deciding further changes.
+- **Archive:** trajectory/20261015_221946_iter-367/

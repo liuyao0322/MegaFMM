@@ -33,6 +33,8 @@ void candidate(int id,megafmm::DType dtype,int sms,int layout=0) {
   if(layout==1) {p.m=129;p.n=137;p.k=65;p.trans_a=p.trans_b=true;p.lda=132;p.ldb=70;p.ldc=p.ldd=144;}
   if(layout==2) {p.m=129;p.n=138;p.k=66;p.lda=68;p.ldb=140;p.ldc=p.ldd=144;}
   if(layout==3) {p.m=3;p.n=6;p.k=2;p.lda=4;p.ldb=8;p.ldc=p.ldd=8;}
+  // Exercise fewer/equal/more K tiles than the custom consumer prologue window.
+  if(layout>=4 && layout<=7) {p.k=8+(layout-4)*32;p.lda=p.k+8;}
   const size_t ac=(p.trans_a?p.k:p.m)*p.lda,bc=(p.trans_b?p.n:p.k)*p.ldb,dc=p.m*p.ldd;
   std::vector<T>a(ac),b(bc);std::vector<float>initial(dc),result(dc);
   Buffer da(ac*2),db(bc*2),out0(dc*4),out1(dc*4);
@@ -115,6 +117,10 @@ int main(int argc,char** argv){try{
     if(only_wmma && id!=24 && id!=25 && (id<33 || (id>38 && id<43))) continue;
     candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount);
     candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount);
+    if(id==104 || id==105) for(int layout=4;layout<=7;++layout) {
+      candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount,layout);
+      candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount,layout);
+    }
     if(id==24 || id==25 || (id>=33 && id<=36)) {
       candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount,1);
       candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount,1);
