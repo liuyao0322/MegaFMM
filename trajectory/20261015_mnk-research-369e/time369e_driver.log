@@ -1,0 +1,12 @@
+PASS dtype=fp16 four kernels x four grid targets, twelve K tails plus persistent reuse K8/K1032, exact original-AB FP64 and padding
+PASS dtype=fp16 three fresh fractional input trials bitwise against each matching132-grid original
+PASS dtype=bf16 four kernels x four grid targets, twelve K tails plus persistent reuse K8/K1032, exact original-AB FP64 and padding
+PASS dtype=bf16 three fresh fractional input trials bitwise against each matching132-grid original
+candidate=92 target=132 group=4 baseline_ms=0.227666572 custom_ms=0.231307834 speedup=0.984258 original_ms=0.228675514 original_speedup=0.988620
+candidate=92 target=132 diagnostic_median=0.993475 diagnostic_min=0.982979 acceptance=unchecked
+candidate=92 target=132 group=4 baseline_ms=0.225715518 custom_ms=0.240386888 speedup=0.938968 original_ms=0.239862725 original_speedup=0.997819
+candidate=92 target=132 diagnostic_median=0.942180 diagnostic_min=0.906544 acceptance=unchecked
+candidate=92 target=132 group=4 baseline_ms=1.619568586 custom_ms=1.648280025 speedup=0.982581 original_ms=1.622077823 original_speedup=0.984103
+candidate=92 target=132 diagnostic_median=0.998857 diagnostic_min=0.982581 acceptance=unchecked
+candidate=92 target=132 group=4 baseline_ms=1.709227920 custom_ms=1.709560752 speedup=0.999805 original_ms=1.700161934 original_speedup=0.994502
+candidate=92 target=132 diagnostic_median=1.008501 diagnostic_min=0.999805 acceptance=unchecked
