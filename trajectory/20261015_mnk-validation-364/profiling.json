@@ -1,0 +1,53 @@
+{
+  "candidate": 98,
+  "shape": [
+    8192,
+    8192,
+    8192
+  ],
+  "dtype": "fp16",
+  "inputs": "zeros diagnostic only, not performance acceptance",
+  "metrics": {
+    "gpu__time_duration.sum": {
+      "value": 2.394656,
+      "unit": "ms"
+    },
+    "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+      "value": 60.003521,
+      "unit": "%"
+    },
+    "lts__t_sector_hit_rate.pct": {
+      "value": 65.462506,
+      "unit": "%"
+    },
+    "smsp__warps_eligible.avg.per_cycle_active": {
+      "value": 0.090141,
+      "unit": "warp"
+    },
+    "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+      "value": 27.628568,
+      "unit": "inst"
+    },
+    "smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio": {
+      "value": 0.031137,
+      "unit": "inst"
+    },
+    "launch__registers_per_thread": {
+      "value": 168.0,
+      "unit": "register/thread"
+    },
+    "smsp__inst_executed.sum": {
+      "value": 103949306.0,
+      "unit": "inst"
+    },
+    "dram__bytes_read.sum": {
+      "value": 1.49328,
+      "unit": "Gbyte"
+    },
+    "dram__bytes_write.sum": {
+      "value": 262.249472,
+      "unit": "Mbyte"
+    }
+  },
+  "analysis": "K128 auto has two stages; Tensor elapsed activity drops to60% and long-scoreboard pressure rises relative to prior K64. Shared bytes/register allocation unchanged. This supports testing finer pipeline granularity; does not establish causality or a physical floor."
+}
