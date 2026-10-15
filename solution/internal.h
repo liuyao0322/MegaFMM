@@ -3,7 +3,7 @@
 namespace megafmm::detail {
 void scale_output(const Problem& p, const float* C0, float* D, cudaStream_t stream);
 void run_sw_multisize(const Problem& p,const void* A,const void* B,const float* C0,float* D,cudaStream_t stream);
-constexpr int HopperCandidateCount=106;
+constexpr int HopperCandidateCount=110;
 bool wmma_dense(int bk,const Problem& p,const void* A,const void* B,const float* C,float* D,
                  cudaStream_t stream,int operation);
 bool mma_even_dense(int bk,const Problem& p,const void* A,const void* B,const float* C,float* D,

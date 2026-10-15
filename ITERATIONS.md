@@ -641,6 +641,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 367 | K32 consumer window three candidates | 1.0712 | 1.762258 | measured |
 
+| 368 | Eight-tile batched consumer K loops | 1.0647 | 1.761783 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -6246,3 +6248,37 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal benchmark completed 20 rows. No new stable win is claimed; latest independent certification remains 16/28. At 8192 cubed candidates measured 1.636760/1.676926 ms for BF16/FP16 versus cuBLASLt 1.460307/1.621064 ms. At 16384 cubed BF16 best new candidate measured 12.777552 ms versus 12.675695 ms. Detailed error and paired-group review follows closure.
 - **Next:** Validate all 106 candidates, relevant CTests and sanitizer checks; profile candidate 104 before deciding further changes.
 - **Archive:** trajectory/20261015_221946_iter-367/
+
+### Iter 368 — Eight-tile batched consumer K loops
+
+- **Hypothesis:** Unroll eight consumer iterations to reduce loop and pipeline-index overhead while preserving arithmetic and per-tile synchronization.
+- **Changes:** Added licensed private batched mainloop and guarded BatchEight default false; candidates106-109 cover CM1/CM2 and windows1/3, total110. Added short-K, batch-tail and persistent CTA reuse API cases.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 20 rows; arithmetic mean of row median latency=1.761783 ms; mean speedup=1.0647x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005645 | 0.005023 | 1.1237 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005648 | 0.005046 | 1.1194 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008659 | 0.006663 | 1.2995 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008633 | 0.006645 | 1.2991 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.244803 | 0.221355 | 1.1059 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232327 | 0.233040 | 0.9969 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.629332 | 1.642094 | 0.9922 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.795053 | 1.716555 | 1.0457 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025174 | 0.023598 | 1.0668 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026796 | 0.024630 | 1.0879 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026686 | 0.024224 | 1.1016 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026054 | 0.024208 | 1.0763 | 6.43463e-07 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.736427 | 12.736251 | 1.0000 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.265394 | 13.301393 | 0.9973 | 1.93317e-05 | 1 |
+| 8192,4096,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.873215 | 0.879081 | 0.9933 | 8.55058e-06 | 1 |
+| 8192,4096,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.900656 | 0.906917 | 0.9931 | 9.68961e-06 | 1 |
+| 4096,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.833504 | 0.830993 | 1.0030 | 8.55119e-06 | 1 |
+| 4096,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.898551 | 0.904579 | 0.9933 | 9.68981e-06 | 1 |
+| 8192,8192,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.846162 | 0.846442 | 0.9997 | 4.02534e-06 | 1 |
+| 8192,8192,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.896519 | 0.896922 | 0.9996 | 4.87776e-06 | 1 |
+
+- **Analysis:** Formal20-row benchmark completed. No new stable win is claimed; completed large square cases select cuBLASLt fallback. New8192 BF16/FP16 best short timings1.599563/1.702278ms versus same-phase Lt1.461965/1.593898ms. New16384 BF16/FP16 best12.677428/13.388349ms versus Lt12.606092/13.333582ms. Latest independent certification353 remains16/28. Full paired-group and precision review follows closure.
+- **Next:** Validate110 forced candidates, six relevant CTests, precision guard and candidate sanitizers; profile106 before choosing further changes.
+- **Archive:** trajectory/20261015_224325_iter-368/
