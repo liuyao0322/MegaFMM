@@ -47,7 +47,7 @@ template<class T>bool dispatch(int id,const Problem& p,const void* A,const void*
     case 2:return AmpereCandidate<T,64,64,32,32,32>::run(p,A,B,C,D,stream,operation);
     case 3:return AmpereCandidate<T,64,64,64,32,32>::run(p,A,B,C,D,stream,operation);
     case 4:return AmpereCandidate<T,64,32,64,32,32>::run(p,A,B,C,D,stream,operation);
-    case 5:return AmpereCandidate<T,32,128,32,16,32>::run(p,A,B,C,D,stream,operation);
+    case 5:return AmpereCandidate<T,32,128,32,32,32>::run(p,A,B,C,D,stream,operation);
     default:return false;
   }
 }

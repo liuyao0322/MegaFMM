@@ -607,6 +607,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 350 | Deeper small-MMA staging and SM80 iterator candidates: compile failure | 0.0000 | 0.000000 | measured |
 
+| 351 | Repair SM80 warp mapping and measure deeper-K candidates | 1.1807 | 0.014190 | completed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5740,3 +5742,29 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Build failed in the added CUTLASS SM80 path with a pitch-linear thread-map static assertion: number of iterations must be non-zero. No GPU benchmark rows were generated, no accuracy or speed evidence is claimed, and the proposed BK128 paths were not evaluated in this build. Preserve failure before inspecting or changing templates.
 - **Next:** Read the template-instantiation chain, replace unsupported threadblock/warp shapes with legal configurations, then benchmark as the next numbered iteration and force-validate every new candidate.
 - **Archive:** trajectory/20261015_180349_iter-350/
+
+### Iter 351 — Repair SM80 warp mapping and measure deeper-K candidates
+
+- **Hypothesis:** Four-warp mapping permits the narrow SM80 tile to compile and enables measurement of deeper-K and predicated-iterator candidates.
+- **Changes:** Changed AMP32x128x32 WarpM from 16 to 32 and corrected its metadata.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 12 rows; arithmetic mean of row median latency=0.014190 ms; mean speedup=1.1807x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005665 | 0.005043 | 1.1234 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005720 | 0.005072 | 1.1277 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008725 | 0.006713 | 1.2999 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008654 | 0.006641 | 1.3030 | 3.40967e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.011931 | 0.007979 | 1.4953 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009584 | 0.008046 | 1.1912 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.031164 | 0.028636 | 1.0883 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.032079 | 0.030219 | 1.0616 | 2.45816e-06 | 1 |
+| 1025,1537,769 | bf16 | tuned_padded_hopper v0 | launch | 0.037551 | 0.033560 | 1.1189 | 6.19792e-07 | 1 |
+| 1025,1537,769 | fp16 | tuned_padded_hopper v0 | launch | 0.036273 | 0.033313 | 1.0888 | 9.7026e-07 | 1 |
+| 1,1,1 | bf16 | tuned_simt_small v0 | launch | 0.002850 | 0.002506 | 1.1373 | 0 | 1 |
+| 1,1,1 | fp16 | tuned_simt_small v0 | launch | 0.002892 | 0.002553 | 1.1329 | 0 | 1 |
+
+- **Analysis:** Formal six-shape two-dtype run completed with exit code zero; detailed per-candidate results and independent validation remain to be assessed. This run does not establish additional full-suite stable wins.
+- **Next:** Inspect measured candidates, force all candidate correctness tests, and run sanitizer checks before independent acceptance.
+- **Archive:** trajectory/20261015_180708_iter-351/
