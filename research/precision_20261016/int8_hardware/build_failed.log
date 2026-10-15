@@ -1,0 +1,12 @@
+third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp(210): error: calling a __device__ function("cute::cast_smem_ptr_to_uint(const void *)") from a __host__ __device__ function("make_gmma_desc") is not allowed
+    uint32_t start_address = cast_smem_ptr_to_uint(raw_pointer_cast(u128_tensor.data()));
+                             ^
+          detected during instantiation of "cute::GmmaDescriptor cute::GMMA::make_gmma_desc<MajorMode,TEngine,TLayout>(const cute::Tensor<TEngine, TLayout> &) [with MajorMode=cute::GMMA::Major::K, TEngine=cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<3, 4, 3>, cute::smem_ptr<int8_t *>>>, TLayout=cute::Layout<cute::tuple<cute::C<64>, cute::C<32>>, cute::tuple<cute::_128, cute::_1>>]" at line 39 of research/precision_20261016/int8_hardware/corrected.cuh
+
+third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp(210): error: calling a __device__ function("_ZN4cute21cast_smem_ptr_to_uintE1?") from a __host__ __device__ function("make_gmma_desc") is not allowed
+    uint32_t start_address = cast_smem_ptr_to_uint(raw_pointer_cast(u128_tensor.data()));
+                             ^
+          detected during instantiation of "cute::GmmaDescriptor cute::GMMA::make_gmma_desc<MajorMode,TEngine,TLayout>(const cute::Tensor<TEngine, TLayout> &) [with MajorMode=cute::GMMA::Major::K, TEngine=cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<3, 4, 3>, cute::smem_ptr<int8_t *>>>, TLayout=cute::Layout<cute::tuple<cute::C<32>, cute::C<32>>, cute::tuple<cute::_128, cute::_1>>]" at line 40 of research/precision_20261016/int8_hardware/corrected.cuh
+
+2 errors detected in the compilation of "research/precision_20261016/int8_hardware/compare.cu".
+srun: error: g08: task 0: Exited with exit code 2
