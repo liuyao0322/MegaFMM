@@ -1,0 +1,31 @@
+{
+  "iteration": 361,
+  "commit": "54978ac",
+  "formal_rows": 12,
+  "original_fp64_pass_rows": 12,
+  "ctest": {
+    "passed": 5,
+    "failed": 0,
+    "forced_candidates": 94
+  },
+  "sanitizer": "CUDA12.8 ComputeSanitizer2025.1",
+  "memcheck_errors": 0,
+  "racecheck_errors": 0,
+  "racecheck_warnings": 0,
+  "new_custom_stable_wins": 0,
+  "last_independent_acceptance": {
+    "iteration": 353,
+    "stable_custom_wins": 16,
+    "total": 28
+  },
+  "best_new_short_ms": {
+    "4096_bf16": 0.219021,
+    "4096_fp16": 0.225702,
+    "8192_bf16": 1.606317,
+    "8192_fp16": 1.698936
+  },
+  "notes": [
+    "CM2 reduces8192BF16 versus singleCTA1.631747ms but rerankedLt1.470262ms remains faster.",
+    "Large-shape supplement running, not full-suite independent certification."
+  ]
+}
