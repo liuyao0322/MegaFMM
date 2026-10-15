@@ -16,7 +16,7 @@ memcheck/racecheck/synccheck限定范围各36配置/72调用零错误，racechec
 未锁时钟，无置信区间；完整调用仍约为生产SW的2.8倍，未进入生产或改变Auto。
 [P47实现](research/precision_20261016/int8_hardware/DIRECT_NATIVE_PACK_HARDWARE.md)、[自身验收](research/precision_20261016/int8_hardware/p47_validation.json)、
 [综合审计](research/precision_20261016/fused_int8/audit.json)及[后续消融](research/precision_20261016/int8_hardware/NEXT_EXPERIMENTS.md)保留确切范围与性能差距。
-P48仅缩小共享申请量未改善完整成本，已恢复P47；M14的72组新输入/四臂288条K分块重组数值筛选已通过，下一步为独立原生融合硬件原型，尚无其性能结论。失败候选、M11/M12/M13的独立数值筛选和范围反例完整保留；目标继续进行。
+P48缩小共享申请量未获完整收益。M14通过后，实现并独立测量[原生融合N1/N2/N3](research/precision_20261016/fused_native/REPORT.md)：各自布局和原始精度通过，普通/Graph完整调用约615/118/105μs，均慢于同轮P47，全部拒绝；没有将P47的双流或工具验收转移给它们。重复变换与指数缓存消融、各自profile和失败布局证据保留；下一步回到P47的全局原生生产器复用原始值，方案尚未实现。目标继续进行。
 [片上融合后续](research/precision_20261016/fused_int8/REPORT.md)修正布局后通过72项普通精度；继续移出逐元素缩放判断后，F13完整调用约224–240 μs，仍拒绝性能验收。
 下方 iter282 等标签为历史检查点，实际起点和文件哈希以新报告为准。
 

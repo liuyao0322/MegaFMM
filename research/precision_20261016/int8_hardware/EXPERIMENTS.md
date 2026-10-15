@@ -608,3 +608,43 @@ AfterP48rejectedandP47restored, test72fresh configurations (12patterns×bothorig
 All72fresh configurations/288rows passoriginalgatesandstricterfixedfloors,0nonfiniteoutputs/correctionoperands. Twosameinputuniformcontrols exactlymatchM13correctedleafef. MaxFP16/BF16 eF fullK1283.08702026765e-5/1.56787838295e-5,fullK642.39828527410e-5/1.54611983923e-5,chunkK642.03117137069e-5/8.88117463667e-6,streamK642.06438537745e-5/9.44446119237e-6. ChunkK64lowererrorall36casesperdtype; streamlower33/higher3perdtype, maxincreasesFP16/BF165.8186620532e-9/9.4397033063e-9. FullK64BF16lower21/higher15 (maxincrease9.66442437788e-10), notuniversallybetter. MaxoutputdeltatocurrentmodeledfullK128~3.21e-5FP16/~1.94e-5BF16 acrossarms. Source/design/importdependencies/summary/control/output hashes frozen inm14_manifest.json. NumericalTF32offbmm/addnotexactWGMMAorperformance; not comparethese freshmodel eFs toP47hardwareascontrolledlatency/accuracyimprovement.
 
 NextN1nativefusion canfirsttrythelowerregisterstreamK64route, preservingall15logicaldots/exactinsideandoriginaldtypes. ProveTMArawandCUDAsharedstore/asyncMMAproxyordering,allready/freephasesandaccumulatorread-to-reusefencesbeforedeviceexecution. Needownlayoutprobes,originalFP64gates/insideexponents,completeordinary/Graphcomparisons,freshstreamsguards/tools. NoN1source,binaryorperformanceexists. P47workingfourfiles/binaryretainedbyteexact; allGPUandCPUtaskscompletedatcheckpoint, productionhashauditrequired.
+
+
+## N1/N2/N3 — native raw fusion, independent complete-cost rejection
+
+After M14, separatefused_native implements K64streaming all7main/8nativecrossdots,
+originalFP16/BF16,exactinside,p11/p8,originalroundedinputFP64gates. N1two raw/two
+leafslots147584B; N2one raw/all11planes184448B; N3adds4096Bexactinsidecache188544B.
+Ownbuilds136registers,0stack/spill/noC7515/C7510;actual132SM*1CTA supports128grid.
+N1initialpre-MMA54layouts fail due missingflaggedbyte→elementindexconversion,
+archivedandfixedbeforeanyMMA; eachcorrectedcandidateown54freshlayoutcases,
+3737124864nativeuint16comparisonsincludingCTAreuse+55296exponents0errors.
+Notbillionsindependentvalues,norFP64matrix/sanitizerevidence.
+
+Eachownordinary78andindependentordinary/GraphABBA312permode passoriginalgates,
+319488exactexponentsperABBA;maxBF16/FP16ef7.76549370193e-6/8.86329900005e-6.
+N1ordinary same-roundP4728.549200/28.815040→616.205154/615.401924us,Graph
+28.493920/28.754160→616.138519/615.559593. N2ordinary28.589639/28.783001→
+118.346798/117.528841,Graph28.703360/28.740720→117.920678/116.977077.
+N3ordinary28.573920/28.765720→106.078319/105.360960,Graph28.670400/28.690600→
+105.615918/104.887001. Unlockedclocks/noCI;profilerprocesstimings excluded.
+Allthree rejected;noownfreshdual-stream/guard/sanitizeracceptance. P47unchanged.
+
+EachownfirstbalancedBF16 NCU17passes,136regs,1CTA,0localRWsectors. N1/N2/N3
+profile-only634.752/125.984/113.600us,issueactive16.230425/22.267105/24.865674%,
+sharedLDwavefronts5746787/787584/1180800,ST2166856/2168450/2176503,
+bankconflictLD0each,ST2120/3714/7671. Longscoreboard ratios5.918134/4.611615/
+3.799002,wait2.973386/1.677844/1.566830. Aggregateratiosnotelapsedfractions,
+uniqueattributionorfloor. Removeintra-CTAduplicatetransformstronglyhelps;
+sharedinsidecachehelpslessthanremaininggap. InterCTA nativeemission69,206,016
+valuesvsP47unique5,767,168=12x,not12xrawcompute(P47alreadythreepackgroups)
+orphysicaltraffic. Ownsources/binaries/data/profile/layouts frozeninnine
+manifests;N2/N3generatorsreproducefivefileseachinisolatedCPUdirectories.
+
+AfterP48/N1/N2fail, ownN2profile/history/newprimaryCUDA12.4latency/memoryread
+completedbeforeN3. Whole-kernelreadonlycacheguidance doesnotjustifyforcing
+__ldg oninsidewrittenearlierinsamekernel. NewP49proposalreturnsall-plane
+rawtuplereusetoglobalP47producer, preservesconsumer/grid288/65536B/resources
+untilmeasured;onlyGroup0packsall11planes,96packingCTAsvs288mayloseparallelism.
+ALL_NATIVE_PACK_DESIGN.mdandgeneratorpreparedonly,notapplied/built/measured.
+NoP49speedclaim,nocertificate transfer. ProductionhashauditandP47identityrequired.

@@ -4632,5 +4632,131 @@
     "scope": "Full original-input FP64 matrix gates; printed eF equality is not a bitwise-output claim. Host eligibility diagnostics outside timing. No production integration. Unlocked clocks, no confidence interval."
   },
   "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11/M12/M13/M14 are numerical only. P43 owns fresh9-pattern108/864stress without tools/independent Graph timing; P44 ordinaryABBA only. P45 owns ordinary/Graph78, fresh108/864stress and36/72tools; P46 owns its independent ordinary/GraphABBA, fresh108/864stress and36/72tools; P47 owns independent ordinary/GraphABBA, fresh108/864stress,36/72tools and separate54configurations of full native plane/exponent bit comparisons; P48 has only ordinary/GraphABBA and matching device code, no fresh stress/tools and is rejected; none transfers to later changes.",
-  "remaining": "Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration."
+  "remaining": "Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration.",
+  "native_fusion_hardware": {
+    "audit": "research/precision_20261016/fused_native/audit.json",
+    "retained": false,
+    "candidates": {
+      "n1": {
+        "summary": [
+          {
+            "mode": "ordinary",
+            "dtype": "bf16",
+            "p47_us": 28.549200057874998,
+            "n1_us": 616.205154418875,
+            "n1_over_p47": 21.58397269169373,
+            "relative_reduction": -20.58397269169373
+          },
+          {
+            "mode": "ordinary",
+            "dtype": "fp16",
+            "p47_us": 28.8150396345,
+            "n1_us": 615.4019241332501,
+            "n1_over_p47": 21.356969552678827,
+            "relative_reduction": -20.356969552678827
+          },
+          {
+            "mode": "graph",
+            "dtype": "bf16",
+            "p47_us": 28.493920087874997,
+            "n1_us": 616.138519287,
+            "n1_over_p47": 21.623508362023696,
+            "relative_reduction": -20.623508362023696
+          },
+          {
+            "mode": "graph",
+            "dtype": "fp16",
+            "p47_us": 28.754159927499998,
+            "n1_us": 615.5595932005,
+            "n1_over_p47": 21.40767091622764,
+            "relative_reduction": -20.40767091622764
+          }
+        ],
+        "precision_checks_per_mode": 312,
+        "exact_exponents_per_mode": 319488,
+        "fresh_stream_guard_acceptance": false,
+        "sanitizer_acceptance": false
+      },
+      "n2": {
+        "summary": [
+          {
+            "mode": "ordinary",
+            "dtype": "bf16",
+            "p47_us": 28.589639186875,
+            "n2_us": 118.34679794312501,
+            "n2_over_p47": 4.139499528817277,
+            "relative_reduction": -3.139499528817277
+          },
+          {
+            "mode": "ordinary",
+            "dtype": "fp16",
+            "p47_us": 28.78300094625,
+            "n2_us": 117.528841018625,
+            "n2_over_p47": 4.083272666324853,
+            "relative_reduction": -3.083272666324853
+          },
+          {
+            "mode": "graph",
+            "dtype": "bf16",
+            "p47_us": 28.703359842125,
+            "n2_us": 117.92067813874999,
+            "n2_over_p47": 4.10825348625877,
+            "relative_reduction": -3.1082534862587696
+          },
+          {
+            "mode": "graph",
+            "dtype": "fp16",
+            "p47_us": 28.740720033625,
+            "n2_us": 116.977077484,
+            "n2_over_p47": 4.070081659302325,
+            "relative_reduction": -3.070081659302325
+          }
+        ],
+        "precision_checks_per_mode": 312,
+        "exact_exponents_per_mode": 319488,
+        "fresh_stream_guard_acceptance": false,
+        "sanitizer_acceptance": false
+      },
+      "n3": {
+        "summary": [
+          {
+            "mode": "ordinary",
+            "dtype": "bf16",
+            "p47_us": 28.5739200115,
+            "n3_us": 106.07831859575,
+            "n3_over_p47": 3.712417426557406,
+            "relative_reduction": -2.712417426557406
+          },
+          {
+            "mode": "ordinary",
+            "dtype": "fp16",
+            "p47_us": 28.7657203675,
+            "n3_us": 105.3609600065,
+            "n3_over_p47": 3.662726281853821,
+            "relative_reduction": -2.662726281853821
+          },
+          {
+            "mode": "graph",
+            "dtype": "bf16",
+            "p47_us": 28.6704001425,
+            "n3_us": 105.615918159375,
+            "n3_over_p47": 3.6837964463151547,
+            "relative_reduction": -2.6837964463151547
+          },
+          {
+            "mode": "graph",
+            "dtype": "fp16",
+            "p47_us": 28.690599918375,
+            "n3_us": 104.887001037625,
+            "n3_over_p47": 3.6557967186475504,
+            "relative_reduction": -2.6557967186475504
+          }
+        ],
+        "precision_checks_per_mode": 312,
+        "exact_exponents_per_mode": 319488,
+        "fresh_stream_guard_acceptance": false,
+        "sanitizer_acceptance": false
+      }
+    }
+  }
 }

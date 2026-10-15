@@ -1,0 +1,30 @@
+research/precision_20261016/fused_native/prototype.cuh(86): warning #177-D: variable "PlaneBytes" was declared but never referenced
+   constexpr int Count=SideA?2048:4096,PlaneBytes=Count*2;
+                                       ^
+          detected during:
+            instantiation of "void native_fusion::produce<T>(native_fusion::Shared &, const CUtensorMap *, const CUtensorMap *, const int *, int, int) [with T=cutlass::half_t]" at line 227
+            instantiation of "void native_fusion::fused<T,Probe>(const T *, const T *, CUtensorMap, CUtensorMap, int *, float *, const T *, const T *, unsigned int *) [with T=cutlass::half_t, Probe=false]" at line 238
+            instantiation of "void native_fusion::init_one<T,Probe>() [with T=cutlass::half_t, Probe=false]" at line 247
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+research/precision_20261016/fused_native/probe.cu(45): error: no instance of function template "native_fusion::launch" matches the argument list
+            argument types are: (void *, void *, std::nullptr_t, void *, cudaStream_t, CUtensorMap, CUtensorMap, void *, void *, unsigned int *)
+    native_fusion::launch<Native,true>(a.p,b.p,nullptr,new_work.p,stream.s,ma,mb,old.ha,old.hb,error.as<unsigned>());
+    ^
+research/precision_20261016/fused_native/prototype.cuh(248): note #3326-D: function template "native_fusion::launch" does not match because argument #8 does not match parameter
+  template<class T,bool Probe> inline void launch(const void* A,const void* B,float* D,void* workspace,cudaStream_t stream,CUtensorMap ma,CUtensorMap mb,const T* ra=nullptr,const T* rb=nullptr,unsigned* error=nullptr){
+                                           ^
+          detected during instantiation of "int probe<Input,Native>(const char *, megafmm::DType) [with Input=__nv_bfloat16, Native=cutlass::bfloat16_t]" at line 58
+
+research/precision_20261016/fused_native/probe.cu(45): error: no instance of function template "native_fusion::launch" matches the argument list
+            argument types are: (void *, void *, std::nullptr_t, void *, cudaStream_t, CUtensorMap, CUtensorMap, void *, void *, unsigned int *)
+    native_fusion::launch<Native,true>(a.p,b.p,nullptr,new_work.p,stream.s,ma,mb,old.ha,old.hb,error.as<unsigned>());
+    ^
+research/precision_20261016/fused_native/prototype.cuh(248): note #3326-D: function template "native_fusion::launch" does not match because argument #8 does not match parameter
+  template<class T,bool Probe> inline void launch(const void* A,const void* B,float* D,void* workspace,cudaStream_t stream,CUtensorMap ma,CUtensorMap mb,const T* ra=nullptr,const T* rb=nullptr,unsigned* error=nullptr){
+                                           ^
+          detected during instantiation of "int probe<Input,Native>(const char *, megafmm::DType) [with Input=__half, Native=cutlass::half_t]" at line 58
+
+2 errors detected in the compilation of "research/precision_20261016/fused_native/probe.cu".
+srun: error: g08: task 0: Exited with exit code 1

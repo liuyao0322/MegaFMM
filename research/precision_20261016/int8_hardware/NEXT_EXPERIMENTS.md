@@ -1,7 +1,7 @@
 # Remaining-cost experiments and outcomes
 
 
-**Current checkpoint: P45 is the fully validated ordinary/Graph research reference; P39 is a historical complete fallback.** Own ordinary/Graph78, fresh108/864stream/guard stress and scoped36/72checks each pass. Complete ordinary35.141/35.193us, Graph35.389/35.667us remain much slower than production~10us. P43/P44 BF16 correction controls regress; no certificates transfer. Later sections preserve historical hypotheses; the final section states the next unimplemented step.
+**Current checkpoint: P47 is the fully validated ordinary/Graph research reference; production performance target remains unmet.** Its own complete validation and paired results are inEXPERIMENTS.md andp47_validation.json. P48's compact scratch and new native raw fusionN1/N2/N3 fail independent complete-call comparisons. Native fusion preserves precision but costs~615/~118/~105us versusP47~28.8us. Each has own layout/ordinary/Graph evidence and profile, no fresh dual-stream/guard or sanitizer acceptance. The final section records a separate unimplemented P49 producer-reuse proposal; no acceptance or floor claim transfers.
 
 P27 supplied the fully validated research base, about41us ordinary full calls versus production SW about10us. Completed controls and remaining hypotheses are distinguished below; final retention and validation scope are recorded inEXPERIMENTS.md. Preserve seven native products, eight integer dots, exact per-column inside scaling, original rounded-input FP64 reference and all current preparation/descriptor costs. FrozenP27 profile reports joint pack56regs/65,576B shared, a shared-resource limit3CTAs/SM and issueactive53.16percent. Corrected196regs/196,736B is limited to1CTA/SM and issueactive35.71percent. All four measured kernels have zero local sectors on that input. Partial/finalize show high long-scoreboard/issue-active ratios,5.950/6.163. These are diagnostic metrics, not time fractions or a physical floor. Seeprofile_p27_stats.json and its manifest; never overlap GPU tasks.
 
@@ -113,3 +113,20 @@ P48普通BF16仅降低0.313%、FP16慢0.080%，Graph两种慢0.591/0.522percent�
 M14全部72新配置/288条通过原始门槛及固定floor，两个同输入控制与M13匹配。streamK64最大FP16/BF16eF2.06438537745e-5/9.44446119237e-6；每类型33项误差下降、3项极小增加，不能宣称所有输入改善。数值模型不是WGMMA或性能证据。
 
 下一原型放在独立fused_native研究目录，保留P47完整参考。128合作式CTA先精确完成1024inside指数并grid.sync，随后rawTMA+CUDA生成原生高低部+TC累加K64流式重组；全部7主项/8交叉不删。先验证两个原始输入描述符、四象限与MN/K swizzle映射、regular/async proxy可见性、raw/leaf槽位和双fragment读后复用fence。实际共享/寄存器/合作容量必须检查，名义144KiB不是编译资源结论。F13失败/重复变换与更频繁交接风险保留；不保证快于P47，更没有生产性能验收。模型结果m14_summary.json及m14_manifest.json，方案FUSED_NATIVE_DESIGN.md已冻结，不改写原文，新增硬件设计单独记录。
+
+
+## After N1–N3: proposed P49 global all-plane reuse
+
+Allthree raw native fusions fail full performance despite own layouts/original
+gates/ordinary/Graph pairs. Ownprofiles and exact scopes are in../fused_native/REPORT.md;
+no production change, P47 retained. N2 removes sevenfold withinCTA tuple scaling;
+N3 caches exact inside after grid sync. Neither removes8xA/16xB spatial replication.
+The12x emitted-native-store source count is not raw-load/physical-traffic scaling.
+
+Next P49 is prepared but unapplied: same frozenP47 cooperative288grid,
+65536Brequest,inside/barriers/tilegeometry,loadfastfallback/RN,all11planes and
+byte-identicalconsumer. Group0 writes all7high/4low fromone tuple; Group1/2
+packinginactive onlyafterexistinggridbarrier.96packingCTAs may reduce hiding;
+querynewresources/layoutbits/ownoriginalgates/fullordinary+Graph/freshness/tools
+before retention. SeeALL_NATIVE_PACK_DESIGN.md. No P49 implementation binary,
+measurement or acceptance exists at this checkpoint.
