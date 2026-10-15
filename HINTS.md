@@ -231,6 +231,8 @@ the user's requests in this conversation:
 
 ## Active precision/performance research goal — 2026-10-15
 
+- Latest explicit user instruction: stop the FP8 residual-correction/fusion route because its cost is too high. Do not implement the proposed fully fused FP8 prototype or continue dense/sparse FP8 correction experiments. Preserve existing evidence. This stops that route; it does not authorize relaxing the original accuracy gates or declaring the broader goal complete.
+
 - User explicitly requests sustained research into fixing accuracy without significantly affecting performance. Preserve both FP16 and BF16 original-input FP64 gates and complete-call timing. Prioritize materially cheaper numerical representations/corrections; do not silently settle for accuracy-only compensation or speed-only seven products.
 - Research diagnostics live in `research/precision_20261015/`. No production solution or benchmark gate changed in this research phase. Screened DPS equations98/101/102 pass tensor identities but FP16 transform quantization still exceeds the original floor with ideal FP64 leaf dots.
 - Scaled E4M3 first-order residual correction has promising numerical evidence, including actual H100 FP8 Tensor Core products on independent seeds; this is not production acceptance or a demonstrated cheap implementation. Eight independently launched correction GEMMs and cuBLASLt batched8 timing are too expensive as append-only implementations. All-2:4 residual pruning fails both floors. Enumerated mixed dense/sparse corrections require further performance and hardware-sparse validation.
