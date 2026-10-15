@@ -609,6 +609,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 351 | Repair SM80 warp mapping and measure deeper-K candidates | 1.1807 | 0.014190 | completed |
 
+| 352 | Test shallow pipelines, multiple persistent workers and source-free epilogues | 1.0932 | 0.327055 | completed |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5768,3 +5770,29 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal six-shape two-dtype run completed with exit code zero; detailed per-candidate results and independent validation remain to be assessed. This run does not establish additional full-suite stable wins.
 - **Next:** Inspect measured candidates, force all candidate correctness tests, and run sanitizer checks before independent acceptance.
 - **Archive:** trajectory/20261015_180708_iter-351/
+
+### Iter 352 — Test shallow pipelines, multiple persistent workers and source-free epilogues
+
+- **Hypothesis:** Smaller shared-storage footprints and additional persistent workers can improve large and rectangular GEMM utilization; disabling C for beta zero can reduce epilogue overhead.
+- **Changes:** Added six Hopper variants, two-worker scheduling hints, beta-zero-only TMA epilogues, accurate algorithm metadata and explicit beta rejection tests.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 12 rows; arithmetic mean of row median latency=0.327055 ms; mean speedup=1.0932x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005653 | 0.005049 | 1.1196 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005706 | 0.005059 | 1.1278 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008699 | 0.006723 | 1.2939 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008666 | 0.006641 | 1.3048 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.235839 | 0.218787 | 1.0779 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.229799 | 0.229704 | 1.0004 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.693093 | 1.631719 | 1.0376 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.738982 | 1.718461 | 1.0119 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_dense_cublaslt v0 | launch | 0.026036 | 0.026088 | 0.9980 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.025793 | 0.025905 | 0.9957 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027335 | 0.025070 | 1.0904 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026989 | 0.025460 | 1.0601 | 6.43463e-07 | 1 |
+
+- **Analysis:** Formal six-shape twelve-row run completed and archived. Early 4096 FP16 source-free short-ranking gain failed independent long-batch confirmation and was correctly rejected. Detailed results and forced candidate validation follow; iter351 remains the latest full independent 13/28 certification.
+- **Next:** Assess all per-shape results, force all62 candidates and sanitizer checks, profile resource limits before choosing the next direction.
+- **Archive:** trajectory/20261015_182619_iter-352/

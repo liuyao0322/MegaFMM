@@ -22,7 +22,7 @@ template<>__nv_bfloat16 rounded(float x){return __float2bfloat16_rn(x);}
 template<class T>
 void candidate(int id,megafmm::DType dtype,int sms,int layout=0) {
   using namespace megafmm;
-  Problem p;p.dtype=dtype;p.alpha=0.5f;p.beta=-0.25f;
+  Problem p;p.dtype=dtype;p.alpha=0.5f;p.beta=id>=60?0.0f:-0.25f;
   if(id<4 || id>=9) {p.m=129;p.n=256;p.k=128;p.lda=136;p.ldb=264;p.ldc=p.ldd=264;}
   else {p.m=id==4?17:129;p.n=id==4?23:137;p.k=id==4?19:65;
         p.trans_a=p.trans_b=true;p.lda=p.m+3;p.ldb=p.k+5;p.ldc=p.ldd=p.n+7;}
@@ -39,7 +39,7 @@ void candidate(int id,megafmm::DType dtype,int sms,int layout=0) {
   Execution execution[2];void* outputs[]={out0.p,out1.p};void* workspaces[]={work0.p,work1.p};
   const int base=id>=5 && id<=8?id-5:id;
   detail::hopper_dense(base,p,nullptr,nullptr,nullptr,nullptr,nullptr,sms,nullptr,2);
-  if(id==37 || id==38 || id>=43) {
+  if(id==37 || id==38 || (id>=43 && id<=55)) {
     Problem rejected=p;rejected.trans_a=true;
     if(detail::hopper_dense(id,rejected,da.p,db.p,static_cast<float*>(out0.p),static_cast<float*>(out0.p),work0.p,sms,nullptr,0))
       throw std::runtime_error("even MMA accepted transpose");
@@ -48,6 +48,11 @@ void candidate(int id,megafmm::DType dtype,int sms,int layout=0) {
       throw std::runtime_error("even MMA accepted unsafe 32-bit offset range");
     if(detail::hopper_dense(id,p,da.p,db.p,static_cast<float*>(out0.p),static_cast<float*>(out0.p)+1,work0.p,sms,nullptr,0))
       throw std::runtime_error("even MMA accepted misaligned vector output");
+  }
+  if(id>=60) {
+    Problem rejected=p;rejected.beta=1;
+    if(detail::hopper_dense(id,rejected,da.p,db.p,static_cast<float*>(out0.p),static_cast<float*>(out0.p),work0.p,sms,nullptr,0))
+      throw std::runtime_error("zero-beta candidate accepted nonzero beta");
   }
   // Capture only after one setup; both executions bind distinct output/scratch.
   check(cudaStreamBeginCapture(execution[0].stream,cudaStreamCaptureModeThreadLocal));
@@ -107,7 +112,7 @@ int main(int argc,char** argv){try{
       candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount,2);
       candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount,2);
     }
-    if(id==37 || id==38 || id>=43) {
+    if(id==37 || id==38 || (id>=43 && id<=55)) {
       candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount,2);
       candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount,2);
       candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount,3);
