@@ -621,6 +621,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 357 | Add Stream-K scheduling with caller-owned scratch | 1.1077 | 0.327048 | no-change |
 
+| 358 | Test Stream-K raster and swizzle for input reuse | 1.1132 | 0.328092 | no-change |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5924,3 +5926,29 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal six-shape twelve-row run completed and archived. Complete-call timings include scratch initialization and reduction. Detailed score inspection and forced implementation/sanitizer validation follow; latest independent full-suite certification remains35316/28.
 - **Next:** Force all85 candidates, API/CTest and CUDA12.8 memcheck/racecheck; inspect complete scores and profile any promising Stream-K result before changing parameters.
 - **Archive:** trajectory/20261015_193123_iter-357/
+
+### Iter 358 — Test Stream-K raster and swizzle for input reuse
+
+- **Hypothesis:** Stream-K94percent Tensor activity still has lower L2 reuse than regular source-free kernels; alternate tile traversal can reduce reload overhead and stabilize large-K performance.
+- **Changes:** Add six Stream-K128x256 schedule variants: CM1 swizzle1/4 and rasterM/N8, CM2 rasterM/N8. Workspace sizing takes identical swizzle/raster arguments as execution.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 12 rows; arithmetic mean of row median latency=0.328092 ms; mean speedup=1.1132x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005690 | 0.005061 | 1.1242 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005636 | 0.005061 | 1.1136 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008656 | 0.006686 | 1.2947 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008629 | 0.006635 | 1.3005 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.246352 | 0.227432 | 1.0832 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.233758 | 0.233517 | 1.0010 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.644651 | 1.625889 | 1.0115 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.737334 | 1.729705 | 1.0044 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025292 | 0.023697 | 1.0673 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026531 | 0.024406 | 1.0871 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026919 | 0.024325 | 1.1066 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.028731 | 0.024690 | 1.1637 | 6.43463e-07 | 1 |
+
+- **Analysis:** Formal six-shape twelve-row run completed and archived; original complete-call numerical/timing contract preserved. Detailed scores and forced validation follow; latest independent full-suite certification remains35316/28.
+- **Next:** Force all91 candidates and API/CTest/CUDA12.8 sanitizers. Reassess from measured profiles and history before further kernel changes if no new improvement.
+- **Archive:** trajectory/20261015_194154_iter-358/
