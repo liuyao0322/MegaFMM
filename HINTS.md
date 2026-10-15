@@ -231,6 +231,8 @@ the user's requests in this conversation:
 
 ## Active precision/performance research goal — 2026-10-15
 
+- User explicitly requested trying the layout/supply and selective-fusion lessons from FalconGEMM. This is a bounded comparison from current iter330: test coordinated S/T workspace layout and CTA access, then selective on-chip transformation with full-call costs. Preserve seven products, both dtype gates, Auto=Dense and the stopped FP8 correction route. Reject slow/incorrect candidates and restore the measured baseline if neither direction wins.
+
 - Latest explicit user instruction: stop the FP8 residual-correction/fusion route because its cost is too high. Do not implement the proposed fully fused FP8 prototype or continue dense/sparse FP8 correction experiments. Preserve existing evidence. This stops that route; it does not authorize relaxing the original accuracy gates or declaring the broader goal complete.
 
 - User explicitly requests sustained research into fixing accuracy without significantly affecting performance. Preserve both FP16 and BF16 original-input FP64 gates and complete-call timing. Prioritize materially cheaper numerical representations/corrections; do not silently settle for accuracy-only compensation or speed-only seven products.

@@ -567,6 +567,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 330 | FP16-only packed S3 and T3 output | 1.0781 | 0.010116 | experiment |
 
+| 331 | Fresh iter330 baseline for Falcon layout and selective fusion | 1.0746 | 0.010125 | baseline |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5150,3 +5152,19 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal benchmark completed.329 is rejected despite passing72 bitwise162 checks, three quicksanitizers,256two-stream/Graph launches, and exhaustive4,030,726,144 finite FP16 input pairs for packed add/sub withzero bitwise mismatches.329 ABBA FP ordinary10.16720vs28210.10816us andGraph10.21152vs9.95200.329 minimalNCU FP primary536576instructions vs282552960 but no fullcall gain; compute60regs/local0 unchanged. Fewer primary instructions alone are insufficient.
 - **Next:** Inspect330, perform full paired comparison if promising, then restore selected282 if no reproducible gain and archive314-330 evidence; continue supply-layout investigation
 - **Archive:** trajectory/20261015_075159_iter-330/
+
+### Iter 331 — Fresh iter330 baseline for Falcon layout and selective fusion
+
+- **Hypothesis:** Establish contemporary complete-call baseline before two bounded FalconGEMM-inspired experiments
+- **Changes:** No solution edits; current iter330 source retained; record user scope in HINTS
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 2 rows; arithmetic mean of row median latency=0.010125 ms; mean speedup=1.0746x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 1024,1024,1024 | bf16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.012160 | 0.010177 | 1.1948 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw_cooperative_hilo_64x32x256 v0 | launch | 0.009613 | 0.010072 | 0.9544 | 0.000754626 | 0 |
+
+- **Analysis:** Both original FP64 gates fail as expected; baseline BF16 about10.177us and FP16 about10.072us; no numerical improvement claimed
+- **Next:** Archive baseline binary then test row-interleaved S/T planes
+- **Archive:** trajectory/20261015_090010_iter-331/
