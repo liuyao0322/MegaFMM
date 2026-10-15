@@ -22,5 +22,21 @@
     "solution/dense_hopper.cu": "90385aacbdf8728133956dfe23a45bdd73e36826f2765c3c3f550f4a92b9227a",
     "solution/tuning_check.cu": "8b109a5756a8c95fd38ec8c7ec4dc76cb8f8e1000906e39dd122795c55786a5f"
   },
-  "notes": "All77forced candidates and original Tuned API pass, including odd cluster tails, fresh inputs, Graph/direct dualstream and beta rejection. Formal12rows pass originalFP64; newclusters and ninewarp offer no additional provisional shape wins. Candidate76 8192^3 ~2.45ms vs retained~1.6ms, despite two-block resource capacity. Latest full independent certification353 sixteenof28;12largeK unresolved."
+  "notes": "All77forced candidates and original Tuned API pass, including odd cluster tails, fresh inputs, Graph/direct dualstream and beta rejection. Formal12rows pass originalFP64; newclusters and ninewarp offer no additional provisional shape wins. Candidate76 8192^3 ~2.45ms vs retained~1.6ms, despite two-block resource capacity. Latest full independent certification353 sixteenof28;12largeK unresolved.",
+  "profile_candidate76_fp16_8192": {
+    "registers": 90,
+    "local_load_sectors": 0,
+    "local_store_sectors": 0,
+    "shared_bytes": 100352,
+    "register_block_limit": 2,
+    "shared_block_limit": 2,
+    "achieved_occupancy_percent": 27.364905,
+    "eligible_warps_per_scheduler": 0.272953,
+    "issued_warp_instructions": 297683057,
+    "tensor_percent_elapsed": 59.557477,
+    "L1TEX_percent": 45.985207,
+    "L2_percent": 52.18706,
+    "replay_ms": 2.371488,
+    "notes": "Occupancy increases but latency and instruction overhead dominate. Long-scoreboard sampled19.9cycles/issued; do not call this global-bandwidth saturation. Replay diagnostic only."
+  }
 }
