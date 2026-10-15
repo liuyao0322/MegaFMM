@@ -11,8 +11,8 @@ struct alignas(128) Shared {
 template<class T> struct QuantType {using type=int8_t;};
 static_assert(sizeof(Shared)==196736);
 __host__ __device__ constexpr int main_product(int step){return step<2?step:step==2?5:step==3?6:step==4?4:step==5?2:3;}
-__host__ __device__ constexpr int qa_plane(int term){constexpr int p[8]={7,8,4,0,5,1,6,2};return p[term];}
-__host__ __device__ constexpr int qb_plane(int term){constexpr int p[8]={8,7,0,4,1,5,2,6};return p[term];}
+__host__ __device__ constexpr int qa_plane(int term){return term<2?7+term:(term-2)/2+((term&1)?0:4);}
+__host__ __device__ constexpr int qb_plane(int term){return term<2?8-term:(term-2)/2+((term&1)?4:0);}
 
 template<class T> __device__ __forceinline__ void float_mma(uint64_t a,uint64_t b,float* d,cute::GMMA::ScaleOut scale){
  using namespace cute;
@@ -40,6 +40,11 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
  auto dbh=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(tiled_divide(bh,Shape<_32,_16>{}));
  auto daq=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(tiled_divide(aq,Shape<_64,_32>{}));
  auto dbq=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(tiled_divide(bq,Shape<_32,_32>{}));
+ // One correction/K metadata entry per lane, replicated in each consumer warp.
+ // Subsequent iterations broadcast registers instead of chasing local/global loads.
+ int lane=tid&31,term=lane/4,kk=lane%4,ap=qa_plane(term),bp=qb_plane(term);
+ int meta_a=ea[ap*32+(n0/64)*4+kk];
+ int meta_b0=eb[bp*64+kk*16+m0/32],meta_b1=eb[bp*64+kk*16+m0/32+1];
  float c[4][16]={};
  #pragma unroll 1
  for(int step=0;step<15;++step){
@@ -70,9 +75,9 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
     warpgroup_commit_batch();warpgroup_wait<0>();
     #pragma unroll
     for(int j=0;j<16;++j)warpgroup_fence_operand(integer[j]);
-    int ap=qa_plane(step-7),bp=qb_plane(step-7);
-    int aexp=ea[ap*32+(n0/64)*4+k];
-    int bexp0=eb[bp*64+k*16+m0/32],bexp1=eb[bp*64+k*16+m0/32+1];
+    int owner=(step-7)*4+k;
+    int aexp=__shfl_sync(0xffffffff,meta_a,owner);
+    int bexp0=__shfl_sync(0xffffffff,meta_b0,owner),bexp1=__shfl_sync(0xffffffff,meta_b1,owner);
     #pragma unroll
     for(int j=0;j<16;++j){
      int mn=GMMA::CLayout_64x32{}(tid-128,j);
