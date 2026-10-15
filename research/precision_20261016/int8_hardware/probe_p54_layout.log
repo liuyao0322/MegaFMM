@@ -1,0 +1,13 @@
+COOPERATIVE_INIT dtype=fp16 supported=1 sm_count=132 active_blocks_per_sm=3 grid=384 shared_bytes=65536
+COOPERATIVE_INIT dtype=bf16 supported=1 sm_count=132 active_blocks_per_sm=3 grid=384 shared_bytes=65536
+LEAF_CONSUMER_INIT dtype=bf16 sm_count=132 active_blocks_per_sm=1 grid=448 shared_bytes=131200
+LEAF_CONSUMER_INIT dtype=fp16 sm_count=132 active_blocks_per_sm=1 grid=448 shared_bytes=131200
+CONSUMER_LAYOUT dtype=bf16 trial=0 seed=119101 ctas=448 sequences=4 slots=2 native_comparisons=46137344 a_errors=0 b_errors=0 shared_guard_errors=0 coverage_errors=0 workspace_guard_errors=0 pass=1
+CONSUMER_LAYOUT dtype=bf16 trial=1 seed=119558 ctas=448 sequences=4 slots=2 native_comparisons=46137344 a_errors=0 b_errors=0 shared_guard_errors=0 coverage_errors=0 workspace_guard_errors=0 pass=1
+CONSUMER_LAYOUT dtype=bf16 trial=2 seed=120015 ctas=448 sequences=4 slots=2 native_comparisons=46137344 a_errors=0 b_errors=0 shared_guard_errors=0 coverage_errors=0 workspace_guard_errors=0 pass=1
+CONSUMER_LAYOUT dtype=fp16 trial=0 seed=119340 ctas=448 sequences=4 slots=2 native_comparisons=46137344 a_errors=0 b_errors=0 shared_guard_errors=0 coverage_errors=0 workspace_guard_errors=0 pass=1
+CONSUMER_LAYOUT dtype=fp16 trial=1 seed=119797 ctas=448 sequences=4 slots=2 native_comparisons=46137344 a_errors=0 b_errors=0 shared_guard_errors=0 coverage_errors=0 workspace_guard_errors=0 pass=1
+CONSUMER_LAYOUT dtype=fp16 trial=2 seed=120254 ctas=448 sequences=4 slots=2 native_comparisons=46137344 a_errors=0 b_errors=0 shared_guard_errors=0 coverage_errors=0 workspace_guard_errors=0 pass=1
+LEAF_RECOMBINE trial=0 seed=120103 output_bit_comparisons=1048576 bit_errors=0 guard_errors=0 input_values=1835264 input_errors=0 nonfinite=0 changed_order_negative_differences=22367 pass=1
+LEAF_RECOMBINE trial=1 seed=120564 output_bit_comparisons=1048576 bit_errors=0 guard_errors=0 input_values=1835264 input_errors=0 nonfinite=0 changed_order_negative_differences=22532 pass=1
+LEAF_RECOMBINE trial=2 seed=121025 output_bit_comparisons=1048576 bit_errors=0 guard_errors=0 input_values=1835264 input_errors=0 nonfinite=0 changed_order_negative_differences=22487 pass=1

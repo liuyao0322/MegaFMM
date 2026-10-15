@@ -187,3 +187,54 @@ IsolatedCPUgenerationonly, noP54sourceapplication/build/deviceexecution.
 Ownnewpre-MMAlayout+scalarGPUrecombine first, thenoriginalgates/exactinside,
 independentP53/P54shapecontrol andP51/P54retentioncomparison ordinary+Graph;
 ownfreshdualstream/guards/tools if retained. CurrentP51,productionunchanged.
+
+## P54 closed; M15 compensation representation screen
+
+P54 own layout/GPU scalar recombination/standard78 gates pass, but both independent
+shape and retention comparisons lose ordinary and Graph latency. Own profile and
+full timing scope are frozen in LEAF_N64_HARDWARE.md/p54_hardware.json. Restored
+P51 sources/binary byte-exact and new-process78 original gates/exactinside pass.
+No P54 fresh matrix stream/tools certificate; rejected. Earlier prepared-only
+paragraphs are historical state at proposal creation, superseded by these results.
+
+After own P54 profiling, fresh primary EmuGEMM/PTX reading and M8/M9/M12/M14 plus
+P35–P39 review, FINE_QUANT_SCREEN_DESIGN.md fixes M15 before measurement:84 newly
+seeded configurations, original12 patterns plus two row/column scale patterns,
+five arms crossing coarse/fine fullK512 INT8 geometry with post/leaf recombination
+and native leaf control. All7+8dots, original inside/input FP64 gates and stricter
+floors retained. Direct fine-group packing is distinct from old requantization.
+Numerical results cannot justify hardware retention or claim speed; complete prep,
+metadata, reload, transpose, conversion and synchronization costs remain unresolved.
+
+## M15/M16 measured numerical results
+
+M15 complete420rows: all original gates pass; fine84 configs also pass fixed
+floors; coarseFP16 has six stricter-floor negative rows (three inputs x orders).
+M16 complete850rows/exit0:84 fresh plus1 old replay, all original gates and fine/
+native floors pass.425 paired eF equalities,zero changed correction bits; M15's
+zero product scales align with zero integer accumulations.5409scalarbits prove
+combined-exponent model including a constructed underflow negative control, not
+native CUDA execution or measured matrix accuracy gain. Reports/manifests frozen.
+
+Next is a concrete direct fine-group packing/consumer proposal, not another native
+leaf shape. Preserve all7+8dots,both inputs,exactinside,original gates/fulltiming.
+Fine metadata must vary by output row/column; completeK512 INT32 accumulation has
+own bound. Avoid double quantization; cost raw reloads/reductions/transpose/metadata.
+Actual compile resource capacity and own pre-MMA packing/TMA probes remain gates.
+P51 remains unchanged; no new GPU hardware performance claim from these models.
+
+## P55 prepared direct fine-group hardware design
+
+DIRECT_FINE_QUANT_DESIGN.md fixes the direct fine producer/consumer design after
+M15/M16, before C++ generation/build/device execution.128 cooperative CTAs x768
+threads, exactinside first256 then one all-thread grid barrier,64 B512x8 tasks+
+64 A8x512 tasks, two original-tuple passes, seven native/nine INT8 planes per side,
+fullK512 integer exponents9x64 eachside. Consumer retains P39 native64x32/grid128,
+eight24576B slots plus432B onchip fine metadata,fullK512 all eight integer cross
+dots in five groups,post correction order. Proposed shared55808Bprep/197248Bconsumer,
+workspace12329472B,two kernels/four descriptors; actual compile capacities unknown.
+CPU geometry/count checks cover both262144element packings and262144output fine
+metadata coordinates.352vs480sourceMMA instructions/CTA, but source TMA bytes same
+asP51 and commands15360vs11264; more batches and reload/reduction can lose. No
+C++ source application/build/GPU result. Own packing/scalar/TMA probes are required
+before first MMA; ordinary/Graph full costs and fresh stress/tools before retention.

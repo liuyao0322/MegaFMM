@@ -839,3 +839,59 @@ recombine,fullK512/all7+8/nativep11p8/inside/originalgate/dtypes,7MiBleaf and
 threecompletekernels. NominalTMA92274688B/5632commands/30720WGMMAinstructions
 notphysicaltraffic/speedproof. IsolatedCPUproposalchecks pass; workingP51
 retained, noP54application/build/deviceexecution,candidate-specificgatesrequired.
+
+
+## P54 native N64 full-leaf control, premeasurement
+
+Applied frozenLEAF_N64_DESIGN.md/generate_leaf_n64.py exactly to isolatedCPU
+proposalhashes; ownfourp54sources/sourceMFfrozenbeforeanybuild. Onlyconsumer
+geometrychangesfromP53:N64/d32r32/two65536Bslots/Shared131200B/grid448,unchanged
+all7+8/fullK512/p11p8/inside/FP64gate and byte-identicalpack/compare/pow2/recombine.
+Ownpre-MMAlayout/GPUrecombineprobe newlyseeded119101+457trial+239dtype and
+120103+461trial;compilingbeforeanyP54MMA. AllGPUtasksserial,no productionchange.
+
+## P54 hardware completion and restoration
+
+Own pre-MMA layout six cases276824064uint16 and11010048 leaf coordinates, guards
+and own GPU scalar recombine3145728output bits/5505792unchanged input values pass.
+Build106regs,0spill,Shared131200B/actual1CTA/SM. Standard78FP64/79872inside pass,
+printed eF equal P51. Independent P53/P54 ordinary BF/FP40.957719/41.041360 to
+41.198840/41.276760us; Graph37.548600/37.546920 to37.724440/37.938601us. Independent
+P51/P54 ordinary27.447800/27.319679 to41.202841/41.248279us, Graph27.312000/27.474520
+to37.803200/37.953360us.312 original gates/319488inside per pair/mode allpass.
+All arms retained/unlocked/noCI. P54 rejected, no own fresh matrix stress/tools.
+Own17pass NCU prep17.280/leaf22.912/recombine6.624us, regs52/106/18,shared65536/
+131200/0B,0localRW; excluded from ABBA, not additive. All working sources/bin
+restored byte-exact P51, new-process78/79872inside pass. LEAF_N64_HARDWARE.md,
+p54_hardware.json and associated manifests preserve own scope. No production edit.
+
+M15 design/source premeasurement manifest frozen before first model invocation.
+Five arms separate fullK512 quantization geometry from recombination order,84 fresh
+configurations and original Dense gate+fixed floors. No new hardware source or
+performance claim; P51 remains current. First model run is separate serial GPU job.
+
+## M15/M16 complete numerical screens
+
+M15 terminal2 after all84configurations/420rows: all original gates pass, fine and
+native fixed floors pass; six coarseFP16 fixed-floor negatives retained (three
+rowcol_cancellation inputs x two orders). Maxfineleaf FP/BF7.294e-5/5.432e-4.
+NoNF/saturation;86016inside CPU matches. FrozenREPORT/summary/manifests distinguish
+original gate from extra fixed floor. BF tiny zero scale products prompted M16.
+M16 terminal0,84 fresh+1replay/850rows,all original gates+fine/native fixed floors
+pass.425 paired eF equalities/correction bits unchanged,zero nonzero integers at
+zero product scales/lost representable corrections. Thus no measured matrix error
+attributed to scale-product underflow.5409scalaroracle bits0errors,constructed
+2^20 exponent-152 gives old0/new2^-132;not native CUDA proof.87040inside matches.
+Maxfreshfineleaf FP/BF7.118e-5/5.147e-4. Sources/design frozen before each model,
+no hardware/speed claim or production edit; current four sources/binary P51.
+
+## P55 proposal only
+
+Following M15/M16, DIRECT_FINE_QUANT_DESIGN.md and independent CPU geometry/count
+checker freeze direct A8x512/B512x8 INT8 producer and fullK consumer:128x768prep,
+55808Bpack shared,197248Bconsumer shared incl fine metadata,workspace12329472B,
+two kernels. CPU checks both262144element packings/output metadata map,integer
+bound16516096,352MMA/CTA,nominal138412032BTMAwhole/15360commands. No C++ generated,
+no build/device execution/capacity query. More TMA commands/reloads versus P51
+explicitly counted; no speed guarantee. Sources/bin still P51. Proposal manifest
+preserves numerical and P54 profile provenance; production/library/Auto unchanged.

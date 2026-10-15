@@ -1,0 +1,145 @@
+{
+  "scope": "M16: paired product versus combined-exponent restoration; numerical only.",
+  "fresh_configurations": 84,
+  "replayed_configurations": 1,
+  "rows": 850,
+  "scalar": {
+    "cases": 5409,
+    "bit_errors": 0,
+    "combined_model": "FP64 exact power-of-two scaling then FP32",
+    "negative_product_value": 0.0,
+    "negative_combined_value": 1.8367099231598242e-40,
+    "native_cuda_operation_tested": false
+  },
+  "summary": [
+    {
+      "dtype": "float16",
+      "arm": "coarse_post",
+      "fresh_configurations": 42,
+      "original_gate_passes": 42,
+      "fixed_floor_passes": 39,
+      "max_ef": 0.00011423525402843978,
+      "worst_pattern": "rowcol_cancellation",
+      "worst_seed": 124141
+    },
+    {
+      "dtype": "float16",
+      "arm": "coarse_leaf",
+      "fresh_configurations": 42,
+      "original_gate_passes": 42,
+      "fixed_floor_passes": 39,
+      "max_ef": 0.00011428877042411242,
+      "worst_pattern": "rowcol_cancellation",
+      "worst_seed": 124141
+    },
+    {
+      "dtype": "float16",
+      "arm": "fine_post",
+      "fresh_configurations": 42,
+      "original_gate_passes": 42,
+      "fixed_floor_passes": 42,
+      "max_ef": 7.109317461529608e-05,
+      "worst_pattern": "rowcol_cancellation",
+      "worst_seed": 124141
+    },
+    {
+      "dtype": "float16",
+      "arm": "fine_leaf",
+      "fresh_configurations": 42,
+      "original_gate_passes": 42,
+      "fixed_floor_passes": 42,
+      "max_ef": 7.117998442274516e-05,
+      "worst_pattern": "rowcol_cancellation",
+      "worst_seed": 124141
+    },
+    {
+      "dtype": "float16",
+      "arm": "native_leaf",
+      "fresh_configurations": 42,
+      "original_gate_passes": 42,
+      "fixed_floor_passes": 42,
+      "max_ef": 3.116395536441893e-05,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 124140
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "coarse_post",
+      "fresh_configurations": 42,
+      "original_gate_passes": 42,
+      "fixed_floor_passes": 42,
+      "max_ef": 0.0008773629867401379,
+      "worst_pattern": "rowcol_cancellation",
+      "worst_seed": 124141
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "coarse_leaf",
+      "fresh_configurations": 42,
+      "original_gate_passes": 42,
+      "fixed_floor_passes": 42,
+      "max_ef": 0.0008773782658129499,
+      "worst_pattern": "rowcol_cancellation",
+      "worst_seed": 124141
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "fine_post",
+      "fresh_configurations": 42,
+      "original_gate_passes": 42,
+      "fixed_floor_passes": 42,
+      "max_ef": 0.0005146909040281831,
+      "worst_pattern": "cancellation",
+      "worst_seed": 124139
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "fine_leaf",
+      "fresh_configurations": 42,
+      "original_gate_passes": 42,
+      "fixed_floor_passes": 42,
+      "max_ef": 0.0005146935116879635,
+      "worst_pattern": "cancellation",
+      "worst_seed": 124139
+    },
+    {
+      "dtype": "bfloat16",
+      "arm": "native_leaf",
+      "fresh_configurations": 42,
+      "original_gate_passes": 42,
+      "fixed_floor_passes": 42,
+      "max_ef": 1.706210459627215e-05,
+      "worst_pattern": "cancellation_k_bands",
+      "worst_seed": 124140
+    }
+  ],
+  "model_exit_code": 0,
+  "controls": [
+    {
+      "dtype": "torch.float16",
+      "seed": 124139,
+      "product_matches_unmodified_m15": true
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 124139,
+      "product_matches_unmodified_m15": true
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 123107,
+      "product_replay_matches_archived_m15": true
+    }
+  ],
+  "paired_arm_ef_equalities": 425,
+  "nonzero_integer_at_zero_product_scale": 0,
+  "lost_representable_nonzero": 0,
+  "correction_bit_differences": 0,
+  "inside_cpu_exponents": 87040,
+  "inside_cpu_errors": 0,
+  "fine_original_and_fixed_fresh_passes": 84,
+  "conclusion": "Combined exponents protect a constructed scalar case, but no tested matrix correction or eF changed. M15 zero scale products coincide with zero integer accumulations; not the measured matrix error source.",
+  "goal_achieved": false,
+  "hardware_accepted": false,
+  "performance_measured": false
+}
