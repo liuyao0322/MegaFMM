@@ -1,0 +1,159 @@
+{
+  "scope": "actual FP8 Tensor Core correction but FP32 main products; not production implementation or acceptance; timing only for explicitly scoped append-only chain",
+  "device": "NVIDIA H100 80GB HBM3",
+  "torch": "2.10.0+cu128",
+  "rows": [
+    {
+      "dtype": "torch.float16",
+      "seed": 101,
+      "correction": "dense",
+      "ef": 1.997578044665256e-05,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.float16",
+      "seed": 101,
+      "correction": "residual_2of4",
+      "ef": 0.0001693489943429041,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.float16",
+      "seed": 101,
+      "correction": "mixed4_dense",
+      "ef": 9.068315552373354e-05,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.float16",
+      "seed": 102,
+      "correction": "dense",
+      "ef": 1.9914973036282993e-05,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.float16",
+      "seed": 102,
+      "correction": "residual_2of4",
+      "ef": 0.00016940612910650282,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.float16",
+      "seed": 102,
+      "correction": "mixed4_dense",
+      "ef": 9.017428952138501e-05,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.float16",
+      "seed": 103,
+      "correction": "dense",
+      "ef": 1.9992885690622312e-05,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.float16",
+      "seed": 103,
+      "correction": "residual_2of4",
+      "ef": 0.00016955254013452433,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.float16",
+      "seed": 103,
+      "correction": "mixed4_dense",
+      "ef": 9.072589265841861e-05,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 101,
+      "correction": "dense",
+      "ef": 0.00016125487629466254,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 101,
+      "correction": "residual_2of4",
+      "ef": 0.0013581821172707076,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 101,
+      "correction": "mixed4_dense",
+      "ef": 0.0007248513467674046,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 102,
+      "correction": "dense",
+      "ef": 0.00016067516377164174,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 102,
+      "correction": "residual_2of4",
+      "ef": 0.0013578615044110382,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 102,
+      "correction": "mixed4_dense",
+      "ef": 0.0007231806502610271,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 103,
+      "correction": "dense",
+      "ef": 0.00016096203765679902,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 103,
+      "correction": "residual_2of4",
+      "ef": 0.0013580255962847738,
+      "nonfinite": 0
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "seed": 103,
+      "correction": "mixed4_dense",
+      "ef": 0.0007270882559529445,
+      "nonfinite": 0
+    }
+  ],
+  "timings": [
+    {
+      "dtype": "torch.float16",
+      "scope": "eight prequantized FP8 GEMMs only; graph replay; excludes encoding, main products, output recombination",
+      "group_us": [
+        26.312320232391357,
+        26.35648012161255,
+        26.34176015853882,
+        26.339519023895264,
+        26.37376070022583
+      ],
+      "median_us": 26.34176015853882
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "scope": "eight prequantized FP8 GEMMs only; graph replay; excludes encoding, main products, output recombination",
+      "group_us": [
+        26.131200790405273,
+        26.17055892944336,
+        26.16096019744873,
+        26.18175983428955,
+        26.13919973373413
+      ],
+      "median_us": 26.16096019744873
+    }
+  ]
+}

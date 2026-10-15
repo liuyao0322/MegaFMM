@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/share/home/liuyao/workspace/MegaFMM/research/precision_20261015/hardware_fp8.py", line 59, in <module>
+    main()
+  File "/share/home/liuyao/workspace/MegaFMM/research/precision_20261015/hardware_fp8.py", line 49, in main
+    result=torch._scaled_mm(lv.contiguous(),rv.T.contiguous().T,scale_a=ls,scale_b=rs,out_dtype=torch.float32,use_fast_accum=False)
+RuntimeError: CUDA error: CUBLAS_STATUS_INVALID_VALUE when calling `::cublasLtMatmulDescSetAttribute(descriptor(), attr, &value, sizeof(value))`
+srun: error: g08: task 0: Exited with exit code 1
