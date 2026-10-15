@@ -66,7 +66,7 @@ template<class T,bool SideA,bool Balance> __device__ float value(const T* X,cons
 }
 
 template<class T,bool SideA,bool Balance> __global__ __launch_bounds__(256,1)
-void pack(const T* X,T* high,int8_t* q,int* exp,const int* inside){
+void pack(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,int* __restrict__ exp,const int* __restrict__ inside){
  constexpr int Rows=SideA?64:128,Cols=SideA?128:32,Size=Rows*Cols,PerThread=Size/256;
  constexpr int ColTiles=512/Cols,Tiles=(512/Rows)*ColTiles;
  int plane=blockIdx.x/Tiles,tile=blockIdx.x%Tiles,r0=(tile/ColTiles)*Rows,c0=(tile%ColTiles)*Cols,tid=threadIdx.x;
