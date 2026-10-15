@@ -135,3 +135,11 @@ Production `solution/` unchanged; these are standalone research candidates, not 
 - Each B warp visits16 K rows. Cache the row-specific exponent/factor pair in lanes0..15 (duplicated in16..31), guard all16 rows once with warp-all, and shuffle the two factors for each element iteration. General exponents retain the original per-element path. Per-column exponent computation, numerical representation, metadata and main kernel unchanged.
 -78/78 FP64 checks pass, all printed eF values identical toP12,79,872 per-column exponents equal the original reduction. CompleteBF16/FP16 54.909/54.805us vsSW10.341/10.104us. FP16 B packing diagnostic9.480us vsP12 18.325us, A10.822us.
 - B register usage rises60→122 BF16 /59→118 FP16,0stack/spill, shared41344bytes. The simpler common path still reduces measured full latency. No independent performance certification or Graph/dual-stream/sanitizer transfer. RetainP13 as next research base; still performance-rejected versusSW.
+
+## P14 — outline exceptional packing exponents (no latency gain)
+
+- Only packing uses a compact normal-power wrapper with one noinline ldexpf device function for other exponents. Shared pow2.cuh and the corrected consumer are unchanged, so existing fusion/source dependencies retain their original helper.
+-1,048,576 full-bit float tests over exponents[-300,300], signed zero, normal/subnormal extrema and arbitrary bit patterns match directldexpf; NaN payload differences treated as equivalent as in the original test.0errors.
+-78/78 original FP64 checks pass; all printed eF equalP13. CompleteBF16/FP16 54.869/54.974us vsSW10.281/10.115us: no meaningful improvement overP13 54.909/54.805us. FP16 A/B packing11.230/9.596us, effectively unchanged.
+- BF16 B entry static SASS shrinks28,264→13,952 instructions (outlined helper body separate),497CALL instructions in that entry; static call presence is not execution count. B117/115regs, A158/146regs,0stack/spill. Code compaction alone does not identify the current common-path bottleneck.
+- FreezeP14 and its compact-scaling validation. P13 remains the best measured latency reference; P14 is a semantically equivalent experimental base for a new bulk-packing design that can reuse four loaded/scaled quadrants. No production changes or broader validation claims.

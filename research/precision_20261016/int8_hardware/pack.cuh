@@ -10,6 +10,14 @@
 #include "pow2.cuh"
 
 namespace int8_research {
+// Keep the uncommon general exponent implementation in one device function.
+// Only packing uses this wrapper; the corrected consumer and shared pow2 helper
+// are unchanged so this experiment isolates preprocessing code generation.
+static __device__ __noinline__ float general_pow2_for_pack(float x,int e){return ldexpf(x,e);}
+__device__ __forceinline__ float scale_pow2_compact(float x,int e){
+ if(e>=-126&&e<=127)return __fmul_rn(x,__int_as_float((e+127)<<23));
+ return general_pow2_for_pack(x,e);
+}
 constexpr int H=512, Plane=H*H, BK=128, BM=64, BN=32, Stages=8;
 constexpr size_t HighBytes=7*Plane*2, QuantBytes=9*Plane;
 // Seven main planes per side, nine INT8 planes per side, integer scale metadata.
@@ -75,16 +83,16 @@ template<class T,bool SideA,bool Balance,bool FastBalance=false> __device__ __fo
     x0=__fmul_rn(x0,scale0);x2=__fmul_rn(x2,scale0);
     x1=__fmul_rn(x1,scale1);x3=__fmul_rn(x3,scale1);
    }else{
-    x0=scale_pow2(x0,-ex[c]);x2=scale_pow2(x2,-ex[c]);
-    x1=scale_pow2(x1,-ex[c+512]);x3=scale_pow2(x3,-ex[c+512]);
+    x0=scale_pow2_compact(x0,-ex[c]);x2=scale_pow2_compact(x2,-ex[c]);
+    x1=scale_pow2_compact(x1,-ex[c+512]);x3=scale_pow2_compact(x3,-ex[c+512]);
    }
   }else{
    if constexpr(FastBalance){
     x0=__fmul_rn(x0,scale0);x1=__fmul_rn(x1,scale0);
     x2=__fmul_rn(x2,scale1);x3=__fmul_rn(x3,scale1);
    }else{
-    x0=scale_pow2(x0,ex[r]);x1=scale_pow2(x1,ex[r]);
-    x2=scale_pow2(x2,ex[r+512]);x3=scale_pow2(x3,ex[r+512]);
+    x0=scale_pow2_compact(x0,ex[r]);x1=scale_pow2_compact(x1,ex[r]);
+    x2=scale_pow2_compact(x2,ex[r+512]);x3=scale_pow2_compact(x3,ex[r+512]);
    }
   }
  }
@@ -164,7 +172,7 @@ void pack_plane(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict_
   for(int j=0;j<PerThread;++j)store_quant(j,__float2int_rn(__fmul_rn(vh[j],sh)),__float2int_rn(__fmul_rn(vl[j],sl)));
  }else{
   #pragma unroll
-  for(int j=0;j<PerThread;++j)store_quant(j,__float2int_rn(scale_pow2(vh[j],-eh)),__float2int_rn(scale_pow2(vl[j],-el)));
+  for(int j=0;j<PerThread;++j)store_quant(j,__float2int_rn(scale_pow2_compact(vh[j],-eh)),__float2int_rn(scale_pow2_compact(vl[j],-el)));
  }
  if constexpr(!SideA){
   __syncthreads();
