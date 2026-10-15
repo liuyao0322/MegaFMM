@@ -42,13 +42,18 @@ template<class T> __global__ void inside_scale(const T* A,const T* B,int* expone
  }
 }
 
-template<class T,bool SideA,bool Balance> __device__ __forceinline__ float value(const T* X,const int* ex,int r,int c,int plane){
+template<class T,bool SideA,bool Balance,bool FastBalance=false> __device__ __forceinline__ float value(const T* X,const int* ex,int r,int c,int plane,float scale0=0,float scale1=0){
  int at=r*1024+c;
  float x0=float(X[at]),x1=float(X[at+512]),x2=float(X[at+512*1024]),x3=float(X[at+512*1024+512]);
  if constexpr(Balance){
   if constexpr(SideA){
-   x0=scale_pow2(x0,-ex[c]);x2=scale_pow2(x2,-ex[c]);
-   x1=scale_pow2(x1,-ex[c+512]);x3=scale_pow2(x3,-ex[c+512]);
+   if constexpr(FastBalance){
+    x0=__fmul_rn(x0,scale0);x2=__fmul_rn(x2,scale0);
+    x1=__fmul_rn(x1,scale1);x3=__fmul_rn(x3,scale1);
+   }else{
+    x0=scale_pow2(x0,-ex[c]);x2=scale_pow2(x2,-ex[c]);
+    x1=scale_pow2(x1,-ex[c+512]);x3=scale_pow2(x3,-ex[c+512]);
+   }
   }else{
    x0=scale_pow2(x0,ex[r]);x1=scale_pow2(x1,ex[r]);
    x2=scale_pow2(x2,ex[r+512]);x3=scale_pow2(x3,ex[r+512]);
@@ -75,14 +80,23 @@ void pack_plane(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict_
  constexpr bool quant=plane>=4 || plane==(SideA?2:3) || plane==RawPlane;
  constexpr int qp=plane==RawPlane?8:plane>=4?plane-4:3;
  float vh[PerThread],vl[PerThread],hi=0,lo=0;
- #pragma unroll
- for(int j=0;j<PerThread;++j){
-  int i=tid+256*j,r=r0+i/Cols,c=c0+i%Cols;
-  float v=value<T,SideA,Balance>(X,inside,r,c,plane);
-  T h=T(v);high[plane*Plane+r*512+c]=h;
-  vh[j]=float(h);vl[j]=__fsub_rn(v,float(h));
-  hi=fmaxf(hi,fabsf(vh[j]));lo=fmaxf(lo,fabsf(vl[j]));
- }
+ auto load_values=[&](auto fast,float scale0,float scale1){
+  #pragma unroll
+  for(int j=0;j<PerThread;++j){
+   int i=tid+256*j,r=r0+i/Cols,c=c0+i%Cols;
+   float v=value<T,SideA,Balance,decltype(fast)::value>(X,inside,r,c,plane,scale0,scale1);
+   T h=T(v);high[plane*Plane+r*512+c]=h;
+   vh[j]=float(h);vl[j]=__fsub_rn(v,float(h));
+   hi=fmaxf(hi,fabsf(vh[j]));lo=fmaxf(lo,fabsf(vl[j]));
+  }
+ };
+ if constexpr(SideA&&Balance){
+  // Cols=128 and the per-thread stride256 keep c invariant over the element loop.
+  int c=c0+tid%Cols,e0=-inside[c],e1=-inside[c+512];
+  if(e0>=-126&&e0<=127&&e1>=-126&&e1<=127)
+   load_values(std::true_type{},__int_as_float((e0+127)<<23),__int_as_float((e1+127)<<23));
+  else load_values(std::false_type{},0,0);
+ }else load_values(std::false_type{},0,0);
  if(!quant){asm volatile("fence.proxy.async.global;" ::: "memory");return;}
  __shared__ float maxima[2][8];__shared__ int exponents[2];
  for(int s=16;s;s/=2){hi=fmaxf(hi,__shfl_xor_sync(0xffffffff,hi,s));lo=fmaxf(lo,__shfl_xor_sync(0xffffffff,lo,s));}

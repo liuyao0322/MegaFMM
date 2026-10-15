@@ -55,3 +55,10 @@ Production `solution/` unchanged; these are standalone research candidates, not 
 - CUDA12.8 memcheck/racecheck/synccheck:each24cases/48calls, filtered to`kns=int8_research`; all0errors and racecheck0warnings. Do not describe this instrumentation scope as the full72case/576call stress.
 - Audit verifies all P1–P7 source/result/binary identities, primitive18exact checks,1,048,576power-of-two equivalence cases, and all five production file hashes. Status explicitly`accuracy_validated_performance_rejected`; overall goal remains active.
 - Evidence and limitations in`HARDWARE_REPORT.md`. Next work targets repeated inside-scale work in the packer, followed by consumer scheduling; no promotion based solely on numerical success.
+
+## P8 — hoist invariant per-thread A inside scaling
+
+- A pack has128columns and a256element per-thread stride; each thread reuses exactly two input column exponents across its32elements. Hoist these loads, exponent validation and scale construction, then select a compiled fast or general loop before reduction barriers. B's numerical body is unchanged. No gate or representation change.
+- Full72/72 ordinary FP64 checks pass; every printed eF equalsP7. Complete BF16/FP16=77.415/76.751us, currentSW10.181/9.994us. Preprocessing41.269/41.198us; A11.255/11.087us, B17.036/17.111us, inside9.320/9.943us. Still reject performance.
+- Source/binary/results frozen in`p8/` and`p8_manifest.json`. Graph/dual-stream/sanitizer evidence in the hardware report is specificallyP7, not silently transferred toP8.
+- Next isolated experiment moves consumer product/term selection outside its16-output loops, preserving the scalar addition order.
