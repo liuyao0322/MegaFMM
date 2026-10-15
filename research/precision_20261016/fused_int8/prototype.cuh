@@ -102,16 +102,26 @@ template<class T,int Prod,bool Fast> __device__ void pack_leaf_impl(Shared& s,Sl
  producer_sync();
  auto qbh=reinterpret_cast<int8_t*>(slot.bytes+24576),qal=reinterpret_cast<int8_t*>(slot.bytes+32768);
  auto qbl=reinterpret_cast<int8_t*>(slot.bytes+36864),qah=reinterpret_cast<int8_t*>(slot.bytes+45056);
+ int eah=slot.eah,eal=slot.eal,ebh=slot.ebh,ebl=slot.ebl;
+ auto quantize=[&](auto fast,float shA,float slA,float shB,float slB){
+  auto qscale=[&](float value,int exponent,float factor){
+   if constexpr(decltype(fast)::value)return __fmul_rn(value,factor);
+   else return int8_research::scale_pow2(value,-exponent);
+  };
  for(int i=tid;i<4096;i+=128){int r=i/128,k=i%128;float h=float(ha[Traits<T>::ah_index(r,k)]);
   float l=__fsub_rn(transformed<T,Prod,true,Fast>(s,r,k,a0,a1),h);
-  qah[Traits<T>::aq()(r,k)]=int8_t(max(-127,min(127,__float2int_rn(int8_research::scale_pow2(h,-slot.eah)))));
-  qal[Traits<T>::aq()(r,k)]=int8_t(max(-127,min(127,__float2int_rn(int8_research::scale_pow2(l,-slot.eal)))));
+  qah[Traits<T>::aq()(r,k)]=int8_t(max(-127,min(127,__float2int_rn(qscale(h,eah,shA)))));
+  qal[Traits<T>::aq()(r,k)]=int8_t(max(-127,min(127,__float2int_rn(qscale(l,eal,slA)))));
  }
  for(int i=tid;i<8192;i+=128){int n=i%64,k=i/64;float h=float(hb[Traits<T>::bh_index(n,k)]);
   float l=__fsub_rn(transformed<T,Prod,false,Fast>(s,n,k,b0,b1),h);
-  qbh[Traits<T>::bq()(n,k)]=int8_t(max(-127,min(127,__float2int_rn(int8_research::scale_pow2(h,-slot.ebh)))));
-  qbl[Traits<T>::bq()(n,k)]=int8_t(max(-127,min(127,__float2int_rn(int8_research::scale_pow2(l,-slot.ebl)))));
+  qbh[Traits<T>::bq()(n,k)]=int8_t(max(-127,min(127,__float2int_rn(qscale(h,ebh,shB)))));
+  qbl[Traits<T>::bq()(n,k)]=int8_t(max(-127,min(127,__float2int_rn(qscale(l,ebl,slB)))));
  }
+ };
+ if(eah>=-127&&eah<=126&&eal>=-127&&eal<=126&&ebh>=-127&&ebh<=126&&ebl>=-127&&ebl<=126){
+  quantize(std::true_type{},__int_as_float((127-eah)<<23),__int_as_float((127-eal)<<23),__int_as_float((127-ebh)<<23),__int_as_float((127-ebl)<<23));
+ }else quantize(std::false_type{},0,0,0,0);
  asm volatile("fence.proxy.async.shared::cta;" ::: "memory");producer_sync();
 }
 

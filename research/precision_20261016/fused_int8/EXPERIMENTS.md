@@ -54,3 +54,11 @@ F6/F7两种dtype均0stack、0spill、124registers/thread。F7对齐修正大幅�
 - bf16: complete395.751us versus currentSW10.120us.
 - fp16: complete379.155us versus currentSW9.946us.
 - This supports repeated inside scaling as a large packer cost, but still fails end-to-end performance badly. No Graph/dual-stream/sanitizer acceptance claimed. Next isolated change hoists quantization scale validation/factor construction from its element loops.
+
+## F11 — quantization scale construction before element loops
+
+- Cache four adaptive quantization exponents, validate their inverse scales in a uniform branch before the quantization loops, then use explicit RN multiplies in the common path. General exponents retain scale_pow2; no representation or barrier change.
+- All72ordinary original-input FP64 checks pass, all printed eF identical toF10.
+- bf16: complete245.429us versus currentSW10.325us.
+- fp16: complete228.806us versus currentSW10.062us.
+- Large reduction within the fused prototype, still much slower than independent-packingP9 and currentSW. Do not transfer P7 Graph/sanitizer acceptance. Next diagnostic subdivides the measured producer pack interval into native packing, reduction and quantization, instead of guessing from the overall time.
