@@ -69,9 +69,14 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
     #pragma unroll
     for(int inner=0;inner<8;++inner)
      float_mma<T>(uint64_t(dah(0,0,inner))+offset,uint64_t(dbh(0,0,inner))+offset,d,(k==0&&inner==0)?GMMA::ScaleOut::Zero:GMMA::ScaleOut::One);
-    // The four K groups accumulate into the same shape/fragment. No
-    // CPU register access or slot reuse until all four groups complete.
     warpgroup_commit_batch();
+    if(k>0){
+     // Only the current group may still use shared memory. Retire the
+     // previous slot immediately while its successor remains in flight.
+     warpgroup_wait<1>();
+     asm volatile("bar.warp.sync 0xffffffff;" ::: "memory");
+     if((tid&31)==0)Barrier::arrive(&s.free[(seq-1)%Stages]);
+    }
    }else{
     uint32_t integer[16]={};
     #pragma unroll
@@ -120,10 +125,7 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
    #pragma unroll
    for(int j=0;j<16;++j)warpgroup_fence_operand(d[j]);
    asm volatile("bar.warp.sync 0xffffffff;" ::: "memory");
-   if((tid&31)==0){
-    #pragma unroll
-    for(int k=0;k<4;++k)Barrier::arrive(&s.free[(step*4+k)%Stages]);
-   }
+   if((tid&31)==0)Barrier::arrive(&s.free[(step*4+3)%Stages]);
   }
   // Product/term is uniform across all16outputs; select before the vector loop.
   if(step<7){
