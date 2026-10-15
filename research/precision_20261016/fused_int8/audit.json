@@ -745,6 +745,20 @@
       "validation_scope": "own six synthetic pre-MMA TMA layouts, standard78, independent ordinary/GraphABBA312 each and own two-kernel profile; rejected performance, no own fresh dual-stream or sanitizer certificate",
       "numerical_algorithm_changed": "native m64n16k16/eight-value fragments, two actual40960Bslots/shared82048B/grid256; fullK512/all7+8dots/RN/planes/inside preserved"
     },
+    "p53": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 41.143839836,
+        "fp16": 41.21087837225
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": false,
+      "validation_scope": "own six synthetic pre-MMA TMA layouts and three scalar GPU recombination trials, standard78, independent ordinary/GraphABBA312 each and own three-kernel profile; rejected performance, no own fresh dual-stream or sanitizer certificate",
+      "numerical_algorithm_changed": "native N32/fullK512/all7+8dots/RN/planes/inside preserved, one leaf per CTA/grid896/two49152Bslots/Shared98432B, extra7MiB FP32leaf workspace and same-stream scalar recombine kernel; three full kernels"
+    },
     "p35": {
       "checks": 78,
       "failures": 0,
@@ -6515,7 +6529,7 @@
     "restore": "Four working sources restored from committedP51 and binary copied byte-exact; own fresh process78gates passes",
     "scope": "contiguous1024^3 alpha1 beta0, original FP16/BF16 inputs/FP32output; originalFP64AB/gates, exact inside, seven main/eightcrossdots; no certificate transfer"
   },
-  "p53_prepared_proposal": {
+  "p53_historical_premeasurement_proposal": {
     "scope": "isolated CPU proposal generation only; working P51 retained, no P53 application/build/device measurement",
     "unchanged": {
       "compare.cu": true,
@@ -6534,6 +6548,932 @@
     "total_workspace_bytes": 19144064,
     "leaf_grid": 896,
     "run_kernel_count": 3,
+    "gpu_executed": false
+  },
+  "p53_leaf_parallel_control": {
+    "candidate": "P53",
+    "goal_achieved": false,
+    "performance_accepted": false,
+    "retained": "P51",
+    "ordinary_original_fp64_checks": 78,
+    "equal_inside_exponents": 79872,
+    "independent_checks_per_mode": 312,
+    "independent_exact_exponents_per_mode": 319488,
+    "printed_per_case_ef_matches_p51": true,
+    "full_output_bit_equality_proven": false,
+    "layout": {
+      "scope": "Pre-MMA only: own six synthetic native plane/TMA layouts, all896CTAs/four sequences/two-slot reuse, seven-plane output-coordinate bijection/shared+workspace+output guards. Generic reads release current slot without any MMA; no WGMMA wait-order, original-input matrix, performance or sanitizer certificate. Separate GPU recombination kernel compared against independent P51-order host oracle on three newly seeded signed/scaled/canceling leaf arrays and signed zeros, guarded output and unchanged leaf input.",
+      "configurations": 6,
+      "native_uint16_comparisons_including_cta_reuse": 415236096,
+      "unique_workspace_native_values_per_configuration": 5767168,
+      "bit_errors": 0,
+      "leaf_coordinate_checks": 11010048,
+      "consumer_runtime_capacity": [
+        {
+          "dtype": "bf16",
+          "sm_count": "132",
+          "active_blocks_per_sm": "2",
+          "grid": "896",
+          "shared_bytes": "98432"
+        },
+        {
+          "dtype": "fp16",
+          "sm_count": "132",
+          "active_blocks_per_sm": "2",
+          "grid": "896",
+          "shared_bytes": "98432"
+        }
+      ],
+      "rows": [
+        {
+          "dtype": "bf16",
+          "trial": "0",
+          "seed": "116081",
+          "ctas": "896",
+          "sequences": "4",
+          "slots": "2",
+          "native_comparisons": "69206016",
+          "a_errors": "0",
+          "b_errors": "0",
+          "shared_guard_errors": "0",
+          "coverage_errors": "0",
+          "workspace_guard_errors": "0",
+          "pass": "1"
+        },
+        {
+          "dtype": "bf16",
+          "trial": "1",
+          "seed": "116524",
+          "ctas": "896",
+          "sequences": "4",
+          "slots": "2",
+          "native_comparisons": "69206016",
+          "a_errors": "0",
+          "b_errors": "0",
+          "shared_guard_errors": "0",
+          "coverage_errors": "0",
+          "workspace_guard_errors": "0",
+          "pass": "1"
+        },
+        {
+          "dtype": "bf16",
+          "trial": "2",
+          "seed": "116967",
+          "ctas": "896",
+          "sequences": "4",
+          "slots": "2",
+          "native_comparisons": "69206016",
+          "a_errors": "0",
+          "b_errors": "0",
+          "shared_guard_errors": "0",
+          "coverage_errors": "0",
+          "workspace_guard_errors": "0",
+          "pass": "1"
+        },
+        {
+          "dtype": "fp16",
+          "trial": "0",
+          "seed": "116314",
+          "ctas": "896",
+          "sequences": "4",
+          "slots": "2",
+          "native_comparisons": "69206016",
+          "a_errors": "0",
+          "b_errors": "0",
+          "shared_guard_errors": "0",
+          "coverage_errors": "0",
+          "workspace_guard_errors": "0",
+          "pass": "1"
+        },
+        {
+          "dtype": "fp16",
+          "trial": "1",
+          "seed": "116757",
+          "ctas": "896",
+          "sequences": "4",
+          "slots": "2",
+          "native_comparisons": "69206016",
+          "a_errors": "0",
+          "b_errors": "0",
+          "shared_guard_errors": "0",
+          "coverage_errors": "0",
+          "workspace_guard_errors": "0",
+          "pass": "1"
+        },
+        {
+          "dtype": "fp16",
+          "trial": "2",
+          "seed": "117200",
+          "ctas": "896",
+          "sequences": "4",
+          "slots": "2",
+          "native_comparisons": "69206016",
+          "a_errors": "0",
+          "b_errors": "0",
+          "shared_guard_errors": "0",
+          "coverage_errors": "0",
+          "workspace_guard_errors": "0",
+          "pass": "1"
+        }
+      ],
+      "recombine_trials": 3,
+      "recombine_output_bit_comparisons": 3145728,
+      "recombine_bit_errors": 0,
+      "recombine_rows": [
+        {
+          "trial": "0",
+          "seed": "118097",
+          "output_bit_comparisons": "1048576",
+          "bit_errors": "0",
+          "guard_errors": "0",
+          "input_values": "1835264",
+          "input_errors": "0",
+          "nonfinite": "0",
+          "changed_order_negative_differences": "22524",
+          "pass": "1"
+        },
+        {
+          "trial": "1",
+          "seed": "118546",
+          "output_bit_comparisons": "1048576",
+          "bit_errors": "0",
+          "guard_errors": "0",
+          "input_values": "1835264",
+          "input_errors": "0",
+          "nonfinite": "0",
+          "changed_order_negative_differences": "22407",
+          "pass": "1"
+        },
+        {
+          "trial": "2",
+          "seed": "118995",
+          "output_bit_comparisons": "1048576",
+          "bit_errors": "0",
+          "guard_errors": "0",
+          "input_values": "1835264",
+          "input_errors": "0",
+          "nonfinite": "0",
+          "changed_order_negative_differences": "22554",
+          "pass": "1"
+        }
+      ]
+    },
+    "performance": {
+      "ordinary": [
+        {
+          "dtype": "bf16",
+          "old_candidate": "p51",
+          "new_candidate": "p53",
+          "old_group_median_us": 27.676800251,
+          "new_group_median_us": 41.052640915,
+          "relative_reduction": -0.483287104820461
+        },
+        {
+          "dtype": "fp16",
+          "old_candidate": "p51",
+          "new_candidate": "p53",
+          "old_group_median_us": 27.467400074,
+          "new_group_median_us": 41.138799667499995,
+          "relative_reduction": -0.49773184053342656
+        }
+      ],
+      "graph": [
+        {
+          "dtype": "bf16",
+          "old_candidate": "p51",
+          "new_candidate": "p53",
+          "old_group_median_us": 27.535359859499998,
+          "new_group_median_us": 37.3694400785,
+          "relative_reduction": -0.357143697020075
+        },
+        {
+          "dtype": "fp16",
+          "old_candidate": "p51",
+          "new_candidate": "p53",
+          "old_group_median_us": 27.3442800045,
+          "new_group_median_us": 37.463359356,
+          "relative_reduction": -0.37006201479193157
+        }
+      ]
+    },
+    "own_profile": {
+      "scope": "first three balanced BF16 P53 full kernels, frozen full comparison --quick; all profiler-process timing arms excluded from ordinary performance",
+      "kernels": [
+        {
+          "Kernel Name": {
+            "value": "void preprocess_cooperative_columns<cutlass::bfloat16_t>(const T1 *, const T1 *, T1 *, T1 *, T1 *, T1 *, int *, int *, int *, float *)",
+            "unit": ""
+          },
+          "gpu__time_duration.sum": {
+            "value": "16.992000",
+            "unit": "us"
+          },
+          "launch__registers_per_thread": {
+            "value": "52",
+            "unit": "register/thread"
+          },
+          "launch__shared_mem_per_block_static": {
+            "value": "0",
+            "unit": "byte/block"
+          },
+          "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+            "value": "14.578428",
+            "unit": "%"
+          },
+          "dram__bytes.sum": {
+            "value": "6.419456",
+            "unit": "Mbyte"
+          },
+          "lts__t_sectors_op_read.sum": {
+            "value": "341357.000000",
+            "unit": "sector"
+          },
+          "lts__t_sectors_op_write.sum": {
+            "value": "541226.000000",
+            "unit": "sector"
+          },
+          "l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum": {
+            "value": "0",
+            "unit": "sector"
+          },
+          "l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum": {
+            "value": "0",
+            "unit": "sector"
+          },
+          "smsp__average_warps_issue_stalled_barrier_per_issue_active.ratio": {
+            "value": "17.234804",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_branch_resolving_per_issue_active.ratio": {
+            "value": "0.470015",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_dispatch_stall_per_issue_active.ratio": {
+            "value": "0.206972",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_drain_per_issue_active.ratio": {
+            "value": "0.316783",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_gmma_per_issue_active.ratio": {
+            "value": "0.000000",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_imc_miss_per_issue_active.ratio": {
+            "value": "1.401022",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_lg_throttle_per_issue_active.ratio": {
+            "value": "1.032748",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+            "value": "9.684417",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_math_pipe_throttle_per_issue_active.ratio": {
+            "value": "0.183700",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_membar_per_issue_active.ratio": {
+            "value": "0.188834",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio": {
+            "value": "0.445334",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_misc_per_issue_active.ratio": {
+            "value": "0.017363",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_no_instruction_per_issue_active.ratio": {
+            "value": "0.199107",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_not_selected_per_issue_active.ratio": {
+            "value": "0.610805",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_selected_per_issue_active.ratio": {
+            "value": "0.996367",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio": {
+            "value": "0.245893",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_sleeping_per_issue_active.ratio": {
+            "value": "0.000000",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_tex_throttle_per_issue_active.ratio": {
+            "value": "0",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_wait_per_issue_active.ratio": {
+            "value": "1.465734",
+            "unit": "inst"
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.avg": {
+            "value": "11.79",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.max": {
+            "value": "52",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.min": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": {
+            "value": "1556",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.avg": {
+            "value": "0.36",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.max": {
+            "value": "3",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.min": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": {
+            "value": "47",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.avg": {
+            "value": "20.52",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.max": {
+            "value": "79",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.min": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": {
+            "value": "2708",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.avg": {
+            "value": "15.87",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.max": {
+            "value": "50",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.min": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": {
+            "value": "2095",
+            "unit": ""
+          },
+          "launch__block_size": {
+            "value": "256",
+            "unit": ""
+          },
+          "launch__grid_size": {
+            "value": "384",
+            "unit": ""
+          },
+          "launch__occupancy_limit_barriers": {
+            "value": "32.000000",
+            "unit": "block"
+          },
+          "launch__occupancy_limit_blocks": {
+            "value": "32.000000",
+            "unit": "block"
+          },
+          "launch__occupancy_limit_registers": {
+            "value": "4.000000",
+            "unit": "block"
+          },
+          "launch__occupancy_limit_shared_mem": {
+            "value": "3.000000",
+            "unit": "block"
+          },
+          "launch__occupancy_limit_warps": {
+            "value": "8.000000",
+            "unit": "block"
+          },
+          "launch__shared_mem_per_block_allocated": {
+            "value": "66.560000",
+            "unit": "Kbyte/block"
+          },
+          "launch__shared_mem_per_block_driver": {
+            "value": "1.024000",
+            "unit": "Kbyte/block"
+          },
+          "launch__shared_mem_per_block_dynamic": {
+            "value": "65.536000",
+            "unit": "Kbyte/block"
+          },
+          "launch__waves_per_multiprocessor": {
+            "value": "0.97",
+            "unit": ""
+          }
+        },
+        {
+          "Kernel Name": {
+            "value": "void corrected<cutlass::bfloat16_t>(CUtensorMap_st, CUtensorMap_st, const int *, const int *, float *)",
+            "unit": ""
+          },
+          "gpu__time_duration.sum": {
+            "value": "23.296000",
+            "unit": "us"
+          },
+          "launch__registers_per_thread": {
+            "value": "74",
+            "unit": "register/thread"
+          },
+          "launch__shared_mem_per_block_static": {
+            "value": "0",
+            "unit": "byte/block"
+          },
+          "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+            "value": "25.172080",
+            "unit": "%"
+          },
+          "dram__bytes.sum": {
+            "value": "12.022784",
+            "unit": "Mbyte"
+          },
+          "lts__t_sectors_op_read.sum": {
+            "value": "2874403.000000",
+            "unit": "sector"
+          },
+          "lts__t_sectors_op_write.sum": {
+            "value": "344486.000000",
+            "unit": "sector"
+          },
+          "l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum": {
+            "value": "0",
+            "unit": "sector"
+          },
+          "l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum": {
+            "value": "0",
+            "unit": "sector"
+          },
+          "smsp__average_warps_issue_stalled_barrier_per_issue_active.ratio": {
+            "value": "0.446891",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_branch_resolving_per_issue_active.ratio": {
+            "value": "0.091015",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_dispatch_stall_per_issue_active.ratio": {
+            "value": "0.160901",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_drain_per_issue_active.ratio": {
+            "value": "0.444224",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_gmma_per_issue_active.ratio": {
+            "value": "0.081229",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_imc_miss_per_issue_active.ratio": {
+            "value": "0.024732",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_lg_throttle_per_issue_active.ratio": {
+            "value": "0.011491",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+            "value": "4.581773",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_math_pipe_throttle_per_issue_active.ratio": {
+            "value": "0.115124",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_membar_per_issue_active.ratio": {
+            "value": "0.000000",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio": {
+            "value": "0.032219",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_misc_per_issue_active.ratio": {
+            "value": "0.001510",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_no_instruction_per_issue_active.ratio": {
+            "value": "0.062784",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_not_selected_per_issue_active.ratio": {
+            "value": "0.150173",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_selected_per_issue_active.ratio": {
+            "value": "0.999998",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio": {
+            "value": "0.178158",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_sleeping_per_issue_active.ratio": {
+            "value": "0.171524",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_tex_throttle_per_issue_active.ratio": {
+            "value": "0",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_wait_per_issue_active.ratio": {
+            "value": "1.738488",
+            "unit": "inst"
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.avg": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.max": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.min": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.avg": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.max": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.min": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.avg": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.max": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.min": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.avg": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.max": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.min": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": {
+            "value": "0",
+            "unit": ""
+          },
+          "launch__block_size": {
+            "value": "256",
+            "unit": ""
+          },
+          "launch__grid_size": {
+            "value": "896",
+            "unit": ""
+          },
+          "launch__occupancy_limit_barriers": {
+            "value": "32.000000",
+            "unit": "block"
+          },
+          "launch__occupancy_limit_blocks": {
+            "value": "32.000000",
+            "unit": "block"
+          },
+          "launch__occupancy_limit_registers": {
+            "value": "3.000000",
+            "unit": "block"
+          },
+          "launch__occupancy_limit_shared_mem": {
+            "value": "2.000000",
+            "unit": "block"
+          },
+          "launch__occupancy_limit_warps": {
+            "value": "8.000000",
+            "unit": "block"
+          },
+          "launch__shared_mem_per_block_allocated": {
+            "value": "99.456000",
+            "unit": "Kbyte/block"
+          },
+          "launch__shared_mem_per_block_driver": {
+            "value": "1.024000",
+            "unit": "Kbyte/block"
+          },
+          "launch__shared_mem_per_block_dynamic": {
+            "value": "98.432000",
+            "unit": "Kbyte/block"
+          },
+          "launch__waves_per_multiprocessor": {
+            "value": "3.39",
+            "unit": ""
+          }
+        },
+        {
+          "Kernel Name": {
+            "value": "recombine(const float *, float *)",
+            "unit": ""
+          },
+          "gpu__time_duration.sum": {
+            "value": "6.240000",
+            "unit": "us"
+          },
+          "launch__registers_per_thread": {
+            "value": "18",
+            "unit": "register/thread"
+          },
+          "launch__shared_mem_per_block_static": {
+            "value": "0",
+            "unit": "byte/block"
+          },
+          "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+            "value": "18.315580",
+            "unit": "%"
+          },
+          "dram__bytes.sum": {
+            "value": "7.450880",
+            "unit": "Mbyte"
+          },
+          "lts__t_sectors_op_read.sum": {
+            "value": "229568.000000",
+            "unit": "sector"
+          },
+          "lts__t_sectors_op_write.sum": {
+            "value": "196360.000000",
+            "unit": "sector"
+          },
+          "l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum": {
+            "value": "0",
+            "unit": "sector"
+          },
+          "l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum": {
+            "value": "0",
+            "unit": "sector"
+          },
+          "smsp__average_warps_issue_stalled_barrier_per_issue_active.ratio": {
+            "value": "0.000000",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_branch_resolving_per_issue_active.ratio": {
+            "value": "0.205545",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_dispatch_stall_per_issue_active.ratio": {
+            "value": "0.749482",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_drain_per_issue_active.ratio": {
+            "value": "1.025838",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_gmma_per_issue_active.ratio": {
+            "value": "0.000000",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_imc_miss_per_issue_active.ratio": {
+            "value": "14.938189",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_lg_throttle_per_issue_active.ratio": {
+            "value": "1.192780",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+            "value": "28.054662",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_math_pipe_throttle_per_issue_active.ratio": {
+            "value": "0.084815",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_membar_per_issue_active.ratio": {
+            "value": "0.000000",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio": {
+            "value": "11.024870",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_misc_per_issue_active.ratio": {
+            "value": "0.000000",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_no_instruction_per_issue_active.ratio": {
+            "value": "0.686417",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_not_selected_per_issue_active.ratio": {
+            "value": "1.951465",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_selected_per_issue_active.ratio": {
+            "value": "1.000000",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio": {
+            "value": "1.766357",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_sleeping_per_issue_active.ratio": {
+            "value": "0.000000",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_tex_throttle_per_issue_active.ratio": {
+            "value": "0",
+            "unit": "inst"
+          },
+          "smsp__average_warps_issue_stalled_wait_per_issue_active.ratio": {
+            "value": "2.727644",
+            "unit": "inst"
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.avg": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.max": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.min": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.avg": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.max": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.min": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.avg": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.max": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.min": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.avg": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.max": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.min": {
+            "value": "0",
+            "unit": ""
+          },
+          "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": {
+            "value": "0",
+            "unit": ""
+          },
+          "launch__block_size": {
+            "value": "256",
+            "unit": ""
+          },
+          "launch__grid_size": {
+            "value": "1024",
+            "unit": ""
+          },
+          "launch__occupancy_limit_barriers": {
+            "value": "32.000000",
+            "unit": "block"
+          },
+          "launch__occupancy_limit_blocks": {
+            "value": "32.000000",
+            "unit": "block"
+          },
+          "launch__occupancy_limit_registers": {
+            "value": "10.000000",
+            "unit": "block"
+          },
+          "launch__occupancy_limit_shared_mem": {
+            "value": "32.000000",
+            "unit": "block"
+          },
+          "launch__occupancy_limit_warps": {
+            "value": "8.000000",
+            "unit": "block"
+          },
+          "launch__shared_mem_per_block_allocated": {
+            "value": "1.024000",
+            "unit": "Kbyte/block"
+          },
+          "launch__shared_mem_per_block_driver": {
+            "value": "1.024000",
+            "unit": "Kbyte/block"
+          },
+          "launch__shared_mem_per_block_dynamic": {
+            "value": "0.000000",
+            "unit": "Kbyte/block"
+          },
+          "launch__waves_per_multiprocessor": {
+            "value": "0.97",
+            "unit": ""
+          }
+        }
+      ]
+    },
+    "fresh_stream_guard_acceptance": false,
+    "sanitizer_acceptance": false,
+    "nominal_transfer": {
+      "bytes_whole_grid": 138412032,
+      "tma_commands": 11264,
+      "source_payload_same_as_p51": true,
+      "additional_leaf_workspace_bytes": 7340032,
+      "total_workspace_bytes": 19144064,
+      "run_kernels": 3,
+      "interpretation": "source box counts, not measured physical traffic; shared stage depth/grid/temporary output change together, no unique causal attribution or physical floor; profiler timings excluded and not summed into ABBA decomposition"
+    },
+    "restore": "Four working sources/binary restored byte-exact P51, own fresh process78gates/exactinside passes",
+    "scope": "contiguous1024^3 alpha1 beta0, original FP16/BF16 inputs/FP32output; originalFP64AB/gates, exact inside, seven main/eightcrossdots; no certificate transfer"
+  },
+  "p54_prepared_proposal": {
+    "scope": "isolated CPU prepared P54 proposal from rejected frozen P53; working P51 retained; no P54 application/build/device measurement",
+    "unchanged": {
+      "pack.cuh": true,
+      "compare.cu": true,
+      "pow2.cuh": true
+    },
+    "recombine_kernel_byte_identical_to_p53": true,
+    "generated_source_sha256": {
+      "pack.cuh": "bdbf2960fbb91257fb1f611bad4b3b6375c8349653f11214a613bea885cbb20e",
+      "corrected.cuh": "553d00b2d152df470de1b59d87ec748127d88e7dab72fd7dfa92fc6f37e11653",
+      "compare.cu": "aded56c6126b9bc509a7cc68ac2a657f0131a2dba6b3f30114f4693f63e03aae",
+      "pow2.cuh": "5a15f7a2406d7ef23d70068e7667849d004fc1906795ac47f726685a36809d13"
+    },
+    "consumer_shared_arithmetic_bytes": 131200,
+    "leaf_grid": 448,
+    "total_workspace_bytes": 19144064,
+    "run_kernel_count": 3,
+    "nominal_tma_payload_bytes": 92274688,
+    "nominal_tma_commands": 5632,
+    "native_mma_instructions_whole_grid": 30720,
     "gpu_executed": false
   },
   "p48_independent_performance": [
@@ -8095,7 +9035,7 @@
     ],
     "scope": "Full original-input FP64 matrix gates; printed eF equality is not a bitwise-output claim. Host eligibility diagnostics outside timing. No production integration. Unlocked clocks, no confidence interval."
   },
-  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11/M12/M13/M14 are numerical only. P43 owns fresh9-pattern108/864stress without tools/independent Graph timing; P44 ordinaryABBA only. P45 owns ordinary/Graph78, fresh108/864stress and36/72tools; P46 owns its independent ordinary/GraphABBA, fresh108/864stress and36/72tools; P47 owns independent ordinary/GraphABBA, fresh108/864stress,36/72tools and separate54configurations of full native plane/exponent bit comparisons; P48 has only ordinary/GraphABBA and matching device code, no fresh stress/tools and is rejected; P49 has own ordinary/Graph ABBA and54fresh packing configurations but is rejected, no fresh stress/tools; P50 owns ordinary/Graph ABBA,54fresh packing configurations plus18edge packing configurations, fresh12-pattern144/1152stress and48/96tools per tool; P51 owns ordinary/Graph ABBA,54fresh packing configurations plus18edge32K packing configurations, fresh12-pattern144/1152stress and48/96tools per tool; P52 owns six synthetic pre-MMA layouts, ordinary78 and independent ordinary/GraphABBA312 each plus ownprofile; rejected, no own fresh stress/tools. P53 only CPU prepared proposal/recombination model; none transfers to later changes.",
+  "validations_not_transferred": "P20, P24, P26, P27, P29 and P30 each have their own Graph78, independent stress84/672calls and scoped sanitizers28/56calls per tool. P7 remains historical; fusion candidates retain only their separately recorded scope. P33 has its own9-pattern108/864stress and36/72scoped tools; rejectedP31 has only9-pattern stress, P32/P34/P35/P36/P37 only ordinary, P38 ordinary plus ABBA. P39 owns its Graph78, fresh9-pattern108/864stress and36/72tools. P40 owns ordinary/GraphABBA312 each, P41/P42 ordinaryABBA312 only; no fresh stress/tools acceptance. M11/M12/M13/M14 are numerical only. P43 owns fresh9-pattern108/864stress without tools/independent Graph timing; P44 ordinaryABBA only. P45 owns ordinary/Graph78, fresh108/864stress and36/72tools; P46 owns its independent ordinary/GraphABBA, fresh108/864stress and36/72tools; P47 owns independent ordinary/GraphABBA, fresh108/864stress,36/72tools and separate54configurations of full native plane/exponent bit comparisons; P48 has only ordinary/GraphABBA and matching device code, no fresh stress/tools and is rejected; P49 has own ordinary/Graph ABBA and54fresh packing configurations but is rejected, no fresh stress/tools; P50 owns ordinary/Graph ABBA,54fresh packing configurations plus18edge packing configurations, fresh12-pattern144/1152stress and48/96tools per tool; P51 owns ordinary/Graph ABBA,54fresh packing configurations plus18edge32K packing configurations, fresh12-pattern144/1152stress and48/96tools per tool; P52 owns six synthetic pre-MMA layouts, ordinary78 and independent ordinary/GraphABBA312 each plus ownprofile; rejected, no own fresh stress/tools. P53 owns six synthetic pre-MMA layouts, three scalar GPU recombination trials, ordinary78, independent ordinary/GraphABBA312 each and own three-kernel profile; rejected, no own fresh dual-stream matrix stress/tools. P54 is only an isolated CPU prepared proposal; none transfers to later changes.",
   "remaining": "Resolve the end-to-end latency gap, then independent performance repeats, Graph/dual-stream/sanitizer and production integration.",
   "native_fusion_hardware": {
     "audit": "research/precision_20261016/fused_native/audit.json",

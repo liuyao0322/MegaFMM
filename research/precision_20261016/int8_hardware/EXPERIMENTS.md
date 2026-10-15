@@ -806,3 +806,36 @@ andsame-streamrecombine. Allthree kernelsmustcountinfullordinary/Graphcost.
 CPUscalarRNmodelseed117089262144leaftuples1048576bitchecks0errors; changed
 ordernegativecontrol34042differences. IsolatedCPUgeneratedproposalonly;
 ownpre-MMAlayoutandGPUrecombineprobesmandatory,nocertificatetransfer.
+
+
+P53 appliedexactfrozenCPUproposalhashes, ownsourceMF frozenbeforebuild. Own
+pre-MMA sixsyntheticnativeTMA/layout/twoslotchecks all896CTAs/foursequences
+415236096uint16 comparisons(includingCTAreuse),11010048seven-planecoordinates
+andshared/workspace/outputguardszeroerrors. Bothdtypesactual2CTA/SM,98432B.
+Own separateGPUrecombine3newseedleafarrays3145728outputbitcomparisonszero
+errors,leafinputunchangedincludingguards,outputguards/noNFpass, independent
+hostP51-orderoracle. Negativechangedorderdiffers22524/22407/22554outputs.
+NoMMArunintheseprobes; genericcurrentretirementdoesnotcertifyMMAwaitorder.
+Ownfullcomparisonbuildstartedafterterminalprobeexit0/auditpass.
+
+P53 standard78/79872inside allpass, maxBF16/FP16eF1.61320431617e-5/
+2.16394614392e-5,printedpercaseP51equal(notfullmatrixbitcertificate).
+Prep52/48regs,consumer74/recombine18,0stack/spill/noC7515/C7510. Independent
+ordinaryP51->P53 BF16/FP16 27.676800251/27.467400074->41.052640915/41.1387996675us,
+48.3287/49.7732%slower; Graph27.5353598595/27.3442800045->37.3694400785/
+37.463359356us,35.7144/37.0062%slower. Eachmode312gates/319488expspass,unlocked/
+noCI. RejectP53,noownfreshdualstream/sanitizeracceptance. OwnfirstbalancedBF16
+NCU17passes/kernel allthree: prep16.992us/52regs/65536B/shared3reg4limit;
+leaf23.296us/74regs/98432B/shared2reg3limit/issue25.172080%; recombine6.240us/
+18regs/0B/issue18.315580%;all0localRW. Profilertimingsexcluded/notABBA
+decomposition. P51fourworkingsourcesandbinrestoredexact,ownnewprocess78/79872
+pass. Ownscope frozenLEAF_PARALLEL_HARDWARE.md/p53_hardware.json/MF.
+
+AfterP51/P52/P53sub3%,reviewedownP53profile/history+freshprimaryCUTLASS
+EfficientGEMM/Hopperwarp-specializationandCUDA12.4HopperTuningGuide. Next
+LEAF_N64_DESIGN.md/generate_leaf_n64.py preparesP54onlyfromfrozenP53: N64,
+448CTAs/131200BShared,two65536Bslots,d/r32;unchangedpack/compare/pow2/scalar
+recombine,fullK512/all7+8/nativep11p8/inside/originalgate/dtypes,7MiBleaf and
+threecompletekernels. NominalTMA92274688B/5632commands/30720WGMMAinstructions
+notphysicaltraffic/speedproof. IsolatedCPUproposalchecks pass; workingP51
+retained, noP54application/build/deviceexecution,candidate-specificgatesrequired.

@@ -162,3 +162,28 @@ pass before any new MMA. Then originalgates/exactinside/independent ordinary+
 GraphABBA; if retained, own new12pattern dualstream/guards/scopedthree tools.
 More occupancy is not guaranteed speed; source payload counts are not physical
 traffic, no floor established. Production/library unchanged, goalactive.
+
+
+## P53 rejected; P54 prepared native N64 shape control
+
+P53 is now measured and rejected. Own six fresh synthetic layouts415236096uint16
+comparisons/11010048leafcoordinates and three freshGPU scalarrecombine3145728
+outputbitchecks/guards pass before any MMA. Standard78/79872originalgates/exps
+pass; consumer74regs/recombine18/zero spill, actual2CTA/SM. Independentordinary
+P51->P53 BF16/FP16 27.676800/27.467400->41.052641/41.138800us (48.329/49.773%
+slower); Graph27.535360/27.344280->37.369440/37.463359 (35.714/37.006%slower).
+Eachmode312gates/319488inside, unlocked/noCI, noownfreshstress/tools. Ownthree
+kernelNCU prep16.992us/52regs,leaf23.296us/74regs/98432B/sharedlimit2/issue25.172080%,
+recombine6.240us/18regs,all0localRW. Profilertimingsexcluded/notABBAdecomposition.
+P51sources/binrestoredbyteexact and newprocess78gates/insidepass.
+
+AfterP51/P52/P53sub3percent, ownprofile/history and newlysearched/readprimary
+CUTLASS EfficientGEMM and CUDA12.4Hopper guide informLEAF_N64_DESIGN.md. P54
+preparedonlyfromfrozenP53: native64x64/fullK512/twoslots65536B/Shared131200B,
+grid448,d/r32,all7+8dots,p11/8/inside/originaldtypes/RN unchanged. Three kernels,
+7MiBleaf workspace and byte-identical scalar recombine preserved; no shortcut
+costaccounting. NominalTMA2/3P53/instructions1/2,notphysicaltraffic/speedproof.
+IsolatedCPUgenerationonly, noP54sourceapplication/build/deviceexecution.
+Ownnewpre-MMAlayout+scalarGPUrecombine first, thenoriginalgates/exactinside,
+independentP53/P54shapecontrol andP51/P54retentioncomparison ordinary+Graph;
+ownfreshdualstream/guards/tools if retained. CurrentP51,productionunchanged.

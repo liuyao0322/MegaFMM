@@ -1,0 +1,157 @@
+{
+  "scope": "Pre-MMA only: own six synthetic native plane/TMA layouts, all896CTAs/four sequences/two-slot reuse, seven-plane output-coordinate bijection/shared+workspace+output guards. Generic reads release current slot without any MMA; no WGMMA wait-order, original-input matrix, performance or sanitizer certificate. Separate GPU recombination kernel compared against independent P51-order host oracle on three newly seeded signed/scaled/canceling leaf arrays and signed zeros, guarded output and unchanged leaf input.",
+  "configurations": 6,
+  "native_uint16_comparisons_including_cta_reuse": 415236096,
+  "unique_workspace_native_values_per_configuration": 5767168,
+  "bit_errors": 0,
+  "leaf_coordinate_checks": 11010048,
+  "consumer_runtime_capacity": [
+    {
+      "dtype": "bf16",
+      "sm_count": "132",
+      "active_blocks_per_sm": "2",
+      "grid": "896",
+      "shared_bytes": "98432"
+    },
+    {
+      "dtype": "fp16",
+      "sm_count": "132",
+      "active_blocks_per_sm": "2",
+      "grid": "896",
+      "shared_bytes": "98432"
+    }
+  ],
+  "rows": [
+    {
+      "dtype": "bf16",
+      "trial": "0",
+      "seed": "116081",
+      "ctas": "896",
+      "sequences": "4",
+      "slots": "2",
+      "native_comparisons": "69206016",
+      "a_errors": "0",
+      "b_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "bf16",
+      "trial": "1",
+      "seed": "116524",
+      "ctas": "896",
+      "sequences": "4",
+      "slots": "2",
+      "native_comparisons": "69206016",
+      "a_errors": "0",
+      "b_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "bf16",
+      "trial": "2",
+      "seed": "116967",
+      "ctas": "896",
+      "sequences": "4",
+      "slots": "2",
+      "native_comparisons": "69206016",
+      "a_errors": "0",
+      "b_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "fp16",
+      "trial": "0",
+      "seed": "116314",
+      "ctas": "896",
+      "sequences": "4",
+      "slots": "2",
+      "native_comparisons": "69206016",
+      "a_errors": "0",
+      "b_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "fp16",
+      "trial": "1",
+      "seed": "116757",
+      "ctas": "896",
+      "sequences": "4",
+      "slots": "2",
+      "native_comparisons": "69206016",
+      "a_errors": "0",
+      "b_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "fp16",
+      "trial": "2",
+      "seed": "117200",
+      "ctas": "896",
+      "sequences": "4",
+      "slots": "2",
+      "native_comparisons": "69206016",
+      "a_errors": "0",
+      "b_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    }
+  ],
+  "recombine_trials": 3,
+  "recombine_output_bit_comparisons": 3145728,
+  "recombine_bit_errors": 0,
+  "recombine_rows": [
+    {
+      "trial": "0",
+      "seed": "118097",
+      "output_bit_comparisons": "1048576",
+      "bit_errors": "0",
+      "guard_errors": "0",
+      "input_values": "1835264",
+      "input_errors": "0",
+      "nonfinite": "0",
+      "changed_order_negative_differences": "22524",
+      "pass": "1"
+    },
+    {
+      "trial": "1",
+      "seed": "118546",
+      "output_bit_comparisons": "1048576",
+      "bit_errors": "0",
+      "guard_errors": "0",
+      "input_values": "1835264",
+      "input_errors": "0",
+      "nonfinite": "0",
+      "changed_order_negative_differences": "22407",
+      "pass": "1"
+    },
+    {
+      "trial": "2",
+      "seed": "118995",
+      "output_bit_comparisons": "1048576",
+      "bit_errors": "0",
+      "guard_errors": "0",
+      "input_values": "1835264",
+      "input_errors": "0",
+      "nonfinite": "0",
+      "changed_order_negative_differences": "22554",
+      "pass": "1"
+    }
+  ]
+}
