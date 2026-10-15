@@ -1,7 +1,7 @@
 # Remaining-cost experiments and outcomes
 
 
-**Current checkpoint: P47 is the fully validated ordinary/Graph research reference; production performance target remains unmet.** Its own complete validation and paired results are inEXPERIMENTS.md andp47_validation.json. P48's compact scratch and new native raw fusionN1/N2/N3 fail independent complete-call comparisons. Native fusion preserves precision but costs~615/~118/~105us versusP47~28.8us. Each has own layout/ordinary/Graph evidence and profile, no fresh dual-stream/guard or sanitizer acceptance. The final section records a separate unimplemented P49 producer-reuse proposal; no acceptance or floor claim transfers.
+**Current checkpoint: P50 is the fully validated ordinary/Graph research reference; production performance target remains unmet.** Own ordinary/Graph ABBA improve over same-roundP47 by2.61/2.78% and2.38/1.77% BF16/FP16, complete calls28.1–28.3us versusSW~10us. Own12-pattern stress144/1152calls and scoped tools48/96calls each pass; own54full-plane bit configurations plus18finite-edge packing configurations pass. P49 all-native tuple reuse alone regresses; spatial subdivision in P50 provides a small gain. SeeALL_NATIVE_PACK_GEOMETRY_HARDWARE.md andp50_validation.json. HistoricalP47 remains independently validated. Native fusionN1/N2/N3 are rejected,~615/~118/~105us with own layout/matrix/profile evidence, no own stress/tools. Each acceptance is candidate-specific. Reassessment reviewed ownP50profile, N1–N3/P49/P50 history and fresh primary CUDA12.4BestPractices before another geometry control; no physicalfloor.
 
 P27 supplied the fully validated research base, about41us ordinary full calls versus production SW about10us. Completed controls and remaining hypotheses are distinguished below; final retention and validation scope are recorded inEXPERIMENTS.md. Preserve seven native products, eight integer dots, exact per-column inside scaling, original rounded-input FP64 reference and all current preparation/descriptor costs. FrozenP27 profile reports joint pack56regs/65,576B shared, a shared-resource limit3CTAs/SM and issueactive53.16percent. Corrected196regs/196,736B is limited to1CTA/SM and issueactive35.71percent. All four measured kernels have zero local sectors on that input. Partial/finalize show high long-scoreboard/issue-active ratios,5.950/6.163. These are diagnostic metrics, not time fractions or a physical floor. Seeprofile_p27_stats.json and its manifest; never overlap GPU tasks.
 
@@ -130,3 +130,12 @@ packinginactive onlyafterexistinggridbarrier.96packingCTAs may reduce hiding;
 querynewresources/layoutbits/ownoriginalgates/fullordinary+Graph/freshness/tools
 before retention. SeeALL_NATIVE_PACK_DESIGN.md. No P49 implementation binary,
 measurement or acceptance exists at this checkpoint.
+
+
+P51 premeasurement proposal prepared after P50 acceptance/reassessment:
+ALL_NATIVE_PACK_GRID_DESIGN.md +generate_all_native_grid.py. A16x128/B32x32,
+384activepackingCTAs, cooperativegrid384/allthreadsunconditionalbarrier;
+actualresidentcapacitymandatory, Bfactorlane%4 andcomponentdiagnosticgrids
+128A/256Brequiredforbounds/coverage. Consumer/pow2byteexactP50. IsolatedCPU
+generationonly atthischeckpoint; own54freshbit+18edge32Kpackingchecks mustpass
+beforefirstP51MMA. NoP51speed/precision/toolclaim orcertificate transfer.

@@ -648,3 +648,81 @@ rawtuplereusetoglobalP47producer, preservesconsumer/grid288/65536B/resources
 untilmeasured;onlyGroup0packsall11planes,96packingCTAsvs288mayloseparallelism.
 ALL_NATIVE_PACK_DESIGN.mdandgeneratorpreparedonly,notapplied/built/measured.
 NoP49speedclaim,nocertificate transfer. ProductionhashauditandP47identityrequired.
+
+
+## P49 — all native planes from one raw tuple, premeasurement
+
+Apply prepared generator from frozenP47. Keep cooperative288grid/inside/barriers,
+65536Brequest,tilegeometry,normal-exponent shuffle/guard/fallback,RN operations,
+planes/descriptors/workspace andconsumer unchanged. Group0 emitsall7high/4low;
+Group1/2packinactive afterexistinggridbarrier.96actualpackingCTAs vs288maylose
+latencyhiding; source reuse doesnot imply speed. Own54fresh full-plane bitprobe
+seed109003+383*trial+83*pattern, poisonnewworkspace before eachpreprocess, require
+all11planesbothsides/1024inside bitexactP47 before anyP49MMA. Thenownoriginal
+FP64gate/exactinside/fullordinary+GraphABBA; ownfreshness/toolsrequiredifretained.
+P47remainsreferenceuntilindependentacceptance; productionunchanged.
+
+
+P49ownordinary78/79872insidepass,maxBF16/FP16ef1.61320431617e-5/2.16394614392e-5,
+preprocess54/47regs,consumer143,0stack/spill/noC7515/C7510,actual3CTA/SM capacity.
+Own54freshpoisoned full-planeprobe311427072nativevalues/55296exponents0errors.
+Independentordinary P47->P49 BF1628.696840->30.314680us,FP1628.824400->29.816440us
+(5.638/3.442percent slower);Graph28.654680->30.146040 and28.814800->30.032279
+(5.205/4.225percent slower). Eachmode312gates/319488expspass,unlocked/noCI.
+Rejectperformance;noownfreshdual-stream/guards/sanitizeracceptance. OwnBF16NCU
+prep20.096us/54regs/65536B/3sharedlimitCTAs issue15.224558%,consumer17.536us/
+143regs/196736B/1CTAbyshared+regs issue31.588867%;both0localRWsectors.
+Profileprocessalltimings excluded; no uniqueparallelismcost/floorclaim.
+
+## P50 — all-plane producer spatial subdivision, premeasurement
+
+StartfrozenP49, halveAtileRows64->32 andB128->64, samecols128/32,all7high/4low,
+sameallnativeRN/p11p8/consumer/insidegrid288/65536B. Group0counts32A+64B->64A+
+128B,192activepackingCTAs. Updategroupdivisions andBwarpinsidefactorlane%16->%8
+for8loopiterations toavoidbeyond1024insideatlasttile; no exponentapproximation.
+Existingdiagnosticgrids96A/192Bcovernewtiles. ALL_NATIVE_PACK_GEOMETRY_DESIGN.md
+recordsnewcapacity/ownpoisonedpreMMA54freshseed110017formula andfullacceptance
+requirements. No speedclaim fromsourcecounts. P47 remainsresearchreference.
+
+
+P50ownpre-MMA54freshpoisonedfull-planecomparisons311427072nativevalues+55296
+insideexpsallbitexactP47. Additional18freshfiniteedgecases103809024nativevalues+
+18432exps0errors:BF16large/subnormalpairsandreversed,alternating64Knormal/
+out-of-rangescales;actualinsideabsmax130,out-of-normal1024or512vsFP16max19/0.
+TheyexercisesharedB128guardfallbackversusnewB64normal/fallbackseparation.
+Thesearepacking-onlydiagnostics,nofullFP64matrix/sanitizeracceptance. FirstP50
+MMAhasnotexecutedatthischeckpoint. p50_edges_manifest.jsonpreservessource/logs.
+
+
+P50 own ordinary78/79872exponents pass, maxBF16/FP16ef1.61320431617e-5/
+2.16394614392e-5, matchingP47printedper-casevalues; prep54/47regs,consumer143,
+zero stack/spill/noC7515/C7510, actual3CTA/SM. Independentordinary P47->P50
+28.897120/28.852760->28.143240/28.051480us (2.60884/2.77714% reduction);
+Graph28.872840/28.852360->28.184720/28.341720 (2.38328/1.76984%). Eachmode
+312originalgates/319488exponents pass, unlocked/noCI. Own12-pattern freshstress
+seed50957+401trial+211stream+101pattern,144configs/1152interleavedcalls,2streams/
+workspaces and128floatguards bothends allpass. BothoriginalDense-dependentgate
+and stricterfixedfloor BF16<=1e-3/FP16<=1e-4 enforced; maxef1.53744945035e-5/
+2.09392400621e-5, noNF. Includes realcompleteFP64matrix extreme/subnormal cases,
+not justpacking. Own scopedmemcheck/racecheck/synccheck each48configs/96calls,
+zeroerrors, racezerohazards/warnings, terminaldriverexit0. RetainP50research
+reference; notproductionperformancewinner, noformaliter371.
+
+Own firstbalancedBF16 NCU17passes/kernel prep18.464us/54regs/65536B/sharedlimit3,
+issue14.653062%; consumer17.440us/143regs/196736B/shared+reglimit1/issue31.567722%;
+both0localRW. Profiletimingsexcluded. LowerP50issueversusP49despitefastercalls
+precludes simplistic monotonicissue/occupancycausality. No physicalfloor.
+After N1/N2/N3, P49 and P50 sub3% results, reviewedfrozenhistory+ownP50profile+
+freshprimaryCUDA12.4BestPractices sections10.1/10.3/10.4 beforeanyP51. More
+parallelismmayhide latency but higheroccupancydoesnotguaranteespeed; actual
+cooperativecapacitymandatory. See ALL_NATIVE_PACK_GEOMETRY_HARDWARE.md.
+P49/P50 generators reproduceallfourfrozensourcefilesinisolatedCPUdirectories.
+
+
+P51 premeasurement proposal prepared after P50 acceptance/reassessment:
+ALL_NATIVE_PACK_GRID_DESIGN.md +generate_all_native_grid.py. A16x128/B32x32,
+384activepackingCTAs, cooperativegrid384/allthreadsunconditionalbarrier;
+actualresidentcapacitymandatory, Bfactorlane%4 andcomponentdiagnosticgrids
+128A/256Brequiredforbounds/coverage. Consumer/pow2byteexactP50. IsolatedCPU
+generationonly atthischeckpoint; own54freshbit+18edge32Kpackingchecks mustpass
+beforefirstP51MMA. NoP51speed/precision/toolclaim orcertificate transfer.

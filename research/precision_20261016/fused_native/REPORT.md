@@ -1,6 +1,9 @@
 # Native fusion hardware evidence
 
-P47 remains the fully validated ordinary/Graph research reference. Production
+At the native-fusion checkpoint, P47 was the fully validated ordinary/Graph
+research reference. The later independently validated P50 producer is now the
+reference (~28.1–28.3us; see ../int8_hardware/ALL_NATIVE_PACK_GEOMETRY_HARDWARE.md).
+All N1/N2/N3 comparisons below retain their original frozen P47 controls. Production
 and its static library remain unchanged. The accuracy/performance goal is active:
 P47 takes~28.8us versus production SW~10us, while production SW still fails the
 original accuracy requirement. Native fusion N1/N2 pass their own numerical

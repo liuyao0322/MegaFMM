@@ -6,17 +6,16 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 **2026-10-16 精度研究：** [调研、误差消融与硬件对照](research/precision_20261016/REPORT.md)
 和[针对性方案设计](research/precision_20261016/DESIGN.md)。生产源码与研究起点一致，
 原七乘法仍未通过原始精度门槛；达标且更快的直接输入稠密原型保留为研究对照。
-[补偿路径硬件研究](research/precision_20261016/int8_hardware/HARDWARE_REPORT.md)的普通和Graph参考现统一为P47，P46/P45/P39为完整验收历史回退。
-原始FP16/BF16输入、精确逐列平衡、七个主乘积和全部八个交叉修正点积保留。M13先筛选重组顺序，P46复用高部执行主项与修正，P47再直接写出原生高低部，移除不再需要的FP32暂存。
-普通标准检查最大BF16/FP16 eF为1.61320e-5/2.16395e-5；P47与P46打印误差逐项相同。
-独立普通ABBA同轮P46→P47为30.376→28.809μs / 30.354→28.813μs，降低5.16%/5.08%；Graph30.408→28.640μs / 30.545→28.853μs，降低5.81%/5.54%。
-此前P46相对同轮P45普通降低13.69%/13.80%、Graph14.69%/14.63%；这些是分别进行的对照。
-P47自身普通/Graph各78项精度和每模式79,872个指数检查、新种子九模式双流108配置/864调用及保护区全部通过；
-memcheck/racecheck/synccheck限定范围各36配置/72调用零错误，racecheck零警告/零hazard；另54组新输入对约3.11亿个高低部数值逐位比较零差异。
+[补偿路径硬件研究](research/precision_20261016/int8_hardware/HARDWARE_REPORT.md)的普通和Graph参考现统一为P50，P47/P46/P45/P39为历史完整验收回退。
+原始FP16/BF16输入、精确逐列平衡、七个主乘积和全部八个交叉修正点积保留。P46复用高部执行主项与修正，P47直接写出原生高低部；P49复用原始值但性能变慢，P50缩小打包任务后获得小幅收益。
+普通标准78项最大BF16/FP16 eF为1.61320e-5/2.16395e-5，与P47打印误差逐项相同。
+独立普通ABBA同轮P47→P50为28.897→28.143μs / 28.853→28.051μs，降低2.61%/2.78%；Graph28.873→28.185μs / 28.852→28.342μs，降低2.38%/1.77%。
+P50自身普通/Graph各78项精度和每模式79,872个指数检查、新种子12模式双流144配置/1,152调用及保护区全部通过；
+memcheck/racecheck/synccheck限定范围各48配置/96调用零错误，racecheck零警告/零hazard；另54组新输入的约3.11亿个原生高低部值及18组极端缩放的约1.04亿个值逐位比较均无差异。极端样本也通过自身完整FP64矩阵stress。
 未锁时钟，无置信区间；完整调用仍约为生产SW的2.8倍，未进入生产或改变Auto。
-[P47实现](research/precision_20261016/int8_hardware/DIRECT_NATIVE_PACK_HARDWARE.md)、[自身验收](research/precision_20261016/int8_hardware/p47_validation.json)、
+[P50实现与消融](research/precision_20261016/int8_hardware/ALL_NATIVE_PACK_GEOMETRY_HARDWARE.md)、[自身验收](research/precision_20261016/int8_hardware/p50_validation.json)、
 [综合审计](research/precision_20261016/fused_int8/audit.json)及[后续消融](research/precision_20261016/int8_hardware/NEXT_EXPERIMENTS.md)保留确切范围与性能差距。
-P48缩小共享申请量未获完整收益。M14通过后，实现并独立测量[原生融合N1/N2/N3](research/precision_20261016/fused_native/REPORT.md)：各自布局和原始精度通过，普通/Graph完整调用约615/118/105μs，均慢于同轮P47，全部拒绝；没有将P47的双流或工具验收转移给它们。重复变换与指数缓存消融、各自profile和失败布局证据保留；下一步回到P47的全局原生生产器复用原始值，方案尚未实现。目标继续进行。
+P48缩小共享申请量未获完整收益。[原生融合N1/N2/N3](research/precision_20261016/fused_native/REPORT.md)各自布局和原始精度通过，普通/Graph完整调用约615/118/105μs，均慢于同轮P47，全部拒绝；没有将其他候选的双流或工具验收转移给它们。目标继续进行。
 [片上融合后续](research/precision_20261016/fused_int8/REPORT.md)修正布局后通过72项普通精度；继续移出逐元素缩放判断后，F13完整调用约224–240 μs，仍拒绝性能验收。
 下方 iter282 等标签为历史检查点，实际起点和文件哈希以新报告为准。
 

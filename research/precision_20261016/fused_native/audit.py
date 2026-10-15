@@ -1,4 +1,4 @@
-"""Keep rejected native fusion evidence separate from retained P47 and production."""
+"""Keep rejected native fusion evidence separate from historical P47 controls, retained P50 and production."""
 import hashlib,json,re
 from pathlib import Path
 r=Path(__file__).resolve().parent;repo=r.parents[2];h=r.parent/'int8_hardware'
@@ -9,8 +9,10 @@ for manifest in manifest_files:
 for name,sha in json.loads((r.parent/'source_manifest.json').read_text())['production_unchanged_sha256'].items():
  assert digest(repo/name)==sha,name
 for name in ['pack.cuh','corrected.cuh','compare.cu','pow2.cuh']:
- assert digest(h/name)==digest(h/'p47'/name),name
-assert digest(h/'bin/compare')==digest(h/'bin/compare_p47')
+ assert digest(h/name)==digest(h/'p50'/name),name
+assert digest(h/'bin/compare')==digest(h/'bin/compare_p50')
+validation=json.loads((h/'p50_validation.json').read_text())
+assert validation['independent_stress_configurations']==144 and validation['sanitizer_cases_per_tool']==48
 results={}
 for label in ['n1','n2','n3']:
  result=json.loads((r/f'{label}_summary.json').read_text())
@@ -38,6 +40,6 @@ assert len(failed)==54 and any(x['pass']=='0' for x in failed)
 n2=(r/'n2/prototype.cuh').read_text();n3=(r/'n3/prototype.cuh').read_text()
 assert 'int cached_inside[1024]' in n3 and 'sizeof(Shared)==188544' in n3
 assert 'produce<T>(s,&map_a,&map_b,s.cached_inside,m0,n0)' in n3
-out=dict(status='progress',goal_achieved=False,production_unchanged=True,retained_candidate='P47',manifest_files=len(manifest_files),candidates=results,n1_initial_layout_preflight_failed_before_mma=True,n3='Own original-input and layout gates pass; slower than P47 in independent ordinary/Graph ABBA, no fresh stream/guard or sanitizer acceptance')
+out=dict(status='progress',goal_achieved=False,production_unchanged=True,retained_candidate='P50',manifest_files=len(manifest_files),candidates=results,n1_initial_layout_preflight_failed_before_mma=True,n3='Own original-input and layout gates pass; slower than P47 in independent ordinary/Graph ABBA, no fresh stream/guard or sanitizer acceptance')
 (r/'audit.json').write_text(json.dumps(out,indent=2)+'\n')
-print(json.dumps(dict(status=out['status'],goal_achieved=False,production_unchanged=True,retained_candidate='P47',manifests_checked=len(manifest_files),rejected=['N1','N2','N3']),indent=2))
+print(json.dumps(dict(status=out['status'],goal_achieved=False,production_unchanged=True,retained_candidate='P50',manifests_checked=len(manifest_files),rejected=['N1','N2','N3']),indent=2))

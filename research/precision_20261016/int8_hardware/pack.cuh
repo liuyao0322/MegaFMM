@@ -125,7 +125,9 @@ void direct_native_store(float v,int at,T* high,T* q){
 template<class T,bool SideA,bool Balance,int Group> __device__ __forceinline__
 void pack_pair(const T* __restrict__ X,T* __restrict__ high,T* __restrict__ q,int* __restrict__ exp,
  const int* __restrict__ inside,PairPackShared<SideA>& s){
- constexpr int Rows=SideA?64:128,Cols=SideA?128:32,PT=Rows*Cols/256,Tiles=(512/Rows)*(512/Cols);
+ // P49 Group0 writes all planes; all collective barriers precede this helper.
+ if constexpr(Group!=0)return;
+ constexpr int Rows=SideA?32:64,Cols=SideA?128:32,PT=Rows*Cols/256,Tiles=(512/Rows)*(512/Cols);
  int tile=blockIdx.x%Tiles,tid=threadIdx.x,r0=tile/(512/Cols)*Rows,c0=tile%(512/Cols)*Cols;
  auto load=[&](auto fast,float sf0,float sf1){
   #pragma unroll 4
@@ -144,29 +146,22 @@ void pack_pair(const T* __restrict__ X,T* __restrict__ high,T* __restrict__ q,in
     }
    }
    int target=r*512+c;
-   if constexpr(Group==2){
-    direct_native_store<T,0,8>(a,target,high,q);
-    direct_native_store<T,1,8>(SideA?b:cc,target,high,q);
-    direct_native_store<T,(SideA?3:2),8>(d,target,high,q);
-   }else if constexpr(SideA){
+   direct_native_store<T,0,8>(a,target,high,q);
+   direct_native_store<T,1,8>(SideA?b:cc,target,high,q);
+   direct_native_store<T,(SideA?3:2),8>(d,target,high,q);
+   if constexpr(SideA){
     float s1=__fadd_rn(cc,d),s2=__fsub_rn(s1,a);
-    if constexpr(Group==0){
-     direct_native_store<T,4,0>(s1,target,high,q);direct_native_store<T,5,1>(s2,target,high,q);
-    }else{
-     direct_native_store<T,6,2>(__fsub_rn(a,cc),target,high,q);direct_native_store<T,2,3>(__fsub_rn(b,s2),target,high,q);
-    }
+    direct_native_store<T,4,0>(s1,target,high,q);direct_native_store<T,5,1>(s2,target,high,q);
+    direct_native_store<T,6,2>(__fsub_rn(a,cc),target,high,q);direct_native_store<T,2,3>(__fsub_rn(b,s2),target,high,q);
    }else{
     float t1=__fsub_rn(b,a),t2=__fsub_rn(d,t1);
-    if constexpr(Group==0){
-     direct_native_store<T,4,0>(t1,target,high,q);direct_native_store<T,5,1>(t2,target,high,q);
-    }else{
-     direct_native_store<T,6,2>(__fsub_rn(d,b),target,high,q);direct_native_store<T,3,3>(__fsub_rn(t2,cc),target,high,q);
-    }
+    direct_native_store<T,4,0>(t1,target,high,q);direct_native_store<T,5,1>(t2,target,high,q);
+    direct_native_store<T,6,2>(__fsub_rn(d,b),target,high,q);direct_native_store<T,3,3>(__fsub_rn(t2,cc),target,high,q);
    }
   }
  };
  if constexpr(Balance){
-  int pos=SideA?c0+tid%Cols:r0+tid/32+8*(tid%16);
+  int pos=SideA?c0+tid%Cols:r0+tid/32+8*(tid%8);
   int e0=SideA?-inside[pos]:inside[pos],e1=SideA?-inside[pos+512]:inside[pos+512];
   bool normal=e0>=-126&&e0<=127&&e1>=-126&&e1<=127;if constexpr(!SideA)normal=__all_sync(0xffffffff,normal);
   if(normal)load(std::true_type{},__int_as_float((e0+127)<<23),__int_as_float((e1+127)<<23));else load(std::false_type{},0,0);
@@ -178,7 +173,7 @@ template<class T,bool SideA,bool Balance> __global__ __launch_bounds__(256,1)
 void pack(const T* __restrict__ X,T* __restrict__ high,T* __restrict__ q,int* __restrict__ exp,const int* __restrict__ inside){
  extern __shared__ __align__(128) unsigned char scratch_buffer[];
  auto& scratch=*reinterpret_cast<PairPackShared<SideA>*>(scratch_buffer);
- int group=blockIdx.x/(SideA?32:64);
+ int group=blockIdx.x/(SideA?64:128);
  if(group==0)pack_pair<T,SideA,Balance,0>(X,high,q,exp,inside,scratch);
  else if(group==1)pack_pair<T,SideA,Balance,1>(X,high,q,exp,inside,scratch);
  else pack_pair<T,SideA,Balance,2>(X,high,q,exp,inside,scratch);
@@ -193,13 +188,13 @@ void pack_joint(const T* __restrict__ A,const T* __restrict__ B,
  extern __shared__ __align__(128) unsigned char scratch_buffer[];
  if(blockIdx.x<192){
   auto& s=*reinterpret_cast<PairPackShared<false>*>(scratch_buffer);
-  int group=blockIdx.x/64;
+  int group=blockIdx.x/128;
   if(group==0)pack_pair<T,false,Balance,0>(B,hb,qb,eb,inside,s);
   else if(group==1)pack_pair<T,false,Balance,1>(B,hb,qb,eb,inside,s);
   else pack_pair<T,false,Balance,2>(B,hb,qb,eb,inside,s);
  }else{
   auto& s=*reinterpret_cast<PairPackShared<true>*>(scratch_buffer);
-  int group=(blockIdx.x-192)/32;
+  int group=(blockIdx.x-192)/64;
   if(group==0)pack_pair<T,true,Balance,0>(A,ha,qa,ea,inside,s);
   else if(group==1)pack_pair<T,true,Balance,1>(A,ha,qa,ea,inside,s);
   else pack_pair<T,true,Balance,2>(A,ha,qa,ea,inside,s);
@@ -245,13 +240,13 @@ void preprocess_cooperative_columns(const T* __restrict__ A,const T* __restrict_
 
  if(blockIdx.x<192){
   auto& s=*reinterpret_cast<PairPackShared<false>*>(scratch_buffer);
-  int group=blockIdx.x/64;
+  int group=blockIdx.x/128;
   if(group==0)pack_pair<T,false,Balance,0>(B,hb,qb,eb,inside,s);
   else if(group==1)pack_pair<T,false,Balance,1>(B,hb,qb,eb,inside,s);
   else pack_pair<T,false,Balance,2>(B,hb,qb,eb,inside,s);
  }else{
   auto& s=*reinterpret_cast<PairPackShared<true>*>(scratch_buffer);
-  int group=(blockIdx.x-192)/32;
+  int group=(blockIdx.x-192)/64;
   if(group==0)pack_pair<T,true,Balance,0>(A,ha,qa,ea,inside,s);
   else if(group==1)pack_pair<T,true,Balance,1>(A,ha,qa,ea,inside,s);
   else pack_pair<T,true,Balance,2>(A,ha,qa,ea,inside,s);
