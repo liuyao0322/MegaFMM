@@ -37,6 +37,9 @@ void candidate(int id,megafmm::DType dtype,int sms,int layout=0) {
   if(layout>=4 && layout<=7) {p.k=8+(layout-4)*32;p.lda=p.k+8;}
   if(layout>=8 && layout<=12) {p.k=256+(layout-8)*32;p.lda=p.k+8;}
   if(layout==13) {p.m=6145;p.k=8;p.lda=16;}
+  // Ping-pong uses two consumers on different output tiles: exceed 2*132
+  // logical tiles so each consumer must reuse its persistent pipeline state.
+  if(layout==14) {p.m=12289;p.k=8;p.lda=16;}
   const size_t ac=(p.trans_a?p.k:p.m)*p.lda,bc=(p.trans_b?p.n:p.k)*p.ldb,dc=p.m*p.ldd;
   std::vector<T>a(ac),b(bc);std::vector<float>initial(dc),result(dc);
   Buffer da(ac*2),db(bc*2),out0(dc*4),out1(dc*4);
@@ -126,6 +129,10 @@ int main(int argc,char** argv){try{
     if(id>=106) for(int layout=4;layout<=13;++layout) {
       candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount,layout);
       candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount,layout);
+    }
+    if(id>=110) {
+      candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount,14);
+      candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount,14);
     }
     if(id==24 || id==25 || (id>=33 && id<=36)) {
       candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount,1);

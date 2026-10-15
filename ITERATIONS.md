@@ -643,6 +643,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 368 | Eight-tile batched consumer K loops | 1.0647 | 1.761783 | measured |
 
+| 369 | Source-free M128 pingpong candidates for epilogue overlap | 1.0787 | 1.761118 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -6282,3 +6284,37 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal20-row benchmark completed. No new stable win is claimed; completed large square cases select cuBLASLt fallback. New8192 BF16/FP16 best short timings1.599563/1.702278ms versus same-phase Lt1.461965/1.593898ms. New16384 BF16/FP16 best12.677428/13.388349ms versus Lt12.606092/13.333582ms. Latest independent certification353 remains16/28. Full paired-group and precision review follows closure.
 - **Next:** Validate110 forced candidates, six relevant CTests, precision guard and candidate sanitizers; profile106 before choosing further changes.
 - **Archive:** trajectory/20261015_224325_iter-368/
+
+### Iter 369 — Source-free M128 pingpong candidates for epilogue overlap
+
+- **Hypothesis:** Two independent consumer output tiles can overlap epilogue with math; research N128 CM2 at4096 BF16 exceeded Lt by at least4.65percent in five paired groups.
+- **Changes:** Append110/111 source-free128x128x64 auto-stage pingpong CM1/CM2, total112; extend original-input forced tests with12289x520 K8 to force both pingpong consumers to reuse pipeline state.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 20 rows; arithmetic mean of row median latency=1.761118 ms; mean speedup=1.0787x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005608 | 0.005025 | 1.1160 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005636 | 0.005057 | 1.1146 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008646 | 0.006660 | 1.2982 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008653 | 0.006671 | 1.2971 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.243494 | 0.223367 | 1.0901 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232557 | 0.232220 | 1.0015 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.644654 | 1.615852 | 1.0178 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.706804 | 1.703565 | 1.0019 | 9.68937e-06 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.779479 | 12.741390 | 1.0030 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.311819 | 13.310658 | 1.0001 | 1.93317e-05 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025249 | 0.022183 | 1.1382 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.025622 | 0.022357 | 1.1460 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027450 | 0.023285 | 1.1788 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026942 | 0.023281 | 1.1573 | 6.43463e-07 | 1 |
+| 8192,4096,8192 | bf16 | tuned_hopper_dense v0 | launch | 0.889611 | 0.862516 | 1.0314 | 8.55058e-06 | 1 |
+| 8192,4096,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.904719 | 0.903974 | 1.0008 | 9.68961e-06 | 1 |
+| 4096,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.817794 | 0.841214 | 0.9722 | 8.55119e-06 | 1 |
+| 4096,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.904870 | 0.894091 | 1.0121 | 9.68981e-06 | 1 |
+| 8192,8192,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.879101 | 0.879938 | 0.9990 | 4.02534e-06 | 1 |
+| 8192,8192,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.896801 | 0.899064 | 0.9975 | 4.87776e-06 | 1 |
+
+- **Analysis:** Formal20rows all pass unchanged original FP64 gate. Research performance is not certification. LargeK cases retain Lt fallback;4096 BF16 new candidates score0.203586/0.203770ms in short ranking but are not selected by the capped holdout policy. Full per-row outcomes are recorded below; latest independent certification remains35316/28.
+- **Next:** Validate all112 candidates/API/six relevant CTests and CUDA12.8 sanitizers. Then instrument and broaden sustained confirmation coverage with early rejection while retaining original precision and final acceptance gates; do not infer stable wins from fallback timing.
+- **Archive:** trajectory/20261015_235236_iter-369/
