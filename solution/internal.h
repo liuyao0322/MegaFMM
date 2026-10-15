@@ -3,11 +3,13 @@
 namespace megafmm::detail {
 void scale_output(const Problem& p, const float* C0, float* D, cudaStream_t stream);
 void run_sw_multisize(const Problem& p,const void* A,const void* B,const float* C0,float* D,cudaStream_t stream);
-constexpr int HopperCandidateCount=48;
+constexpr int HopperCandidateCount=56;
 bool wmma_dense(int bk,const Problem& p,const void* A,const void* B,const float* C,float* D,
                  cudaStream_t stream,int operation);
 bool mma_even_dense(int bk,const Problem& p,const void* A,const void* B,const float* C,float* D,
                     cudaStream_t stream,int operation);
+bool ampere_dense(int id,const Problem& p,const void* A,const void* B,const float* C,float* D,
+                  cudaStream_t stream,int operation);
 size_t hopper_workspace(const Problem& p,int id);
 bool padded_hopper(int base,const Problem& p,const void* A,const void* B,const float* C,float* D,
                     void* workspace,int sm_count,cudaStream_t stream,int operation);

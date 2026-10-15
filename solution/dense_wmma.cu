@@ -331,9 +331,21 @@ bool wmma_dense(int bk,const Problem& p,const void* A,const void* B,const float*
   return true;
 }
 
+template<class T,int M,int N>
+void prepare_deep_even() {
+  auto e=cudaFuncSetAttribute(even_mma<T,128,4,M,N,false>,cudaFuncAttributePreferredSharedMemoryCarveout,100);
+  if(e==cudaSuccess)e=cudaFuncSetAttribute(even_mma<T,128,16,M,N,false>,cudaFuncAttributePreferredSharedMemoryCarveout,100);
+  if(e!=cudaSuccess)throw std::runtime_error(cudaGetErrorString(e));
+}
 bool mma_even_dense(int bk,const Problem& p,const void* A,const void* B,const float* C,float* D,
                     cudaStream_t stream,int operation) {
-  if(operation==2)return true;
+  if(operation==2) {
+    if(bk==1024 || bk==1025) {
+      if(p.dtype==DType::BF16) {if(bk==1024)prepare_deep_even<__nv_bfloat16,32,32>();else prepare_deep_even<__nv_bfloat16,16,64>();}
+      else {if(bk==1024)prepare_deep_even<__half,32,32>();else prepare_deep_even<__half,16,64>();}
+    }
+    return true;
+  }
   if(p.trans_a || p.trans_b || p.m<=0 || p.n<=0 || p.k<=0 || p.m>2048 || p.n>2048 || p.k>2048 ||
      p.n%2 || p.k%2 || p.lda%2 || p.ldb%2 || p.lda>(1<<20) || p.ldb>(1<<20) ||
      p.ldc>(1<<20) || p.ldd>(1<<20) || p.ldd%2 || reinterpret_cast<uintptr_t>(D)%8 ||
@@ -342,14 +354,16 @@ bool mma_even_dense(int bk,const Problem& p,const void* A,const void* B,const fl
   SmallProblem q{int(p.m),int(p.n),int(p.k),int(p.lda),int(p.ldb),int(p.ldc),int(p.ldd),p.alpha,p.beta};
   const bool wide=p.k%8==0 && p.n%8==0 && p.lda%8==0 && p.ldb%8==0 &&
        reinterpret_cast<uintptr_t>(A)%16==0 && reinterpret_cast<uintptr_t>(B)%16==0;
-  const int bm=(bk==128 || bk==512)?16:32,bn=(bk==129 || bk==513)?16:32;
+  const int bm=(bk==128 || bk==512 || bk==1025)?16:32,bn=bk==1025?64:(bk==129 || bk==513)?16:32;
   dim3 grid(unsigned((p.n+bn-1)/bn),unsigned((p.m+bm-1)/bm));
   #define EVEN_LAUNCH(T,K,M,N,S) do { \
     if(wide)even_mma<T,K,16,M,N,S><<<grid,128,0,stream>>>(q,static_cast<const T*>(A),static_cast<const T*>(B),C,D); \
     else even_mma<T,K,4,M,N,S><<<grid,128,0,stream>>>(q,static_cast<const T*>(A),static_cast<const T*>(B),C,D); \
   } while(0)
   #define EVEN_DISPATCH(T) do { \
-    if(bk==128)EVEN_LAUNCH(T,64,16,32,true); \
+    if(bk==1024)EVEN_LAUNCH(T,128,32,32,false); \
+    else if(bk==1025)EVEN_LAUNCH(T,128,16,64,false); \
+    else if(bk==128)EVEN_LAUNCH(T,64,16,32,true); \
     else if(bk==129)EVEN_LAUNCH(T,64,32,16,true); \
     else if(bk==256)EVEN_LAUNCH(T,64,32,32,true); \
     else if(bk==32)EVEN_LAUNCH(T,32,32,32,false); \

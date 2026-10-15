@@ -605,6 +605,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 349 | Register-only warp GEMM without shared staging | 1.1188 | 0.014624 | measured |
 
+| 350 | Deeper small-MMA staging and SM80 iterator candidates: compile failure | 0.0000 | 0.000000 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5724,3 +5726,17 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Completed the six-shape two-dtype full timing and fresh original-input FP64 screening. This is a distinct direct-register candidate family; it must pass forced Graph/stream/tail/alignment and sanitizer checks regardless of whether the autotuner selects it. No additional independent stable-win certification is claimed.
 - **Next:** Inspect new candidate scores, force-check all48 candidates and run warp memcheck/racecheck; only profile or independently certify after validation.
 - **Archive:** trajectory/20261015_175343_iter-349/
+
+### Iter 350 — Deeper small-MMA staging and SM80 iterator candidates: compile failure
+
+- **Hypothesis:** Larger K stages may amortize boundary-kernel control; native SM80 iterators with larger warp output tiles may reduce per-output address cost.
+- **Changes:** Add two BK128 direct-MMA candidates and six native SM80 TensorOp configurations with four-byte input alignment and paired FP32 epilogues; hoist all kernel-attribute preparation out of run.
+- **Bench:** Compiled=False/partial; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 0 rows; arithmetic mean of row median latency=0.000000 ms; mean speedup=0.0000x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+
+- **Analysis:** Build failed in the added CUTLASS SM80 path with a pitch-linear thread-map static assertion: number of iterations must be non-zero. No GPU benchmark rows were generated, no accuracy or speed evidence is claimed, and the proposed BK128 paths were not evaluated in this build. Preserve failure before inspecting or changing templates.
+- **Next:** Read the template-instantiation chain, replace unsupported threadblock/warp shapes with legal configurations, then benchmark as the next numbered iteration and force-validate every new candidate.
+- **Archive:** trajectory/20261015_180349_iter-350/
