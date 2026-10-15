@@ -595,6 +595,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 344 | Larger-K Hopper pipelines and direct output epilogues | 1.0899 | 0.046659 | measured |
 
+| 345 | Four-byte asynchronous staging and explicit warp MMA output | 1.0553 | 1.266034 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5562,3 +5564,45 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Completed seven-shape BF16/FP16 screening with full 100-call five-group timing and fresh FP64 accuracy trials. This is a candidate screening iteration, not independent all-shape acceptance. Candidate ranking, repeated acceptance and sanitizer evidence must be assessed before declaring new stable wins.
 - **Next:** Run forced candidate regression and repeat the full 14-shape acceptance suite without rebuilding between sweeps; profile winning new candidates.
 - **Archive:** trajectory/20261015_165802_iter-344/
+
+### Iter 345 — Four-byte asynchronous staging and explicit warp MMA output
+
+- **Hypothesis:** Four-byte asynchronous copies avoid scalar staging on even but non-eight-aligned input rows; smaller output tiles and direct MMA-register stores reduce small-GEMM overhead.
+- **Changes:** Add two 32x32 WMMA and two explicit ldmatrix/MMA candidates; support predicated cp.async.ca four-byte loads; bound measured-slow K128/K256 candidates to dimensions up to2048; add forced aligned, transposed and even-stride-tail tests.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 28 rows; arithmetic mean of row median latency=1.266034 ms; mean speedup=1.0553x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005664 | 0.005028 | 1.1265 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005716 | 0.005083 | 1.1246 | 6.44261e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.011921 | 0.008047 | 1.4815 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009567 | 0.008044 | 1.1893 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.031202 | 0.028817 | 1.0828 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.033205 | 0.030492 | 1.0890 | 2.45816e-06 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.248803 | 0.230289 | 1.0804 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232575 | 0.232665 | 0.9996 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.597813 | 1.655470 | 0.9652 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.689061 | 1.690232 | 0.9993 | 9.68937e-06 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.783077 | 12.727958 | 1.0043 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.320990 | 13.300020 | 1.0016 | 1.93317e-05 | 1 |
+| 8192,4096,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.865820 | 0.890858 | 0.9719 | 8.55058e-06 | 1 |
+| 8192,4096,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.882611 | 0.917060 | 0.9624 | 9.68961e-06 | 1 |
+| 4096,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.846955 | 0.843743 | 1.0038 | 8.55119e-06 | 1 |
+| 4096,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.898506 | 0.901726 | 0.9964 | 9.68981e-06 | 1 |
+| 8192,8192,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.871089 | 0.884179 | 0.9852 | 4.02534e-06 | 1 |
+| 8192,8192,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.909420 | 0.894554 | 1.0166 | 4.87776e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_dense_cublaslt v0 | launch | 0.025508 | 0.025434 | 1.0029 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.026119 | 0.026141 | 0.9992 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027446 | 0.025915 | 1.0591 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.027484 | 0.026160 | 1.0506 | 6.43463e-07 | 1 |
+| 1025,1537,769 | bf16 | tuned_padded_hopper v0 | launch | 0.037866 | 0.034033 | 1.1126 | 6.19792e-07 | 1 |
+| 1025,1537,769 | fp16 | tuned_padded_hopper v0 | launch | 0.036480 | 0.033985 | 1.0734 | 9.7026e-07 | 1 |
+| 514,770,258 | bf16 | tuned_dense_cublaslt v0 | launch | 0.008828 | 0.008829 | 0.9998 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_dense_cublaslt v0 | launch | 0.008856 | 0.008854 | 1.0002 | 3.40967e-07 | 1 |
+| 1,1,1 | bf16 | tuned_simt_small v0 | launch | 0.002911 | 0.002676 | 1.0878 | 0 | 1 |
+| 1,1,1 | fp16 | tuned_simt_small v0 | launch | 0.002896 | 0.002672 | 1.0837 | 0 | 1 |
+
+- **Analysis:** Completed all14 shapes and both dtypes with full100-call five-group timing and fresh original-input FP64 checks. Explicit MMA improves the own-WMMA aligned512 route but does not beat the retained Hopper candidate there. All newly selected routes still require forced sanitizer validation and independent certification; do not transfer iter344 eleven-win certification to this changed pool.
+- **Next:** Inspect boundary measurements, finish forced candidate and sanitizer checks, profile the fixed new small kernel and a fixed large Hopper kernel before the next optimization.
+- **Archive:** trajectory/20261015_171836_iter-345/

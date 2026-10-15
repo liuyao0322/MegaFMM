@@ -20,7 +20,7 @@ template<class T>T rounded(float x);
 template<>__half rounded(float x){return __float2half_rn(x);}
 template<>__nv_bfloat16 rounded(float x){return __float2bfloat16_rn(x);}
 template<class T>
-void candidate(int id,megafmm::DType dtype,int sms,bool irregular=false) {
+void candidate(int id,megafmm::DType dtype,int sms,int layout=0) {
   using namespace megafmm;
   Problem p;p.dtype=dtype;p.alpha=0.5f;p.beta=-0.25f;
   if(id<4 || id>=9) {p.m=129;p.n=256;p.k=128;p.lda=136;p.ldb=264;p.ldc=p.ldd=264;}
@@ -28,7 +28,8 @@ void candidate(int id,megafmm::DType dtype,int sms,bool irregular=false) {
         p.trans_a=p.trans_b=true;p.lda=p.m+3;p.ldb=p.k+5;p.ldc=p.ldd=p.n+7;}
   if(id>=9) {p.m=769;p.n=1536;p.k=16;p.lda=24;p.ldb=1544;p.ldc=p.ldd=1544;}
   if(id>=26) {p.m=129;p.n=256;p.k=520;p.lda=528;p.ldb=264;p.ldc=p.ldd=264;}
-  if(irregular) {p.m=129;p.n=137;p.k=65;p.trans_a=p.trans_b=true;p.lda=132;p.ldb=70;p.ldc=p.ldd=144;}
+  if(layout==1) {p.m=129;p.n=137;p.k=65;p.trans_a=p.trans_b=true;p.lda=132;p.ldb=70;p.ldc=p.ldd=144;}
+  if(layout==2) {p.m=129;p.n=138;p.k=66;p.lda=68;p.ldb=140;p.ldc=p.ldd=144;}
   const size_t ac=(p.trans_a?p.k:p.m)*p.lda,bc=(p.trans_b?p.n:p.k)*p.ldb,dc=p.m*p.ldd;
   std::vector<T>a(ac),b(bc);std::vector<float>initial(dc),result(dc);
   Buffer da(ac*2),db(bc*2),out0(dc*4),out1(dc*4);
@@ -79,15 +80,20 @@ void candidate(int id,megafmm::DType dtype,int sms,bool irregular=false) {
 }
 int main(int argc,char** argv){try{
   int first=0;
-  if(argc==2 && std::string(argv[1])=="--wmma") first=24;
-  else if(argc!=1) throw std::runtime_error("usage: test_tuning_candidates [--wmma]");
+  bool only_wmma=false;
+  if(argc==2 && std::string(argv[1])=="--wmma") {first=24;only_wmma=true;}
+  else if(argc==2 && std::string(argv[1])=="--new") first=33;
+  else if(argc!=1) throw std::runtime_error("usage: test_tuning_candidates [--wmma|--new]");
   int device;cudaDeviceProp prop;check(cudaGetDevice(&device));check(cudaGetDeviceProperties(&prop,device));
-  for(int id=first;id<(first==24?26:megafmm::detail::HopperCandidateCount);++id) {
+  for(int id=first;id<megafmm::detail::HopperCandidateCount;++id) {
+    if(only_wmma && id!=24 && id!=25 && id<33) continue;
     candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount);
     candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount);
-    if(id==24 || id==25) {
-      candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount,true);
-      candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount,true);
+    if(id==24 || id==25 || id>=33) {
+      candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount,1);
+      candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount,1);
+      candidate<__nv_bfloat16>(id,megafmm::DType::BF16,prop.multiProcessorCount,2);
+      candidate<__half>(id,megafmm::DType::FP16,prop.multiProcessorCount,2);
     }
   }
   return 0;

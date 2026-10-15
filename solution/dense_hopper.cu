@@ -122,11 +122,16 @@ const char* hopper_candidate_name(int id) {
       "128x256x64_c1_sw8","128x128x64_c2_sw4","128x128x64_c2_sw8",
       "64x32x64_basic_s3","64x64x64_basic_s3","128x128x64_pingpong_s3",
       "256x128x64_c1_sw8","128x256x64_c2_sw8","128x256x64_pingpong_s3_sw8",
-      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8"};
+      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64"};
   return id>=0 && id<HopperCandidateCount ? names[id]:"invalid";
 }
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C,float* D,
                   void* workspace,int sm_count,cudaStream_t stream,int operation) {
+  if(id>=33 && id<=36) {
+    constexpr int codes[]={96,128,256,257};
+    return wmma_dense(codes[id-33],p,A,B,C,D,stream,operation);
+  }
+  if(id>=26 && id<=32 && (p.m>2048 || p.n>2048 || p.k>2048) && operation!=2) return false;
   if(id==24 || id==25) return wmma_dense(id==24?32:64,p,A,B,C,D,stream,operation);
   if((id==15 || id==16 || id==17 || id==20) && (p.m>2048 || p.n>2048 || p.k>2048) && operation!=2) return false;
   if(id>=5 && id<=8)
