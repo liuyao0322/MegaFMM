@@ -7,7 +7,7 @@ r=Path(__file__).resolve().parent
 repo=r.parents[2]
 h=r.parent/'int8_hardware'
 def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
-for path in list(h.glob('p*_manifest.json'))+list(r.glob('f*_manifest.json'))+[h/'tile_inside_adaptive_manifest.json',h/'f2_f3_manifest.json',h/'m4_manifest.json',r/'probe_manifest.json',r/'profile_manifest.json',r/'trace_f9_manifest.json',r/'trace_f11_manifest.json',r/'compile_stopped_f12_manifest.json',r/'layout_access_manifest.json',h/'m5_manifest.json',h/'m6_manifest.json',h/'m7_manifest.json',h/'alternating_hardware_manifest.json']:
+for path in list(h.glob('p*_manifest.json'))+list(r.glob('f*_manifest.json'))+[h/'tile_inside_adaptive_manifest.json',h/'f2_f3_manifest.json',h/'m4_manifest.json',r/'probe_manifest.json',r/'profile_manifest.json',r/'trace_f9_manifest.json',r/'trace_f11_manifest.json',r/'compile_stopped_f12_manifest.json',r/'layout_access_manifest.json',h/'m5_manifest.json',h/'m6_manifest.json',h/'m7_manifest.json',h/'m8_manifest.json',h/'alternating_hardware_manifest.json']:
     for name,sha in json.loads(path.read_text()).items():assert digest(repo/name)==sha,(path,name)
 for name,sha in json.loads((r.parent/'source_manifest.json').read_text())['production_unchanged_sha256'].items():
     assert digest(repo/name)==sha,name
@@ -33,6 +33,14 @@ for name,passes in [('tile_inside_adaptive',42),('tile_inside_interleave',42),('
     rows=json.loads((h/(name+'.json')).read_text())['rows'];assert len(rows)==42
     assert sum(bool(x['pass_fixed_floor']) for x in rows)==passes
     models[name]=dict(cases=42,pass_fixed_floor=passes)
+m8=json.loads((h/'paired_column_model.json').read_text())['rows']
+assert len(m8)==144
+for arm in ['adaptive_unpaired','relative_unpaired','relative_paired']:
+    rows=[x for x in m8 if x['arm']==arm]
+    assert len(rows)==48 and all(x['pass_fixed_floor'] and x['nonfinite']==0 and x['saturated_low_values']==0 for x in rows)
+    models['m8_'+arm]=dict(fresh_configurations=48,passes=48,hardware_accepted=False)
+abba=json.loads((h/'p17_abba.json').read_text())
+assert abba['correctness_checks']==312 and abba['independent_numerical_configurations']==78
 for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19']:
     j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19'] else 72
     assert len(j['checks'])==count and all(x['pass']=='1' and int(x['nonfinite'])==0 for x in j['checks'])
