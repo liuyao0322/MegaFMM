@@ -625,6 +625,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 359 | Remove Stream-K swizzle-one edge liveness failure | 1.1168 | 0.329471 | no-change |
 
+| 360 | Widen nine-warp source-free kernels to 128x256 | 1.1156 | 0.325011 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5980,3 +5982,29 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal six-shape twelve-row benchmark completed after removing the isolated failing variant. Full forced and sanitizer validation must be rerun; latest independent full-suite certification remains35316/28. User requested regular quantitative reports; requirement persisted in HINTS.
 - **Next:** Force all90 candidates with bounded runtime, API/CTest and CUDA12.8 memcheck/racecheck before new experiments. Inspect precision values for user report.
 - **Archive:** trajectory/20261015_195133_iter-359/
+
+### Iter 360 — Widen nine-warp source-free kernels to 128x256
+
+- **Hypothesis:** Matching the efficient large-output tile while reducing producer threads may retain Tensor throughput with fewer static registers.
+- **Changes:** Add candidates90/91: nine-warp128x256x64 four-stage TMA and direct epilogues, one worker per SM; resource and exact boundary preflight passed before production.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 12 rows; arithmetic mean of row median latency=0.325011 ms; mean speedup=1.1156x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005669 | 0.005031 | 1.1268 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005674 | 0.005057 | 1.1221 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008693 | 0.006707 | 1.2961 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008654 | 0.006616 | 1.3081 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.243447 | 0.225285 | 1.0806 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232294 | 0.232269 | 1.0001 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.640078 | 1.618221 | 1.0135 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.709505 | 1.703937 | 1.0033 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025043 | 0.023511 | 1.0652 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026231 | 0.024295 | 1.0797 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027256 | 0.024344 | 1.1196 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.029142 | 0.024863 | 1.1721 | 6.43463e-07 | 1 |
+
+- **Analysis:** Formal twelve-row benchmark completed. Original FP64 and full-call timing gates preserved; expanded pool requires forced and sanitizer validation. No independent certification inferred; latest certified count remains35316/28.
+- **Next:** Inspect per-candidate large-K scores, force all92 candidates and API/CTest, run CUDA12.8 memcheck/racecheck, and profile the new wide kernel before deciding next axis.
+- **Archive:** trajectory/20261015_200501_iter-360/
