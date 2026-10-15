@@ -635,6 +635,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 364 | Measure source-free TMA with K128 and exact precision-guard boundaries | 1.0658 | 1.765012 | measured |
 
+| 365 | Measure eight-stage K32 source-free TMA across large MNK shapes | 1.0712 | 1.763380 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -6138,3 +6140,37 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal20/20 original FP64 gates pass. K128 loses on4096/8192/16384, selected routes preserve faster old/custom or Lt paths. Full scores and remaining rectangular results need structured review; no new independent certification inferred. Last complete35316/28.
 - **Next:** Validate100forced/API/sixCTest plus guard/candidate CUDA12.8sanitizers. Profile representative K128 complete call versus prior K64 evidence before choosing next pipeline direction.
 - **Archive:** trajectory/20261015_211419_iter-364/
+
+### Iter 365 — Measure eight-stage K32 source-free TMA across large MNK shapes
+
+- **Hypothesis:** K32 auto uses eight stages at the same shared footprint; finer-grained transfers may recover overlap lost in K128 two-stage kernels.
+- **Changes:** Append100/101 source-free128x256K32 CM1/CM2 after resource and strided-tail preflight; count102; preserve all original numerical and timing gates.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 20 rows; arithmetic mean of row median latency=1.763380 ms; mean speedup=1.0712x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005680 | 0.005006 | 1.1347 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005680 | 0.005048 | 1.1251 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008644 | 0.006671 | 1.2957 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008650 | 0.006678 | 1.2952 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.237227 | 0.218317 | 1.0866 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.229926 | 0.230387 | 0.9980 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.659998 | 1.638725 | 1.0130 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.749553 | 1.729791 | 1.0114 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.024951 | 0.023461 | 1.0635 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.025521 | 0.023918 | 1.0670 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.028155 | 0.024357 | 1.1559 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.027044 | 0.024308 | 1.1125 | 6.43463e-07 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.753899 | 12.743834 | 1.0008 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.305985 | 13.313341 | 0.9994 | 1.93317e-05 | 1 |
+| 8192,4096,8192 | bf16 | tuned_hopper_dense v0 | launch | 0.875228 | 0.848334 | 1.0317 | 8.55058e-06 | 1 |
+| 8192,4096,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.910688 | 0.884108 | 1.0301 | 9.68961e-06 | 1 |
+| 4096,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.853289 | 0.852002 | 1.0015 | 8.55119e-06 | 1 |
+| 4096,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.906404 | 0.898484 | 1.0088 | 9.68981e-06 | 1 |
+| 8192,8192,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.882855 | 0.877332 | 1.0063 | 4.02534e-06 | 1 |
+| 8192,8192,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.901642 | 0.913497 | 0.9870 | 4.87776e-06 | 1 |
+
+- **Analysis:** Formal benchmark completed; original FP64 results and all per-shape scores are archived. K32 improves K128 but large squares still choose Lt. BF16 8192x4096x8192 selects101 with aggregate median ratio1.0317, but formal paired groups include0.975 and0.992 so it is NOT a stable win. Structured remaining-row review follows; latest independent35316/28 is unchanged.
+- **Next:** Validate102forced/API/sixCTest and CUDA12.8 guard/candidate memcheck/racecheck. Profile100K32 and research operand-swapped column-major direct output as a different access direction. Do not count provisional or fallback rows as stable custom wins.
+- **Archive:** trajectory/20261015_213437_iter-365/
