@@ -583,6 +583,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 338 | Hoist Hopper launch setup and add tiny SIMT candidate | 1.0675 | 0.045346 | measured |
 
+| 339 | Add padded Hopper candidates for boundary and general layouts | 1.0729 | 0.040910 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5322,3 +5324,35 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Full-count eight-shape two-dtype run with unchanged FP64 gates and five-round stable tuning. NCU337 retuning under profiler selected fallback with CUDA12.8; exclude that capture from custom-kernel performance explanation and use a fixed-candidate harness next
 - **Next:** Inspect gains and tiny path; add aligned padding candidates for boundary sizes and run independent repeated acceptance and API Graph checks
 - **Archive:** trajectory/20261015_161602_iter-338/
+
+### Iter 339 — Add padded Hopper candidates for boundary and general layouts
+
+- **Hypothesis:** Packing odd K and N into aligned TMA matrices can outperform unaligned cuBLAS even after including both pack and unpack kernels
+- **Changes:** Four padded variants reuse validated Hopper cores, caller workspace includes aligned input and output buffers, pack supports transposes strides alpha beta and in-place C; add Tuned API regression mode and independent multi-sweep stability registry script
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 18 rows; arithmetic mean of row median latency=0.040910 ms; mean speedup=1.0729x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_dense_cublaslt v0 | launch | 0.005665 | 0.005662 | 1.0005 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.005749 | 0.005746 | 1.0006 | 6.44261e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.012152 | 0.008145 | 1.4920 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009668 | 0.008117 | 1.1911 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.031362 | 0.028448 | 1.1024 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.032981 | 0.029839 | 1.1053 | 2.45816e-06 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.224763 | 0.223766 | 1.0045 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.232637 | 0.232666 | 0.9999 | 4.87674e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027490 | 0.027003 | 1.0180 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.025384 | 0.025303 | 1.0032 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026338 | 0.025460 | 1.0345 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.025143 | 0.025190 | 0.9981 | 6.43463e-07 | 1 |
+| 1025,1537,769 | bf16 | tuned_hopper_dense v0 | launch | 0.038186 | 0.034213 | 1.1161 | 6.19792e-07 | 1 |
+| 1025,1537,769 | fp16 | tuned_hopper_dense v0 | launch | 0.036660 | 0.033608 | 1.0908 | 9.7026e-07 | 1 |
+| 514,770,258 | bf16 | tuned_dense_cublaslt v0 | launch | 0.008946 | 0.008944 | 1.0002 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_dense_cublaslt v0 | launch | 0.008916 | 0.008922 | 0.9994 | 3.40967e-07 | 1 |
+| 1,1,1 | bf16 | tuned_hopper_dense v0 | launch | 0.002886 | 0.002674 | 1.0792 | 0 | 1 |
+| 1,1,1 | fp16 | tuned_hopper_dense v0 | launch | 0.002879 | 0.002675 | 1.0763 | 0 | 1 |
+
+- **Analysis:** Full-count nine-shape two-dtype benchmark, with complete packing costs and original FP64 gates; no threshold relaxation. Registry requires every repeated paired group to exceed configured margin and rejects fallback as a custom win
+- **Next:** Inspect boundary gains; run complete 14-shape independent repeated acceptance, fixed-candidate profiling, and Tuned API Graph plus sanitizer checks
+- **Archive:** trajectory/20261015_161818_iter-339/

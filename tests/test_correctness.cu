@@ -11,6 +11,7 @@
 #include <vector>
 
 namespace {
+bool tuned_mode=false;
 void check(cudaError_t status) {
   if (status != cudaSuccess) throw std::runtime_error(cudaGetErrorString(status));
 }
@@ -50,6 +51,7 @@ void dense_case(megafmm::DType dtype, int m, int n, int k, bool ta, bool tb,
   megafmm::Problem p;
   p.m=m; p.n=n; p.k=k; p.dtype=dtype; p.trans_a=ta; p.trans_b=tb;
   p.lda=(ta ? m:k)+8; p.ldb=(tb ? k:n)+8; p.ldc=n+3; p.ldd=n+3;
+  if(tuned_mode && m>=128) p.ldc=p.ldd=n+8;
   p.alpha=0.5f; p.beta=alias ? -0.25f:0.0f;
   const size_t ac=size_t(ta ? k:m)*p.lda, bc=size_t(tb ? n:k)*p.ldb;
   const size_t dc=size_t(m)*p.ldd;
@@ -60,11 +62,11 @@ void dense_case(megafmm::DType dtype, int m, int n, int k, bool ta, bool tb,
   T* bp=db.as<T>()+(element_aligned ? 1:0);
   Stream stream;
   megafmm::Policy policy;
-  policy.algorithm=graph_mode ? megafmm::Algorithm::Auto:megafmm::Algorithm::Dense;
+  policy.algorithm=tuned_mode ? megafmm::Algorithm::Tuned : graph_mode ? megafmm::Algorithm::Auto:megafmm::Algorithm::Dense;
   policy.workspace_limit=size_t(32)<<20;
   auto plan=megafmm::create_plan(p,policy);
   Buffer workspace(plan->workspace_bytes());
-  require(plan->algorithm_name()=="dense_cublaslt", "unexpected Dense route");
+  require(tuned_mode ? plan->algorithm_name().find("tuned_")==0 : plan->algorithm_name()=="dense_cublaslt", "unexpected Dense route");
   require(plan->workspace_bytes()<=policy.workspace_limit,"workspace budget exceeded");
   Graph graph;
   std::mt19937 rng(1234567);
@@ -162,12 +164,13 @@ template<class T> void suite(megafmm::DType dtype) {
 }
 int main(int argc,char** argv) {
   try {
-    if(argc>2 || (argc==2 && std::string(argv[1])!="--strict-numerics"))
-      throw std::invalid_argument("usage: test_correctness [--strict-numerics]; only Dense is implemented");
+    if(argc>2 || (argc==2 && std::string(argv[1])!="--strict-numerics" && std::string(argv[1])!="--tuned"))
+      throw std::invalid_argument("usage: test_correctness [--strict-numerics|--tuned]");
+    tuned_mode=argc==2 && std::string(argv[1])=="--tuned";
     policy_and_binding_cases();
     suite<__nv_bfloat16>(megafmm::DType::BF16);
     suite<__half>(megafmm::DType::FP16);
-    std::cout << "PASS Dense baseline with fresh rounded inputs and original-input FP64 references; no SW kernel is implemented\n";
+    std::cout << "PASS GEMM policy with fresh rounded inputs and original-input FP64 references\n";
     return 0;
   } catch(const std::exception& e) {std::cerr << "FAIL " << e.what() << '\n';return 1;}
 }

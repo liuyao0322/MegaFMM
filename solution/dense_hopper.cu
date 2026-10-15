@@ -86,11 +86,13 @@ template<class T> __global__ void small_gemm(Problem p,const T* A,const T* B,con
 }
 }
 const char* hopper_candidate_name(int id) {
-  static const char* names[]={"128x64x64_c1","128x128x64_c1","128x256x64_c1","128x128x64_c2","simt_small"};
-  return id>=0 && id<5 ? names[id]:"invalid";
+  static const char* names[]={"128x64x64_c1","128x128x64_c1","128x256x64_c1","128x128x64_c2","simt_small","pad_128x64x64_c1","pad_128x128x64_c1","pad_128x256x64_c1","pad_128x128x64_c2"};
+  return id>=0 && id<HopperCandidateCount ? names[id]:"invalid";
 }
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C,float* D,
                   void* workspace,int sm_count,cudaStream_t stream,int operation) {
+  if(id>=5 && id<HopperCandidateCount)
+    return padded_hopper(id-5,p,A,B,C,D,workspace,sm_count,stream,operation);
   if(id==4) {
     if(p.m*p.n>4096 || p.k>256) return false;
     if(operation!=1) return true;
