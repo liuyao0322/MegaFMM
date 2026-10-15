@@ -1,0 +1,20 @@
+# M9: wider integer correction slabs, exact per-column inside retained
+
+The P24/P26 native loop can overlap four K128 slabs because its FP32 accumulator is not touched until completion. Integer correction loops still wait, restore scale and add to FP32 after each K128, because their adaptive scales can differ across K. This is a remaining algorithmic cost after addressing native compiler serialization.
+
+M9 tests quantization slabsK128/256/512 on the same fresh original inputs. Inside scaling remains a globally shared exponent for every original K column. This is distinct from the rejectedP10 coarse-inside approximation. A quantization row tile64 and B column tile32 remain fixed; only the quantization K extent changes. The native representation, native four-slab FP32 model, all seven main products, all eight correction dots and output signs are shared across the three arms.
+
+The low exponent remains high minus11(FP16)/8(BF16). Matched correction pairs first add their two integer dots across the entire quantization slab, then restore one common scale. Bound2*K*127^2 is4,129,024 /8,258,048 /16,516,096 forK128/256/512; evenK512 is below2^24 and INT32 overflow. Each signed integer intermediate is exactly representable in the FP32 numerical model with TF32 disabled. Do not combine unmatched exponent slabs or assume the new quantization error passes.
+
+Scriptwide_quant_model.py uses60fresh configurations:10patterns (including alternating per-column mismatch and two newly constructed K-band patterns),3seeds4801–4803,2dtypes;180paired-arm rows, not180independent inputs. It checks original rounded-input FP64 AB, fixed floors, nonfinite and low saturation. ItsK128 control on the first uniform seed in each dtype must exactly match frozenM8's relative-paired numerical implementation on that same input. Existing deterministic78 hardware cases do not establish this new approximation's precision. No timing, real WGMMA accumulation, synchronization or production claim from this model.
+
+If a wider arm passes, a new hardware producer may stage one transformed plane (not two) across the wider K slab in dynamic shared memory, compute a shared quantization exponent, and write the original global native/INT8 layouts. Metadata may retain old storage sizes by repeating the common exponent into each covered K128 entry. ForK512, one A64x512 FP32 plane occupies128KiB, one B512x32 occupies64KiB plus the padded two-plane INT8 transpose. These fit Hopper opt-in shared limits in principle, but occupancy, extra raw reloads, actual compiler resources and full preparation cost need measurement. Do not select these predicted sizes as performance evidence.
+
+The consumer would keep nativeP24 scheduling. Integer accumulation becomes a pure INT32 WGMMA loop over the covered K slabs, with no CPU accumulator writes before the matching wait; only afterward convert/rescale once. Shared slot release must still wait for the corresponding MMA readers. TMA bytes/requests and integer MMA work need not shrink; the intended gain is overlap and fewer FP32 rescalings. Inspect C7515 again. Required hardware acceptance:78original-input checks/79,872inside exponents, full-call timing, new fresh adverse inputs, independent performance repeat and own Graph/dual-stream/guards/scoped sanitizers for any retained candidate.
+
+
+## M9 measured numerical screen
+
+All180rows pass (60configurations,3controlled arms), zero nonfinite and low saturation. MaximumFP16/BF16 eF byK128:6.94034e-5/5.15374e-4;K256:6.95186e-5/5.16298e-4;K512:7.10737e-5/5.30430e-4. Largest observed integer230,840. Both same-inputK128 controls exactly match M8's relative-paired eF and largest integer. Summarym9_summary.json; full inputs/arms and imported-source identitiesm9_manifest.json.
+
+This supports a future hardware comparison, not performance acceptance. Start withK512 as a distinct consumer/producer numerical algorithm, preserve allK128 inside exponents and original FP64 gate, and retain the current fully validated reference if it fails. Do not claim the fixed-scale pair model reproduces Hopper native accumulation or bounds arbitrary input error.
