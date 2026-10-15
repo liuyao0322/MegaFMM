@@ -49,6 +49,7 @@ solution/
   plan.cpp             Dense 规划、cuBLASLt 调优、指针检查和执行
   scale_output.cu      alpha=0 或 K=0 时的 FP32 输出处理
   sw_pipeline.cu       1024³ PDL 双kernel SW、统一 S/T workspace、TMA/WGMMA 流水
+  sw_multisize.cu      多尺寸单层 Winograd、WMMA 七乘法、逻辑补零与融合输出
   internal.h           内部声明
 include/megafmm/gemm.h  Problem、Policy、Plan 和 run/tune 接口
 bench/benchmark.cu     普通 launch/Graph 计时和原始输入的 FP64 参考检查
@@ -71,7 +72,7 @@ trajectory/            历史逐轮源码快照和运行输出
 - 精度未通过的方案只能记录为诊断结果，不能称作合格 winner 或进入 Auto。
 
 原 `PLAN.md` 的数值合同和数学公式继续作为参考；其中旧架构、路线与覆盖描述属于
-历史设计。新 buffer 布局、warp 分工和数值表示已实现，验证范围仅为本次 1024³ 测试集合。
+历史设计。1024 专用路径保留原 buffer 布局与 warp 分工；多尺寸通用路径见下文。
 
 ## 构建与验证
 
@@ -113,8 +114,39 @@ bash scripts/on_gpu.sh ./build/test_sw1024
 ```
 
 `test_sw1024` 仅执行 1024³，检查两种 dtype、六类输入、每类三轮新输入以及同一
-Graph 的新输入重放。SW 仅支持非转置、连续布局、alpha=1、beta=0；不满足条件时
-强制 SW 抛错，不静默退回 Dense。Auto 始终保留 Dense。
+Graph 的新输入重放。它仍使用原始 FP64 精度门限，当前无补偿实现预计未通过。
+
+## 多尺寸 SW
+
+显式选择 `Algorithm::SWPipeline`（benchmark 中为 `--algorithm sw`）时：
+
+- 连续、非转置的 1024³，且 alpha=1、beta=0，继续使用原 TMA/WGMMA PDL 专用路径，
+  workspace 为 4 MiB，预算检查与实际分配一致。
+- 其余非退化尺寸使用 `sw_multisize_wmma`：支持 BF16/FP16、矩形、奇数边长、转置、
+  leading dimension、alpha/beta 和兼容 C0/D 原位视图。尺寸范围沿用公共 API 的 INT_MAX 上限。
+- 通用路径将每个维度逻辑补到偶数，再切为四个子块；边界读取补零，不分配 padding buffer。
+  每个 warp 计算一个 16×16 子块的七个 Winograd 乘法，输入变换在 shared memory 中完成，
+  FP32 累加及输出重组，调用方 workspace 为 **0 字节**。
+- M/N 为零或 K/alpha 为零时，分别走已有 empty/scale 路径。
+- `run()` 保持无分配、无 host 同步，支持 CUDA Graph 和新输入重放。GPU 目标仍为 Hopper sm90。
+
+通用路径用于尺寸与接口覆盖，尚未进行性能调优，不能沿用 1024 专用路径的加速比。
+它沿用无补偿的变换舍入策略，**不保证通过原始输入 FP64 精度门限**，Auto 仍使用 Dense。
+实现正确性测试将整数输入与原始 AB 精确比较，并将非整数输入与独立的标量 Winograd
+舍入参考比较；后者不能代替原始 AB 精度验收。
+
+```bash
+bash scripts/on_gpu.sh ctest --test-dir build \
+  -R 'sw_multisize_implementation|gpu_correctness|exact_winograd_dag' --output-on-failure
+bash scripts/on_gpu.sh ./build/megafmm_bench \
+  --algorithm sw --shapes '512,512,512;1025,1537,769;2048,2048,2048' \
+  --dtype both --trials 10 --warmup 3 --groups 3 --correct-trials 2 \
+  --output results/multisize.csv
+```
+
+benchmark 会报告实际路径、workspace、原始 FP64 精度和计时；未过精度门限时退出码为 2。
+`test_multisize` 覆盖小尺寸、512³、1025/2048/4096 行矩形、四种转置组合、非连续布局、
+元素对齐指针、alpha/beta、原位输出、padding 保护、fresh-input launch/Graph 和退化尺寸。
 
 `scripts/bench.sh <label>` 保留 AKO 的源码快照逻辑；正式迭代记录 `ITERATIONS.md`
 和对应 Git 版本。按用户最新指令持续 AKO4ALL 优化，目标仍在进行；每轮保存失败及有效结果，未通过精度或性能验收不宣布合格 winner。

@@ -70,18 +70,15 @@ template<class T>int validate(megafmm::DType dtype,bool quick){
   if(quick)policy.heuristic_candidates=1; // Sanitizer scope, never used for performance.
   auto sw=megafmm::create_plan(p,policy);
   require(sw->algorithm_name().find("sw_")==0,"not native SW");
-  require(sw->workspace_bytes()==(size_t(8)<<20),"SW workspace accounting must be8MiB");
+  require(sw->workspace_bytes()==(size_t(4)<<20),"SW workspace accounting must be4MiB");
   policy.algorithm=megafmm::Algorithm::Auto;auto dense=megafmm::create_plan(p,policy);
   require(dense->algorithm_name()=="dense_cublaslt","Auto was incorrectly promoted");
   Buffer workspace(std::max(dense->workspace_bytes(),sw->workspace_bytes()));
-  // Rejections use the same 1024 size and never execute a second matrix size.
   policy.algorithm=megafmm::Algorithm::SWPipeline;
-  auto invalid=p;invalid.trans_a=true;bool rejected=false;
-  try{auto x=megafmm::create_plan(invalid,policy);}catch(const std::invalid_argument&){rejected=true;}
-  require(rejected,"SW accepted transpose");
+  bool rejected=false;
   rejected=false;try{megafmm::run(*sw,static_cast<char*>(a.p)+2,b.p,nullptr,d.as<float>(),workspace.p,stream.s);}catch(const std::invalid_argument&){rejected=true;}
   require(rejected,"TMA accepted misaligned input");
-  auto small_budget=policy;small_budget.workspace_limit=(size_t(8)<<20)-1;
+  auto small_budget=policy;small_budget.workspace_limit=(size_t(4)<<20)-1;
   rejected=false;
   try{auto x=megafmm::create_plan(p,small_budget);}catch(const std::invalid_argument&){rejected=true;}
   require(rejected,"SW accepted insufficient workspace budget");

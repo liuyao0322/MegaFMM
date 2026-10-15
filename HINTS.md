@@ -247,3 +247,11 @@ the user's requests in this conversation:
 - Research diagnostics live in `research/precision_20261015/`. No production solution or benchmark gate changed in this research phase. Screened DPS equations98/101/102 pass tensor identities but FP16 transform quantization still exceeds the original floor with ideal FP64 leaf dots.
 - Scaled E4M3 first-order residual correction has promising numerical evidence, including actual H100 FP8 Tensor Core products on independent seeds; this is not production acceptance or a demonstrated cheap implementation. Eight independently launched correction GEMMs and cuBLASLt batched8 timing are too expensive as append-only implementations. All-2:4 residual pruning fails both floors. Enumerated mixed dense/sparse corrections require further performance and hardware-sparse validation.
 - The research goal remains active until numerical correctness and low complete-call overhead are jointly verified. See research report for exact measurements, limitations and next experiment.
+
+## Active MNK tuning goal — 2026-10-15
+
+- Latest user goal: build a tuning strategy for different M/N/K and strive to stably outperform cuBLAS for every size. This supersedes historical 1024-only scope for this task; use bench/shapes.json and both BF16/FP16, with aligned, rectangular, boundary and tiny cases.
+- Preserve original-input FP64 gates, independently tuned cuBLASLt comparisons, full-call costs, fresh data, and no run-time allocation/host synchronization. Do not claim success from selecting the cuBLAS fallback or from speed-only SW results.
+- Add precision-valid dense Hopper candidates and empirical per-shape selection alongside the experimental SW routes. Keep existing Auto behavior until acceptance evidence warrants promotion; expose experimental tuning explicitly.
+- Existing multi-size WMMA SW has implementation tests/memcheck passing but 2048^3 takes4.7–4.9ms and original gates fail. It is a functional baseline, not a tuned winner.
+- FP8 residual correction remains stopped. No relaxation of numerical contracts or restoration of deleted old SW implementations is authorized.

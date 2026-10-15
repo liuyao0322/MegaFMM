@@ -288,7 +288,7 @@ std::string describe_lt(const LtOp& op, size_t bound) {
 
 struct Plan::Impl {
   Problem problem;
-  bool empty = false, scale = false;
+  bool empty = false, scale = false, sw_multisize = false;
   size_t bytes = 0;
   cublasLtHandle_t handle = nullptr;
   std::unique_ptr<LtOp> dense;
@@ -341,6 +341,10 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     cuda_check(cudaPeekAtLastError(), "launch degenerate output kernel");
     return;
   }
+  if (plan.sw_multisize) {
+    detail::run_sw_multisize(plan.problem,A,B,C0,D,stream);
+    return;
+  }
   if (plan.sw) {
     detail::run_sw_pipeline(*plan.sw,A,B,D,workspace,stream);
     return;
@@ -358,12 +362,13 @@ Plan& Plan::operator=(Plan&&) noexcept = default;
 size_t Plan::workspace_bytes() const { return impl_->bytes; }
 const Problem& Plan::problem() const { return impl_->problem; }
 std::string Plan::algorithm_name() const {
-  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw ? "sw_cooperative_hilo_64x32x256" : "dense_cublaslt";
+  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw_multisize ? "sw_multisize_wmma" : impl_->sw ? "sw_cooperative_hilo_64x32x256" : "dense_cublaslt";
 }
 std::string Plan::lt_algorithm_config(const void* A, const void* B, const float* C0,
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
+  if (impl_->sw_multisize) return "sw_multisize_wmma;tile=16x16;warps=4;leaf_terms=7;levels=1;padding=logical_even;transforms=fp32_to_input_rn;accum=fp32;workspace=0;residual_correction=off";
   if (impl_->sw) return "sw_two_kernel_pdl;warp_roles=1tma+4wgmma;transform_kernel=128x512;shared_carveout=100percent_both;smem=196736;operand_stages=8;bk=128;workspace=4194304;st=compact4planes_balanced_async_p1p2;pack_conversion=fp32_to_pair_rn;FP16_S3T3=direct_packed_rn;publication=programmatic_dependent_launch_grid_dependency_wait;terminal_cta_barrier=off;recombine=private_static_ptx;accum_init=first_mma_overwrite;product_order=1_2_6_7_5_3_4;product_slots=0;product_layout=registers;leaf=Btrans_Atrans;lhs=MN128;rhs=K128;output=transposed_fragment;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;descriptor_prefetch=warp1_before_init_barrier;alpha=1;beta=0";
   return "dense:" + describe_lt(*impl_->dense, bound_candidate(*impl_->dense, A, B, C0, D));
 }
@@ -378,10 +383,23 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   impl->problem = p;
   impl->empty = !p.m || !p.n;
   impl->scale = !p.k || p.alpha == 0.0f;
-  if (policy.algorithm==Algorithm::SWPipeline) {
-    if(policy.workspace_limit<(size_t(8)<<20))throw std::invalid_argument("SW needs8MiB workspace");
-    impl->sw=detail::make_sw_pipeline(p);
-    impl->bytes=size_t(4)<<20;
+  if (policy.algorithm==Algorithm::SWPipeline && !impl->empty && !impl->scale) {
+    const bool specialized=p.m==1024 && p.n==1024 && p.k==1024 &&
+        !p.trans_a && !p.trans_b && p.lda==1024 && p.ldb==1024 &&
+        p.ldd==1024 && p.alpha==1.0f && p.beta==0.0f;
+    if (specialized) {
+      impl->bytes=size_t(4)<<20;
+      if (policy.workspace_limit<impl->bytes)
+        throw std::invalid_argument("SW 1024 pipeline needs 4 MiB workspace");
+      impl->sw=detail::make_sw_pipeline(p);
+    } else {
+      int device; cudaDeviceProp prop{};
+      cuda_check(cudaGetDevice(&device),"SW device");
+      cuda_check(cudaGetDeviceProperties(&prop,device),"SW properties");
+      if (prop.major!=9 || prop.minor!=0)
+        throw std::invalid_argument("MegaFMM SW requires Hopper sm90");
+      impl->sw_multisize=true;
+    }
   } else if (!impl->empty && !impl->scale) {
     lt_check(cublasLtCreate(&impl->handle), "create cuBLASLt handle");
     impl->dense = make_lt_op(impl->handle, p, policy.workspace_limit, policy.heuristic_candidates);
@@ -409,7 +427,7 @@ void tune(Plan& plan, const void* A, const void* B, const float* C0,
     original_c = snapshot;
   }
   try {
-    if (!impl.scale && !impl.sw)
+    if (!impl.scale && !impl.sw && !impl.sw_multisize)
       tune_lt(impl.handle, *impl.dense, A, B, original_c, D,
               impl.bytes ? workspace : nullptr, stream);
     run_internal(impl, A, B, original_c, D, workspace, stream);
