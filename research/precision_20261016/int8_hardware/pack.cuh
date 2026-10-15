@@ -13,15 +13,16 @@ namespace int8_research {
 constexpr int H=512, Plane=H*H, BK=128, BM=64, BN=32, Stages=8;
 constexpr size_t HighBytes=7*Plane*2, QuantBytes=9*Plane;
 // Seven main planes per side, nine INT8 planes per side, integer scale metadata.
-constexpr size_t WorkBytes=2*HighBytes+2*QuantBytes+(9*32+9*64+1024)*sizeof(int);
+constexpr size_t PartialBytes=2*1024*32*sizeof(float);
+constexpr size_t WorkBytes=2*HighBytes+2*QuantBytes+(9*32+9*64+1024)*sizeof(int)+PartialBytes;
 void check(cudaError_t e,const char* where){if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));}
 struct Work {
- void *ha,*hb;int8_t *qa,*qb;int *ea,*eb,*inside;
+ void *ha,*hb;int8_t *qa,*qb;int *ea,*eb,*inside;float* partial;
  explicit Work(void* w){
   auto p=static_cast<char*>(w);ha=p;p+=HighBytes;hb=p;p+=HighBytes;
   qa=reinterpret_cast<int8_t*>(p);p+=QuantBytes;qb=reinterpret_cast<int8_t*>(p);p+=QuantBytes;
   ea=reinterpret_cast<int*>(p);p+=9*32*sizeof(int);eb=reinterpret_cast<int*>(p);p+=9*64*sizeof(int);
-  inside=reinterpret_cast<int*>(p);
+  inside=reinterpret_cast<int*>(p);p+=1024*sizeof(int);partial=reinterpret_cast<float*>(p);
  }
 };
 
@@ -40,6 +41,29 @@ template<class T> __global__ void inside_scale(const T* A,const T* B,int* expone
   float x=0,y=0;for(int j=0;j<8;++j){x=fmaxf(x,ma[j]);y=fmaxf(y,mb[j]);}
   exponent[k]=(x>0 && y>0)?__float2int_rn(.5f*(log2f(x)-log2f(y))):0;
  }
+}
+
+// Exact per-column maxima with coalesced input loads. The original inside_scale
+// above remains a diagnostics-only reference; preprocess uses these two kernels.
+template<class T> __global__ void inside_partial(const T* A,const T* B,float* partial){
+ int slab=blockIdx.x,chunk=blockIdx.y,tid=threadIdx.x,lane=tid%32,warp=tid/32;
+ float am=0;int k=slab*128+tid%128;
+ for(int row=tid/128;row<32;row+=2)
+  am=fmaxf(am,fabsf(float(A[(chunk*32+row)*1024+k])));
+ __shared__ float aa[256],bb[128];aa[tid]=am;
+ for(int kr=warp;kr<128;kr+=8){
+  float bm=fabsf(float(B[(slab*128+kr)*1024+chunk*32+lane]));
+  for(int step=16;step;step/=2)bm=fmaxf(bm,__shfl_xor_sync(0xffffffff,bm,step));
+  if(lane==0)bb[kr]=bm;
+ }
+ __syncthreads();
+ if(tid<128){int at=chunk*1024+slab*128+tid;partial[at]=fmaxf(aa[tid],aa[tid+128]);partial[1024*32+at]=bb[tid];}
+}
+__global__ void inside_finalize(const float* partial,int* exponent){
+ int tid=threadIdx.x,k=blockIdx.x*8+tid/32,lane=tid%32;
+ float am=partial[lane*1024+k],bm=partial[1024*32+lane*1024+k];
+ for(int step=16;step;step/=2){am=fmaxf(am,__shfl_xor_sync(0xffffffff,am,step));bm=fmaxf(bm,__shfl_xor_sync(0xffffffff,bm,step));}
+ if(lane==0)exponent[k]=(am>0&&bm>0)?__float2int_rn(.5f*(log2f(am)-log2f(bm))):0;
 }
 
 template<class T,bool SideA,bool Balance,bool FastBalance=false> __device__ __forceinline__ float value(const T* X,const int* ex,int r,int c,int plane,float scale0=0,float scale1=0){
@@ -150,7 +174,7 @@ void pack(const T* __restrict__ X,T* __restrict__ high,int8_t* __restrict__ q,in
 }
 
 template<class T,bool Balance> void preprocess(const T* A,const T* B,Work w,cudaStream_t stream){
- if constexpr(Balance)inside_scale<<<1024,256,0,stream>>>(A,B,w.inside);
+ if constexpr(Balance){inside_partial<<<dim3(8,32),256,0,stream>>>(A,B,w.partial);inside_finalize<<<128,256,0,stream>>>(w.partial,w.inside);}
  pack<T,true,Balance><<<7*32,256,0,stream>>>(A,static_cast<T*>(w.ha),w.qa,w.ea,w.inside);
  pack<T,false,Balance><<<7*64,256,0,stream>>>(B,static_cast<T*>(w.hb),w.qb,w.eb,w.inside);
  check(cudaPeekAtLastError(),"INT8 preprocess");

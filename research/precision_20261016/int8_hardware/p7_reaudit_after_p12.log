@@ -1,0 +1,22 @@
+{
+  "status": "accuracy_validated_performance_rejected",
+  "goal_achieved": false,
+  "production_unchanged": true,
+  "checks": {
+    "primitive_exact": 18,
+    "pow2_equivalence": 1048576,
+    "ordinary": 72,
+    "graph": 72,
+    "dual_stream": 72,
+    "dual_stream_calls": 576,
+    "sanitizer_cases_per_tool": 24,
+    "sanitizer_calls_per_tool": 48
+  },
+  "scope": "1024^3 contiguous no-transpose alpha1 beta0, H100. Seven native main products plus eight INT8 first-order correction products. Repeated deterministic seeds across variants are not independent new accuracy samples.",
+  "max_ef": {
+    "bf16": 0.000509541715534,
+    "fp16": 6.56734752628e-05
+  },
+  "performance_pass": false,
+  "required_remaining": "A precision-accepted full FMM invocation with no measured regression versus current SW; production integration and final acceptance remain outstanding."
+}

@@ -3,7 +3,7 @@
   "goal_achieved": false,
   "production_unchanged": true,
   "working_candidate": "f13",
-  "retained_global_candidate": "p9; p10 rejected by fresh alternating-input hardware",
+  "retained_global_candidate": "p12, 78 ordinary FP64 checks and 79872 exact per-column exponents; p10 rejected by fresh hardware",
   "compile_stopped_candidates": [
     "F12: no numerical or latency measurement"
   ],
@@ -118,7 +118,7 @@
       },
       "fresh_alternating_checks": 6,
       "fresh_alternating_passes": 6,
-      "retained": true
+      "retained": false
     },
     "p10": {
       "checks": 72,
@@ -131,6 +131,30 @@
       "fresh_alternating_checks": 6,
       "fresh_alternating_passes": 0,
       "retained": false
+    },
+    "p11": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 66.19248008725,
+        "fp16": 66.432958603
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": false
+    },
+    "p12": {
+      "checks": 78,
+      "failures": 0,
+      "performance_accepted": false,
+      "full_call_us": {
+        "bf16": 63.51191902175,
+        "fp16": 63.2461595535
+      },
+      "equal_per_column_exponents": 79872,
+      "additional_alternating_checks_passed": 6,
+      "retained": true
     }
   },
   "numerical_models": {

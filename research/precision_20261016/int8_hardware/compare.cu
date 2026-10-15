@@ -18,6 +18,7 @@ template<class T> __global__ void extended_fill(T* a,T* b,double* ad,double* bd,
   if(pattern==3){x=ldexpf(x,c<512?0:-12);y=ldexpf(y,r<512?-12:0);}
   if(pattern==4){x=ldexpf(x,int(hash(i+seed)%17)-8);y=ldexpf(y,int(hash(i+seed+1)%17)-8);}
   if(pattern==5){x=r==c?1:0;y*=2;}
+  if(pattern==6){bool af=((c%2)==1)^(c>=512),bf=((r%2)==1)^(r>=512);x=ldexpf(x,af?-12:0);y=ldexpf(y,bf?0:-12);}
   T xx=rounded<T>(x),yy=rounded<T>(y);a[i]=xx;b[i]=yy;ad[i]=float(xx);bd[i]=float(yy);
  }
 }
@@ -30,7 +31,7 @@ double time_calls(const std::function<void()>& fn,cudaStream_t stream){
 template<class T> int compare(megafmm::DType dtype,bool balance,bool quick,bool graph_mode){
  Stream stream;Blas blas(stream.s);Buffer a(Count*2),b(Count*2),ad(Count*8),bd(Count*8),ref(Count*8);
  Buffer denseout(Count*4),swout(Count*4),directout(Count*4),out(Count*4),scratch(128*sizeof(Metric));
- Buffer workspace(int8_research::WorkBytes);
+ Buffer workspace(int8_research::WorkBytes),reference_inside(1024*sizeof(int));
  megafmm::Problem p;p.m=p.n=p.k=N;p.dtype=dtype;megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::Dense;
  auto dense=megafmm::create_plan(p,policy);policy.algorithm=megafmm::Algorithm::SWPipeline;auto sw=megafmm::create_plan(p,policy);
  Buffer basework(std::max(dense->workspace_bytes(),sw->workspace_bytes()));
@@ -47,14 +48,23 @@ template<class T> int compare(megafmm::DType dtype,bool balance,bool quick,bool 
   check(cudaGraphInstantiate(&graphs[j].x,graphs[j].g,nullptr,nullptr,0));runs[j]=[&,j]{check(cudaGraphLaunch(graphs[j].x,stream.s));};
  }
  const char* dt=dtype==megafmm::DType::BF16?"bf16":"fp16";int failures=0;
- for(int pat=0;pat<(quick?1:12);++pat)for(int trial=0;trial<(quick?1:3);++trial){
+ for(int pat=0;pat<(quick?1:13);++pat)for(int trial=0;trial<(quick?1:3);++trial){
   if(pat<6)fill<<<512,256,0,stream.s>>>(a.as<T>(),b.as<T>(),ad.as<double>(),bd.as<double>(),pat,1901901ULL+trial*271+pat*29);
   else extended_fill<<<512,256,0,stream.s>>>(a.as<T>(),b.as<T>(),ad.as<double>(),bd.as<double>(),pat-6,1901901+trial*271+pat*29);
   double one=1,zero=0;check(cublasDgemm(blas.h,CUBLAS_OP_N,CUBLAS_OP_N,N,N,N,&one,bd.as<double>(),N,ad.as<double>(),N,&zero,ref.as<double>(),N));
   runs[0]();runs[3]();
+  int inside_errors=0;
+  if(balance){using CT=std::conditional_t<std::is_same_v<T,__half>,cute::half_t,cute::bfloat16_t>;
+   int8_research::inside_scale<CT><<<1024,256,0,stream.s>>>(static_cast<const CT*>(a.p),static_cast<const CT*>(b.p),reference_inside.as<int>());
+   std::vector<int> got(1024),expected(1024);auto iw=int8_research::Work(workspace.p);
+   check(cudaMemcpyAsync(got.data(),iw.inside,1024*sizeof(int),cudaMemcpyDeviceToHost,stream.s));
+   check(cudaMemcpyAsync(expected.data(),reference_inside.p,1024*sizeof(int),cudaMemcpyDeviceToHost,stream.s));check(cudaStreamSynchronize(stream.s));
+   for(int k=0;k<1024;++k)inside_errors+=got[k]!=expected[k];
+   printf("INSIDE_EQUAL dtype=%s pattern=%d trial=%d elements=1024 errors=%d\n",dt,pat,trial,inside_errors);
+  }
   Metric dm=metric(denseout.as<float>(),ref.as<double>(),scratch,stream.s),cm=metric(out.as<float>(),ref.as<double>(),scratch,stream.s);
   double gate=3*ef(dm)+(dtype==megafmm::DType::BF16?1e-3:1e-4);
-  bool pass=cm.nonfinite==0&&dm.nonfinite==0&&ef(cm)<=gate;failures+=!pass;
+  bool pass=cm.nonfinite==0&&dm.nonfinite==0&&ef(cm)<=gate&&inside_errors==0;failures+=!pass;
   printf("CHECK dtype=%s balance=%d graph=%d pattern=%d trial=%d dense_ef=%.12g corrected_ef=%.12g gate=%.12g nonfinite=%llu pass=%d\n",dt,balance,graph_mode,pat,trial,ef(dm),ef(cm),gate,cm.nonfinite,pass);fflush(stdout);
  }
  fill<<<512,256,0,stream.s>>>(a.as<T>(),b.as<T>(),ad.as<double>(),bd.as<double>(),0,1908191);
@@ -76,13 +86,14 @@ template<class T> int compare(megafmm::DType dtype,bool balance,bool quick,bool 
  for(int j=0;j<20;++j)prep();
  printf("COMPONENT dtype=%s balance=%d preprocess_us=%.9f diagnostic_only=1\n",dt,balance,time_calls(prep,stream.s));
  using CT=std::conditional_t<std::is_same_v<T,__half>,cute::half_t,cute::bfloat16_t>;
- std::function<void()> components[3]={
-  [&]{int8_research::inside_scale<CT><<<1024,256,0,stream.s>>>(static_cast<const CT*>(a.p),static_cast<const CT*>(b.p),w.inside);},
+ std::function<void()> components[4]={
+  [&]{int8_research::inside_partial<CT><<<dim3(8,32),256,0,stream.s>>>(static_cast<const CT*>(a.p),static_cast<const CT*>(b.p),w.partial);},
+  [&]{int8_research::inside_finalize<<<128,256,0,stream.s>>>(w.partial,w.inside);},
   [&]{if(balance)int8_research::pack<CT,true,true><<<7*32,256,0,stream.s>>>(static_cast<const CT*>(a.p),static_cast<CT*>(w.ha),w.qa,w.ea,w.inside);else int8_research::pack<CT,true,false><<<7*32,256,0,stream.s>>>(static_cast<const CT*>(a.p),static_cast<CT*>(w.ha),w.qa,w.ea,w.inside);},
   [&]{if(balance)int8_research::pack<CT,false,true><<<7*64,256,0,stream.s>>>(static_cast<const CT*>(b.p),static_cast<CT*>(w.hb),w.qb,w.eb,w.inside);else int8_research::pack<CT,false,false><<<7*64,256,0,stream.s>>>(static_cast<const CT*>(b.p),static_cast<CT*>(w.hb),w.qb,w.eb,w.inside);}
  };
- for(int j=0;j<3;++j){for(int warm=0;warm<20;++warm)components[j]();printf("PREP_STAGE dtype=%s balance=%d stage=%d us=%.9f diagnostic_only=1\n",dt,balance,j,time_calls(components[j],stream.s));}
- printf("SUMMARY dtype=%s balance=%d checks=%d failures=%d\n",dt,balance,quick?1:36,failures);fflush(stdout);
+ for(int j=0;j<4;++j){for(int warm=0;warm<20;++warm)components[j]();printf("PREP_STAGE dtype=%s balance=%d stage=%d us=%.9f diagnostic_only=1\n",dt,balance,j,time_calls(components[j],stream.s));}
+ printf("SUMMARY dtype=%s balance=%d checks=%d failures=%d\n",dt,balance,quick?1:39,failures);fflush(stdout);
  return failures;
 }
 int main(int argc,char** argv){try{

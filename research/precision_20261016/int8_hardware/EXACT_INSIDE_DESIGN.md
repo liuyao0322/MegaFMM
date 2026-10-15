@@ -1,6 +1,10 @@
 # Next proposal: coalesced exact per-column inside scaling
 
-Status: design only. Do not promote P10's coarser K128 scale. M7 identifies
+Status: P11 implemented and measured;78/78 FP64 checks and79,872/79,872
+per-column exponents match the original reduction. Complete BF16/FP16
+66.192/66.433us: no latency gain over P9. P12 contiguous partial stores also pass78/78 and preserve all79,872 exponents;
+complete BF16/FP16 calls63.512/63.246us. Retained as the next research starting
+point, still far slower than production SW ~10us. No production integration. Do not promote P10's coarser K128 scale. M7 identifies
 within-slab alternating imbalance as a numerical counterexample. Preserve P9's
 per-column exponents exactly and improve the way maxima are read/reduced.
 
