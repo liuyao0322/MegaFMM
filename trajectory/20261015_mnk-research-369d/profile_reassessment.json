@@ -46,5 +46,14 @@
     "No accumulator access besides MMA; compiler operand fences match Base. Producer/arguments/layout/shared storage inherited."
   ],
   "primary_semantics": "https://docs.nvidia.com/cuda/parallel-thread-execution/#asynchronous-warpgroup-level-matrix-instructions-wgmma-wait-group",
-  "next": "Resource guard and twelve original-input exact FP64 tails plus persistent reuse for ordinary/nine-warp x CM1/2; large random FP64 acceptance not yet measured."
+  "next": "Resource guard and twelve original-input exact FP64 tails plus persistent reuse for ordinary/nine-warp x CM1/2; large random FP64 acceptance not yet measured.",
+  "raw_metric_units": {
+    "gpu__time_duration.sum": "msecond",
+    "smsp__inst_executed.sum": "instructions"
+  },
+  "fresh_lt_sass_summary": [
+    "Steady iteration has eight 64x128x16 instructions for two output fragments over K64.",
+    "Commit after first four instructions (K32 across both fragments), wait1, then four remaining instructions and second commit.",
+    "This supports testing half-K64 groups independently of output tile width; it does not establish a speedup."
+  ]
 }
