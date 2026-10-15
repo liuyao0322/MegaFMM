@@ -1,0 +1,15 @@
+window=1 registers=90 local=0 resident_blocks=2
+window=3 registers=90 local=0 resident_blocks=2
+diagnostic_only=1 fp64_acceptance=unchecked shape=4096,4096,4096 dtype=bf16 baseline_route=tuned_dense_cublaslt
+window=1 group=0 baseline_ms=0.221978873 custom_ms=0.262752652 speedup=0.844821
+window=1 group=1 baseline_ms=0.225326732 custom_ms=0.261889905 speedup=0.860387
+window=1 group=2 baseline_ms=0.230583370 custom_ms=0.271203846 speedup=0.850222
+window=1 group=3 baseline_ms=0.227505907 custom_ms=0.265861422 speedup=0.855731
+window=1 group=4 baseline_ms=0.231999040 custom_ms=0.278333426 speedup=0.833529
+window=1 diagnostic_median=0.850222 diagnostic_min=0.833529 acceptance=unchecked
+window=3 group=0 baseline_ms=0.232211843 custom_ms=0.291363835 speedup=0.796982
+window=3 group=1 baseline_ms=0.212805122 custom_ms=0.283413768 speedup=0.750864
+window=3 group=2 baseline_ms=0.226731837 custom_ms=0.290797114 speedup=0.779691
+window=3 group=3 baseline_ms=0.212048322 custom_ms=0.282743037 speedup=0.749968
+window=3 group=4 baseline_ms=0.220735028 custom_ms=0.285167992 speedup=0.774053
+window=3 diagnostic_median=0.774053 diagnostic_min=0.749968 acceptance=unchecked
