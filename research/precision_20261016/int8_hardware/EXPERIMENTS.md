@@ -726,3 +726,39 @@ actualresidentcapacitymandatory, Bfactorlane%4 andcomponentdiagnosticgrids
 128A/256Brequiredforbounds/coverage. Consumer/pow2byteexactP50. IsolatedCPU
 generationonly atthischeckpoint; own54freshbit+18edge32Kpackingchecks mustpass
 beforefirstP51MMA. NoP51speed/precision/toolclaim orcertificate transfer.
+
+
+P51 proposal applied byte-exact to isolatedCPU expectedhashes; ownp51source
+manifest frozen before pre-MMA probes. NewgeometryA16x128/B32x32,grid384,
+B0..255/A256..383, first128inside/barrier/RN/planes/consumer unchanged.
+Bfactorlane%4, standalonecomponentgrids128A/256B. No P51MMA yet.
+
+P51 ownpre-MMA54freshpoisoned-workspace fullplanechecks311427072uint16/
+55296exponents0errorsagainstfrozenP47. Separate18freshfiniteedges with32Kmixed
+slabs103809024values/18432exponents0errors; BF16actualabsinside130, outside
+normal1024/1024/512 vsFP16max19/outside0. Ownactual3CTA/SM*132>=384 bothtypes.
+Bothdiagnostics terminalexit0 before firstP51MMA. P51fullcomparebuildstarted;
+no fullmatrix/performance acceptance frompackingonlychecks.
+
+
+P51 own standard78/79872exactinside pass, maxBF16/FP16eF1.61320431617e-5/
+2.16394614392e-5 matchingP50printedpercase. Prep52/48regs,consumer143,0stack/
+spill/noC7515/C7510. IndependentordinaryP50->P51 BF16/FP16 28.128800/27.967040
+->27.389840/27.339400us (2.62706/2.24421% reduction); Graph27.973720/28.181640
+->27.405320/27.650881 (2.03190/1.88335%). Eachmode312gates/319488exponentspass,
+unlocked/noCI. Ownseed51971+431trial+223stream+109pattern,12pattern144configs/
+1152interleavedordinary+Graphcalls,2independentstreams/workspaces,128floatguards
+before/afteroutput allpass, noNF, unchangedoriginalgate andstricterfixedfloors.
+MaxstressBF16/FP16eF1.53057462997e-5/2.08831273132e-5. Own scopedmemcheck/
+racecheck/synccheck each48configs/96calls terminalexit0, zeroerrors/racewarnings/
+hazards. RetainP51researchreference; production/libraryunchanged/goalactive.
+
+Own firstbalancedBF16NCU17passes prep17.056us/52regs/65536B/sharedlimit3/
+reglimit4/issue15.787778%; consumer17.472us/143regs/196736B/shared+reglimit1/
+issue31.610582%,both0localRWsectors. Allprofilertimingsexcluded. AfterP49/P50/
+P51sub3%, reviewedownprofile/history+freshprimaryCUDA12.4occupancy/latency
+andPTX8.7WGMMAordering/localCUTLASS64x16eightregistershapes. No physicalfloor.
+P52CONSUMER_N16_DESIGN.md/generate_consumer_n16.py preparedonly, isolatedCPU
+proposalkeepspack/compare/pow2byteexactP51; consumer64x16,2actual40960Bslots,
+82048BShared,grid256. OwnpreMMAlayout/TMAslotreusecheckmandatorybeforeanynew
+MMA. NoP52sourceapplication/build/measurement/certificate transfer.

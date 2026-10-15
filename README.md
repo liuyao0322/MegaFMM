@@ -6,16 +6,16 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 **2026-10-16 精度研究：** [调研、误差消融与硬件对照](research/precision_20261016/REPORT.md)
 和[针对性方案设计](research/precision_20261016/DESIGN.md)。生产源码与研究起点一致，
 原七乘法仍未通过原始精度门槛；达标且更快的直接输入稠密原型保留为研究对照。
-[补偿路径硬件研究](research/precision_20261016/int8_hardware/HARDWARE_REPORT.md)的普通和Graph参考现统一为P50，P47/P46/P45/P39为历史完整验收回退。
-原始FP16/BF16输入、精确逐列平衡、七个主乘积和全部八个交叉修正点积保留。P46复用高部执行主项与修正，P47直接写出原生高低部；P49复用原始值但性能变慢，P50缩小打包任务后获得小幅收益。
-普通标准78项最大BF16/FP16 eF为1.61320e-5/2.16395e-5，与P47打印误差逐项相同。
-独立普通ABBA同轮P47→P50为28.897→28.143μs / 28.853→28.051μs，降低2.61%/2.78%；Graph28.873→28.185μs / 28.852→28.342μs，降低2.38%/1.77%。
-P50自身普通/Graph各78项精度和每模式79,872个指数检查、新种子12模式双流144配置/1,152调用及保护区全部通过；
+[补偿路径硬件研究](research/precision_20261016/int8_hardware/HARDWARE_REPORT.md)的普通和Graph参考现统一为P51，P50/P47/P46/P45/P39为历史完整验收回退。
+原始FP16/BF16输入、精确逐列平衡、七个主乘积和全部八个交叉修正点积保留。P49复用原始值但性能变慢；P50/P51逐步缩小打包任务，并配套完整索引及协作网格覆盖，获得小幅收益。
+普通标准78项最大BF16/FP16 eF为1.61320e-5/2.16395e-5，与P50打印误差逐项相同。
+独立普通ABBA同轮P50→P51为28.129→27.390μs / 27.967→27.339μs，降低2.63%/2.24%；Graph27.974→27.405μs / 28.182→27.651μs，降低2.03%/1.88%。此前P50相对P47的收益来自另一轮独立对照，不将两轮相加作为直接测量。
+P51自身普通/Graph各78项精度和每模式79,872个指数检查、新种子12模式双流144配置/1,152调用及保护区全部通过；
 memcheck/racecheck/synccheck限定范围各48配置/96调用零错误，racecheck零警告/零hazard；另54组新输入的约3.11亿个原生高低部值及18组极端缩放的约1.04亿个值逐位比较均无差异。极端样本也通过自身完整FP64矩阵stress。
-未锁时钟，无置信区间；完整调用仍约为生产SW的2.8倍，未进入生产或改变Auto。
-[P50实现与消融](research/precision_20261016/int8_hardware/ALL_NATIVE_PACK_GEOMETRY_HARDWARE.md)、[自身验收](research/precision_20261016/int8_hardware/p50_validation.json)、
+未锁时钟，无置信区间；完整调用仍约为生产SW的2.7倍，未进入生产或改变Auto。
+[P51实现与消融](research/precision_20261016/int8_hardware/ALL_NATIVE_PACK_GRID_HARDWARE.md)、[自身验收](research/precision_20261016/int8_hardware/p51_validation.json)、
 [综合审计](research/precision_20261016/fused_int8/audit.json)及[后续消融](research/precision_20261016/int8_hardware/NEXT_EXPERIMENTS.md)保留确切范围与性能差距。
-P48缩小共享申请量未获完整收益。[原生融合N1/N2/N3](research/precision_20261016/fused_native/REPORT.md)各自布局和原始精度通过，普通/Graph完整调用约615/118/105μs，均慢于同轮P47，全部拒绝；没有将其他候选的双流或工具验收转移给它们。目标继续进行。
+P48缩小共享申请量未获完整收益。[原生融合N1/N2/N3](research/precision_20261016/fused_native/REPORT.md)各自布局和原始精度通过，完整调用约615/118/105μs，均慢于同轮P47，全部拒绝；没有将其他候选的双流或工具验收转移给它们。下一项[P52计算瓦片与TMA槽位实验](research/precision_20261016/int8_hardware/CONSUMER_N16_DESIGN.md)仅准备方案和生成器，尚未应用或测量。目标继续进行。
 [片上融合后续](research/precision_20261016/fused_int8/REPORT.md)修正布局后通过72项普通精度；继续移出逐元素缩放判断后，F13完整调用约224–240 μs，仍拒绝性能验收。
 下方 iter282 等标签为历史检查点，实际起点和文件哈希以新报告为准。
 

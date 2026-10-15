@@ -127,7 +127,7 @@ void pack_pair(const T* __restrict__ X,T* __restrict__ high,T* __restrict__ q,in
  const int* __restrict__ inside,PairPackShared<SideA>& s){
  // P49 Group0 writes all planes; all collective barriers precede this helper.
  if constexpr(Group!=0)return;
- constexpr int Rows=SideA?32:64,Cols=SideA?128:32,PT=Rows*Cols/256,Tiles=(512/Rows)*(512/Cols);
+ constexpr int Rows=SideA?16:32,Cols=SideA?128:32,PT=Rows*Cols/256,Tiles=(512/Rows)*(512/Cols);
  int tile=blockIdx.x%Tiles,tid=threadIdx.x,r0=tile/(512/Cols)*Rows,c0=tile%(512/Cols)*Cols;
  auto load=[&](auto fast,float sf0,float sf1){
   #pragma unroll 4
@@ -161,7 +161,7 @@ void pack_pair(const T* __restrict__ X,T* __restrict__ high,T* __restrict__ q,in
   }
  };
  if constexpr(Balance){
-  int pos=SideA?c0+tid%Cols:r0+tid/32+8*(tid%8);
+  int pos=SideA?c0+tid%Cols:r0+tid/32+8*(tid%4);
   int e0=SideA?-inside[pos]:inside[pos],e1=SideA?-inside[pos+512]:inside[pos+512];
   bool normal=e0>=-126&&e0<=127&&e1>=-126&&e1<=127;if constexpr(!SideA)normal=__all_sync(0xffffffff,normal);
   if(normal)load(std::true_type{},__int_as_float((e0+127)<<23),__int_as_float((e1+127)<<23));else load(std::false_type{},0,0);
@@ -173,28 +173,28 @@ template<class T,bool SideA,bool Balance> __global__ __launch_bounds__(256,1)
 void pack(const T* __restrict__ X,T* __restrict__ high,T* __restrict__ q,int* __restrict__ exp,const int* __restrict__ inside){
  extern __shared__ __align__(128) unsigned char scratch_buffer[];
  auto& scratch=*reinterpret_cast<PairPackShared<SideA>*>(scratch_buffer);
- int group=blockIdx.x/(SideA?64:128);
+ int group=blockIdx.x/(SideA?128:256);
  if(group==0)pack_pair<T,SideA,Balance,0>(X,high,q,exp,inside,scratch);
  else if(group==1)pack_pair<T,SideA,Balance,1>(X,high,q,exp,inside,scratch);
  else pack_pair<T,SideA,Balance,2>(X,high,q,exp,inside,scratch);
 }
 
-// B occupies0..191, A192..287.192 is divisible by both tile counts,
+// B occupies0..255, A256..383.256 is divisible by both tile counts,
 // so pack_pair's blockIdx modulo Tiles still selects the original tile.
 template<class T,bool Balance> __global__ __launch_bounds__(256,1)
 void pack_joint(const T* __restrict__ A,const T* __restrict__ B,
  T* __restrict__ ha,T* __restrict__ hb,T* __restrict__ qa,T* __restrict__ qb,
  int* __restrict__ ea,int* __restrict__ eb,const int* __restrict__ inside){
  extern __shared__ __align__(128) unsigned char scratch_buffer[];
- if(blockIdx.x<192){
+ if(blockIdx.x<256){
   auto& s=*reinterpret_cast<PairPackShared<false>*>(scratch_buffer);
-  int group=blockIdx.x/128;
+  int group=blockIdx.x/256;
   if(group==0)pack_pair<T,false,Balance,0>(B,hb,qb,eb,inside,s);
   else if(group==1)pack_pair<T,false,Balance,1>(B,hb,qb,eb,inside,s);
   else pack_pair<T,false,Balance,2>(B,hb,qb,eb,inside,s);
  }else{
   auto& s=*reinterpret_cast<PairPackShared<true>*>(scratch_buffer);
-  int group=(blockIdx.x-192)/64;
+  int group=(blockIdx.x-256)/128;
   if(group==0)pack_pair<T,true,Balance,0>(A,ha,qa,ea,inside,s);
   else if(group==1)pack_pair<T,true,Balance,1>(A,ha,qa,ea,inside,s);
   else pack_pair<T,true,Balance,2>(A,ha,qa,ea,inside,s);
@@ -203,7 +203,7 @@ void pack_joint(const T* __restrict__ A,const T* __restrict__ B,
 static_assert(sizeof(PairPackShared<true>)>=sizeof(PairPackShared<false>));
 
 
-// All288CTAs participate in the grid barrier. The first128CTAs each finish
+// All384CTAs participate in the grid barrier. The first128CTAs each finish
 // all8column exponents before the barrier permits inside reads/scratch reuse.
 template<class T> __global__ __launch_bounds__(256,1)
 void preprocess_cooperative_columns(const T* __restrict__ A,const T* __restrict__ B,
@@ -238,15 +238,15 @@ void preprocess_cooperative_columns(const T* __restrict__ A,const T* __restrict_
  }
  grid.sync();
 
- if(blockIdx.x<192){
+ if(blockIdx.x<256){
   auto& s=*reinterpret_cast<PairPackShared<false>*>(scratch_buffer);
-  int group=blockIdx.x/128;
+  int group=blockIdx.x/256;
   if(group==0)pack_pair<T,false,Balance,0>(B,hb,qb,eb,inside,s);
   else if(group==1)pack_pair<T,false,Balance,1>(B,hb,qb,eb,inside,s);
   else pack_pair<T,false,Balance,2>(B,hb,qb,eb,inside,s);
  }else{
   auto& s=*reinterpret_cast<PairPackShared<true>*>(scratch_buffer);
-  int group=(blockIdx.x-192)/64;
+  int group=(blockIdx.x-256)/128;
   if(group==0)pack_pair<T,true,Balance,0>(A,ha,qa,ea,inside,s);
   else if(group==1)pack_pair<T,true,Balance,1>(A,ha,qa,ea,inside,s);
   else pack_pair<T,true,Balance,2>(A,ha,qa,ea,inside,s);
@@ -261,18 +261,18 @@ template<class T> void init_cooperative_preprocess(){
  check(cudaDeviceGetAttribute(&supported,cudaDevAttrCooperativeLaunch,device),"cooperative support");
  check(cudaDeviceGetAttribute(&sms,cudaDevAttrMultiProcessorCount,device),"cooperative SM count");
  check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&active,preprocess_cooperative_columns<T>,256,smem),"cooperative occupancy");
- printf("COOPERATIVE_INIT dtype=%s supported=%d sm_count=%d active_blocks_per_sm=%d grid=288 shared_bytes=%zu\n",
+ printf("COOPERATIVE_INIT dtype=%s supported=%d sm_count=%d active_blocks_per_sm=%d grid=384 shared_bytes=%zu\n",
   (std::is_same_v<T,cute::half_t> ? "fp16" : "bf16"),supported,sms,active,smem);
- if(!supported||active*sms<288)throw std::runtime_error("Cooperative preprocess requires resident capacity for288CTAs");
+ if(!supported||active*sms<384)throw std::runtime_error("Cooperative preprocess requires resident capacity for384CTAs");
 }
 
 template<class T,bool Balance> void preprocess(const T* A,const T* B,Work w,cudaStream_t stream){
  if constexpr(Balance){
   T* ha=static_cast<T*>(w.ha);T* hb=static_cast<T*>(w.hb);T* qa=static_cast<T*>(w.qa);T* qb=static_cast<T*>(w.qb);
   void* args[]={&A,&B,&ha,&hb,&qa,&qb,&w.ea,&w.eb,&w.inside,&w.partial};
-  check(cudaLaunchCooperativeKernel(reinterpret_cast<const void*>(preprocess_cooperative_columns<T>),dim3(288),dim3(256),args,sizeof(PairPackShared<true>),stream),"cooperative preprocess launch");
+  check(cudaLaunchCooperativeKernel(reinterpret_cast<const void*>(preprocess_cooperative_columns<T>),dim3(384),dim3(256),args,sizeof(PairPackShared<true>),stream),"cooperative preprocess launch");
  }else{
-  pack_joint<T,false><<<288,256,sizeof(PairPackShared<true>),stream>>>(
+  pack_joint<T,false><<<384,256,sizeof(PairPackShared<true>),stream>>>(
    A,B,static_cast<T*>(w.ha),static_cast<T*>(w.hb),static_cast<T*>(w.qa),static_cast<T*>(w.qb),w.ea,w.eb,w.inside);
  }
  check(cudaPeekAtLastError(),"INT8 preprocess");
