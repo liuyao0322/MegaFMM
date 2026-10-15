@@ -24,6 +24,9 @@ struct Policy {
   Algorithm algorithm=Algorithm::Auto;
   size_t workspace_limit=size_t(8)<<30;
   int heuristic_candidates=32;
+  // Explicit Tuned setup may duplicate inputs to model a rotating working set.
+  // Scratch copies are freed before tune returns; run retains no input values.
+  int tuning_input_sets=1;
 };
 class Plan {
  public:

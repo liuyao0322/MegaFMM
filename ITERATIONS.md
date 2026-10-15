@@ -589,6 +589,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 341 | Explore shallow small tiles pingpong and alternate raster order | 1.0437 | 1.270647 | measured |
 
+| 342 | Match tuning working set and rerank the strongest cuBLASLt candidates | 1.0482 | 1.271215 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -5444,3 +5446,45 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Full14-shape bothdtype two-input100x5 benchmark with3 FP64 trials.512 BF16 narrow tile is only about2.8percent faster in formal timing, below stability margin.4096 FP16 exposes a tune-versus-rotating-working-set selection mismatch and is not a certified winner. All numerical gates recorded unchanged; no full-goal completion claim
 - **Next:** Match tuning to rotating input working set and rerank strongest Lt candidates under the same five-round protocol, prune measured slow small tiles on large shapes, then independently validate policy and kernels
 - **Archive:** trajectory/20261015_163116_iter-341/
+
+### Iter 342 — Match tuning working set and rerank the strongest cuBLASLt candidates
+
+- **Hypothesis:** Single-set short tuning can misrank kernels used with rotating inputs; stronger fallback comparison may reduce false custom wins
+- **Changes:** Policy tuning_input_sets1to4, temporary aligned clone inputs freed on return, top8 Lt candidates reranked alongside custom candidates under identical five-round timing, metadata records working set and fallback rerank; prune measured slow small tiles on large shapes
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 28 rows; arithmetic mean of row median latency=1.271215 ms; mean speedup=1.0482x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_dense_cublaslt v0 | launch | 0.005684 | 0.005679 | 1.0008 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005762 | 0.005550 | 1.0383 | 6.44261e-07 | 1 |
+| 1024,1024,1024 | bf16 | tuned_hopper_dense v0 | launch | 0.012152 | 0.008086 | 1.5029 | 8.52266e-07 | 1 |
+| 1024,1024,1024 | fp16 | tuned_hopper_dense v0 | launch | 0.009566 | 0.008031 | 1.1912 | 1.25092e-06 | 1 |
+| 2048,2048,2048 | bf16 | tuned_hopper_dense v0 | launch | 0.031785 | 0.029460 | 1.0789 | 1.85669e-06 | 1 |
+| 2048,2048,2048 | fp16 | tuned_hopper_dense v0 | launch | 0.032532 | 0.029970 | 1.0855 | 2.45816e-06 | 1 |
+| 4096,4096,4096 | bf16 | tuned_hopper_dense v0 | launch | 0.228230 | 0.217213 | 1.0507 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_hopper_dense v0 | launch | 0.220530 | 0.235729 | 0.9355 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.662178 | 1.678449 | 0.9903 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.729460 | 1.758791 | 0.9833 | 9.68937e-06 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.747355 | 12.796935 | 0.9961 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.311395 | 13.296216 | 1.0011 | 1.93317e-05 | 1 |
+| 8192,4096,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.862145 | 0.877730 | 0.9822 | 8.55058e-06 | 1 |
+| 8192,4096,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.922297 | 0.913738 | 1.0094 | 9.68961e-06 | 1 |
+| 4096,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.849809 | 0.833235 | 1.0199 | 8.55119e-06 | 1 |
+| 4096,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.913782 | 0.904990 | 1.0097 | 9.68981e-06 | 1 |
+| 8192,8192,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.891144 | 0.884431 | 1.0076 | 4.02534e-06 | 1 |
+| 8192,8192,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.908300 | 0.917712 | 0.9897 | 4.87776e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.024788 | 0.024600 | 1.0076 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_dense_cublaslt v0 | launch | 0.025376 | 0.025441 | 0.9974 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.026985 | 0.025209 | 1.0705 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026592 | 0.025504 | 1.0427 | 6.43463e-07 | 1 |
+| 1025,1537,769 | bf16 | tuned_hopper_dense v0 | launch | 0.038157 | 0.034267 | 1.1135 | 6.19792e-07 | 1 |
+| 1025,1537,769 | fp16 | tuned_hopper_dense v0 | launch | 0.036409 | 0.034009 | 1.0706 | 9.7026e-07 | 1 |
+| 514,770,258 | bf16 | tuned_dense_cublaslt v0 | launch | 0.008857 | 0.008850 | 1.0008 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_dense_cublaslt v0 | launch | 0.008870 | 0.008875 | 0.9994 | 3.40967e-07 | 1 |
+| 1,1,1 | bf16 | tuned_hopper_dense v0 | launch | 0.002895 | 0.002664 | 1.0866 | 0 | 1 |
+| 1,1,1 | fp16 | tuned_hopper_dense v0 | launch | 0.002896 | 0.002667 | 1.0858 | 0 | 1 |
+
+- **Analysis:** Full14-shape bothdtype two-input100x5 benchmark and3 FP64 trials, unchanged independent reference. Matching working set preserves1024 gains but does not eliminate4096 FP16 short-rank to sustained-timing mismatch; no claim that policy reliability is solved. All numerical outcomes remain recorded per row
+- **Next:** Add independent five100-call confirmation for shortlisted winners and direct cp.async WMMA small-GEMM candidates; rerun forced correctness sanitizers and independent all-size acceptance
+- **Archive:** trajectory/20261015_163807_iter-342/

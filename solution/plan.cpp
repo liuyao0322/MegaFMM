@@ -74,6 +74,9 @@ struct LtOp {
   std::vector<cublasLtMatmulHeuristicResult_t> candidates;
   std::vector<std::array<uint32_t, 4>> alignments;
   bool robust_small_tuning = false;
+  bool strategy_reranked = false;
+  int strategy_input_sets = 1;
+  std::vector<float> candidate_tuning_ms;
   bool tuned = false;
   float selected_tuning_ms = std::numeric_limits<float>::quiet_NaN();
   size_t selected = 0;
@@ -197,7 +200,8 @@ cublasStatus_t execute_lt(cublasLtHandle_t handle, const LtOp& op, size_t candid
 }
 void tune_lt(cublasLtHandle_t handle, LtOp& op, const void* A, const void* B,
              const float* C0, float* D, void* scratch, cudaStream_t stream) {
-  op.tuned = false;
+  op.tuned = false;op.strategy_reranked=false;
+  op.candidate_tuning_ms.assign(op.candidates.size(),std::numeric_limits<float>::infinity());
   op.selected_tuning_ms = std::numeric_limits<float>::quiet_NaN();
   cudaEvent_t start = nullptr, stop = nullptr;
   cuda_check(cudaEventCreate(&start), "create tuning start event");
@@ -231,6 +235,7 @@ void tune_lt(cublasLtHandle_t handle, LtOp& op, const void* A, const void* B,
       }
       std::sort(samples.begin(), samples.begin() + groups);
       const float score = samples[size_t(groups / 2)];
+      if(valid) op.candidate_tuning_ms[i]=score/repetitions;
       if (valid && score < best) { best = score; chosen = i; found = true; }
     }
     if (!found) throw std::runtime_error("all cuBLASLt tuning candidates rejected their bound pointers");
@@ -273,7 +278,8 @@ std::string describe_lt(const LtOp& op, size_t bound) {
   result += ";tuned_candidate=" + std::to_string(op.selected);
   result += ";bound_workspace=" + std::to_string(candidate.workspaceSize);
   result += ";tuned=" + std::string(op.tuned ? "1" : "0");
-  result += ";tune=" + std::string(op.robust_small_tuning ? "4w/3x10median" : "1w/1x3");
+  result += ";tune=" + (op.strategy_reranked ? "4w/5x20median_sets"+std::to_string(op.strategy_input_sets) :
+      std::string(op.robust_small_tuning ? "4w/3x10median" : "1w/1x3"));
   // A rebound pointer can legitimately use another compatible candidate. Its
   // identity is reported above, but the selected candidate's score is not its score.
   if (!op.tuned) result += ";tuning_ms=NA(untuned)";
@@ -291,7 +297,7 @@ struct Plan::Impl {
   bool empty = false, scale = false, sw_multisize = false;
   size_t bytes = 0;
   bool strategy = false;
-  int hopper_selected = -1, sm_count = 0;
+  int hopper_selected = -1, sm_count = 0, strategy_input_sets = 1;
   std::array<float,detail::HopperCandidateCount+1> strategy_ms{};
   cublasLtHandle_t handle = nullptr;
   std::unique_ptr<LtOp> dense;
@@ -366,56 +372,103 @@ void tune_strategy(Plan::Impl& plan,const void* A,const void* B,const float* C,
   plan.hopper_selected=-1;
   plan.strategy_ms.fill(NAN);
   if(!plan.sm_count) return;
-  std::array<bool,detail::HopperCandidateCount+1> eligible{};eligible[0]=true;
+  std::array<bool,detail::HopperCandidateCount> eligible{};
   for(int id=0;id<detail::HopperCandidateCount;++id)
-    eligible[id+1]=detail::hopper_workspace(plan.problem,id)<=plan.bytes && detail::hopper_dense(id,plan.problem,A,B,C,D,workspace,plan.sm_count,stream,false);
-  if(std::none_of(eligible.begin()+1,eligible.end(),[](bool x){return x;})) return;
-  const size_t bytes=matrix_bytes(plan.problem.m,plan.problem.n,plan.problem.ldd,4);
+    eligible[id]=detail::hopper_workspace(plan.problem,id)<=plan.bytes &&
+        detail::hopper_dense(id,plan.problem,A,B,C,D,workspace,plan.sm_count,stream,0);
+  if(std::none_of(eligible.begin(),eligible.end(),[](bool x){return x;})) return;
+  auto& lt=*plan.dense;
+  std::vector<size_t> lt_pool;
+  for(size_t i=0;i<lt.candidates.size();++i)
+    if(compatible(lt,i,A,B,C,D) && std::isfinite(lt.candidate_tuning_ms[i])) lt_pool.push_back(i);
+  std::stable_sort(lt_pool.begin(),lt_pool.end(),[&](size_t x,size_t y) {
+    return lt.candidate_tuning_ms[x]<lt.candidate_tuning_ms[y];
+  });
+  if(lt_pool.size()>8) lt_pool.resize(8);
+  if(lt_pool.empty()) lt_pool.push_back(lt.selected);
+  std::vector<void*> allocations;
+  std::vector<const void*> input_a{A},input_b{B};
   float* reference=nullptr;
   cudaEvent_t start=nullptr,stop=nullptr;
-  auto launch=[&](int id) {
-    if(id==0) lt_check(execute_lt(plan.handle,*plan.dense,
-        bound_candidate(*plan.dense,A,B,C,D),A,B,C,D,workspace,stream),"strategy dense");
-    else if(!detail::hopper_dense(id-1,plan.problem,A,B,C,D,workspace,plan.sm_count,stream,true))
+  auto cleanup=[&]() {
+    if(start) cudaEventDestroy(start);if(stop) cudaEventDestroy(stop);
+    if(reference) cudaFree(reference);
+    for(void* p:allocations) cudaFree(p);
+  };
+  auto dense_launch=[&](size_t index,int set) {
+    lt_check(execute_lt(plan.handle,lt,index,input_a[set],input_b[set],C,D,workspace,stream),"strategy dense");
+  };
+  auto custom_launch=[&](int id,int set) {
+    if(!detail::hopper_dense(id,plan.problem,input_a[set],input_b[set],C,D,workspace,plan.sm_count,stream,1))
       throw std::runtime_error("strategy candidate binding changed during tuning");
   };
   try {
-    cuda_check(cudaMalloc(reinterpret_cast<void**>(&reference),bytes),"strategy reference allocation");
-    launch(0);
-    cuda_check(cudaMemcpyAsync(reference,D,bytes,cudaMemcpyDeviceToDevice,stream),"strategy reference copy");
-    for(int id=1;id<=detail::HopperCandidateCount;++id) if(eligible[id]) {
-      launch(id);
-      eligible[id]=detail::dense_agreement(plan.problem,D,reference,stream);
+    const auto& p=plan.problem;
+    const size_t abytes=matrix_bytes(p.trans_a?p.k:p.m,p.trans_a?p.m:p.k,p.lda,2);
+    const size_t bbytes=matrix_bytes(p.trans_b?p.n:p.k,p.trans_b?p.k:p.n,p.ldb,2);
+    // Explicit tuning may allocate. These temporary copies model the caller's
+    // rotating working set; they are released before tune returns. No input
+    // values or output values are retained by run(). Preserve pointer alignment.
+    for(int set=1;set<plan.strategy_input_sets;++set) {
+      void* ar=nullptr;void* br=nullptr;
+      cuda_check(cudaMalloc(&ar,checked_add(abytes,256)),"strategy A working set");allocations.push_back(ar);
+      cuda_check(cudaMalloc(&br,checked_add(bbytes,256)),"strategy B working set");allocations.push_back(br);
+      char* ap=static_cast<char*>(ar)+reinterpret_cast<uintptr_t>(A)%256;
+      char* bp=static_cast<char*>(br)+reinterpret_cast<uintptr_t>(B)%256;
+      cuda_check(cudaMemcpyAsync(ap,A,abytes,cudaMemcpyDeviceToDevice,stream),"strategy copy A");
+      cuda_check(cudaMemcpyAsync(bp,B,bbytes,cudaMemcpyDeviceToDevice,stream),"strategy copy B");
+      input_a.push_back(ap);input_b.push_back(bp);
     }
+    const size_t bytes=matrix_bytes(p.m,p.n,p.ldd,4);
+    cuda_check(cudaMalloc(reinterpret_cast<void**>(&reference),bytes),"strategy reference allocation");
+    dense_launch(lt.selected,0);
+    cuda_check(cudaMemcpyAsync(reference,D,bytes,cudaMemcpyDeviceToDevice,stream),"strategy reference copy");
+    for(int id=0;id<detail::HopperCandidateCount;++id) if(eligible[id]) {
+      custom_launch(id,0);
+      eligible[id]=detail::dense_agreement(p,D,reference,stream);
+    }
+    // Negative route IDs encode Lt indices. Re-rank the strongest eight Lt
+    // candidates under the SAME working set and timing protocol as custom ones.
+    std::vector<int> routes;
+    for(size_t index:lt_pool) routes.push_back(-int(index)-1);
+    for(int id=0;id<detail::HopperCandidateCount;++id) if(eligible[id]) routes.push_back(id);
+    std::vector<std::array<float,5>> times(routes.size());
+    auto launch=[&](size_t route,int set) {
+      if(routes[route]<0) dense_launch(size_t(-routes[route]-1),set);
+      else custom_launch(routes[route],set);
+    };
     cuda_check(cudaEventCreate(&start),"strategy start event");
     cuda_check(cudaEventCreate(&stop),"strategy stop event");
-    std::array<std::array<float,5>,detail::HopperCandidateCount+1> times{};
     constexpr int repetitions=20;
-    for(int round=0;round<5;++round) for(int index=0;index<=detail::HopperCandidateCount;++index) {
-      const int id=round%2 ? detail::HopperCandidateCount-index:index;
-      if(!eligible[id]) continue;
-      for(int w=0;w<4;++w) launch(id);
+    for(int round=0;round<5;++round) for(size_t index=0;index<routes.size();++index) {
+      const size_t route=round%2 ? routes.size()-1-index:index;
+      for(int w=0;w<4;++w) launch(route,w%plan.strategy_input_sets);
       cuda_check(cudaEventRecord(start,stream),"strategy record start");
-      for(int rep=0;rep<repetitions;++rep) launch(id);
+      for(int rep=0;rep<repetitions;++rep) launch(route,rep%plan.strategy_input_sets);
       cuda_check(cudaEventRecord(stop,stream),"strategy record stop");
       cuda_check(cudaEventSynchronize(stop),"strategy wait");
-      cuda_check(cudaEventElapsedTime(&times[id][round],start,stop),"strategy elapsed");
-      times[id][round]/=repetitions;
+      cuda_check(cudaEventElapsedTime(&times[route][round],start,stop),"strategy elapsed");
+      times[route][round]/=repetitions;
     }
-    for(int id=0;id<=detail::HopperCandidateCount;++id) if(eligible[id]) {
-      auto sorted=times[id];std::sort(sorted.begin(),sorted.end());plan.strategy_ms[id]=sorted[2];
+    std::vector<float> medians(routes.size());
+    size_t baseline=0;
+    for(size_t r=0;r<routes.size();++r) {
+      auto sorted=times[r];std::sort(sorted.begin(),sorted.end());medians[r]=sorted[2];
+      if(routes[r]<0) {if(medians[r]<medians[baseline]) baseline=r;}
+      else plan.strategy_ms[routes[r]+1]=medians[r];
     }
-    float best=plan.strategy_ms[0]*0.97f;
-    for(int id=1;id<=detail::HopperCandidateCount;++id) if(eligible[id] && plan.strategy_ms[id]<best) {
+    lt.selected=size_t(-routes[baseline]-1);
+    lt.selected_tuning_ms=medians[baseline];lt.strategy_reranked=true;
+    lt.strategy_input_sets=plan.strategy_input_sets;
+    plan.strategy_ms[0]=medians[baseline];
+    float best=medians[baseline]*0.97f;
+    for(size_t r=lt_pool.size();r<routes.size();++r) if(medians[r]<best) {
       bool stable=true;
-      for(int r=0;r<5;++r) stable=stable && times[id][r]<times[0][r];
-      if(stable) {best=plan.strategy_ms[id];plan.hopper_selected=id-1;}
+      for(int round=0;round<5;++round) stable=stable && times[r][round]<times[baseline][round];
+      if(stable) {best=medians[r];plan.hopper_selected=routes[r];}
     }
-  } catch(...) {
-    if(start) cudaEventDestroy(start);if(stop) cudaEventDestroy(stop);
-    if(reference) cudaFree(reference);throw;
-  }
-  cudaEventDestroy(start);cudaEventDestroy(stop);cudaFree(reference);
+  } catch(...) {cleanup();throw;}
+  cleanup();
 }
 }  // namespace
 
@@ -442,6 +495,7 @@ std::string Plan::lt_algorithm_config(const void* A, const void* B, const float*
         impl_->problem,A,B,C0,D,workspace,impl_->sm_count,nullptr,false);
     info+=bound ? detail::hopper_candidate_name(impl_->hopper_selected):"dense_cublaslt";
     info+=";rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5";
+    info+=";input_sets="+std::to_string(impl_->strategy_input_sets)+";dense_rerank=top8";
     info+=";dense_ms="+std::to_string(impl_->strategy_ms[0]);
     for(int id=0;id<detail::HopperCandidateCount;++id) info+=";"+std::string(detail::hopper_candidate_name(id))+"_ms="+std::to_string(impl_->strategy_ms[id+1]);
     return info+";fallback="+describe_lt(*impl_->dense,bound_candidate(*impl_->dense,A,B,C0,D));
@@ -455,7 +509,10 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
     throw std::invalid_argument("unsupported algorithm: old SW implementations have been removed");
   if (policy.heuristic_candidates < 1 || policy.heuristic_candidates > 128)
     throw std::invalid_argument("heuristic_candidates must be between 1 and 128");
+  if(policy.tuning_input_sets<1 || policy.tuning_input_sets>4)
+    throw std::invalid_argument("tuning_input_sets must be between 1 and 4");
   auto impl = std::make_unique<Plan::Impl>();
+  impl->strategy_input_sets=policy.tuning_input_sets;
   impl->problem = p;
   impl->strategy_ms.fill(NAN);
   impl->empty = !p.m || !p.n;

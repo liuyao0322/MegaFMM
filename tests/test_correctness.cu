@@ -64,6 +64,7 @@ void dense_case(megafmm::DType dtype, int m, int n, int k, bool ta, bool tb,
   megafmm::Policy policy;
   policy.algorithm=tuned_mode ? megafmm::Algorithm::Tuned : graph_mode ? megafmm::Algorithm::Auto:megafmm::Algorithm::Dense;
   policy.workspace_limit=size_t(32)<<20;
+  if(tuned_mode) policy.tuning_input_sets=2;
   auto plan=megafmm::create_plan(p,policy);
   Buffer workspace(plan->workspace_bytes());
   require(tuned_mode ? plan->algorithm_name().find("tuned_")==0 : plan->algorithm_name()=="dense_cublaslt", "unexpected Dense route");
@@ -127,6 +128,8 @@ void policy_and_binding_cases() {
   require(rejected(p,policy),"removed SW algorithm accepted");
   p.m=0;require(rejected(p,policy),"removed SW algorithm accepted before empty dispatch");
   p.m=16;policy={};policy.heuristic_candidates=0;require(rejected(p,policy),"invalid candidate budget accepted");
+  policy={};policy.tuning_input_sets=0;require(rejected(p,policy),"invalid tuning working set accepted");
+  policy.tuning_input_sets=5;require(rejected(p,policy),"excessive tuning working set accepted");
   p.m=0;auto empty=megafmm::create_plan(p);megafmm::run(*empty,nullptr,nullptr,nullptr,nullptr,nullptr);
   require(empty->algorithm_name()=="empty","empty route missing");
   p.m=16;p.alpha=0;p.beta=-0.5f;

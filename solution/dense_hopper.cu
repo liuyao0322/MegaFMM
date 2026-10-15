@@ -119,6 +119,7 @@ const char* hopper_candidate_name(int id) {
 }
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C,float* D,
                   void* workspace,int sm_count,cudaStream_t stream,int operation) {
+  if((id==15 || id==16) && (p.m>2048 || p.n>2048 || p.k>2048) && operation!=2) return false;
   if(id>=5 && id<=8)
     return padded_hopper(id-5,p,A,B,C,D,workspace,sm_count,stream,operation);
   if(id==4) {

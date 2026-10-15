@@ -279,6 +279,7 @@ template <class T> bool benchmark(const Options& o, int m, int n, int k, megafmm
   policy.workspace_limit=size_t(8)<<30;
   policy.algorithm=o.algorithm=="tuned" ? megafmm::Algorithm::Tuned : o.algorithm=="sw" ? megafmm::Algorithm::SWPipeline : o.algorithm=="auto" ? megafmm::Algorithm::Auto : megafmm::Algorithm::Dense;
   if (o.profile && o.profile_dense) policy.algorithm=megafmm::Algorithm::Dense;
+  if(policy.algorithm==megafmm::Algorithm::Tuned) policy.tuning_input_sets=std::min(o.rotate_inputs,4);
   auto setup_start=Clock::now();
   auto solution=megafmm::create_plan(problem,policy);
   policy.algorithm=megafmm::Algorithm::Dense;
