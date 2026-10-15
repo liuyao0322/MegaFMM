@@ -637,6 +637,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 365 | Measure eight-stage K32 source-free TMA across large MNK shapes | 1.0712 | 1.763380 | measured |
 
+| 366 | Measure operand-swapped direct-output TMA GEMM | 1.0677 | 1.762829 | measured |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -6174,3 +6176,37 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Formal benchmark completed; original FP64 results and all per-shape scores are archived. K32 improves K128 but large squares still choose Lt. BF16 8192x4096x8192 selects101 with aggregate median ratio1.0317, but formal paired groups include0.975 and0.992 so it is NOT a stable win. Structured remaining-row review follows; latest independent35316/28 is unchanged.
 - **Next:** Validate102forced/API/sixCTest and CUDA12.8 guard/candidate memcheck/racecheck. Profile100K32 and research operand-swapped column-major direct output as a different access direction. Do not count provisional or fallback rows as stable custom wins.
 - **Archive:** trajectory/20261015_213437_iter-365/
+
+### Iter 366 — Measure operand-swapped direct-output TMA GEMM
+
+- **Hypothesis:** Column-major views of B^T A^T change memory orientation and reuse while writing original D directly, possibly improving unresolved large MNK shapes.
+- **Changes:** Add compile-time Swapped flag with shared arguments/layouts and zero-beta ordinary-kernel static guard; append102/103 CM1/CM2, total104; metadata count static assertion; no extra transpose or scratch.
+- **Bench:** Compiled=True; frozen numerical gate=PASS. No certification is inferred from runtime gains.
+- **Scope:** 20 rows; arithmetic mean of row median latency=1.762829 ms; mean speedup=1.0677x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | tuned_hopper_dense v0 | launch | 0.005655 | 0.005014 | 1.1278 | 3.94063e-07 | 1 |
+| 512,512,512 | fp16 | tuned_hopper_dense v0 | launch | 0.005665 | 0.005050 | 1.1219 | 6.44261e-07 | 1 |
+| 514,770,258 | bf16 | tuned_ampere_dense v0 | launch | 0.008686 | 0.006694 | 1.2976 | 1.89701e-07 | 1 |
+| 514,770,258 | fp16 | tuned_ampere_dense v0 | launch | 0.008642 | 0.006623 | 1.3048 | 3.40967e-07 | 1 |
+| 4096,4096,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.236286 | 0.216771 | 1.0900 | 4.02375e-06 | 1 |
+| 4096,4096,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.233438 | 0.233525 | 0.9996 | 4.87674e-06 | 1 |
+| 8192,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 1.658798 | 1.642533 | 1.0099 | 8.55055e-06 | 1 |
+| 8192,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 1.762794 | 1.716757 | 1.0268 | 9.68937e-06 | 1 |
+| 8192,1024,512 | bf16 | tuned_hopper_dense v0 | launch | 0.025180 | 0.023580 | 1.0679 | 3.92291e-07 | 1 |
+| 8192,1024,512 | fp16 | tuned_hopper_dense v0 | launch | 0.025702 | 0.023819 | 1.0790 | 6.43419e-07 | 1 |
+| 1024,8192,512 | bf16 | tuned_hopper_dense v0 | launch | 0.027690 | 0.024250 | 1.1419 | 3.93343e-07 | 1 |
+| 1024,8192,512 | fp16 | tuned_hopper_dense v0 | launch | 0.026247 | 0.024225 | 1.0835 | 6.43463e-07 | 1 |
+| 16384,16384,16384 | bf16 | tuned_dense_cublaslt v0 | launch | 12.758127 | 12.743253 | 1.0012 | 1.7906e-05 | 1 |
+| 16384,16384,16384 | fp16 | tuned_dense_cublaslt v0 | launch | 13.300522 | 13.321469 | 0.9984 | 1.93317e-05 | 1 |
+| 8192,4096,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.876435 | 0.868490 | 1.0091 | 8.55058e-06 | 1 |
+| 8192,4096,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.908656 | 0.905724 | 1.0032 | 9.68961e-06 | 1 |
+| 4096,8192,8192 | bf16 | tuned_dense_cublaslt v0 | launch | 0.834770 | 0.826330 | 1.0102 | 8.55119e-06 | 1 |
+| 4096,8192,8192 | fp16 | tuned_dense_cublaslt v0 | launch | 0.905523 | 0.884143 | 1.0242 | 9.68981e-06 | 1 |
+| 8192,8192,4096 | bf16 | tuned_dense_cublaslt v0 | launch | 0.845561 | 0.863357 | 0.9794 | 4.02534e-06 | 1 |
+| 8192,8192,4096 | fp16 | tuned_dense_cublaslt v0 | launch | 0.895084 | 0.914980 | 0.9783 | 4.87776e-06 | 1 |
+
+- **Analysis:** Formal20/20 original FP64 gates pass. All12 unresolved large-K combinations choose Lt fallback; no new stable custom wins. Best new8192 BF/FP1.599/1.708ms versus same-phase Lt1.426/1.615;16384 BF/FP12.936/13.416 versus Lt12.783/13.128.4096BF short0.197ms advantage fails independent confirmation. Latest independent35316/28 unchanged.
+- **Next:** Validate104forced/API/sixCTest and guard/candidate CUDA12.8 memcheck/racecheck. Profile1028192FP16, review364-366 history and official PTX wait-group semantics, then preflight private consumer window3 with matching MMA tail on K32 for a distinct pipeline axis.
+- **Archive:** trajectory/20261015_215628_iter-366/

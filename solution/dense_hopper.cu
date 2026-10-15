@@ -12,22 +12,24 @@
 namespace megafmm::detail {
 namespace {
 using namespace cute;
-template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0,int K=64,bool DirectStore=false,int ClusterN=1,int Workers=1,bool ZeroBeta=false,bool NineWarp=false,bool StreamK=false,int Splits=1>
+template<class T,int M,int N,int ClusterM,int Schedule=0,int Stages=0,int K=64,bool DirectStore=false,int ClusterN=1,int Workers=1,bool ZeroBeta=false,bool NineWarp=false,bool StreamK=false,int Splits=1,bool Swapped=false>
 struct Candidate {
   static_assert(!NineWarp || ZeroBeta,"Nine-warp candidates require beta-zero eligibility");
   static_assert(Splits>=1 && (StreamK || Splits==1),"K splits require the reduction scheduler");
+  static_assert(!Swapped || (ZeroBeta && !NineWarp && !StreamK),"Swapped candidates require ordinary beta-zero kernels");
+  using Layout=cute::conditional_t<Swapped,cutlass::layout::ColumnMajor,cutlass::layout::RowMajor>;
   using Tile=Shape<Int<M>,Int<N>,Int<K>>;
   using Cluster=Shape<Int<ClusterM>,Int<ClusterN>,_1>;
   using Epilogue=typename cutlass::epilogue::collective::CollectiveBuilder<
       cutlass::arch::Sm90,cutlass::arch::OpClassTensorOp,Tile,Cluster,
       cutlass::epilogue::collective::EpilogueTileAuto,float,float,
-      cute::conditional_t<ZeroBeta,void,float>,cutlass::layout::RowMajor,4,float,cutlass::layout::RowMajor,4,
+      cute::conditional_t<ZeroBeta,void,float>,Layout,4,float,Layout,4,
       cute::conditional_t<DirectStore,cutlass::epilogue::NoSmemWarpSpecialized,
         cute::conditional_t<Schedule==0,cutlass::epilogue::TmaWarpSpecializedCooperative,
                             cutlass::epilogue::TmaWarpSpecialized>>>::CollectiveOp;
   using Mainloop=typename cutlass::gemm::collective::CollectiveBuilder<
       cutlass::arch::Sm90,cutlass::arch::OpClassTensorOp,
-      T,cutlass::layout::RowMajor,8,T,cutlass::layout::RowMajor,8,float,Tile,Cluster,
+      T,Layout,8,T,Layout,8,float,Tile,Cluster,
       cute::conditional_t<Stages==0,
         cutlass::gemm::collective::StageCountAutoCarveout<int(sizeof(typename Epilogue::SharedStorage))>,
         cutlass::gemm::collective::StageCount<Stages>>,
@@ -41,13 +43,28 @@ struct Candidate {
   using Gemm=cutlass::gemm::device::GemmUniversalAdapter<Kernel>;
   static typename Gemm::Arguments arguments(const Problem& p,const void* A,const void* B,
       const float* C,float* D,int sm_count,int swizzle=8,int raster=0) {
+    typename Kernel::StrideA stride_a{};
+    typename Kernel::StrideB stride_b{};
+    typename Kernel::StrideC stride_c{};
+    typename Kernel::StrideD stride_d{};
+    if constexpr(Swapped) {
+      // D^T = B^T A^T: column-major views use the original buffers directly.
+      stride_a={Int<1>{},p.ldb,int64_t(0)};
+      stride_b={p.lda,Int<1>{},int64_t(0)};
+      stride_c={Int<1>{},p.beta==0 ? p.ldd:p.ldc,int64_t(0)};
+      stride_d={Int<1>{},p.ldd,int64_t(0)};
+    } else {
+      stride_a={p.lda,Int<1>{},int64_t(0)};
+      stride_b={Int<1>{},p.ldb,int64_t(0)};
+      stride_c={p.beta==0 ? p.ldd:p.ldc,Int<1>{},int64_t(0)};
+      stride_d={p.ldd,Int<1>{},int64_t(0)};
+    }
     typename Gemm::Arguments args{
       cutlass::gemm::GemmUniversalMode::kGemm,
-      {int(p.m),int(p.n),int(p.k),1},
-      {static_cast<const T*>(A),typename Kernel::StrideA{p.lda,Int<1>{},int64_t(0)},
-       static_cast<const T*>(B),typename Kernel::StrideB{Int<1>{},p.ldb,int64_t(0)}},
-      {{},p.beta==0 ? D:C,typename Kernel::StrideC{p.beta==0 ? p.ldd:p.ldc,Int<1>{},int64_t(0)},
-       D,typename Kernel::StrideD{p.ldd,Int<1>{},int64_t(0)}},
+      {int(Swapped ? p.n:p.m),int(Swapped ? p.m:p.n),int(p.k),1},
+      {static_cast<const T*>(Swapped ? B:A),stride_a,
+       static_cast<const T*>(Swapped ? A:B),stride_b},
+      {{},p.beta==0 ? D:C,stride_c,D,stride_d},
       {0,sm_count*Workers}
     };
     args.scheduler.max_swizzle_size=swizzle;
@@ -181,6 +198,8 @@ bool dispatch(int id,const Problem& p,const void* A,const void* B,const float* C
     case 99:return Candidate<T,128,256,2,0,0,128,false,1,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 100:return Candidate<T,128,256,1,0,0,32,false,1,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     case 101:return Candidate<T,128,256,2,0,0,32,false,1,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 102:return Candidate<T,128,256,1,0,0,64,false,1,1,true,false,false,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
+    case 103:return Candidate<T,128,256,2,0,0,64,false,1,1,true,false,false,1,true>::run(p,A,B,C,D,workspace,sm_count,stream,operation,8);
     default:return false;
   }
 }
@@ -229,7 +248,8 @@ const char* hopper_candidate_name(int id) {
       "128x256x64_c1_sw8","128x128x64_c2_sw4","128x128x64_c2_sw8",
       "64x32x64_basic_s3","64x64x64_basic_s3","128x128x64_pingpong_s3",
       "256x128x64_c1_sw8","128x256x64_c2_sw8","128x256x64_pingpong_s3_sw8",
-      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64","even_mma_32x32x32","even_mma_32x32x64","128x256x64_cm4_sw8","128x256x64_cm8_sw8","128x256x64_cn2_sw8","128x256x64_cm2cn2_sw8","even_mma_swizzle_32x32x64","even_mma_swizzle_16x32x64","even_mma_swizzle_32x16x64","register_mma_16x32x16","register_mma_32x16x16","even_mma_32x32x128","even_mma_16x64x128","ampere_32x64x32","ampere_32x64x64","ampere_64x64x32","ampere_64x64x64","ampere_64x32x64","ampere_32x128x32_w32x32","64x128x64_basic_s3_sw8","64x256x64_basic_s2_sw8","128x128x64_direct_s3_2cta_sw8","64x256x64_direct_s2_2cta_sw8","128x128x64_beta0_s2_2cta_sw8","128x256x64_beta0_auto_sw8","128x256x64_beta0_sw1","128x256x64_beta0_sw4","128x256x64_beta0_rasterM","128x256x64_beta0_rasterN","128x128x64_beta0_auto_sw8","64x256x64_beta0_pingpong","64x256x64_beta0_pingpong_s3","64x256x64_beta0_pingpong_c2","128x256x64_beta0_cm2","128x256x64_beta0_cn2","128x256x64_beta0_cm2cn2","128x256x64_beta0_cm4","128x256x64_beta0_cm2_rasterM","128x256x64_beta0_cm2_rasterN","128x128x64_beta0_ninewarp_2workers","128x128x64_ninewarp_direct_s2","128x128x64_ninewarp_direct_s3","128x160x64_ninewarp_s2","128x64x64_ninewarp_s3","128x256x64_beta0_streamk","128x256x64_beta0_streamk_cm2","128x128x64_beta0_streamk","128x128x64_beta0_streamk_cm2","128x256x64_beta0_streamk_sw4","128x256x64_beta0_streamk_rasterM","128x256x64_beta0_streamk_rasterN","128x256x64_beta0_streamk_cm2_rasterM","128x256x64_beta0_streamk_cm2_rasterN","128x256x64_ninewarp_tma_s4","128x256x64_ninewarp_direct_s4","128x256x64_ninewarp_tma_s4_cm2","128x256x64_ninewarp_tma_s4_cn2","128x256x64_beta0_splitk2","128x256x64_beta0_splitk4","128x256x64_beta0_splitk2_cm2","128x256x64_beta0_splitk4_cm2","128x256x128_beta0_auto","128x256x128_beta0_cm2","128x256x32_beta0_auto","128x256x32_beta0_cm2"};
+      "128x256x64_c1_sw8_rasterN","128x128x64_c2_sw8_rasterN","256x128x64_c1_sw8_rasterM","wmma_32x64x32","wmma_32x64x64","64x32x128_basic_s3","64x64x128_basic_s3","64x64x256_basic_s2","128x64x128_c1","128x128x128_c1_sw8","128x256x128_direct_sw8","128x128x128_direct_sw8","wmma_32x32x32","wmma_32x32x64","mma_32x32x32","mma_32x32x64","even_mma_32x32x32","even_mma_32x32x64","128x256x64_cm4_sw8","128x256x64_cm8_sw8","128x256x64_cn2_sw8","128x256x64_cm2cn2_sw8","even_mma_swizzle_32x32x64","even_mma_swizzle_16x32x64","even_mma_swizzle_32x16x64","register_mma_16x32x16","register_mma_32x16x16","even_mma_32x32x128","even_mma_16x64x128","ampere_32x64x32","ampere_32x64x64","ampere_64x64x32","ampere_64x64x64","ampere_64x32x64","ampere_32x128x32_w32x32","64x128x64_basic_s3_sw8","64x256x64_basic_s2_sw8","128x128x64_direct_s3_2cta_sw8","64x256x64_direct_s2_2cta_sw8","128x128x64_beta0_s2_2cta_sw8","128x256x64_beta0_auto_sw8","128x256x64_beta0_sw1","128x256x64_beta0_sw4","128x256x64_beta0_rasterM","128x256x64_beta0_rasterN","128x128x64_beta0_auto_sw8","64x256x64_beta0_pingpong","64x256x64_beta0_pingpong_s3","64x256x64_beta0_pingpong_c2","128x256x64_beta0_cm2","128x256x64_beta0_cn2","128x256x64_beta0_cm2cn2","128x256x64_beta0_cm4","128x256x64_beta0_cm2_rasterM","128x256x64_beta0_cm2_rasterN","128x128x64_beta0_ninewarp_2workers","128x128x64_ninewarp_direct_s2","128x128x64_ninewarp_direct_s3","128x160x64_ninewarp_s2","128x64x64_ninewarp_s3","128x256x64_beta0_streamk","128x256x64_beta0_streamk_cm2","128x128x64_beta0_streamk","128x128x64_beta0_streamk_cm2","128x256x64_beta0_streamk_sw4","128x256x64_beta0_streamk_rasterM","128x256x64_beta0_streamk_rasterN","128x256x64_beta0_streamk_cm2_rasterM","128x256x64_beta0_streamk_cm2_rasterN","128x256x64_ninewarp_tma_s4","128x256x64_ninewarp_direct_s4","128x256x64_ninewarp_tma_s4_cm2","128x256x64_ninewarp_tma_s4_cn2","128x256x64_beta0_splitk2","128x256x64_beta0_splitk4","128x256x64_beta0_splitk2_cm2","128x256x64_beta0_splitk4_cm2","128x256x128_beta0_auto","128x256x128_beta0_cm2","128x256x32_beta0_auto","128x256x32_beta0_cm2","128x256x64_beta0_swapped","128x256x64_beta0_swapped_cm2"};
+  static_assert(sizeof(names)/sizeof(names[0])==HopperCandidateCount,"Candidate metadata count mismatch");
   return id>=0 && id<HopperCandidateCount ? names[id]:"invalid";
 }
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C,float* D,
