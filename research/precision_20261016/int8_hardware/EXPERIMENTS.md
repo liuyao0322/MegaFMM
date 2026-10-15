@@ -70,3 +70,9 @@ Production `solution/` unchanged; these are standalone research candidates, not 
 - fp16: complete 65.457us versus currentSW10.024us.
 - Corrected kernel registers166->196,0stack/spill. This isolated change does not address the end-to-end gap. P7 sanitizer/Graph acceptance is not transferred toP9.
 - Next: screen a structurally fused design numerically, using local K128 inside scales and CTA-local quantization, before implementing a new on-chip producer/consumer pipeline.
+
+## F1 numerical screen — local K128 inside scales for fused packing
+
+- A output tile32rows and B output tile64columns define each output CTA. Select two independent inside powers perK128, for the two original K halves, from all four local raw A/B quadrants. Quantize with local32x128 A and128x64 B scales, instead of the global packer's64x128/128x32 blocks.
+- 7patterns x3fresh seeds1701–1703 x2dtypes=42cases:all pass fixed floors, no nonfinite or low-part saturation. FP32 batched leaves approximate native accumulation; correction integer dots are exactly representable. Model has no performance/synchronization claim.
+- This screen retains leaf-then-output recombination. Interleaving K and main/correction accumulation for an on-chip design is a separate numerical change and needs its own test. Evidence in`tile_inside_adaptive*`; manifest identifies the pre-interleaving script.
