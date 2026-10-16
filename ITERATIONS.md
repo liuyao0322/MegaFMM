@@ -647,6 +647,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 370 | Broaden sustained confirmation beyond the top two nominees | 1.1077 | 1.261785 | measured |
 
+| 371 | Extend fused seven-product Hopper SW to aligned variable M N K | 0.4298 | 3.885417 | experimental-numerical-fail |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -6362,3 +6364,45 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Full14-shape28-row formal protocol uses100 calls x5 groups,3 fresh original-input FP64 checks and2 rotating inputs. This is one formal sweep, not independent certification. Preliminary4096BF selection occurred at the eighth attempt but its external minimum pair was only1.00365 despite median1.07552; preserve this failure. Current independently certified369 result remains15/28. Detailed telemetry analysis follows this mandatory log and commit.
 - **Next:** Inspect all per-candidate traces; run seven relevant CTests and CUDA12.8 guard/candidate memcheck and racecheck; investigate separate tuning outputs to match benchmark working-set footprint; require fresh three-sweep evidence before certifying new stable wins.
 - **Archive:** trajectory/20261016_004537_iter-370/
+
+### Iter 371 — Extend fused seven-product Hopper SW to aligned variable M N K
+
+- **Hypothesis:** Generalize the restored 1024 SW dataflow with runtime K loops, independent rectangular transforms and wider WGMMA tiles while preserving seven-product semantics.
+- **Changes:** Add generated dynamic-K consumers, rectangular TMA descriptors, multi-wave launch, shape-aware workspace and explicit SW dispatch; preserve the restored 1024 path and general SW; add guarded shared-Plan dual-stream and fresh Graph tests.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 28 rows; arithmetic mean of row median latency=3.885417 ms; mean speedup=0.4298x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | sw_hopper v0 | launch | 0.005676 | 0.009854 | 0.5760 | 0.00604926 | 0 |
+| 512,512,512 | fp16 | sw_hopper v0 | launch | 0.005757 | 0.009787 | 0.5882 | 0.000756941 | 0 |
+| 1024,1024,1024 | bf16 | sw1024_pdl v0 | launch | 0.012337 | 0.010375 | 1.1891 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw1024_pdl v0 | launch | 0.009796 | 0.010294 | 0.9516 | 0.000754626 | 0 |
+| 2048,2048,2048 | bf16 | sw_hopper v0 | launch | 0.030938 | 0.070267 | 0.4403 | 0.00602495 | 0 |
+| 2048,2048,2048 | fp16 | sw_hopper v0 | launch | 0.032232 | 0.071229 | 0.4525 | 0.00075359 | 0 |
+| 4096,4096,4096 | bf16 | sw_hopper v0 | launch | 0.196764 | 0.451062 | 0.4362 | 0.0060269 | 0 |
+| 4096,4096,4096 | fp16 | sw_hopper v0 | launch | 0.206065 | 0.487303 | 0.4229 | 0.000753133 | 0 |
+| 8192,8192,8192 | bf16 | sw_hopper v0 | launch | 1.575130 | 3.255441 | 0.4838 | 0.00602339 | 0 |
+| 8192,8192,8192 | fp16 | sw_hopper v0 | launch | 1.662515 | 3.446794 | 0.4823 | 0.000753411 | 0 |
+| 16384,16384,16384 | bf16 | sw_hopper v0 | launch | 12.729233 | 43.981426 | 0.2894 | 0.00602276 | 0 |
+| 16384,16384,16384 | fp16 | sw_hopper v0 | launch | 13.330435 | 43.993389 | 0.3030 | 0.000753079 | 0 |
+| 8192,4096,8192 | bf16 | sw_hopper v0 | launch | 0.862635 | 1.776820 | 0.4855 | 0.006025 | 0 |
+| 8192,4096,8192 | fp16 | sw_hopper v0 | launch | 0.863895 | 1.846837 | 0.4678 | 0.000753171 | 0 |
+| 4096,8192,8192 | bf16 | sw_hopper v0 | launch | 0.816214 | 1.735369 | 0.4703 | 0.0060256 | 0 |
+| 4096,8192,8192 | fp16 | sw_hopper v0 | launch | 0.853446 | 1.787294 | 0.4775 | 0.000753411 | 0 |
+| 8192,8192,4096 | bf16 | sw_hopper v0 | launch | 0.853063 | 1.707343 | 0.4996 | 0.00602418 | 0 |
+| 8192,8192,4096 | fp16 | sw_hopper v0 | launch | 0.874619 | 1.800554 | 0.4857 | 0.000753089 | 0 |
+| 8192,1024,512 | bf16 | sw_hopper v0 | launch | 0.026423 | 0.048945 | 0.5399 | 0.00605665 | 0 |
+| 8192,1024,512 | fp16 | sw_hopper v0 | launch | 0.025516 | 0.047304 | 0.5394 | 0.000754911 | 0 |
+| 1024,8192,512 | bf16 | sw_hopper v0 | launch | 0.027019 | 0.075692 | 0.3570 | 0.00602494 | 0 |
+| 1024,8192,512 | fp16 | sw_hopper v0 | launch | 0.026022 | 0.075572 | 0.3443 | 0.000753215 | 0 |
+| 1025,1537,769 | bf16 | sw_pipeline v0 | launch | 0.037965 | 0.843934 | 0.0450 | 0.00601373 | 0 |
+| 1025,1537,769 | fp16 | sw_pipeline v0 | launch | 0.036406 | 0.821685 | 0.0443 | 0.000751472 | 0 |
+| 514,770,258 | bf16 | sw_pipeline v0 | launch | 0.008823 | 0.206253 | 0.0428 | 0.00604418 | 0 |
+| 514,770,258 | fp16 | sw_pipeline v0 | launch | 0.008822 | 0.200732 | 0.0440 | 0.000758417 | 0 |
+| 1,1,1 | bf16 | sw_pipeline v0 | launch | 0.002901 | 0.010196 | 0.2845 | 0 | 1 |
+| 1,1,1 | fp16 | sw_pipeline v0 | launch | 0.002902 | 0.009914 | 0.2927 | 0 | 1 |
+
+- **Analysis:** Related implementation CTest 4/4 and own targeted memcheck racecheck synccheck pass. First completed aligned measurements are slower than independently tuned cuBLASLt; functional coverage is not acceleration or numerical acceptance. C7515 warnings and 250-register wide consumers require investigation. NCU failed with lock-file permission error; no dynamic profile claimed. Preserve all timing and numerical failures.
+- **Next:** Inspect all 28 actual SW rows, then independently compile and validate split-first-K initialization and resource-focused candidates before promoting a measured improvement.
+- **Archive:** trajectory/20261016_203357_iter-371/

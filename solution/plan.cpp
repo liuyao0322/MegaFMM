@@ -295,7 +295,8 @@ std::string describe_lt(const LtOp& op, size_t bound) {
 
 struct Plan::Impl {
   Problem problem;
-  bool empty = false, scale = false, sw_multisize = false;
+  bool empty = false, scale = false, sw = false, sw_hopper = false;
+  std::shared_ptr<detail::SWState> sw1024;
   size_t bytes = 0;
   bool strategy = false, strategy_confirmed = false;
   int confirm_candidate = -1;
@@ -307,7 +308,6 @@ struct Plan::Impl {
   std::array<float,detail::HopperCandidateCount+1> strategy_ms{};
   cublasLtHandle_t handle = nullptr;
   std::unique_ptr<LtOp> dense;
-  std::shared_ptr<detail::SWState> sw;
   ~Impl() {
     dense.reset();
     if (handle) cublasLtDestroy(handle);
@@ -356,12 +356,15 @@ void run_internal(const Plan::Impl& plan, const void* A, const void* B,
     cuda_check(cudaPeekAtLastError(), "launch degenerate output kernel");
     return;
   }
-  if (plan.sw_multisize) {
-    detail::run_sw_multisize(plan.problem,A,B,C0,D,stream);
-    return;
-  }
   if (plan.sw) {
-    detail::run_sw_pipeline(*plan.sw,A,B,D,workspace,stream);
+    if (plan.sw1024 && reinterpret_cast<uintptr_t>(A)%16==0 &&
+        reinterpret_cast<uintptr_t>(B)%16==0)
+      detail::run_sw_pipeline(*plan.sw1024,A,B,D,workspace,stream);
+    else if (plan.sw_hopper && reinterpret_cast<uintptr_t>(A)%16==0 &&
+             reinterpret_cast<uintptr_t>(B)%16==0)
+      detail::run_sw_hopper(plan.problem,A,B,D,workspace,stream);
+    else
+      detail::run_sw_pipeline(plan.problem,A,B,C0,D,stream);
     return;
   }
   if (plan.hopper_selected>=0 && detail::hopper_dense(plan.hopper_selected,plan.problem,
@@ -531,14 +534,19 @@ const Problem& Plan::problem() const { return impl_->problem; }
 std::string Plan::algorithm_name() const {
   if(impl_->strategy && !impl_->empty && !impl_->scale)
     return (impl_->hopper_selected>=50 && impl_->hopper_selected<=55) ? "tuned_ampere_dense" : (impl_->hopper_selected==24 || impl_->hopper_selected==25 || ((impl_->hopper_selected>=33 && impl_->hopper_selected<=38) || (impl_->hopper_selected>=43 && impl_->hopper_selected<=49))) ? "tuned_warp_mma_dense" : impl_->hopper_selected==4 ? "tuned_simt_small" : impl_->hopper_selected>=5 && impl_->hopper_selected<=8 ? "tuned_padded_hopper" : impl_->hopper_selected>=0 ? "tuned_hopper_dense" : "tuned_dense_cublaslt";
-  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw_multisize ? "sw_multisize_wmma" : impl_->sw ? "sw_cooperative_hilo_64x32x256" : "dense_cublaslt";
+  return impl_->empty ? "empty" : impl_->scale ? "degenerate_scale" : impl_->sw1024 ? "sw1024_pdl" : impl_->sw_hopper ? "sw_hopper" : impl_->sw ? "sw_pipeline" : "dense_cublaslt";
 }
 std::string Plan::lt_algorithm_config(const void* A, const void* B, const float* C0,
                                       float* D, void* workspace) const {
   validate_binding(*impl_, A, B, C0, D, workspace);
   if (impl_->empty || impl_->scale) return "none";
-  if (impl_->sw_multisize) return "sw_multisize_wmma;tile=16x16;warps=4;leaf_terms=7;levels=1;padding=logical_even;transforms=fp32_to_input_rn;accum=fp32;workspace=0;residual_correction=off";
-  if (impl_->sw) return "sw_two_kernel_pdl;warp_roles=1tma+4wgmma;transform_kernel=128x512;shared_carveout=100percent_both;smem=196736;operand_stages=8;bk=128;workspace=4194304;st=compact4planes_balanced_async_p1p2;pack_conversion=fp32_to_pair_rn;FP16_S3T3=direct_packed_rn;publication=programmatic_dependent_launch_grid_dependency_wait;terminal_cta_barrier=off;recombine=private_static_ptx;accum_init=first_mma_overwrite;product_order=1_2_6_7_5_3_4;product_slots=0;product_layout=registers;leaf=Btrans_Atrans;lhs=MN128;rhs=K128;output=transposed_fragment;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;descriptor_prefetch=warp1_before_init_barrier;alpha=1;beta=0";
+  if (impl_->sw1024 && reinterpret_cast<uintptr_t>(A)%16==0 &&
+      reinterpret_cast<uintptr_t>(B)%16==0)
+    return "sw1024_pdl;source=iter313_79dad0b;tile=64x32;bk=128;operand_stages=8;threads=256;leaf_terms=7;levels=1;transform=128x512;compute=128x256;shared=196736;workspace=4194304;publication=programmatic_dependent_launch;accum=fp32;residual_correction=off";
+  if (impl_->sw_hopper && reinterpret_cast<uintptr_t>(A)%16==0 &&
+      reinterpret_cast<uintptr_t>(B)%16==0)
+    return std::string(detail::sw_hopper_config(impl_->problem))+";workspace="+std::to_string(impl_->bytes);
+  if (impl_->sw) return "sw_pipeline;tile=16x16;warps=4;leaf_terms=7;levels=1;padding=logical_even;transforms=fp32_to_input_rn;accum=fp32;workspace=0;residual_correction=off";
   if(impl_->strategy) {
     std::string info="mnk_strategy;selection=";
     const bool bound=impl_->hopper_selected>=0 && detail::hopper_dense(impl_->hopper_selected,
@@ -573,21 +581,24 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
   impl->empty = !p.m || !p.n;
   impl->scale = !p.k || p.alpha == 0.0f;
   if (policy.algorithm==Algorithm::SWPipeline && !impl->empty && !impl->scale) {
-    const bool specialized=p.m==1024 && p.n==1024 && p.k==1024 &&
-        !p.trans_a && !p.trans_b && p.lda==1024 && p.ldb==1024 &&
-        p.ldd==1024 && p.alpha==1.0f && p.beta==0.0f;
-    if (specialized) {
-      impl->bytes=size_t(4)<<20;
-      if (policy.workspace_limit<impl->bytes)
-        throw std::invalid_argument("SW 1024 pipeline needs 4 MiB workspace");
-      impl->sw=detail::make_sw_pipeline(p);
+    int device; cudaDeviceProp prop{};
+    cuda_check(cudaGetDevice(&device),"SW device");
+    cuda_check(cudaGetDeviceProperties(&prop,device),"SW properties");
+    if (prop.major!=9 || prop.minor!=0)
+      throw std::invalid_argument("MegaFMM SW requires Hopper sm90");
+    impl->sw=true;
+    // Keep the general SW path for other layouts and smaller workspace budgets.
+    // Pointer alignment is checked per binding, including Graph capture/replay.
+    if (p.m==1024 && p.n==1024 && p.k==1024 && !p.trans_a && !p.trans_b &&
+        p.lda==1024 && p.ldb==1024 && p.ldd==1024 && p.alpha==1 && p.beta==0 &&
+        policy.workspace_limit>=detail::SW1024WorkspaceBytes) {
+      impl->sw1024=detail::make_sw_pipeline(p);
+      impl->bytes=detail::SW1024WorkspaceBytes;
     } else {
-      int device; cudaDeviceProp prop{};
-      cuda_check(cudaGetDevice(&device),"SW device");
-      cuda_check(cudaGetDeviceProperties(&prop,device),"SW properties");
-      if (prop.major!=9 || prop.minor!=0)
-        throw std::invalid_argument("MegaFMM SW requires Hopper sm90");
-      impl->sw_multisize=true;
+      size_t bytes=detail::sw_hopper_workspace(p);
+      if(bytes && bytes<=policy.workspace_limit) {
+        detail::setup_sw_hopper(p);impl->sw_hopper=true;impl->bytes=bytes;
+      }
     }
   } else if (!impl->empty && !impl->scale) {
     lt_check(cublasLtCreate(&impl->handle), "create cuBLASLt handle");
@@ -631,7 +642,7 @@ void tune(Plan& plan, const void* A, const void* B, const float* C0,
     original_c = snapshot;
   }
   try {
-    if (!impl.scale && !impl.sw && !impl.sw_multisize)
+    if (!impl.scale && !impl.sw)
       tune_lt(impl.handle, *impl.dense, A, B, original_c, D,
               impl.bytes ? workspace : nullptr, stream);
     if(impl.strategy) tune_strategy(impl,A,B,original_c,D,workspace,stream);

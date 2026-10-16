@@ -23,7 +23,7 @@ __device__ float load(const T* data, int64_t row, int64_t col,
 // only in warp-private shared memory; seven products stay in FP32 registers.
 // No global scratch, atomics, cross-CTA dependencies, or cached input values.
 template<class T>
-__global__ void sw_multisize(Problem p, const T* A, const T* B,
+__global__ void sw_pipeline(Problem p, const T* A, const T* B,
                              const float* C, float* D, int64_t tiles_n,
                              int64_t tile_count) {
   using namespace nvcuda;
@@ -101,15 +101,15 @@ __global__ void sw_multisize(Problem p, const T* A, const T* B,
 }
 } // namespace
 
-void run_sw_multisize(const Problem& p,const void* A,const void* B,
+void run_sw_pipeline(const Problem& p,const void* A,const void* B,
                       const float* C,float* D,cudaStream_t stream) {
   const int64_t rows=((p.m+1)/2+15)/16, cols=((p.n+1)/2+15)/16;
   const int blocks=int(std::min<int64_t>((rows*cols+3)/4,65535));
   if (p.dtype==DType::BF16)
-    sw_multisize<<<blocks,128,0,stream>>>(p,static_cast<const __nv_bfloat16*>(A),static_cast<const __nv_bfloat16*>(B),C,D,cols,rows*cols);
+    sw_pipeline<<<blocks,128,0,stream>>>(p,static_cast<const __nv_bfloat16*>(A),static_cast<const __nv_bfloat16*>(B),C,D,cols,rows*cols);
   else
-    sw_multisize<<<blocks,128,0,stream>>>(p,static_cast<const __half*>(A),static_cast<const __half*>(B),C,D,cols,rows*cols);
+    sw_pipeline<<<blocks,128,0,stream>>>(p,static_cast<const __half*>(A),static_cast<const __half*>(B),C,D,cols,rows*cols);
   auto status=cudaPeekAtLastError();
-  if (status!=cudaSuccess) throw std::runtime_error(std::string("SW multisize launch: ")+cudaGetErrorString(status));
+  if (status!=cudaSuccess) throw std::runtime_error(std::string("SW pipeline launch: ")+cudaGetErrorString(status));
 }
 } // namespace megafmm::detail

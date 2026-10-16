@@ -7,8 +7,11 @@
 
 namespace megafmm {
 enum class DType { BF16, FP16 };
-// Experimental forced SW: specialized contiguous 1024^3 pipeline, otherwise
-// one-level Winograd with logical even padding, transpose/stride/alpha/beta.
+// Experimental forced SW: 1024^3 contiguous non-transposed alpha=1,beta=0 uses
+// the restored PDL/TMA/WGMMA seven-product specialization with 4 MiB workspace
+// when permitted by workspace_limit and A/B are 16-byte aligned. Other cases
+// use the aligned multi-size Hopper seven-product path when eligible and its
+// caller workspace fits the budget, otherwise general Winograd (zero workspace).
 // Auto remains independently tuned Dense; SW precision is not certified.
 // Tuned empirically ranks precision-valid Hopper dense, tiny and padded
 // candidates against tuned cuBLASLt; requires explicit tune(), starts on Dense.

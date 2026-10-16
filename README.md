@@ -3,8 +3,34 @@
 H100 上 Strassen–Winograd 矩阵乘法的研究工程。2026-10-14 按用户要求移除旧
 SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的首版。
 
+**已按用户要求恢复历史 iter313（79dad0b，逐字恢复 iter282）的 1024³ 专用 SW 实现。**
+显式 `SWPipeline` 下，连续、非转置、alpha=1、beta=0 的 1024³ 且 workspace
+预算至少 4 MiB 时，Plan 使用 `sw1024_pdl`；A/B 需 16 字节对齐。
+其他尺寸/布局、较小 workspace 预算以及未对齐绑定仍走通用 `sw_pipeline`。
+专用路径仍是七乘法无补偿实现，**没有解决原始精度不达标问题**。
+下文专用路径耗时均为历史数据；恢复后的验证结果另行记录。
+
+恢复后已在 H100 上完成全量构建，相关 CTest **4/4 通过**，覆盖专用路径普通调用、
+Graph 新输入重放、工作区重新填充和通用路径回退；quick memcheck 零错误。
+原始 FP64 精度验收中，BF16/FP16 **各 36 项、各 24 项未达门槛**，均无 nonfinite。
+本次未重新测量性能。详见[恢复与验证记录](trajectory/20261016_restore_sw1024/REPORT.md)。
+
+**恢复后独立复测（2026-10-16）**：普通完整调用 BF16 SW **10.149 μs** /
+同期 cuBLASLt **12.173 μs**，约 **1.199×**；FP16 SW **10.061 μs** /
+cuBLASLt **9.587 μs**，约 **0.953×**。Graph 分别约 **1.121× / 0.929×**。
+每模式 3 个独立进程、每进程 5 组×100 次、2 轮换输入集；上面耗时取 15 个组均值的中位数。
+两种 dtype 原始精度门槛均失败；这不是数值验收通过。
+[新测完整数据与所有样本](trajectory/20261016_sw1024_remeasure/REPORT.md)。
+
+**多尺寸 SW 推广正在实现**：新增 `sw_hopper`，支持连续、非转置、alpha=1/beta=0，
+M 为 256 倍数、N 为 128 倍数、K 为 256 倍数且各维不超过 32768 的 BF16/FP16。
+保留 1024³ 专用实现；其他对齐尺寸使用动态 K 的七乘法 TMA/WGMMA 流水线，
+短形状采用 64×32×128、较大形状采用 64×128×64，调用方 workspace 为
+`2*K*(M+N)` 字节，预算不足或输入未按 16 字节对齐时继续执行通用 SW。
+该路径尚在验证和测量，不代表精度或性能验收通过；不替换 Auto/Dense。
+
 **2026-10-16 精度研究：** [调研、误差消融与硬件对照](research/precision_20261016/REPORT.md)
-和[针对性方案设计](research/precision_20261016/DESIGN.md)。生产源码与研究起点一致，
+和[针对性方案设计](research/precision_20261016/DESIGN.md)。以下研究以统一前的生产源码为起点，
 原七乘法仍未通过原始精度门槛；达标且更快的直接输入稠密原型保留为研究对照。
 [补偿路径硬件研究](research/precision_20261016/int8_hardware/HARDWARE_REPORT.md)的普通和Graph参考现统一为P56，P51/P50/P47/P46/P45/P39为历史完整验收回退。
 P56仅把P51的原生consumer七叶外循环unroll1改为7，其余源码逐字保持；原始FP16/BF16输入、精确逐列平衡、七个主乘积和全部八个交叉修正点积、FP32 RN依赖图不变。
@@ -24,7 +50,7 @@ P48缩小共享申请量未获完整收益。[原生融合N1/N2/N3](research/pre
 [片上融合后续](research/precision_20261016/fused_int8/REPORT.md)修正布局后通过72项普通精度；继续移出逐元素缩放判断后，F13完整调用约224–240 μs，仍拒绝性能验收。
 下方 iter282 等标签为历史检查点，实际起点和文件哈希以新报告为准。
 
-**当前保留 iter282（1bdfb29）的七乘法、无补偿实验内核。持续优化目标尚未完成。**
+**历史 1024 专用路径检查点：iter282（1bdfb29）的七乘法、无补偿实验内核。以下为历史计时，不作为恢复后的新测量。**
 完整A/B/B/A普通调用：BF16/FP16 SW约 **10.273/10.238 μs**，同期调优Dense约 **12.228/9.807 μs**。
 BF16加速比约1.190×；FP16仍慢约4.40%，还需减少约0.432 μs（SW时间的4.22%）。
 Graph单独配对：SW约 **9.976/9.993 μs**，Dense约 **11.274/9.341 μs**；不替代普通调用目标。
@@ -32,7 +58,7 @@ Graph单独配对：SW约 **9.976/9.993 μs**，Dense约 **11.274/9.341 μs**；
 313逐字恢复后的新测BF16/FP16约10.293/10.246 μs，Dense约12.469/9.791 μs；FP16仍需减少约0.455 μs。
 292–312的cluster分工、本地shared变换及同步改动均未改善保留版普通调用；错误或未编译候选明确排除。
 
-**两种输入仍未通过原始精度门槛**：BF16 eF约0.0060152，FP16约0.000754626。
+**该历史专用实现的两种输入均未通过原始精度门槛**：BF16 eF约0.0060152，FP16约0.000754626。
 `Auto` 和 `Dense` 继续普通调优 cuBLASLt GEMM；当前 SW 必须显式指定。
 
 [当前持续优化检查点（292–313，目标仍在进行）](trajectory/20261015_optimization-goal-checkpoint-313/REPORT.md)
@@ -47,15 +73,15 @@ Graph单独配对：SW约 **9.976/9.993 μs**，Dense约 **11.274/9.341 μs**；
 
 [此前性能配对与完整独立验证（109–162）](trajectory/20261015_optimization-goal-checkpoint/REPORT.md)
 
-当前实现使用4 MiB调用方workspace、196736B动态shared和八个BK128 operand slots。
+历史 1024 专用实现使用4 MiB调用方workspace、196736B动态shared和八个BK128 operand slots。
 输入变换是128 CTA×512线程的primary kernel；乘法是128 CTA×256线程的secondary，
 TMA warp0、TC warps4–7，warp1 leader提前预取四个当前descriptor。
 叶乘法按B转置乘A转置组织，TC私有寄存器直接重组输出；P1/P2可与变换重叠，及时释放slot。
 使用官方PDL与首次变换块前的grid dependency wait，两个kernel统一设置100%shared carveout。
 `run()`无分配、无host同步；每次为当前指针编码tensor maps，无跨调用计算值缓存。
 
-279和当前282分别通过72项fresh-input逐位检查、三种quick sanitizer，以及256次双stream/Graph调用。
-282验证源码与当前solution逐字一致。这些检查验证实现与同步，**不代表通过原始FP64精度验收**。
+历史279和282分别通过72项fresh-input逐位检查、三种quick sanitizer，以及256次双stream/Graph调用。
+282验证源码对应当时的solution。这些检查验证实现与同步，**不代表通过原始FP64精度验收**。
 
 [历史四slot预取优化（iter100）](trajectory/20261015_validation-seven-prefetch/REPORT.md)
 
@@ -69,13 +95,13 @@ TMA warp0、TC warps4–7，warp1 leader提前预取四个当前descriptor。
 solution/
   plan.cpp             Dense 规划、cuBLASLt 调优、指针检查和执行
   scale_output.cu      alpha=0 或 K=0 时的 FP32 输出处理
-  sw_pipeline.cu       1024³ PDL 双kernel SW、统一 S/T workspace、TMA/WGMMA 流水
   dense_hopper.cu     TMA/WGMMA dense 候选与分发
   dense_ampere.cu     偶数边界尺寸的 SM80 Tensor Core dense 候选
   dense_wmma.cu       WMMA/显式 MMA 候选
   dense_padding.cu    打包、补零、dense 叶乘法与写回
   tuning_check.cu     调优阶段的数值筛选
-  sw_multisize.cu      多尺寸单层 Winograd、WMMA 七乘法、逻辑补零与融合输出
+  sw_pipeline.cu      通用 SW、WMMA 七乘法、逻辑补零与融合输出
+  sw1024.cu           恢复的 1024³ 专用 PDL/TMA/WGMMA 七乘法（iter313 原文）
   internal.h           内部声明
 include/megafmm/gemm.h  Problem、Policy、Plan 和 run/tune 接口
 bench/benchmark.cu     普通 launch/Graph 计时和原始输入的 FP64 参考检查
@@ -98,7 +124,7 @@ trajectory/            历史逐轮源码快照和运行输出
 - 精度未通过的方案只能记录为诊断结果，不能称作合格 winner 或进入 Auto。
 
 原 `PLAN.md` 的数值合同和数学公式继续作为参考；其中旧架构、路线与覆盖描述属于
-历史设计。1024 专用路径保留原 buffer 布局与 warp 分工；多尺寸通用路径见下文。
+历史设计。当前所有尺寸共用单层 Winograd 实现，见下文。
 
 ## 构建与验证
 
@@ -131,7 +157,7 @@ bash scripts/on_gpu.sh ./build/megafmm_bench \
 加 `--graph` 测量 CUDA Graph。当前比较双方都是独立调优的 Dense，输出的
 `speedup` 仅反映重复测量差异，不代表 SW 加速。
 
-首版 SW 只测 1024：
+单独检查统一 SW 的 1024 尺寸：
 
 ```bash
 MEGAFMM_ALGORITHM=sw bash scripts/bench.sh <label>
@@ -140,15 +166,16 @@ bash scripts/on_gpu.sh ./build/test_sw1024
 ```
 
 `test_sw1024` 仅执行 1024³，检查两种 dtype、六类输入、每类三轮新输入以及同一
-Graph 的新输入重放。它仍使用原始 FP64 精度门限，当前无补偿实现预计未通过。
+Graph 的新输入重放。它仍使用原始 FP64 精度门限，专用及通用无补偿实现均不保证通过。
 
-## 多尺寸 SW
+## SW Pipeline
 
 显式选择 `Algorithm::SWPipeline`（benchmark 中为 `--algorithm sw`）时：
 
-- 连续、非转置的 1024³，且 alpha=1、beta=0，继续使用原 TMA/WGMMA PDL 专用路径，
-  workspace 为 4 MiB，预算检查与实际分配一致。
-- 其余非退化尺寸使用 `sw_multisize_wmma`：支持 BF16/FP16、矩形、奇数边长、转置、
+- 连续、非转置、alpha=1、beta=0 的 1024³ 在 workspace 预算至少 4 MiB 时，
+  Plan 选择 `sw1024_pdl`，运行时 A/B 16 字节对齐则执行专用两 kernel PDL 路径。
+  指针未对齐时回到通用 SW；绑定元数据报告实际路径。专用 Plan 的调用方 workspace 为 4 MiB。
+- 其他情况使用 `sw_pipeline`：支持 BF16/FP16、矩形、奇数边长、转置、
   leading dimension、alpha/beta 和兼容 C0/D 原位视图。尺寸范围沿用公共 API 的 INT_MAX 上限。
 - 通用路径将每个维度逻辑补到偶数，再切为四个子块；边界读取补零，不分配 padding buffer。
   每个 warp 计算一个 16×16 子块的七个 Winograd 乘法，输入变换在 shared memory 中完成，
@@ -156,14 +183,14 @@ Graph 的新输入重放。它仍使用原始 FP64 精度门限，当前无补�
 - M/N 为零或 K/alpha 为零时，分别走已有 empty/scale 路径。
 - `run()` 保持无分配、无 host 同步，支持 CUDA Graph 和新输入重放。GPU 目标仍为 Hopper sm90。
 
-通用路径用于尺寸与接口覆盖，尚未进行性能调优，不能沿用 1024 专用路径的加速比。
+统一路径尚未进行性能调优，不能沿用历史 1024 专用路径的加速比。
 它沿用无补偿的变换舍入策略，**不保证通过原始输入 FP64 精度门限**，Auto 仍使用 Dense。
 实现正确性测试将整数输入与原始 AB 精确比较，并将非整数输入与独立的标量 Winograd
 舍入参考比较；后者不能代替原始 AB 精度验收。
 
 ```bash
 bash scripts/on_gpu.sh ctest --test-dir build \
-  -R 'sw_multisize_implementation|gpu_correctness|exact_winograd_dag' --output-on-failure
+  -R 'sw_pipeline_implementation|gpu_correctness|exact_winograd_dag' --output-on-failure
 bash scripts/on_gpu.sh ./build/megafmm_bench \
   --algorithm sw --shapes '512,512,512;1025,1537,769;2048,2048,2048' \
   --dtype both --trials 10 --warmup 3 --groups 3 --correct-trials 2 \
@@ -171,7 +198,7 @@ bash scripts/on_gpu.sh ./build/megafmm_bench \
 ```
 
 benchmark 会报告实际路径、workspace、原始 FP64 精度和计时；未过精度门限时退出码为 2。
-`test_multisize` 覆盖小尺寸、512³、1025/2048/4096 行矩形、四种转置组合、非连续布局、
+`test_sw_pipeline` 覆盖小尺寸、512³、1024³（连续及转置/stride/原位）、1025/2048/4096 行矩形、四种转置组合、非连续布局、
 元素对齐指针、alpha/beta、原位输出、padding 保护、fresh-input launch/Graph 和退化尺寸。
 
 `scripts/bench.sh <label>` 保留 AKO 的源码快照逻辑；正式迭代记录 `ITERATIONS.md`

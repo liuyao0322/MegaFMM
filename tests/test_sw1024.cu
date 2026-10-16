@@ -69,19 +69,21 @@ template<class T>int validate(megafmm::DType dtype,bool quick){
   megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::SWPipeline;
   if(quick)policy.heuristic_candidates=1; // Sanitizer scope, never used for performance.
   auto sw=megafmm::create_plan(p,policy);
-  require(sw->algorithm_name().find("sw_")==0,"not native SW");
+  require(sw->algorithm_name()=="sw1024_pdl","not native SW");
   require(sw->workspace_bytes()==(size_t(4)<<20),"SW workspace accounting must be4MiB");
   policy.algorithm=megafmm::Algorithm::Auto;auto dense=megafmm::create_plan(p,policy);
   require(dense->algorithm_name()=="dense_cublaslt","Auto was incorrectly promoted");
   Buffer workspace(std::max(dense->workspace_bytes(),sw->workspace_bytes()));
   policy.algorithm=megafmm::Algorithm::SWPipeline;
   bool rejected=false;
-  rejected=false;try{megafmm::run(*sw,static_cast<char*>(a.p)+2,b.p,nullptr,d.as<float>(),workspace.p,stream.s);}catch(const std::invalid_argument&){rejected=true;}
-  require(rejected,"TMA accepted misaligned input");
+  // A valid element-aligned binding retains the general SW fallback. Check
+  // metadata only here; fresh launch/Graph execution is in test_sw_pipeline.
+  require(sw->lt_algorithm_config(static_cast<char*>(a.p)+2,b.p,nullptr,d.as<float>(),workspace.p).find("sw_pipeline;")==0,
+          "misaligned input did not select general SW");
   auto small_budget=policy;small_budget.workspace_limit=(size_t(4)<<20)-1;
-  rejected=false;
-  try{auto x=megafmm::create_plan(p,small_budget);}catch(const std::invalid_argument&){rejected=true;}
-  require(rejected,"SW accepted insufficient workspace budget");
+  auto general=megafmm::create_plan(p,small_budget);
+  require(general->workspace_bytes()==0 && general->algorithm_name()=="sw_pipeline",
+          "small workspace budget did not select general SW");
   void* invalid_workspaces[]={nullptr,static_cast<char*>(workspace.p)+2,a.p};
   for(void* bad:invalid_workspaces){
     rejected=false;

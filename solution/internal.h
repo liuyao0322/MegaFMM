@@ -2,7 +2,18 @@
 #include "megafmm/gemm.h"
 namespace megafmm::detail {
 void scale_output(const Problem& p, const float* C0, float* D, cudaStream_t stream);
-void run_sw_multisize(const Problem& p,const void* A,const void* B,const float* C0,float* D,cudaStream_t stream);
+void run_sw_pipeline(const Problem& p,const void* A,const void* B,const float* C0,float* D,cudaStream_t stream);
+// Restored verbatim from iter313 (79dad0b); explicit 1024 SW specialization.
+struct SWState;
+std::shared_ptr<SWState> make_sw_pipeline(const Problem& p);
+void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,
+                     void* workspace,cudaStream_t stream);
+size_t sw_hopper_workspace(const Problem& p);
+void setup_sw_hopper(const Problem& p);
+void run_sw_hopper(const Problem& p,const void* A,const void* B,float* D,
+                   void* workspace,cudaStream_t stream);
+const char* sw_hopper_config(const Problem& p);
+constexpr size_t SW1024WorkspaceBytes=size_t(4)<<20;
 constexpr int HopperCandidateCount=112;
 bool wmma_dense(int bk,const Problem& p,const void* A,const void* B,const float* C,float* D,
                  cudaStream_t stream,int operation);
@@ -22,7 +33,4 @@ bool original_fp64_agreement(const Problem& p,const void* A,const void* B,
 const char* hopper_candidate_name(int id);
 bool hopper_dense(int id,const Problem& p,const void* A,const void* B,const float* C0,float* D,
                   void* workspace,int sm_count,cudaStream_t stream,int operation);
-struct SWState;
-std::shared_ptr<SWState> make_sw_pipeline(const Problem& p);
-void run_sw_pipeline(const SWState& state,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream);
 }

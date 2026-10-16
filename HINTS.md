@@ -1,5 +1,47 @@
 # Hints
 
+## Active multi-size SW extension — user request 2026-10-16
+
+- Extend the restored 1024^3 seven-product SW pipeline to different sizes with
+  complete-call speedups over independently tuned cuBLASLt. This supersedes the
+  previous bounded-measurement-only scope. Do not resume direct dense optimization.
+- Use the existing 14 benchmark shapes x BF16/FP16 (28 rows) as the target matrix.
+  First implement aligned variable-K Hopper SW, preserving the frozen 1024 path;
+  retain general SW for unsupported layouts until their dedicated implementation.
+- Every reported SW row must execute seven-product SW. Dense leaf GEMMs inside
+  the seven-product factorization are allowed, direct full AB substitution is not.
+- Preserve original FP64 gates and report known uncompensated accuracy failures.
+  An implementation match or speedup is not numerical acceptance. No FP8 restart.
+- Report concrete performance regularly, especially after each complete sweep,
+  and distinguish implementation coverage, latency wins and precision acceptance.
+- Preserve the pre-existing uncommitted unified/restored SW and research work;
+  starting snapshots are in results/sw_multisize_start. No unrelated edits.
+
+## Bounded performance remeasurement — user request 2026-10-16
+
+- Remeasure the restored specialized 1024^3 seven-product SW against same-run
+  independently tuned cuBLASLt, BF16 and FP16. No kernel changes or dense
+  optimization loop. Keep original FP64 gates and every timing sample.
+- Three independent processes per mode (ordinary / Graph), 20 warmups,
+  5 groups x100 calls, 3 fresh precision checks, 2 rotating input sets.
+- Archive: `trajectory/20261016_sw1024_remeasure`.
+
+## Restore specialized 1024 SW — user request 2026-10-16
+
+- User explicitly requested restoring the historical specialized 1024 SW implementation.
+  This supersedes the earlier instruction removing that specialization.
+- `solution/sw1024.cu` is byte-identical to `79dad0b:solution/sw_pipeline.cu`
+  (iter313 restoring iter282), SHA256
+  `ebc37e9dd171dd5855cdaed91fbb030d250c052a4c459746dd33b82cc634264b`.
+- Explicit SWPipeline selects sw1024_pdl for contiguous non-transposed 1024^3,
+  alpha=1, beta=0, workspace budget >=4 MiB. Each run uses the PDL specialization
+  for 16-byte-aligned A/B; other bindings use general SW. Other shapes/layouts
+  and smaller budgets keep the general zero-workspace SW implementation.
+- This is restoration, not a resumed dense optimization loop. Historical timing
+  is not a new measurement, and the original precision failure remains explicit.
+- Preserve existing uncommitted unified-path and precision research work.
+  Restore validation records are under `results/restore_sw1024`.
+
 ## Precision research goal — user request 2026-10-16
 
 - Resume work on precision with the order explicitly requested by the user:
