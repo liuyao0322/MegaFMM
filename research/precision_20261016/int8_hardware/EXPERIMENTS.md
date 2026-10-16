@@ -1052,3 +1052,66 @@ Own17pass NCU prep17.120us/52regs/issue14.251824%, consumer15.776us/128regs/
 issue22.862103%, localRWzero; profilingtimingsexcluded/notadded/no floor.
 Sourcesrestoredbyteexact14d9720 P56 plusfrozenbinary, newprocess78/79872inside pass.
 RESIDENT_PACK_HARDWARE.md/ownaudit freeze scopes, productionunchanged goalactive.
+
+## P59 premeasurement global-plane phase fusion
+
+P58 closed6dc8f60, own and comprehensive audits terminal0, workingP56 unchanged.
+GLOBAL_PHASE_FUSION_DESIGN.md fixes128residentCTAs, identicalP58preparationhelper/
+all11globalplanes/once-per-input transforms, secondunconditionalgrid.sync then
+verbatimP56producer/consume. Shared196736B/workspaceunchanged/onebalancedrun kernel.
+CPUlineargrid262144coordinates/phase/storage checks pass; isolatedsourcegenerated,
+consumer andproducer exacttext checked. Own six newrawinput->prep->globalpublish->
+TMA genericread tests frozen beforecompile, includeinside/shared/workspace/coverage
+guards andactual fused/probe cooperative capacities. Initialprobe generator used
+too-broad56->59 identifier substitution and CPUassert caught numeric256change; no
+C++written. Prematurebuildscript call then exited127missingfile, noGPUcompilation/
+kernel invocation. Correctidentifier-boundary substitution generatedsource; failed
+preflightlogpreserved. WorkingP56 remains, no P59MMA orlatency result.
+
+P59 probe generation succeeded after identifier-boundary fix; firstretry script
+was temporarily invisible on compute node after prior negative lookup, exited127
+withoutcompilation, preservedseparatevisibilitylog. Firstactualcompile thenstopped
+on hostprintf adjacentvariabletemplate >? parse, two syntaxerrors/no binary/device
+invocation; preflight_p59_01 and flatcompilepreflightmanifest preserveinitialsource/
+generator/log. Whitespace-only conditional fix regeneratedisolatedsource+probe/MFs,
+consumer/preparation/producer unchanged; actualretrycompiling. WorkingP56 unchanged.
+
+## P59 completed: global-plane phase fusion rejected
+
+[Own hardware record](GLOBAL_PHASE_FUSION_HARDWARE.md) freezes the exact P58 preparation
+helper, a second unconditional grid barrier and verbatim P56 producer/consumer in one
+128CTA cooperative kernel. Actual114regs/196736B/oneCTA capacity supports128CTAs on
+132SMs; no stack/spills. Own six new raw-input/pack/publication/TMA cases compared
+415236096 native values, 1572864 coordinates and6144inside exponents with zero errors.
+This generic reader does not certify WGMMA wait order. Standard78/79872inside pass;
+printed per-case eF equals P56, without claiming full-output bit equality.
+
+Independent P56→P59 ordinary BF/FP25.331520→25.307240 /25.066840→25.041480us
+(0.096/0.101%lower); Graph24.918800→24.922000 /25.260520→24.975040us
+(0.013%slower/1.130%lower). Independent P58→P59 ordinary24.884120→25.180359 /
+24.960361→25.052440us (1.190/0.369%slower); Graph24.682560→25.189559 /
+24.712361→24.770320us (2.054/0.235%slower). Each comparison/mode owns312gates/
+319488inside, all timing arms retained, unlocked clocks/no CI. Reject; own fresh
+stress/tools sources prepared but never compiled or executed, no certificate transfer.
+
+Own BF16 NCU17passes reports33.280us/114regs/issue14.633669%, zero local reads/writes;
+profile times excluded, not additive or a physical floor. Historical standalone
+preparation/consumer normalized SASS equals P58; actual fused code5280BF/5312FP static
+instructions,120HGMMA each, not dynamic instruction counts. Initial generator/script
+and compile-only preflights remain archived with exact no-device scopes. Four working
+sources and binary restored byte-exact P56 from14d9720; new-process78/79872inside pass.
+Production solution/library/Auto unchanged, performance goal remains active.
+
+## P60 prepared proposal after three-candidate reassessment
+
+P57/P58/P59 have no >=3% progress signal. [Fresh primary-source research and history
+review](LITERATURE_UPDATE_P59.md) reexamines their own profiles, prior native packing,
+failed native fusion and older INT8 vectorized requantization. [Paired native packing
+design](PAIR_NATIVE_PACK_DESIGN.md) keeps P56 geometry and its consumer unchanged;
+uses adjacent-column paired loads/conversions/stores while preserving every FP32 RN
+transform, all high/low planes, exact inside and a scalar fallback for2B-aligned inputs.
+P56 already has packed conversions: this proposal targets residual narrow memory
+instructions and makes no dynamic bottleneck or speed claim. CPU coverage/alignment/
+B-factor broadcast checks pass for262144paired coordinates, covering262144elements
+per side exactly once; scalar fallback decisions also checked. Proposal only: no C++
+generation, GPU execution, actual resource/capacity measurement or hardware acceptance.

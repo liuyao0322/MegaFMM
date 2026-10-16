@@ -1,7 +1,7 @@
 # Remaining-cost experiments and outcomes
 
 
-**Current checkpoint: P56 is the fully validated ordinary/Graph research reference; production performance target remains unmet.** Own same-round P51→P56 gain~8%, complete calls~25.1us versus SW~10us. Own original78, independent ordinary/Graph312each, six pre-MMA layouts, fresh14-pattern168/1344interleaved calls, guards and scoped56/112calls pertool pass. P57 producer-only unroll was rejected; P58 resident128pack showed0.37–1.38% point-estimate gains and is retained only as a fusion control, without freshstress/tools. Working four sources/bin byte-exact P56 restored from14d9720 and independent78checked. Historical premeasurement paragraphs below describe then-current state and are superseded by subsequent results.
+**Current checkpoint: P56 is the fully validated ordinary/Graph research reference; production performance target remains unmet.** Own same-round P51→P56 gain~8%, complete calls~25.1us versus SW~10us. Own original78, independent ordinary/Graph312each, six pre-MMA layouts, fresh14-pattern168/1344interleaved calls, guards and scoped56/112calls pertool pass. P57 producer-only unroll was rejected; P58 resident128pack showed0.37–1.38% point-estimate gains, without freshstress/tools. P59 full phase fusion was rejected after independent P56 and P58 controls. P60 paired native packing is a CPU-checked proposal only; no C++ or GPU acceptance. Working four sources/bin byte-exact P56 restored from14d9720 and independent78checked. Historical premeasurement paragraphs below describe then-current state and are superseded by subsequent results.
 
 P27 supplied the fully validated research base, about41us ordinary full calls versus production SW about10us. Completed controls and remaining hypotheses are distinguished below; final retention and validation scope are recorded inEXPERIMENTS.md. Preserve seven native products, eight integer dots, exact per-column inside scaling, original rounded-input FP64 reference and all current preparation/descriptor costs. FrozenP27 profile reports joint pack56regs/65,576B shared, a shared-resource limit3CTAs/SM and issueactive53.16percent. Corrected196regs/196,736B is limited to1CTA/SM and issueactive35.71percent. All four measured kernels have zero local sectors on that input. Partial/finalize show high long-scoreboard/issue-active ratios,5.950/6.163. These are diagnostic metrics, not time fractions or a physical floor. Seeprofile_p27_stats.json and its manifest; never overlap GPU tasks.
 
@@ -316,3 +316,43 @@ fusedkernel and genericreadprobe co-residency; own rawinput->pack->TMA values/
 inside/guards before firstMMA. Differentcompiledresources/code and newbarrier mean
 P58's speed/correctness scope cannot certify P59. Originalgates/fullcost/own
 validation mandatory; design/source not yet present at this historical checkpoint.
+
+## P59 completed: global-plane phase fusion rejected
+
+[Own hardware record](GLOBAL_PHASE_FUSION_HARDWARE.md) freezes the exact P58 preparation
+helper, a second unconditional grid barrier and verbatim P56 producer/consumer in one
+128CTA cooperative kernel. Actual114regs/196736B/oneCTA capacity supports128CTAs on
+132SMs; no stack/spills. Own six new raw-input/pack/publication/TMA cases compared
+415236096 native values, 1572864 coordinates and6144inside exponents with zero errors.
+This generic reader does not certify WGMMA wait order. Standard78/79872inside pass;
+printed per-case eF equals P56, without claiming full-output bit equality.
+
+Independent P56→P59 ordinary BF/FP25.331520→25.307240 /25.066840→25.041480us
+(0.096/0.101%lower); Graph24.918800→24.922000 /25.260520→24.975040us
+(0.013%slower/1.130%lower). Independent P58→P59 ordinary24.884120→25.180359 /
+24.960361→25.052440us (1.190/0.369%slower); Graph24.682560→25.189559 /
+24.712361→24.770320us (2.054/0.235%slower). Each comparison/mode owns312gates/
+319488inside, all timing arms retained, unlocked clocks/no CI. Reject; own fresh
+stress/tools sources prepared but never compiled or executed, no certificate transfer.
+
+Own BF16 NCU17passes reports33.280us/114regs/issue14.633669%, zero local reads/writes;
+profile times excluded, not additive or a physical floor. Historical standalone
+preparation/consumer normalized SASS equals P58; actual fused code5280BF/5312FP static
+instructions,120HGMMA each, not dynamic instruction counts. Initial generator/script
+and compile-only preflights remain archived with exact no-device scopes. Four working
+sources and binary restored byte-exact P56 from14d9720; new-process78/79872inside pass.
+Production solution/library/Auto unchanged, performance goal remains active.
+
+## P60 prepared proposal after three-candidate reassessment
+
+P57/P58/P59 have no >=3% progress signal. [Fresh primary-source research and history
+review](LITERATURE_UPDATE_P59.md) reexamines their own profiles, prior native packing,
+failed native fusion and older INT8 vectorized requantization. [Paired native packing
+design](PAIR_NATIVE_PACK_DESIGN.md) keeps P56 geometry and its consumer unchanged;
+uses adjacent-column paired loads/conversions/stores while preserving every FP32 RN
+transform, all high/low planes, exact inside and a scalar fallback for2B-aligned inputs.
+P56 already has packed conversions: this proposal targets residual narrow memory
+instructions and makes no dynamic bottleneck or speed claim. CPU coverage/alignment/
+B-factor broadcast checks pass for262144paired coordinates, covering262144elements
+per side exactly once; scalar fallback decisions also checked. Proposal only: no C++
+generation, GPU execution, actual resource/capacity measurement or hardware acceptance.

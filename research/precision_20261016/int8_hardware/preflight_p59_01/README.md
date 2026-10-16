@@ -1,0 +1,1 @@
+P59 first actual compile stopped: CUDA12.4 parses adjacent variable-template closing > and ternary ? incorrectly. Two host-init printf syntax errors; no binary or kernel invocation. Retry inserts only whitespace around that conditional; numerical/preparation/consumer code unchanged. Earlier generation/visibility preflights are separately frozen.

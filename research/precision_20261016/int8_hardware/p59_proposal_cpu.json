@@ -1,0 +1,31 @@
+{
+  "candidate": "P59",
+  "proposal_only": true,
+  "cpp_generated": false,
+  "gpu_executed": false,
+  "retained": "P56",
+  "control": "P58",
+  "cooperative_grid": 128,
+  "threads": 256,
+  "logical_pack_tasks": 384,
+  "grid_barriers": 2,
+  "unconditional_all_threads": true,
+  "shared_bytes": 196736,
+  "probe_shared_with_guards": 197888,
+  "workspace_bytes": 11804032,
+  "run_kernels_balanced": 1,
+  "descriptors": 2,
+  "coordinates": 262144,
+  "actual_capacity_checked": false,
+  "hardware_accepted": false,
+  "phase_order": [
+    "exactinside",
+    "grid.sync",
+    "pack_all_global_planes_and_writer_proxy_fences",
+    "grid.sync",
+    "initialize_ready_free",
+    "block.sync",
+    "P56producer_and_consume"
+  ],
+  "scope": "CPU coordinate/storage/phase schedule only; no cross-proxy hardware/WGMMA/precision/performance certificate"
+}

@@ -442,3 +442,43 @@ Graph25.084440→24.737800 /25.104920→24.849720，降低1.382%/1.017%。每模
 门槛/319488inside通过，未锁时钟/无置信区间；小幅点估计未达工作流3%进展信号，
 不升级P56，保留P58作为后续融合对照，无自身双流或工具证书。自身两核NCU零local
 读写，仅诊断、计时排除且不相加。逐字恢复P56源码/二进制及新进程78复核通过。
+
+## P59 completed: global-plane phase fusion rejected
+
+[Own hardware record](GLOBAL_PHASE_FUSION_HARDWARE.md) freezes the exact P58 preparation
+helper, a second unconditional grid barrier and verbatim P56 producer/consumer in one
+128CTA cooperative kernel. Actual114regs/196736B/oneCTA capacity supports128CTAs on
+132SMs; no stack/spills. Own six new raw-input/pack/publication/TMA cases compared
+415236096 native values, 1572864 coordinates and6144inside exponents with zero errors.
+This generic reader does not certify WGMMA wait order. Standard78/79872inside pass;
+printed per-case eF equals P56, without claiming full-output bit equality.
+
+Independent P56→P59 ordinary BF/FP25.331520→25.307240 /25.066840→25.041480us
+(0.096/0.101%lower); Graph24.918800→24.922000 /25.260520→24.975040us
+(0.013%slower/1.130%lower). Independent P58→P59 ordinary24.884120→25.180359 /
+24.960361→25.052440us (1.190/0.369%slower); Graph24.682560→25.189559 /
+24.712361→24.770320us (2.054/0.235%slower). Each comparison/mode owns312gates/
+319488inside, all timing arms retained, unlocked clocks/no CI. Reject; own fresh
+stress/tools sources prepared but never compiled or executed, no certificate transfer.
+
+Own BF16 NCU17passes reports33.280us/114regs/issue14.633669%, zero local reads/writes;
+profile times excluded, not additive or a physical floor. Historical standalone
+preparation/consumer normalized SASS equals P58; actual fused code5280BF/5312FP static
+instructions,120HGMMA each, not dynamic instruction counts. Initial generator/script
+and compile-only preflights remain archived with exact no-device scopes. Four working
+sources and binary restored byte-exact P56 from14d9720; new-process78/79872inside pass.
+Production solution/library/Auto unchanged, performance goal remains active.
+
+## P60 prepared proposal after three-candidate reassessment
+
+P57/P58/P59 have no >=3% progress signal. [Fresh primary-source research and history
+review](LITERATURE_UPDATE_P59.md) reexamines their own profiles, prior native packing,
+failed native fusion and older INT8 vectorized requantization. [Paired native packing
+design](PAIR_NATIVE_PACK_DESIGN.md) keeps P56 geometry and its consumer unchanged;
+uses adjacent-column paired loads/conversions/stores while preserving every FP32 RN
+transform, all high/low planes, exact inside and a scalar fallback for2B-aligned inputs.
+P56 already has packed conversions: this proposal targets residual narrow memory
+instructions and makes no dynamic bottleneck or speed claim. CPU coverage/alignment/
+B-factor broadcast checks pass for262144paired coordinates, covering262144elements
+per side exactly once; scalar fallback decisions also checked. Proposal only: no C++
+generation, GPU execution, actual resource/capacity measurement or hardware acceptance.
