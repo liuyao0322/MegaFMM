@@ -33,7 +33,15 @@ TMA evict-last、对 B 使用 evict-first 缓存提示。
 `16*KHpad*(MHpad+NHpad)` 字节，包含 S/T 和原始象限的打包存储。
 1³ 使用单 warp 的七个 SIMT 叶乘积和 256 字节 workspace 标记，不使用 Tensor Core。
 预算不足或 A/B 未按 16 字节对齐时继续执行通用 SW。所有变换、七乘法和重组均在完整调用计时内。
-该版本的原始精度问题仍未解决，性能与验证记录将按正式实测补充；不替换 Auto/Dense。
+**iter372 正式实测**：1025×1537×769 BF16/FP16 为 **2.047× / 1.986×**；
+最终二进制另做每模式 3 个独立进程，普通调用为 **2.022× / 1.970×**，
+Graph 为 **1.983× / 1.979×**。514×770×258 仅接近持平，不能视作稳定突破。
+全量 28 项中大尺寸仍慢于 cuBLAS，1024³ FP16 仍慢；16384³ SW 已从前版约 44 ms
+降到约 21.7/22.4 ms，但仅为 cuBLAS 的 0.582×/0.593×。
+自身相关 CTest 4/4 通过，memcheck/synccheck/racecheck 各 120 次 guarded fresh 普通/Graph
+调用零错误，racecheck 零警告。**原始精度仍有 26/28 项失败**，仅 1³ 两种 dtype 通过；
+这次推广没有解决精度问题，也未实现所有尺寸加速。
+[完整 28 项、六次独立复测、设计与自身验证](trajectory/20261016_sw_multisize_validation372/REPORT.md)。
 
 **2026-10-16 精度研究：** [调研、误差消融与硬件对照](research/precision_20261016/REPORT.md)
 和[针对性方案设计](research/precision_20261016/DESIGN.md)。以下研究以统一前的生产源码为起点，
