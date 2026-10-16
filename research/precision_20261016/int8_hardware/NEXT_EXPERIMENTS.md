@@ -1,7 +1,7 @@
 # Remaining-cost experiments and outcomes
 
 
-**Current checkpoint: P51 is the fully validated ordinary/Graph research reference; production performance target remains unmet.** Own same-roundP50→P51 ordinary reduction2.63/2.24%, Graph2.03/1.88% BF16/FP16, completecalls~27.4us versusSW~10us. Own standard78/79872exponents, eachmodeABBA312/319488exponents,54full-plane bit configurations plus18finite-edge32Kpacking configurations,12-pattern freshstress144/1152calls and scopedtools48/96calls each pass. SeeALL_NATIVE_PACK_GRID_HARDWARE.md/p51_validation.json. P50/P47 historical complete acceptance remains independent. P49 tuple reuse alone andN1–N3nativefusion rejected. New ownP51profile+history+freshCUDA12.4/ PTX8.7reassessment supports a separate consumer64x16/two-slot control, not a physicalfloor. CONSUMER_N16_DESIGN.md/generate_consumer_n16.py prepared and isolatedCPU-reproduced only; no P52application/build/measurement.
+**Current checkpoint: P56 is the fully validated ordinary/Graph research reference; production performance target remains unmet.** Own same-round P51→P56 gain~8%, complete calls~25.1us versus SW~10us. Own original78, independent ordinary/Graph312each, six pre-MMA layouts, fresh14-pattern168/1344interleaved calls, guards and scoped56/112calls pertool pass. P57 producer-only unroll was rejected; P58 resident128pack showed0.37–1.38% point-estimate gains and is retained only as a fusion control, without freshstress/tools. Working four sources/bin byte-exact P56 restored from14d9720 and independent78checked. Historical premeasurement paragraphs below describe then-current state and are superseded by subsequent results.
 
 P27 supplied the fully validated research base, about41us ordinary full calls versus production SW about10us. Completed controls and remaining hypotheses are distinguished below; final retention and validation scope are recorded inEXPERIMENTS.md. Preserve seven native products, eight integer dots, exact per-column inside scaling, original rounded-input FP64 reference and all current preparation/descriptor costs. FrozenP27 profile reports joint pack56regs/65,576B shared, a shared-resource limit3CTAs/SM and issueactive53.16percent. Corrected196regs/196,736B is limited to1CTA/SM and issueactive35.71percent. All four measured kernels have zero local sectors on that input. Partial/finalize show high long-scoreboard/issue-active ratios,5.950/6.163. These are diagnostic metrics, not time fractions or a physical floor. Seeprofile_p27_stats.json and its manifest; never overlap GPU tasks.
 
@@ -299,3 +299,20 @@ raw-input transforms per output tile. Prepare CPU proof, source/resource/pre-MMA
 packing/TMA controls before actual matrix launch. Larger shared footprint reduces
 pack concurrency and may regress. No P58 proposal/code/device result exists here;
 original seven main/eightcross/exactinside/fullcost mandatory, goal active.
+
+## P58 control measured; next P59 separate fusion design
+
+P58 own72pre-MMA pack/edge bit comparisons and original78 pass; independentordinary
+0.366/0.989%lower BF/FP, Graph1.382/1.017%lower, eachmode312gates/319488inside.
+Consumerbyte/SASSidenticalP56, preparedgrid128/3tasks changesprepcode; no3%progress,
+no newstress/tools, notupgraded. P56 restoredbyteexact/newprocess78passed.
+SeeRESIDENT_PACK_HARDWARE.md; no physicalfloor. P57/P58 are two consecutive
+no3% controls since P56 gain; do not reset stallcounter for sub3% estimates.
+
+P59 should fuse128resident preparation with fullK512 P56 compute while preserving
+global11planes and once-per-input transforms, totalShared196736B, aftersecond
+unconditionalgrid.sync and existingper-writerasyncproxyfences. Query both actual
+fusedkernel and genericreadprobe co-residency; own rawinput->pack->TMA values/
+inside/guards before firstMMA. Differentcompiledresources/code and newbarrier mean
+P58's speed/correctness scope cannot certify P59. Originalgates/fullcost/own
+validation mandatory; design/source not yet present at this historical checkpoint.

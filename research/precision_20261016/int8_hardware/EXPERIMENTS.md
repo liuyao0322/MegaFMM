@@ -1023,3 +1023,32 @@ Four sources restored14d9720 P56 plus frozenbin; newprocess78/79872inside pass.
 Firstrestore CLI mistakenlyusedunsupported--balanced and exitedbeforecompute;
 preflightlog preserved separately, not a matrix sample. Ownhardwareaudit/manifests
 freeze scope. P56 remainsresearchreference, productionunchanged, goalactive.
+
+## P58 premeasurement resident128 packing control
+
+P57 closed9a3d6e8 and byte-exact P56 restored. Freshly reviewed CUDA12.4grid sync/
+actualcooperativecapacity and PTX8.4asyncproxyconstraints; RESIDENT_PACK_DESIGN.md
+fixes128CTA/3logicalpacktasks while retaining65536Brequest/two kernels and exact
+consumer. CPU independent384task/524288coordinate/1048576factorindexchecks pass.
+First generator CPU assert miscounted helper call sites18vsactual15 (three use
+scratch rather than s); corrected exhaustive call-site replacement before any
+C++ write/build. Source/probe manifests frozen; own54pack+18edge fresh inputs
+prepared (FP16 edge raw up to32768, BF16 outside-normal fallback). WorkingP56
+unchanged, packprobecompile running; no P58MMA/precision/latency result yet.
+
+## P58 complete, small point-estimate gains; do not upgrade P56
+
+Own54newpack+18newedge configurations beforeMMA compare415236096nativeuint16
+and73728inside bits with frozenP56, allzero; FP16edge raw rangeup32768, BF16
+outside-normalfallback. Standard78/79872inside pass and printed eF equalP56.
+Build prep52BF49FPregs, 65536Bcapacity3/actualgrid128; consumer128/196736B/1CTA
+unchanged and normalizedconsumerSASSidentical. Prepstatic1848->2648 BF/1856->2640FP.
+Independentordinary P56->P58 BF24.924320->24.833120 /FP25.160880->24.912160us
+(0.366/0.989%lower); Graph25.084440->24.737800 /25.104920->24.849720us
+(1.382/1.017%lower). Eachmode312gates/319488inside pass, unlocked/allarms/noCI.
+Smallpointestimates belowworkflow3%progress, no stablegain established; no own
+dualstream/tools and no transferredcertificate. KeepP58asfusioncontrol, P56reference.
+Own17pass NCU prep17.120us/52regs/issue14.251824%, consumer15.776us/128regs/
+issue22.862103%, localRWzero; profilingtimingsexcluded/notadded/no floor.
+Sourcesrestoredbyteexact14d9720 P56 plusfrozenbinary, newprocess78/79872inside pass.
+RESIDENT_PACK_HARDWARE.md/ownaudit freeze scopes, productionunchanged goalactive.
