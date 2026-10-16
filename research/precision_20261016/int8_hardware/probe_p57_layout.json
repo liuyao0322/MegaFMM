@@ -1,0 +1,135 @@
+{
+  "scope": "Own six newly seeded full-grid pre-MMA TMA/shared/ring28batch/fourslot tests, all native high/low values and guards/coordinate coverage. Producer verbatim candidate. Generic reads retire current slots without MMA: not actual WGMMA wait-order, numerical matrix, input packing, sanitizer or performance acceptance. Candidate MMA resource queries are compiled but no corrected launch here; layout generic reader itself has32B stack,0spill.",
+  "configurations": 6,
+  "native_uint16_comparisons_including_cta_reuse": 415236096,
+  "output_coordinates": 1572864,
+  "errors": 0,
+  "resources": [
+    {
+      "dtype": "bf16",
+      "prep_regs": "52",
+      "consumer_regs": "128",
+      "shared_bytes": "196736",
+      "active_blocks_per_sm": "1",
+      "sm_count": "132"
+    },
+    {
+      "dtype": "fp16",
+      "prep_regs": "48",
+      "consumer_regs": "128",
+      "shared_bytes": "196736",
+      "active_blocks_per_sm": "1",
+      "sm_count": "132"
+    }
+  ],
+  "cooperative_capacity": [
+    {
+      "dtype": "fp16",
+      "supported": "1",
+      "sm_count": "132",
+      "active_blocks_per_sm": "3",
+      "grid": "384",
+      "shared_bytes": "65536"
+    },
+    {
+      "dtype": "bf16",
+      "supported": "1",
+      "sm_count": "132",
+      "active_blocks_per_sm": "3",
+      "grid": "384",
+      "shared_bytes": "65536"
+    }
+  ],
+  "rows": [
+    {
+      "dtype": "bf16",
+      "trial": "0",
+      "seed": "131179",
+      "ctas": "128",
+      "sequences": "28",
+      "slots": "4",
+      "native_comparisons": "69206016",
+      "coordinates": "262144",
+      "native_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "bf16",
+      "trial": "1",
+      "seed": "131682",
+      "ctas": "128",
+      "sequences": "28",
+      "slots": "4",
+      "native_comparisons": "69206016",
+      "coordinates": "262144",
+      "native_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "bf16",
+      "trial": "2",
+      "seed": "132185",
+      "ctas": "128",
+      "sequences": "28",
+      "slots": "4",
+      "native_comparisons": "69206016",
+      "coordinates": "262144",
+      "native_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "fp16",
+      "trial": "0",
+      "seed": "131460",
+      "ctas": "128",
+      "sequences": "28",
+      "slots": "4",
+      "native_comparisons": "69206016",
+      "coordinates": "262144",
+      "native_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "fp16",
+      "trial": "1",
+      "seed": "131963",
+      "ctas": "128",
+      "sequences": "28",
+      "slots": "4",
+      "native_comparisons": "69206016",
+      "coordinates": "262144",
+      "native_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    },
+    {
+      "dtype": "fp16",
+      "trial": "2",
+      "seed": "132466",
+      "ctas": "128",
+      "sequences": "28",
+      "slots": "4",
+      "native_comparisons": "69206016",
+      "coordinates": "262144",
+      "native_errors": "0",
+      "shared_guard_errors": "0",
+      "coverage_errors": "0",
+      "workspace_guard_errors": "0",
+      "pass": "1"
+    }
+  ]
+}

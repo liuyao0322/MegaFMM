@@ -995,3 +995,31 @@ P56 own hardware audit and comprehensive native+INT8 audits terminal0; current
 four sources/binary byte-exact frozenP56, production hash unchanged, goalfalse.
 HistoricalP54/P55 restoration manifests untouched and explicitly mapped to P51
 snapshots in current audit; all other frozen manifests checked at actual paths.
+
+## P57 premeasurement producer-only unroll control
+
+Prior P56 turn was progress: own complete acceptance and8percent full-call gain,
+retained P56 from14d9720. Allocation107488 again verified RUNNING/g08/UNLIMITED.
+P57 isolated source adds only pragmaunroll7 to producer's outerstep7 loop; all
+consumer/prep/math/synchronization bytes unchangedP56. Independent CPU literal
+plane/transaction/byte/phase52events match,28ready/88TMA/1081344B perCTA, slots
+nonoverlap; proposal/source/probe identities frozen before compilation. Own six
+newseed131179+503trial+281FP16 layout/guards/resource probes compiling; no MMA.
+Working four sources/bin remain P56. No production or formal iteration change.
+
+## P57 completed and rejected
+
+Own six newseed pre-MMA layouts415236096nativeuint16/1572864coordinates and guards
+pass; consumer128regs/Shared196736B/actual1CTA, prep52BF48FP/65536B/3capacity384.
+Standard78/79872inside pass, printed eF percase equal P56. Independentordinary
+P56->P57 BF/FP25.103480->25.221000 /25.188000->25.270559us (0.468/0.328%slower);
+Graph25.019320->24.900519 /25.052360->25.072481us (0.475%lower/0.080%slower).
+Eachmode312gates/319488inside pass, unlocked/allarms/noCI, full cost. Noconsistent
+gain, rejected, no own fresh dualstream stress or tools. PrepnormalizedSASSsame;
+consumer2048->2904staticinstructions, HGMMA120same, BRA83->136, regs128same.
+Own17pass NCU prep17.120us/52regs/issue15.163659%, consumer15.616us/128regs/
+issue22.335403%, zero localRW; timings excluded/notadded/causal attribution absent.
+Four sources restored14d9720 P56 plus frozenbin; newprocess78/79872inside pass.
+Firstrestore CLI mistakenlyusedunsupported--balanced and exitedbeforecompute;
+preflightlog preserved separately, not a matrix sample. Ownhardwareaudit/manifests
+freeze scope. P56 remainsresearchreference, productionunchanged, goalactive.

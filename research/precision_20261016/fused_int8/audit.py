@@ -125,8 +125,8 @@ assert arithmetic['differing_scale_negative_control']['original']!=arithmetic['d
 models['uniform_scale_arithmetic']=dict(scope='CPU restoration arithmetic only; not matrix or hardware acceptance',generated_tuples_per_dot_count=20008,exponents_per_dot_count=230,bitwise_errors=0,hardware_accepted=False)
 abba=json.loads((h/'p17_abba.json').read_text())
 assert abba['correctness_checks']==312 and abba['independent_numerical_configurations']==78
-for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52','p53','p54','p55','p56']:
-    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52','p53','p54','p55','p56'] else 72
+for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52','p53','p54','p55','p56','p57']:
+    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52','p53','p54','p55','p56','p57'] else 72
     assert len(j['checks'])==count and all(x['pass']=='1' and int(x['nonfinite'])==0 for x in j['checks'])
     assert all(g['speedup_vs_sw']<1 for z in j['summaries'] for g in z['groups'])
     candidates[label]=dict(checks=count,failures=0,performance_accepted=False,full_call_us={s['dtype']:s['corrected_us'] for s in j['summaries']})
@@ -145,7 +145,7 @@ for granularity,passes in [('K128',0),('column',6)]:
     rows=[x for x in m7 if x['inside_granularity']==granularity]
     assert len(rows)==6 and sum(x['pass_fixed_floor'] for x in rows)==passes
 models['alternating_inside']=dict(fresh_configurations=6,paired_variants=2,coarse_passes=0,column_passes=6)
-for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52','p53','p54','p55','p56']:
+for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52','p53','p54','p55','p56','p57']:
     rows=[dict(re.findall(r'(\w+)=([^ ]+)',line)) for line in (h/(label+'_balanced.log')).read_text().splitlines() if line.startswith('INSIDE_EQUAL ')]
     assert len(rows)==78 and all(x['errors']=='0' and x['elements']=='1024' for x in rows)
     j=json.loads((h/(label+'_balanced.json')).read_text())
@@ -374,6 +374,17 @@ assert c56.replace(' #pragma unroll 7\n for(int step=0;step<7;++step)',' #pragma
 candidates['p56']['validation_scope']='own six newly seeded pre-MMA TMA layouts, original78, independent ordinary/Graph312 each, fresh14pattern168configs/1344interleaved calls and output/workspace guards, scoped56configs/112calls per tool, own static/two-kernel profile; research retained, production target unachieved'
 candidates['p56']['numerical_algorithm_changed']='Exactly one consumer pragma unroll1 to7; all remaining source bytes identical P51, same RN graph/fullK512/exactinside/all7+8dots/planes/producer'
 
+producer57=json.loads((h/'p57_hardware.json').read_text())
+assert not producer57['performance_accepted'] and producer57['retained']=='P56' and not producer57['goal_achieved']
+assert producer57['standard_original_fp64_gates']==78 and producer57['exact_inside_exponents']==79872
+assert producer57['own_pre_mma_layout']['configurations']==6 and producer57['own_pre_mma_layout']['errors']==0
+assert producer57['printed_per_case_ef_matches_p56'] and not producer57['fresh_dual_stream_reuse_acceptance'] and not producer57['sanitizer_acceptance']
+for suffix in ['abba','graph_abba']:
+    data=json.loads((h/f'p57_{suffix}.json').read_text())
+    assert data['correctness_checks']==312 and all(x['relative_reduction']<.01 for x in data['summary'])
+candidates['p57']['validation_scope']='Own six pre-MMA TMA cases, standard78, independent ordinary/Graph312each, own static/two-kernel profile; rejected, no fresh dual-stream reuse stress or scoped tools, byte-exact P56 restoration plus new-process78'
+candidates['p57']['numerical_algorithm_changed']='One added producer pragma unroll7; all other source bytes identical P56, same numerical graph and all7+8dots/fullK512/inside/fences'
+
 ordinary38=json.loads((h/'p38_abba.json').read_text())
 assert ordinary38['correctness_checks']==312 and ordinary38['independent_numerical_configurations']==78
 assert ordinary38['summary'][0]['relative_reduction']>0 and ordinary38['summary'][1]['relative_reduction']<0
@@ -411,7 +422,7 @@ out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved
     p30_independent_performance=ordinary30['summary'],p30_graph_regression=graph30['summary'],
     p33_validation=json.loads((h/'p33_validation.json').read_text()),
     p40_p42_local_controls=local_controls,m11_numerical_screen=m11_summary,m12_numerical_screen=m12_summary,m13_numerical_screen=m13_summary,m14_numerical_screen=m14_summary,m15_numerical_screen=m15_summary,m16_numerical_screen=m16_summary,
-    native_pack_controls=native_pack_controls,p52_consumer_control=consumer52,p53_historical_premeasurement_proposal=proposal53,p53_leaf_parallel_control=leaf53,p54_historical_premeasurement_proposal=proposal54,p54_leaf_n64_control=leaf54,p55_historical_premeasurement_proposal=proposal55,p55_direct_fine_quant_control=fine55,p56_static_leaf_control=static56,
+    native_pack_controls=native_pack_controls,p52_consumer_control=consumer52,p53_historical_premeasurement_proposal=proposal53,p53_leaf_parallel_control=leaf53,p54_historical_premeasurement_proposal=proposal54,p54_leaf_n64_control=leaf54,p55_historical_premeasurement_proposal=proposal55,p55_direct_fine_quant_control=fine55,p56_static_leaf_control=static56,p57_static_producer_control=producer57,
     p48_independent_performance=ordinary48['summary'],p48_graph_performance=graph48['summary'],p48_device_identity=static48,
     p47_pack_bits=pack47,p47_validation=validation47,p47_independent_performance=ordinary47['summary'],p47_graph_performance=graph47['summary'],
     p46_validation=validation46,p46_independent_performance=ordinary46['summary'],p46_graph_performance=graph46['summary'],

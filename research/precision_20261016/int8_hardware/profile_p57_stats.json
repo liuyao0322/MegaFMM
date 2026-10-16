@@ -1,0 +1,457 @@
+{
+  "scope": "first two balanced BF16 P57 full kernels, frozen full comparison --quick; all profiler-process timing arms excluded from ordinary performance",
+  "kernels": [
+    {
+      "Kernel Name": {
+        "value": "void preprocess_cooperative_columns<bfloat16_t>(const T1 *, const T1 *, T1 *, T1 *, T1 *, T1 *, int *, int *, int *, float *)",
+        "unit": ""
+      },
+      "gpu__time_duration.sum": {
+        "value": "17.120000",
+        "unit": "us"
+      },
+      "launch__registers_per_thread": {
+        "value": "52",
+        "unit": "register/thread"
+      },
+      "launch__shared_mem_per_block_static": {
+        "value": "0",
+        "unit": "byte/block"
+      },
+      "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+        "value": "15.163659",
+        "unit": "%"
+      },
+      "dram__bytes.sum": {
+        "value": "6.124288",
+        "unit": "Mbyte"
+      },
+      "lts__t_sectors_op_read.sum": {
+        "value": "337203.000000",
+        "unit": "sector"
+      },
+      "lts__t_sectors_op_write.sum": {
+        "value": "541264.000000",
+        "unit": "sector"
+      },
+      "l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum": {
+        "value": "0",
+        "unit": "sector"
+      },
+      "l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum": {
+        "value": "0",
+        "unit": "sector"
+      },
+      "smsp__average_warps_issue_stalled_barrier_per_issue_active.ratio": {
+        "value": "17.255541",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_branch_resolving_per_issue_active.ratio": {
+        "value": "0.487220",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_dispatch_stall_per_issue_active.ratio": {
+        "value": "0.205831",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_drain_per_issue_active.ratio": {
+        "value": "0.320248",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_gmma_per_issue_active.ratio": {
+        "value": "0.000000",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_imc_miss_per_issue_active.ratio": {
+        "value": "1.418167",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_lg_throttle_per_issue_active.ratio": {
+        "value": "1.015331",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+        "value": "9.049396",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_math_pipe_throttle_per_issue_active.ratio": {
+        "value": "0.169976",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_membar_per_issue_active.ratio": {
+        "value": "0.186526",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio": {
+        "value": "0.464812",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_misc_per_issue_active.ratio": {
+        "value": "0.015001",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_no_instruction_per_issue_active.ratio": {
+        "value": "0.195980",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_not_selected_per_issue_active.ratio": {
+        "value": "0.617750",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_selected_per_issue_active.ratio": {
+        "value": "0.993604",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio": {
+        "value": "0.246359",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_sleeping_per_issue_active.ratio": {
+        "value": "0.000000",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_tex_throttle_per_issue_active.ratio": {
+        "value": "0",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_wait_per_issue_active.ratio": {
+        "value": "1.446090",
+        "unit": "inst"
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.avg": {
+        "value": "11.83",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.max": {
+        "value": "57.00",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.min": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": {
+        "value": "1562.00",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.avg": {
+        "value": "0.30",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.max": {
+        "value": "2.00",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.min": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": {
+        "value": "40.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.avg": {
+        "value": "20.56",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.max": {
+        "value": "84.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.min": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": {
+        "value": "2714.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.avg": {
+        "value": "15.82",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.max": {
+        "value": "49.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.min": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": {
+        "value": "2088.00",
+        "unit": ""
+      },
+      "launch__block_size": {
+        "value": "256.00",
+        "unit": ""
+      },
+      "launch__grid_size": {
+        "value": "384.00",
+        "unit": ""
+      },
+      "launch__occupancy_limit_barriers": {
+        "value": "32.000000",
+        "unit": "block"
+      },
+      "launch__occupancy_limit_blocks": {
+        "value": "32.000000",
+        "unit": "block"
+      },
+      "launch__occupancy_limit_registers": {
+        "value": "4.000000",
+        "unit": "block"
+      },
+      "launch__occupancy_limit_shared_mem": {
+        "value": "3.000000",
+        "unit": "block"
+      },
+      "launch__occupancy_limit_warps": {
+        "value": "8.000000",
+        "unit": "block"
+      },
+      "launch__shared_mem_per_block_allocated": {
+        "value": "66.560000",
+        "unit": "Kbyte/block"
+      },
+      "launch__shared_mem_per_block_driver": {
+        "value": "1.024000",
+        "unit": "Kbyte/block"
+      },
+      "launch__shared_mem_per_block_dynamic": {
+        "value": "65.536000",
+        "unit": "Kbyte/block"
+      },
+      "launch__waves_per_multiprocessor": {
+        "value": "0.97",
+        "unit": ""
+      }
+    },
+    {
+      "Kernel Name": {
+        "value": "void corrected<bfloat16_t>(CUtensorMap_st, CUtensorMap_st, const int *, const int *, float *)",
+        "unit": ""
+      },
+      "gpu__time_duration.sum": {
+        "value": "15.616000",
+        "unit": "us"
+      },
+      "launch__registers_per_thread": {
+        "value": "128",
+        "unit": "register/thread"
+      },
+      "launch__shared_mem_per_block_static": {
+        "value": "0",
+        "unit": "byte/block"
+      },
+      "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+        "value": "22.335403",
+        "unit": "%"
+      },
+      "dram__bytes.sum": {
+        "value": "12.123648",
+        "unit": "Mbyte"
+      },
+      "lts__t_sectors_op_read.sum": {
+        "value": "2219137.000000",
+        "unit": "sector"
+      },
+      "lts__t_sectors_op_write.sum": {
+        "value": "197056.000000",
+        "unit": "sector"
+      },
+      "l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum": {
+        "value": "0",
+        "unit": "sector"
+      },
+      "l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum": {
+        "value": "0",
+        "unit": "sector"
+      },
+      "smsp__average_warps_issue_stalled_barrier_per_issue_active.ratio": {
+        "value": "0.425615",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_branch_resolving_per_issue_active.ratio": {
+        "value": "0.023723",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_dispatch_stall_per_issue_active.ratio": {
+        "value": "0.091781",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_drain_per_issue_active.ratio": {
+        "value": "0.148688",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_gmma_per_issue_active.ratio": {
+        "value": "0.282471",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_imc_miss_per_issue_active.ratio": {
+        "value": "0.066221",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_lg_throttle_per_issue_active.ratio": {
+        "value": "0.107584",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+        "value": "1.645550",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_math_pipe_throttle_per_issue_active.ratio": {
+        "value": "0.005975",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_membar_per_issue_active.ratio": {
+        "value": "0.000000",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio": {
+        "value": "0.229438",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_misc_per_issue_active.ratio": {
+        "value": "0.000426",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_no_instruction_per_issue_active.ratio": {
+        "value": "0.162475",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_not_selected_per_issue_active.ratio": {
+        "value": "0.036640",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_selected_per_issue_active.ratio": {
+        "value": "0.999999",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio": {
+        "value": "0.063343",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_sleeping_per_issue_active.ratio": {
+        "value": "0.020501",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_tex_throttle_per_issue_active.ratio": {
+        "value": "0",
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_wait_per_issue_active.ratio": {
+        "value": "1.146378",
+        "unit": "inst"
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.avg": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.max": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.min": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.avg": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.max": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.min": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.avg": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.max": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.min": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.avg": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.max": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.min": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": {
+        "value": "0.00",
+        "unit": ""
+      },
+      "launch__block_size": {
+        "value": "256.00",
+        "unit": ""
+      },
+      "launch__grid_size": {
+        "value": "128.00",
+        "unit": ""
+      },
+      "launch__occupancy_limit_barriers": {
+        "value": "32.000000",
+        "unit": "block"
+      },
+      "launch__occupancy_limit_blocks": {
+        "value": "32.000000",
+        "unit": "block"
+      },
+      "launch__occupancy_limit_registers": {
+        "value": "2.000000",
+        "unit": "block"
+      },
+      "launch__occupancy_limit_shared_mem": {
+        "value": "1.000000",
+        "unit": "block"
+      },
+      "launch__occupancy_limit_warps": {
+        "value": "8.000000",
+        "unit": "block"
+      },
+      "launch__shared_mem_per_block_allocated": {
+        "value": "197.760000",
+        "unit": "Kbyte/block"
+      },
+      "launch__shared_mem_per_block_driver": {
+        "value": "1.024000",
+        "unit": "Kbyte/block"
+      },
+      "launch__shared_mem_per_block_dynamic": {
+        "value": "196.736000",
+        "unit": "Kbyte/block"
+      },
+      "launch__waves_per_multiprocessor": {
+        "value": "0.97",
+        "unit": ""
+      }
+    }
+  ]
+}

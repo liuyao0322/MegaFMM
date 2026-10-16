@@ -281,3 +281,21 @@ source/CPU operand-plane+slot/phase equivalence and verify actual compiler chang
 then own pre-MMA checks and independent full-call gates. More code can regress;
 no P57 source/design/binary or latency claim exists at this checkpoint. Do not
 remove exactinside or any7+8dots to close remaining~25us versus~10us gap. Goalactive.
+
+## P57 rejected; preserve P56
+
+Producer-only outer unroll requested and actual machine code changed2048->2904
+staticinstructions without lower128regs. Own layouts/standard78/ordinary+Graph
+ABBA312each pass but ordinaryslow0.468/0.328%, Graph BF0.475%lower/FP0.080%slower,
+no consistent3%gain. Ownprofile no localRW, timings excluded/notadded. Rejected,
+no freshdualstream/tools; byte-exact14d9720 P56 restored and newprocess78passed.
+STATIC_PRODUCER_HARDWARE.md and own manifests retain allscope/initial CLIexit.
+
+Next reassess a cooperative single-kernel global-plane phase fusion:128resident
+CTAs loop over384 original P51 logical packing tasks, publish existing11planes
+with proxy fences and a full grid barrier, then unchanged P56 fullK512 consumer.
+This preserves once-per-input transforms/global planes, unlike N1-N3 repeated
+raw-input transforms per output tile. Prepare CPU proof, source/resource/pre-MMA
+packing/TMA controls before actual matrix launch. Larger shared footprint reduces
+pack concurrency and may regress. No P58 proposal/code/device result exists here;
+original seven main/eightcross/exactinside/fullcost mandatory, goal active.
