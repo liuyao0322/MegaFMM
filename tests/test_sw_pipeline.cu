@@ -56,7 +56,14 @@ void exercise(megafmm::DType dtype,int m,int n,int k,bool ta=false,bool tb=false
   p.ldc=n+(strided?7:0);p.ldd=inplace?p.ldc:n+(strided?9:0);p.alpha=alpha;p.beta=beta;
   megafmm::Policy policy;policy.algorithm=megafmm::Algorithm::SWPipeline;policy.workspace_limit=hopper ? size_t(8)<<30 : dedicated ? size_t(4)<<20 : 0;
   auto plan=megafmm::create_plan(p,policy);
-  require(plan->workspace_bytes()==(hopper ? size_t(2)*k*(m+n) : dedicated ? size_t(4)<<20 : 0),"SW workspace dispatch failed");
+  size_t expected=0;
+  if(dedicated)expected=size_t(4)<<20;
+  if(hopper) {
+    int w=m>768?64:16;
+    expected=(m%256 || n%128 || k%256)?size_t(16)*(((k+1)/2+127)/128*128)*((((m+1)/2+w-1)/w*w)+(((n+1)/2+63)/64*64)):size_t(2)*k*(m+n);
+    if(m==1 && n==1 && k==1)expected=256;
+  }
+  require(plan->workspace_bytes()==expected,"SW workspace dispatch failed");
   Buffer scratch(plan->workspace_bytes());
   require(plan->algorithm_name()==(hopper ? "sw_hopper" : dedicated ? "sw1024_pdl" : "sw_pipeline"),"generic SW dispatch failed");
   if(diagonal) require(m==k && !fractional,"diagonal reference requires square integer A");
@@ -205,8 +212,17 @@ template<class T> void suite(megafmm::DType dtype) {
   // More than one wave of CTAs with an inexpensive exact original-AB oracle.
   exercise<T>(dtype,4096,2048,4096,false,false,false,1,0,false,false,true,false,false,true);
   exercise<T>(dtype,512,256,512,false,false,false,1,0,false,false,false,false,true,true);
+  concurrent_hopper<T>(dtype,1,1,1);
+  concurrent_hopper<T>(dtype,514,770,258);
+  concurrent_hopper<T>(dtype,1025,1537,769);
+  // Rounded SW oracle covers both interior and masked boundary fragments.
+  for(auto shape:std::vector<std::vector<int>>{{1,3,5},{33,65,129},{65,129,129}})
+    exercise<T>(dtype,shape[0],shape[1],shape[2],false,false,false,1,0,false,true,false,false,false,true);
+  exercise<T>(dtype,33,65,129,false,false,false,1,0,false,true,false,false,true,true);
   concurrent_hopper<T>(dtype,1536,128,768);
   concurrent_hopper<T>(dtype,2048,256,1536);
+  // Long-K cache hints and raster include full groups and a final partial group.
+  concurrent_hopper<T>(dtype,2304,128,16384);
   // Restore the fast specialization while retaining zero-budget and unaligned SW.
   exercise<T>(dtype,1024,1024,1024,false,false,false,1,0,false,false,true,true);
   exercise<T>(dtype,1024,1024,1024,false,false,false,1,0,false,false,true,true,true);
@@ -224,6 +240,12 @@ template<class T> void suite(megafmm::DType dtype) {
 } // namespace
 int main(int argc,char** argv) { try {
   if(argc==2 && std::string(argv[1])=="--hopper-only") {
+    concurrent_hopper<__nv_bfloat16>(megafmm::DType::BF16,1,1,1);
+    concurrent_hopper<__half>(megafmm::DType::FP16,1,1,1);
+    concurrent_hopper<__nv_bfloat16>(megafmm::DType::BF16,514,770,258);
+    concurrent_hopper<__nv_bfloat16>(megafmm::DType::BF16,1025,1537,769);
+    concurrent_hopper<__half>(megafmm::DType::FP16,514,770,258);
+    concurrent_hopper<__half>(megafmm::DType::FP16,1025,1537,769);
     concurrent_hopper<__nv_bfloat16>(megafmm::DType::BF16,256,128,256);
     concurrent_hopper<__nv_bfloat16>(megafmm::DType::BF16,2048,256,1536);
     concurrent_hopper<__half>(megafmm::DType::FP16,256,128,256);

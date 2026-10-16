@@ -649,6 +649,8 @@ Prior history remains in Git. Current optimization resumes at iteration 51.
 
 | 371 | Extend fused seven-product Hopper SW to aligned variable M N K | 0.4298 | 3.885417 | experimental-numerical-fail |
 
+| 372 | Add guarded padded seven-product SW and long-K cache scheduling | 0.7713 | 2.161684 | improved |
+
 ## Iterations
 
 ### Iter 51 — Publish shared stages once per warp
@@ -6406,3 +6408,45 @@ New source-specific stage diagnostics and raw profiles, candidate summaries, inv
 - **Analysis:** Related implementation CTest 4/4 and own targeted memcheck racecheck synccheck pass. First completed aligned measurements are slower than independently tuned cuBLASLt; functional coverage is not acceleration or numerical acceptance. C7515 warnings and 250-register wide consumers require investigation. NCU failed with lock-file permission error; no dynamic profile claimed. Preserve all timing and numerical failures.
 - **Next:** Inspect all 28 actual SW rows, then independently compile and validate split-first-K initialization and resource-focused candidates before promoting a measured improvement.
 - **Archive:** trajectory/20261016_203357_iter-371/
+
+### Iter 372 — Add guarded padded seven-product SW and long-K cache scheduling
+
+- **Hypothesis:** Guarded logical-quadrant padding and paired packing remove the slow generic boundary path; grouped raster and asymmetric TMA hints improve aligned reuse while preserving seven products.
+- **Changes:** Promote C400 paired padded N16/N64 consumers and seven-SIMT-leaf scalar path; split-first runtime K consumers from C372; grouped rows from C386; long-K A evict-last/B evict-first from C403; keep sw1024.cu byte-identical. Extend rounded-oracle, unaligned fallback, fresh dual-stream Graph, and guarded long-K tests. Archive 33 standalone candidates including failures and unmeasured proposals.
+- **Bench:** Compiled=True; frozen numerical gate=FAIL/unchecked. No certification is inferred from runtime gains.
+- **Scope:** 28 rows; arithmetic mean of row median latency=2.161684 ms; mean speedup=0.7713x. Compare individual identical shape/dtype/mode rows below.
+
+| M,N,K | dtype | route | mode | dense ms | solution ms | speedup | SW eF | numerical pass |
+|---|---|---|---|---:|---:|---:|---:|---|
+| 512,512,512 | bf16 | sw_hopper v0 | launch | 0.005719 | 0.007882 | 0.7256 | 0.00604926 | 0 |
+| 512,512,512 | fp16 | sw_hopper v0 | launch | 0.005768 | 0.007815 | 0.7381 | 0.000756941 | 0 |
+| 1024,1024,1024 | bf16 | sw1024_pdl v0 | launch | 0.012308 | 0.010300 | 1.1948 | 0.0060152 | 0 |
+| 1024,1024,1024 | fp16 | sw1024_pdl v0 | launch | 0.009774 | 0.010293 | 0.9495 | 0.000754626 | 0 |
+| 2048,2048,2048 | bf16 | sw_hopper v0 | launch | 0.030937 | 0.064561 | 0.4792 | 0.00602495 | 0 |
+| 2048,2048,2048 | fp16 | sw_hopper v0 | launch | 0.032207 | 0.065179 | 0.4941 | 0.00075359 | 0 |
+| 4096,4096,4096 | bf16 | sw_hopper v0 | launch | 0.200204 | 0.409976 | 0.4883 | 0.0060269 | 0 |
+| 4096,4096,4096 | fp16 | sw_hopper v0 | launch | 0.206841 | 0.435260 | 0.4752 | 0.000753133 | 0 |
+| 8192,8192,8192 | bf16 | sw_hopper v0 | launch | 1.614790 | 2.892249 | 0.5583 | 0.00602339 | 0 |
+| 8192,8192,8192 | fp16 | sw_hopper v0 | launch | 1.714494 | 2.953552 | 0.5805 | 0.000753411 | 0 |
+| 16384,16384,16384 | bf16 | sw_hopper v0 | launch | 12.626445 | 21.704575 | 0.5817 | 0.00602276 | 0 |
+| 16384,16384,16384 | fp16 | sw_hopper v0 | launch | 13.245531 | 22.353799 | 0.5925 | 0.000753079 | 0 |
+| 8192,4096,8192 | bf16 | sw_hopper v0 | launch | 0.835394 | 1.597806 | 0.5228 | 0.006025 | 0 |
+| 8192,4096,8192 | fp16 | sw_hopper v0 | launch | 0.859107 | 1.623802 | 0.5291 | 0.000753171 | 0 |
+| 4096,8192,8192 | bf16 | sw_hopper v0 | launch | 0.791122 | 1.550619 | 0.5102 | 0.0060256 | 0 |
+| 4096,8192,8192 | fp16 | sw_hopper v0 | launch | 0.825357 | 1.567214 | 0.5266 | 0.000753411 | 0 |
+| 8192,8192,4096 | bf16 | sw_hopper v0 | launch | 0.842377 | 1.479884 | 0.5692 | 0.00602418 | 0 |
+| 8192,8192,4096 | fp16 | sw_hopper v0 | launch | 0.868508 | 1.523746 | 0.5700 | 0.000753089 | 0 |
+| 8192,1024,512 | bf16 | sw_hopper v0 | launch | 0.026225 | 0.045323 | 0.5786 | 0.00605665 | 0 |
+| 8192,1024,512 | fp16 | sw_hopper v0 | launch | 0.025634 | 0.044554 | 0.5753 | 0.000754911 | 0 |
+| 1024,8192,512 | bf16 | sw_hopper v0 | launch | 0.027066 | 0.059052 | 0.4583 | 0.00602494 | 0 |
+| 1024,8192,512 | fp16 | sw_hopper v0 | launch | 0.026253 | 0.059179 | 0.4436 | 0.000753215 | 0 |
+| 1025,1537,769 | bf16 | sw_hopper v0 | launch | 0.038789 | 0.018947 | 2.0472 | 0.00601373 | 0 |
+| 1025,1537,769 | fp16 | sw_hopper v0 | launch | 0.037605 | 0.018932 | 1.9864 | 0.000751472 | 0 |
+| 514,770,258 | bf16 | sw_hopper v0 | launch | 0.008903 | 0.008881 | 1.0025 | 0.00604418 | 0 |
+| 514,770,258 | fp16 | sw_hopper v0 | launch | 0.008899 | 0.008804 | 1.0108 | 0.000758417 | 0 |
+| 1,1,1 | bf16 | sw_hopper v0 | launch | 0.003009 | 0.002493 | 1.2069 | 0 | 1 |
+| 1,1,1 | fp16 | sw_hopper v0 | launch | 0.002968 | 0.002473 | 1.2003 | 0 | 1 |
+
+- **Analysis:** The full clean-build 28-row same-process cuBLASLt comparison completed. Boundary 1025x1537x769 gains substantially and 1x1x1 improves launch latency; 514x770x258 is near parity. Aligned large shapes remain slower than cuBLAS despite reducing 16384-cubed latency from about 44ms to about 22ms. Original precision remains failed for 26/28 rows (only tiny passes), with no numerical acceptance inferred. Rejected structural directions include local shared transforms, multi-warpgroup global/shared intermediate storage, and seven cuBLASLt leaf backends; C388 timing is invalid because of its A22 offset bug. NCU was previously attempted and blocked by its lock; no successful new profiling claimed. Independent final-binary replication and sanitizer validation follow this closed iteration.
+- **Next:** Validate this exact production binary with relevant CTest, 120 guarded fresh direct/Graph calls per sanitizer, and three independent processes per mode for boundary/tiny results. Broad cuBLAS acceleration and original accuracy targets remain unmet.
+- **Archive:** trajectory/20261016_212727_iter-372/

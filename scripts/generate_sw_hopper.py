@@ -31,22 +31,30 @@ for n,bk,stages in [(32,128,8),(128,64,4)]:
         for j in range(count):
             ins += [f'"n"(int(GMMA::CLayout_64x{n}{{}}(0,Int<{j}>{{}}))/64)',f'"n"(4*(int(GMMA::CLayout_64x{n}{{}}(0,Int<{j}>{{}}))%64))']
         major=len(ins);ins+=['"n"(int32_t(GMMA::Major::MN))','"n"(int32_t(GMMA::Major::K))']
-        lines=['{ .reg .pred acc,always,leader,done,more;',
+        lines=['{ .reg .pred noacc,always,leader,done,more;',
                '.reg .b64 ba,bb,da,db,dst,offset64;',
                f'.reg .b32 q,sequence,slot,phase,offset,rb,fb; .reg .f32 d<{count}>,first<{count}>,second<{count}>,x;',
-               'setp.eq.u32 leader,%4,0;','setp.ne.u32 always,1,0;','mov.u32 sequence,0;']
+               'setp.eq.u32 noacc,1,0;','setp.eq.u32 leader,%4,0;','setp.ne.u32 always,1,0;','mov.u32 sequence,0;']
         for step in range(7):
-            lines += ['mov.u32 q,0;',f'LOOP_{step}:',f'and.b32 slot,sequence,{stages-1};',f'shr.u32 phase,sequence,{stages.bit_length()-1};','and.b32 phase,phase,1;',
-                      'shl.b32 offset,slot,3;','add.u32 rb,%2,offset;','add.u32 fb,%3,offset;',f'WAIT_{step}:',
-                      'mbarrier.try_wait.parity.shared::cta.b64 done,[rb],phase,0x989680;',f'@!done bra WAIT_{step};',
-                      'wgmma.fence.sync.aligned;',f'mul.lo.u32 offset,slot,{2*(64+n)*bk//16};',
-                      'cvt.u64.u32 offset64,offset;','add.u64 ba,%0,offset64;','add.u64 bb,%1,offset64;','setp.ne.u32 acc,q,0;']
             regs=','.join(f'd{j}' for j in range(count))
-            for k in range(bk//16):
-                lines += [f'add.u64 da,ba,%{descstart+2*k};',f'add.u64 db,bb,%{descstart+2*k+1};',
-                          f'wgmma.mma_async.sync.aligned.m64n{n}k16.f32.{dtype}.{dtype} {{{regs}}},da,db,'+('acc' if k==0 else 'always')+f',1,1,%{major},%{major+1};']
-            lines += ['wgmma.commit_group.sync.aligned;','wgmma.wait_group.sync.aligned 0;','bar.warp.sync 0xffffffff;',
-                      '@leader mbarrier.arrive.shared::cta.b64 _,[fb];','add.u32 sequence,sequence,1;','add.u32 q,q,1;','setp.lt.u32 more,q,%6;',f'@more bra LOOP_{step};']
+            def tile_body(first):
+                label=f'{step}_'+('FIRST' if first else 'REST')
+                r=[f'and.b32 slot,sequence,{stages-1};',f'shr.u32 phase,sequence,{stages.bit_length()-1};','and.b32 phase,phase,1;',
+                   'shl.b32 offset,slot,3;','add.u32 rb,%2,offset;','add.u32 fb,%3,offset;',f'WAIT_{label}:',
+                   'mbarrier.try_wait.parity.shared::cta.b64 done,[rb],phase,0x989680;',f'@!done bra WAIT_{label};',
+                   f'mul.lo.u32 offset,slot,{2*(64+n)*bk//16};','cvt.u64.u32 offset64,offset;',
+                   'add.u64 ba,%0,offset64;','add.u64 bb,%1,offset64;','wgmma.fence.sync.aligned;']
+                for k in range(bk//16):
+                    r += [f'add.u64 da,ba,%{descstart+2*k};',f'add.u64 db,bb,%{descstart+2*k+1};',
+                          f'wgmma.mma_async.sync.aligned.m64n{n}k16.f32.{dtype}.{dtype} {{{regs}}},da,db,'+
+                          ('noacc' if first and k==0 else 'always')+f',1,1,%{major},%{major+1};']
+                r += ['wgmma.commit_group.sync.aligned;','wgmma.wait_group.sync.aligned 0;','bar.warp.sync 0xffffffff;',
+                      '@leader mbarrier.arrive.shared::cta.b64 _,[fb];','add.u32 sequence,sequence,1;']
+                return r
+            lines+=tile_body(True)
+            lines+=['mov.u32 q,1;','setp.ge.u32 more,q,%6;',f'@more bra DONE_{step};',f'LOOP_{step}:']
+            lines+=tile_body(False)
+            lines+=['add.u32 q,q,1;','setp.lt.u32 more,q,%6;',f'@more bra LOOP_{step};',f'DONE_{step}:']
             for j in range(count):
                 if step==0:lines += [f'mov.f32 first{j},d{j};']
                 elif step==2:lines += [f'add.rn.f32 first{j},first{j},d{j};']

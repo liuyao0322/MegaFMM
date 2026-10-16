@@ -10,7 +10,8 @@ enum class DType { BF16, FP16 };
 // Experimental forced SW: 1024^3 contiguous non-transposed alpha=1,beta=0 uses
 // the restored PDL/TMA/WGMMA seven-product specialization with 4 MiB workspace
 // when permitted by workspace_limit and A/B are 16-byte aligned. Other cases
-// use the aligned multi-size Hopper seven-product path when eligible and its
+// use the multi-size Hopper seven-product path (including padded boundaries)
+// for positive dimensions <=32768, contiguous alpha=1/beta=0, when its
 // caller workspace fits the budget, otherwise general Winograd (zero workspace).
 // Auto remains independently tuned Dense; SW precision is not certified.
 // Tuned empirically ranks precision-valid Hopper dense, tiny and padded

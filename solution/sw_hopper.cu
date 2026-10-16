@@ -16,6 +16,8 @@ template<class T,int N,int K,int S> struct alignas(128) Shared {
   T operand[S][(64+N)*K];
   uint64_t ready[S],free[S];
 };
+#include "sw_padded_16.cuh"
+#include "sw_padded_64.cuh"
 #include "sw_hopper_32.cuh"
 #include "sw_hopper_128.cuh"
 __device__ __forceinline__ void wait_free(uint64_t* bar,int phase) {
@@ -32,7 +34,8 @@ template<class T> __device__ uint32_t pair(float lo,float hi) {
   return bits;
 }
 // A/B planes have independent sizes and pitches, including rectangular cases.
-// No input-dependent values persist across calls. Raw P1/P2 can overlap packing.
+// No input-dependent values persist across calls. Aligned raw P1/P2 overlap packing;
+// padded raw operands wait for the pack kernel before their first TMA load.
 template<class T> __global__ __launch_bounds__(256)
 void transform(const T* A,const T* B,T* packed,int mh,int nh,int kh) {
   cudaTriggerProgrammaticLaunchCompletion();
@@ -71,14 +74,22 @@ void transform(const T* A,const T* B,T* packed,int mh,int nh,int kh) {
   asm volatile("fence.proxy.async.global;" ::: "memory");
 }
 
-template<class T,int N,int K,int Stages> __global__ __launch_bounds__(256,1)
+template<class T,int N,int K,int Stages,bool Pad=false> __global__ __launch_bounds__(256,1)
 void compute(const __grid_constant__ CUtensorMap amap,const __grid_constant__ CUtensorMap bmap,
              const __grid_constant__ CUtensorMap smap,const __grid_constant__ CUtensorMap tmap,
-             int mh,int nh,int kh,float* D) {
+             int mh,int nh,int kh,float* D,int M,int NN,int packed) {
   using namespace cute;
   extern __shared__ __align__(128) unsigned char bytes[];
   auto& s=*reinterpret_cast<Shared<T,N,K,Stages>*>(bytes);
   int tid=threadIdx.x,m0=blockIdx.y*64,n0=blockIdx.x*N,kt=kh/K;
+  if constexpr(!Pad) {
+    if(kh>=1024) {
+      int group_size=kh>=8192?2:4,gx=gridDim.x,gy=gridDim.y;
+      int pid=blockIdx.x+blockIdx.y*gx,group=pid/(group_size*gy),first=group*group_size;
+      int count=min(group_size,gx-first),within=pid%(group_size*gy);
+      m0=(within/count)*64;n0=(first+within%count)*N;
+    }
+  }
   if(tid==32) asm volatile("prefetch.tensormap [%0]; prefetch.tensormap [%1]; prefetch.tensormap [%2]; prefetch.tensormap [%3];"::"l"(&amap),"l"(&bmap),"l"(&smap),"l"(&tmap):"memory");
   if(tid==0) {
     for(int i=0;i<Stages;++i){Barrier::init(&s.ready[i],1);Barrier::init(&s.free[i],4);}
@@ -86,31 +97,37 @@ void compute(const __grid_constant__ CUtensorMap amap,const __grid_constant__ CU
   }
   __syncthreads();
   if(tid==0) {
+    // Long-K row groups reuse A planes while B streams through L2.
+    const uint64_t a_hint=kh>=8192?uint64_t(TMA::CacheHintSm90::EVICT_LAST):0;
+    const uint64_t b_hint=kh>=8192?uint64_t(TMA::CacheHintSm90::EVICT_FIRST):0;
     for(int step=0;step<7;++step)for(int q=0;q<kt;++q) {
       int p=product_for_step(step),seq=step*kt+q,slot=seq%Stages,k0=q*K;
       // All transformed global operands are complete before their first TMA.
-      if(seq==2*kt)cudaGridDependencySynchronize();
+      if(seq==(Pad?0:2*kt))cudaGridDependencySynchronize();
       if(seq>=Stages)wait_free(&s.free[slot],((seq-Stages)/Stages)%2);
       TxBarrier::arrive_and_expect_tx(&s.ready[slot],2*(64+N)*K);
       T* dst=s.operand[slot];
       if(p==3 || p>=4) {
-        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],0,dst,m0,k0,p==3?3:p-4);
+        SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],b_hint,dst,m0,k0,p==3?3:p-4);
       } else {
         int col=p==2?nh:0,row=p==1 || p==2?kh:0;
-        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],0,dst,m0+col,k0+row);
+        SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],b_hint,dst,m0+col,k0+row);
       }
       if(p==2 || p>=4) {
-        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],0,dst+64*K,0,n0,k0/64,p==2?3:p-4);
+        SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],a_hint,dst+64*K,0,n0,k0/64,p==2?3:p-4);
       } else {
         int col=p==1 || p==3?kh:0,row=p==3?mh:0;
-        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,dst+64*K,0,n0+row,(k0+col)/64);
+        SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],a_hint,dst+64*K,0,n0+row,(k0+col)/64);
       }
     }
   } else if(tid>=128) {
-    if constexpr(N==32)consume_32(s,tid,m0,n0,mh,nh,kt,D);
+    if constexpr(Pad && N==16)consume_pad_16(s,tid,m0,n0,(M+1)/2,(NN+1)/2,kt,D,M,NN);
+    else if constexpr(Pad && N==64)consume_pad_64(s,tid,m0,n0,(M+1)/2,(NN+1)/2,kt,D,M,NN);
+    else if constexpr(N==32)consume_32(s,tid,m0,n0,mh,nh,kt,D);
     else consume_128(s,tid,m0,n0,mh,nh,kt,D);
   }
 }
+#include "sw_padded.cuh"
 void check(cudaError_t e,const char* where) {
   if(e!=cudaSuccess)throw std::runtime_error(std::string(where)+": "+cudaGetErrorString(e));
 }
@@ -131,42 +148,56 @@ void encode(CUtensorMap& map,const void* ptr,DType type,bool is_a,bool transform
       CU_TENSOR_MAP_INTERLEAVE_NONE,CU_TENSOR_MAP_SWIZZLE_128B,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
   if(r!=CUDA_SUCCESS)throw std::runtime_error("multisize SW tensor map: "+std::to_string(int(r)));
 }
-template<class T,int N,int K,int Stages> void setup() {
+template<class T,int N,int K,int Stages,bool Pad=false> void setup() {
   check(cudaFuncSetAttribute(transform<T>,cudaFuncAttributePreferredSharedMemoryCarveout,100),"SW transform carveout");
-  check(cudaFuncSetAttribute(compute<T,N,K,Stages>,cudaFuncAttributePreferredSharedMemoryCarveout,100),"SW carveout");
-  check(cudaFuncSetAttribute(compute<T,N,K,Stages>,cudaFuncAttributeMaxDynamicSharedMemorySize,sizeof(Shared<T,N,K,Stages>)),"SW shared opt-in");
+  check(cudaFuncSetAttribute(compute<T,N,K,Stages,Pad>,cudaFuncAttributePreferredSharedMemoryCarveout,100),"SW carveout");
+  check(cudaFuncSetAttribute(compute<T,N,K,Stages,Pad>,cudaFuncAttributeMaxDynamicSharedMemorySize,sizeof(Shared<T,N,K,Stages>)),"SW shared opt-in");
 }
-template<class T,int N,int K,int Stages> void launch(const Problem& p,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream) {
-  int mh=int(p.m/2),nh=int(p.n/2),kh=int(p.k/2);
+template<class T,int N,int K,int Stages,bool Pad=false> void launch(const Problem& p,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream) {
+  bool padded=padded_shape(p);auto shape=pad_shape(p);
+  int mh=padded?shape.mh:int(p.m/2),nh=padded?shape.nh:int(p.n/2),kh=padded?shape.kh:int(p.k/2);
+  const void* rawA=padded?static_cast<char*>(workspace)+8*(shape.sa+shape.sb):A;
+  const void* rawB=padded?static_cast<const char*>(rawA)+8*shape.sa:B;
   CUtensorMap amap{},bmap{},smap{},tmap{};
   void* tbase=static_cast<char*>(workspace)+size_t(4)*mh*kh*2;
-  encode(amap,A,p.dtype,true,false,mh,nh,kh,N,K);encode(bmap,B,p.dtype,false,false,mh,nh,kh,N,K);
+  encode(amap,rawA,p.dtype,true,false,mh,nh,kh,N,K);encode(bmap,rawB,p.dtype,false,false,mh,nh,kh,N,K);
   encode(smap,workspace,p.dtype,true,true,mh,nh,kh,N,K);encode(tmap,tbase,p.dtype,false,true,mh,nh,kh,N,K);
-  const int blocks=int(std::min<int64_t>(128,(std::max(int64_t(mh)*kh,int64_t(kh)*nh)+511)/512));
-  transform<T><<<blocks,256,0,stream>>>(static_cast<const T*>(A),static_cast<const T*>(B),static_cast<T*>(workspace),mh,nh,kh);
+  const int blocks=int(std::min<int64_t>(padded?512:128,(std::max(int64_t(mh)*kh,int64_t(kh)*nh)+511)/512));
+  if(padded)pack_padded<T><<<blocks,256,0,stream>>>(static_cast<const T*>(A),static_cast<const T*>(B),static_cast<T*>(workspace),int(p.m),int(p.n),int(p.k),mh,nh,kh);
+  else transform<T><<<blocks,256,0,stream>>>(static_cast<const T*>(A),static_cast<const T*>(B),static_cast<T*>(workspace),mh,nh,kh);
   check(cudaPeekAtLastError(),"SW transform launch");
   cudaLaunchAttribute attribute{};attribute.id=cudaLaunchAttributeProgrammaticStreamSerialization;attribute.val.programmaticStreamSerializationAllowed=1;
   cudaLaunchConfig_t cfg{};cfg.gridDim=dim3(mh/N,nh/64);cfg.blockDim=dim3(256);cfg.dynamicSmemBytes=sizeof(Shared<T,N,K,Stages>);cfg.stream=stream;cfg.attrs=&attribute;cfg.numAttrs=1;
-  check(cudaLaunchKernelEx(&cfg,compute<T,N,K,Stages>,amap,bmap,smap,tmap,mh,nh,kh,D),"SW compute launch");
+  check(cudaLaunchKernelEx(&cfg,compute<T,N,K,Stages,Pad>,amap,bmap,smap,tmap,mh,nh,kh,D,int(p.m),int(p.n),int(padded)),"SW compute launch");
 }
 } // namespace
 size_t sw_hopper_workspace(const Problem& p) {
   if(p.m<=0 || p.n<=0 || p.k<=0 || p.m>32768 || p.n>32768 || p.k>32768 ||
-     p.m%256 || p.n%128 || p.k%256 || p.trans_a || p.trans_b ||
+     p.trans_a || p.trans_b ||
      p.lda!=p.k || p.ldb!=p.n || p.ldd!=p.n || p.alpha!=1 || p.beta!=0)return 0;
-  return size_t(2)*p.k*(p.m+p.n);
+  if(scalar_shape(p))return 256;
+  return padded_shape(p)?pad_shape(p).bytes:size_t(2)*p.k*(p.m+p.n);
 }
 void setup_sw_hopper(const Problem& p) {
+  if(scalar_shape(p))return;
   bool wide=p.m>=2048 || p.k>=2048;
-  if(p.dtype==DType::BF16){if(wide)setup<cute::bfloat16_t,128,64,4>();else setup<cute::bfloat16_t,32,128,8>();}
-  else{if(wide)setup<cute::half_t,128,64,4>();else setup<cute::half_t,32,128,8>();}
+  if(p.dtype==DType::BF16){if(padded_shape(p)){if(padded_width(p)==64)setup<cute::bfloat16_t,64,128,4,true>();else setup<cute::bfloat16_t,16,128,8,true>();}else if(wide)setup<cute::bfloat16_t,128,64,4>();else setup<cute::bfloat16_t,32,128,8>();}
+  else{if(padded_shape(p)){if(padded_width(p)==64)setup<cute::half_t,64,128,4,true>();else setup<cute::half_t,16,128,8,true>();}else if(wide)setup<cute::half_t,128,64,4>();else setup<cute::half_t,32,128,8>();}
 }
 void run_sw_hopper(const Problem& p,const void* A,const void* B,float* D,void* workspace,cudaStream_t stream) {
+  if(scalar_shape(p)) {
+    if(p.dtype==DType::BF16)scalar_seven<cute::bfloat16_t><<<1,32,0,stream>>>(static_cast<const cute::bfloat16_t*>(A),static_cast<const cute::bfloat16_t*>(B),D);
+    else scalar_seven<cute::half_t><<<1,32,0,stream>>>(static_cast<const cute::half_t*>(A),static_cast<const cute::half_t*>(B),D);
+    check(cudaPeekAtLastError(),"scalar seven-product SW");return;
+  }
   bool wide=p.m>=2048 || p.k>=2048;
-  if(p.dtype==DType::BF16){if(wide)launch<cute::bfloat16_t,128,64,4>(p,A,B,D,workspace,stream);else launch<cute::bfloat16_t,32,128,8>(p,A,B,D,workspace,stream);}
-  else{if(wide)launch<cute::half_t,128,64,4>(p,A,B,D,workspace,stream);else launch<cute::half_t,32,128,8>(p,A,B,D,workspace,stream);}
+  if(p.dtype==DType::BF16){if(padded_shape(p)){if(padded_width(p)==64)launch<cute::bfloat16_t,64,128,4,true>(p,A,B,D,workspace,stream);else launch<cute::bfloat16_t,16,128,8,true>(p,A,B,D,workspace,stream);}else if(wide)launch<cute::bfloat16_t,128,64,4>(p,A,B,D,workspace,stream);else launch<cute::bfloat16_t,32,128,8>(p,A,B,D,workspace,stream);}
+  else{if(padded_shape(p)){if(padded_width(p)==64)launch<cute::half_t,64,128,4,true>(p,A,B,D,workspace,stream);else launch<cute::half_t,16,128,8,true>(p,A,B,D,workspace,stream);}else if(wide)launch<cute::half_t,128,64,4>(p,A,B,D,workspace,stream);else launch<cute::half_t,32,128,8>(p,A,B,D,workspace,stream);}
 }
 const char* sw_hopper_config(const Problem& p) {
-  return p.m>=2048 || p.k>=2048 ? "sw_hopper;tile=64x128;bk=64;stages=4;leaf_terms=7;residual_correction=off" : "sw_hopper;tile=64x32;bk=128;stages=8;leaf_terms=7;residual_correction=off";
+  if(scalar_shape(p))return "sw_hopper;tile=scalar;leaf_terms=7;leaf_backend=simt;threads=32;launches=1;residual_correction=off";
+  if(padded_shape(p) && padded_width(p)==64)return "sw_hopper;tile=64x64;bk=128;stages=4;leaf_terms=7;padding=logical_quadrants;pack=paired;pack_cta_cap=512;residual_correction=off";
+  if(padded_shape(p))return "sw_hopper;tile=64x16;bk=128;stages=8;leaf_terms=7;padding=logical_quadrants;pack=paired;pack_cta_cap=512;residual_correction=off";
+  return p.m>=2048 || p.k>=2048 ? "sw_hopper;tile=64x128;bk=64;stages=4;leaf_terms=7;consumer_init=split_first;raster=grouped_rows_4_or_2_when_k_ge_2048;cache=retain_a_when_k_ge_16384;residual_correction=off" : "sw_hopper;tile=64x32;bk=128;stages=8;leaf_terms=7;consumer_init=split_first;raster=grouped_rows_4_or_2_when_k_ge_2048;cache=retain_a_when_k_ge_16384;residual_correction=off";
 }
 } // namespace megafmm::detail
