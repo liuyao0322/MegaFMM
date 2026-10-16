@@ -940,3 +940,58 @@ DIRECT_FINE_QUANT_HARDWARE.md/audit_p55_hardware.py/p55_hardware.json preserve s
 New primary CUTLASS and tensor-core numerical-model source read plus own profile/
 history reassessment in LITERATURE_UPDATE_P55.md. No floor/exhaustion claim, no
 P56 design/source/binary, no production change; goal remains active.
+
+## P56 static leaf schedule premeasurement control
+
+Prior P55 turn was progress: complete own hardware/performance rejection changed
+next direction, byte-exact P51 restored. Allocation107488 reverified RUNNING/g08/
+UNLIMITED; no other live GPU task. Reviewed P25/26 producer unroll, P28 dual INT8
+fragments, P46 high reuse and P52–54 shape/concurrency: no duplicate P51 native
+consumer7leaf unroll control found. STATIC_LEAF_SCHEDULE_DESIGN.md/CPU672event
+identity and slot completion proof,262144output coordinates frozen before sources.
+Isolated p56 generated with exactly one pragma unroll1→7 on consumer step<7 loop;
+all other source bytes retained P51. Own six new seed full-grid pre-MMA native TMA
+probe prepared with verbatim unchanged producer/four49152Bslots, all28batches and
+11planes. Own candidate resource queries included; compile running, no MMA yet.
+Working four sources/bin still P51. No production or formal iteration change.
+
+## P56 first hardware and full-call comparisons
+
+Own pre-MMA six new-seed full-grid layout tests pass415236096nativeuint16 and
+1572864output coordinates/guards, actual candidateconsumer128regs0stack/spill,
+Shared196736B/1CTA, prep52BF48FPregs/65536B/3capacity384grid. Generic layout
+reader itself has32Bstack/0spill, not candidate MMA or wait-order certification.
+Full build terminal0; first matrix78 original gates/79872inside pass, printed
+eF eachcase equal P51. Independent ordinary P51/P56 ABBA27.465440274→25.065080166us
+BF16,27.511400223→25.104760647FP16 (8.740/8.748percent lower); Graph
+27.496039867→25.065160275/27.443079472→25.163640022us (8.841/8.306percent lower).
+312gates/319488inside per mode pass, unlocked/allarms retained/noCI.
+Exact-binary SASS prep normalized instruction text identical; consumer static
+instructions1600→2048, HGMMA.64 static25→120, registers143→128. Counts are static,
+not dynamic execution or unique attribution to branch reduction. This is compiler
+evidence of actual expansion; dynamic dots/nominal payload remain fixed.
+Own fresh14pattern two-stream/independent guarded workspace stress prepared and
+frozen before compilation; source129173+499trial+271stream+131pattern+277FP16.
+168configs/1344calls then each scoped tool56configs/112calls running serial.
+Not retained yet; no certificate transferred. Production unchanged.
+
+## P56 retained after own complete scope
+
+Own168fresh configs/1344interleaved calls, original+fixed gates,128float output/
+256B workspace guards allpass; maxBF/FP eF1.62425188506e-5/2.17198745465e-5.
+Scopedmemcheck/racecheck/synccheck each56configs/112calls zeroerrors, race zero
+hazards/warnings. Graph78 exactcopy ownABBA_b0, not extra samples. Own17pass NCU
+prep17.376us52regs65536B/issue15.219711percent, consumer15.936us128regs196736B/
+issue23.034603percent, zero localRW; timings excluded/not summed. Consumer
+registercapacity2CTA but sharedlimit1CTA unchanged. P56 retained onlyresearch,
+P51historical fallback; full~25.1us still far from production~10us, goalactive.
+P54/P55 frozenrestore manifests name then-working paths; comprehensive audit
+now explicitly verifies those historical hashes against frozenP51, current
+working P56 identity checked separately. Manifests themselves unmodified.
+STATIC_LEAF_SCHEDULE_HARDWARE.md/p56_hardware audit preserve all scope; noformal
+iteration/production/Auto edit, no certificate transfer, no physicalfloor claim.
+
+P56 own hardware audit and comprehensive native+INT8 audits terminal0; current
+four sources/binary byte-exact frozenP56, production hash unchanged, goalfalse.
+HistoricalP54/P55 restoration manifests untouched and explicitly mapped to P51
+snapshots in current audit; all other frozen manifests checked at actual paths.

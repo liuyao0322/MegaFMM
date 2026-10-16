@@ -1,0 +1,67 @@
+{
+  "status": "p56_accuracy_scoped_tools_validated_production_performance_target_unachieved",
+  "goal_achieved": false,
+  "ordinary_original_input_fp64_checks": 78,
+  "graph_original_input_fp64_checks": 78,
+  "graph_same_deterministic_configurations": true,
+  "graph_process_provenance": "p56_graph.log is an exact copy of existing own p56_graph_abba_b0.log; no extra independent Graph sample",
+  "equal_per_column_exponents_per_mode": 79872,
+  "independent_stress_configurations": 168,
+  "independent_stress_calls": 1344,
+  "sanitizer_cases_per_tool": 56,
+  "sanitizer_calls_per_tool": 112,
+  "sanitizers": [
+    "memcheck",
+    "racecheck",
+    "synccheck"
+  ],
+  "sanitizer_kernel_scope": "kns=int8_research",
+  "stress_dense_control": "historical cuBLAS GemmEx; ordinary and Graph compare use production tuned Dense gate",
+  "stress_additional_strict_fixed_floor": "BF16 eF<=1e-3 and FP16 eF<=1e-4; original Dense-dependent gate also enforced",
+  "stress_patterns": "0..13: prior12 including extreme/subnormal and32K slabs, plus8row/column scale bands and cancellation; original rounded inputs/FP64AB",
+  "stress_output_guards": "128 floats before and after each output plus256B before/after each workspace; two independent streams/workspaces. Metrics/guards checked after the final repeat per configuration, not every intermediate submission",
+  "graph_timing_us": {
+    "bf16": 25.079919815,
+    "fp16": 25.2855205535
+  },
+  "cooperative_preprocessing": "384CTAs, one unconditional grid.sync barrier; actual supported/resident capacity checked outside run in every validation process",
+  "stress_seed_formula": "129173+trial*499+stream*271+pattern*131+(FP16?277:0)",
+  "research_retention": "P56 ordinary and Graph research reference with its own complete evidence; production performance target remains unachieved",
+  "independent_ordinary_comparison": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p51",
+      "new_candidate": "p56",
+      "old_group_median_us": 27.4654402735,
+      "new_group_median_us": 25.065080165875,
+      "relative_reduction": 0.08739565372782265
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p51",
+      "new_candidate": "p56",
+      "old_group_median_us": 27.511400222749998,
+      "new_group_median_us": 25.104760646875,
+      "relative_reduction": 0.08747790212018636
+    }
+  ],
+  "independent_graph_comparison": [
+    {
+      "dtype": "bf16",
+      "old_candidate": "p51",
+      "new_candidate": "p56",
+      "old_group_median_us": 27.496039867375,
+      "new_group_median_us": 25.065160274500002,
+      "relative_reduction": 0.08840835278826176
+    },
+    {
+      "dtype": "fp16",
+      "old_candidate": "p51",
+      "new_candidate": "p56",
+      "old_group_median_us": 27.443079471624998,
+      "new_group_median_us": 25.163640022125,
+      "relative_reduction": 0.08306062925105917
+    }
+  ],
+  "limitations": "Only contiguous non-transposed1024^3, alpha1 beta0, FP16/BF16; no arbitrary-range proof, no production integration, no transfer to later modified candidates."
+}

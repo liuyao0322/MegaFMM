@@ -260,3 +260,24 @@ Potential code/register/cache growth can regress. No P56 design/source/binary or
 speed claim yet; own layout/lifetimes, actual compiled capacity and original gates/
 independent ordinary+Graph full costs mandatory, then own streams/guards/tools if
 retained. No floor/exhaustion established; goal active.
+
+## P56 own full acceptance; retained research reference
+
+Exactly one consumer unroll1→7 directive from P51, all other source bytes unchanged.
+Own six pre-MMA full-grid TMA cases415236096values/guards pass; standard78 and
+Graph78 original gates/79872inside per mode pass, printed eF equal P51. Independent
+ordinary gains8.740/8.748percent BF/FP, Graph8.841/8.306percent, all312gates/
+319488inside per mode pass. Own fresh14pattern168configs/1344two-stream independent
+workspace/direct+Graph calls and output/workspace guards pass; scoped tools each
+56configs/112calls zeroerrors, race zero warnings/hazards. P56 now replaces P51
+only as research ordinary/Graph reference, production/Auto unchanged. Static prep
+instructions identical; consumer128regs versus143, code1600→2048instructions;
+source dots/payload/synchronization unchanged. No unique causal attribution/floor.
+See STATIC_LEAF_SCHEDULE_HARDWARE.md and own validation/hardware manifests.
+
+Next controlled direction: evaluate producer's dynamic seven-leaf dispatch from
+frozen P56, separately from the accepted consumer expansion. Before code, freeze
+source/CPU operand-plane+slot/phase equivalence and verify actual compiler changes,
+then own pre-MMA checks and independent full-call gates. More code can regress;
+no P57 source/design/binary or latency claim exists at this checkpoint. Do not
+remove exactinside or any7+8dots to close remaining~25us versus~10us gap. Goalactive.

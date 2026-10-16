@@ -6,16 +6,17 @@ SW 架构后，实现统一 buffer 与 TMA、CUDA Core、Tensor Core 分工的�
 **2026-10-16 精度研究：** [调研、误差消融与硬件对照](research/precision_20261016/REPORT.md)
 和[针对性方案设计](research/precision_20261016/DESIGN.md)。生产源码与研究起点一致，
 原七乘法仍未通过原始精度门槛；达标且更快的直接输入稠密原型保留为研究对照。
-[补偿路径硬件研究](research/precision_20261016/int8_hardware/HARDWARE_REPORT.md)的普通和Graph参考现统一为P51，P50/P47/P46/P45/P39为历史完整验收回退。
-原始FP16/BF16输入、精确逐列平衡、七个主乘积和全部八个交叉修正点积保留。P49复用原始值但性能变慢；P50/P51逐步缩小打包任务，并配套完整索引及协作网格覆盖，获得小幅收益。
-普通标准78项最大BF16/FP16 eF为1.61320e-5/2.16395e-5，与P50打印误差逐项相同。
-独立普通ABBA同轮P50→P51为28.129→27.390μs / 27.967→27.339μs，降低2.63%/2.24%；Graph27.974→27.405μs / 28.182→27.651μs，降低2.03%/1.88%。此前P50相对P47的收益来自另一轮独立对照，不将两轮相加作为直接测量。
-P51自身普通/Graph各78项精度和每模式79,872个指数检查、新种子12模式双流144配置/1,152调用及保护区全部通过；
-memcheck/racecheck/synccheck限定范围各48配置/96调用零错误，racecheck零警告/零hazard；另54组新输入的约3.11亿个原生高低部值及18组极端缩放的约1.04亿个值逐位比较均无差异。极端样本也通过自身完整FP64矩阵stress。
-未锁时钟，无置信区间；完整调用仍约为生产SW的2.7倍，未进入生产或改变Auto。
-[P51实现与消融](research/precision_20261016/int8_hardware/ALL_NATIVE_PACK_GRID_HARDWARE.md)、[自身验收](research/precision_20261016/int8_hardware/p51_validation.json)、
-[综合审计](research/precision_20261016/fused_int8/audit.json)及[后续消融](research/precision_20261016/int8_hardware/NEXT_EXPERIMENTS.md)保留确切范围与性能差距。
-P48缩小共享申请量未获完整收益。[原生融合N1/N2/N3](research/precision_20261016/fused_native/REPORT.md)各自布局和原始精度通过，完整调用约615/118/105μs，均慢于同轮P47，全部拒绝；没有将其他候选的双流或工具验收转移给它们。[P52计算瓦片与TMA槽位实验](research/precision_20261016/int8_hardware/CONSUMER_N16_HARDWARE.md)通过自身布局及78项原始精度，但独立普通/Graph耗时约39μs，比P51慢41%–42%，已拒绝。[P53全K512叶乘积并行](research/precision_20261016/int8_hardware/LEAF_PARALLEL_HARDWARE.md)通过自身约4.15亿次布局比较、315万次GPU重组位比较及78项原始精度，74寄存器/实际两CTA每SM，但完整普通调用约41.1μs、Graph约37.4μs，分别比P51慢48%–50%/36%–37%，也拒绝；没有自身fresh双流/工具验收。已逐字恢复P51并另跑新进程78项复核通过。[P54原生N64叶瓦片](research/precision_20261016/int8_hardware/LEAF_N64_HARDWARE.md)已测量拒绝：自身约2.77亿次布局比较、315万次GPU重组位比较和78项原始门槛通过，106寄存器/实际一CTA每SM；独立普通约41.2μs、Graph约37.8–38.0μs，比P51慢50%–51%/38%，相对P53也未改善。再次逐字恢复P51并通过新进程78项复核。[M15细分组全K512整数补偿消融](research/precision_20261016/int8_hardware/FINE_QUANT_SCREEN_REPORT.md)和[M16指数恢复消融](research/precision_20261016/int8_hardware/EXPONENT_RESTORE_SCREEN_REPORT.md)合计168组新输入支持A8/B8细分组：全部原始与固定门槛通过，保留两种输入及7+8点积。粗分组有FP16额外固定上限阴性对照，原始门槛仍通过；指数恢复未改变这些矩阵的修正值，排除已观察的零因子作为该批误差来源。[P55直接细分组INT8硬件](research/precision_20261016/int8_hardware/DIRECT_FINE_QUANT_HARDWARE.md)现已实测拒绝：自身96组CPU参考打包、6组混合TMA布局、78项标准及84组新矩阵精度/保护区通过；普通完整调用约45.4–45.9μs、Graph约44.4–44.7μs，比同轮P51慢65%–67%/62%–63%。自身两核profile与全部计时臂冻结，无自身双流压力/工具证书。已逐字恢复P51，新进程78项复核通过；[再次调研与历史复核](research/precision_20261016/int8_hardware/LITERATURE_UPDATE_P55.md)后转向保留原生补偿路径的更窄调度消融，尚无下一硬件候选。目标继续进行。
+[补偿路径硬件研究](research/precision_20261016/int8_hardware/HARDWARE_REPORT.md)的普通和Graph参考现统一为P56，P51/P50/P47/P46/P45/P39为历史完整验收回退。
+P56仅把P51的原生consumer七叶外循环unroll1改为7，其余源码逐字保持；原始FP16/BF16输入、精确逐列平衡、七个主乘积和全部八个交叉修正点积、FP32 RN依赖图不变。
+标准78项最大BF16/FP16 eF为1.61320e-5/2.16395e-5，打印误差逐项等于P51。
+独立普通ABBA同轮P51→P56为27.465→25.065μs / 27.511→25.105μs，降低8.74%/8.75%；Graph27.496→25.065μs / 27.443→25.164μs，降低8.84%/8.31%。全部准备与描述符/计算成本计入，保留全部计时臂；未锁时钟，无置信区间。
+consumer143→128寄存器、0stack/spill，共享内存仍196736B/实际1CTA每SM；准备核归一化SASS逐条相同。静态代码变大，不将收益唯一归因于寄存器或分支。
+P56自身普通/Graph各78项门槛及79,872inside通过，新种子14模式双流168配置/1,344次普通/Graph交错调用、独立workspace及输出/workspace保护区通过；memcheck/racecheck/synccheck限定范围各56配置/112调用零错误，racecheck零警告/零hazard。
+自身原生TMA探针在首次MMA前覆盖六组/约4.15亿次高低部值比较及槽位/guards，未把通用读取当作WGMMA等待证明。没有将P51的证书转移给P56。
+完整调用约25.1μs，仍约为生产SW的2.5倍，尚未进入生产或改变Auto，原生产七乘法仍不满足精度目标。
+[P56实现与受控消融](research/precision_20261016/int8_hardware/STATIC_LEAF_SCHEDULE_HARDWARE.md)、[自身验收](research/precision_20261016/int8_hardware/p56_validation.json)、[综合审计](research/precision_20261016/fused_int8/audit.json)及[后续消融](research/precision_20261016/int8_hardware/NEXT_EXPERIMENTS.md)保留确切范围与剩余性能差距。
+此前P51的384CTA打包路径、54组原生高低部逐位检查及18组极端缩放证据仍冻结在[P51硬件记录](research/precision_20261016/int8_hardware/ALL_NATIVE_PACK_GRID_HARDWARE.md)，作为历史回退；不同轮次的提速不相加当作直接测量。
+P48缩小共享申请量未获完整收益。[原生融合N1/N2/N3](research/precision_20261016/fused_native/REPORT.md)各自布局和原始精度通过，完整调用约615/118/105μs，均慢于同轮P47，全部拒绝；没有将其他候选的双流或工具验收转移给它们。[P52计算瓦片与TMA槽位实验](research/precision_20261016/int8_hardware/CONSUMER_N16_HARDWARE.md)通过自身布局及78项原始精度，但独立普通/Graph耗时约39μs，比P51慢41%–42%，已拒绝。[P53全K512叶乘积并行](research/precision_20261016/int8_hardware/LEAF_PARALLEL_HARDWARE.md)通过自身约4.15亿次布局比较、315万次GPU重组位比较及78项原始精度，74寄存器/实际两CTA每SM，但完整普通调用约41.1μs、Graph约37.4μs，分别比P51慢48%–50%/36%–37%，也拒绝；没有自身fresh双流/工具验收。已逐字恢复P51并另跑新进程78项复核通过。[P54原生N64叶瓦片](research/precision_20261016/int8_hardware/LEAF_N64_HARDWARE.md)已测量拒绝：自身约2.77亿次布局比较、315万次GPU重组位比较和78项原始门槛通过，106寄存器/实际一CTA每SM；独立普通约41.2μs、Graph约37.8–38.0μs，比P51慢50%–51%/38%，相对P53也未改善。再次逐字恢复P51并通过新进程78项复核。[M15细分组全K512整数补偿消融](research/precision_20261016/int8_hardware/FINE_QUANT_SCREEN_REPORT.md)和[M16指数恢复消融](research/precision_20261016/int8_hardware/EXPONENT_RESTORE_SCREEN_REPORT.md)合计168组新输入支持A8/B8细分组：全部原始与固定门槛通过，保留两种输入及7+8点积。粗分组有FP16额外固定上限阴性对照，原始门槛仍通过；指数恢复未改变这些矩阵的修正值，排除已观察的零因子作为该批误差来源。[P55直接细分组INT8硬件](research/precision_20261016/int8_hardware/DIRECT_FINE_QUANT_HARDWARE.md)现已实测拒绝：自身96组CPU参考打包、6组混合TMA布局、78项标准及84组新矩阵精度/保护区通过；普通完整调用约45.4–45.9μs、Graph约44.4–44.7μs，比同轮P51慢65%–67%/62%–63%。自身两核profile与全部计时臂冻结，无自身双流压力/工具证书。P55拒绝时已逐字恢复P51，新进程78项复核通过；[再次调研与历史复核](research/precision_20261016/int8_hardware/LITERATURE_UPDATE_P55.md)后完成上述P56原生调度消融并独立验收保留。目标继续进行。
 [片上融合后续](research/precision_20261016/fused_int8/REPORT.md)修正布局后通过72项普通精度；继续移出逐元素缩放判断后，F13完整调用约224–240 μs，仍拒绝性能验收。
 下方 iter282 等标签为历史检查点，实际起点和文件哈希以新报告为准。
 

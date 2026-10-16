@@ -40,7 +40,7 @@ template<class T> __device__ __forceinline__ void consume(Shared& s,int tid,int 
  auto da=make_tensor<GMMA::smem_desc<GMMA::Major::MN>>(tiled_divide(a,Shape<_64,_16>{}));
  auto db=make_tensor<GMMA::smem_desc<GMMA::Major::K>>(tiled_divide(b,Shape<_32,_16>{}));
  float c[4][16]={};
- #pragma unroll 1
+ #pragma unroll 7
  for(int step=0;step<7;++step){
   int p=main_product(step);
   float d[16]={},r[16]={};

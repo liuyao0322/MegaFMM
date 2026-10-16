@@ -396,3 +396,25 @@ MMA源指令减少而TMA批次/命令及量化/转置/元数据等共同变化�
 拒绝后工作四源码/二进制逐字恢复P51，新进程78原始门槛及79,872inside通过。
 [P55后再次调研及复核](LITERATURE_UPDATE_P55.md)记录新的原始来源及后续静态叶调度方向，
 目前无P56设计/实现或性能结论；生产及Auto未改，目标继续。
+
+## P56：仅展开consumer七叶外循环，新的研究参考
+
+[自身硬件记录](STATIC_LEAF_SCHEDULE_HARDWARE.md)与[完整验收](p56_validation.json)
+固定单一源码改动：P51 consumer外循环unroll1→7，其余源码逐字相同。pre-MMA六组
+全网格28批次/四槽、415236096原生值和guards通过；候选128regs/0stack-spill，
+Shared196736B/实际1CTA，prep原52BF48FPregs/65536B/3容量不变。准备核归一化
+SASS逐条相同，consumer静态1600→2048指令，HGMMA.64 25→120，说明展开生效；
+不是动态执行计数，也不唯一归因于寄存器或分支。
+
+标准78/79872inside及Graph78通过，打印eF逐项等于P51，最大BF/FP1.61320e-5/2.16395e-5。
+独立普通P51→P56 BF/FP27.465440/27.511400→25.065080/25.104761μs，降低8.740%/8.748%；
+Graph27.496040/27.443079→25.065160/25.163640μs，降低8.841%/8.306%。每模式312原始
+门槛/319488inside通过，所有计时臂保留，未锁时钟/无置信区间，完整准备成本计入。
+
+自身新种子14模式168配置/1344双流独立workspace普通/Graph交错调用，原始及额外
+固定门槛、输出前后128float/workspace前后256B guards通过。限定kns=int8_research
+三工具各56配置/112调用零错误，racecheck零警告/hazard。没有沿用P51证书。
+自身两核17pass NCU prep17.376μs52regs/issue15.219711%，consumer15.936μs128regs/
+issue23.034603%，local读写零，所有profile计时排除/不加和解释ABBA，无物理下界。
+P56替代P51为普通/Graph研究参考，P51保留历史回退；约25.1μs仍约为生产2.5倍，
+生产solution/library/Auto未改，目标继续。后续独立研究producer静态调度，尚无P57。

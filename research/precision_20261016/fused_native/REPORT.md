@@ -1,8 +1,10 @@
 # Native fusion hardware evidence
 
 At the native-fusion checkpoint, P47 was the fully validated ordinary/Graph
-research reference. The later independently validated P51 producer is now the
-reference (~27.3–27.7us; see ../int8_hardware/ALL_NATIVE_PACK_GRID_HARDWARE.md).
+research reference. The later independently validated P56 native consumer schedule is now the
+reference (~25.1us; see ../int8_hardware/STATIC_LEAF_SCHEDULE_HARDWARE.md), with
+its own14-pattern168/1344stream/guard and56/112scoped-tool evidence. P51 remains a
+historical validated fallback.
 All N1/N2/N3 comparisons below retain their original frozen P47 controls. Production
 and its static library remain unchanged. The accuracy/performance goal is active:
 P47 takes~28.8us versus production SW~10us, while production SW still fails the
