@@ -1,0 +1,30 @@
+research/precision_20261016/int8_hardware/p55/pack.cuh(112): error: expected a ">"
+   constexpr int Bits=std::is_same_v<T,cute::half_t>?11:8;
+                                                   ^
+
+research/precision_20261016/int8_hardware/p55/pack.cuh(144): error: expected a ">"
+    constexpr int Bits=std::is_same_v<T,cute::half_t>?11:8;
+                                                    ^
+
+research/precision_20261016/int8_hardware/p55/pack.cuh(204): error: expected a ">"
+   printf("COOPERATIVE_INIT dtype=%s supported=%d sm_count=%d active_blocks_per_sm=%d grid=128 threads=768 shared_bytes=%zu\n",std::is_same_v<T,cute::half_t>?"fp16":"bf16",supported,sms,active,sizeof(DirectPackShared));
+                                                                                                                                                            ^
+
+research/precision_20261016/int8_hardware/p55/corrected.cuh(243): error: expected a ">"
+   printf("FINE_CONSUMER_INIT dtype=%s sm_count=%d active_blocks_per_sm=%d grid=128 shared_bytes=%zu\n",std::is_same_v<T,cute::half_t>?"fp16":"bf16",sms,active,sizeof(Shared));
+                                                                                                                                     ^
+
+research/precision_20261016/int8_hardware/probe_p55_pack.cu(63): error: expected a ">"
+   constexpr int Bits=std::is_same_v<T,cute::half_t>?11:8;
+                                                   ^
+
+research/precision_20261016/int8_hardware/probe_p55_pack.cu(87): error: expected a ">"
+    int seed=125153+467*trial+113*pattern+(std::is_same_v<T,cute::half_t>?251:0);
+                                                                        ^
+
+research/precision_20261016/int8_hardware/probe_p55_pack.cu(87): error: expected an expression
+    int seed=125153+467*trial+113*pattern+(std::is_same_v<T,cute::half_t>?251:0);
+                                                                                ^
+
+7 errors detected in the compilation of "research/precision_20261016/int8_hardware/probe_p55_pack.cu".
+srun: error: g08: task 0: Exited with exit code 2

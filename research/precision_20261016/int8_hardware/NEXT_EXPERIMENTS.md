@@ -238,3 +238,25 @@ metadata coordinates.352vs480sourceMMA instructions/CTA, but source TMA bytes sa
 asP51 and commands15360vs11264; more batches and reload/reduction can lose. No
 C++ source application/build/GPU result. Own packing/scalar/TMA probes are required
 before first MMA; ordinary/Graph full costs and fresh stress/tools before retention.
+
+## P55 rejected; reassess retained native schedule before another candidate
+
+P55 own96 packing/scalar/exponent and six mixed TMA pre-MMA checks pass; standard78
+and own84 fresh original-input single-stream gates/guards pass. Ordinary/GraphABBA
+312 original gates/319488inside per mode pass, yet full latency regresses65–67/
+62–63percent. Own two-kernel17pass NCU is diagnostic only; no own dual-stream/reuse
+stress or scoped tools. Rejected, four working sources/bin byte-exact P51 restored
+from retained commit plus frozen binary; new-process78/79872inside pass. See
+DIRECT_FINE_QUANT_HARDWARE.md and own hardware audit/manifests. Production unchanged.
+
+LITERATURE_UPDATE_P55.md records own profile/history and fresh primary CUTLASS plus
+tensor-core model research after three no3percent results. P51 native representation
+is the evidence-supported starting point; don't repeat fine INT8 solely for fewer
+MMAs or treat scale-underflow as this batch's matrix error. Next investigate static
+seven-leaf consumer dispatch against the existing dynamic step loop, first checking
+prior controls for duplication. Preserve leaf order0,1,5,6,4,2,3, FP32 RN dependency
+graph, fullK512/all7+8dots/exactinside and all hardware fences/slot release ordering.
+Potential code/register/cache growth can regress. No P56 design/source/binary or
+speed claim yet; own layout/lifetimes, actual compiled capacity and original gates/
+independent ordinary+Graph full costs mandatory, then own streams/guards/tools if
+retained. No floor/exhaustion established; goal active.

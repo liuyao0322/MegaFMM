@@ -895,3 +895,48 @@ bound16516096,352MMA/CTA,nominal138412032BTMAwhole/15360commands. No C++ generat
 no build/device execution/capacity query. More TMA commands/reloads versus P51
 explicitly counted; no speed guarantee. Sources/bin still P51. Proposal manifest
 preserves numerical and P54 profile provenance; production/library/Auto unchanged.
+
+## P55 source generation and pre-MMA packing
+
+Isolated P55 generator/checker completed, four working sources/bin still P51.
+First probe compilation stopped exit2 for NVCC adjacent variable-template/ternary
+lexing; preflight_p55_01 archives all sources/logs before whitespace-only correction.
+Whitespace-stripped candidate and probe sources equal archived version; no GPU
+execution of initial preflight. Fresh build terminal0, no C7515/C7510/spill; prep40
+registers768threads/55808B/actual2CTAperSM capacity, consumer182regs/197248B/1CTA.
+Own CPU-oracle packing96fresh configurations16patterns x3trials x2dtypes passes
+352321536nativeuint16,452984832INT8bytes,110592quant exponents,98304inside exponents,
+workspaceguards/referencepreclampsaturation allzero. Own6611integer/exponent pow2
+scalar bits and64384native high exponents pass independent mathematical CPU oracle.
+No candidate matrix/MMA yet. Mixed TMA probe compiles and is being run separately;
+48batches/eightslots and fine metadata need own pass before first matrix invocation.
+
+## P55 own pre-MMA and first matrix gates complete
+
+Mixed TMA six synthetic configurations pass264241152native uint16 and
+301989888INT8 byte comparisons including all128CTA/48batch/eightslot reuse,
+1572864output coordinate checks, fine metadata/paired exponent and guards zero.
+Verbatim producer, generic reads without MMA: not a WGMMA wait-order certificate.
+Then applied frozen four P55 sources, full build terminal0, no spills/warnings.
+First real MMA standard78 original gates/79872inside allpass; maxeF BF16
+5.09554290751e-4/FP16 6.56764542743e-5. Own84 freshly seeded14pattern configurations
+(original rounded inputs/FP64AB/tunedDense, one stream/workspace) all original and
+extra fixed floors pass,86016inside/workspace/output guards zero; maxeF BF16
+5.13723810862e-4/FP16 7.04913362862e-5. Not a dual-stream/Graph stress certificate.
+Independent ordinary P51/P55 ABBA312 original gates/319488inside pass, all arms
+frozen: BF16 27.478559733→45.376080036us, FP16 27.421879769→45.866839409us,
+65.133/67.264percent slower. Graph ABBA/profile still pending at this entry.
+
+## P55 completion, rejection and restoration
+
+Own Graph ABBA312 gates/319488inside allpass: P51/P55 BF16
+27.393319607→44.659280300us,FP16 27.425920487→44.412758827us,63.030/61.937percent
+slower. Own17pass/twokernel NCU prep28.640us40regs55808B/issue28.999949percent;
+consumer25.920us182regs197248B/issue27.773920percent,zero localRW. All profiler
+process times excluded and not summed. Reject P55; no own dual-stream/reuse stress
+or sanitizer certificate. Four working sources restored from733eeb7 and frozen
+P51 binary copied byte-exact; own fresh process78 original gates/79872inside pass.
+DIRECT_FINE_QUANT_HARDWARE.md/audit_p55_hardware.py/p55_hardware.json preserve scope.
+New primary CUTLASS and tensor-core numerical-model source read plus own profile/
+history reassessment in LITERATURE_UPDATE_P55.md. No floor/exhaustion claim, no
+P56 design/source/binary, no production change; goal remains active.
