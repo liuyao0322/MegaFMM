@@ -1,7 +1,7 @@
 # Remaining-cost experiments and outcomes
 
 
-**Current checkpoint: P56 is the fully validated ordinary/Graph research reference; production performance target remains unmet.** Own same-round P51→P56 gain~8%, complete calls~25.1us versus SW~10us. Own original78, independent ordinary/Graph312each, six pre-MMA layouts, fresh14-pattern168/1344interleaved calls, guards and scoped56/112calls pertool pass. P57 producer-only unroll was rejected; P58 resident128pack showed0.37–1.38% point-estimate gains, without freshstress/tools. P59 full phase fusion was rejected after independent P56 and P58 controls. P60 paired native packing completed own pre-MMA and matrix/performance controls but did not upgrade P56. P61 exact inside K16 mapping is a CPU-checked proposal only; no C++ or GPU acceptance. Working four sources/bin byte-exact P56 restored from14d9720 and independent78checked. Historical premeasurement paragraphs below describe then-current state and are superseded by subsequent results.
+**Current checkpoint: P56 is the fully validated ordinary/Graph research reference; production performance target remains unmet.** Own same-round P51→P56 gain~8%, complete calls~25.1us versus SW~10us. Own original78, independent ordinary/Graph312each, six pre-MMA layouts, fresh14-pattern168/1344interleaved calls, guards and scoped56/112calls pertool pass. P57 producer-only unroll was rejected; P58 resident128pack showed0.37–1.38% point-estimate gains, without freshstress/tools. P59 full phase fusion was rejected after independent P56 and P58 controls. P60 paired native packing completed own pre-MMA and matrix/performance controls but did not upgrade P56. P61 exact inside K16 mapping has its own preparation-only GPU84cases/484442112native bits and independent scalar-inside controls; no MMA/full-matrix or timing acceptance yet. Working four sources/bin byte-exact P56 restored from14d9720 and independent78checked. Historical premeasurement paragraphs below describe then-current state and are superseded by subsequent results.
 
 P27 supplied the fully validated research base, about41us ordinary full calls versus production SW about10us. Completed controls and remaining hypotheses are distinguished below; final retention and validation scope are recorded inEXPERIMENTS.md. Preserve seven native products, eight integer dots, exact per-column inside scaling, original rounded-input FP64 reference and all current preparation/descriptor costs. FrozenP27 profile reports joint pack56regs/65,576B shared, a shared-resource limit3CTAs/SM and issueactive53.16percent. Corrected196regs/196,736B is limited to1CTA/SM and issueactive35.71percent. All four measured kernels have zero local sectors on that input. Partial/finalize show high long-scoreboard/issue-active ratios,5.950/6.163. These are diagnostic metrics, not time fractions or a physical floor. Seeprofile_p27_stats.json and its manifest; never overlap GPU tasks.
 
@@ -389,3 +389,16 @@ bounds and full1024exponents. Natural32B address model halves A sector-address v
 not unique sectors or measured cache/DRAM transactions. Active reductionCTAs halve
 and perthread work doubles, so no speed prediction. No C++/GPU/actual capacity or
 hardware acceptance yet; P60 is the first sub3% control after P59's reassessment.
+
+## P61 preparation-only GPU checkpoint
+
+Isolated P61 preparation built/executed terminal0, no warnings or stack/spills.
+Own84fresh pre-MMA cases (54standard+18extreme+12input2B offsets) compare
+484442112native values with frozenP56,86016inside with P56 and additionally86016
+with original independent inside_scale. All bits/errors/guards pass; BF16extreme
+outside-normal fallback covered. Preparation52BF48FPregs/65536B/actual3CTA capacity
+supports384grid. Original native packing, consumer/compare/pow2 and post-reduction
+barrier/launch unchangedP56. Full matrix comparison source/build/ABBA scripts are
+prepared only: no P61 MMA, FP64 matrix gate, complete-call timing, freshstream or
+sanitizer acceptance yet. No conclusion about latency or production readiness.
+Working four sources/bin remain byte-exact retainedP56; production unchanged.

@@ -443,6 +443,12 @@ assert proposal61['retained']=='P56' and not proposal61['actual_capacity_checked
 assert proposal61['input_positions_each_side']==1048576 and proposal61['coverage_min']==proposal61['coverage_max']==1
 assert proposal61['reduction_ctas']==64 and proposal61['columns_per_reduction_cta']==16 and proposal61['launch_ctas']==384
 
+pack61=json.loads((h/'probe_p61_pack.json').read_text())
+assert pack61['retained']=='P56' and pack61['packing_configurations']==84
+assert pack61['native_uint16_comparisons']==484442112 and pack61['bitwise_errors']==pack61['guard_errors']==0
+assert pack61['inside_comparisons_against_p56']==pack61['inside_comparisons_against_scalar_reference']==86016
+assert not pack61['matrix_acceptance'] and not pack61['performance_acceptance'] and not pack61['sanitizer_acceptance']
+
 ordinary38=json.loads((h/'p38_abba.json').read_text())
 assert ordinary38['correctness_checks']==312 and ordinary38['independent_numerical_configurations']==78
 assert ordinary38['summary'][0]['relative_reduction']>0 and ordinary38['summary'][1]['relative_reduction']<0
@@ -480,7 +486,7 @@ out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved
     p30_independent_performance=ordinary30['summary'],p30_graph_regression=graph30['summary'],
     p33_validation=json.loads((h/'p33_validation.json').read_text()),
     p40_p42_local_controls=local_controls,m11_numerical_screen=m11_summary,m12_numerical_screen=m12_summary,m13_numerical_screen=m13_summary,m14_numerical_screen=m14_summary,m15_numerical_screen=m15_summary,m16_numerical_screen=m16_summary,
-    native_pack_controls=native_pack_controls,p52_consumer_control=consumer52,p53_historical_premeasurement_proposal=proposal53,p53_leaf_parallel_control=leaf53,p54_historical_premeasurement_proposal=proposal54,p54_leaf_n64_control=leaf54,p55_historical_premeasurement_proposal=proposal55,p55_direct_fine_quant_control=fine55,p56_static_leaf_control=static56,p57_static_producer_control=producer57,p58_resident_pack_control=resident58,p59_global_phase_control=phase59,p60_historical_premeasurement_proposal=proposal60,p60_pair_native_pack_control=pair60,p61_historical_premeasurement_proposal=proposal61,
+    native_pack_controls=native_pack_controls,p52_consumer_control=consumer52,p53_historical_premeasurement_proposal=proposal53,p53_leaf_parallel_control=leaf53,p54_historical_premeasurement_proposal=proposal54,p54_leaf_n64_control=leaf54,p55_historical_premeasurement_proposal=proposal55,p55_direct_fine_quant_control=fine55,p56_static_leaf_control=static56,p57_static_producer_control=producer57,p58_resident_pack_control=resident58,p59_global_phase_control=phase59,p60_historical_premeasurement_proposal=proposal60,p60_pair_native_pack_control=pair60,p61_historical_premeasurement_proposal=proposal61,p61_pre_mma_preparation_only=pack61,
     p48_independent_performance=ordinary48['summary'],p48_graph_performance=graph48['summary'],p48_device_identity=static48,
     p47_pack_bits=pack47,p47_validation=validation47,p47_independent_performance=ordinary47['summary'],p47_graph_performance=graph47['summary'],
     p46_validation=validation46,p46_independent_performance=ordinary46['summary'],p46_graph_performance=graph46['summary'],

@@ -515,3 +515,16 @@ bounds and full1024exponents. Natural32B address model halves A sector-address v
 not unique sectors or measured cache/DRAM transactions. Active reductionCTAs halve
 and perthread work doubles, so no speed prediction. No C++/GPU/actual capacity or
 hardware acceptance yet; P60 is the first sub3% control after P59's reassessment.
+
+## P61 preparation-only GPU checkpoint
+
+Isolated P61 preparation built/executed terminal0, no warnings or stack/spills.
+Own84fresh pre-MMA cases (54standard+18extreme+12input2B offsets) compare
+484442112native values with frozenP56,86016inside with P56 and additionally86016
+with original independent inside_scale. All bits/errors/guards pass; BF16extreme
+outside-normal fallback covered. Preparation52BF48FPregs/65536B/actual3CTA capacity
+supports384grid. Original native packing, consumer/compare/pow2 and post-reduction
+barrier/launch unchangedP56. Full matrix comparison source/build/ABBA scripts are
+prepared only: no P61 MMA, FP64 matrix gate, complete-call timing, freshstream or
+sanitizer acceptance yet. No conclusion about latency or production readiness.
+Working four sources/bin remain byte-exact retainedP56; production unchanged.
