@@ -42,6 +42,8 @@ Graph 为 **1.983× / 1.979×**。514×770×258 仅接近持平，不能视作�
 调用零错误，racecheck 零警告。**原始精度仍有 26/28 项失败**，仅 1³ 两种 dtype 通过；
 这次推广没有解决精度问题，也未实现所有尺寸加速。
 [完整 28 项、六次独立复测、设计与自身验证](trajectory/20261016_sw_multisize_validation372/REPORT.md)。
+[慢点原因分析：寄存器、流水线、矩形分派及补零量](trajectory/20261016_sw_slowpoint_analysis/REPORT.md)，
+包含当前4096³ BF16的新NCU计数器和七个形状的500次CUDA时间线分解。
 
 **2026-10-16 精度研究：** [调研、误差消融与硬件对照](research/precision_20261016/REPORT.md)
 和[针对性方案设计](research/precision_20261016/DESIGN.md)。以下研究以统一前的生产源码为起点，
