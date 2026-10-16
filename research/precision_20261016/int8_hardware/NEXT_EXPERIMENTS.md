@@ -1,7 +1,7 @@
 # Remaining-cost experiments and outcomes
 
 
-**Current checkpoint: P56 is the fully validated ordinary/Graph research reference; production performance target remains unmet.** Own same-round P51→P56 gain~8%, complete calls~25.1us versus SW~10us. Own original78, independent ordinary/Graph312each, six pre-MMA layouts, fresh14-pattern168/1344interleaved calls, guards and scoped56/112calls pertool pass. P57 producer-only unroll was rejected; P58 resident128pack showed0.37–1.38% point-estimate gains, without freshstress/tools. P59 full phase fusion was rejected after independent P56 and P58 controls. P60 paired native packing is a CPU-checked proposal only; no C++ or GPU acceptance. Working four sources/bin byte-exact P56 restored from14d9720 and independent78checked. Historical premeasurement paragraphs below describe then-current state and are superseded by subsequent results.
+**Current checkpoint: P56 is the fully validated ordinary/Graph research reference; production performance target remains unmet.** Own same-round P51→P56 gain~8%, complete calls~25.1us versus SW~10us. Own original78, independent ordinary/Graph312each, six pre-MMA layouts, fresh14-pattern168/1344interleaved calls, guards and scoped56/112calls pertool pass. P57 producer-only unroll was rejected; P58 resident128pack showed0.37–1.38% point-estimate gains, without freshstress/tools. P59 full phase fusion was rejected after independent P56 and P58 controls. P60 paired native packing completed own pre-MMA and matrix/performance controls but did not upgrade P56. P61 exact inside K16 mapping is a CPU-checked proposal only; no C++ or GPU acceptance. Working four sources/bin byte-exact P56 restored from14d9720 and independent78checked. Historical premeasurement paragraphs below describe then-current state and are superseded by subsequent results.
 
 P27 supplied the fully validated research base, about41us ordinary full calls versus production SW about10us. Completed controls and remaining hypotheses are distinguished below; final retention and validation scope are recorded inEXPERIMENTS.md. Preserve seven native products, eight integer dots, exact per-column inside scaling, original rounded-input FP64 reference and all current preparation/descriptor costs. FrozenP27 profile reports joint pack56regs/65,576B shared, a shared-resource limit3CTAs/SM and issueactive53.16percent. Corrected196regs/196,736B is limited to1CTA/SM and issueactive35.71percent. All four measured kernels have zero local sectors on that input. Partial/finalize show high long-scoreboard/issue-active ratios,5.950/6.163. These are diagnostic metrics, not time fractions or a physical floor. Seeprofile_p27_stats.json and its manifest; never overlap GPU tasks.
 
@@ -356,3 +356,36 @@ instructions and makes no dynamic bottleneck or speed claim. CPU coverage/alignm
 B-factor broadcast checks pass for262144paired coordinates, covering262144elements
 per side exactly once; scalar fallback decisions also checked. Proposal only: no C++
 generation, GPU execution, actual resource/capacity measurement or hardware acceptance.
+
+## P60 completed: paired native storage does not upgrade P56
+
+[Own hardware record](PAIR_NATIVE_PACK_HARDWARE.md) freezes 1,048,576pair scalar
+oracles/4,194,304high-low comparisons,54aligned+18extreme+12fresh2B-misaligned full
+plane controls/484,442,112native bits and86,016inside, zero errors/input-workspace
+guards. Prep37BF36FPregs/65536B/actual3CTA capacity supports384grid; consumer128regs/
+196736B/1CTA and normalizedSASS unchangedP56. Standard78/79872inside original gates
+pass, printed eF percase equalP56 without full-output bit proof. Scalar conversion
+oracles do not certify matrix synchronization or actual performance.
+
+Independent P56→P60 ordinary BF25.350679→24.888840us (1.822%lower),
+FP25.219400→25.261240us (0.166%slower); Graph24.892080→24.442600 /
+25.252800→25.024160us (1.806/0.905%lower). Eachmode312gates/319488inside,
+all arms retained, unlocked/noCI. No consistent >=3% gain; do not upgradeP56.
+Own freshstress/tool sources prepared but not compiled/executed, no transferred
+certificate. Own two-kernel17pass BF16 NCU prep17.248us/37regs/issue12.178357%,
+consumer16.128us/128regs/issue22.648489%, localRWzero. Profile timings excluded,
+not summed or a floor. Prepared componentwise paired native stores are32bit in
+actualSASS; staticcode grows due branches, cannot equate to dynamic execution.
+Restored from14d9720 P56 four sources/bin and new-process78/79872inside pass.
+Production solution/library/Auto unchanged; about25us vsproduction10us gap remains.
+
+## P61 historical proposal prepared: exact inside K16 reduction mapping
+
+[Design](INSIDE_K16_DESIGN.md) isolates only inside reduction from P56: first64CTAs
+handle16completeKcolumns each instead of128CTAs/eight, while all384CTAs retain one
+unconditional grid barrier and original native packing. P60 paired storage is not
+combined. CPU proves each original A/B position and each reduction set once, scratch
+bounds and full1024exponents. Natural32B address model halves A sector-address visits,
+not unique sectors or measured cache/DRAM transactions. Active reductionCTAs halve
+and perthread work doubles, so no speed prediction. No C++/GPU/actual capacity or
+hardware acceptance yet; P60 is the first sub3% control after P59's reassessment.

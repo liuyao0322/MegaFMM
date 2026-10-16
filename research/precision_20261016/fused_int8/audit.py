@@ -125,8 +125,8 @@ assert arithmetic['differing_scale_negative_control']['original']!=arithmetic['d
 models['uniform_scale_arithmetic']=dict(scope='CPU restoration arithmetic only; not matrix or hardware acceptance',generated_tuples_per_dot_count=20008,exponents_per_dot_count=230,bitwise_errors=0,hardware_accepted=False)
 abba=json.loads((h/'p17_abba.json').read_text())
 assert abba['correctness_checks']==312 and abba['independent_numerical_configurations']==78
-for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52','p53','p54','p55','p56','p57','p58','p59']:
-    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52','p53','p54','p55','p56','p57','p58','p59'] else 72
+for label in ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52','p53','p54','p55','p56','p57','p58','p59','p60']:
+    j=json.loads((h/(label+'_balanced.json')).read_text());count=78 if label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52','p53','p54','p55','p56','p57','p58','p59','p60'] else 72
     assert len(j['checks'])==count and all(x['pass']=='1' and int(x['nonfinite'])==0 for x in j['checks'])
     assert all(g['speedup_vs_sw']<1 for z in j['summaries'] for g in z['groups'])
     candidates[label]=dict(checks=count,failures=0,performance_accepted=False,full_call_us={s['dtype']:s['corrected_us'] for s in j['summaries']})
@@ -145,7 +145,7 @@ for granularity,passes in [('K128',0),('column',6)]:
     rows=[x for x in m7 if x['inside_granularity']==granularity]
     assert len(rows)==6 and sum(x['pass_fixed_floor'] for x in rows)==passes
 models['alternating_inside']=dict(fresh_configurations=6,paired_variants=2,coarse_passes=0,column_passes=6)
-for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52','p53','p54','p55','p56','p57','p58','p59']:
+for label in ['p11','p12','p13','p14','p15','p16','p17','p18','p19','p20','p21','p22','p23','p24','p25','p26','p27','p28','p29','p30','p31','p32','p33','p34','p38','p39','p40','p41','p42','p43','p44','p45','p46','p47','p48','p49','p50','p51','p52','p53','p54','p55','p56','p57','p58','p59','p60']:
     rows=[dict(re.findall(r'(\w+)=([^ ]+)',line)) for line in (h/(label+'_balanced.log')).read_text().splitlines() if line.startswith('INSIDE_EQUAL ')]
     assert len(rows)==78 and all(x['errors']=='0' and x['elements']=='1024' for x in rows)
     j=json.loads((h/(label+'_balanced.json')).read_text())
@@ -423,6 +423,26 @@ assert proposal60['cooperative_grid']==384 and proposal60['paired_coordinates']=
 assert proposal60['covered_elements']=={'A':262144,'B':262144}
 assert proposal60['original_input_alignment_preserved'] and proposal60['input_offset2_requires_scalar_fallback']==1048576
 
+pair60=json.loads((h/'p60_hardware.json').read_text())
+assert pair60['retained']=='P56' and not pair60['goal_achieved'] and not pair60['performance_accepted']
+assert pair60['standard_original_fp64_gates']==78 and pair60['exact_inside_exponents']==79872
+assert pair60['own_pre_mma_pack']['packing_configurations']==84 and pair60['own_pre_mma_pack']['misaligned_input']==12
+assert pair60['own_pre_mma_pack']['native_uint16_comparisons']==484442112
+assert pair60['own_pre_mma_pack']['conversion_native_comparisons']==4194304
+assert pair60['own_pre_mma_pack']['bitwise_errors']==pair60['own_pre_mma_pack']['guard_errors']==0
+assert not pair60['fresh_dual_stream_reuse_acceptance'] and not pair60['sanitizer_acceptance']
+assert pair60['stress_and_tool_sources_prepared_but_not_executed']
+for suffix in ['abba','graph_abba']:
+    data=json.loads((h/f'p60_{suffix}.json').read_text())
+    assert data['correctness_checks']==312 and all(x['relative_reduction']<.03 for x in data['summary'])
+candidates['p60']['validation_scope']='Own scalar pair conversion/residual oracle,54aligned+18edge+12misaligned full-plane controls, standard78, independent ordinary/Graph312each, own static/two-kernel profile; rejected, no own fresh streams/tools; byte-exact P56restore/new-process78'
+candidates['p60']['numerical_algorithm_changed']='Adjacent-column paired raw loads/RN native casts/32bit plane writes; componentwise FP32 RN, 2B scalar fallback, all7+8dots/inside/consumer and original cooperative reduction unchanged P56'
+proposal61=json.loads((h/'p61_proposal_cpu.json').read_text())
+assert proposal61['proposal_only'] and not proposal61['cpp_generated'] and not proposal61['gpu_executed']
+assert proposal61['retained']=='P56' and not proposal61['actual_capacity_checked'] and not proposal61['hardware_accepted']
+assert proposal61['input_positions_each_side']==1048576 and proposal61['coverage_min']==proposal61['coverage_max']==1
+assert proposal61['reduction_ctas']==64 and proposal61['columns_per_reduction_cta']==16 and proposal61['launch_ctas']==384
+
 ordinary38=json.loads((h/'p38_abba.json').read_text())
 assert ordinary38['correctness_checks']==312 and ordinary38['independent_numerical_configurations']==78
 assert ordinary38['summary'][0]['relative_reduction']>0 and ordinary38['summary'][1]['relative_reduction']<0
@@ -444,7 +464,7 @@ assert int(profile13[bank_key]['value'])>500000
 assert int(profile17[bank_key]['value'])<2000
 assert 'cases=1048576 exponents=-300..300 errors=0' in (h/'p14_pow2.log').read_text()
 out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved=False,production_unchanged=True,
-    working_candidate=current,working_global_candidate=global_current,compact_pow2_equivalence_cases=1048576,retained_global_candidate='p56 ordinary and Graph research reference, own ordinary/Graph78, fresh14-pattern stress168/1344calls, scoped tools56/112calls each and output/workspace guards. p51/p50/p47/p46/p45/p39/p33/p27 remain historical validated fallbacks. No production performance winner.',compile_stopped_candidates=['P59 initial host ternary compile-only preflight: no binary/device execution, archived before whitespace-only retry subsequently measured','F12: no numerical or latency measurement','P28 initial compile-only preflight: missing read-to-reuse hardware fence, superseded before device execution','P43 initial host descriptor preflight: invalid256Bfast box, no matrix invocation','P45 initial syntax compile-only preflight: no candidate binary/device execution','P52 initial host ternary compile-only preflight: no binary/device execution, whitespace-only retry subsequently measured','P55 initial variable-template ternary compile-only preflight: no binary/device execution, whitespace-only retry subsequently measured'],candidates=candidates,numerical_models=models,
+    working_candidate=current,working_global_candidate=global_current,compact_pow2_equivalence_cases=1048576,retained_global_candidate='p56 ordinary and Graph research reference, own ordinary/Graph78, fresh14-pattern stress168/1344calls, scoped tools56/112calls each and output/workspace guards. p51/p50/p47/p46/p45/p39/p33/p27 remain historical validated fallbacks. No production performance winner.',compile_stopped_candidates=['P60 initial probe host ternary and CUTLASS mutable Array proxy preflights: no binary/device execution, archived separately before corrected probe subsequently passed','P59 initial host ternary compile-only preflight: no binary/device execution, archived before whitespace-only retry subsequently measured','F12: no numerical or latency measurement','P28 initial compile-only preflight: missing read-to-reuse hardware fence, superseded before device execution','P43 initial host descriptor preflight: invalid256Bfast box, no matrix invocation','P45 initial syntax compile-only preflight: no candidate binary/device execution','P52 initial host ternary compile-only preflight: no binary/device execution, whitespace-only retry subsequently measured','P55 initial variable-template ternary compile-only preflight: no binary/device execution, whitespace-only retry subsequently measured'],candidates=candidates,numerical_models=models,
     diagnostic_traces=['F9 role-level, one BF16 uniform case','F11 pack subphases, one BF16 uniform case','P33 warp0 paths,10 cases, zero bitwise differences; other warp records excluded from interpretation'],p38_independent_performance=ordinary38['summary'],p33_phase_trace=trace33,probe_scope='one P5 K128 tile, fresh uniform CPU inputs, two dtypes; not full-call acceptance',
     p20_validation=json.loads((h/'p20_validation.json').read_text()),
     p20_independent_performance=json.loads((h/'p20_abba.json').read_text())['summary'],
@@ -460,7 +480,7 @@ out=dict(status='progress_accuracy_validated_performance_rejected',goal_achieved
     p30_independent_performance=ordinary30['summary'],p30_graph_regression=graph30['summary'],
     p33_validation=json.loads((h/'p33_validation.json').read_text()),
     p40_p42_local_controls=local_controls,m11_numerical_screen=m11_summary,m12_numerical_screen=m12_summary,m13_numerical_screen=m13_summary,m14_numerical_screen=m14_summary,m15_numerical_screen=m15_summary,m16_numerical_screen=m16_summary,
-    native_pack_controls=native_pack_controls,p52_consumer_control=consumer52,p53_historical_premeasurement_proposal=proposal53,p53_leaf_parallel_control=leaf53,p54_historical_premeasurement_proposal=proposal54,p54_leaf_n64_control=leaf54,p55_historical_premeasurement_proposal=proposal55,p55_direct_fine_quant_control=fine55,p56_static_leaf_control=static56,p57_static_producer_control=producer57,p58_resident_pack_control=resident58,p59_global_phase_control=phase59,p60_historical_premeasurement_proposal=proposal60,
+    native_pack_controls=native_pack_controls,p52_consumer_control=consumer52,p53_historical_premeasurement_proposal=proposal53,p53_leaf_parallel_control=leaf53,p54_historical_premeasurement_proposal=proposal54,p54_leaf_n64_control=leaf54,p55_historical_premeasurement_proposal=proposal55,p55_direct_fine_quant_control=fine55,p56_static_leaf_control=static56,p57_static_producer_control=producer57,p58_resident_pack_control=resident58,p59_global_phase_control=phase59,p60_historical_premeasurement_proposal=proposal60,p60_pair_native_pack_control=pair60,p61_historical_premeasurement_proposal=proposal61,
     p48_independent_performance=ordinary48['summary'],p48_graph_performance=graph48['summary'],p48_device_identity=static48,
     p47_pack_bits=pack47,p47_validation=validation47,p47_independent_performance=ordinary47['summary'],p47_graph_performance=graph47['summary'],
     p46_validation=validation46,p46_independent_performance=ordinary46['summary'],p46_graph_performance=graph46['summary'],

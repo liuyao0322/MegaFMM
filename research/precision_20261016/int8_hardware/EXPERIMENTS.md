@@ -1115,3 +1115,70 @@ instructions and makes no dynamic bottleneck or speed claim. CPU coverage/alignm
 B-factor broadcast checks pass for262144paired coordinates, covering262144elements
 per side exactly once; scalar fallback decisions also checked. Proposal only: no C++
 generation, GPU execution, actual resource/capacity measurement or hardware acceptance.
+
+## P60 implementation and pre-MMA probe prepared
+
+P59 closedc3ca046; own/comprehensive audits terminal0, production/workingP56 unchanged.
+P60 paired native loads/stores/conversions generated from frozenP56; original
+cooperative reduction/launch and consumer/compare/pow2 byte-exact checked. A reads
+separate exponents for both columns; B uses CPU-proved factor broadcast and warp
+normal guard. Input2B alignment uses scalar fallback, all output words4B aligned.
+Initial CPU source review guarded exponent-to-factor construction against invalid
+negative shifts before any compilation. Own scalar conversion/residual oracle and
+72aligned+12misaligned all11plane/inside/input-workspace guard controls prepared
+before first MMA; actual build running, no numerical/performance result yet.
+
+P60 first probe compilation stopped on host seed variable-template ternary spacing
+(two parser errors), no binary or device execution. preflight_p60_01 archives
+source/generator/log; whitespace-only probe fix before retry, candidate unchanged.
+
+P60 second probe compilation stopped on CUTLASS mutable Array proxy .raw()
+(six errors), no binary/device execution. preflight_p60_02 preserves bytes.
+Probe comparator now explicitly converts proxy to native T, candidate unchanged.
+
+P60 corrected probe build and execution terminal0. Own scalar1,048,576pairs /
+4,194,304native high/low comparisons, swapped-lane negative controls detected;
+72aligned and12fresh2B-misaligned packing cases compare484,442,112native bits
+and86,016inside values with P56, allzero errors and input/workspace guards intact.
+BF16 extreme cases enter outside-normal fallback. Prep37BF36FPregs/65536B/actual
+3CTA capacity/384grid; no local/stack/spill or warnings. Original cooperative
+reduction/launch and consumer/compare/pow2 byte-exact P56. Full candidate build
+running; no matrix or timing conclusion yet.
+
+P60 full build/std terminal0, no warnings/stack/spills. Standard78/79872inside
+pass, printed eF equalP56 percase (not full-output bit equality). First single
+process complete-call BF25.100480/FP25.129360us, not retention evidence; independent
+ordinary ABBA running, all arms and full original gates unchanged.
+
+## P60 completed: paired native storage does not upgrade P56
+
+[Own hardware record](PAIR_NATIVE_PACK_HARDWARE.md) freezes 1,048,576pair scalar
+oracles/4,194,304high-low comparisons,54aligned+18extreme+12fresh2B-misaligned full
+plane controls/484,442,112native bits and86,016inside, zero errors/input-workspace
+guards. Prep37BF36FPregs/65536B/actual3CTA capacity supports384grid; consumer128regs/
+196736B/1CTA and normalizedSASS unchangedP56. Standard78/79872inside original gates
+pass, printed eF percase equalP56 without full-output bit proof. Scalar conversion
+oracles do not certify matrix synchronization or actual performance.
+
+Independent P56→P60 ordinary BF25.350679→24.888840us (1.822%lower),
+FP25.219400→25.261240us (0.166%slower); Graph24.892080→24.442600 /
+25.252800→25.024160us (1.806/0.905%lower). Eachmode312gates/319488inside,
+all arms retained, unlocked/noCI. No consistent >=3% gain; do not upgradeP56.
+Own freshstress/tool sources prepared but not compiled/executed, no transferred
+certificate. Own two-kernel17pass BF16 NCU prep17.248us/37regs/issue12.178357%,
+consumer16.128us/128regs/issue22.648489%, localRWzero. Profile timings excluded,
+not summed or a floor. Prepared componentwise paired native stores are32bit in
+actualSASS; staticcode grows due branches, cannot equate to dynamic execution.
+Restored from14d9720 P56 four sources/bin and new-process78/79872inside pass.
+Production solution/library/Auto unchanged; about25us vsproduction10us gap remains.
+
+## P61 historical proposal prepared: exact inside K16 reduction mapping
+
+[Design](INSIDE_K16_DESIGN.md) isolates only inside reduction from P56: first64CTAs
+handle16completeKcolumns each instead of128CTAs/eight, while all384CTAs retain one
+unconditional grid barrier and original native packing. P60 paired storage is not
+combined. CPU proves each original A/B position and each reduction set once, scratch
+bounds and full1024exponents. Natural32B address model halves A sector-address visits,
+not unique sectors or measured cache/DRAM transactions. Active reductionCTAs halve
+and perthread work doubles, so no speed prediction. No C++/GPU/actual capacity or
+hardware acceptance yet; P60 is the first sub3% control after P59's reassessment.

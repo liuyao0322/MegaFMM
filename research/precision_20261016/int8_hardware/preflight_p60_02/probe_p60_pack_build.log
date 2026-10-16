@@ -1,0 +1,44 @@
+research/precision_20261016/int8_hardware/probe_p60_pack.cu(81): error: class "cutlass::Array<T, N, false>::reference [with T=cutlass::bfloat16_t, N=2]" has no member "raw"
+    if(high[k].raw()!=expected.raw())atomicAdd(err,1u);
+               ^
+          detected during:
+            instantiation of "void conversion_oracle<T>(unsigned int *) [with T=cutlass::bfloat16_t]" at line 95
+            instantiation of "int probe<Input,Native>(const char *) [with Input=__nv_bfloat16, Native=cutlass::bfloat16_t]" at line 135
+
+research/precision_20261016/int8_hardware/probe_p60_pack.cu(82): error: class "cutlass::Array<T, N, false>::reference [with T=cutlass::bfloat16_t, N=2]" has no member "raw"
+    if(low[k].raw()!=expected_low.raw())atomicAdd(err+1,1u);
+              ^
+          detected during:
+            instantiation of "void conversion_oracle<T>(unsigned int *) [with T=cutlass::bfloat16_t]" at line 95
+            instantiation of "int probe<Input,Native>(const char *) [with Input=__nv_bfloat16, Native=cutlass::bfloat16_t]" at line 135
+
+research/precision_20261016/int8_hardware/probe_p60_pack.cu(83): error: class "cutlass::Array<T, N, false>::reference [with T=cutlass::bfloat16_t, N=2]" has no member "raw"
+    if(high[k].raw()!=T(v[1-k]).raw())atomicAdd(err+2,1u);
+               ^
+          detected during:
+            instantiation of "void conversion_oracle<T>(unsigned int *) [with T=cutlass::bfloat16_t]" at line 95
+            instantiation of "int probe<Input,Native>(const char *) [with Input=__nv_bfloat16, Native=cutlass::bfloat16_t]" at line 135
+
+research/precision_20261016/int8_hardware/probe_p60_pack.cu(81): error: class "cutlass::Array<T, N, false>::reference [with T=cutlass::half_t, N=2]" has no member "raw"
+    if(high[k].raw()!=expected.raw())atomicAdd(err,1u);
+               ^
+          detected during:
+            instantiation of "void conversion_oracle<T>(unsigned int *) [with T=cutlass::half_t]" at line 95
+            instantiation of "int probe<Input,Native>(const char *) [with Input=__half, Native=cutlass::half_t]" at line 136
+
+research/precision_20261016/int8_hardware/probe_p60_pack.cu(82): error: class "cutlass::Array<T, N, false>::reference [with T=cutlass::half_t, N=2]" has no member "raw"
+    if(low[k].raw()!=expected_low.raw())atomicAdd(err+1,1u);
+              ^
+          detected during:
+            instantiation of "void conversion_oracle<T>(unsigned int *) [with T=cutlass::half_t]" at line 95
+            instantiation of "int probe<Input,Native>(const char *) [with Input=__half, Native=cutlass::half_t]" at line 136
+
+research/precision_20261016/int8_hardware/probe_p60_pack.cu(83): error: class "cutlass::Array<T, N, false>::reference [with T=cutlass::half_t, N=2]" has no member "raw"
+    if(high[k].raw()!=T(v[1-k]).raw())atomicAdd(err+2,1u);
+               ^
+          detected during:
+            instantiation of "void conversion_oracle<T>(unsigned int *) [with T=cutlass::half_t]" at line 95
+            instantiation of "int probe<Input,Native>(const char *) [with Input=__half, Native=cutlass::half_t]" at line 136
+
+6 errors detected in the compilation of "research/precision_20261016/int8_hardware/probe_p60_pack.cu".
+srun: error: g08: task 0: Exited with exit code 1

@@ -1,0 +1,1 @@
+Second P60 probe compile stopped: mutable CUTLASS Array subscript returns proxy lacking raw(). Six errors, no binary/device execution. Explicit T conversion in probe bit comparator fixes proxy use; candidate pack source unchanged.

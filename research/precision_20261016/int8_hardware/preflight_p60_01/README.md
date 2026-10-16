@@ -1,0 +1,1 @@
+Initial P60 probe host seed ternary lacks whitespace after variable-template closing >; CUDA12.4 compile reports two parser errors. No binary generated or kernel invoked. Candidate pack source unchanged. Corrected whitespace before retry; full preflight bytes preserved.
