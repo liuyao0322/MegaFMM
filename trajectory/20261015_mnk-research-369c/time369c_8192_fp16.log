@@ -1,0 +1,57 @@
+tile_n=160 tile_k=64 stages=5 registers=106 local=0 resident_blocks=1
+tile_n=192 tile_k=64 stages=5 registers=122 local=0 resident_blocks=1
+tile_n=224 tile_k=64 stages=4 registers=138 local=0 resident_blocks=1
+tile_n=256 tile_k=64 stages=4 registers=154 local=0 resident_blocks=1
+tile_n=160 tile_k=32 stages=11 registers=106 local=0 resident_blocks=1
+tile_n=192 tile_k=32 stages=10 registers=122 local=0 resident_blocks=1
+tile_n=224 tile_k=32 stages=9 registers=138 local=0 resident_blocks=1
+tile_n=256 tile_k=32 stages=8 registers=154 local=0 resident_blocks=1
+diagnostic_only=1 fp64_acceptance=unchecked shape=8192,8192,8192 dtype=fp16 baseline_route=tuned_dense_cublaslt
+variant=1 tile_n=160 tile_k=64 group=0 baseline_ms=1.731490970 custom_ms=2.775837660 speedup=0.623772
+variant=1 tile_n=160 tile_k=64 group=1 baseline_ms=1.704805732 custom_ms=2.822932959 speedup=0.603913
+variant=1 tile_n=160 tile_k=64 group=2 baseline_ms=1.789622068 custom_ms=2.700610876 speedup=0.662673
+variant=1 tile_n=160 tile_k=64 group=3 baseline_ms=1.742369175 custom_ms=2.682695866 speedup=0.649484
+variant=1 tile_n=160 tile_k=64 group=4 baseline_ms=1.728376031 custom_ms=2.827966928 speedup=0.611173
+variant=1 tile_n=160 tile_k=64 diagnostic_median=0.623772 diagnostic_min=0.603913 acceptance=unchecked
+variant=2 tile_n=192 tile_k=64 group=0 baseline_ms=1.735728621 custom_ms=2.156245470 speedup=0.804977
+variant=2 tile_n=192 tile_k=64 group=1 baseline_ms=1.757430077 custom_ms=2.146946669 speedup=0.818572
+variant=2 tile_n=192 tile_k=64 group=2 baseline_ms=1.699159384 custom_ms=2.205696583 speedup=0.770350
+variant=2 tile_n=192 tile_k=64 group=3 baseline_ms=1.727093101 custom_ms=2.156421423 speedup=0.800907
+variant=2 tile_n=192 tile_k=64 group=4 baseline_ms=1.704051852 custom_ms=2.154134035 speedup=0.791061
+variant=2 tile_n=192 tile_k=64 diagnostic_median=0.800907 diagnostic_min=0.770350 acceptance=unchecked
+variant=3 tile_n=224 tile_k=64 group=0 baseline_ms=1.723405123 custom_ms=2.500799417 speedup=0.689142
+variant=3 tile_n=224 tile_k=64 group=1 baseline_ms=1.698422074 custom_ms=2.456054926 speedup=0.691524
+variant=3 tile_n=224 tile_k=64 group=2 baseline_ms=1.707069993 custom_ms=2.534946918 speedup=0.673414
+variant=3 tile_n=224 tile_k=64 group=3 baseline_ms=1.700136542 custom_ms=2.435684204 speedup=0.698012
+variant=3 tile_n=224 tile_k=64 group=4 baseline_ms=1.712795854 custom_ms=2.410638332 speedup=0.710515
+variant=3 tile_n=224 tile_k=64 diagnostic_median=0.691524 diagnostic_min=0.673414 acceptance=unchecked
+variant=4 tile_n=256 tile_k=64 group=0 baseline_ms=1.712296247 custom_ms=1.793468833 speedup=0.954740
+variant=4 tile_n=256 tile_k=64 group=1 baseline_ms=1.718126655 custom_ms=1.710930943 speedup=1.004206
+variant=4 tile_n=256 tile_k=64 group=2 baseline_ms=1.707344413 custom_ms=1.743533492 speedup=0.979244
+variant=4 tile_n=256 tile_k=64 group=3 baseline_ms=1.731200695 custom_ms=1.777994871 speedup=0.973682
+variant=4 tile_n=256 tile_k=64 group=4 baseline_ms=1.700246096 custom_ms=1.719401836 speedup=0.988859
+variant=4 tile_n=256 tile_k=64 diagnostic_median=0.979244 diagnostic_min=0.954740 acceptance=unchecked
+variant=5 tile_n=160 tile_k=32 group=0 baseline_ms=1.709669232 custom_ms=3.079873085 speedup=0.555110
+variant=5 tile_n=160 tile_k=32 group=1 baseline_ms=1.681974053 custom_ms=3.055608273 speedup=0.550455
+variant=5 tile_n=160 tile_k=32 group=2 baseline_ms=1.717392325 custom_ms=3.068483353 speedup=0.559688
+variant=5 tile_n=160 tile_k=32 group=3 baseline_ms=1.698021650 custom_ms=3.042497873 speedup=0.558101
+variant=5 tile_n=160 tile_k=32 group=4 baseline_ms=1.713689566 custom_ms=3.087107897 speedup=0.555112
+variant=5 tile_n=160 tile_k=32 diagnostic_median=0.555112 diagnostic_min=0.550455 acceptance=unchecked
+variant=6 tile_n=192 tile_k=32 group=0 baseline_ms=1.686980724 custom_ms=2.453769445 speedup=0.687506
+variant=6 tile_n=192 tile_k=32 group=1 baseline_ms=1.714802861 custom_ms=2.494541407 speedup=0.687422
+variant=6 tile_n=192 tile_k=32 group=2 baseline_ms=1.700534940 custom_ms=2.446075201 speedup=0.695210
+variant=6 tile_n=192 tile_k=32 group=3 baseline_ms=1.723929882 custom_ms=2.381049633 speedup=0.724021
+variant=6 tile_n=192 tile_k=32 group=4 baseline_ms=1.724211931 custom_ms=2.436463356 speedup=0.707670
+variant=6 tile_n=192 tile_k=32 diagnostic_median=0.695210 diagnostic_min=0.687422 acceptance=unchecked
+variant=7 tile_n=224 tile_k=32 group=0 baseline_ms=1.702275872 custom_ms=2.659858704 speedup=0.639987
+variant=7 tile_n=224 tile_k=32 group=1 baseline_ms=1.775289059 custom_ms=2.689257622 speedup=0.660141
+variant=7 tile_n=224 tile_k=32 group=2 baseline_ms=1.688665628 custom_ms=2.678970098 speedup=0.630341
+variant=7 tile_n=224 tile_k=32 group=3 baseline_ms=1.705357790 custom_ms=2.667412043 speedup=0.639330
+variant=7 tile_n=224 tile_k=32 group=4 baseline_ms=1.744231701 custom_ms=2.676744699 speedup=0.651624
+variant=7 tile_n=224 tile_k=32 diagnostic_median=0.639987 diagnostic_min=0.630341 acceptance=unchecked
+variant=8 tile_n=256 tile_k=32 group=0 baseline_ms=1.694532514 custom_ms=1.762704372 speedup=0.961325
+variant=8 tile_n=256 tile_k=32 group=1 baseline_ms=1.721654058 custom_ms=1.777391076 speedup=0.968641
+variant=8 tile_n=256 tile_k=32 group=2 baseline_ms=1.727475166 custom_ms=1.723277688 speedup=1.002436
+variant=8 tile_n=256 tile_k=32 group=3 baseline_ms=1.747956514 custom_ms=1.753961086 speedup=0.996577
+variant=8 tile_n=256 tile_k=32 group=4 baseline_ms=1.720961571 custom_ms=1.772103786 speedup=0.971140
+variant=8 tile_n=256 tile_k=32 diagnostic_median=0.971140 diagnostic_min=0.961325 acceptance=unchecked

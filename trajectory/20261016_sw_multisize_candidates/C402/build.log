@@ -1,0 +1,17 @@
+results/stage402/sw_hopper.cu(101): error: name followed by "::" must be a class or namespace name
+          SM90_TMA_LOAD_3D::copy(&tmap,&s.ready[slot],uint64_t(CacheHintSm90::EVICT_FIRST),dst,m0,k0,p==3?3:p-4);
+                                                               ^
+
+results/stage402/sw_hopper.cu(104): error: name followed by "::" must be a class or namespace name
+          SM90_TMA_LOAD_2D::copy(&bmap,&s.ready[slot],uint64_t(CacheHintSm90::EVICT_FIRST),dst,m0+col,k0+row);
+                                                               ^
+
+results/stage402/sw_hopper.cu(107): error: name followed by "::" must be a class or namespace name
+          SM90_TMA_LOAD_4D::copy(&smap,&s.ready[slot],uint64_t(CacheHintSm90::EVICT_LAST),dst+64*K,0,n0,k0/64,p==2?3:p-4);
+                                                               ^
+
+results/stage402/sw_hopper.cu(110): error: name followed by "::" must be a class or namespace name
+          SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],uint64_t(CacheHintSm90::EVICT_LAST),dst+64*K,0,n0+row,(k0+col)/64);
+                                                               ^
+
+4 errors detected in the compilation of "results/stage402/sw_hopper.cu".

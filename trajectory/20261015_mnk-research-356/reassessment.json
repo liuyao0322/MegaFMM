@@ -1,0 +1,22 @@
+{
+  "sources": [
+    {
+      "url": "https://developer.nvidia.com/blog/cutlass-3-x-orthogonal-reusable-and-composable-abstractions-for-gemm-kernel-design/",
+      "claim": "Hopper Stream-K is persistent and divides some output tile work along K for improved load balancing."
+    },
+    {
+      "url": "https://docs.nvidia.com/cutlass/4.3.3/media/docs/cpp/efficient_gemm.html",
+      "claim": "Persistent Hopper kernels use a tile scheduler to assign multiple output tiles per CTA."
+    }
+  ],
+  "review": [
+    "353 increased certified stable coverage to16/28 using64x256pingpong and cluster2 on low-K rectangles.",
+    "354 source-free clusters and nine-warp S2 did not add wins; nine-warp76 achieved two-CTA capacity but only59.56%Tensor utilization,0.273eligiblewarp/scheduler and2.37ms replay.",
+    "355 failed only due native160 two-block launch target96;356 is testing diagnosed repair plus direct-store/deeper buffers.",
+    "Large-K candidates near cuBLAS tensor activity91-92% still have tile scheduling and wave-tail overhead; this is not evidence of a physical floor."
+  ],
+  "next_direction": "Stream-K for large-K square/rectangles with per-call scratch reset, complete-call timing, originalFP64 gate and distinct-stream/Graph scratch validation.",
+  "prepared_only": "results/prepare357.py; not applied while356 runs.",
+  "goal_status": "active",
+  "latest_independent_acceptance": "353 sixteen of28; do not transfer certification to later candidate pools."
+}

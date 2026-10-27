@@ -1,0 +1,61 @@
+a21b2bb07f1c42cdcdfebee9bb2b6d2c236b4dedb8a2485162469d3786d9965d  solution/internal.h
+d76f86a36ac2c7241d4c3797fb7261af7d6f91d9158bca83cefd693d3f17b32f  solution/plan.cpp
+32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708  solution/scale_output.cu
+350a4a2cd21b39cadc9c18b4a93fc9bd7aa23148bf7e74f98ad8035868c45ada  solution/sw_pipeline.cu
+d5564b71d399c934229c8dc2089c5dd8de7e942957845a9cf23977353186e475  include/megafmm/gemm.h
+0964fc49fdbd02945515ff2d8f6bb834c6a4c937fb4cfad396b1be313634ae4e  bench/benchmark.cu
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 20%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 20%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 30%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(15): warning #177-D: variable "megafmm::detail::<unnamed>::WorkspaceBytes" was declared but never referenced
+  constexpr size_t WorkspaceBytes=size_t(16)*Plane*2;
+                   ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+[ 40%] Linking CXX static library libmegafmm.a
+[ 40%] Built target megafmm
+[ 60%] Building CUDA object CMakeFiles/megafmm_bench.dir/bench/benchmark.cu.o
+[ 70%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+[ 70%] Building CUDA object CMakeFiles/test_sw1024.dir/tests/test_sw1024.cu.o
+[ 80%] Linking CXX executable test_sw1024
+[ 80%] Built target test_sw1024
+[ 90%] Linking CXX executable test_correctness
+[ 90%] Built target test_correctness
+[100%] Linking CXX executable megafmm_bench
+[100%] Built target megafmm_bench
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=dense config=dense:id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=10;bound_candidate=4/16;tuned_candidate=4;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.012973;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=sw_global_pair;cluster=none;roles=1tma+4tc+8consumer;smem=213120;bk=256;stages=3;product_slots=1;products=4plus3;exchange=global_U2_U3_per_consumer_release_acquire;local_partial=registers;st=compact_balanced_async608;publication=tma_leader_driver_workspace_cuda12.4;leaf_terms=7;residual_correction=off;workspace=8388608;alpha=1;beta=0
+CHECK 1024,1024,1024 bf16 trial=0 dense_eF=8.51899e-07 solution_eF=0.00600975 gate=0.00100256 pass=0
+CHECK 1024,1024,1024 bf16 trial=1 dense_eF=8.52266e-07 solution_eF=0.0060152 gate=0.00100256 pass=0
+CHECK 1024,1024,1024 bf16 trial=2 dense_eF=8.50027e-07 solution_eF=0.00601153 gate=0.00100255 pass=0
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.014832 wall_ms=0.0149394
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0123104 wall_ms=0.0123935
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.0123562 wall_ms=0.0124438
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.0148582 wall_ms=0.0149398
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.0148426 wall_ms=0.0149253
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.0122634 wall_ms=0.012349
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.014841 wall_ms=0.014926
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.0122694 wall_ms=0.0123536
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.0122413 wall_ms=0.0123287
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.0148342 wall_ms=0.0149179
+TUNE shape=1024,1024,1024 dtype=fp16 case=dense config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010394;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=sw_global_pair;cluster=none;roles=1tma+4tc+8consumer;smem=213120;bk=256;stages=3;product_slots=1;products=4plus3;exchange=global_U2_U3_per_consumer_release_acquire;local_partial=registers;st=compact_balanced_async608;publication=tma_leader_driver_workspace_cuda12.4;leaf_terms=7;residual_correction=off;workspace=8388608;alpha=1;beta=0
+CHECK 1024,1024,1024 fp16 trial=0 dense_eF=1.24851e-06 solution_eF=0.000751819 gate=0.000103746 pass=0
+CHECK 1024,1024,1024 fp16 trial=1 dense_eF=1.25092e-06 solution_eF=0.000753235 gate=0.000103753 pass=0
+CHECK 1024,1024,1024 fp16 trial=2 dense_eF=1.24799e-06 solution_eF=0.000754626 gate=0.000103744 pass=0
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.015135 wall_ms=0.0152465
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.00990144 wall_ms=0.00999043
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.00991072 wall_ms=0.00999765
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.0151552 wall_ms=0.0152403
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.0151418 wall_ms=0.0152283
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.00991232 wall_ms=0.00999931
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.0151555 wall_ms=0.0152457
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.00988576 wall_ms=0.00997384
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.0098944 wall_ms=0.00998196
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.0151786 wall_ms=0.0152659
+srun: error: g08: task 0: Exited with exit code 2

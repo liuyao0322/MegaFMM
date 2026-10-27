@@ -1,0 +1,45 @@
+b9a82afc6a640022c6e7a1081a87bab5c98e425965d08e8a150fb554128d0478  solution/dense_ampere.cu
+cae221d200aa194acaec67cfd780d3e972456449b0b58e342227e92f657ba5fd  solution/dense_hopper.cu
+88cc8c81f2025c4965e416b790817fa30f51c0a8c4af701896cf32c8fe6e019a  solution/dense_padding.cu
+fd3c6eb06343c7e59aba443cfc72c5bc6fef04ad81a9419773ec4b5303c2bced  solution/dense_wmma.cu
+33494ceb45b62e963aa1ce0645245bae20b11474134ec5027d5ca3b5eb36e9c0  solution/hopper_nine_warp_kernel.cuh
+c7c964b2afd3a29e945414940c01a391012bd85835b675af0016559c6fd4f370  solution/internal.h
+e2d5bb4f89dc721d4635994c3d428ee73f36524fbf1d25f096091b106b1f32ba  solution/plan.cpp
+32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708  solution/scale_output.cu
+6439b99b3f6cc2fac7a510eff4638d8be5cfd2cda1ca312b6a86bbe8a2c43641  solution/sw_multisize.cu
+748e7ace9de0b6469d47922cb7cb531bbb56a9d55c9915b0194c0e0a72e916e7  solution/sw_pipeline.cu
+8b109a5756a8c95fd38ec8c7ec4dc76cb8f8e1000906e39dd122795c55786a5f  solution/tuning_check.cu
+fb177ea650a30c7fadaded5ac1800f731abea4a647d3f09ba9c8676b5a6eed68  include/megafmm/gemm.h
+09a646ec092f7bd563aa0dc7e301bfd4a322f5cba7f72ab20219bb9203707bff  bench/benchmark.cu
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 10%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 10%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 15%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_multisize.cu.o
+[ 20%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+[ 25%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_hopper.cu.o
+[ 30%] Building CUDA object CMakeFiles/megafmm.dir/solution/tuning_check.cu.o
+[ 35%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_padding.cu.o
+[ 40%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_wmma.cu.o
+[ 45%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_ampere.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(13): warning #177-D: variable "megafmm::detail::<unnamed>::Elements" was declared but never referenced
+  constexpr int BM=64,BN=32,BK=128,Stages=8,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+                                                                    ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(25): warning #177-D: function "megafmm::detail::<unnamed>::arrive" was declared but never referenced
+            void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
+                 ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(27): warning #177-D: function "megafmm::detail::<unnamed>::product_index" was declared but never referenced
+                            int product_index(int row,int col){
+                                ^
+
+ptxas fatal   : (C7600) Register allocation failed with register count of '96'. Compile the program with a higher register target
+ptxas fatal   : Ptx assembly aborted due to errors
+gmake[2]: *** [CMakeFiles/megafmm.dir/build.make:136: CMakeFiles/megafmm.dir/solution/dense_hopper.cu.o] Error 255
+gmake[1]: *** [CMakeFiles/Makefile2:93: CMakeFiles/megafmm.dir/all] Error 2
+gmake: *** [Makefile:101: all] Error 2
+srun: error: g08: task 0: Exited with exit code 2

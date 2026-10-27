@@ -1,0 +1,23 @@
+# AKO4ALL workspace .gitignore — copied as `.gitignore` during scaffold.
+# This is workspace-side: it ignores bytecode caches and the bench wrapper's
+# intermediate output file. The loop's outputs (`solution/`, `scripts/`,
+# `trajectory/`, `ITERATIONS.md`, `HINTS.md`) are intentionally tracked.
+
+# Python bytecode caches
+__pycache__/
+.scratch/
+*.pyc
+
+# Bench intermediate (moves to trajectory/ on success)
+_bench_output.txt
+
+/build*/
+/third_party/cutlass/
+*.ncu-rep
+*.nsys-rep
+*.sqlite
+
+results/
+research/
+trajectory/
+research/

@@ -1,0 +1,677 @@
+#include "sw_fp32_batch.h"
+#include <cuda.h>
+#include <cute/arch/copy_sm90_tma.hpp>
+#include <cutlass/arch/barrier.h>
+#include <cutlass/gemm/device/gemm_batched.h>
+#include <algorithm>
+#include <stdexcept>
+
+namespace megafmm::detail::sw_fp32_batch {
+namespace {
+constexpr int BK=32;
+using Barrier=cutlass::arch::ClusterBarrier;
+using TxBarrier=cutlass::arch::ClusterTransactionBarrier;
+void check(cudaError_t e) {if(e!=cudaSuccess)throw std::runtime_error(cudaGetErrorString(e));}
+__device__ __forceinline__ float read(const float* x,int r,int c,int rows,int cols,int ld) {
+  return r<rows && c<cols?x[int64_t(r)*ld+c]:0.0f;
+}
+
+// The A output is K-major so the leaf TMA can write vector-friendly shared A
+// directly. This tiled transpose keeps both original reads and packed writes
+// coalesced; seven transforms are rounded exactly as in the fused pipeline.
+template<bool Grid2D=false> __global__ void pack(Problem p,Shape z,const float* A,const float* B,float* ap,float* bp) {
+  __shared__ float tile[4][32][33];
+  const int x=threadIdx.x,y=threadIdx.y;
+  const int mh=int((p.m+1)/2),nh=int((p.n+1)/2),kh=int((p.k+1)/2);
+  if(blockIdx.z==0) {
+    const int tiles_k=z.kp/32;
+    if constexpr(Grid2D) {if(blockIdx.x>=tiles_k || blockIdx.y>=z.mp/32)return;}
+    else if(blockIdx.x>=(z.mp/32)*tiles_k)return;
+    const int r0=Grid2D?int(blockIdx.y)*32:int(blockIdx.x)/tiles_k*32;
+    const int q0=Grid2D?int(blockIdx.x)*32:int(blockIdx.x)%tiles_k*32;
+    #pragma unroll
+    for(int offset=0;offset<32;offset+=8) {
+      const int r=r0+y+offset,q=q0+x;
+      float a[4]={};
+      if(r<mh && q<kh) {
+        #pragma unroll
+        for(int j=0;j<4;++j)a[j]=read(A,r+(j/2)*mh,q+(j%2)*kh,int(p.m),int(p.k),int(p.lda));
+      }
+      // Transpose the four original quadrants before forming seven operands.
+      // This preserves every RN transform while reducing shared traffic 7 -> 4.
+      #pragma unroll
+      for(int j=0;j<4;++j)tile[j][y+offset][x]=a[j];
+    }
+    __syncthreads();
+    #pragma unroll
+    for(int offset=0;offset<32;offset+=8) {
+      const int r=r0+x,q=q0+y+offset;
+      float a[4];
+      #pragma unroll
+      for(int j=0;j<4;++j)a[j]=tile[j][x][y+offset];
+      const float s1=__fadd_rn(a[2],a[3]),s2=__fsub_rn(s1,a[0]);
+      const float av[7]={a[0],a[1],__fsub_rn(a[1],s2),a[3],s1,s2,__fsub_rn(a[0],a[2])};
+      #pragma unroll
+      for(int j=0;j<7;++j)ap[size_t(j)*z.mp*z.kp+size_t(q)*z.mp+r]=av[j];
+    }
+  } else {
+    const int tiles_n=z.np/32;
+    if constexpr(Grid2D) {if(blockIdx.x>=tiles_n || blockIdx.y>=z.kp/32)return;}
+    else if(blockIdx.x>=(z.kp/32)*tiles_n)return;
+    const int q0=Grid2D?int(blockIdx.y)*32:int(blockIdx.x)/tiles_n*32;
+    const int c0=Grid2D?int(blockIdx.x)*32:int(blockIdx.x)%tiles_n*32;
+    #pragma unroll
+    for(int offset=0;offset<32;offset+=8) {
+      const int q=q0+y+offset,c=c0+x;
+      float b[4]={};
+      if(q<kh && c<nh) {
+        #pragma unroll
+        for(int j=0;j<4;++j)b[j]=read(B,q+(j/2)*kh,c+(j%2)*nh,int(p.k),int(p.n),int(p.ldb));
+      }
+      const float t1=__fsub_rn(b[1],b[0]),t2=__fsub_rn(b[3],t1);
+      const float bv[7]={b[0],b[2],b[3],__fsub_rn(t2,b[2]),t1,t2,__fsub_rn(b[3],b[1])};
+      #pragma unroll
+      for(int j=0;j<7;++j)bp[size_t(j)*z.kp*z.np+size_t(q)*z.np+c]=bv[j];
+    }
+  }
+}
+
+__device__ __forceinline__ float4 add4(float4 a,float4 b) {
+  return {__fadd_rn(a.x,b.x),__fadd_rn(a.y,b.y),__fadd_rn(a.z,b.z),__fadd_rn(a.w,b.w)};
+}
+__device__ __forceinline__ float4 sub4(float4 a,float4 b) {
+  return {__fsub_rn(a.x,b.x),__fsub_rn(a.y,b.y),__fsub_rn(a.z,b.z),__fsub_rn(a.w,b.w)};
+}
+__device__ __forceinline__ float4 read4(const float* x,int r,int c,int rows,int cols,int ld) {
+  return r<rows && c+3<cols?*reinterpret_cast<const float4*>(x+int64_t(r)*ld+c):float4{};
+}
+// Four contiguous elements per thread reduce global load/store instruction count.
+template<bool Grid2D=false> __global__ void pack_vector(Problem p,Shape z,const float* A,const float* B,float* ap,float* bp) {
+  __shared__ float tile[4][32][33];
+  const int x=threadIdx.x,y=threadIdx.y;
+  const int mh=int((p.m+1)/2),nh=int((p.n+1)/2),kh=int((p.k+1)/2);
+  if(blockIdx.z==0) {
+    const int tiles_k=z.kp/32;
+    if constexpr(Grid2D) {if(blockIdx.x>=tiles_k || blockIdx.y>=z.mp/32)return;}
+    else if(blockIdx.x>=(z.mp/32)*tiles_k)return;
+    const int r0=Grid2D?int(blockIdx.y)*32:int(blockIdx.x)/tiles_k*32;
+    const int q0=Grid2D?int(blockIdx.x)*32:int(blockIdx.x)%tiles_k*32;
+    #pragma unroll
+    for(int offset=0;offset<32;offset+=32) {
+      const int r=r0+y+offset,q=q0+4*x;float4 a[4]={};
+      if(r<mh && q<kh) {
+        #pragma unroll
+        for(int j=0;j<4;++j)a[j]=read4(A,r+(j/2)*mh,q+(j%2)*kh,int(p.m),int(p.k),int(p.lda));
+      }
+      #pragma unroll
+      for(int j=0;j<4;++j) {
+        tile[j][y+offset][4*x]=a[j].x;tile[j][y+offset][4*x+1]=a[j].y;
+        tile[j][y+offset][4*x+2]=a[j].z;tile[j][y+offset][4*x+3]=a[j].w;
+      }
+    }
+    __syncthreads();
+    #pragma unroll
+    for(int offset=0;offset<32;offset+=32) {
+      const int r=r0+4*x,q=q0+y+offset;
+      float4 a[4];
+      #pragma unroll
+      for(int j=0;j<4;++j)a[j]={tile[j][4*x][y+offset],tile[j][4*x+1][y+offset],
+                               tile[j][4*x+2][y+offset],tile[j][4*x+3][y+offset]};
+      const float4 s1=add4(a[2],a[3]),s2=sub4(s1,a[0]);
+      const float4 av[7]={a[0],a[1],sub4(a[1],s2),a[3],s1,s2,sub4(a[0],a[2])};
+      #pragma unroll
+      for(int j=0;j<7;++j)*reinterpret_cast<float4*>(ap+size_t(j)*z.mp*z.kp+size_t(q)*z.mp+r)=av[j];
+    }
+  } else {
+    const int tiles_n=z.np/32;
+    if constexpr(Grid2D) {if(blockIdx.x>=tiles_n || blockIdx.y>=z.kp/32)return;}
+    else if(blockIdx.x>=(z.kp/32)*tiles_n)return;
+    const int q0=Grid2D?int(blockIdx.y)*32:int(blockIdx.x)/tiles_n*32;
+    const int c0=Grid2D?int(blockIdx.x)*32:int(blockIdx.x)%tiles_n*32;
+    #pragma unroll
+    for(int offset=0;offset<32;offset+=32) {
+      const int q=q0+y+offset,c=c0+4*x;float4 b[4]={};
+      if(q<kh && c<nh) {
+        #pragma unroll
+        for(int j=0;j<4;++j)b[j]=read4(B,q+(j/2)*kh,c+(j%2)*nh,int(p.k),int(p.n),int(p.ldb));
+      }
+      const float4 t1=sub4(b[1],b[0]),t2=sub4(b[3],t1);
+      const float4 bv[7]={b[0],b[2],b[3],sub4(t2,b[2]),t1,t2,sub4(b[3],b[1])};
+      #pragma unroll
+      for(int j=0;j<7;++j)
+        *reinterpret_cast<float4*>(bp+size_t(j)*z.kp*z.np+size_t(q)*z.np+c)=bv[j];
+    }
+  }
+}
+void launch_pack(const Problem& p,Shape z,const float* A,const float* B,float* ap,float* bp,
+                  cudaStream_t stream,bool vectorized) {
+  const int pack_a=(z.mp/32)*(z.kp/32),pack_b=(z.kp/32)*(z.np/32);
+  const int gx=std::max(z.kp,z.np)/32,gy=std::max(z.mp,z.kp)/32;
+  const bool grid2d=gx*gy==std::max(pack_a,pack_b);
+  const dim3 grid=grid2d?dim3(gx,gy,2):dim3(std::max(pack_a,pack_b),1,2);
+  if(vectorized && p.k%8==0 && p.n%8==0 && p.lda%4==0 && p.ldb%4==0 &&
+     reinterpret_cast<uintptr_t>(A)%16==0 && reinterpret_cast<uintptr_t>(B)%16==0) {
+    if(grid2d)pack_vector<true><<<grid,dim3(8,32),0,stream>>>(p,z,A,B,ap,bp);
+    else pack_vector<false><<<grid,dim3(8,32),0,stream>>>(p,z,A,B,ap,bp);
+  } else {
+    if(grid2d)pack<true><<<grid,dim3(32,8),0,stream>>>(p,z,A,B,ap,bp);
+    else pack<false><<<grid,dim3(32,8),0,stream>>>(p,z,A,B,ap,bp);
+  }
+}
+template<int BM,int BN> struct alignas(128) Shared {
+  alignas(128) float a[2][BK][BM];
+  alignas(128) float b[2][BK][BN];
+  uint64_t ready[2];
+};
+template<int BM,int BN> __device__ __forceinline__
+void prefetch(Shared<BM,BN>& s,const CUtensorMap& amap,const CUtensorMap& bmap,
+              int slot,int r0,int c0,int q,int product) {
+  TxBarrier::arrive_and_expect_tx(&s.ready[slot],(BM+BN)*BK*sizeof(float));
+  cute::SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,&s.a[slot][0][0],r0,q,product);
+  cute::SM90_TMA_LOAD_3D::copy(&bmap,&s.ready[slot],0,&s.b[slot][0][0],c0,q,product);
+}
+
+template<int BM,int BN,int RM,int RN>
+__global__ __launch_bounds__(BM*BN/(RM*RN))
+void leaves(Shape z,const __grid_constant__ CUtensorMap amap,
+             const __grid_constant__ CUtensorMap bmap,float* products,int tiles_n) {
+  constexpr int WarpCols=BN/(8*RN)>0?BN/(8*RN):1;
+  extern __shared__ __align__(128) unsigned char storage[];
+  auto& s=*reinterpret_cast<Shared<BM,BN>*>(storage);
+  const int tid=threadIdx.x,warp=tid/32,lane=tid%32;
+  const int row=(warp/WarpCols)*(4*RM)+(lane/8)*RM;
+  const int col=(warp%WarpCols)*(8*RN)+(lane%8)*RN;
+  const int r0=blockIdx.x/tiles_n*BM,c0=blockIdx.x%tiles_n*BN,product=blockIdx.z;
+  if(tid==0) {
+    Barrier::init(&s.ready[0],1);Barrier::init(&s.ready[1],1);
+    cutlass::arch::fence_barrier_init();
+    asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
+  }
+  __syncthreads();
+  float v[RM][RN]={};int phase0=0,phase1=0;
+  if(tid==0)prefetch(s,amap,bmap,0,r0,c0,0,product);
+  for(int q=0,seq=0;q<z.kp;q+=BK,++seq) {
+    const int slot=seq%2;
+    Barrier::wait(&s.ready[slot],slot?phase1:phase0);
+    if(slot)phase1^=1;else phase0^=1;
+    asm volatile("" ::: "memory");
+    if(tid==0 && q+BK<z.kp)prefetch(s,amap,bmap,slot^1,r0,c0,q+BK,product);
+    #pragma unroll 8
+    for(int k=0;k<BK;++k) {
+      float a[RM],b[RN];
+      #pragma unroll
+      for(int r=0;r<RM;r+=4) {
+        const float4 x=*reinterpret_cast<const float4*>(&s.a[slot][k][row+r]);
+        a[r]=x.x;a[r+1]=x.y;a[r+2]=x.z;a[r+3]=x.w;
+      }
+      #pragma unroll
+      for(int c=0;c<RN;c+=4) {
+        const float4 x=*reinterpret_cast<const float4*>(&s.b[slot][k][col+c]);
+        b[c]=x.x;b[c+1]=x.y;b[c+2]=x.z;b[c+3]=x.w;
+      }
+      #pragma unroll
+      for(int r=0;r<RM;++r) {
+        #pragma unroll
+        for(int c=0;c<RN;++c)v[r][c]=__fmaf_rn(a[r],b[c],v[r][c]);
+      }
+    }
+    __syncthreads();
+  }
+  #pragma unroll
+  for(int r=0;r<RM;++r) {
+    #pragma unroll
+    for(int c=0;c<RN;++c)if(r0+row+r<z.mp && c0+col+c<z.np)
+      products[size_t(product)*z.mp*z.np+size_t(r0+row+r)*z.np+c0+col+c]=v[r][c];
+  }
+}
+
+__global__ void combine(Problem p,Shape z,const float* products,const float* C,float* D) {
+  const int mh=int((p.m+1)/2),nh=int((p.n+1)/2);
+  const size_t pos=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(pos>=size_t(mh)*nh)return;
+  const int r=int(pos/nh),c=int(pos%nh);
+  float v[7];
+  #pragma unroll
+  for(int j=0;j<7;++j)v[j]=products[size_t(j)*z.mp*z.np+size_t(r)*z.np+c];
+  const float u2=__fadd_rn(v[0],v[5]),u3=__fadd_rn(u2,v[6]),u4=__fadd_rn(u2,v[4]);
+  const float out[4]={__fadd_rn(v[0],v[1]),__fadd_rn(u4,v[2]),__fsub_rn(u3,v[3]),__fadd_rn(u3,v[4])};
+  #pragma unroll
+  for(int j=0;j<4;++j) {
+    const int rr=r+(j/2)*mh,cc=c+(j%2)*nh;
+    if(rr<p.m && cc<p.n) {
+      float value=__fmul_rn(p.alpha,out[j]);
+      if(p.beta!=0)value=__fadd_rn(value,__fmul_rn(p.beta,C[int64_t(rr)*p.ldc+cc]));
+      D[int64_t(rr)*p.ldd+cc]=value;
+    }
+  }
+}
+
+template<int BM,int BN,int RM,int RN>
+SWResources dispatch(const Problem* p,const float* A,const float* B,const float* C,
+                     float* D,void* workspace,cudaStream_t stream,const Maps* prepared=nullptr) {
+  constexpr size_t Bytes=sizeof(Shared<BM,BN>);constexpr int Threads=BM*BN/(RM*RN);
+  if(!p) {
+    check(cudaFuncSetAttribute(leaves<BM,BN,RM,RN>,cudaFuncAttributeMaxDynamicSharedMemorySize,Bytes));
+    cudaFuncAttributes attr{};int resident=0;
+    check(cudaFuncGetAttributes(&attr,leaves<BM,BN,RM,RN>));
+    check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&resident,leaves<BM,BN,RM,RN>,Threads,Bytes));
+    return {Bytes+attr.sharedSizeBytes,attr.numRegs,resident};
+  }
+  const auto z=shape(*p);
+  float* ap=static_cast<float*>(workspace),*bp=ap+z.a,*products=bp+z.b;
+  const auto& maps=*prepared;
+  launch_pack(*p,z,A,B,ap,bp,stream,configurations.at(maps.id).vector_pack);
+  const int tiles_n=(z.np+BN-1)/BN,tiles_m=(z.mp+BM-1)/BM;
+  leaves<BM,BN,RM,RN><<<dim3(tiles_m*tiles_n,1,7),Threads,Bytes,stream>>>(z,maps.a,maps.b,products,tiles_n);
+  const size_t outputs=size_t((p->m+1)/2)*((p->n+1)/2);
+  combine<<<unsigned((outputs+255)/256),256,0,stream>>>(*p,z,products,C,D);
+  check(cudaPeekAtLastError());return {};
+}
+// The same seven packed FP32 operand pairs also admit a CUTLASS SIMT leaf.
+// This candidate tests its shared/register software pipeline; no Tensor Ops or
+// extra products are instantiated and the complete pack/leaf/combine is timed.
+template<int BM,int BN,int WM,int WN>
+SWResources cutlass_dispatch(const Problem* p,const float* A,const float* B,const float* C,
+                            float* D,void* workspace,cudaStream_t stream) {
+  using Gemm=cutlass::gemm::device::GemmBatched<float,cutlass::layout::ColumnMajor,
+    float,cutlass::layout::RowMajor,float,cutlass::layout::RowMajor,float,
+    cutlass::arch::OpClassSimt,cutlass::arch::Sm80,
+    cutlass::gemm::GemmShape<BM,BN,8>,cutlass::gemm::GemmShape<WM,WN,8>,
+    cutlass::gemm::GemmShape<1,1,1>,
+    cutlass::epilogue::thread::LinearCombination<float,1,float,float>,
+    cutlass::gemm::threadblock::GemmBatchedIdentityThreadblockSwizzle,2>;
+  using Kernel=typename Gemm::GemmKernel;
+  constexpr int Bytes=sizeof(typename Kernel::SharedStorage);
+  if(!p) {
+    if(Bytes>=48*1024)check(cudaFuncSetAttribute(cutlass::Kernel<Kernel>,cudaFuncAttributeMaxDynamicSharedMemorySize,Bytes));
+    cudaFuncAttributes attr{};int resident=0;
+    check(cudaFuncGetAttributes(&attr,cutlass::Kernel<Kernel>));
+    check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&resident,cutlass::Kernel<Kernel>,Kernel::kThreadCount,Bytes));
+    return {Bytes+attr.sharedSizeBytes,attr.numRegs,resident};
+  }
+  const auto z=shape(*p);
+  float* ap=static_cast<float*>(workspace),*bp=ap+z.a,*products=bp+z.b;
+  const int pack_a=(z.mp/32)*(z.kp/32),pack_b=(z.kp/32)*(z.np/32);
+  pack<false><<<dim3(std::max(pack_a,pack_b),1,2),dim3(32,8),0,stream>>>(*p,z,A,B,ap,bp);
+  Gemm op;
+  typename Gemm::Arguments args({z.mp,z.np,z.kp},{ap,z.mp},int64_t(z.mp)*z.kp,
+    {bp,z.np},int64_t(z.kp)*z.np,{products,z.np},int64_t(z.mp)*z.np,
+    {products,z.np},int64_t(z.mp)*z.np,{1.0f,0.0f},7);
+  if(op.can_implement(args)!=cutlass::Status::kSuccess || op(args,nullptr,stream)!=cutlass::Status::kSuccess)
+    throw std::runtime_error("FP32 seven-batch CUTLASS SIMT launch failed");
+  const size_t outputs=size_t((p->m+1)/2)*((p->n+1)/2);
+  combine<<<unsigned((outputs+255)/256),256,0,stream>>>(*p,z,products,C,D);
+  check(cudaPeekAtLastError());return {};
+}
+template<int BM,int BN,int K> struct alignas(128) FusedShared {
+  union {
+    struct {
+      alignas(128) float a[2][7][K][BM];
+      alignas(128) float b[2][7][K][BN];
+    } stage;
+    float products[7][BM][BN];
+  };
+  alignas(16) uint64_t ready[2];
+};
+template<int BM,int BN,int K> __device__ __forceinline__
+void fused_prefetch(FusedShared<BM,BN,K>& s,const CUtensorMap& amap,
+                    const CUtensorMap& bmap,int slot,int r0,int c0,int q) {
+  TxBarrier::arrive_and_expect_tx(&s.ready[slot],7*(BM+BN)*K*4);
+  // The third box dimension spans all seven disjoint packed product planes.
+  cute::SM90_TMA_LOAD_3D::copy(&amap,&s.ready[slot],0,s.stage.a[slot],r0,q,0);
+  cute::SM90_TMA_LOAD_3D::copy(&bmap,&s.ready[slot],0,s.stage.b[slot],c0,q,0);
+}
+template<int BM,int BN,int RM,int RN,int K> __device__ __forceinline__
+void fused_register_load(FusedShared<BM,BN,K>& s,int slot,int product,int k,int row,int col,
+                          float (&a)[RM],float (&b)[RN]) {
+  if constexpr(RM==2) {
+    const float2 x=*reinterpret_cast<const float2*>(&s.stage.a[slot][product][k][row]);a[0]=x.x;a[1]=x.y;
+  } else {
+    #pragma unroll
+    for(int r=0;r<RM;r+=4) {
+      const float4 x=*reinterpret_cast<const float4*>(&s.stage.a[slot][product][k][row+r]);
+      a[r]=x.x;a[r+1]=x.y;a[r+2]=x.z;a[r+3]=x.w;
+    }
+  }
+  if constexpr(RN%4==0) {
+    #pragma unroll
+    for(int c=0;c<RN;c+=4) {
+      const float4 x=*reinterpret_cast<const float4*>(&s.stage.b[slot][product][k][col+c]);
+      b[c]=x.x;b[c+1]=x.y;b[c+2]=x.z;b[c+3]=x.w;
+    }
+  } else {
+    static_assert(RN%2==0);
+    #pragma unroll
+    for(int c=0;c<RN;c+=2) {
+      const float2 x=*reinterpret_cast<const float2*>(&s.stage.b[slot][product][k][col+c]);b[c]=x.x;b[c+1]=x.y;
+    }
+  }
+}
+template<int CoreBN,bool ExtraM,bool FoldN,int APitch,int BPitch,int K,int RM,int RN>
+__device__ __forceinline__ void fused_accumulate(FusedShared<APitch,BPitch,K>& s,int slot,int product,
+    int k,int lane,bool extra_active,int extra_row,bool fold_last_n,float (&v)[RM][RN],
+    float (&extra)[RN],float (&extra_n)[RM],float& corner,float (&a)[RM],float (&b)[RN]) {
+  constexpr int LaneCols=CoreBN/RN;
+  float ax=0.0f,bx=0.0f;
+  if(ExtraM && extra_active)ax=s.stage.a[slot][product][k][extra_row];
+  if(FoldN && fold_last_n && lane%LaneCols==0)bx=s.stage.b[slot][product][k][CoreBN];
+  #pragma unroll
+  for(int r=0;r<RM;++r) {
+    #pragma unroll
+    for(int c=0;c<RN;++c)v[r][c]=__fmaf_rn(a[r],b[c],v[r][c]);
+  }
+  if(ExtraM && extra_active) {
+    #pragma unroll
+    for(int c=0;c<RN;++c)extra[c]=__fmaf_rn(ax,b[c],extra[c]);
+  }
+  if(FoldN && fold_last_n && lane%LaneCols==0) {
+    #pragma unroll
+    for(int r=0;r<RM;++r)extra_n[r]=__fmaf_rn(a[r],bx,extra_n[r]);
+    if(ExtraM && extra_active)corner=__fmaf_rn(ax,bx,corner);
+  }
+}
+template<int BM,int BN,int RM,int RN,int K,bool Pipeline=false,int MinBlocks=2,bool ActiveK=false,bool FoldM=false,int Threads=256,int Unroll=0,bool FoldN=false,int ProductWarps=1>
+__global__ __launch_bounds__(Threads,MinBlocks)
+void fused_leaves(Problem p,Shape z,const __grid_constant__ CUtensorMap amap,
+                  const __grid_constant__ CUtensorMap bmap,const float* C,float* D,int tiles_n) {
+  extern __shared__ __align__(128) unsigned char storage[];
+  auto& s=*reinterpret_cast<FusedShared<BM+(FoldM?4:0),BN+(FoldN?4:0),K>*>(storage);
+  const int tid=threadIdx.x,warp=tid/32,lane=tid%32;
+  constexpr int LaneCols=BN/RN;
+  constexpr int RowGroups=32/LaneCols,MainRows=RM*RowGroups*ProductWarps,ExtraRows=BM-MainRows;
+  static_assert(32%LaneCols==0 && ExtraRows>=0 && ExtraRows<=RowGroups && BM%4==0);
+  static_assert(!(ExtraRows>0 && FoldM));
+  constexpr int ComputeWarps=7*ProductWarps;
+  constexpr int Issuer=Threads==32*ComputeWarps?0:32*ComputeWarps;
+  const int product=warp/ProductWarps;
+  const int row=(warp%ProductWarps)*RM*RowGroups+lane/LaneCols*RM,col=lane%LaneCols*RN;
+  const int r0=blockIdx.x/tiles_n*BM,c0=blockIdx.x%tiles_n*BN;
+  if(tid==Issuer) {
+    Barrier::init(&s.ready[0],1);Barrier::init(&s.ready[1],1);
+    cutlass::arch::fence_barrier_init();
+    asm volatile("fence.proxy.async.shared::cta;" ::: "memory");
+  }
+  __syncthreads();
+  const int mh=int((p.m+1)/2),nh=int((p.n+1)/2);
+  const bool fold_last=FoldM && mh>BM && mh%BM==1 && r0+BM==mh-1;
+  const bool fold_last_n=FoldN && nh>BN && nh%BN==1 && c0+BN==nh-1;
+  const bool extra_active=(ExtraRows>0 && lane/LaneCols<ExtraRows) || (FoldM && fold_last && lane<LaneCols);
+  const int extra_row=ExtraRows>0?MainRows+lane/LaneCols:BM;
+  const int active_k=ActiveK?int((p.k+1)/2):z.kp;
+  float extra[RN]={},extra_n[RM]={},corner=0.0f;
+  float v[RM][RN]={};int phase0=0,phase1=0;
+  if(tid==Issuer)fused_prefetch(s,amap,bmap,0,r0,c0,0);
+  for(int q=0,seq=0;q<active_k;q+=K,++seq) {
+    const int slot=seq%2;
+    Barrier::wait(&s.ready[slot],slot?phase1:phase0);
+    if(slot)phase1^=1;else phase0^=1;
+    asm volatile("" ::: "memory");
+    if(tid==Issuer && q+K<active_k)fused_prefetch(s,amap,bmap,slot^1,r0,c0,q+K);
+    if(warp<ComputeWarps) {
+      if(ActiveK && q+K>active_k) {
+        #pragma unroll 1
+        for(int k=0;k<active_k-q;++k) {
+          float a[RM],b[RN];fused_register_load(s,slot,product,k,row,col,a,b);
+          fused_accumulate<BN,(ExtraRows>0)||FoldM,FoldN>(s,slot,product,k,lane,extra_active,extra_row,fold_last_n,v,extra,extra_n,corner,a,b);
+        }
+      } else if constexpr(Pipeline) {
+        float a[2][RM],b[2][RN];
+        fused_register_load(s,slot,product,0,row,col,a[0],b[0]);
+        #pragma unroll (Unroll==0?K:Unroll)
+        for(int k=0;k<K;++k) {
+          if(k+1<K)fused_register_load(s,slot,product,k+1,row,col,a[(k+1)%2],b[(k+1)%2]);
+          fused_accumulate<BN,(ExtraRows>0)||FoldM,FoldN>(s,slot,product,k,lane,extra_active,extra_row,fold_last_n,v,extra,extra_n,corner,a[k%2],b[k%2]);
+        }
+      } else {
+        #pragma unroll (Unroll==0?16:Unroll)
+        for(int k=0;k<K;++k) {
+          float a[RM],b[RN];fused_register_load(s,slot,product,k,row,col,a,b);
+          fused_accumulate<BN,(ExtraRows>0)||FoldM,FoldN>(s,slot,product,k,lane,extra_active,extra_row,fold_last_n,v,extra,extra_n,corner,a,b);
+        }
+      }
+    }
+    __syncthreads();
+  }
+  if(ActiveK && warp<ComputeWarps && active_k%16!=0) {
+    // All omitted padding operands are +0. Repeated fma(+0,+0,x) is
+    // idempotent, including signed zero; one preserves the BK16 reference.
+    #pragma unroll
+    for(int r=0;r<RM;++r) {
+      #pragma unroll
+      for(int c=0;c<RN;++c)v[r][c]=__fmaf_rn(0.0f,0.0f,v[r][c]);
+    }
+  }
+  if(((ExtraRows>0)||FoldM) && ActiveK && warp<ComputeWarps && extra_active && active_k%16!=0) {
+    #pragma unroll
+    for(int c=0;c<RN;++c)extra[c]=__fmaf_rn(0.0f,0.0f,extra[c]);
+  }
+  if(FoldN && ActiveK && warp<ComputeWarps && fold_last_n && lane%LaneCols==0 && active_k%16!=0) {
+    #pragma unroll
+    for(int r=0;r<RM;++r)extra_n[r]=__fmaf_rn(0.0f,0.0f,extra_n[r]);
+    if(((ExtraRows>0)||FoldM) && extra_active)corner=__fmaf_rn(0.0f,0.0f,corner);
+  }
+  // All stage readers have finished; reuse the same storage for reconstruction.
+  if(warp<ComputeWarps) {
+    #pragma unroll
+    for(int r=0;r<RM;++r) {
+      #pragma unroll
+      for(int c=0;c<RN;++c)s.products[product][row+r][col+c]=v[r][c];
+    }
+  }
+  if(((ExtraRows>0)||FoldM) && warp<ComputeWarps && extra_active) {
+    #pragma unroll
+    for(int c=0;c<RN;++c)s.products[product][extra_row][col+c]=extra[c];
+  }
+  if(FoldN && warp<ComputeWarps && fold_last_n && lane%LaneCols==0) {
+    #pragma unroll
+    for(int r=0;r<RM;++r)s.products[product][row+r][BN]=extra_n[r];
+    if(((ExtraRows>0)||FoldM) && extra_active)s.products[product][extra_row][BN]=corner;
+  }
+  __syncthreads();
+  const int output_cols=BN+int(fold_last_n);
+  for(int pos=tid;pos<(BM+int(fold_last))*output_cols;pos+=Threads) {
+    const int r=pos/output_cols,c=pos%output_cols;
+    if(r0+r<mh && c0+c<nh) {
+      float v[7];
+      #pragma unroll
+      for(int j=0;j<7;++j)v[j]=s.products[j][r][c];
+      const float u2=__fadd_rn(v[0],v[5]),u3=__fadd_rn(u2,v[6]),u4=__fadd_rn(u2,v[4]);
+      const float out[4]={__fadd_rn(v[0],v[1]),__fadd_rn(u4,v[2]),__fsub_rn(u3,v[3]),__fadd_rn(u3,v[4])};
+      #pragma unroll
+      for(int j=0;j<4;++j) {
+        const int rr=r0+r+(j/2)*mh,cc=c0+c+(j%2)*nh;
+        if(rr<p.m && cc<p.n) {
+          float value=__fmul_rn(p.alpha,out[j]);
+          if(p.beta!=0)value=__fadd_rn(value,__fmul_rn(p.beta,C[int64_t(rr)*p.ldc+cc]));
+          D[int64_t(rr)*p.ldd+cc]=value;
+        }
+      }
+    }
+  }
+}
+template<int BM,int BN,int RM,int RN,int K,bool Pipeline=false,int MinBlocks=2,bool ActiveK=false,bool FoldM=false,int Threads=256,int Unroll=0,bool FoldN=false,int ProductWarps=1>
+SWResources fused_dispatch(const Problem* p,const float* A,const float* B,const float* C,
+                           float* D,void* workspace,cudaStream_t stream,const Maps* prepared) {
+  constexpr int Bytes=sizeof(FusedShared<BM+(FoldM?4:0),BN+(FoldN?4:0),K>);
+  if(!p) {
+    check(cudaFuncSetAttribute(fused_leaves<BM,BN,RM,RN,K,Pipeline,MinBlocks,ActiveK,FoldM,Threads,Unroll,FoldN,ProductWarps>,cudaFuncAttributeMaxDynamicSharedMemorySize,Bytes));
+    cudaFuncAttributes attr{};int resident=0;
+    check(cudaFuncGetAttributes(&attr,fused_leaves<BM,BN,RM,RN,K,Pipeline,MinBlocks,ActiveK,FoldM,Threads,Unroll,FoldN,ProductWarps>));
+    check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&resident,fused_leaves<BM,BN,RM,RN,K,Pipeline,MinBlocks,ActiveK,FoldM,Threads,Unroll,FoldN,ProductWarps>,Threads,Bytes));
+    return {Bytes+attr.sharedSizeBytes,attr.numRegs,resident};
+  }
+  const auto z=shape(*p);float* ap=static_cast<float*>(workspace),*bp=ap+z.a;
+  const auto& maps=*prepared;
+  launch_pack(*p,z,A,B,ap,bp,stream,configurations.at(maps.id).vector_pack);
+  const int mh=int((p->m+1)/2),nh=int((p->n+1)/2);
+  const int tiles_n=FoldN && nh>BN && nh%BN==1?(nh-1)/BN:(nh+BN-1)/BN;
+  const int tiles_m=FoldM && mh>BM && mh%BM==1?(mh-1)/BM:(mh+BM-1)/BM;
+  fused_leaves<BM,BN,RM,RN,K,Pipeline,MinBlocks,ActiveK,FoldM,Threads,Unroll,FoldN,ProductWarps><<<tiles_m*tiles_n,Threads,Bytes,stream>>>(*p,z,maps.a,maps.b,C,D,tiles_n);
+  check(cudaPeekAtLastError());return {};
+}
+SWResources select(int id,const Problem* p,const float* A,const float* B,const float* C,
+                   float* D,void* workspace,cudaStream_t stream,const Maps* prepared=nullptr) {
+  if(p && !configurations.at(id).cutlass && !prepared) {
+    const auto encoded=prepare(*p,id,workspace);return select(id,p,A,B,C,D,workspace,stream,&encoded);
+  }
+  switch(id) {
+#define CONFIG(ID,BM,BN,RM,RN) case ID:return dispatch<BM,BN,RM,RN>(p,A,B,C,D,workspace,stream,prepared)
+    CONFIG(0,64,64,4,4);CONFIG(1,32,64,4,4);CONFIG(2,64,32,4,4);
+    CONFIG(3,32,32,4,4);CONFIG(4,64,64,8,8);CONFIG(5,64,32,8,4);
+#define CUTLASS_CONFIG(ID,BM,BN,WM,WN) case ID:return cutlass_dispatch<BM,BN,WM,WN>(p,A,B,C,D,workspace,stream)
+    CUTLASS_CONFIG(6,64,64,32,32);CUTLASS_CONFIG(7,64,128,32,64);
+    CUTLASS_CONFIG(8,128,64,64,32);CUTLASS_CONFIG(9,128,128,32,64);
+    CUTLASS_CONFIG(10,32,64,16,32);CUTLASS_CONFIG(11,64,32,32,16);
+#undef CUTLASS_CONFIG
+#define FUSED_CONFIG(ID,BM,BN,RM,RN,K) case ID:return fused_dispatch<BM,BN,RM,RN,K>(p,A,B,C,D,workspace,stream,prepared)
+    FUSED_CONFIG(12,32,64,4,16,16);FUSED_CONFIG(13,64,32,8,8,16);
+    FUSED_CONFIG(14,32,32,4,8,16);FUSED_CONFIG(15,32,16,4,4,16);
+    FUSED_CONFIG(16,16,32,2,8,16);FUSED_CONFIG(17,16,16,2,4,16);
+    FUSED_CONFIG(18,32,32,4,8,32);FUSED_CONFIG(19,32,16,4,4,32);
+    FUSED_CONFIG(20,16,16,2,4,32);FUSED_CONFIG(21,16,32,2,8,32);
+    FUSED_CONFIG(22,64,32,16,4,16);FUSED_CONFIG(23,64,32,16,4,32);
+    FUSED_CONFIG(24,32,64,8,8,16);FUSED_CONFIG(25,32,64,16,4,16);
+    FUSED_CONFIG(26,32,64,16,4,32);FUSED_CONFIG(27,32,32,8,4,16);
+    FUSED_CONFIG(28,32,32,8,4,32);FUSED_CONFIG(29,32,16,4,4,64);
+    FUSED_CONFIG(30,16,16,2,4,64);FUSED_CONFIG(31,16,32,4,4,32);
+    FUSED_CONFIG(32,16,32,4,4,16);
+#undef FUSED_CONFIG
+#define PIPE_CONFIG(ID,BM,BN,RM,RN,K,MIN) case ID:return fused_dispatch<BM,BN,RM,RN,K,true,MIN>(p,A,B,C,D,workspace,stream,prepared)
+    PIPE_CONFIG(33,64,32,8,8,16,1);PIPE_CONFIG(34,64,32,8,8,16,2);
+    PIPE_CONFIG(35,64,32,8,8,32,1);PIPE_CONFIG(36,32,64,8,8,16,1);
+    PIPE_CONFIG(37,32,32,8,4,16,2);PIPE_CONFIG(38,32,32,8,4,32,2);
+    PIPE_CONFIG(39,32,16,4,4,32,2);PIPE_CONFIG(40,16,32,4,4,32,2);PIPE_CONFIG(105,16,32,4,4,32,2);
+    PIPE_CONFIG(41,32,64,16,4,16,1);PIPE_CONFIG(42,64,32,16,4,16,1);
+    PIPE_CONFIG(46,64,32,8,8,16,2);PIPE_CONFIG(47,32,64,8,8,16,1);
+    PIPE_CONFIG(48,32,16,4,4,32,2);
+#undef PIPE_CONFIG
+#define EXTRA_CONFIG(ID,BM,BN,RM,RN,K,PIPE,MIN,TAIL) case ID:return fused_dispatch<BM,BN,RM,RN,K,PIPE,MIN,TAIL>(p,A,B,C,D,workspace,stream,prepared)
+    EXTRA_CONFIG(43,32,16,4,4,64,false,2,false);EXTRA_CONFIG(44,16,32,4,4,32,false,2,false);
+    EXTRA_CONFIG(45,64,32,8,8,16,false,2,false);
+    EXTRA_CONFIG(49,64,32,8,8,16,false,2,true);EXTRA_CONFIG(50,64,32,8,8,16,true,2,true);
+    EXTRA_CONFIG(51,64,32,8,8,32,true,1,true);EXTRA_CONFIG(104,64,32,8,8,32,true,1,true);EXTRA_CONFIG(52,32,64,8,8,16,false,2,true);
+    EXTRA_CONFIG(53,32,32,8,4,16,false,2,true);EXTRA_CONFIG(54,32,32,8,4,32,true,2,true);
+    EXTRA_CONFIG(64,64,64,16,8,16,false,1,true);EXTRA_CONFIG(65,64,64,16,8,16,true,1,true);
+    EXTRA_CONFIG(72,64,64,8,16,16,false,1,true);
+#undef EXTRA_CONFIG
+#define FOLD_CONFIG(ID,BM,BN,RM,RN,K,PIPE,MIN) case ID:return fused_dispatch<BM,BN,RM,RN,K,PIPE,MIN,true,true>(p,A,B,C,D,workspace,stream,prepared)
+    FOLD_CONFIG(55,64,32,8,8,16,false,2);FOLD_CONFIG(56,64,32,8,8,16,true,2);
+    FOLD_CONFIG(57,64,32,8,8,16,true,1);FOLD_CONFIG(58,64,32,8,8,32,true,1);
+    FOLD_CONFIG(59,32,64,8,8,16,false,2);FOLD_CONFIG(60,32,32,8,4,16,false,2);
+    FOLD_CONFIG(61,32,32,8,4,32,true,2);FOLD_CONFIG(62,32,16,4,4,32,true,2);
+    FOLD_CONFIG(63,16,32,4,4,32,true,2);
+    FOLD_CONFIG(66,64,64,16,8,16,false,1);FOLD_CONFIG(67,64,64,16,8,16,true,1);
+    FOLD_CONFIG(68,128,32,16,8,16,false,1);FOLD_CONFIG(69,128,32,16,8,16,true,1);
+    FOLD_CONFIG(70,32,128,16,8,16,false,1);FOLD_CONFIG(71,32,128,16,8,16,true,1);
+    FOLD_CONFIG(73,64,64,8,16,16,true,1);
+#undef FOLD_CONFIG
+#define SCHEDULE_CONFIG(ID,BM,BN,RM,RN,K,PIPE,MIN,TAIL,FOLD,THREADS,UNROLL) case ID:return fused_dispatch<BM,BN,RM,RN,K,PIPE,MIN,TAIL,FOLD,THREADS,UNROLL>(p,A,B,C,D,workspace,stream,prepared)
+    SCHEDULE_CONFIG(74,64,64,16,8,16,false,1,true,false,256,4);
+    SCHEDULE_CONFIG(75,64,64,16,8,16,false,1,true,false,256,8);
+    SCHEDULE_CONFIG(76,64,64,16,8,16,false,1,true,false,256,1);
+    SCHEDULE_CONFIG(77,64,64,16,8,16,true,1,true,false,256,4);
+    SCHEDULE_CONFIG(78,64,64,16,8,16,false,1,true,false,224,4);
+    SCHEDULE_CONFIG(79,64,64,16,8,16,true,1,true,false,224,4);
+    SCHEDULE_CONFIG(80,128,32,16,8,16,false,1,true,true,224,4);
+    SCHEDULE_CONFIG(81,32,128,16,8,16,false,1,true,true,224,4);
+    SCHEDULE_CONFIG(82,64,32,8,8,32,true,1,true,false,224,8);
+    SCHEDULE_CONFIG(83,64,32,8,8,16,true,2,true,false,224,8);
+    SCHEDULE_CONFIG(84,32,16,4,4,32,true,2,false,false,224,8);
+    SCHEDULE_CONFIG(85,32,16,4,4,64,false,2,false,false,224,8);
+    SCHEDULE_CONFIG(86,16,32,4,4,32,true,2,false,false,224,8);
+    SCHEDULE_CONFIG(87,64,64,16,8,16,true,1,true,true,224,4);
+    SCHEDULE_CONFIG(88,64,64,8,16,16,false,1,true,false,224,4);
+    SCHEDULE_CONFIG(89,64,32,8,8,16,true,2,true,true,224,8);
+#undef SCHEDULE_CONFIG
+#define BALANCED_CONFIG(ID,BM,BN,RM,RN,K,PIPE,MIN,FOLDM,THREADS,UNROLL,FOLDN) case ID:return fused_dispatch<BM,BN,RM,RN,K,PIPE,MIN,true,FOLDM,THREADS,UNROLL,FOLDN>(p,A,B,C,D,workspace,stream,prepared)
+    BALANCED_CONFIG(90,104,32,12,8,16,false,1,false,256,0,false);
+    BALANCED_CONFIG(91,104,32,12,8,16,true,1,false,256,0,false);
+    BALANCED_CONFIG(92,104,32,12,8,16,false,1,false,224,8,false);
+    BALANCED_CONFIG(93,104,32,12,8,16,false,1,false,256,8,false);
+    BALANCED_CONFIG(94,48,64,12,8,16,false,1,false,256,0,true);
+    BALANCED_CONFIG(95,48,64,12,8,16,true,1,false,256,0,true);
+    BALANCED_CONFIG(96,48,64,12,8,32,true,1,false,256,16,true);
+    BALANCED_CONFIG(97,64,48,8,12,16,false,1,true,256,0,true);
+    BALANCED_CONFIG(98,64,48,8,12,16,true,1,true,256,0,true);
+    BALANCED_CONFIG(99,64,48,8,12,32,true,1,true,256,16,true);
+    BALANCED_CONFIG(100,32,96,8,12,16,true,1,true,256,0,true);
+    BALANCED_CONFIG(101,72,48,8,12,16,true,1,false,256,0,true);
+    BALANCED_CONFIG(102,64,24,8,6,16,true,2,true,256,0,false);
+    BALANCED_CONFIG(103,64,24,8,6,16,true,2,true,256,0,true);
+#undef BALANCED_CONFIG
+#undef CONFIG
+#define MULTI_CONFIG(ID,BM,BN,RM,RN,K,PIPE,TAIL,THREADS,PP) case ID:return fused_dispatch<BM,BN,RM,RN,K,PIPE,1,TAIL,false,THREADS,0,false,PP>(p,A,B,C,D,workspace,stream,prepared)
+    MULTI_CONFIG(106,64,32,4,8,32,true,true,480,2);
+    MULTI_CONFIG(107,64,32,4,8,16,true,true,480,2);
+    MULTI_CONFIG(108,64,32,2,8,32,true,true,928,4);
+    MULTI_CONFIG(109,64,32,2,8,16,true,true,928,4);
+    MULTI_CONFIG(110,16,32,2,4,32,true,false,480,2);
+    MULTI_CONFIG(111,32,16,2,4,64,false,false,480,2);
+    MULTI_CONFIG(112,64,32,4,8,32,false,true,480,2);
+#undef MULTI_CONFIG
+    default:throw std::invalid_argument("invalid FP32 packed configuration");
+  }
+}
+}
+bool problem(const Problem& p) {
+  return p.dtype==DType::FP32 && !p.trans_a && !p.trans_b && p.m>0 && p.n>0 && p.k>0 &&
+    std::max({p.m,p.n,p.k,p.lda,p.ldb})<=32768;
+}
+Shape shape(const Problem& p) {
+  const auto align=[](int64_t x){return int((x+31)/32*32);};
+  const int mp=align((p.m+1)/2),np=align((p.n+1)/2),kp=align((p.k+1)/2);
+  const size_t a=size_t(7)*mp*kp,b=size_t(7)*kp*np,c=size_t(7)*mp*np;
+  return {mp,np,kp,a,b,c,(a+b+c)*4};
+}
+Maps prepare(const Problem& p,int id,void* workspace) {
+  const auto& c=configurations.at(id);const auto z=shape(p);
+  if(!problem(p) || !workspace || reinterpret_cast<uintptr_t>(workspace)%256 || c.cutlass)
+    throw std::invalid_argument("incompatible FP32 packed map preparation");
+  Maps maps;maps.workspace=workspace;maps.id=id;maps.mp=z.mp;maps.np=z.np;maps.kp=z.kp;
+  float* ap=static_cast<float*>(workspace),*bp=ap+z.a;
+  for(int side=0;side<2;++side) {
+    const uint64_t dims[3]={uint64_t(side?z.np:z.mp),uint64_t(z.kp),7};
+    const uint64_t strides[2]={dims[0]*4,dims[0]*z.kp*4};
+    const uint32_t box[3]={uint32_t(side?c.bn+(c.fold_n?4:0):c.bm+(c.fold_m?4:0)),uint32_t(c.fused?c.bk:32),uint32_t(c.fused?7:1)},es[3]={1,1,1};
+    const auto result=cuTensorMapEncodeTiled(side?&maps.b:&maps.a,CU_TENSOR_MAP_DATA_TYPE_FLOAT32,
+      3,side?bp:ap,dims,strides,box,es,CU_TENSOR_MAP_INTERLEAVE_NONE,
+      CU_TENSOR_MAP_SWIZZLE_NONE,CU_TENSOR_MAP_L2_PROMOTION_NONE,CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
+    if(result!=CUDA_SUCCESS)throw std::runtime_error("FP32 packed tensor map: "+std::to_string(int(result)));
+  }
+  return maps;
+}
+void run_prepared(const Problem& p,int id,const float* A,const float* B,const float* C,
+                  float* D,void* workspace,cudaStream_t stream,const Maps& maps) {
+  const auto z=shape(p);
+  if(!problem(p) || maps.id!=id || maps.workspace!=workspace || maps.mp!=z.mp || maps.np!=z.np || maps.kp!=z.kp)
+    throw std::invalid_argument("prepared FP32 packed maps do not match binding");
+  select(id,&p,A,B,C,D,workspace,stream,&maps);
+}
+SWResources setup(int id) {return select(id,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr);}
+std::string name(int id) {
+  const auto& c=configurations.at(id);
+  if(c.fused)return "sw_fp32_batch_fused;leaf_terms=7;tile="+std::to_string(c.bm)+"x"+std::to_string(c.bn)+
+    ";thread_tile="+std::to_string(c.rm)+"x"+std::to_string(c.rn)+";bk="+std::to_string(c.bk)+
+    ";threads="+std::to_string(c.threads)+";k_unroll="+std::to_string(c.unroll?c.unroll:(c.pipeline?c.bk:16))+
+    ";extra_m_rows="+std::to_string(c.bm-c.rm*(32/(c.bn/c.rn))*c.warps_per_product)+";fold_one_n="+std::to_string(c.fold_n)+";b_box_cols="+std::to_string(c.bn+(c.fold_n?4:0))+
+    ";fold_one_m="+std::to_string(c.fold_m)+";a_box_rows="+std::to_string(c.bm+(c.fold_m?4:0))+
+    ";pack_vector_shared="+std::to_string(c.vector_pack?16896:0)+";pack_vector_if_aligned="+std::to_string(c.vector_pack)+";active_k="+std::to_string(c.active_k)+
+    ";register_pipeline="+std::to_string(c.pipeline)+";min_blocks="+std::to_string(c.min_blocks)+
+    ";transforms=fp32;leaf_math=fp32_simt;accum=fp32;load=tma;box_products=7;copies_per_stage=2;"
+    "raw_stages=2;issuer=thread"+std::to_string(c.threads==32*7*c.warps_per_product?0:32*7*c.warps_per_product)+";warps_per_product="+std::to_string(c.warps_per_product)+";product_warps="+std::to_string(7*c.warps_per_product)+";calls=pack+fused_leaves_combine;resource_scope=leaf;pack_shared=16896;pack_grid_2d_if_no_extra_ctas=1;residual_correction=off";
+  if(c.cutlass)return "sw_fp32_batch;leaf_terms=7;batch_count=7;tile="+std::to_string(c.bm)+"x"+std::to_string(c.bn)+
+    ";warp_tile="+std::to_string(c.wm)+"x"+std::to_string(c.wn)+
+    ";bk=8;transforms=fp32;leaf_math=fp32_simt;accum=fp32;load=cutlass_simt;stages=2;"
+    "calls=pack+seven_leaves+combine;resource_scope=leaf;pack_shared=16896;residual_correction=off";
+  return "sw_fp32_batch;leaf_terms=7;batch_count=7;tile="+std::to_string(c.bm)+"x"+std::to_string(c.bn)+
+    ";thread_tile="+std::to_string(c.rm)+"x"+std::to_string(c.rn)+
+    ";bk=32;transforms=fp32;leaf_math=fp32_simt;accum=fp32;load=tma;raw_stages=2;issuer=thread0;"
+    "calls=pack+seven_leaves+combine;resource_scope=leaf;pack_shared=16896;pack_grid_2d_if_no_extra_ctas=1;residual_correction=off";
+}
+void run(const Problem& p,int id,const float* A,const float* B,const float* C,
+         float* D,void* workspace,cudaStream_t stream) {
+  if(!problem(p) || !workspace || reinterpret_cast<uintptr_t>(workspace)%256)
+    throw std::invalid_argument("FP32 packed binding/workspace is incompatible");
+  select(id,&p,A,B,C,D,workspace,stream);
+}
+}

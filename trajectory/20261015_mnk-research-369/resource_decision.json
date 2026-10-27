@@ -1,0 +1,41 @@
+{
+  "status": "2/4 resource variants pass; N160 safely rejected before launch",
+  "variants": [
+    {
+      "variant": 0,
+      "tile_n": 128,
+      "window": 1,
+      "resources_pass": true,
+      "exact_original_ab_pass": true,
+      "launch_rejected_by_resource_guard": false
+    },
+    {
+      "variant": 1,
+      "tile_n": 160,
+      "window": 1,
+      "resources_pass": false,
+      "exact_original_ab_pass": false,
+      "launch_rejected_by_resource_guard": true
+    },
+    {
+      "variant": 2,
+      "tile_n": 128,
+      "window": 3,
+      "resources_pass": true,
+      "exact_original_ab_pass": true,
+      "launch_rejected_by_resource_guard": false
+    },
+    {
+      "variant": 3,
+      "tile_n": 160,
+      "window": 3,
+      "resources_pass": false,
+      "exact_original_ab_pass": false,
+      "launch_rejected_by_resource_guard": true
+    }
+  ],
+  "driver_exit": 1,
+  "driver_exit_reason": "Each N160 variant has only one resident CTA, below required two; no correctness test or timing launched for them.",
+  "next": "Measure N128 windows1/3 diagnostic only against existing tuned dispatcher on rotating random inputs; no production369 changes or new performance certification.",
+  "latest_certification": "353:16/28"
+}

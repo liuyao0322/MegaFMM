@@ -1,0 +1,9 @@
+{
+  "status": "Resource/correctness probe running; no production369 edits",
+  "prior_evidence": "Research369 N128 two-CTA K32S4 loses4096/8192 BF/FP; N160 actual residency1. Current production368all110validated; latest independent35316/28.",
+  "change": "Use supported cooperative epilogue128x16 rather than default128x32, with five K32 input stages; testN128/N160 windows1/3.",
+  "local_authority": "third_party/cutlass/include/cutlass/epilogue/collective/builders/sm90_builder.inl:sm90_compute_tile_shape_or_override enforcesM128 for cooperative schedules and N divisible16; sm90_get_tma_dispatch_policy chooses min(EpiTiles,2) D buffers.",
+  "rationale": "Halve epilogue tile storage while retaining two D buffers, then spend freed shared memory on a fifth input stage. Store count increases and performance benefit is unproven.",
+  "guards": "Actual>=2CTA,localSizeBytes0 before launch;12 fresh nonsymmetric originalAB FP64 tails including K136/168 (five/six stages), persistent12289x520K8/K1032,alpha.5,padding.",
+  "next": "Only resource/correctness passing variants enter diagnostic paired timing; original formal precision/timing/certification unchanged."
+}

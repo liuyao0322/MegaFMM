@@ -1,0 +1,220 @@
+{
+  "source_commit": "77e1489",
+  "baseline_commit": "58743df",
+  "scope": "1024^3 BF16/FP16, FP32 output",
+  "optimization_scope": "one authorized streaming-recombination candidate; sustained goal remains paused",
+  "ncu_version": "2025.1.1",
+  "ncu_passes_per_dtype": 39,
+  "clock_control": "none",
+  "cache_control": "none",
+  "paired_order": [
+    "launch A1",
+    "launch B1",
+    "launch B2",
+    "launch A2",
+    "graph A1",
+    "graph B1"
+  ],
+  "paired_comparison": [
+    {
+      "mode": "launch",
+      "dtype": "bf16",
+      "iter81_us": 21.66463971135,
+      "iter82_us": 21.3182401657,
+      "latency_reduction_pct": 1.598916715280152
+    },
+    {
+      "mode": "launch",
+      "dtype": "fp16",
+      "iter81_us": 21.7545592785,
+      "iter82_us": 21.4294397831,
+      "latency_reduction_pct": 1.4944889999280009
+    },
+    {
+      "mode": "graph",
+      "dtype": "bf16",
+      "iter81_us": 21.0831999779,
+      "iter82_us": 20.9052801132,
+      "latency_reduction_pct": 0.84389402408791
+    },
+    {
+      "mode": "graph",
+      "dtype": "fp16",
+      "iter81_us": 21.175360679599997,
+      "iter82_us": 20.8700799942,
+      "latency_reduction_pct": 1.4416787983880686
+    }
+  ],
+  "metrics": {
+    "iter81": {
+      "bf16": {
+        "gpu__time_duration.sum": {
+          "value": "21.920000",
+          "unit": "us"
+        },
+        "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+          "value": "18.909706",
+          "unit": "%"
+        },
+        "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+          "value": "32.948700",
+          "unit": "%"
+        },
+        "smsp__warps_eligible.avg.per_cycle_active": {
+          "value": "0.433859",
+          "unit": "warp"
+        },
+        "smsp__inst_executed.sum": {
+          "value": "5720550.000000",
+          "unit": "inst"
+        },
+        "launch__registers_per_thread": {
+          "value": "110",
+          "unit": "register/thread"
+        },
+        "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+          "value": "6.236376",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio": {
+          "value": "0.060753",
+          "unit": "inst"
+        }
+      },
+      "fp16": {
+        "gpu__time_duration.sum": {
+          "value": "21.952000",
+          "unit": "us"
+        },
+        "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+          "value": "19.140925",
+          "unit": "%"
+        },
+        "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+          "value": "33.850972",
+          "unit": "%"
+        },
+        "smsp__warps_eligible.avg.per_cycle_active": {
+          "value": "0.447060",
+          "unit": "warp"
+        },
+        "smsp__inst_executed.sum": {
+          "value": "5744504.000000",
+          "unit": "inst"
+        },
+        "launch__registers_per_thread": {
+          "value": "110",
+          "unit": "register/thread"
+        },
+        "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+          "value": "6.292034",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio": {
+          "value": "0.031344",
+          "unit": "inst"
+        }
+      }
+    },
+    "iter82": {
+      "bf16": {
+        "gpu__time_duration.sum": {
+          "value": "22.080000",
+          "unit": "us"
+        },
+        "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+          "value": "18.878744",
+          "unit": "%"
+        },
+        "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+          "value": "34.484068",
+          "unit": "%"
+        },
+        "smsp__warps_eligible.avg.per_cycle_active": {
+          "value": "0.479809",
+          "unit": "warp"
+        },
+        "smsp__inst_executed.sum": {
+          "value": "6119946.000000",
+          "unit": "inst"
+        },
+        "launch__registers_per_thread": {
+          "value": "110",
+          "unit": "register/thread"
+        },
+        "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+          "value": "5.577116",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio": {
+          "value": "0.054643",
+          "unit": "inst"
+        }
+      },
+      "fp16": {
+        "gpu__time_duration.sum": {
+          "value": "21.952000",
+          "unit": "us"
+        },
+        "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+          "value": "18.966351",
+          "unit": "%"
+        },
+        "smsp__issue_active.avg.pct_of_peak_sustained_active": {
+          "value": "35.512555",
+          "unit": "%"
+        },
+        "smsp__warps_eligible.avg.per_cycle_active": {
+          "value": "0.494285",
+          "unit": "warp"
+        },
+        "smsp__inst_executed.sum": {
+          "value": "6144374.000000",
+          "unit": "inst"
+        },
+        "launch__registers_per_thread": {
+          "value": "110",
+          "unit": "register/thread"
+        },
+        "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+          "value": "5.629223",
+          "unit": "inst"
+        },
+        "smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio": {
+          "value": "0.028881",
+          "unit": "inst"
+        }
+      }
+    }
+  },
+  "p_accesses": {
+    "bf16": {
+      "STS": {
+        "static_instructions": 16,
+        "n_way": 1,
+        "excessive_wavefronts": 0
+      },
+      "LDS": {
+        "static_instructions": 42,
+        "n_way": 1,
+        "excessive_wavefronts": 0
+      }
+    },
+    "fp16": {
+      "STS": {
+        "static_instructions": 16,
+        "n_way": 1,
+        "excessive_wavefronts": 0
+      },
+      "LDS": {
+        "static_instructions": 42,
+        "n_way": 1,
+        "excessive_wavefronts": 0
+      }
+    }
+  },
+  "source_sha256": {
+    "solution/sw_pipeline.cu": "16ea84da7ca864f3cd0b7941048c0fca9d27577cebd344bb17f852c31539c89b",
+    "solution/plan.cpp": "a5ba05fc0066bb60322382bdbd91f71fa130e1eda8a19ba7dc5ea5460235e863"
+  }
+}

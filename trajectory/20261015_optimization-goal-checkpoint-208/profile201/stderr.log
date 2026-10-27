@@ -1,0 +1,2 @@
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=sw_leaf_cluster8;grid=8x4x7;threads=384;tc_groups=2;smem=163968;bk=128;stages=2;workspace=4194304;leaf_terms=7;residual_correction=off;recombine=last_cta_rowmajor_loop_global_release_acquire;pack=96raw_352transformed;publication=driver_workspace_cuda12.4

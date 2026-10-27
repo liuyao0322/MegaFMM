@@ -1,0 +1,232 @@
+--- a/solution/plan.cpp
++++ b/solution/plan.cpp
+@@ -1,5 +1,6 @@
+ #include "megafmm/gemm.h"
+ #include "internal.h"
++#include "tuning_confirmation.h"
+ #include <cublasLt.h>
+ #include <algorithm>
+ #include <array>
+@@ -298,6 +299,8 @@
+   size_t bytes = 0;
+   bool strategy = false, strategy_confirmed = false;
+   int confirm_candidate = -1;
++  int confirm_attempts = 0, confirm_groups = 0;
++  std::string confirm_trace;
+   float confirm_dense_ms = NAN, confirm_custom_ms = NAN;
+   int hopper_selected = -1, sm_count = 0, strategy_input_sets = 1;
+   int strategy_fp64_rechecks = 0, strategy_fp64_accepted = 0;
+@@ -374,6 +377,7 @@
+                    float* D,void* workspace,cudaStream_t stream) {
+   plan.hopper_selected=-1;plan.strategy_confirmed=false;plan.confirm_candidate=-1;
+   plan.confirm_dense_ms=plan.confirm_custom_ms=NAN;
++  plan.confirm_attempts=plan.confirm_groups=0;plan.confirm_trace.clear();
+   plan.strategy_ms.fill(NAN);
+   plan.strategy_fp64_rechecks=plan.strategy_fp64_accepted=0;
+   if(!plan.sm_count) return;
+@@ -471,40 +475,46 @@
+     lt.selected_tuning_ms=medians[baseline];lt.strategy_reranked=true;
+     lt.strategy_input_sets=plan.strategy_input_sets;
+     plan.strategy_ms[0]=medians[baseline];
++    // Short batches nominate candidates; only sustained batches accept them.
++    // Do not discard a fast median for one noisy short round or a top-two cap.
+     std::vector<size_t> shortlist;
+-    for(size_t r=lt_pool.size();r<routes.size();++r) if(medians[r]<medians[baseline]*0.97f) {
+-      bool stable=true;
+-      for(int round=0;round<5;++round) stable=stable && times[r][round]<times[baseline][round];
+-      if(stable) shortlist.push_back(r);
+-    }
++    for(size_t r=lt_pool.size();r<routes.size();++r)
++      if(medians[r]<medians[baseline]*0.97f)shortlist.push_back(r);
+     std::sort(shortlist.begin(),shortlist.end(),[&](size_t x,size_t y){return medians[x]<medians[y];});
+-    if(shortlist.size()>2) shortlist.resize(2);
+-    // Independently confirm short-burst winners using full100-call batches.
+-    // This exposes sustained-power/cache behavior missed by twenty-call ranking.
+-    for(size_t candidate:shortlist) {
+-      std::array<float,5> dense_holdout{},custom_holdout{};
+-      for(int warm=0;warm<20;++warm) {
+-        launch(baseline,warm%plan.strategy_input_sets);
+-        launch(candidate,warm%plan.strategy_input_sets);
++    auto warm=[&](size_t candidate) {
++      for(int w=0;w<20;++w) {
++        launch(baseline,w%plan.strategy_input_sets);
++        launch(candidate,w%plan.strategy_input_sets);
+       }
+       cuda_check(cudaStreamSynchronize(stream),"strategy holdout warmup");
+-      for(int round=0;round<5;++round) for(int order=0;order<2;++order) {
++    };
++    auto measure=[&](size_t candidate,int round) {
++      float elapsed_ms[2]{};
++      for(int order=0;order<2;++order) {
+         const bool custom=round%2 ? order==0:order==1;
+         const size_t route=custom?candidate:baseline;
+         cuda_check(cudaEventRecord(start,stream),"strategy holdout start");
+-        for(int rep=0;rep<100;++rep) launch(route,rep%plan.strategy_input_sets);
++        for(int rep=0;rep<100;++rep)launch(route,rep%plan.strategy_input_sets);
+         cuda_check(cudaEventRecord(stop,stream),"strategy holdout stop");
+         cuda_check(cudaEventSynchronize(stop),"strategy holdout wait");
+-        float elapsed=0;
+-        cuda_check(cudaEventElapsedTime(&elapsed,start,stop),"strategy holdout elapsed");
+-        (custom?custom_holdout:dense_holdout)[round]=elapsed/100;
+-      }
+-      bool stable=true;
+-      for(int round=0;round<5;++round) stable=stable && custom_holdout[round]<dense_holdout[round];
+-      auto d=dense_holdout,c=custom_holdout;std::sort(d.begin(),d.end());std::sort(c.begin(),c.end());
+-      plan.confirm_candidate=routes[candidate];plan.confirm_dense_ms=d[2];plan.confirm_custom_ms=c[2];
+-      if(stable && c[2]<d[2]*0.97f) {
+-        plan.hopper_selected=routes[candidate];plan.strategy_confirmed=true;break;
++        cuda_check(cudaEventElapsedTime(&elapsed_ms[custom],start,stop),"strategy holdout elapsed");
++        elapsed_ms[custom]/=100;
++      }
++      return std::pair<float,float>{elapsed_ms[0],elapsed_ms[1]};
++    };
++    const auto confirmation=detail::confirm_ranked_candidates(shortlist,warm,measure);
++    plan.confirm_attempts=int(confirmation.attempts.size());
++    for(const auto& attempt:confirmation.attempts) {
++      const int id=routes[attempt.route];
++      plan.confirm_candidate=id;plan.confirm_groups=int(attempt.groups.size());
++      plan.confirm_dense_ms=attempt.dense_median;plan.confirm_custom_ms=attempt.custom_median;
++      if(!plan.confirm_trace.empty())plan.confirm_trace+='|';
++      plan.confirm_trace+=std::to_string(id)+":"+std::to_string(attempt.groups.size())+":"+
++          (attempt.accepted?"pass":attempt.groups.size()<5?"early_fail":"median_or_pair_fail");
++      for(auto pair:attempt.groups)
++        plan.confirm_trace+=":"+std::to_string(pair.first)+","+std::to_string(pair.second);
++      if(attempt.accepted) {
++        plan.hopper_selected=id;plan.strategy_confirmed=true;
+       }
+     }
+   } catch(...) {cleanup();throw;}
+@@ -537,6 +547,8 @@
+     info+=";rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5_or_original_fp64_gate";
+     info+=";fp64_rechecks="+std::to_string(impl_->strategy_fp64_rechecks)+";fp64_accepted="+std::to_string(impl_->strategy_fp64_accepted);
+     info+=";input_sets="+std::to_string(impl_->strategy_input_sets)+";dense_rerank=top8";
++    info+=";nomination=median3percent;confirmation_coverage=ranked_until_pass;confirmation_attempts="+std::to_string(impl_->confirm_attempts)+";confirmation_groups="+std::to_string(impl_->confirm_groups);
++    info+=";confirmation_trace="+impl_->confirm_trace;
+     info+=";confirmation=5x100;confirmation_status="+std::string(impl_->confirm_candidate<0?"skipped":impl_->strategy_confirmed?"passed":"failed");
+     if(impl_->confirm_candidate>=0) info+=";confirmed_candidate="+std::string(detail::hopper_candidate_name(impl_->confirm_candidate))+";confirmed_dense_ms="+std::to_string(impl_->confirm_dense_ms)+";confirmed_custom_ms="+std::to_string(impl_->confirm_custom_ms);
+     info+=";dense_ms="+std::to_string(impl_->strategy_ms[0]);
+--- /dev/null
++++ b/solution/tuning_confirmation.h
+@@ -0,0 +1,59 @@
++#pragma once
++// Host-only policy for explicit tuning. Callbacks measure complete invocations;
++// this helper never launches work, changes streams, or retains input/output data.
++#include <algorithm>
++#include <cmath>
++#include <cstddef>
++#include <limits>
++#include <utility>
++#include <vector>
++
++namespace megafmm::detail {
++struct ConfirmationAttempt {
++  std::size_t route;
++  std::vector<std::pair<float,float>> groups; // dense, custom milliseconds
++  float dense_median=0,custom_median=0;
++  bool accepted=false;
++};
++struct ConfirmationResult {
++  std::vector<ConfirmationAttempt> attempts;
++  bool accepted() const {return !attempts.empty() && attempts.back().accepted;}
++};
++template<class Warm,class Measure>
++ConfirmationResult confirm_ranked_candidates(const std::vector<std::size_t>& ranked,
++                                             Warm&& warm,Measure&& measure) {
++  ConfirmationResult result;
++  for(std::size_t route:ranked) {
++    warm(route);
++    ConfirmationAttempt attempt;attempt.route=route;
++    bool every_pair_wins=true,valid_timings=true;
++    for(int round=0;round<5;++round) {
++      auto pair=measure(route,round);
++      attempt.groups.push_back(pair);
++      const float dense=pair.first,custom=pair.second;
++      // A failed pair makes the unchanged five-pair gate impossible to pass.
++      // Reject immediately and give the next ranked candidate a chance.
++      valid_timings=std::isfinite(dense) && std::isfinite(custom) && dense>0 && custom>0;
++      if(!valid_timings || !(custom<dense)) {
++        every_pair_wins=false;break;
++      }
++    }
++    if(valid_timings) {
++      std::vector<float> dense,custom;
++      for(auto pair:attempt.groups){dense.push_back(pair.first);custom.push_back(pair.second);}
++      std::sort(dense.begin(),dense.end());std::sort(custom.begin(),custom.end());
++      attempt.dense_median=dense[dense.size()/2];
++      attempt.custom_median=custom[custom.size()/2];
++    } else {
++      attempt.dense_median=attempt.custom_median=std::numeric_limits<float>::quiet_NaN();
++    }
++    // Preserve the original sustained confirmation gate exactly: five wins,
++    // and custom median strictly below 97% of the dense median.
++    attempt.accepted=every_pair_wins && attempt.groups.size()==5 &&
++        attempt.custom_median<attempt.dense_median*0.97f;
++    result.attempts.push_back(std::move(attempt));
++    if(result.accepted())break;
++  }
++  return result;
++}
++} // namespace megafmm::detail
+--- /dev/null
++++ b/tests/test_tuning_confirmation.cpp
+@@ -0,0 +1,49 @@
++#include "tuning_confirmation.h"
++#include <cstdio>
++#include <limits>
++#include <stdexcept>
++#include <vector>
++using namespace megafmm::detail;
++void require(bool value,const char* message){if(!value)throw std::runtime_error(message);}
++int main(){try{
++  // Sustained winner is ninth in short-burst ranking. Earlier candidates fail
++  // at different rounds; a fixed top-two/top-eight cap would miss this winner.
++  std::vector<std::size_t> ranked={0,1,2,3,4,5,6,7,8,9};
++  int warm_count=0,measure_count=0;
++  auto late=confirm_ranked_candidates(ranked,[&](std::size_t){++warm_count;},
++      [&](std::size_t route,int round){++measure_count;
++        return std::pair<float,float>{1.f,route==8?.9f:(round==int(route%5)?1.01f:.9f)};});
++  require(late.accepted() && late.attempts.size()==9 && late.attempts.back().route==8,"late sustained winner was skipped");
++  require(warm_count==9,"warmup performed for a skipped or accepted successor");
++  int expected=5;for(int route=0;route<8;++route)expected+=route%5+1;
++  require(measure_count==expected,"failed candidate was not rejected at its first losing pair");
++  require(late.attempts.back().groups.size()==5,"accepted without five complete paired groups");
++  // A single losing pair invalidates an otherwise fast median.
++  auto losing=confirm_ranked_candidates({0},[](std::size_t){},[](std::size_t,int round){return std::pair<float,float>{1.f,round==3?1.001f:.8f};});
++  require(!losing.accepted() && losing.attempts[0].groups.size()==4,"one losing group was ignored");
++  // Winning every pair by only two percent must retain the original 3% gate.
++  auto weak=confirm_ranked_candidates({0},[](std::size_t){},[](std::size_t,int){return std::pair<float,float>{1.f,.98f};});
++  require(!weak.accepted() && weak.attempts[0].groups.size()==5,"median improvement gate was relaxed");
++  auto boundary=confirm_ranked_candidates({0},[](std::size_t){},[](std::size_t,int){return std::pair<float,float>{1.f,.97f};});
++  require(!boundary.accepted(),"strict original 97% boundary was changed");
++  auto after_weak=confirm_ranked_candidates({0,1},[](std::size_t){},[](std::size_t route,int){return std::pair<float,float>{1.f,route==0?.98f:.95f};});
++  require(after_weak.accepted() && after_weak.attempts.size()==2 && after_weak.attempts[0].groups.size()==5,"median-only failure prevented later confirmation");
++  // Median ratio, rather than median of pairwise ratios, is the frozen gate.
++  auto old_median=confirm_ranked_candidates({0},[](std::size_t){},[](std::size_t,int r){
++    constexpr float d[]={1,1,100,100,100},c[]={.98f,.98f,98,50,50};return std::pair<float,float>{d[r],c[r]};});
++  require(old_median.accepted(),"original ratio-of-medians policy changed");
++  auto median_reject=confirm_ranked_candidates({0},[](std::size_t){},[](std::size_t,int r){
++    constexpr float d[]={1,1,100,10000,10000},c[]={.5f,.5f,98,5000,5000};return std::pair<float,float>{d[r],c[r]};});
++  require(!median_reject.accepted(),"ratio-of-medians rejection changed to median of ratios");
++  for(float invalid:{0.f,-1.f,std::numeric_limits<float>::infinity(),std::numeric_limits<float>::quiet_NaN()}) {
++    auto bad_custom=confirm_ranked_candidates({0},[](std::size_t){},[&](std::size_t,int){return std::pair<float,float>{1.f,invalid};});
++    auto bad_dense=confirm_ranked_candidates({0},[](std::size_t){},[&](std::size_t,int){return std::pair<float,float>{invalid,.5f};});
++    require(!bad_custom.accepted() && !bad_dense.accepted(),"invalid timing accepted");
++  }
++  auto late_nan=confirm_ranked_candidates({0},[](std::size_t){},[](std::size_t,int round){return std::pair<float,float>{1.f,round==2?std::numeric_limits<float>::quiet_NaN():.9f};});
++  require(!late_nan.accepted() && late_nan.attempts[0].groups.size()==3,"nonfinite prefix was sorted or accepted");
++  int calls=0;
++  auto empty=confirm_ranked_candidates({},[&](std::size_t){++calls;},[&](std::size_t,int){++calls;return std::pair<float,float>{1,.5f};});
++  require(!empty.accepted() && calls==0,"empty ranking launched work");
++  puts("PASS late ninth winner, failed-prefix early rejection, five complete wins, unchanged median/boundary gates, invalid/empty timing rejection");return 0;
++}catch(const std::exception& e){fprintf(stderr,"ERROR %s\n",e.what());return 1;}}
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -46,3 +46,8 @@
+ target_link_libraries(test_tuning_precision PRIVATE megafmm)
+ target_compile_options(test_tuning_precision PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_90a,code=sm_90a>)
+ add_test(NAME tuning_precision_guard COMMAND test_tuning_precision)
++
++# Host-only deterministic regression tests for sustained candidate selection.
++add_executable(test_tuning_confirmation tests/test_tuning_confirmation.cpp)
++target_include_directories(test_tuning_confirmation PRIVATE solution)
++add_test(NAME tuning_confirmation_policy COMMAND test_tuning_confirmation)

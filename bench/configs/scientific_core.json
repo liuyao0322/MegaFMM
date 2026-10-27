@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "suite": "scientific_core",
+  "description": "Main FP32 scientific comparison: large dense square covariance propagation and three numerical application checks. End-to-end application wall time is primary; quality failures remain reported results.",
+  "backends": ["cublaslt", "megafmm", "torch", "practical_torch"],
+  "baseline": "cublaslt",
+  "modes": ["launch"],
+  "measurement": {
+    "independent_processes": 3,
+    "warmup": 2,
+    "groups": 5,
+    "calls_per_group": 2,
+    "fresh_quality_trials": 2,
+    "rotate_inputs": 2,
+    "timeout_seconds": 1800
+  },
+  "backend_options": {
+    "workspace_limit": 2147483648,
+    "heuristic_candidates": 16,
+    "tuning_input_sets": 2,
+    "sw_tuning_candidates": 0,
+    "strict": true
+  },
+  "cases": [
+    {"id": "covariance_fp32_1024", "kind": "covariance", "dtype": "fp32", "n": 1024, "iterations": 5, "transition_radius": 0.95, "quality": {"relative_error": 1e-5, "symmetry_error": 1e-5}},
+    {"id": "covariance_fp32_2048", "kind": "covariance", "dtype": "fp32", "n": 2048, "iterations": 5, "transition_radius": 0.95, "quality": {"relative_error": 1e-5, "symmetry_error": 1e-5}},
+    {"id": "covariance_fp32_4096", "kind": "covariance", "dtype": "fp32", "n": 4096, "iterations": 5, "transition_radius": 0.95, "quality": {"relative_error": 1e-5, "symmetry_error": 1e-5}},
+    {"id": "covariance_fp32_8192", "kind": "covariance", "dtype": "fp32", "n": 8192, "iterations": 5, "transition_radius": 0.95, "quality": {"relative_error": 1e-5, "symmetry_error": 1e-5}},
+    {"id": "sqrt_fp32_512", "kind": "matrix_function", "dtype": "fp32", "n": 512, "function": "sqrt", "iterations": 26, "condition_number": 100, "quality": {"residual": 1e-5, "relative_error": 1e-4, "symmetry_error": 1e-5}},
+    {"id": "inverse_sqrt_fp32_1024", "kind": "matrix_function", "dtype": "fp32", "n": 1024, "function": "inverse_sqrt", "iterations": 26, "condition_number": 100, "quality": {"residual": 1e-5, "relative_error": 1e-4, "symmetry_error": 1e-5}},
+    {"id": "purification_fp32_1024", "kind": "purification", "dtype": "fp32", "n": 1024, "occupied": 512, "iterations": 25, "gap": 0.1, "quality": {"residual": 1e-5, "trace_error": 1e-3, "relative_error": 1e-4}}
+  ]
+}

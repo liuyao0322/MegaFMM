@@ -1,0 +1,67 @@
+b9a82afc6a640022c6e7a1081a87bab5c98e425965d08e8a150fb554128d0478  solution/dense_ampere.cu
+a77d13bca05425c6b681fa03696755172d16923253fd58d73c86e66649b5b1bc  solution/dense_hopper.cu
+b26e82bb50ea5f22b24b5f26975d2d9ddd31d589583793dd26f69df144c23769  solution/dense_padding.cu
+fd3c6eb06343c7e59aba443cfc72c5bc6fef04ad81a9419773ec4b5303c2bced  solution/dense_wmma.cu
+d93ec9550172cd8fdc3c2f4159715dfcac124be64c3a413386b6e300413b3175  solution/hopper_batched_mainloop.cuh
+d3413c2d15ae54399415e58f2483aadd70e3f04ba61a1c676822601902b4c261  solution/hopper_inflight_mainloop.cuh
+be709dad8f042ff00592d43a781cb2c83bac466eb4a38c73fc428eba13e03adb  solution/hopper_nine_warp_kernel.cuh
+fc2a2a6abc0e321fbc872c598f090ac28f69c1fa9cda07949087ae2a6522334f  solution/internal.h
+a6ffdb0c258889404908f4241cf04dcf11d4ffbf4c63490de4b39e99e8056007  solution/plan.cpp
+32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708  solution/scale_output.cu
+ebc37e9dd171dd5855cdaed91fbb030d250c052a4c459746dd33b82cc634264b  solution/sw1024.cu
+7143cb3aa0ed93ee5425d49db341d90151ba9cff91b0cb0e10895483a0fb32d5  solution/sw_pipeline.cu
+6d20dc34a3ed69cdf4ce0334130258f3545a007632ee45c1e8093a2eaad36f9c  solution/tuning_check.cu
+fd729aeb4931baf9193f1c7b695ed0c3ed77d91d118646fedd7818301f0fca4d  solution/tuning_confirmation.h
+8be9d5ca4f73c559a7fdc89546abe40f2438c76f87c502620aefa0f9edbd28e3  include/megafmm/gemm.h
+09a646ec092f7bd563aa0dc7e301bfd4a322f5cba7f72ab20219bb9203707bff  bench/benchmark.cu
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[  8%] Building CXX object CMakeFiles/test_tuning_confirmation.dir/tests/test_tuning_confirmation.cpp.o
+[  8%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 16%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 16%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+[ 20%] Linking CXX executable test_tuning_confirmation
+[ 20%] Built target test_tuning_confirmation
+[ 25%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw1024.cu.o
+[ 29%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_hopper.cu.o
+[ 33%] Building CUDA object CMakeFiles/megafmm.dir/solution/tuning_check.cu.o
+[ 37%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_padding.cu.o
+[ 41%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_wmma.cu.o
+[ 45%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_ampere.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/sw1024.cu(13): warning #177-D: variable "megafmm::detail::<unnamed>::Elements" was declared but never referenced
+  constexpr int BM=64,BN=32,BK=128,Stages=8,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+                                                                    ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw1024.cu(25): warning #177-D: function "megafmm::detail::<unnamed>::arrive" was declared but never referenced
+            void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
+                 ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw1024.cu(27): warning #177-D: function "megafmm::detail::<unnamed>::product_index" was declared but never referenced
+                            int product_index(int row,int col){
+                                ^
+
+ptxas info    : (C7511) Potential Performance Loss: wgmma.mma_async instructions are serialized due to insufficient register resources for the wgmma pipeline in the function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi3ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_32KernelTmaWarpSpecializedPingpongEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_6half_tENS5_IJlSB_lEEESJ_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x256x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSQ_1ELNSP_7ScaleInE1ELSR_1EEEEEENS4_6LayoutISC_NS5_IJNSA_ILi0EEESV_SV_EEEEENS5_IJNS4_10UnderscoreESY_SY_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSU_INS5_IJNSA_ILi8EEESH_EEENS5_IJSH_SB_EEEEEEEvNS4_8identityES11_NS12_IS14_S16_NSU_INS5_IJSH_S17_EEENS5_IJSB_SH_EEEEEEEvS1C_EENS_8epilogue10collective18CollectiveEpilogueINS1I_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSI_NS5_IJSH_NSA_ILi32EEEEEEfSK_fSK_NS1I_6fusion15FusionCallbacksIS1M_NS1P_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESI_S1O_JEEES11_NS12_IS14_NS15_ILi32EEENSU_INS5_IJS17_S1N_EEENS5_IJS1N_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES1Z_S21_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESJ_EEEEEEvvEEEEvNT_6ParamsE'
+ptxas info    : (C7511) Potential Performance Loss: wgmma.mma_async instructions are serialized due to insufficient register resources for the wgmma pipeline in the function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi3ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_32KernelTmaWarpSpecializedPingpongEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_10bfloat16_tENS5_IJlSB_lEEESJ_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x256x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSQ_1ELNSP_7ScaleInE1ELSR_1EEEEEENS4_6LayoutISC_NS5_IJNSA_ILi0EEESV_SV_EEEEENS5_IJNS4_10UnderscoreESY_SY_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSU_INS5_IJNSA_ILi8EEESH_EEENS5_IJSH_SB_EEEEEEEvNS4_8identityES11_NS12_IS14_S16_NSU_INS5_IJSH_S17_EEENS5_IJSB_SH_EEEEEEEvS1C_EENS_8epilogue10collective18CollectiveEpilogueINS1I_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSI_NS5_IJSH_NSA_ILi32EEEEEEfSK_fSK_NS1I_6fusion15FusionCallbacksIS1M_NS1P_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESI_S1O_JEEES11_NS12_IS14_NS15_ILi32EEENSU_INS5_IJS17_S1N_EEENS5_IJS1N_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES1Z_S21_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEEvvEEEEvNT_6ParamsE'
+[ 50%] Linking CXX static library libmegafmm.a
+[ 50%] Built target megafmm
+[ 66%] Building CUDA object CMakeFiles/test_sw1024.dir/tests/test_sw1024.cu.o
+[ 66%] Building CUDA object CMakeFiles/test_sw_pipeline.dir/tests/test_sw_pipeline.cu.o
+[ 66%] Building CUDA object CMakeFiles/megafmm_bench.dir/bench/benchmark.cu.o
+[ 66%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+[ 70%] Linking CXX executable test_sw1024
+[ 70%] Built target test_sw1024
+[ 75%] Building CUDA object CMakeFiles/test_tuning_candidates.dir/tests/test_tuning_candidates.cu.o
+[ 79%] Linking CXX executable test_correctness
+[ 79%] Built target test_correctness
+[ 83%] Building CUDA object CMakeFiles/test_tuning_precision.dir/tests/test_tuning_precision.cu.o
+[ 87%] Linking CXX executable test_sw_pipeline
+[ 87%] Built target test_sw_pipeline
+[ 91%] Linking CXX executable test_tuning_candidates
+[ 95%] Linking CXX executable megafmm_bench
+[ 95%] Built target test_tuning_candidates
+[100%] Linking CXX executable test_tuning_precision
+[100%] Built target megafmm_bench
+[100%] Built target test_tuning_precision

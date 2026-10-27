@@ -1,0 +1,31 @@
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1,1,1 dtype=bf16 case=dense config=dense:id=13;tile=0;split_k=1;reduction=0;swizzle=0;stages=0;custom=78;inner=0;cluster=0;bound_candidate=2/8;tuned_candidate=2;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.004474;align0=2;align1=2;align2=4;align3=4
+TUNE shape=1,1,1 dtype=bf16 case=solution config=sw_tuned;leaf_terms=7;status=precision_pass;gpu=NVIDIA H100 80GB HBM3;mode=launch;input_sets=2;candidate_count=1;rank=5x20;confirmation=5x100;selected_id=-3;selected=sw_scalar;leaf_terms=7;median_ms=0.002546;ef=0.000000;gate=0.001000
+CHECK 1,1,1 bf16 trial=0 dense_eF=0 solution_eF=0 gate=0.001 pass=1
+CHECK 1,1,1 bf16 trial=1 dense_eF=0 solution_eF=0 gate=0.001 pass=1
+CHECK 1,1,1 bf16 trial=2 dense_eF=0 solution_eF=0 gate=0.001 pass=1
+TIME shape=1,1,1 dtype=bf16 group=0 case=solution event_ms=0.00274048 wall_ms=0.00282581
+TIME shape=1,1,1 dtype=bf16 group=0 case=dense event_ms=0.00453696 wall_ms=0.00461775
+TIME shape=1,1,1 dtype=bf16 group=1 case=solution event_ms=0.0028432 wall_ms=0.00292094
+TIME shape=1,1,1 dtype=bf16 group=1 case=dense event_ms=0.00450272 wall_ms=0.00458281
+TIME shape=1,1,1 dtype=bf16 group=2 case=solution event_ms=0.00279328 wall_ms=0.00287008
+TIME shape=1,1,1 dtype=bf16 group=2 case=dense event_ms=0.00438048 wall_ms=0.00445833
+TIME shape=1,1,1 dtype=bf16 group=3 case=dense event_ms=0.00436576 wall_ms=0.00444234
+TIME shape=1,1,1 dtype=bf16 group=3 case=solution event_ms=0.0027728 wall_ms=0.0028482
+TIME shape=1,1,1 dtype=bf16 group=4 case=solution event_ms=0.00269664 wall_ms=0.00277497
+TIME shape=1,1,1 dtype=bf16 group=4 case=dense event_ms=0.00426656 wall_ms=0.00434522
+TUNE shape=1,1,1 dtype=fp16 case=dense config=dense:id=13;tile=0;split_k=1;reduction=0;swizzle=0;stages=0;custom=10;inner=0;cluster=0;bound_candidate=6/8;tuned_candidate=6;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.004531;align0=2;align1=2;align2=4;align3=4
+TUNE shape=1,1,1 dtype=fp16 case=solution config=sw_tuned;leaf_terms=7;status=precision_pass;gpu=NVIDIA H100 80GB HBM3;mode=launch;input_sets=2;candidate_count=1;rank=5x20;confirmation=5x100;selected_id=-3;selected=sw_scalar;leaf_terms=7;median_ms=0.002513;ef=0.000000;gate=0.000100
+CHECK 1,1,1 fp16 trial=0 dense_eF=0 solution_eF=0 gate=0.0001 pass=1
+CHECK 1,1,1 fp16 trial=1 dense_eF=0 solution_eF=0 gate=0.0001 pass=1
+CHECK 1,1,1 fp16 trial=2 dense_eF=0 solution_eF=0 gate=0.0001 pass=1
+TIME shape=1,1,1 dtype=fp16 group=0 case=solution event_ms=0.00268896 wall_ms=0.00277162
+TIME shape=1,1,1 dtype=fp16 group=0 case=dense event_ms=0.0044288 wall_ms=0.00450986
+TIME shape=1,1,1 dtype=fp16 group=1 case=solution event_ms=0.00291552 wall_ms=0.00299234
+TIME shape=1,1,1 dtype=fp16 group=1 case=dense event_ms=0.0043648 wall_ms=0.00444194
+TIME shape=1,1,1 dtype=fp16 group=2 case=solution event_ms=0.00272704 wall_ms=0.0028048
+TIME shape=1,1,1 dtype=fp16 group=2 case=dense event_ms=0.0043792 wall_ms=0.00445659
+TIME shape=1,1,1 dtype=fp16 group=3 case=dense event_ms=0.00434688 wall_ms=0.00442487
+TIME shape=1,1,1 dtype=fp16 group=3 case=solution event_ms=0.00273792 wall_ms=0.00281417
+TIME shape=1,1,1 dtype=fp16 group=4 case=solution event_ms=0.00285984 wall_ms=0.0029351
+TIME shape=1,1,1 dtype=fp16 group=4 case=dense event_ms=0.00421568 wall_ms=0.00429306

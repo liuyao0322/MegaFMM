@@ -1,0 +1,15 @@
+{
+  "iteration": 358,
+  "commit": "a0bd9b9",
+  "formal_original_fp64_rows_passed": 12,
+  "forced_suite": "FAILED: terminated after171.33sec while waiting for GPU; not a pass",
+  "ctest_passed": 4,
+  "ctest_terminated": 1,
+  "sanitizers": "not run because prerequisite forced suite failed",
+  "isolated_old_id85_sw1": "timeout20sec exit124; serial Graph/direct diagnostic also timeout20sec",
+  "other_new_ids86_to90": "all isolated pass bothdtypes and Graph/direct",
+  "existing_streamk_ids81_to84": "all isolated pass bothdtypes and Graph/direct",
+  "cause_boundary": "Swizzle1 at257x520x1032 edge liveness failure reproduced. Serial also fails, so no concurrency-only diagnosis. Exact internal scheduler cause remains unresolved.",
+  "action": "Remove only unsafe swizzle1 variant and renumber86..90 to85..89; rerun original full contract and forced/sanitizer checks.",
+  "latest_full_independent_acceptance": "35316/28; goalactive"
+}

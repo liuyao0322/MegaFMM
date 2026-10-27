@@ -1,0 +1,31 @@
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=dense config=dense:id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=10;bound_candidate=4/16;tuned_candidate=4;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.013267;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=sw_two_kernel_pdl;warp_roles=1tma+4wgmma;transform_kernel=128x512;shared_carveout=100percent_both;smem=196736;operand_stages=8;bk=128;workspace=4194304;st=compact4planes_balanced_async_p1p2;publication=programmatic_dependent_launch_grid_dependency_wait;terminal_cta_barrier=off;recombine=private_static_ptx;accum_init=first_mma_overwrite;product_order=1_2_6_7_5_3_4;product_slots=0;product_layout=registers;leaf=Btrans_Atrans;lhs=MN128;rhs=K128;output=transposed_fragment;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;descriptor_prefetch=warp1_before_init_barrier;alpha=1;beta=0
+CHECK 1024,1024,1024 bf16 trial=0 dense_eF=8.51899e-07 solution_eF=0.00600975 gate=0.00100256 pass=0
+CHECK 1024,1024,1024 bf16 trial=1 dense_eF=8.52266e-07 solution_eF=0.0060152 gate=0.00100256 pass=0
+CHECK 1024,1024,1024 bf16 trial=2 dense_eF=8.50027e-07 solution_eF=0.00601153 gate=0.00100255 pass=0
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.010065 wall_ms=0.0101961
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0112608 wall_ms=0.0113773
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.0112538 wall_ms=0.0113338
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.0100496 wall_ms=0.0101273
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.0100582 wall_ms=0.0101454
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.0112515 wall_ms=0.0113306
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.0100502 wall_ms=0.010143
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.0112141 wall_ms=0.0112919
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.0112157 wall_ms=0.0112953
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.0100432 wall_ms=0.010121
+TUNE shape=1024,1024,1024 dtype=fp16 case=dense config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010310;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=sw_two_kernel_pdl;warp_roles=1tma+4wgmma;transform_kernel=128x512;shared_carveout=100percent_both;smem=196736;operand_stages=8;bk=128;workspace=4194304;st=compact4planes_balanced_async_p1p2;publication=programmatic_dependent_launch_grid_dependency_wait;terminal_cta_barrier=off;recombine=private_static_ptx;accum_init=first_mma_overwrite;product_order=1_2_6_7_5_3_4;product_slots=0;product_layout=registers;leaf=Btrans_Atrans;lhs=MN128;rhs=K128;output=transposed_fragment;operand_release=warp_leader;leaf_terms=7;residual_correction=off;current_pointer_maps=4;descriptor_prefetch=warp1_before_init_barrier;alpha=1;beta=0
+CHECK 1024,1024,1024 fp16 trial=0 dense_eF=1.24851e-06 solution_eF=0.000751819 gate=0.000103746 pass=0
+CHECK 1024,1024,1024 fp16 trial=1 dense_eF=1.25092e-06 solution_eF=0.000753235 gate=0.000103753 pass=0
+CHECK 1024,1024,1024 fp16 trial=2 dense_eF=1.24799e-06 solution_eF=0.000754626 gate=0.000103744 pass=0
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.00996224 wall_ms=0.0100517
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.00936064 wall_ms=0.00944025
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.00936448 wall_ms=0.00945552
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.0099792 wall_ms=0.0100692
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.0099536 wall_ms=0.0100432
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.00936288 wall_ms=0.00944291
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.009952 wall_ms=0.0100425
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.00934848 wall_ms=0.00943893
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.00934912 wall_ms=0.00944002
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.00995776 wall_ms=0.0100515

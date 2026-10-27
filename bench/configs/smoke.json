@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "suite": "smoke",
+  "description": "Native integration smoke: one GEMM and four fixed-work applications; synthetic data is not task validation.",
+  "backends": ["cublaslt", "megafmm"],
+  "baseline": "cublaslt",
+  "modes": ["launch", "graph"],
+  "measurement": {"independent_processes": 1, "warmup": 2, "groups": 3, "calls_per_group": 3, "fresh_quality_trials": 2, "rotate_inputs": 2, "timeout_seconds": 600},
+  "backend_options": {"workspace_limit": 268435456, "heuristic_candidates": 4, "tuning_input_sets": 2, "sw_tuning_candidates": 4},
+  "cases": [
+    {"id": "gemm_fp32_64", "kind": "gemm", "dtype": "fp32", "m": 64, "n": 64, "k": 64, "algorithm": "sw-tuned"},
+    {"id": "sqrt_fp32_32", "kind": "matrix_function", "dtype": "fp32", "n": 32, "function": "sqrt", "iterations": 15, "condition_number": 100},
+    {"id": "muon_bf16_64", "kind": "muon", "dtype": "bf16", "m": 64, "n": 64, "iterations": 5},
+    {"id": "mlp_fp16_32", "kind": "mlp", "dtype": "fp16", "tokens": 32, "hidden": 32, "intermediate": 64, "activation": "swiglu"},
+    {"id": "purification_fp32_32", "kind": "purification", "dtype": "fp32", "n": 32, "occupied": 16, "iterations": 25, "gap": 0.1}
+  ]
+}

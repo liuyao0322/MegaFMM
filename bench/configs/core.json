@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "suite": "core",
+  "description": "Representative matched-contract sizes; three process pairs, native FP32 outputs, fixed-work and synchronized time-to-quality.",
+  "backends": ["cublaslt", "megafmm"],
+  "baseline": "cublaslt",
+  "modes": ["launch", "graph"],
+  "measurement": {"independent_processes": 3, "warmup": 5, "groups": 7, "calls_per_group": 10, "fresh_quality_trials": 3, "rotate_inputs": 2, "timeout_seconds": 1800},
+  "backend_options": {"workspace_limit": 1073741824, "heuristic_candidates": 12, "tuning_input_sets": 3, "sw_tuning_candidates": 16},
+  "cases": [
+    {"id": "gemm_fp32_512", "kind": "gemm", "dtype": "fp32", "m": 512, "n": 512, "k": 512},
+    {"id": "gemm_fp32_1024", "kind": "gemm", "dtype": "fp32", "m": 1024, "n": 1024, "k": 1024},
+    {"id": "gemm_bf16_1024", "kind": "gemm", "dtype": "bf16", "m": 1024, "n": 1024, "k": 1024},
+    {"id": "gemm_fp16_1024", "kind": "gemm", "dtype": "fp16", "m": 1024, "n": 1024, "k": 1024},
+    {"id": "sqrt_fp32_512", "kind": "matrix_function", "dtype": "fp32", "n": 512, "function": "sqrt", "iterations": 20, "condition_number": 100},
+    {"id": "inverse_sqrt_fp32_1024", "kind": "matrix_function", "dtype": "fp32", "n": 1024, "function": "inverse_sqrt", "iterations": 22, "condition_number": 100},
+    {"id": "inverse_sqrt_quality_fp32_512", "kind": "matrix_function", "dtype": "fp32", "n": 512, "function": "inverse_sqrt", "evaluation": "time_to_quality", "max_iterations": 30, "stop_tolerance": 0.001, "modes": ["launch"], "condition_number": 100},
+    {"id": "muon_bf16_square_512", "kind": "muon", "dtype": "bf16", "m": 512, "n": 512, "iterations": 5},
+    {"id": "muon_bf16_rectangular_512x2048", "kind": "muon", "dtype": "bf16", "m": 512, "n": 2048, "iterations": 5},
+    {"id": "muon_fp16_square_1024", "kind": "muon", "dtype": "fp16", "m": 1024, "n": 1024, "iterations": 5},
+    {"id": "mlp_bf16_512", "kind": "mlp", "dtype": "bf16", "tokens": 512, "hidden": 512, "intermediate": 2048, "activation": "swiglu"},
+    {"id": "mlp_fp16_1024", "kind": "mlp", "dtype": "fp16", "tokens": 1024, "hidden": 1024, "intermediate": 4096, "activation": "gelu"},
+    {"id": "purification_fp32_512", "kind": "purification", "dtype": "fp32", "n": 512, "occupied": 256, "iterations": 25, "gap": 0.1},
+    {"id": "purification_fp32_1024", "kind": "purification", "dtype": "fp32", "n": 1024, "occupied": 512, "iterations": 25, "gap": 0.1},
+    {"id": "purification_quality_fp32_512", "kind": "purification", "dtype": "fp32", "n": 512, "occupied": 256, "evaluation": "time_to_quality", "max_iterations": 45, "stop_tolerance": 0.001, "modes": ["launch"], "gap": 0.1}
+  ]
+}

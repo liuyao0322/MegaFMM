@@ -1,0 +1,54 @@
+a21b2bb07f1c42cdcdfebee9bb2b6d2c236b4dedb8a2485162469d3786d9965d  solution/internal.h
+9c3c2c25ba828cc5894f2800f59c0568f962485a45804886629558ca536b889f  solution/plan.cpp
+32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708  solution/scale_output.cu
+f63d5358482ae2b8bbf9d6c33badeb6ca09cdcd6198d4458b59f3d4ce4c25b97  solution/sw_pipeline.cu
+d5564b71d399c934229c8dc2089c5dd8de7e942957845a9cf23977353186e475  include/megafmm/gemm.h
+0964fc49fdbd02945515ff2d8f6bb834c6a4c937fb4cfad396b1be313634ae4e  bench/benchmark.cu
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 20%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+[ 20%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 30%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 40%] Linking CXX static library libmegafmm.a
+[ 40%] Built target megafmm
+[ 50%] Building CUDA object CMakeFiles/test_sw1024.dir/tests/test_sw1024.cu.o
+[ 70%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+[ 70%] Building CUDA object CMakeFiles/megafmm_bench.dir/bench/benchmark.cu.o
+[ 80%] Linking CXX executable test_sw1024
+[ 80%] Built target test_sw1024
+[ 90%] Linking CXX executable test_correctness
+[ 90%] Built target test_correctness
+[100%] Linking CXX executable megafmm_bench
+[100%] Built target megafmm_bench
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=dense config=dense:id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=10;bound_candidate=4/16;tuned_candidate=4;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.012982;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=sw_cooperative;warp_roles=1tma+27simt+4wgmma;smem=213120;workspace=8388608;st=global_once_fp32_hilo;recombine=full_k_register_P;product_slots=2;operand_release=warp_leader;leaf_terms=15;current_pointer_maps=4;alpha=1;beta=0
+CHECK 1024,1024,1024 bf16 trial=0 dense_eF=8.51899e-07 solution_eF=7.3588e-06 gate=0.00100256 pass=1
+CHECK 1024,1024,1024 bf16 trial=1 dense_eF=8.52266e-07 solution_eF=7.39459e-06 gate=0.00100256 pass=1
+CHECK 1024,1024,1024 bf16 trial=2 dense_eF=8.50027e-07 solution_eF=7.38346e-06 gate=0.00100255 pass=1
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.0288214 wall_ms=0.0289164
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0122426 wall_ms=0.0123222
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.0122563 wall_ms=0.0123343
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.0288874 wall_ms=0.0289644
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.0288896 wall_ms=0.0289668
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.0122701 wall_ms=0.0123487
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.0288163 wall_ms=0.028896
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.0122502 wall_ms=0.0123328
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.0122234 wall_ms=0.0123038
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.0288403 wall_ms=0.0289176
+TUNE shape=1024,1024,1024 dtype=fp16 case=dense config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010387;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=sw_cooperative;warp_roles=1tma+27simt+4wgmma;smem=213120;workspace=8388608;st=global_once_fp32_hilo;recombine=full_k_register_P;product_slots=2;operand_release=warp_leader;leaf_terms=15;current_pointer_maps=4;alpha=1;beta=0
+CHECK 1024,1024,1024 fp16 trial=0 dense_eF=1.24851e-06 solution_eF=2.37136e-06 gate=0.000103746 pass=1
+CHECK 1024,1024,1024 fp16 trial=1 dense_eF=1.25092e-06 solution_eF=2.37097e-06 gate=0.000103753 pass=1
+CHECK 1024,1024,1024 fp16 trial=2 dense_eF=1.24799e-06 solution_eF=2.37098e-06 gate=0.000103744 pass=1
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.0290618 wall_ms=0.0291473
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.00996608 wall_ms=0.0100433
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.00992704 wall_ms=0.010006
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.0290531 wall_ms=0.0291343
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.0290534 wall_ms=0.0291333
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.00998368 wall_ms=0.0100597
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.0290467 wall_ms=0.0291274
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.0099664 wall_ms=0.0100436
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.0099616 wall_ms=0.0100407
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.029024 wall_ms=0.0291025

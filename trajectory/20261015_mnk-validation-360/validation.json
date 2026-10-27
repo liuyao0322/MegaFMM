@@ -1,0 +1,48 @@
+{
+  "iteration": 360,
+  "commit": "2e9664b",
+  "formal_rows": 12,
+  "original_fp64_pass_rows": 12,
+  "ctest": {
+    "passed": 5,
+    "failed": 0,
+    "forced_candidates": 92
+  },
+  "sanitizer": "CUDA12.8 ComputeSanitizer2025.1",
+  "memcheck_errors": 0,
+  "racecheck_errors": 0,
+  "racecheck_warnings": 0,
+  "new_custom_stable_wins": 0,
+  "last_independent_acceptance": {
+    "iteration": 353,
+    "stable_custom_wins": 16,
+    "total": 28
+  },
+  "new_candidate_short_ms": {
+    "4096_bf16": {
+      "tma": 0.215574,
+      "direct": 0.264462,
+      "lt": 0.212011
+    },
+    "4096_fp16": {
+      "tma": 0.224414,
+      "direct": 0.277355,
+      "lt": 0.207168
+    },
+    "8192_bf16": {
+      "tma": 1.627176,
+      "direct": 1.841449,
+      "lt": 1.446643
+    },
+    "8192_fp16": {
+      "tma": 1.706952,
+      "direct": 1.98941,
+      "lt": 1.64068
+    }
+  },
+  "notes": [
+    "All timings include complete calls; short candidate timings are diagnostic, not independent stable certification.",
+    "Wide TMA substantially faster than prior narrower nine-warp family but still loses to reranked cuBLASLt.",
+    "No expanded-pool full certification claimed."
+  ]
+}

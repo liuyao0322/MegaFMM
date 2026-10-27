@@ -1,0 +1,79 @@
+--- frozen_RS_A_BK64_4e32c7cf
++++ CPU_future_RS_A_BK32_cons192
+@@ -1,5 +1,5 @@
+-// FUTURE CPU-ONLY UNCOMPILED RS-A experiment, not iteration35 formal source.
+-// BK64 raw A4 shared + final B7 shared; whole-stage distinct RS A registers.
++// FUTURE CPU-ONLY UNCOMPILED RS-A experiment, not iteration36 formal source.
++// BK32 raw A4 shared + final B7 shared; whole-stage distinct RS A registers.
+ // Source64/192/192 and initialI152/160/168 are CPU algebra, not fit/launch proof.
+ // Original onecast ST, whole seven FP32 P, fixedU/alphaRN/betaFMA retained.
+ #include "megafmm/kernels.h"
+@@ -51,7 +51,7 @@
+   static_assert(Cols == 32,"this prototype uses BN32 only");
+   static constexpr int BM = 64;
+   static constexpr int BN = Cols;
+-  static constexpr int BK = 64;
++  static constexpr int BK = 32;
+   static constexpr int AtomsK = BK/16;
+   static constexpr int Threads = 384;
+   static constexpr int ProducerThreads = 128;
+@@ -175,19 +175,19 @@
+ // First0: [A11,A12,S4]. First3: [A22,S1,S2,S3], no rawA12 load.
+ // Each group performs three FP32 RN ops/lane; total six versus SS four.
+ // Four derived finals still receive one cast each, with no intermediate cast.
+-template <class Element,int First,class ThrMma,class SmemRawA,
++template <class Element,int First,int BK,class ThrMma,class SmemRawA,
+           class RA0,class RA1,class RA2,class RA3>
+ CUTE_DEVICE void psplit_rsA_build_stage(const ThrMma& thr_mma,SmemRawA raw,
+     RA0& a0,RA1& a1,RA2& a2,RA3& a3) {
+   static_assert(First==0 || First==3,"wholeP3+4 only");
+-  auto coords=thr_mma.partition_A(make_identity_tensor(make_shape(Int<64>{},Int<64>{})));
++  auto coords=thr_mma.partition_A(make_identity_tensor(make_shape(Int<64>{},Int<BK>{})));
+   CUTE_STATIC_ASSERT_V(size<0>(coords)==Int<8>{});
+   CUTE_STATIC_ASSERT_V(size<1>(coords)==Int<1>{});
+-  CUTE_STATIC_ASSERT_V(size<2>(coords)==Int<4>{});
++  CUTE_STATIC_ASSERT_V(size<2>(coords)==Int<BK/16>{});
+   auto u0=recast<uint32_t>(a0);auto u1=recast<uint32_t>(a1);
+   auto u2=recast<uint32_t>(a2);auto u3=recast<uint32_t>(a3);
+   CUTE_UNROLL
+-  for(int atom=0;atom<4;++atom) {
++  for(int atom=0;atom<BK/16;++atom) {
+     CUTE_UNROLL
+     for(int pair=0;pair<4;++pair) {
+       const auto c=coords(2*pair,0,atom);
+@@ -229,7 +229,7 @@
+   }
+ }
+ 
+-// BK64/BN32 has256 B vector tasks; the finalB7 onecast DAG is unchanged.
++// BK32/BN32 has128 B vector tasks; the finalB7 onecast DAG is unchanged.
+ // Producer rawA copy temporaries are dead before constructing finalB slots.
+ template <class Element,int Cols,class SmemB>
+ CUTE_DEVICE void psplit_rsA_fill_b(const Problem& p,const Element* B,
+@@ -373,7 +373,7 @@
+         Element* bank = storage.operands+state.index()*T::BankElements;
+         auto sA = make_tensor(make_smem_ptr(bank),typename T::LayoutA{});
+         auto sB = make_tensor(make_smem_ptr(bank+T::ElementsA),typename T::LayoutB{});
+-        psplit_rsA_build_stage<Element,0>(thr_mma,sA,a0,a1,a2,a3);
++        psplit_rsA_build_stage<Element,0,T::BK>(thr_mma,sA,a0,a1,a2,a3);
+         auto tCrB = thr_mma.make_fragment_B(thr_mma.partition_B(sB));
+         warpgroup_fence_operand(q0);
+         warpgroup_fence_operand(q1);
+@@ -406,7 +406,7 @@
+         Element* bank = storage.operands+state.index()*T::BankElements;
+         auto sA = make_tensor(make_smem_ptr(bank),typename T::LayoutA{});
+         auto sB = make_tensor(make_smem_ptr(bank+T::ElementsA),typename T::LayoutB{});
+-        psplit_rsA_build_stage<Element,3>(thr_mma,sA,a0,a1,a2,a3);
++        psplit_rsA_build_stage<Element,3,T::BK>(thr_mma,sA,a0,a1,a2,a3);
+         auto tCrB = thr_mma.make_fragment_B(thr_mma.partition_B(sB));
+         warpgroup_fence_operand(q0);
+         warpgroup_fence_operand(q1);
+@@ -518,7 +518,7 @@
+ 
+ bool wgmma_psplit_rsA_can_implement(const Problem& p,int configuration) {
+   return configuration == 0 && megakernel_can_implement(p,0) &&
+-      p.m%128 == 0 && p.n%64 == 0 && p.k%128 == 0 && p.lda%8 == 0 && p.ldb%8 == 0;
++      p.m%128 == 0 && p.n%64 == 0 && p.k%64 == 0 && p.lda%8 == 0 && p.ldb%8 == 0;
+ }
+ bool wgmma_psplit_rsA_full_tiles(const Problem& p,const void* A,const void* B,int configuration) {
+   return wgmma_psplit_rsA_can_implement(p,configuration) && A && B &&

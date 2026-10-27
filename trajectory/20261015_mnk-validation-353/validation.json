@@ -1,0 +1,26 @@
+{
+  "iteration": 353,
+  "commit": "8b11978",
+  "candidate_count": 70,
+  "ctest_passed": 5,
+  "ctest_failed": 0,
+  "memcheck_errors": 0,
+  "racecheck_errors": 0,
+  "racecheck_warnings": 0,
+  "racecheck_tool": "CUDA12.8 ComputeSanitizer2025.1.0.0",
+  "sanitizer_note": "CUDA12.4 racecheck aborts with host heap corruption on isolated candidate69. Same binary passes CUDA12.8 whole warp/new candidate racecheck and isolated69 racecheck/memcheck; original failed logs retained. No CUDA runtime or compiled kernel change.",
+  "binary_sha256": "097e9df5c1f1aff3227579180880580800687cc6b31edfad275ca8f098c4f1fc",
+  "solution_sha256": {
+    "solution/scale_output.cu": "32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708",
+    "solution/dense_padding.cu": "88cc8c81f2025c4965e416b790817fa30f51c0a8c4af701896cf32c8fe6e019a",
+    "solution/dense_wmma.cu": "fd3c6eb06343c7e59aba443cfc72c5bc6fef04ad81a9419773ec4b5303c2bced",
+    "solution/dense_ampere.cu": "b9a82afc6a640022c6e7a1081a87bab5c98e425965d08e8a150fb554128d0478",
+    "solution/internal.h": "177d9413236ac35597462738e6f505ad1ecde8ad17c34b1d64e4335f12d9402e",
+    "solution/plan.cpp": "e2d5bb4f89dc721d4635994c3d428ee73f36524fbf1d25f096091b106b1f32ba",
+    "solution/sw_pipeline.cu": "748e7ace9de0b6469d47922cb7cb531bbb56a9d55c9915b0194c0e0a72e916e7",
+    "solution/sw_multisize.cu": "6439b99b3f6cc2fac7a510eff4638d8be5cfd2cda1ca312b6a86bbe8a2c43641",
+    "solution/dense_hopper.cu": "955795fc26fc273b7eb765716133ac141a438c1b87ebe57d2aa96f4b1d416bcf",
+    "solution/tuning_check.cu": "8b109a5756a8c95fd38ec8c7ec4dc76cb8f8e1000906e39dd122795c55786a5f"
+  },
+  "notes": "Twelve original precision rows pass; rectangle wins provisional pending independent repeats. Latest complete full certification351 thirteenof28."
+}

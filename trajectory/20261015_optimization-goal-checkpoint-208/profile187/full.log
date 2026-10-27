@@ -1,0 +1,15 @@
+==WARNING== Note: Running with uncontrolled GPU caches. Profiling results may be inconsistent.
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 1352533 (/share/home/liuyao/workspace/MegaFMM/results/opt_seven_round/iter187_bench)
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=sw_leaf_parallel;grid=8x4x7;threads=384;tc_groups=2;smem=98432;bk=128;stages=2;workspace=12582912;leaf_terms=7;residual_correction=off;recombine=last_cta_global_release_acquire;publication=driver_workspace_cuda12.4
+==WARNING== Unable to access the following 6 metrics: ctc__rx_bytes_data_user.sum, ctc__rx_bytes_data_user.sum.pct_of_peak_sustained_elapsed, ctc__rx_bytes_data_user.sum.per_second, ctc__tx_bytes_data_user.sum, ctc__tx_bytes_data_user.sum.pct_of_peak_sustained_elapsed, ctc__tx_bytes_data_user.sum.per_second.
+
+
+==PROF== Profiling "sw_cooperative_hilo": 0%....50%....100% - 39 passes
+PROFILE 1024,1024,1024 bf16 sw_leaf_parallel_128x64x128 workspace=12582912 target=solution lt_config=sw_leaf_parallel;grid=8x4x7;threads=384;tc_groups=2;smem=98432;bk=128;stages=2;workspace=12582912;leaf_terms=7;residual_correction=off;recombine=last_cta_global_release_acquire;publication=driver_workspace_cuda12.4
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=sw_leaf_parallel;grid=8x4x7;threads=384;tc_groups=2;smem=98432;bk=128;stages=2;workspace=12582912;leaf_terms=7;residual_correction=off;recombine=last_cta_global_release_acquire;publication=driver_workspace_cuda12.4
+==PROF== Profiling "sw_cooperative_hilo": 0%....50%....100% - 39 passes
+PROFILE 1024,1024,1024 fp16 sw_leaf_parallel_128x64x128 workspace=12582912 target=solution lt_config=sw_leaf_parallel;grid=8x4x7;threads=384;tc_groups=2;smem=98432;bk=128;stages=2;workspace=12582912;leaf_terms=7;residual_correction=off;recombine=last_cta_global_release_acquire;publication=driver_workspace_cuda12.4
+==PROF== Disconnected from process 1352533
+==PROF== Report: /share/home/liuyao/workspace/MegaFMM/results/opt_goal/profile187/full.ncu-rep

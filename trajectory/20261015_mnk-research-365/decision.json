@@ -1,0 +1,20 @@
+{
+  "direction": "K32 source-free TMA 128x256 CM1/CM2",
+  "actual_stages": 8,
+  "registers_per_thread": 168,
+  "local_bytes": 0,
+  "shared_bytes": 231424,
+  "threads": 384,
+  "resource_preflight": "both pass",
+  "exact_all_ones_strided_tail": [
+    257,
+    520,
+    1032
+  ],
+  "prior_evidence": "validation364/profiling.json: K128 two-stage Tensor60%, L2hit65%, increased long-scoreboard pressure; K64 profile Tensor92%, L2hit79%.",
+  "hypothesis": "Smaller per-stage transfers and eight buffers may improve load/compute overlap, at a cost of twice the commands versus K64.",
+  "precision_contract": "unchanged original-input FP64 eF gate; preflight is not acceptance",
+  "official_source": "https://docs.nvidia.com/cutlass/latest/media/docs/cpp/efficient_gemm.html",
+  "source_note": "Official pipelining and register-pressure discussion motivates granularity; actual CUTLASS3.5.1 local builder/collective is implementation authority.",
+  "next": "append100/101; formal365 with original full measurement/gates, then forced tests/sanitizers"
+}

@@ -1,0 +1,574 @@
+{
+  "status": "CPU_SOURCE_THREE_BANK_PASS_NOT_COMPILED",
+  "author": "/root/release1_cpu_review",
+  "created_utc": "2026-10-13T18:17:21.316272+00:00",
+  "scope": "Future scratch-only candidate, no formal policy ID; no GPU/CUDA/host compile, formal source write or git mutation; current iteration32 lease untouched.",
+  "hypothesis": "A third operand bank permits one more producer-filled stage while two committed groups remain unretired. No dynamic profiling evidence establishes that two-bank producer slack caused the observed baseline regression.",
+  "baseline_source": {
+    "path": ".scratch/megakernel_wgmma_wait1.cu",
+    "sha256": "80e4ee8f6df3ba738ef10101b9224c701abbb517de993a7ea7d1d710bbd8ae91"
+  },
+  "candidate_source": {
+    "path": ".scratch/megakernel_wgmma_wait1_three_stage.cu",
+    "sha256": "f78b1fbf1541583315ce084cac3e05afd7b5d5887f64b928c0f504c9902afd23"
+  },
+  "cpu_model": {
+    "path": ".scratch/wgmma_wait1_three_stage_model.py",
+    "sha256": "46d094203f57794e33f9d3b33a5e663d1b7145fe374ee2bb18fdd16d256b72ff",
+    "results": {
+      "status": "CPU_THREE_BANK_ABSTRACT_PASS",
+      "banks": 3,
+      "max_unretired_groups": 2,
+      "exhaustive": [
+        {
+          "stages": 0,
+          "states": 8,
+          "transitions": 10,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 0,
+          "maximum_owned_banks": 0,
+          "maximum_committed_unretired_groups": 0
+        },
+        {
+          "stages": 1,
+          "states": 17,
+          "transitions": 24,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 0,
+          "maximum_owned_banks": 1,
+          "maximum_committed_unretired_groups": 1
+        },
+        {
+          "stages": 2,
+          "states": 35,
+          "transitions": 59,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 2,
+          "maximum_owned_banks": 2,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 3,
+          "states": 53,
+          "transitions": 94,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 4,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 4,
+          "states": 71,
+          "transitions": 129,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 6,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 5,
+          "states": 89,
+          "transitions": 164,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 8,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 6,
+          "states": 107,
+          "transitions": 199,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 10,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 7,
+          "states": 125,
+          "transitions": 234,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 12,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 8,
+          "states": 143,
+          "transitions": 269,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 14,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 9,
+          "states": 161,
+          "transitions": 304,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 16,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 10,
+          "states": 179,
+          "transitions": 339,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 18,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 11,
+          "states": 197,
+          "transitions": 374,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 20,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 12,
+          "states": 215,
+          "transitions": 409,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 22,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 13,
+          "states": 233,
+          "transitions": 444,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 24,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 14,
+          "states": 251,
+          "transitions": 479,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 26,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 15,
+          "states": 269,
+          "transitions": 514,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 28,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 16,
+          "states": 287,
+          "transitions": 549,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 30,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 17,
+          "states": 305,
+          "transitions": 584,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 32,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 32,
+          "states": 575,
+          "transitions": 1109,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 62,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 33,
+          "states": 593,
+          "transitions": 1144,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 64,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 64,
+          "states": 1151,
+          "transitions": 2229,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 126,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        },
+        {
+          "stages": 512,
+          "states": 9215,
+          "transitions": 17909,
+          "terminal_states": 1,
+          "out_of_order_completion_states": 1022,
+          "maximum_owned_banks": 3,
+          "maximum_committed_unretired_groups": 2
+        }
+      ],
+      "total_states": 14279,
+      "total_transitions": 27569,
+      "randomized_stage_counts": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        7,
+        8,
+        15,
+        16,
+        17,
+        32,
+        33,
+        64,
+        512
+      ],
+      "randomized_sequences": 448,
+      "randomized_actions": 115616,
+      "phase_crosscheck_stage_counts": [
+        0,
+        512
+      ],
+      "phase_crosschecks": 395523,
+      "mutation_counterexamples": {
+        "release_only_group_after_wait1_is_unsafe": {
+          "produced": 1,
+          "issued": 1,
+          "retired": 0,
+          "mode": 0,
+          "owner": [
+            0,
+            -1,
+            -1
+          ],
+          "complete": [
+            false,
+            false,
+            false
+          ],
+          "producer_tail_acquired": 0
+        },
+        "overwrite_next_producer_bank_while_owned_is_unsafe": {
+          "produced": 3,
+          "issued": 0,
+          "retired": 0,
+          "mode": 0,
+          "owner": [
+            0,
+            1,
+            2
+          ],
+          "complete": [
+            false,
+            false,
+            false
+          ],
+          "producer_tail_acquired": 0
+        },
+        "release_latest_after_wait1_is_unsafe": {
+          "produced": 2,
+          "issued": 2,
+          "retired": 0,
+          "mode": 1,
+          "owner": [
+            0,
+            1,
+            -1
+          ],
+          "complete": [
+            true,
+            false,
+            false
+          ],
+          "producer_tail_acquired": 0
+        },
+        "generic_U_after_tail_wait1_is_unsafe": {
+          "produced": 4,
+          "issued": 4,
+          "retired": 3,
+          "mode": 3,
+          "owner": [
+            3,
+            -1,
+            -1
+          ],
+          "complete": [
+            false,
+            false,
+            false
+          ],
+          "producer_tail_acquired": 0
+        }
+      },
+      "positive_witnesses": {
+        "three_full_banks_before_first_issue": {
+          "produced": 3,
+          "issued": 0,
+          "retired": 0,
+          "mode": 0,
+          "owner": [
+            0,
+            1,
+            2
+          ],
+          "complete": [
+            false,
+            false,
+            false
+          ],
+          "producer_tail_acquired": 0
+        },
+        "third_bank_produced_while_two_commits_unretired": {
+          "produced": 3,
+          "issued": 2,
+          "retired": 0,
+          "mode": 1,
+          "owner": [
+            0,
+            1,
+            2
+          ],
+          "complete": [
+            false,
+            false,
+            false
+          ],
+          "producer_tail_acquired": 0
+        },
+        "retire_old_while_latest_still_inflight": {
+          "produced": 2,
+          "issued": 2,
+          "retired": 0,
+          "mode": 2,
+          "owner": [
+            0,
+            1,
+            -1
+          ],
+          "complete": [
+            true,
+            false,
+            false
+          ],
+          "producer_tail_acquired": 0
+        }
+      },
+      "hardware_memory_order_or_thread_convergence_proven": false
+    }
+  },
+  "prior_two_bank_model": {
+    "path": ".scratch/wgmma_wait1_state_model.py",
+    "sha256": "f2ddcefde43fc7fc5193d74a39e447df9bfb2a64b95c87e8972dd9f73fbc4df6",
+    "prior_pass_not_inherited_as_three_bank_evidence": true
+  },
+  "source_diff": {
+    "normalized_exact_baseline_match": true,
+    "only_executable_configuration_change": "Wait1ThreeStageM1Traits::Stages = 3 (baseline Stages=2)",
+    "renamed_identifiers": {
+      "Wait1M1Traits": "Wait1ThreeStageM1Traits",
+      "Wait1PackedEight": "Wait1ThreeStagePackedEight",
+      "launch_wgmma_wait1": "launch_wgmma_wait1_three_stage",
+      "launch_wgmma_wait1_typed": "launch_wgmma_wait1_three_stage_typed",
+      "prepare_wgmma_wait1": "prepare_wgmma_wait1_three_stage",
+      "prepare_wgmma_wait1_typed": "prepare_wgmma_wait1_three_stage_typed",
+      "wait1_contiguous_eight_sentinels": "wait1_three_stage_contiguous_eight_sentinels",
+      "wait1_fill_a": "wait1_three_stage_fill_a",
+      "wait1_fill_b": "wait1_three_stage_fill_b",
+      "wait1_put_word": "wait1_three_stage_put_word",
+      "wait1_read_eight": "wait1_three_stage_read_eight",
+      "wait1_round_pair": "wait1_three_stage_round_pair",
+      "wait1_store_eight": "wait1_three_stage_store_eight",
+      "wait1_unpack": "wait1_three_stage_unpack",
+      "wgmma_wait1_can_implement": "wgmma_wait1_three_stage_can_implement",
+      "wgmma_wait1_full_tiles": "wgmma_wait1_three_stage_full_tiles",
+      "wgmma_wait1_native_binding": "wgmma_wait1_three_stage_native_binding",
+      "winograd_wgmma_wait1": "winograd_wgmma_wait1_three_stage"
+    },
+    "new_header_comment_lines": 2,
+    "one_bank_count_comment_updated": true,
+    "consumer_empty_arrival_count_still_128": true,
+    "both_consumer_release_sites_still_unconditional_for_128_consumers": true,
+    "same_vector_layout_transform_single_cast_P_order_U_epilogue_binding_guards": true,
+    "same_wait1_pending2_oldest_retirement_and_tail_wait0": true,
+    "bank_storage_and_PipelineAsync_instances_follow_Stages": true,
+    "entry_points": [
+      "wgmma_wait1_three_stage_can_implement",
+      "wgmma_wait1_three_stage_full_tiles",
+      "prepare_wgmma_wait1_three_stage",
+      "launch_wgmma_wait1_three_stage"
+    ]
+  },
+  "pinned_api": {
+    "cutlass_version": "3.5.1",
+    "cutlass_commit": "f7b19de32c5d1f3cedfc735c2849f12b537522ee",
+    "pipeline_path": "third_party/cutlass/include/cutlass/pipeline/sm90_pipeline.hpp",
+    "pipeline_sha256": "550747f08887a71035f7b2da9d7c9113a1f6e6f2b81434573475745a4237d583",
+    "PipelineState_default": [
+      0,
+      0,
+      0
+    ],
+    "PipelineState_increment_lines": [
+      140,
+      147
+    ],
+    "index_formula": "stage % 3",
+    "consumer_phase_formula": "(stage // 3) & 1",
+    "producer_phase_formula": "1 ^ ((stage // 3) & 1)",
+    "producer_tail_actual_source_loop": "count < Stages; producer_acquire(state); ++state",
+    "constructor_counts": "full=128, empty=128; one elected initialization in warp0 followed by CTA barrier",
+    "primary_url": "https://github.com/NVIDIA/cutlass/blob/v3.5.1/include/cutlass/pipeline/sm90_pipeline.hpp"
+  },
+  "resources_predictions_only": [
+    {
+      "dtype": "BF16",
+      "BM": 64,
+      "BN": 16,
+      "BK": 32,
+      "threads": 256,
+      "producer_threads": 128,
+      "consumer_threads": 128,
+      "final_operand_banks": 3,
+      "operand_bank_bytes": 35840,
+      "operand_total_bytes": 107520,
+      "barrier_bytes_prediction": 48,
+      "shared_bytes_prediction": 107648,
+      "bank_offsets_bytes": [
+        0,
+        35840,
+        71680
+      ],
+      "bank_offsets_all_128B_and_512B_aligned": true,
+      "shared_bytes_actual_compiled": null,
+      "source_producer_quota": 64,
+      "source_consumer_quota": 96,
+      "initial_register_allocation_actual": null,
+      "owned_pool_actual": null,
+      "actual_role_register_maxima": null,
+      "spills_actual": null
+    },
+    {
+      "dtype": "BF16",
+      "BM": 64,
+      "BN": 32,
+      "BK": 32,
+      "threads": 256,
+      "producer_threads": 128,
+      "consumer_threads": 128,
+      "final_operand_banks": 3,
+      "operand_bank_bytes": 43008,
+      "operand_total_bytes": 129024,
+      "barrier_bytes_prediction": 48,
+      "shared_bytes_prediction": 129152,
+      "bank_offsets_bytes": [
+        0,
+        43008,
+        86016
+      ],
+      "bank_offsets_all_128B_and_512B_aligned": true,
+      "shared_bytes_actual_compiled": null,
+      "source_producer_quota": 64,
+      "source_consumer_quota": 160,
+      "initial_register_allocation_actual": null,
+      "owned_pool_actual": null,
+      "actual_role_register_maxima": null,
+      "spills_actual": null
+    },
+    {
+      "dtype": "FP16",
+      "BM": 64,
+      "BN": 16,
+      "BK": 32,
+      "threads": 256,
+      "producer_threads": 128,
+      "consumer_threads": 128,
+      "final_operand_banks": 3,
+      "operand_bank_bytes": 35840,
+      "operand_total_bytes": 107520,
+      "barrier_bytes_prediction": 48,
+      "shared_bytes_prediction": 107648,
+      "bank_offsets_bytes": [
+        0,
+        35840,
+        71680
+      ],
+      "bank_offsets_all_128B_and_512B_aligned": true,
+      "shared_bytes_actual_compiled": null,
+      "source_producer_quota": 64,
+      "source_consumer_quota": 96,
+      "initial_register_allocation_actual": null,
+      "owned_pool_actual": null,
+      "actual_role_register_maxima": null,
+      "spills_actual": null
+    },
+    {
+      "dtype": "FP16",
+      "BM": 64,
+      "BN": 32,
+      "BK": 32,
+      "threads": 256,
+      "producer_threads": 128,
+      "consumer_threads": 128,
+      "final_operand_banks": 3,
+      "operand_bank_bytes": 43008,
+      "operand_total_bytes": 129024,
+      "barrier_bytes_prediction": 48,
+      "shared_bytes_prediction": 129152,
+      "bank_offsets_bytes": [
+        0,
+        43008,
+        86016
+      ],
+      "bank_offsets_all_128B_and_512B_aligned": true,
+      "shared_bytes_actual_compiled": null,
+      "source_producer_quota": 64,
+      "source_consumer_quota": 160,
+      "initial_register_allocation_actual": null,
+      "owned_pool_actual": null,
+      "actual_role_register_maxima": null,
+      "spills_actual": null
+    }
+  ],
+  "CPU_model_limits": [
+    "Producer128 publication and consumer128 release are abstract events, not per-thread instruction/memory-order simulation.",
+    "Group completion flags model shared-bank lifetime; they do not simulate WGMMA rounding, individual accumulator registers, compiler spill or issue-credit stalls.",
+    "Source identity/order does not establish new compiled four-instance resource safety, GPU bit equality, numerical gate or performance."
+  ],
+  "protocol_blockers_found": [],
+  "required_new_compile_gate": [
+    "All four BF16/FP16 x BN16/BN32 instances, current actual dynamic plus static shared memory and object/linked SASS identity.",
+    "Initial CTA-owned register pool, producer/consumer allocation directions, full role CFG including implicit register widths, accumulator initialization, local/stack/spill counts.",
+    "Actual modulo3 index and every-third-stage phase lowering, three distinct bank bases and three independent producer_tail acquires.",
+    "All128 aligned WGMMA control flow and consumer release/full publication participation; no generic accumulator accesses or spills while latest group is in flight.",
+    "No iteration30/32 initial register/shared/CFG/spill/occupancy certification inherited; source quotas64/96/160 remain hypotheses until compilation."
+  ],
+  "required_new_runtime_gate": [
+    "Matching-atom raw-U/independent specified epilogue, phase-wrapped stages, odd/even and short1/2/3/4 tails plus long16/17/32/33.",
+    "Fresh current A/B, aligned binding changes, scalar/padded outputs, beta0/null, exact C0=D and all existing guard/fallback contracts.",
+    "One-kernel Graph capture/fresh replay and serial mem/race/sync sanitizer runs.",
+    "Original numerical gates separately and unchanged.",
+    "Complete ordinary and Graph call performance versus same-binary matching two-bank wait1 and retained Mega29; independently tuned same-row cuBLAS denominator, all full1024 modes/dtypes and own latency ranking."
+  ],
+  "actual_cuda_compilation": null,
+  "actual_gpu_validation": null,
+  "actual_performance": null,
+  "conclusion": "Independent CPU three-bank model and normalized source check pass. Candidate is ready for independent CPU/API review and later new compile/resource/GPU gates. No GPU or speedup certification.",
+  "documentation": {
+    "path": ".scratch/wgmma_wait1_three_stage_next.md",
+    "sha256": "3551d9e0413645aa84c8650a1893f491471513cbdd09868435a95d0e9536a6b8"
+  }
+}

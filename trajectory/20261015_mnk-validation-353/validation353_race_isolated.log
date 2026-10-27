@@ -1,0 +1,28 @@
+[ 83%] Built target megafmm
+gmake[3]: Warning: File 'CMakeFiles/test_tuning_candidates.dir/compiler_depend.make' has modification time 0.0017 s in the future
+[ 91%] Building CUDA object CMakeFiles/test_tuning_candidates.dir/tests/test_tuning_candidates.cu.o
+[100%] Linking CXX executable test_tuning_candidates
+gmake[3]: warning:  Clock skew detected.  Your build may be incomplete.
+[100%] Built target test_tuning_candidates
+========= COMPUTE-SANITIZER
+PASS candidate=128x256x64_beta0_rasterN dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x256x64_beta0_rasterN dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)
+========= COMPUTE-SANITIZER
+PASS candidate=128x128x64_beta0_auto_sw8 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x128x64_beta0_auto_sw8 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)
+========= COMPUTE-SANITIZER
+PASS candidate=64x256x64_beta0_pingpong dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=64x256x64_beta0_pingpong dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)
+========= COMPUTE-SANITIZER
+PASS candidate=64x256x64_beta0_pingpong_s3 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=64x256x64_beta0_pingpong_s3 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)
+========= COMPUTE-SANITIZER
+free(): invalid pointer
+========= Error: process didn't terminate successfully
+========= Target application returned an error
+========= RACECHECK SUMMARY: 0 hazards displayed (0 errors, 0 warnings)
+srun: error: g08: task 0: Exited with exit code 6

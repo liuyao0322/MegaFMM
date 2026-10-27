@@ -1,0 +1,390 @@
+{
+  "status": "Reject all measured N128 epilogue128x16 K32S5 two-CTA variants; no production changes",
+  "resources": [
+    {
+      "variant": 0,
+      "n": 128,
+      "window": 1,
+      "resource_and_fp64_tail_pass": true,
+      "rejected_before_launch": false
+    },
+    {
+      "variant": 1,
+      "n": 160,
+      "window": 1,
+      "resource_and_fp64_tail_pass": false,
+      "rejected_before_launch": true
+    },
+    {
+      "variant": 2,
+      "n": 128,
+      "window": 3,
+      "resource_and_fp64_tail_pass": true,
+      "rejected_before_launch": false
+    },
+    {
+      "variant": 3,
+      "n": 160,
+      "window": 3,
+      "resource_and_fp64_tail_pass": false,
+      "rejected_before_launch": true
+    }
+  ],
+  "observations": [
+    {
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "dtype": "bf16",
+      "window": 1,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median": 0.850222,
+      "minimum": 0.833529,
+      "groups": [
+        {
+          "group": 0,
+          "baseline_ms": 0.221978873,
+          "custom_ms": 0.262752652,
+          "speedup": 0.844821
+        },
+        {
+          "group": 1,
+          "baseline_ms": 0.225326732,
+          "custom_ms": 0.261889905,
+          "speedup": 0.860387
+        },
+        {
+          "group": 2,
+          "baseline_ms": 0.23058337,
+          "custom_ms": 0.271203846,
+          "speedup": 0.850222
+        },
+        {
+          "group": 3,
+          "baseline_ms": 0.227505907,
+          "custom_ms": 0.265861422,
+          "speedup": 0.855731
+        },
+        {
+          "group": 4,
+          "baseline_ms": 0.23199904,
+          "custom_ms": 0.278333426,
+          "speedup": 0.833529
+        }
+      ]
+    },
+    {
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "dtype": "bf16",
+      "window": 3,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median": 0.774053,
+      "minimum": 0.749968,
+      "groups": [
+        {
+          "group": 0,
+          "baseline_ms": 0.232211843,
+          "custom_ms": 0.291363835,
+          "speedup": 0.796982
+        },
+        {
+          "group": 1,
+          "baseline_ms": 0.212805122,
+          "custom_ms": 0.283413768,
+          "speedup": 0.750864
+        },
+        {
+          "group": 2,
+          "baseline_ms": 0.226731837,
+          "custom_ms": 0.290797114,
+          "speedup": 0.779691
+        },
+        {
+          "group": 3,
+          "baseline_ms": 0.212048322,
+          "custom_ms": 0.282743037,
+          "speedup": 0.749968
+        },
+        {
+          "group": 4,
+          "baseline_ms": 0.220735028,
+          "custom_ms": 0.285167992,
+          "speedup": 0.774053
+        }
+      ]
+    },
+    {
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "dtype": "fp16",
+      "window": 1,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median": 0.80923,
+      "minimum": 0.782865,
+      "groups": [
+        {
+          "group": 0,
+          "baseline_ms": 0.218002573,
+          "custom_ms": 0.276180148,
+          "speedup": 0.789349
+        },
+        {
+          "group": 1,
+          "baseline_ms": 0.222712949,
+          "custom_ms": 0.275216013,
+          "speedup": 0.80923
+        },
+        {
+          "group": 2,
+          "baseline_ms": 0.227931842,
+          "custom_ms": 0.27880609,
+          "speedup": 0.817528
+        },
+        {
+          "group": 3,
+          "baseline_ms": 0.224253446,
+          "custom_ms": 0.274830401,
+          "speedup": 0.81597
+        },
+        {
+          "group": 4,
+          "baseline_ms": 0.227927029,
+          "custom_ms": 0.291144639,
+          "speedup": 0.782865
+        }
+      ]
+    },
+    {
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "dtype": "fp16",
+      "window": 3,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median": 0.751801,
+      "minimum": 0.736361,
+      "groups": [
+        {
+          "group": 0,
+          "baseline_ms": 0.233622402,
+          "custom_ms": 0.305522233,
+          "speedup": 0.764666
+        },
+        {
+          "group": 1,
+          "baseline_ms": 0.222355843,
+          "custom_ms": 0.298014402,
+          "speedup": 0.746125
+        },
+        {
+          "group": 2,
+          "baseline_ms": 0.236627191,
+          "custom_ms": 0.321346879,
+          "speedup": 0.736361
+        },
+        {
+          "group": 3,
+          "baseline_ms": 0.23218368,
+          "custom_ms": 0.308836818,
+          "speedup": 0.751801
+        },
+        {
+          "group": 4,
+          "baseline_ms": 0.230760962,
+          "custom_ms": 0.304971516,
+          "speedup": 0.756664
+        }
+      ]
+    },
+    {
+      "shape": [
+        8192,
+        8192,
+        8192
+      ],
+      "dtype": "bf16",
+      "window": 1,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median": 0.738325,
+      "minimum": 0.686426,
+      "groups": [
+        {
+          "group": 0,
+          "baseline_ms": 1.584427238,
+          "custom_ms": 2.308227777,
+          "speedup": 0.686426
+        },
+        {
+          "group": 1,
+          "baseline_ms": 1.683320045,
+          "custom_ms": 2.214936972,
+          "speedup": 0.759986
+        },
+        {
+          "group": 2,
+          "baseline_ms": 1.583281875,
+          "custom_ms": 2.24012804,
+          "speedup": 0.706782
+        },
+        {
+          "group": 3,
+          "baseline_ms": 1.703784347,
+          "custom_ms": 2.307633877,
+          "speedup": 0.738325
+        },
+        {
+          "group": 4,
+          "baseline_ms": 1.649712086,
+          "custom_ms": 2.218007565,
+          "speedup": 0.743781
+        }
+      ]
+    },
+    {
+      "shape": [
+        8192,
+        8192,
+        8192
+      ],
+      "dtype": "bf16",
+      "window": 3,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median": 0.79871,
+      "minimum": 0.764202,
+      "groups": [
+        {
+          "group": 0,
+          "baseline_ms": 1.589118004,
+          "custom_ms": 2.079447269,
+          "speedup": 0.764202
+        },
+        {
+          "group": 1,
+          "baseline_ms": 1.637643933,
+          "custom_ms": 2.084441185,
+          "speedup": 0.785651
+        },
+        {
+          "group": 2,
+          "baseline_ms": 1.620756507,
+          "custom_ms": 2.029218197,
+          "speedup": 0.79871
+        },
+        {
+          "group": 3,
+          "baseline_ms": 1.668628573,
+          "custom_ms": 2.062355757,
+          "speedup": 0.809089
+        },
+        {
+          "group": 4,
+          "baseline_ms": 1.647996187,
+          "custom_ms": 2.047483921,
+          "speedup": 0.804888
+        }
+      ]
+    },
+    {
+      "shape": [
+        8192,
+        8192,
+        8192
+      ],
+      "dtype": "fp16",
+      "window": 1,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median": 0.713547,
+      "minimum": 0.699786,
+      "groups": [
+        {
+          "group": 0,
+          "baseline_ms": 1.695330858,
+          "custom_ms": 2.422642708,
+          "speedup": 0.699786
+        },
+        {
+          "group": 1,
+          "baseline_ms": 1.683332205,
+          "custom_ms": 2.359103918,
+          "speedup": 0.713547
+        },
+        {
+          "group": 2,
+          "baseline_ms": 1.700407386,
+          "custom_ms": 2.373957396,
+          "speedup": 0.716275
+        },
+        {
+          "group": 3,
+          "baseline_ms": 1.694862723,
+          "custom_ms": 2.399576664,
+          "speedup": 0.706317
+        },
+        {
+          "group": 4,
+          "baseline_ms": 1.698928952,
+          "custom_ms": 2.346234083,
+          "speedup": 0.724109
+        }
+      ]
+    },
+    {
+      "shape": [
+        8192,
+        8192,
+        8192
+      ],
+      "dtype": "fp16",
+      "window": 3,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median": 0.801313,
+      "minimum": 0.789327,
+      "groups": [
+        {
+          "group": 0,
+          "baseline_ms": 1.732552648,
+          "custom_ms": 2.1621418,
+          "speedup": 0.801313
+        },
+        {
+          "group": 1,
+          "baseline_ms": 1.701029539,
+          "custom_ms": 2.077223778,
+          "speedup": 0.818896
+        },
+        {
+          "group": 2,
+          "baseline_ms": 1.698628902,
+          "custom_ms": 2.124877214,
+          "speedup": 0.799401
+        },
+        {
+          "group": 3,
+          "baseline_ms": 1.694234371,
+          "custom_ms": 2.146428108,
+          "speedup": 0.789327
+        },
+        {
+          "group": 4,
+          "baseline_ms": 1.699106932,
+          "custom_ms": 2.111604452,
+          "speedup": 0.804652
+        }
+      ]
+    }
+  ],
+  "correctness_scope": "FP16 small exact originalAB/persistent reuse preflight; large random-input paired timings are diagnostic only, not original FP64 acceptance.",
+  "decision": "Smaller epilogue permits an extra input stage but loses performance. Probe distinct one-CTA tile widths and auto buffer depth, not more two-CTA narrow variants.",
+  "latest_certification": "353:16/28 unchanged"
+}

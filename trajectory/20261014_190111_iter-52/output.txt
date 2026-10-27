@@ -1,0 +1,55 @@
+364679077480994fb91a0556cdf23cc2a983f90d22e31975712c0f4b68306d9a  solution/internal.h
+f72122307b7a47121f9aebb7cf8ea15c5fce6b0fd4ddcaea9a99a48df35b7e74  solution/plan.cpp
+32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708  solution/scale_output.cu
+4c179015f429bf9017d9bc3bd86e6e42c1ff57ebf70702a70bb5c6b192815404  solution/sw_pipeline.cu
+d5564b71d399c934229c8dc2089c5dd8de7e942957845a9cf23977353186e475  include/megafmm/gemm.h
+0964fc49fdbd02945515ff2d8f6bb834c6a4c937fb4cfad396b1be313634ae4e  bench/benchmark.cu
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 20%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+[ 20%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 30%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 40%] Linking CXX static library libmegafmm.a
+[ 40%] Built target megafmm
+[ 50%] Building CUDA object CMakeFiles/test_sw1024.dir/tests/test_sw1024.cu.o
+[ 70%] Building CUDA object CMakeFiles/megafmm_bench.dir/bench/benchmark.cu.o
+[ 70%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+[ 80%] Linking CXX executable test_sw1024
+[ 80%] Built target test_sw1024
+[ 90%] Linking CXX executable test_correctness
+[ 90%] Built target test_correctness
+[100%] Linking CXX executable megafmm_bench
+[100%] Built target megafmm_bench
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=dense config=dense:id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=10;bound_candidate=4/16;tuned_candidate=4;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.012982;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=sw_v1;warp_roles=1tma+3simt+4wgmma;smem=213120;st=fp32;operand=hi+lo;leaf_terms=15;current_pointer_maps=2;operand_layout=sw32;alpha=1;beta=0
+CHECK 1024,1024,1024 bf16 trial=0 dense_eF=8.51899e-07 solution_eF=1.31946 gate=0.00100256 pass=0
+CHECK 1024,1024,1024 bf16 trial=1 dense_eF=8.52266e-07 solution_eF=1.32243 gate=0.00100256 pass=0
+CHECK 1024,1024,1024 bf16 trial=2 dense_eF=8.50027e-07 solution_eF=1.32164 gate=0.00100255 pass=0
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.416908 wall_ms=0.416998
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0122122 wall_ms=0.0122886
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.0121917 wall_ms=0.012265
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.415751 wall_ms=0.41582
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.411769 wall_ms=0.411855
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.0121222 wall_ms=0.0122017
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.40264 wall_ms=0.40271
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.0119043 wall_ms=0.0119763
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.0118733 wall_ms=0.0119485
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.402582 wall_ms=0.402652
+TUNE shape=1024,1024,1024 dtype=fp16 case=dense config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010118;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=sw_v1;warp_roles=1tma+3simt+4wgmma;smem=213120;st=fp32;operand=hi+lo;leaf_terms=15;current_pointer_maps=2;operand_layout=sw32;alpha=1;beta=0
+CHECK 1024,1024,1024 fp16 trial=0 dense_eF=1.24851e-06 solution_eF=1.31947 gate=0.000103746 pass=0
+CHECK 1024,1024,1024 fp16 trial=1 dense_eF=1.25092e-06 solution_eF=1.32243 gate=0.000103753 pass=0
+CHECK 1024,1024,1024 fp16 trial=2 dense_eF=1.24799e-06 solution_eF=1.32164 gate=0.000103744 pass=0
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.396566 wall_ms=0.396663
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.00998976 wall_ms=0.0100771
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.00975936 wall_ms=0.00983289
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.398881 wall_ms=0.398953
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.398406 wall_ms=0.398487
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.00976768 wall_ms=0.00983985
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.394267 wall_ms=0.394341
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.009768 wall_ms=0.00984367
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.00971744 wall_ms=0.00979079
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.394277 wall_ms=0.394348
+srun: error: g08: task 0: Exited with exit code 2

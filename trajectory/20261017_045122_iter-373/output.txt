@@ -1,0 +1,173 @@
+b9a82afc6a640022c6e7a1081a87bab5c98e425965d08e8a150fb554128d0478  solution/dense_ampere.cu
+a77d13bca05425c6b681fa03696755172d16923253fd58d73c86e66649b5b1bc  solution/dense_hopper.cu
+b26e82bb50ea5f22b24b5f26975d2d9ddd31d589583793dd26f69df144c23769  solution/dense_padding.cu
+fd3c6eb06343c7e59aba443cfc72c5bc6fef04ad81a9419773ec4b5303c2bced  solution/dense_wmma.cu
+d93ec9550172cd8fdc3c2f4159715dfcac124be64c3a413386b6e300413b3175  solution/hopper_batched_mainloop.cuh
+d3413c2d15ae54399415e58f2483aadd70e3f04ba61a1c676822601902b4c261  solution/hopper_inflight_mainloop.cuh
+be709dad8f042ff00592d43a781cb2c83bac466eb4a38c73fc428eba13e03adb  solution/hopper_nine_warp_kernel.cuh
+f0b921cedcd71826ff1c9bba467b5901186bbb45d26d5321e54b42c71e85d107  solution/internal.h
+d1b6457f072de5642d5511e6ebb33304eb8beca4b14d537c20b616935aaed5e6  solution/plan.cpp
+32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708  solution/scale_output.cu
+ebc37e9dd171dd5855cdaed91fbb030d250c052a4c459746dd33b82cc634264b  solution/sw1024.cu
+1753f1d190c814bafa2b4bd17719a89d8d652ab22e1345bcc14582376753bbdf  solution/sw_hopper.cu
+35071d288d943ec4334260fc0df512adaf50ce53601cd83e42781114e2f4a32c  solution/sw_hopper_128.cuh
+5d870752814a1c9e2a6529274fb205a29aba0f4f5cef30ca3136cc885c960f26  solution/sw_hopper_128_128_2.cuh
+98aefc4f2c734253c82df5c19bad3d0f7b8a5bd1d18607e78fa122ead7696409  solution/sw_hopper_128_256_2.cuh
+0e44baf6ed63bdc9f7b150067bbf37f071703dcd600661f74d3a702d1fc0c5ff  solution/sw_hopper_32.cuh
+3516e3b967291e7256ff318704a5d5c8b092bf5fabdc710155ddbe2d434362ff  solution/sw_hopper_32_128_4.cuh
+ac396155adbaec642cf1439551dc31314df4ca31f4b515c008837b7eb7c82320  solution/sw_hopper_32_64_4.cuh
+b698565966c055f65af59e936a5277822ae6c1cd7934cb9a8bed81b1ec8a37b6  solution/sw_hopper_64_128_2.cuh
+84b946be0639967f46fac907e33ee9191b5fcfa807d98aaebbbf5660b361afa7  solution/sw_hopper_64_64_4.cuh
+66dfbcb3885c67fe79f9283432442c780fd73d2574f52801e28cd17307c97ba6  solution/sw_padded.cuh
+814f539a1cb5da50fb20978934be20e6e162fcc076df2550d095664fbd2679d4  solution/sw_padded_16.cuh
+78f444f0540e846a59545b91d839d8b9c187e63c05a11a18006cd241976355de  solution/sw_padded_16_64_4.cuh
+43e39408414383dbeb15a79fbdff30bbe73511a6293ea1d18727965687db9035  solution/sw_padded_64.cuh
+3f6fe3e5fa4adb32eac4d2abfe01d65d3c3f44077b6ac16b712529ad156f4a2c  solution/sw_padded_64_64_4.cuh
+7143cb3aa0ed93ee5425d49db341d90151ba9cff91b0cb0e10895483a0fb32d5  solution/sw_pipeline.cu
+23835ef02b71ce0753ccc79c00f22bfba16d15ab9bb98f93a43202c1f00f2fdc  solution/sw_tuning.inc
+8720da1158d6f6fd385df46e477ac119648977802c2e7ec725f5d5fb8887c2de  solution/tuning_check.cu
+fd729aeb4931baf9193f1c7b695ed0c3ed77d91d118646fedd7818301f0fca4d  solution/tuning_confirmation.h
+661bad8ec17b8da6c66a62e98198eff309e3484b41cb3893d2777c29d3e70422  include/megafmm/gemm.h
+911f3f3b2431cf7bd4b65ae2c34e9635f83eb79c358d0cc1f0d93ce63702f3f7  bench/benchmark.cu
+-- The CXX compiler identification is GNU 12.2.0
+-- The CUDA compiler identification is NVIDIA 12.4.99
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting CUDA compiler ABI info
+-- Detecting CUDA compiler ABI info - done
+-- Check for working CUDA compiler: /share/app/cuda/cuda-12.4/bin/nvcc - skipped
+-- Detecting CUDA compile features
+-- Detecting CUDA compile features - done
+-- Found CUDAToolkit: /share/app/cuda/cuda-12.4/include (found suitable version "12.4.99", minimum required is "12.4") 
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Found Python3: /share/home/liuyao/miniconda3/bin/python3 (found version "3.13.11") found components: Interpreter 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build-sw-speed
+[ 11%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 11%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+[ 11%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 14%] Building CXX object CMakeFiles/test_tuning_confirmation.dir/tests/test_tuning_confirmation.cpp.o
+[ 18%] Linking CXX executable test_tuning_confirmation
+[ 18%] Built target test_tuning_confirmation
+[ 22%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw1024.cu.o
+[ 25%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_hopper.cu.o
+[ 29%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_hopper.cu.o
+[ 33%] Building CUDA object CMakeFiles/megafmm.dir/solution/tuning_check.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/sw1024.cu(13): warning #177-D: variable "megafmm::detail::<unnamed>::Elements" was declared but never referenced
+  constexpr int BM=64,BN=32,BK=128,Stages=8,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+                                                                    ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw1024.cu(25): warning #177-D: function "megafmm::detail::<unnamed>::arrive" was declared but never referenced
+            void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
+                 ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw1024.cu(27): warning #177-D: function "megafmm::detail::<unnamed>::product_index" was declared but never referenced
+                            int product_index(int row,int col){
+                                ^
+
+[ 37%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_padding.cu.o
+[ 40%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_wmma.cu.o
+[ 44%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_ampere.cu.o
+ptxas info    : (C7511) Potential Performance Loss: wgmma.mma_async instructions are serialized due to insufficient register resources for the wgmma pipeline in the function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi3ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_32KernelTmaWarpSpecializedPingpongEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_6half_tENS5_IJlSB_lEEESJ_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_27SM90_64x256x16_F32F16F16_SSILNS4_4GMMA5MajorE0ELSQ_1ELNSP_7ScaleInE1ELSR_1EEEEEENS4_6LayoutISC_NS5_IJNSA_ILi0EEESV_SV_EEEEENS5_IJNS4_10UnderscoreESY_SY_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSU_INS5_IJNSA_ILi8EEESH_EEENS5_IJSH_SB_EEEEEEEvNS4_8identityES11_NS12_IS14_S16_NSU_INS5_IJSH_S17_EEENS5_IJSB_SH_EEEEEEEvS1C_EENS_8epilogue10collective18CollectiveEpilogueINS1I_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSI_NS5_IJSH_NSA_ILi32EEEEEEfSK_fSK_NS1I_6fusion15FusionCallbacksIS1M_NS1P_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESI_S1O_JEEES11_NS12_IS14_NS15_ILi32EEENSU_INS5_IJS17_S1N_EEENS5_IJS1N_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES1Z_S21_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NESJ_EEEEEEvvEEEEvNT_6ParamsE'
+ptxas info    : (C7511) Potential Performance Loss: wgmma.mma_async instructions are serialized due to insufficient register resources for the wgmma pipeline in the function '_ZN7cutlass13device_kernelINS_4gemm6kernel13GemmUniversalIN4cute5tupleIJiiiiEEENS1_10collective13CollectiveMmaINS1_34MainloopSm90TmaGmmaWarpSpecializedILi3ENS5_IJNS4_1CILi1EEESB_SB_EEENS1_32KernelTmaWarpSpecializedPingpongEEENS5_IJNSA_ILi128EEENSA_ILi256EEENSA_ILi64EEEEEENS_10bfloat16_tENS5_IJlSB_lEEESJ_NS5_IJSB_llEEENS4_8TiledMMAINS4_8MMA_AtomIJNS4_29SM90_64x256x16_F32BF16BF16_SSILNS4_4GMMA5MajorE0ELSQ_1ELNSP_7ScaleInE1ELSR_1EEEEEENS4_6LayoutISC_NS5_IJNSA_ILi0EEESV_SV_EEEEENS5_IJNS4_10UnderscoreESY_SY_EEEEENS4_13SM90_TMA_LOADENS4_14ComposedLayoutINS4_7SwizzleILi3ELi4ELi3EEENS4_18smem_ptr_flag_bitsILi16EEENSU_INS5_IJNSA_ILi8EEESH_EEENS5_IJSH_SB_EEEEEEEvNS4_8identityES11_NS12_IS14_S16_NSU_INS5_IJSH_S17_EEENS5_IJSB_SH_EEEEEEEvS1C_EENS_8epilogue10collective18CollectiveEpilogueINS1I_22Sm90TmaWarpSpecializedILi4ELi2ELi16ELb1ELb0EEEJSI_NS5_IJSH_NSA_ILi32EEEEEEfSK_fSK_NS1I_6fusion15FusionCallbacksIS1M_NS1P_17LinearCombinationIffffLNS_15FloatRoundStyleE2EEESI_S1O_JEEES11_NS12_IS14_NS15_ILi32EEENSU_INS5_IJS17_S1N_EEENS5_IJS1N_SB_EEEEEEENS4_39AutoVectorizingCopyWithAssumedAlignmentILi128EEENS4_14SM90_TMA_STOREES1Z_S21_NS4_9Copy_AtomIJNS4_17SM90_U32x4_STSM_NENS_6half_tEEEEEEEvvEEEEvNT_6ParamsE'
+[ 48%] Linking CXX static library libmegafmm.a
+[ 48%] Built target megafmm
+[ 55%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+[ 62%] Building CUDA object CMakeFiles/test_sw1024.dir/tests/test_sw1024.cu.o
+[ 62%] Building CUDA object CMakeFiles/test_sw_pipeline.dir/tests/test_sw_pipeline.cu.o
+[ 62%] Building CUDA object CMakeFiles/megafmm_bench.dir/bench/benchmark.cu.o
+[ 66%] Linking CXX executable test_sw1024
+[ 70%] Linking CXX executable test_correctness
+[ 70%] Built target test_sw1024
+[ 70%] Built target test_correctness
+[ 77%] Building CUDA object CMakeFiles/test_tuning_precision.dir/tests/test_tuning_precision.cu.o
+[ 77%] Building CUDA object CMakeFiles/test_tuning_candidates.dir/tests/test_tuning_candidates.cu.o
+[ 81%] Linking CXX executable test_sw_pipeline
+[ 81%] Built target test_sw_pipeline
+[ 85%] Building CUDA object CMakeFiles/test_sw_tuner.dir/tests/test_sw_tuner.cu.o
+[ 88%] Linking CXX executable megafmm_bench
+[ 92%] Linking CXX executable test_tuning_candidates
+[ 96%] Linking CXX executable test_tuning_precision
+[ 96%] Built target megafmm_bench
+[ 96%] Built target test_tuning_candidates
+[ 96%] Built target test_tuning_precision
+[100%] Linking CXX executable test_sw_tuner
+[100%] Built target test_sw_tuner
+PASS native SW candidates 1024x1024x1024 bf16 count=126 fresh=3 launch+graph
+PASS native SW candidates 514x770x258 bf16 count=36 fresh=3 launch+graph
+PASS native SW candidates 512x1024x512 bf16 count=126 fresh=3 launch+graph
+PASS native SW candidates 512x512x2048 bf16 count=126 fresh=3 launch+graph
+PASS native SW candidates 1024x1024x1024 fp16 count=126 fresh=3 launch+graph
+PASS native SW candidates 514x770x258 fp16 count=36 fresh=3 launch+graph
+PASS native SW candidates 512x1024x512 fp16 count=126 fresh=3 launch+graph
+PASS native SW candidates 512x512x2048 fp16 count=126 fresh=3 launch+graph
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=2048,2048,2048 dtype=bf16 case=dense config=dense:id=39;tile=23;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.032186;align0=16;align1=16;align2=16;align3=16
+TUNE shape=2048,2048,2048 dtype=bf16 case=solution config=sw_tuned;leaf_terms=7;status=diagnostic_precision_failed;gpu=NVIDIA H100 80GB HBM3;mode=launch;input_sets=2;candidate_count=126;rank=5x20;confirmation=5x100;selected_id=16;selected=sw_native;leaf_terms=7;tile=64x128;bk=64;stages=4;padded=0;pack_cap=512;raster=2;median_ms=0.050876;ef=0.006025;gate=0.001006
+CHECK 2048,2048,2048 bf16 trial=0 dense_eF=1.85669e-06 solution_eF=0.00602393 gate=0.00100557 pass=0
+CHECK 2048,2048,2048 bf16 trial=1 dense_eF=1.85611e-06 solution_eF=0.00601892 gate=0.00100557 pass=0
+CHECK 2048,2048,2048 bf16 trial=2 dense_eF=1.85608e-06 solution_eF=0.00602495 gate=0.00100557 pass=0
+TIME shape=2048,2048,2048 dtype=bf16 group=0 case=dense event_ms=0.031648 wall_ms=0.0317432
+TIME shape=2048,2048,2048 dtype=bf16 group=0 case=solution event_ms=0.0510726 wall_ms=0.0511557
+TIME shape=2048,2048,2048 dtype=bf16 group=1 case=dense event_ms=0.0311693 wall_ms=0.0312512
+TIME shape=2048,2048,2048 dtype=bf16 group=1 case=solution event_ms=0.0505453 wall_ms=0.0506243
+TIME shape=2048,2048,2048 dtype=bf16 group=2 case=dense event_ms=0.0312554 wall_ms=0.0313439
+TIME shape=2048,2048,2048 dtype=bf16 group=2 case=solution event_ms=0.0505299 wall_ms=0.0506093
+TIME shape=2048,2048,2048 dtype=bf16 group=3 case=dense event_ms=0.0314141 wall_ms=0.0314961
+TIME shape=2048,2048,2048 dtype=bf16 group=3 case=solution event_ms=0.0506883 wall_ms=0.0507682
+TIME shape=2048,2048,2048 dtype=bf16 group=4 case=dense event_ms=0.0313955 wall_ms=0.0314765
+TIME shape=2048,2048,2048 dtype=bf16 group=4 case=solution event_ms=0.0506301 wall_ms=0.0507094
+TUNE shape=2048,2048,2048 dtype=fp16 case=dense config=dense:id=39;tile=20;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=1/14;tuned_candidate=1;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.032390;align0=16;align1=16;align2=16;align3=16
+TUNE shape=2048,2048,2048 dtype=fp16 case=solution config=sw_tuned;leaf_terms=7;status=diagnostic_precision_failed;gpu=NVIDIA H100 80GB HBM3;mode=launch;input_sets=2;candidate_count=126;rank=5x20;confirmation=5x100;selected_id=16;selected=sw_native;leaf_terms=7;tile=64x128;bk=64;stages=4;padded=0;pack_cap=512;raster=2;median_ms=0.050880;ef=0.000754;gate=0.000107
+CHECK 2048,2048,2048 fp16 trial=0 dense_eF=2.45575e-06 solution_eF=0.000752202 gate=0.000107367 pass=0
+CHECK 2048,2048,2048 fp16 trial=1 dense_eF=2.45746e-06 solution_eF=0.00075359 gate=0.000107372 pass=0
+CHECK 2048,2048,2048 fp16 trial=2 dense_eF=2.45816e-06 solution_eF=0.000752812 gate=0.000107374 pass=0
+TIME shape=2048,2048,2048 dtype=fp16 group=0 case=dense event_ms=0.0316634 wall_ms=0.0317483
+TIME shape=2048,2048,2048 dtype=fp16 group=0 case=solution event_ms=0.0523882 wall_ms=0.0524655
+TIME shape=2048,2048,2048 dtype=fp16 group=1 case=dense event_ms=0.0320288 wall_ms=0.032108
+TIME shape=2048,2048,2048 dtype=fp16 group=1 case=solution event_ms=0.052184 wall_ms=0.0522688
+TIME shape=2048,2048,2048 dtype=fp16 group=2 case=dense event_ms=0.0317558 wall_ms=0.0318344
+TIME shape=2048,2048,2048 dtype=fp16 group=2 case=solution event_ms=0.0521936 wall_ms=0.0522715
+TIME shape=2048,2048,2048 dtype=fp16 group=3 case=dense event_ms=0.0316262 wall_ms=0.0317041
+TIME shape=2048,2048,2048 dtype=fp16 group=3 case=solution event_ms=0.052136 wall_ms=0.0522128
+TIME shape=2048,2048,2048 dtype=fp16 group=4 case=dense event_ms=0.0316397 wall_ms=0.0317161
+TIME shape=2048,2048,2048 dtype=fp16 group=4 case=solution event_ms=0.052312 wall_ms=0.0523891
+TUNE shape=4096,4096,4096 dtype=bf16 case=dense config=dense:id=39;tile=20;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=9;bound_candidate=1/16;tuned_candidate=1;bound_workspace=131;tuned=1;tune=4w/3x10median;tuning_ms=0.201818;align0=16;align1=16;align2=16;align3=16
+TUNE shape=4096,4096,4096 dtype=bf16 case=solution config=sw_tuned;leaf_terms=7;status=diagnostic_precision_failed;gpu=NVIDIA H100 80GB HBM3;mode=launch;input_sets=2;candidate_count=126;rank=5x20;confirmation=5x100;selected_id=52;selected=sw_native;leaf_terms=7;tile=64x128;bk=256;stages=2;padded=0;pack_cap=512;raster=2;median_ms=0.329661;ef=0.006018;gate=0.001012
+CHECK 4096,4096,4096 bf16 trial=0 dense_eF=4.02334e-06 solution_eF=0.00602272 gate=0.00101207 pass=0
+CHECK 4096,4096,4096 bf16 trial=1 dense_eF=4.02328e-06 solution_eF=0.00602569 gate=0.00101207 pass=0
+CHECK 4096,4096,4096 bf16 trial=2 dense_eF=4.02375e-06 solution_eF=0.0060269 gate=0.00101207 pass=0
+TIME shape=4096,4096,4096 dtype=bf16 group=0 case=dense event_ms=0.204082 wall_ms=0.204168
+TIME shape=4096,4096,4096 dtype=bf16 group=0 case=solution event_ms=0.330193 wall_ms=0.330269
+TIME shape=4096,4096,4096 dtype=bf16 group=1 case=solution event_ms=0.331753 wall_ms=0.331835
+TIME shape=4096,4096,4096 dtype=bf16 group=1 case=dense event_ms=0.212566 wall_ms=0.212646
+TIME shape=4096,4096,4096 dtype=bf16 group=2 case=solution event_ms=0.344332 wall_ms=0.34441
+TIME shape=4096,4096,4096 dtype=bf16 group=2 case=dense event_ms=0.2164 wall_ms=0.216475
+TIME shape=4096,4096,4096 dtype=bf16 group=3 case=dense event_ms=0.217227 wall_ms=0.21731
+TIME shape=4096,4096,4096 dtype=bf16 group=3 case=solution event_ms=0.344525 wall_ms=0.344609
+TIME shape=4096,4096,4096 dtype=bf16 group=4 case=solution event_ms=0.333809 wall_ms=0.333884
+TIME shape=4096,4096,4096 dtype=bf16 group=4 case=dense event_ms=0.210936 wall_ms=0.211013
+TUNE shape=4096,4096,4096 dtype=fp16 case=dense config=dense:id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/9;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/3x10median;tuning_ms=0.208406;align0=16;align1=16;align2=16;align3=16
+TUNE shape=4096,4096,4096 dtype=fp16 case=solution config=sw_tuned;leaf_terms=7;status=diagnostic_precision_failed;gpu=NVIDIA H100 80GB HBM3;mode=launch;input_sets=2;candidate_count=126;rank=5x20;confirmation=5x100;selected_id=52;selected=sw_native;leaf_terms=7;tile=64x128;bk=256;stages=2;padded=0;pack_cap=512;raster=2;median_ms=0.347122;ef=0.000753;gate=0.000115
+CHECK 4096,4096,4096 fp16 trial=0 dense_eF=4.87534e-06 solution_eF=0.000753133 gate=0.000114626 pass=0
+CHECK 4096,4096,4096 fp16 trial=1 dense_eF=4.87603e-06 solution_eF=0.000752695 gate=0.000114628 pass=0
+CHECK 4096,4096,4096 fp16 trial=2 dense_eF=4.87674e-06 solution_eF=0.000753062 gate=0.00011463 pass=0
+TIME shape=4096,4096,4096 dtype=fp16 group=0 case=dense event_ms=0.208999 wall_ms=0.209093
+TIME shape=4096,4096,4096 dtype=fp16 group=0 case=solution event_ms=0.333561 wall_ms=0.333637
+TIME shape=4096,4096,4096 dtype=fp16 group=1 case=solution event_ms=0.329641 wall_ms=0.329723
+TIME shape=4096,4096,4096 dtype=fp16 group=1 case=dense event_ms=0.210721 wall_ms=0.210805
+TIME shape=4096,4096,4096 dtype=fp16 group=2 case=solution event_ms=0.353483 wall_ms=0.353562
+TIME shape=4096,4096,4096 dtype=fp16 group=2 case=dense event_ms=0.220093 wall_ms=0.22017
+TIME shape=4096,4096,4096 dtype=fp16 group=3 case=dense event_ms=0.225236 wall_ms=0.225323
+TIME shape=4096,4096,4096 dtype=fp16 group=3 case=solution event_ms=0.364284 wall_ms=0.364366
+TIME shape=4096,4096,4096 dtype=fp16 group=4 case=solution event_ms=0.341046 wall_ms=0.341125
+TIME shape=4096,4096,4096 dtype=fp16 group=4 case=dense event_ms=0.215191 wall_ms=0.21528
+srun: error: g08: task 0: Exited with exit code 2

@@ -1,0 +1,60 @@
+364679077480994fb91a0556cdf23cc2a983f90d22e31975712c0f4b68306d9a  solution/internal.h
+8c0aff9ff8de3148be0d20db8427231276a57300e49c55fef4198dd6ec0ab9af  solution/plan.cpp
+32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708  solution/scale_output.cu
+75153380c09bd2f1c8cb215a54dba0b7c5ecea1b333e52364095483e61b546d0  solution/sw_pipeline.cu
+d5564b71d399c934229c8dc2089c5dd8de7e942957845a9cf23977353186e475  include/megafmm/gemm.h
+0964fc49fdbd02945515ff2d8f6bb834c6a4c937fb4cfad396b1be313634ae4e  bench/benchmark.cu
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 10%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 30%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+[ 30%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(34): warning #177-D: function "megafmm::detail::<unnamed>::workers_sync" was declared but never referenced
+            void workers_sync() { asm volatile("bar.sync 1, 96;" ::: "memory"); }
+                 ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+[ 40%] Linking CXX static library libmegafmm.a
+[ 40%] Built target megafmm
+[ 50%] Building CUDA object CMakeFiles/test_sw1024.dir/tests/test_sw1024.cu.o
+[ 70%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+[ 70%] Building CUDA object CMakeFiles/megafmm_bench.dir/bench/benchmark.cu.o
+[ 80%] Linking CXX executable test_sw1024
+[ 80%] Built target test_sw1024
+[ 90%] Linking CXX executable test_correctness
+[ 90%] Built target test_correctness
+[100%] Linking CXX executable megafmm_bench
+[100%] Built target megafmm_bench
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=dense config=dense:id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=14;bound_candidate=6/16;tuned_candidate=6;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.013123;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=sw_v1;warp_roles=1tma+3simt+4wgmma;smem=188544;bk=64;st=fp32_register;operand=hi+lo;leaf_terms=15;current_pointer_maps=2;raw_stages=1;operand_layout=AK128_BMN64;skip_unused_residual=1;alpha=1;beta=0
+CHECK 1024,1024,1024 bf16 trial=0 dense_eF=8.51899e-07 solution_eF=7.1241e-06 gate=0.00100256 pass=1
+CHECK 1024,1024,1024 bf16 trial=1 dense_eF=8.52266e-07 solution_eF=7.15726e-06 gate=0.00100256 pass=1
+CHECK 1024,1024,1024 bf16 trial=2 dense_eF=8.50027e-07 solution_eF=7.14822e-06 gate=0.00100255 pass=1
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=solution event_ms=0.35811 wall_ms=0.358199
+TIME shape=1024,1024,1024 dtype=bf16 group=0 case=dense event_ms=0.0124528 wall_ms=0.0125296
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=dense event_ms=0.0123894 wall_ms=0.01247
+TIME shape=1024,1024,1024 dtype=bf16 group=1 case=solution event_ms=0.355324 wall_ms=0.355402
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=solution event_ms=0.355349 wall_ms=0.355428
+TIME shape=1024,1024,1024 dtype=bf16 group=2 case=dense event_ms=0.0123872 wall_ms=0.0124654
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=solution event_ms=0.35418 wall_ms=0.354273
+TIME shape=1024,1024,1024 dtype=bf16 group=3 case=dense event_ms=0.0125088 wall_ms=0.0125974
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=dense event_ms=0.0122134 wall_ms=0.0122905
+TIME shape=1024,1024,1024 dtype=bf16 group=4 case=solution event_ms=0.350552 wall_ms=0.35063
+TUNE shape=1024,1024,1024 dtype=fp16 case=dense config=dense:id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.010202;align0=16;align1=16;align2=16;align3=16
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=sw_v1;warp_roles=1tma+3simt+4wgmma;smem=188544;bk=64;st=fp32_register;operand=hi+lo;leaf_terms=15;current_pointer_maps=2;raw_stages=1;operand_layout=AK128_BMN64;skip_unused_residual=1;alpha=1;beta=0
+CHECK 1024,1024,1024 fp16 trial=0 dense_eF=1.24851e-06 solution_eF=4.79212e-07 gate=0.000103746 pass=1
+CHECK 1024,1024,1024 fp16 trial=1 dense_eF=1.25092e-06 solution_eF=4.78548e-07 gate=0.000103753 pass=1
+CHECK 1024,1024,1024 fp16 trial=2 dense_eF=1.24799e-06 solution_eF=4.78957e-07 gate=0.000103744 pass=1
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=solution event_ms=0.348924 wall_ms=0.34901
+TIME shape=1024,1024,1024 dtype=fp16 group=0 case=dense event_ms=0.00983456 wall_ms=0.00991109
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=dense event_ms=0.00982624 wall_ms=0.00990424
+TIME shape=1024,1024,1024 dtype=fp16 group=1 case=solution event_ms=0.348618 wall_ms=0.348705
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=solution event_ms=0.344053 wall_ms=0.344145
+TIME shape=1024,1024,1024 dtype=fp16 group=2 case=dense event_ms=0.00986592 wall_ms=0.00994451
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=solution event_ms=0.343986 wall_ms=0.344076
+TIME shape=1024,1024,1024 dtype=fp16 group=3 case=dense event_ms=0.00972768 wall_ms=0.00980522
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=dense event_ms=0.00972384 wall_ms=0.00980305
+TIME shape=1024,1024,1024 dtype=fp16 group=4 case=solution event_ms=0.34407 wall_ms=0.344151

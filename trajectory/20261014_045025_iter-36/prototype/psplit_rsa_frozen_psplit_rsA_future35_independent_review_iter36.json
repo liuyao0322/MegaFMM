@@ -1,0 +1,237 @@
+{
+  "review": "future35 RS A independent CPU narrow source/API review",
+  "status": "PASS_CONDITIONAL_SOURCE_API_AND_ANALYTIC_MODEL_ONLY",
+  "scope": "Read current final parent candidate/model/report, pinned fdaae75a base and primary CuTe/CUTLASS headers. No full parent model rerun, build, GPU, git, formal edit, old freeze edit, actual PTX/SASS or performance claim. Only two new independent review files written.",
+  "bindings": {
+    ".scratch/psplit_rsA_future35_candidate.cu": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_rsA_future35_candidate.cu",
+      "sha256": "4e32c7cf4bd7b916ae5fad3cab8aba601fb629aaca41ffd310ce40014113fca1"
+    },
+    ".scratch/psplit_rsA_future35_model.py": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_rsA_future35_model.py",
+      "sha256": "aab2e1940470681b51d83596440ae49c5f2369e6abf2a1ff33d7f3c5ab7644ee"
+    },
+    ".scratch/psplit_rsA_future35_review.json": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/.scratch/psplit_rsA_future35_review.json",
+      "sha256": "2f58b36daa5f70b9a0a693af19c2cc3036c5a4519b55a0bb5178900c3608d26a"
+    },
+    "solution/megakernel_wgmma_psplit.cu": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/solution/megakernel_wgmma_psplit.cu",
+      "sha256": "fdaae75a80893ee161a9db202d4746e86daf3d38135332759098bd9f7faa7f91"
+    },
+    "third_party/cutlass/include/cute/arch/mma_sm90.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/arch/mma_sm90.hpp",
+      "sha256": "76076648bb9a4a4a5a103cfe06b2f3a82a25fe03dbc45d08ed269d5a066535ab"
+    },
+    "third_party/cutlass/include/cute/arch/mma_sm90_gmma.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/arch/mma_sm90_gmma.hpp",
+      "sha256": "fb7d9b9358adecb3255e051e3f46026ddf2d8851adef017633f78d4ac4242f83"
+    },
+    "third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/atom/mma_traits_sm90_gmma.hpp",
+      "sha256": "9673bc77196f52edcf0b9b824cec5d305c0738251e9b3beb39ddc308e5b37e9f"
+    },
+    "third_party/cutlass/include/cute/atom/mma_traits.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/atom/mma_traits.hpp",
+      "sha256": "a583bd6ff876bca01927b31a8e9bc7086ebdde6bf692f070c811ed36a4663ae9"
+    },
+    "third_party/cutlass/include/cute/atom/mma_atom.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/atom/mma_atom.hpp",
+      "sha256": "f2c1aca60855106b61854be4e82a51c2a6bb89496f938e5bdd837b138d27dc10"
+    },
+    "third_party/cutlass/include/cute/algorithm/gemm.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/algorithm/gemm.hpp",
+      "sha256": "7794f06ca5977608b74c0ef244f559ca5049dc750127c46b2e726cb367a6c575"
+    },
+    "third_party/cutlass/include/cute/tensor_impl.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/tensor_impl.hpp",
+      "sha256": "4b93241399bfac2e6e2d43b23270d0ea2bcb9aacc766177bd0e145b5905013a0"
+    },
+    "third_party/cutlass/include/cute/layout.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/layout.hpp",
+      "sha256": "f82ea2a9cb3a64f77f49c67d76801a8707456950ace68b5165fd536acb67b2e8"
+    },
+    "third_party/cutlass/include/cute/pointer.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer.hpp",
+      "sha256": "be5dda8addc4ef0e8afc80223762c4046b10797076d8b9fc11be12e34d8a35b2"
+    },
+    "third_party/cutlass/include/cute/pointer_flagged.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_flagged.hpp",
+      "sha256": "0f3a985cc413e7b0b51b38f8260160e17cbe9e30bc9f7559d46d76f98e2193fe"
+    },
+    "third_party/cutlass/include/cute/pointer_swizzle.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/pointer_swizzle.hpp",
+      "sha256": "115e3d4ffa3e98bc757d930af1d63c7377d56ff2f7f96af05b83ba3f20b6aa1a"
+    },
+    "third_party/cutlass/include/cute/container/array_aligned.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cute/container/array_aligned.hpp",
+      "sha256": "d033b2bd8b1f946f3b2a7b0f9d95d9336332ec1a450b1656c188958eb8cc8ec4"
+    },
+    "third_party/cutlass/include/cutlass/half.h": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cutlass/half.h",
+      "sha256": "314fd4281f45e40b8687d84cf32364f7526fe70480486eb35bf3ae13b07ac4d1"
+    },
+    "third_party/cutlass/include/cutlass/bfloat16.h": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cutlass/bfloat16.h",
+      "sha256": "1a0d74acc6a53b245e2e1caaf2b788444368703e89472692529418c74f394063"
+    },
+    "third_party/cutlass/include/cutlass/pipeline/sm90_pipeline.hpp": {
+      "absolute_path": "/share/home/liuyao/workspace/MegaFMM/third_party/cutlass/include/cutlass/pipeline/sm90_pipeline.hpp",
+      "sha256": "550747f08887a71035f7b2da9d7c9113a1f6e6f2b81434573475745a4237d583"
+    }
+  },
+  "independent_binding_count": 19,
+  "parent_model_evidence_bindings_checked": 15,
+  "binding_mismatches": 0,
+  "resolved_findings": [
+    {
+      "severity": "required_source_alignment_contract",
+      "initial_source_sha256": "c4e272155435b6b514701a144af263f6ab1568365f91e234c2403f3688d8c7d7",
+      "finding": "Plain Element arrays initially guaranteed only natural2B alignment, while CuTe recast<uint32_t> and both A tensor fences/mma_unpack require packed32 views. recast documents no alignment check. Owning ArrayEngine normally uses array_aligned default16B; external backing arrays initially lost this guarantee.",
+      "fix": "Parent added alignas(16) to both A array declarations, retaining no initializers. Final source4e32 carries fix. Not an observed GPU misalignment or compiler failure."
+    },
+    {
+      "severity": "comment_only",
+      "finding": "Old BK32 B task-count comment and no-raw-shared-bank comment contradicted BK64/rawA4 future.",
+      "fix": "Both comments corrected in final4e32; no math change."
+    }
+  ],
+  "CuTe_API_chain": {
+    "status": "PASS source/header deduction; actual template compile and partition values pending",
+    "selector": "rs_op_selector BF16/FP16 F32, MajorA K, MajorB MN, atom64x32x16",
+    "partition": "ThrMma.partition_A identity64x64 -> logical rank3 (V8,M1,K4), with hierarchical V inherited from ALayout_64x16=CLayout_64x16",
+    "fragment": "RS traits lack FrgTypeA override, default ValTypeA; make_fragment_A -> make_fragment_like<Element>; static mode0 forced LayoutLeft, rest shape1x4 retained",
+    "packed_view": "recast_layout upcast2 yields logical (V4,M1,K4); u(pair,0,atom) maps packed index pair+4*atom and Element indices2*pair+8*atom, 0..15 packedwords/fragment",
+    "pairs": "coords(2*pair,0,atom),coords(2*pair+1,0,atom) are same row/consecutive K; independent literal-affine check4096 unique A cells plus32768 alignment/contiguity checks",
+    "fence": "Tensor A warpgroup_fence_operand uses recast<uint32_t> and +r for all16 u32; valid rmem view API labels, not physical REG proof",
+    "gemm": "Rank3 rmem A + rank3 rmem B descriptor + rank3 q; pinned dispatcher K ascending0..3; mma_unpack casts each sliced A to exactly4 uint32 ARegisters and C to16 floats",
+    "default_arrays": "Pinned half_t/bfloat16_t default ctor explicitly defaulted, sole uint16 storage has no in-class initializer; external aligned Element arrays have no initializer, so no source value initialization. decltype owning fragment unevaluated; runtime uses views only.",
+    "actual_CUDA_instantiation": false,
+    "actual_layout_or_register_residency": false
+  },
+  "lifetime": {
+    "status": "PASS conservative source virtual-input lifetime; physical alias/copy proof pending",
+    "G0_products": [
+      "A11",
+      "A12",
+      "S4"
+    ],
+    "G1_products": [
+      "A22",
+      "S1",
+      "S2",
+      "S3"
+    ],
+    "K16_atoms_per_stage": 4,
+    "packed_A_words_per_thread_G0": 48,
+    "packed_A_words_per_thread_G1": 64,
+    "P_float_words_per_thread_G0": 48,
+    "P_float_words_per_thread_G1": 64,
+    "payload_register_lower_bounds_G0_G1": [
+      96,
+      128
+    ],
+    "all_stage_A_built_before_arrive": true,
+    "all_required_A_have_preissue_and_postwait_tensor_fences": true,
+    "postwait_fences_before_empty_release": true,
+    "generic_A_rebuild_only_nextstage_after_covered_wait0": true,
+    "no_source_fourword_atom_loop_reuse": true,
+    "G0_a3_uninitialized_view_is_not_read_or_fenced": true,
+    "physical_compiler_liveness_alias_spill_or_hidden_register_copy_verified": false
+  },
+  "math_onecast": {
+    "status": "PASS ordered source equivalence and normalized B/converter/U retention",
+    "A": "G0 recomputes S1/S2/S4 with3RN and converts onlyS4; G1 S1/S2/S3 with3RN and onecast each. RawA11/A12/A22 copied bitwise. No intermediate S1/S2 cast in G0.",
+    "perP_fullK_order": "BK64 perP K16 offsets0,16,32,48; wholeK ascending matches baseline perP sequence, crossP interleaving changes but separate accumulators retained.",
+    "total_ST_RN_ratio_RS_to_SS": "4/3 (+1/3); A6 vs4 operations/cell, B4 unchanged",
+    "total_A_B_onecasts_unchanged": true,
+    "producer_ST_RN_reduced_to_B_only": "8192 vs24576 perBK64 stage",
+    "producer_onecasts_reduced_to_B_only": "8192 vs24576 perBK64 stage",
+    "symbolic_or_numpy_equivalence_is_not_GPU_FP64_correctness": true
+  },
+  "independent_BK64_analytic_counts_per_CTA_stage": {
+    "A_RN_SS": 16384,
+    "A_RN_RS": 24576,
+    "B_RN": 8192,
+    "ST_RN_SS": 24576,
+    "ST_RN_RS": 32768,
+    "A_onecasts": 16384,
+    "B_onecasts": 8192,
+    "RS_A_G0_casts": 4096,
+    "RS_A_G1_casts": 12288,
+    "producer_global_A_bytes": 32768,
+    "producer_global_B_bytes": 16384,
+    "producer_shared_raw_A_bytes": 32768,
+    "producer_shared_final_B_bytes": 28672,
+    "consumer_generic_raw_A_bytes": 57344,
+    "operand_bank_bytes": 61440,
+    "operand_two_banks_bytes": 122880,
+    "tail_bytes": 57344,
+    "tail_combined_store_read_bytes": 114688
+  },
+  "barrier_tail_U_host": {
+    "status": "PASS retained source protocol/math only",
+    "source_participants": "producer128+G0_128+G1_128, same PipelineAsync2 full128/empty256",
+    "events": [
+      "common init0",
+      "producer_tail + bothWG drain then role nonaligned6 count384",
+      "consumer P tail stores then common publish0",
+      "fixed U reads then alphaRN/betaFMA/C0preloads/Dstores"
+    ],
+    "union_operand_bytes": 122880,
+    "union_tail_bytes": 57344,
+    "operand_bank_bytes": 61440,
+    "tail_overlap_bank1_bytes": 0,
+    "barrier_offset_expected": 122880,
+    "barrier_bytes_expected": 32,
+    "shared_bytes_align128_expected": 123008,
+    "barriers_outside_union_and_tail": true,
+    "all_two_banks_retired_even_tail_fits_bank0": true,
+    "fixed_U_alphaRN_betaFMA_normalized_byte_equal": true,
+    "C0_D_exact_alias_runtime_guards_and_SAN_pending": true,
+    "host_native_single_ordinary_kernel_launch": true,
+    "native_k_fulltile_guard": "p.k%128 for BK64 halfK fulltiles",
+    "future_Plan_integration_or_dispatch": false
+  },
+  "parent_model_audit": {
+    "status": "NO_FALSE_ACTUAL_PROOF_FOUND; literal/virtual/NumPy scope caveats retained",
+    "parent_model_not_executed_by_reviewer": true,
+    "literal_geometry": "Primary header chain corroborates formulas but geometry PASS is not actual CuTe template/device pointer ABI or compiled bank transaction proof.",
+    "numeric_patterns": "Reported BF16/FP16 finite quadruples are deterministic samples with each A11 finite pattern, not Cartesian exhaustive4-quadrant values. Raw65536 packed bitcopy check verifies packing algebra, not CUDA FTZ/NaN payload/converter hardware.",
+    "virtual_lifetime": "Negative controls reject virtual pending-label reuse; not proof of LLVM/PTX/SASS physical A registers, hidden copies, or scalarization.",
+    "output_coverage": "Parent logical ownership/unique output mapping and fixed U retention are consistent; no GPU numerical/alias correctness claim.",
+    "model_may_write_parent_report_if_executed": "Read-only reviewer did not invoke it."
+  },
+  "resource_blockers_pending": {
+    "source_requests": [
+      64,
+      192,
+      192
+    ],
+    "owned_pool_hypothesis": 57344,
+    "initial_candidates": [
+      152,
+      160,
+      168
+    ],
+    "pool_math_only": true,
+    "fixed_shared_expected123008_gt_half_H100_optin_budget": "At most1CTA by this shared payload model; no speedup inference.",
+    "payload_lower_bounds_do_not_include": "builder transient RN/raw words, descriptors/indices/pointers, q/A views, compiler spills/local/hidden operand copies, pre/postrole and commonU producer64 bounds.",
+    "gates": [
+      "Actual BF16/FP16 template compile/RS ranks/shape/recast alignment and native ABI.",
+      "Exact PTX/SASS initialI/dec64/inc192, full roleCFG and implicit widths, zero spill/local/serialization gate where required.",
+      "Physical A input operand identities remain valid until own coveredwait0; inspect all 48/64 stage words, no generic touching/rewrite/copy onto pending inputs.",
+      "All fences, namedbar IDs/counts and mbarrier/tail publication ordering in actual stream; object/link exact identity.",
+      "Only after compiled gate: GPU correctness/FP64, alias/SAN/timeout progress, ordinary+Graph E2E and cuBLAS speedup."
+    ]
+  },
+  "not_claimed": [
+    "Compiled CUDA/API instantiation",
+    "Actual CuTe partition values/device shared ABI",
+    "192 quota or I152/160/168 fit",
+    "Physical RS A register liveness or no spill/serialization",
+    "GPU launch/correctness/progress",
+    "Any performance or cuBLAS speedup",
+    "Formal source or policy change"
+  ]
+}

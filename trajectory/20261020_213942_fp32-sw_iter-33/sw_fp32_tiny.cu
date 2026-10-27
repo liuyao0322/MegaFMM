@@ -1,0 +1,77 @@
+#include "sw_fp32_tiny.h"
+#include <stdexcept>
+
+namespace megafmm::detail::sw_fp32_tiny {
+namespace {
+void check(cudaError_t e) {
+  if(e!=cudaSuccess)throw std::runtime_error(cudaGetErrorString(e));
+}
+// Keep all seven Winograd products, including those whose output quadrants
+// lie outside the degenerate 1x1 result. No lower-precision product or dense
+// replacement is used. The scalar schedule retains terms in volatile shared
+// storage so ptxas also preserves products outside the valid output quadrant.
+__device__ __forceinline__ float native_fma(float a,float b,float c) {
+  float result;
+  asm volatile("fma.rn.f32 %0, %1, %2, %3;" : "=f"(result) : "f"(a),"f"(b),"f"(c));
+  return result;
+}
+template<bool Grouped>
+__global__ void kernel(const float* A,const float* B,const float* C,float* D,float alpha,float beta) {
+  const float a=A[0],b=B[0];
+  const float s1=__fadd_rn(0.0f,0.0f),s2=__fsub_rn(s1,a);
+  const float t1=__fsub_rn(0.0f,b),t2=__fsub_rn(0.0f,t1);
+  const float av[7]={a,0.0f,__fsub_rn(0.0f,s2),0.0f,s1,s2,__fsub_rn(a,0.0f)};
+  const float bv[7]={b,0.0f,0.0f,__fsub_rn(t2,0.0f),t1,t2,__fsub_rn(0.0f,0.0f)};
+  float p0,p1;
+  if constexpr(Grouped) {
+    float v=0.0f;
+    if(threadIdx.x<7) {
+      v=native_fma(av[threadIdx.x],bv[threadIdx.x],v);
+      // One zero term is equivalent to all fifteen padded K terms, including
+      // signed-zero canonicalization, after the single real K term.
+      v=native_fma(0.0f,0.0f,v);
+    }
+    p0=__shfl_sync(0xff,v,0,8);p1=__shfl_sync(0xff,v,1,8);
+  } else {
+    __shared__ volatile float values[7];
+    #pragma unroll
+    for(int j=0;j<7;++j) {
+      const float v=native_fma(av[j],bv[j],0.0f);
+      values[j]=native_fma(0.0f,0.0f,v);
+    }
+    p0=values[0];p1=values[1];
+  }
+  if(threadIdx.x==0) {
+    float value=__fmul_rn(alpha,__fadd_rn(p0,p1));
+    if(beta!=0)value=__fadd_rn(value,__fmul_rn(beta,C[0]));
+    D[0]=value;
+  }
+}
+template<bool Grouped> SWResources dispatch(const Problem* p,const float* A,const float* B,const float* C,float* D,cudaStream_t stream) {
+  constexpr int threads=Grouped?8:1;
+  if(!p) {
+    cudaFuncAttributes attr{};int resident=0;
+    check(cudaFuncGetAttributes(&attr,kernel<Grouped>));
+    check(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&resident,kernel<Grouped>,threads,0));
+    return {attr.sharedSizeBytes,attr.numRegs,resident};
+  }
+  kernel<Grouped><<<1,threads,0,stream>>>(A,B,C,D,p->alpha,p->beta);
+  check(cudaPeekAtLastError());return {};
+}
+}
+SWResources setup(int id) {
+  if(id==0)return dispatch<false>(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr);
+  if(id==1)return dispatch<true>(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr);
+  throw std::invalid_argument("invalid FP32 tiny configuration");
+}
+std::string name(int id) {
+  return "sw_fp32_tiny;shape=1x1x1;leaf_terms=7;transforms=fp32;leaf_math=fp32_simt;accum=fp32;workspace=0;load=synchronous;threads="+
+    std::to_string(id?8:1)+";zero_tail_canonicalization=1;residual_correction=off";
+}
+void run(const Problem& p,int id,const float* A,const float* B,const float* C,float* D,cudaStream_t stream) {
+  if(!eligible(p))throw std::invalid_argument("FP32 tiny dimensions unsupported");
+  if(id==0)dispatch<false>(&p,A,B,C,D,stream);
+  else if(id==1)dispatch<true>(&p,A,B,C,D,stream);
+  else throw std::invalid_argument("invalid FP32 tiny configuration");
+}
+}

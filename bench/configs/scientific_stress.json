@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "suite": "scientific_stress",
+  "description": "FP32 scientific numerical boundaries: odd large square matrices, long near-unit-radius propagation, ill-conditioned matrix functions and narrow-gap SP2. Strict quality failures are possible and must be preserved, not reclassified as performance wins.",
+  "backends": ["cublaslt", "megafmm", "torch", "practical_torch"],
+  "baseline": "cublaslt",
+  "modes": ["launch"],
+  "measurement": {
+    "independent_processes": 3,
+    "warmup": 2,
+    "groups": 5,
+    "calls_per_group": 2,
+    "fresh_quality_trials": 2,
+    "rotate_inputs": 2,
+    "timeout_seconds": 3600
+  },
+  "backend_options": {
+    "workspace_limit": 2147483648,
+    "heuristic_candidates": 16,
+    "tuning_input_sets": 2,
+    "sw_tuning_candidates": 0,
+    "strict": true
+  },
+  "cases": [
+    {"id": "covariance_fp32_1025_radius0995_it20", "kind": "covariance", "dtype": "fp32", "n": 1025, "iterations": 20, "transition_radius": 0.995, "quality": {"relative_error": 1e-5, "symmetry_error": 1e-5}},
+    {"id": "covariance_fp32_4097_radius0995_it20", "kind": "covariance", "dtype": "fp32", "n": 4097, "iterations": 20, "transition_radius": 0.995, "quality": {"relative_error": 1e-5, "symmetry_error": 1e-5}},
+    {"id": "sqrt_fp32_512_cond1e4", "kind": "matrix_function", "dtype": "fp32", "n": 512, "function": "sqrt", "iterations": 40, "condition_number": 10000, "quality": {"residual": 1e-5, "relative_error": 1e-4, "symmetry_error": 1e-5}},
+    {"id": "inverse_sqrt_fp32_1024_cond1e4", "kind": "matrix_function", "dtype": "fp32", "n": 1024, "function": "inverse_sqrt", "iterations": 40, "condition_number": 10000, "quality": {"residual": 1e-5, "relative_error": 1e-4, "symmetry_error": 1e-5}},
+    {"id": "purification_fp32_1024_gap001", "kind": "purification", "dtype": "fp32", "n": 1024, "occupied": 512, "iterations": 45, "gap": 0.01, "quality": {"residual": 1e-5, "trace_error": 1e-3, "relative_error": 1e-4}}
+  ]
+}

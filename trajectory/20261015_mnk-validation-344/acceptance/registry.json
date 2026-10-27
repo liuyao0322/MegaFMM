@@ -1,0 +1,2021 @@
+{
+  "binary_sha256": "919c063cb17df73657023f60aa8bd6e3be9e588333a947bb5603a3756155c02a",
+  "source_commit": "575d56fc005a38b01fa7631b5669bf74015782e3",
+  "source_sha256": {
+    "solution/scale_output.cu": "32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708",
+    "solution/dense_padding.cu": "88cc8c81f2025c4965e416b790817fa30f51c0a8c4af701896cf32c8fe6e019a",
+    "solution/dense_wmma.cu": "3b535f357fb8fc61a90b224a1355b9bfea09f2667bb6203ea98d841d83316c88",
+    "solution/internal.h": "dfc92b98f5eced216acb71feb30c2bf144e286068ad3fbd83a7d785eb1da42f0",
+    "solution/plan.cpp": "3d08931c3945569e00263b6e55b2d92d6770efbb90595d6530b30ad69eba8a5e",
+    "solution/sw_pipeline.cu": "748e7ace9de0b6469d47922cb7cb531bbb56a9d55c9915b0194c0e0a72e916e7",
+    "solution/sw_multisize.cu": "6439b99b3f6cc2fac7a510eff4638d8be5cfd2cda1ca312b6a86bbe8a2c43641",
+    "solution/dense_hopper.cu": "68ee50a3557fc29d187440f3677d5e4b57a8d3838d8649256900d1909d2dd305",
+    "solution/tuning_check.cu": "8b109a5756a8c95fd38ec8c7ec4dc76cb8f8e1000906e39dd122795c55786a5f",
+    "include/megafmm/gemm.h": "fb177ea650a30c7fadaded5ac1800f731abea4a647d3f09ba9c8676b5a6eed68",
+    "bench/benchmark.cu": "09a646ec092f7bd563aa0dc7e301bfd4a322f5cba7f72ab20219bb9203707bff",
+    "bench/shapes.json": "3c30d6850a833f0454514f362713752e86c10d63c8b24ee45bb2004de4b32a7a",
+    "scripts/tune_mnk.py": "2277692664bf304d22b88e71377892a29781562fa095a4e1cc0bb0b34dde6669"
+  },
+  "schema_version": 1,
+  "shapes": "512,512,512;1024,1024,1024;2048,2048,2048;4096,4096,4096;8192,8192,8192;16384,16384,16384;8192,4096,8192;4096,8192,8192;8192,8192,4096;8192,1024,512;1024,8192,512;1025,1537,769;514,770,258;1,1,1",
+  "mode": "launch",
+  "rotate_inputs": 2,
+  "repeats_required": 3,
+  "trials": 100,
+  "groups": 5,
+  "correctness_trials": 3,
+  "margin": 0.03,
+  "expected_combinations": 28,
+  "observed_combinations": 28,
+  "stable_wins": 11,
+  "objective_achieved": false,
+  "processes": [
+    {
+      "repeat": 0,
+      "exit_code": 0,
+      "command": [
+        "bash",
+        "scripts/on_gpu.sh",
+        "./build/megafmm_bench",
+        "--algorithm",
+        "tuned",
+        "--shapes",
+        "512,512,512;1024,1024,1024;2048,2048,2048;4096,4096,4096;8192,8192,8192;16384,16384,16384;8192,4096,8192;4096,8192,8192;8192,8192,4096;8192,1024,512;1024,8192,512;1025,1537,769;514,770,258;1,1,1",
+        "--dtype",
+        "both",
+        "--trials",
+        "100",
+        "--warmup",
+        "20",
+        "--groups",
+        "5",
+        "--correct-trials",
+        "3",
+        "--rotate-inputs",
+        "2",
+        "--output",
+        "/share/home/liuyao/workspace/MegaFMM/results/mnk344_acceptance/run0.csv"
+      ]
+    },
+    {
+      "repeat": 1,
+      "exit_code": 0,
+      "command": [
+        "bash",
+        "scripts/on_gpu.sh",
+        "./build/megafmm_bench",
+        "--algorithm",
+        "tuned",
+        "--shapes",
+        "512,512,512;1024,1024,1024;2048,2048,2048;4096,4096,4096;8192,8192,8192;16384,16384,16384;8192,4096,8192;4096,8192,8192;8192,8192,4096;8192,1024,512;1024,8192,512;1025,1537,769;514,770,258;1,1,1",
+        "--dtype",
+        "both",
+        "--trials",
+        "100",
+        "--warmup",
+        "20",
+        "--groups",
+        "5",
+        "--correct-trials",
+        "3",
+        "--rotate-inputs",
+        "2",
+        "--output",
+        "/share/home/liuyao/workspace/MegaFMM/results/mnk344_acceptance/run1.csv"
+      ]
+    },
+    {
+      "repeat": 2,
+      "exit_code": 0,
+      "command": [
+        "bash",
+        "scripts/on_gpu.sh",
+        "./build/megafmm_bench",
+        "--algorithm",
+        "tuned",
+        "--shapes",
+        "512,512,512;1024,1024,1024;2048,2048,2048;4096,4096,4096;8192,8192,8192;16384,16384,16384;8192,4096,8192;4096,8192,8192;8192,8192,4096;8192,1024,512;1024,8192,512;1025,1537,769;514,770,258;1,1,1",
+        "--dtype",
+        "both",
+        "--trials",
+        "100",
+        "--warmup",
+        "20",
+        "--groups",
+        "5",
+        "--correct-trials",
+        "3",
+        "--rotate-inputs",
+        "2",
+        "--output",
+        "/share/home/liuyao/workspace/MegaFMM/results/mnk344_acceptance/run2.csv"
+      ]
+    }
+  ],
+  "entries": [
+    {
+      "m": 512,
+      "n": 512,
+      "k": 512,
+      "dtype": "bf16",
+      "status": "stable_win",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": true,
+      "min_paired_speedup": 1.1145096056622852,
+      "median_paired_speedup": 1.1235491850066595,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "64x32x128_basic_s3",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.11866550642,
+          "paired_speedups": [
+            1.1256444529310674,
+            1.1145096056622852,
+            1.1235491850066595,
+            1.1185236857124738,
+            1.114613725738932
+          ],
+          "solution_ms": 0.00504544019699,
+          "dense_ms": 0.00564415991306,
+          "config": "mnk_strategy;selection=64x32x128_basic_s3;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=64x32x128_basic_s3;confirmed_dense_ms=0.005649;confirmed_custom_ms=0.005043;dense_ms=0.005814;128x64x64_c1_ms=0.006210;128x128x64_c1_ms=0.007696;128x256x64_c1_ms=0.010982;128x128x64_c2_ms=0.007760;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.007730;128x128x64_c1_sw8_ms=0.007717;128x256x64_c1_sw4_ms=0.010976;128x256x64_c1_sw8_ms=0.010950;128x128x64_c2_sw4_ms=0.007934;128x128x64_c2_sw8_ms=0.007909;64x32x64_basic_s3_ms=0.005590;64x64x64_basic_s3_ms=0.005672;128x128x64_pingpong_s3_ms=0.008112;256x128x64_c1_sw8_ms=0.010957;128x256x64_c2_sw8_ms=0.011021;128x256x64_pingpong_s3_sw8_ms=0.097462;128x256x64_c1_sw8_rasterN_ms=0.010978;128x128x64_c2_sw8_rasterN_ms=0.007890;256x128x64_c1_sw8_rasterM_ms=0.010995;wmma_32x64x32_ms=0.012562;wmma_32x64x64_ms=0.010056;64x32x128_basic_s3_ms=0.005187;64x64x128_basic_s3_ms=0.005238;64x64x256_basic_s2_ms=0.005194;128x64x128_c1_ms=0.006475;128x128x128_c1_sw8_ms=0.008776;128x256x128_direct_sw8_ms=0.018066;128x128x128_direct_sw8_ms=0.010531;fallback=id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/13;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.005814;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "64x32x128_basic_s3",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.12232344901,
+          "paired_speedups": [
+            1.1417646315257235,
+            1.1207931940447893,
+            1.1189952904238618,
+            1.1213604417670684,
+            1.1262129804662884
+          ],
+          "solution_ms": 0.00509599983692,
+          "dense_ms": 0.00571936011314,
+          "config": "mnk_strategy;selection=64x32x128_basic_s3;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=64x32x128_basic_s3;confirmed_dense_ms=0.005590;confirmed_custom_ms=0.005035;dense_ms=0.005811;128x64x64_c1_ms=0.006227;128x128x64_c1_ms=0.007723;128x256x64_c1_ms=0.011038;128x128x64_c2_ms=0.007774;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.007701;128x128x64_c1_sw8_ms=0.007702;128x256x64_c1_sw4_ms=0.011027;128x256x64_c1_sw8_ms=0.010997;128x128x64_c2_sw4_ms=0.007899;128x128x64_c2_sw8_ms=0.007920;64x32x64_basic_s3_ms=0.005619;64x64x64_basic_s3_ms=0.005667;128x128x64_pingpong_s3_ms=0.008162;256x128x64_c1_sw8_ms=0.011029;128x256x64_c2_sw8_ms=0.011021;128x256x64_pingpong_s3_sw8_ms=0.097504;128x256x64_c1_sw8_rasterN_ms=0.011019;128x128x64_c2_sw8_rasterN_ms=0.007910;256x128x64_c1_sw8_rasterM_ms=0.010989;wmma_32x64x32_ms=0.012608;wmma_32x64x64_ms=0.010030;64x32x128_basic_s3_ms=0.005187;64x64x128_basic_s3_ms=0.005264;64x64x256_basic_s2_ms=0.005200;128x64x128_c1_ms=0.006502;128x128x128_c1_sw8_ms=0.008789;128x256x128_direct_sw8_ms=0.018117;128x128x128_direct_sw8_ms=0.010630;fallback=id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/13;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.005811;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "64x64x256_basic_s2",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.13406799124,
+          "paired_speedups": [
+            1.140346440763687,
+            1.1340680100755667,
+            1.1352236925015753,
+            1.1248586860947116,
+            1.1204028021015762
+          ],
+          "solution_ms": 0.00508159995079,
+          "dense_ms": 0.00576287984848,
+          "config": "mnk_strategy;selection=64x64x256_basic_s2;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=64x64x256_basic_s2;confirmed_dense_ms=0.005672;confirmed_custom_ms=0.005057;dense_ms=0.005786;128x64x64_c1_ms=0.006248;128x128x64_c1_ms=0.007747;128x256x64_c1_ms=0.011005;128x128x64_c2_ms=0.007802;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.007739;128x128x64_c1_sw8_ms=0.007694;128x256x64_c1_sw4_ms=0.011014;128x256x64_c1_sw8_ms=0.011050;128x128x64_c2_sw4_ms=0.007899;128x128x64_c2_sw8_ms=0.007917;64x32x64_basic_s3_ms=0.005629;64x64x64_basic_s3_ms=0.005726;128x128x64_pingpong_s3_ms=0.008205;256x128x64_c1_sw8_ms=0.011011;128x256x64_c2_sw8_ms=0.011053;128x256x64_pingpong_s3_sw8_ms=0.097560;128x256x64_c1_sw8_rasterN_ms=0.011000;128x128x64_c2_sw8_rasterN_ms=0.007920;256x128x64_c1_sw8_rasterM_ms=0.011021;wmma_32x64x32_ms=0.012603;wmma_32x64x64_ms=0.010042;64x32x128_basic_s3_ms=0.005147;64x64x128_basic_s3_ms=0.005251;64x64x256_basic_s2_ms=0.005142;128x64x128_c1_ms=0.006482;128x128x128_c1_sw8_ms=0.008766;128x256x128_direct_sw8_ms=0.018125;128x128x128_direct_sw8_ms=0.010613;fallback=id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/13;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.005786;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 512,
+      "n": 512,
+      "k": 512,
+      "dtype": "fp16",
+      "status": "stable_win",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": true,
+      "min_paired_speedup": 1.1091066353638948,
+      "median_paired_speedup": 1.1242243890084842,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "64x32x128_basic_s3",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.12181388251,
+          "paired_speedups": [
+            1.1224193446555968,
+            1.1224334600760457,
+            1.1242243890084842,
+            1.121813927012839,
+            1.1199797928769892
+          ],
+          "solution_ms": 0.00505952000618,
+          "dense_ms": 0.00567583978176,
+          "config": "mnk_strategy;selection=64x32x128_basic_s3;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=64x32x128_basic_s3;confirmed_dense_ms=0.005669;confirmed_custom_ms=0.005041;dense_ms=0.005819;128x64x64_c1_ms=0.006248;128x128x64_c1_ms=0.007755;128x256x64_c1_ms=0.011064;128x128x64_c2_ms=0.007795;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.007789;128x128x64_c1_sw8_ms=0.007774;128x256x64_c1_sw4_ms=0.011024;128x256x64_c1_sw8_ms=0.011006;128x128x64_c2_sw4_ms=0.007950;128x128x64_c2_sw8_ms=0.007942;64x32x64_basic_s3_ms=0.005624;64x64x64_basic_s3_ms=0.005726;128x128x64_pingpong_s3_ms=0.008138;256x128x64_c1_sw8_ms=0.011016;128x256x64_c2_sw8_ms=0.011070;128x256x64_pingpong_s3_sw8_ms=0.097173;128x256x64_c1_sw8_rasterN_ms=0.011034;128x128x64_c2_sw8_rasterN_ms=0.007936;256x128x64_c1_sw8_rasterM_ms=0.011000;wmma_32x64x32_ms=0.012552;wmma_32x64x64_ms=0.009542;64x32x128_basic_s3_ms=0.005147;64x64x128_basic_s3_ms=0.005317;64x64x256_basic_s2_ms=0.005211;128x64x128_c1_ms=0.006563;128x128x128_c1_sw8_ms=0.008805;128x256x128_direct_sw8_ms=0.018133;128x128x128_direct_sw8_ms=0.010614;fallback=id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/12;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.005819;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "64x64x256_basic_s2",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.12284219523,
+          "paired_speedups": [
+            1.1378533900425318,
+            1.1287647315582714,
+            1.1091066353638948,
+            1.128112981527016,
+            1.1330170777988615
+          ],
+          "solution_ms": 0.00511615991592,
+          "dense_ms": 0.00574464023113,
+          "config": "mnk_strategy;selection=64x64x256_basic_s2;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=64x64x256_basic_s2;confirmed_dense_ms=0.005758;confirmed_custom_ms=0.005111;dense_ms=0.005851;128x64x64_c1_ms=0.006251;128x128x64_c1_ms=0.007810;128x256x64_c1_ms=0.011082;128x128x64_c2_ms=0.007846;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.007790;128x128x64_c1_sw8_ms=0.007786;128x256x64_c1_sw4_ms=0.011080;128x256x64_c1_sw8_ms=0.011078;128x128x64_c2_sw4_ms=0.008011;128x128x64_c2_sw8_ms=0.007966;64x32x64_basic_s3_ms=0.005659;64x64x64_basic_s3_ms=0.005728;128x128x64_pingpong_s3_ms=0.008182;256x128x64_c1_sw8_ms=0.011059;128x256x64_c2_sw8_ms=0.011114;128x256x64_pingpong_s3_sw8_ms=0.097779;128x256x64_c1_sw8_rasterN_ms=0.011048;128x128x64_c2_sw8_rasterN_ms=0.007994;256x128x64_c1_sw8_rasterM_ms=0.011066;wmma_32x64x32_ms=0.012578;wmma_32x64x64_ms=0.009632;64x32x128_basic_s3_ms=0.005206;64x64x128_basic_s3_ms=0.005326;64x64x256_basic_s2_ms=0.005202;128x64x128_c1_ms=0.006605;128x128x128_c1_sw8_ms=0.008867;128x256x128_direct_sw8_ms=0.018195;128x128x128_direct_sw8_ms=0.010666;fallback=id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/12;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.005851;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "64x32x128_basic_s3",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.12722913797,
+          "paired_speedups": [
+            1.1261482320372467,
+            1.1333712049485576,
+            1.1218592964824121,
+            1.1304347826086956,
+            1.1230071208015628
+          ],
+          "solution_ms": 0.00507808029652,
+          "dense_ms": 0.00572416007519,
+          "config": "mnk_strategy;selection=64x32x128_basic_s3;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=64x32x128_basic_s3;confirmed_dense_ms=0.005711;confirmed_custom_ms=0.005062;dense_ms=0.005829;128x64x64_c1_ms=0.006245;128x128x64_c1_ms=0.007762;128x256x64_c1_ms=0.011006;128x128x64_c2_ms=0.007800;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.007766;128x128x64_c1_sw8_ms=0.007773;128x256x64_c1_sw4_ms=0.011005;128x256x64_c1_sw8_ms=0.011003;128x128x64_c2_sw4_ms=0.007918;128x128x64_c2_sw8_ms=0.007952;64x32x64_basic_s3_ms=0.005630;64x64x64_basic_s3_ms=0.005734;128x128x64_pingpong_s3_ms=0.008110;256x128x64_c1_sw8_ms=0.010995;128x256x64_c2_sw8_ms=0.011085;128x256x64_pingpong_s3_sw8_ms=0.097158;128x256x64_c1_sw8_rasterN_ms=0.010995;128x128x64_c2_sw8_rasterN_ms=0.007938;256x128x64_c1_sw8_rasterM_ms=0.011006;wmma_32x64x32_ms=0.012504;wmma_32x64x64_ms=0.009539;64x32x128_basic_s3_ms=0.005179;64x64x128_basic_s3_ms=0.005302;64x64x256_basic_s2_ms=0.005210;128x64x128_c1_ms=0.006570;128x128x128_c1_sw8_ms=0.008810;128x256x128_direct_sw8_ms=0.018096;128x128x128_direct_sw8_ms=0.010600;fallback=id=21;tile=15;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/12;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.005829;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 1024,
+      "n": 1024,
+      "k": 1024,
+      "dtype": "bf16",
+      "status": "stable_win",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": true,
+      "min_paired_speedup": 1.483356425182409,
+      "median_paired_speedup": 1.493788214842345,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "128x64x64_c1",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.48876114133,
+          "paired_speedups": [
+            1.4992145782310196,
+            1.483356425182409,
+            1.493788214842345,
+            1.4876407354174155,
+            1.4875757968644034
+          ],
+          "solution_ms": 0.00801504015923,
+          "dense_ms": 0.0119324803352,
+          "config": "mnk_strategy;selection=128x64x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x64x64_c1;confirmed_dense_ms=0.011861;confirmed_custom_ms=0.008016;dense_ms=0.012040;128x64x64_c1_ms=0.008222;128x128x64_c1_ms=0.010128;128x256x64_c1_ms=0.015890;128x128x64_c2_ms=0.010632;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.010077;128x128x64_c1_sw8_ms=0.010112;128x256x64_c1_sw4_ms=0.015736;128x256x64_c1_sw8_ms=0.015762;128x128x64_c2_sw4_ms=0.010520;128x128x64_c2_sw8_ms=0.013536;64x32x64_basic_s3_ms=0.013125;64x64x64_basic_s3_ms=0.010427;128x128x64_pingpong_s3_ms=0.010842;256x128x64_c1_sw8_ms=0.015771;128x256x64_c2_sw8_ms=0.016224;128x256x64_pingpong_s3_sw8_ms=0.201886;128x256x64_c1_sw8_rasterN_ms=0.015752;128x128x64_c2_sw8_rasterN_ms=0.013483;256x128x64_c1_sw8_rasterM_ms=0.015768;wmma_32x64x32_ms=0.031877;wmma_32x64x64_ms=0.036013;64x32x128_basic_s3_ms=0.016072;64x64x128_basic_s3_ms=0.009994;64x64x256_basic_s2_ms=0.014549;128x64x128_c1_ms=0.009224;128x128x128_c1_sw8_ms=0.013629;128x256x128_direct_sw8_ms=0.025880;128x128x128_direct_sw8_ms=0.014101;fallback=id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=10;bound_candidate=4/16;tuned_candidate=4;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.012040;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "128x64x64_c1",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.49302971907,
+          "paired_speedups": [
+            1.4938355958673715,
+            1.4896095215291911,
+            1.4914857747097081,
+            1.4952316756540844,
+            1.500200240288346
+          ],
+          "solution_ms": 0.00801119983196,
+          "dense_ms": 0.0119609594345,
+          "config": "mnk_strategy;selection=128x64x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x64x64_c1;confirmed_dense_ms=0.011911;confirmed_custom_ms=0.008010;dense_ms=0.012011;128x64x64_c1_ms=0.008197;128x128x64_c1_ms=0.010150;128x256x64_c1_ms=0.015856;128x128x64_c2_ms=0.010603;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.010085;128x128x64_c1_sw8_ms=0.010078;128x256x64_c1_sw4_ms=0.015822;128x256x64_c1_sw8_ms=0.015827;128x128x64_c2_sw4_ms=0.010501;128x128x64_c2_sw8_ms=0.013562;64x32x64_basic_s3_ms=0.013162;64x64x64_basic_s3_ms=0.010389;128x128x64_pingpong_s3_ms=0.010803;256x128x64_c1_sw8_ms=0.015826;128x256x64_c2_sw8_ms=0.016222;128x256x64_pingpong_s3_sw8_ms=0.203808;128x256x64_c1_sw8_rasterN_ms=0.015829;128x128x64_c2_sw8_rasterN_ms=0.013517;256x128x64_c1_sw8_rasterM_ms=0.015814;wmma_32x64x32_ms=0.032267;wmma_32x64x64_ms=0.036403;64x32x128_basic_s3_ms=0.016043;64x64x128_basic_s3_ms=0.010016;64x64x256_basic_s2_ms=0.014530;128x64x128_c1_ms=0.009277;128x128x128_c1_sw8_ms=0.013621;128x256x128_direct_sw8_ms=0.025890;128x128x128_direct_sw8_ms=0.014088;fallback=id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=10;bound_candidate=4/16;tuned_candidate=4;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.012011;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "128x64x64_c1",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.49608218276,
+          "paired_speedups": [
+            1.4999201533056534,
+            1.5007631104883907,
+            1.4984834227596702,
+            1.493726013432478,
+            1.4912654505582135
+          ],
+          "solution_ms": 0.00800448000431,
+          "dense_ms": 0.0119753599167,
+          "config": "mnk_strategy;selection=128x64x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x64x64_c1;confirmed_dense_ms=0.011994;confirmed_custom_ms=0.008027;dense_ms=0.012059;128x64x64_c1_ms=0.008202;128x128x64_c1_ms=0.010149;128x256x64_c1_ms=0.015883;128x128x64_c2_ms=0.010632;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.010090;128x128x64_c1_sw8_ms=0.010086;128x256x64_c1_sw4_ms=0.015835;128x256x64_c1_sw8_ms=0.015824;128x128x64_c2_sw4_ms=0.010509;128x128x64_c2_sw8_ms=0.013518;64x32x64_basic_s3_ms=0.013110;64x64x64_basic_s3_ms=0.010363;128x128x64_pingpong_s3_ms=0.010834;256x128x64_c1_sw8_ms=0.015859;128x256x64_c2_sw8_ms=0.016275;128x256x64_pingpong_s3_sw8_ms=0.202216;128x256x64_c1_sw8_rasterN_ms=0.015848;128x128x64_c2_sw8_rasterN_ms=0.013349;256x128x64_c1_sw8_rasterM_ms=0.015832;wmma_32x64x32_ms=0.032296;wmma_32x64x64_ms=0.036410;64x32x128_basic_s3_ms=0.016058;64x64x128_basic_s3_ms=0.010026;64x64x256_basic_s2_ms=0.014510;128x64x128_c1_ms=0.009275;128x128x128_c1_sw8_ms=0.013578;128x256x128_direct_sw8_ms=0.025942;128x128x128_direct_sw8_ms=0.014019;fallback=id=39;tile=18;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=10;bound_candidate=4/16;tuned_candidate=4;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.012059;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 1024,
+      "n": 1024,
+      "k": 1024,
+      "dtype": "fp16",
+      "status": "stable_win",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": true,
+      "min_paired_speedup": 1.1907239010443553,
+      "median_paired_speedup": 1.193876330582466,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "128x64x64_c1",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.19589359425,
+          "paired_speedups": [
+            1.194016138052249,
+            1.1957980508068384,
+            1.1967723895502118,
+            1.1967141029740966,
+            1.193876330582466
+          ],
+          "solution_ms": 0.00801087975502,
+          "dense_ms": 0.00958015978336,
+          "config": "mnk_strategy;selection=128x64x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x64x64_c1;confirmed_dense_ms=0.009554;confirmed_custom_ms=0.007990;dense_ms=0.009677;128x64x64_c1_ms=0.008115;128x128x64_c1_ms=0.010053;128x256x64_c1_ms=0.015722;128x128x64_c2_ms=0.010554;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.009994;128x128x64_c1_sw8_ms=0.009960;128x256x64_c1_sw4_ms=0.015707;128x256x64_c1_sw8_ms=0.015715;128x128x64_c2_sw4_ms=0.010435;128x128x64_c2_sw8_ms=0.013437;64x32x64_basic_s3_ms=0.013029;64x64x64_basic_s3_ms=0.010280;128x128x64_pingpong_s3_ms=0.010706;256x128x64_c1_sw8_ms=0.015686;128x256x64_c2_sw8_ms=0.016139;128x256x64_pingpong_s3_sw8_ms=0.202338;128x256x64_c1_sw8_rasterN_ms=0.015706;128x128x64_c2_sw8_rasterN_ms=0.013320;256x128x64_c1_sw8_rasterM_ms=0.015723;wmma_32x64x32_ms=0.028683;wmma_32x64x64_ms=0.025557;64x32x128_basic_s3_ms=0.015939;64x64x128_basic_s3_ms=0.008979;64x64x256_basic_s2_ms=0.014462;128x64x128_c1_ms=0.009186;128x128x128_c1_sw8_ms=0.013490;128x256x128_direct_sw8_ms=0.025810;128x128x128_direct_sw8_ms=0.014069;fallback=id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.009677;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "128x64x64_c1",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.19378702916,
+          "paired_speedups": [
+            1.1960815483050513,
+            1.19362793842727,
+            1.1979037978719165,
+            1.1935201401050788,
+            1.193027785507016
+          ],
+          "solution_ms": 0.00804512023926,
+          "dense_ms": 0.00960416018963,
+          "config": "mnk_strategy;selection=128x64x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x64x64_c1;confirmed_dense_ms=0.009585;confirmed_custom_ms=0.008031;dense_ms=0.009688;128x64x64_c1_ms=0.008173;128x128x64_c1_ms=0.010066;128x256x64_c1_ms=0.015798;128x128x64_c2_ms=0.010574;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.010022;128x128x64_c1_sw8_ms=0.010016;128x256x64_c1_sw4_ms=0.015749;128x256x64_c1_sw8_ms=0.015758;128x128x64_c2_sw4_ms=0.010458;128x128x64_c2_sw8_ms=0.013523;64x32x64_basic_s3_ms=0.013139;64x64x64_basic_s3_ms=0.010374;128x128x64_pingpong_s3_ms=0.010784;256x128x64_c1_sw8_ms=0.015742;128x256x64_c2_sw8_ms=0.016210;128x256x64_pingpong_s3_sw8_ms=0.203862;128x256x64_c1_sw8_rasterN_ms=0.015755;128x128x64_c2_sw8_rasterN_ms=0.013435;256x128x64_c1_sw8_rasterM_ms=0.015755;wmma_32x64x32_ms=0.028981;wmma_32x64x64_ms=0.025702;64x32x128_basic_s3_ms=0.016101;64x64x128_basic_s3_ms=0.009944;64x64x256_basic_s2_ms=0.014486;128x64x128_c1_ms=0.009242;128x128x128_c1_sw8_ms=0.013562;128x256x128_direct_sw8_ms=0.025864;128x128x128_direct_sw8_ms=0.014077;fallback=id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.009688;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "128x64x64_c1",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.19278876806,
+          "paired_speedups": [
+            1.1910353034510115,
+            1.1907239010443553,
+            1.1933499980161093,
+            1.195351983763779,
+            1.1938009139678123
+          ],
+          "solution_ms": 0.00805855989456,
+          "dense_ms": 0.009612159729,
+          "config": "mnk_strategy;selection=128x64x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x64x64_c1;confirmed_dense_ms=0.009592;confirmed_custom_ms=0.008021;dense_ms=0.009698;128x64x64_c1_ms=0.008155;128x128x64_c1_ms=0.010053;128x256x64_c1_ms=0.015786;128x128x64_c2_ms=0.010578;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.010040;128x128x64_c1_sw8_ms=0.010026;128x256x64_c1_sw4_ms=0.015728;128x256x64_c1_sw8_ms=0.015718;128x128x64_c2_sw4_ms=0.010454;128x128x64_c2_sw8_ms=0.013504;64x32x64_basic_s3_ms=0.013064;64x64x64_basic_s3_ms=0.010312;128x128x64_pingpong_s3_ms=0.010781;256x128x64_c1_sw8_ms=0.015723;128x256x64_c2_sw8_ms=0.016181;128x256x64_pingpong_s3_sw8_ms=0.202933;128x256x64_c1_sw8_rasterN_ms=0.015770;128x128x64_c2_sw8_rasterN_ms=0.013429;256x128x64_c1_sw8_rasterM_ms=0.015741;wmma_32x64x32_ms=0.028934;wmma_32x64x64_ms=0.025550;64x32x128_basic_s3_ms=0.015982;64x64x128_basic_s3_ms=0.009928;64x64x256_basic_s2_ms=0.014470;128x64x128_c1_ms=0.009237;128x128x128_c1_sw8_ms=0.013533;128x256x128_direct_sw8_ms=0.025872;128x128x128_direct_sw8_ms=0.014043;fallback=id=21;tile=18;split_k=1;reduction=0;swizzle=0;stages=18;custom=0;inner=0;cluster=0;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.009698;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 2048,
+      "n": 2048,
+      "k": 2048,
+      "dtype": "bf16",
+      "status": "stable_win",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": true,
+      "min_paired_speedup": 1.0777849435455151,
+      "median_paired_speedup": 1.0918925206467374,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "128x256x64_c1",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.09337970027,
+          "paired_speedups": [
+            1.091099379584174,
+            1.0940858925965762,
+            1.095398990817191,
+            1.0939044820388883,
+            1.0918925206467374
+          ],
+          "solution_ms": 0.0291900801659,
+          "dense_ms": 0.0319158411026,
+          "config": "mnk_strategy;selection=128x256x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x256x64_c1;confirmed_dense_ms=0.031663;confirmed_custom_ms=0.029025;dense_ms=0.031510;128x64x64_c1_ms=0.049787;128x128x64_c1_ms=0.031381;128x256x64_c1_ms=0.029158;128x128x64_c2_ms=0.030907;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.029952;128x128x64_c1_sw8_ms=0.030325;128x256x64_c1_sw4_ms=0.029197;128x256x64_c1_sw8_ms=0.029693;128x128x64_c2_sw4_ms=0.030598;128x128x64_c2_sw8_ms=0.031147;64x32x64_basic_s3_ms=0.098877;64x64x64_basic_s3_ms=0.052118;128x128x64_pingpong_s3_ms=0.040896;256x128x64_c1_sw8_ms=0.031280;128x256x64_c2_sw8_ms=0.029365;128x256x64_pingpong_s3_sw8_ms=0.493832;128x256x64_c1_sw8_rasterN_ms=0.029699;128x128x64_c2_sw8_rasterN_ms=0.031198;256x128x64_c1_sw8_rasterM_ms=0.031418;wmma_32x64x32_ms=0.233262;wmma_32x64x64_ms=0.225456;64x32x128_basic_s3_ms=0.099262;64x64x128_basic_s3_ms=0.057421;64x64x256_basic_s2_ms=0.095275;128x64x128_c1_ms=0.057837;128x128x128_c1_sw8_ms=0.051925;128x256x128_direct_sw8_ms=0.054131;128x128x128_direct_sw8_ms=0.046563;fallback=id=39;tile=23;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.031510;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "128x256x64_c1",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.09117951302,
+          "paired_speedups": [
+            1.0911794522900957,
+            1.0912546888363603,
+            1.0965115215646157,
+            1.0909700809812624,
+            1.0793831399049514
+          ],
+          "solution_ms": 0.0296908807755,
+          "dense_ms": 0.0323980808258,
+          "config": "mnk_strategy;selection=128x256x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x256x64_c1;confirmed_dense_ms=0.031644;confirmed_custom_ms=0.029213;dense_ms=0.031602;128x64x64_c1_ms=0.049696;128x128x64_c1_ms=0.031475;128x256x64_c1_ms=0.029166;128x128x64_c2_ms=0.030906;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.030093;128x128x64_c1_sw8_ms=0.030522;128x256x64_c1_sw4_ms=0.029336;128x256x64_c1_sw8_ms=0.029826;128x128x64_c2_sw4_ms=0.030658;128x128x64_c2_sw8_ms=0.031269;64x32x64_basic_s3_ms=0.099275;64x64x64_basic_s3_ms=0.052026;128x128x64_pingpong_s3_ms=0.040506;256x128x64_c1_sw8_ms=0.031370;128x256x64_c2_sw8_ms=0.029325;128x256x64_pingpong_s3_sw8_ms=0.496133;128x256x64_c1_sw8_rasterN_ms=0.029603;128x128x64_c2_sw8_rasterN_ms=0.031251;256x128x64_c1_sw8_rasterM_ms=0.031563;wmma_32x64x32_ms=0.233866;wmma_32x64x64_ms=0.227083;64x32x128_basic_s3_ms=0.099117;64x64x128_basic_s3_ms=0.057544;64x64x256_basic_s2_ms=0.095232;128x64x128_c1_ms=0.058392;128x128x128_c1_sw8_ms=0.051936;128x256x128_direct_sw8_ms=0.054325;128x128x128_direct_sw8_ms=0.046565;fallback=id=39;tile=23;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.031602;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "128x256x64_c1",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.0932533053,
+          "paired_speedups": [
+            1.0777849435455151,
+            1.0941252454106993,
+            1.106978500152966,
+            1.091546796864219,
+            1.0965952147182667
+          ],
+          "solution_ms": 0.0307257604599,
+          "dense_ms": 0.0335910391808,
+          "config": "mnk_strategy;selection=128x256x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x256x64_c1;confirmed_dense_ms=0.031083;confirmed_custom_ms=0.028653;dense_ms=0.031019;128x64x64_c1_ms=0.049677;128x128x64_c1_ms=0.031456;128x256x64_c1_ms=0.029181;128x128x64_c2_ms=0.030798;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.030026;128x128x64_c1_sw8_ms=0.030434;128x256x64_c1_sw4_ms=0.029282;128x256x64_c1_sw8_ms=0.029781;128x128x64_c2_sw4_ms=0.030531;128x128x64_c2_sw8_ms=0.031222;64x32x64_basic_s3_ms=0.098904;64x64x64_basic_s3_ms=0.051939;128x128x64_pingpong_s3_ms=0.040890;256x128x64_c1_sw8_ms=0.031357;128x256x64_c2_sw8_ms=0.029440;128x256x64_pingpong_s3_sw8_ms=0.493747;128x256x64_c1_sw8_rasterN_ms=0.029728;128x128x64_c2_sw8_rasterN_ms=0.031195;256x128x64_c1_sw8_rasterM_ms=0.031451;wmma_32x64x32_ms=0.235947;wmma_32x64x64_ms=0.229122;64x32x128_basic_s3_ms=0.099131;64x64x128_basic_s3_ms=0.057514;64x64x256_basic_s2_ms=0.095294;128x64x128_c1_ms=0.058093;128x128x128_c1_sw8_ms=0.052030;128x256x128_direct_sw8_ms=0.054037;128x128x128_direct_sw8_ms=0.046702;fallback=id=39;tile=23;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/16;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.031019;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 2048,
+      "n": 2048,
+      "k": 2048,
+      "dtype": "fp16",
+      "status": "stable_win",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": true,
+      "min_paired_speedup": 1.0443171676051906,
+      "median_paired_speedup": 1.0491441639888048,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "128x256x64_c1_sw4",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.04894906721,
+          "paired_speedups": [
+            1.0468127554556583,
+            1.0473698509625338,
+            1.0470324386161074,
+            1.0494424321750004,
+            1.0491441639888048
+          ],
+          "solution_ms": 0.030876159668,
+          "dense_ms": 0.0323875188828,
+          "config": "mnk_strategy;selection=128x256x64_c1_sw4;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x256x64_c1_sw4;confirmed_dense_ms=0.032603;confirmed_custom_ms=0.029957;dense_ms=0.032366;128x64x64_c1_ms=0.050138;128x128x64_c1_ms=0.031840;128x256x64_c1_ms=0.029928;128x128x64_c2_ms=0.031299;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.030555;128x128x64_c1_sw8_ms=0.030813;128x256x64_c1_sw4_ms=0.029760;128x256x64_c1_sw8_ms=0.030146;128x128x64_c2_sw4_ms=0.030955;128x128x64_c2_sw8_ms=0.031467;64x32x64_basic_s3_ms=0.098995;64x64x64_basic_s3_ms=0.051938;128x128x64_pingpong_s3_ms=0.040922;256x128x64_c1_sw8_ms=0.031757;128x256x64_c2_sw8_ms=0.030069;128x256x64_pingpong_s3_sw8_ms=0.493920;128x256x64_c1_sw8_rasterN_ms=0.030269;128x128x64_c2_sw8_rasterN_ms=0.031526;256x128x64_c1_sw8_rasterM_ms=0.032138;wmma_32x64x32_ms=0.183478;wmma_32x64x64_ms=0.169475;64x32x128_basic_s3_ms=0.099243;64x64x128_basic_s3_ms=0.057672;64x64x256_basic_s2_ms=0.095525;128x64x128_c1_ms=0.058146;128x128x128_c1_sw8_ms=0.051813;128x256x128_direct_sw8_ms=0.054278;128x128x128_direct_sw8_ms=0.046574;fallback=id=39;tile=23;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/14;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.032366;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "128x256x64_c1_sw4",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.05078988157,
+          "paired_speedups": [
+            1.049049874653218,
+            1.0506003458567474,
+            1.0503624208534403,
+            1.0513843720362428,
+            1.0531945962086833
+          ],
+          "solution_ms": 0.0305446410179,
+          "dense_ms": 0.0320959997177,
+          "config": "mnk_strategy;selection=128x256x64_c1_sw4;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x256x64_c1_sw4;confirmed_dense_ms=0.032335;confirmed_custom_ms=0.029659;dense_ms=0.032190;128x64x64_c1_ms=0.049832;128x128x64_c1_ms=0.031661;128x256x64_c1_ms=0.029787;128x128x64_c2_ms=0.031144;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.030590;128x128x64_c1_sw8_ms=0.030778;128x256x64_c1_sw4_ms=0.029717;128x256x64_c1_sw8_ms=0.030275;128x128x64_c2_sw4_ms=0.031030;128x128x64_c2_sw8_ms=0.031485;64x32x64_basic_s3_ms=0.099307;64x64x64_basic_s3_ms=0.051859;128x128x64_pingpong_s3_ms=0.040790;256x128x64_c1_sw8_ms=0.031774;128x256x64_c2_sw8_ms=0.030070;128x256x64_pingpong_s3_sw8_ms=0.493949;128x256x64_c1_sw8_rasterN_ms=0.030259;128x128x64_c2_sw8_rasterN_ms=0.031466;256x128x64_c1_sw8_rasterM_ms=0.031907;wmma_32x64x32_ms=0.182541;wmma_32x64x64_ms=0.169592;64x32x128_basic_s3_ms=0.099307;64x64x128_basic_s3_ms=0.057522;64x64x256_basic_s2_ms=0.095371;128x64x128_c1_ms=0.057997;128x128x128_c1_sw8_ms=0.051494;128x256x128_direct_sw8_ms=0.053939;128x128x128_direct_sw8_ms=0.046510;fallback=id=39;tile=23;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/14;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.032190;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "128x256x64_c1_sw4",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.04711668188,
+          "paired_speedups": [
+            1.0470184298846281,
+            1.0519403889806027,
+            1.0498245614035087,
+            1.0443171676051906,
+            1.04442937795015
+          ],
+          "solution_ms": 0.0310649609566,
+          "dense_ms": 0.0325286388397,
+          "config": "mnk_strategy;selection=128x256x64_c1_sw4;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x256x64_c1_sw4;confirmed_dense_ms=0.032647;confirmed_custom_ms=0.029901;dense_ms=0.032331;128x64x64_c1_ms=0.049986;128x128x64_c1_ms=0.031640;128x256x64_c1_ms=0.029862;128x128x64_c2_ms=0.031245;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.030675;128x128x64_c1_sw8_ms=0.030818;128x256x64_c1_sw4_ms=0.029763;128x256x64_c1_sw8_ms=0.030256;128x128x64_c2_sw4_ms=0.031126;128x128x64_c2_sw8_ms=0.031587;64x32x64_basic_s3_ms=0.099302;64x64x64_basic_s3_ms=0.052195;128x128x64_pingpong_s3_ms=0.040866;256x128x64_c1_sw8_ms=0.031850;128x256x64_c2_sw8_ms=0.030067;128x256x64_pingpong_s3_sw8_ms=0.494262;128x256x64_c1_sw8_rasterN_ms=0.030366;128x128x64_c2_sw8_rasterN_ms=0.031581;256x128x64_c1_sw8_rasterM_ms=0.031965;wmma_32x64x32_ms=0.183590;wmma_32x64x64_ms=0.169712;64x32x128_basic_s3_ms=0.099203;64x64x128_basic_s3_ms=0.057750;64x64x256_basic_s2_ms=0.095421;128x64x128_c1_ms=0.059770;128x128x128_c1_sw8_ms=0.052307;128x256x128_direct_sw8_ms=0.054355;128x128x128_direct_sw8_ms=0.046994;fallback=id=39;tile=23;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/14;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.032331;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "bf16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9168498816865719,
+      "median_paired_speedup": 1.0796666681625016,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.09104565817,
+          "paired_speedups": [
+            0.9613003704395162,
+            1.153475848202621,
+            1.0157408326714323,
+            1.1204337313404968,
+            1.0910432982266631
+          ],
+          "solution_ms": 0.222179527283,
+          "dense_ms": 0.242408008575,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.217042;128x64x64_c1_ms=0.383763;128x128x64_c1_ms=0.229320;128x256x64_c1_ms=0.221525;128x128x64_c2_ms=0.227490;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.226110;128x128x64_c1_sw8_ms=0.221982;128x256x64_c1_sw4_ms=0.213293;128x256x64_c1_sw8_ms=0.218090;128x128x64_c2_sw4_ms=0.223379;128x128x64_c2_sw8_ms=0.222757;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.238269;128x256x64_c2_sw8_ms=0.219934;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.220984;128x128x64_c2_sw8_rasterN_ms=0.222883;256x128x64_c1_sw8_rasterM_ms=0.238062;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.750971;64x64x128_basic_s3_ms=0.437485;64x64x256_basic_s2_ms=0.982699;128x64x128_c1_ms=0.448128;128x128x128_c1_sw8_ms=0.401997;128x256x128_direct_sw8_ms=0.330419;128x128x128_direct_sw8_ms=0.278203;fallback=id=39;tile=20;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=3/16;tuned_candidate=3;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.217042;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.07966635457,
+          "paired_speedups": [
+            0.9168498816865719,
+            1.0853819392568247,
+            1.0472120088859593,
+            1.1135756154747949,
+            1.0796666681625016
+          ],
+          "solution_ms": 0.222841281891,
+          "dense_ms": 0.240594234467,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.222448;128x64x64_c1_ms=0.384008;128x128x64_c1_ms=0.225389;128x256x64_c1_ms=0.222656;128x128x64_c2_ms=0.229306;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.227587;128x128x64_c1_sw8_ms=0.223566;128x256x64_c1_sw4_ms=0.218643;128x256x64_c1_sw8_ms=0.216992;128x128x64_c2_sw4_ms=0.219562;128x128x64_c2_sw8_ms=0.224179;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.239158;128x256x64_c2_sw8_ms=0.220643;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.221832;128x128x64_c2_sw8_rasterN_ms=0.223907;256x128x64_c1_sw8_rasterM_ms=0.239213;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.759368;64x64x128_basic_s3_ms=0.436342;64x64x256_basic_s2_ms=0.975706;128x64x128_c1_ms=0.441930;128x128x128_c1_sw8_ms=0.396568;128x256x128_direct_sw8_ms=0.327491;128x128x128_direct_sw8_ms=0.278096;fallback=id=39;tile=20;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=3/16;tuned_candidate=3;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.222448;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.09502677108,
+          "paired_speedups": [
+            0.9644538606403013,
+            1.015852369006694,
+            1.0312865635771433,
+            1.1508568319883943,
+            1.0958966261955319
+          ],
+          "solution_ms": 0.220579528809,
+          "dense_ms": 0.241540489197,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.216442;128x64x64_c1_ms=0.385608;128x128x64_c1_ms=0.226926;128x256x64_c1_ms=0.216514;128x128x64_c2_ms=0.224720;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.222256;128x128x64_c1_sw8_ms=0.216982;128x256x64_c1_sw4_ms=0.215694;128x256x64_c1_sw8_ms=0.218907;128x128x64_c2_sw4_ms=0.224563;128x128x64_c2_sw8_ms=0.223850;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.239248;128x256x64_c2_sw8_ms=0.220648;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.222053;128x128x64_c2_sw8_rasterN_ms=0.223675;256x128x64_c1_sw8_rasterM_ms=0.239176;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.758242;64x64x128_basic_s3_ms=0.432282;64x64x256_basic_s2_ms=0.980051;128x64x128_c1_ms=0.445811;128x128x128_c1_sw8_ms=0.394536;128x256x128_direct_sw8_ms=0.324797;128x128x128_direct_sw8_ms=0.278085;fallback=id=39;tile=20;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=3/16;tuned_candidate=3;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.216442;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "fp16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9752732692944683,
+      "median_paired_speedup": 0.9984428965035507,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00153627886,
+          "paired_speedups": [
+            0.9984428965035507,
+            1.1636724906452143,
+            0.9969308854098033,
+            0.9963298901964815,
+            1.0011301224727422
+          ],
+          "solution_ms": 0.233508472443,
+          "dense_ms": 0.233867206573,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.206248;128x64x64_c1_ms=0.379618;128x128x64_c1_ms=0.228056;128x256x64_c1_ms=0.204181;128x128x64_c2_ms=0.219200;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.216314;128x128x64_c1_sw8_ms=0.208877;128x256x64_c1_sw4_ms=0.214717;128x256x64_c1_sw8_ms=0.215226;128x128x64_c2_sw4_ms=0.219718;128x128x64_c2_sw8_ms=0.219725;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.233674;128x256x64_c2_sw8_ms=0.205005;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.199637;128x128x64_c2_sw8_rasterN_ms=0.228733;256x128x64_c1_sw8_rasterM_ms=0.233525;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.802645;64x64x128_basic_s3_ms=0.456568;64x64x256_basic_s2_ms=1.033232;128x64x128_c1_ms=0.450226;128x128x128_c1_sw8_ms=0.420568;128x256x128_direct_sw8_ms=0.340579;128x128x128_direct_sw8_ms=0.281517;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/9;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.206248;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.01778205186,
+          "paired_speedups": [
+            0.9976662384093851,
+            1.0984198768841593,
+            0.9926789395124032,
+            1.008252584327859,
+            1.0002919186461947
+          ],
+          "solution_ms": 0.229516162872,
+          "dense_ms": 0.233597431183,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.208008;128x64x64_c1_ms=0.380454;128x128x64_c1_ms=0.225533;128x256x64_c1_ms=0.205179;128x128x64_c2_ms=0.218254;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.224885;128x128x64_c1_sw8_ms=0.221602;128x256x64_c1_sw4_ms=0.215726;128x256x64_c1_sw8_ms=0.216413;128x128x64_c2_sw4_ms=0.230707;128x128x64_c2_sw8_ms=0.229070;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.236326;128x256x64_c2_sw8_ms=0.229592;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.229920;128x128x64_c2_sw8_rasterN_ms=0.233835;256x128x64_c1_sw8_rasterM_ms=0.247925;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.804024;64x64x128_basic_s3_ms=0.443942;64x64x256_basic_s2_ms=1.037106;128x64x128_c1_ms=0.446589;128x128x128_c1_sw8_ms=0.417558;128x256x128_direct_sw8_ms=0.344392;128x128x128_direct_sw8_ms=0.280277;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/9;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.208008;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00022926625,
+          "paired_speedups": [
+            0.9973697700824522,
+            1.0989321797350617,
+            0.9752732692944683,
+            1.000231652281346,
+            0.9961728680775198
+          ],
+          "solution_ms": 0.233108482361,
+          "dense_ms": 0.23316192627,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.208354;128x64x64_c1_ms=0.381632;128x128x64_c1_ms=0.226552;128x256x64_c1_ms=0.205814;128x128x64_c2_ms=0.218474;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.216237;128x128x64_c1_sw8_ms=0.215694;128x256x64_c1_sw4_ms=0.215142;128x256x64_c1_sw8_ms=0.216051;128x128x64_c2_sw4_ms=0.228627;128x128x64_c2_sw8_ms=0.223864;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.229363;128x256x64_c2_sw8_ms=0.198032;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.200747;128x128x64_c2_sw8_rasterN_ms=0.211974;256x128x64_c1_sw8_rasterM_ms=0.218920;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.815134;64x64x128_basic_s3_ms=0.451731;64x64x256_basic_s2_ms=1.039338;128x64x128_c1_ms=0.446654;128x128x128_c1_sw8_ms=0.419202;128x256x128_direct_sw8_ms=0.345270;128x128x128_direct_sw8_ms=0.281429;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/9;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.208354;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "bf16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9265541800534723,
+      "median_paired_speedup": 0.9952695817314373,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.01644532854,
+          "paired_speedups": [
+            1.0194492657286705,
+            0.9437506397788924,
+            1.017565475626323,
+            1.0162141638968767,
+            0.9626866106664645
+          ],
+          "solution_ms": 1.62473861694,
+          "dense_ms": 1.65145797729,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=1.435157;128x64x64_c1_ms=4.066981;128x128x64_c1_ms=2.122463;128x256x64_c1_ms=1.779816;128x128x64_c2_ms=1.927512;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=1.787936;128x128x64_c1_sw8_ms=1.738182;128x256x64_c1_sw4_ms=1.720435;128x256x64_c1_sw8_ms=1.675280;128x128x64_c2_sw4_ms=1.726112;128x128x64_c2_sw8_ms=1.758629;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=1.814528;128x256x64_c2_sw8_ms=1.677587;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=1.709702;128x128x64_c2_sw8_rasterN_ms=1.832034;256x128x64_c1_sw8_rasterM_ms=1.819269;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=9.702734;64x64x128_basic_s3_ms=4.515945;64x64x256_basic_s2_ms=8.870043;128x64x128_c1_ms=3.736390;128x128x128_c1_sw8_ms=3.081718;128x256x128_direct_sw8_ms=2.282318;128x128x128_direct_sw8_ms=1.959323;fallback=id=39;tile=24;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/8;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=1.435157;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.983586020905,
+          "paired_speedups": [
+            0.9641470846028632,
+            0.9265541800534723,
+            0.9978365534921528,
+            1.0429308526899632,
+            0.9533542160612407
+          ],
+          "solution_ms": 1.67713027954,
+          "dense_ms": 1.64960189819,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=1.464067;128x64x64_c1_ms=4.111344;128x128x64_c1_ms=2.131138;128x256x64_c1_ms=1.789827;128x128x64_c2_ms=1.927168;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=1.782227;128x128x64_c1_sw8_ms=1.771002;128x256x64_c1_sw4_ms=1.739346;128x256x64_c1_sw8_ms=1.679920;128x128x64_c2_sw4_ms=1.799594;128x128x64_c2_sw8_ms=1.838286;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=1.810131;128x256x64_c2_sw8_ms=1.674970;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=1.702022;128x128x64_c2_sw8_rasterN_ms=1.868973;256x128x64_c1_sw8_rasterM_ms=1.843347;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=9.773984;64x64x128_basic_s3_ms=4.292184;64x64x256_basic_s2_ms=8.905587;128x64x128_c1_ms=3.738581;128x128x128_c1_sw8_ms=3.082830;128x256x128_direct_sw8_ms=2.244931;128x128x128_direct_sw8_ms=1.984898;fallback=id=39;tile=24;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/8;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=1.464067;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.990388020822,
+          "paired_speedups": [
+            0.9787093093866736,
+            0.9937394517173744,
+            1.004141894076967,
+            1.0164737254505471,
+            0.9952695817314373
+          ],
+          "solution_ms": 1.63029052734,
+          "dense_ms": 1.61462020874,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=1.458942;128x64x64_c1_ms=4.089880;128x128x64_c1_ms=2.124126;128x256x64_c1_ms=1.774955;128x128x64_c2_ms=1.936154;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=1.785032;128x128x64_c1_sw8_ms=1.765664;128x256x64_c1_sw4_ms=1.748827;128x256x64_c1_sw8_ms=1.681408;128x128x64_c2_sw4_ms=1.766592;128x128x64_c2_sw8_ms=1.830006;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=1.800795;128x256x64_c2_sw8_ms=1.679016;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=1.678045;128x128x64_c2_sw8_rasterN_ms=1.890480;256x128x64_c1_sw8_rasterM_ms=1.836965;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=9.750078;64x64x128_basic_s3_ms=4.368734;64x64x256_basic_s2_ms=8.894666;128x64x128_c1_ms=3.738961;128x128x128_c1_sw8_ms=3.088381;128x256x128_direct_sw8_ms=2.250688;128x128x128_direct_sw8_ms=1.992315;fallback=id=39;tile=24;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/8;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=1.458942;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "fp16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9402929006968641,
+      "median_paired_speedup": 1.0113334083759398,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.01394209441,
+          "paired_speedups": [
+            1.0323479355605811,
+            0.952460967583841,
+            1.011716890412263,
+            1.0217750257997937,
+            0.9692950530918871
+          ],
+          "solution_ms": 1.74419845581,
+          "dense_ms": 1.76851623535,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=1.634842;128x64x64_c1_ms=4.258042;128x128x64_c1_ms=2.455627;128x256x64_c1_ms=1.945134;128x128x64_c2_ms=1.995418;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=1.898176;128x128x64_c1_sw8_ms=1.849250;128x256x64_c1_sw4_ms=1.754909;128x256x64_c1_sw8_ms=1.718053;128x128x64_c2_sw4_ms=1.833011;128x128x64_c2_sw8_ms=1.858048;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=1.857597;128x256x64_c2_sw8_ms=1.738013;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=1.693477;128x128x64_c2_sw8_rasterN_ms=1.812629;256x128x64_c1_sw8_rasterM_ms=1.789994;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=9.882442;64x64x128_basic_s3_ms=4.235429;64x64x256_basic_s2_ms=8.878421;128x64x128_c1_ms=3.814261;128x128x128_c1_sw8_ms=3.218370;128x256x128_direct_sw8_ms=2.298182;128x128x128_direct_sw8_ms=1.976408;fallback=id=39;tile=23;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=2/15;tuned_candidate=2;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=1.634842;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.01540683908,
+          "paired_speedups": [
+            1.01540652511652,
+            0.9402929006968641,
+            1.0011469048425532,
+            1.0348189825315934,
+            0.9660143718361452
+          ],
+          "solution_ms": 1.69928253174,
+          "dense_ms": 1.72546310425,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=1.604104;128x64x64_c1_ms=4.203035;128x128x64_c1_ms=2.447272;128x256x64_c1_ms=1.910685;128x128x64_c2_ms=2.021523;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=1.952998;128x128x64_c1_sw8_ms=1.850019;128x256x64_c1_sw4_ms=1.789707;128x256x64_c1_sw8_ms=1.751142;128x128x64_c2_sw4_ms=1.815448;128x128x64_c2_sw8_ms=1.846699;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=1.870342;128x256x64_c2_sw8_ms=1.706710;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=1.716439;128x128x64_c2_sw8_rasterN_ms=1.777243;256x128x64_c1_sw8_rasterM_ms=1.778093;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=9.841177;64x64x128_basic_s3_ms=4.279934;64x64x256_basic_s2_ms=8.985037;128x64x128_c1_ms=3.810482;128x128x128_c1_sw8_ms=3.179726;128x256x128_direct_sw8_ms=2.322437;128x128x128_direct_sw8_ms=1.985006;fallback=id=39;tile=23;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/15;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=1.604104;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.03076292887,
+          "paired_speedups": [
+            1.051712807031956,
+            0.9601803771522275,
+            1.0113334083759398,
+            1.0717897526396787,
+            0.9704146999325691
+          ],
+          "solution_ms": 1.70422363281,
+          "dense_ms": 1.75665054321,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=1.618058;128x64x64_c1_ms=4.272182;128x128x64_c1_ms=2.409101;128x256x64_c1_ms=2.094379;128x128x64_c2_ms=2.031651;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=1.950896;128x128x64_c1_sw8_ms=1.859472;128x256x64_c1_sw4_ms=1.808363;128x256x64_c1_sw8_ms=1.774384;128x128x64_c2_sw4_ms=1.846290;128x128x64_c2_sw8_ms=1.870709;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=1.854373;128x256x64_c2_sw8_ms=1.750642;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=1.671211;128x128x64_c2_sw8_rasterN_ms=1.818474;256x128x64_c1_sw8_rasterM_ms=1.833626;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=9.813654;64x64x128_basic_s3_ms=4.277795;64x64x256_basic_s2_ms=8.849478;128x64x128_c1_ms=3.864674;128x128x128_c1_sw8_ms=3.183458;128x256x128_direct_sw8_ms=2.314949;128x128x128_direct_sw8_ms=2.047067;fallback=id=39;tile=23;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/15;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=1.618058;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 16384,
+      "n": 16384,
+      "k": 16384,
+      "dtype": "bf16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9966991524427055,
+      "median_paired_speedup": 0.9999529599924736,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.998167343896,
+          "paired_speedups": [
+            0.9966991524427055,
+            0.9981639714709414,
+            0.9999529599924736,
+            0.9980452957569572,
+            1.0010374177728527
+          ],
+          "solution_ms": 12.7448535156,
+          "dense_ms": 12.721496582,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=12.680995;128x64x64_c1_ms=47.507465;128x128x64_c1_ms=26.416452;128x256x64_c1_ms=17.099224;128x128x64_c2_ms=16.210300;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=13.943486;128x128x64_c1_sw8_ms=14.071701;128x256x64_c1_sw4_ms=12.948398;128x256x64_c1_sw8_ms=12.641409;128x128x64_c2_sw4_ms=16.689098;128x128x64_c2_sw8_ms=16.646282;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=13.171019;128x256x64_c2_sw8_ms=12.730626;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=12.583719;128x128x64_c2_sw8_rasterN_ms=17.315741;256x128x64_c1_sw8_rasterM_ms=13.194888;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=90.157455;64x64x128_basic_s3_ms=45.353981;64x64x256_basic_s2_ms=75.381760;128x64x128_c1_ms=45.082306;128x128x128_c1_sw8_ms=24.034342;128x256x128_direct_sw8_ms=18.192558;128x128x128_direct_sw8_ms=15.948458;fallback=id=39;tile=23;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/16;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=12.680995;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00152279465,
+          "paired_speedups": [
+            1.0025105584232754,
+            1.0009371632069723,
+            1.0010002266138422,
+            1.0025009183059406,
+            0.999469197864302
+          ],
+          "solution_ms": 12.7970666504,
+          "dense_ms": 12.8165539551,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=12.742207;128x64x64_c1_ms=47.390453;128x128x64_c1_ms=26.251410;128x256x64_c1_ms=17.206633;128x128x64_c2_ms=16.207546;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=13.881227;128x128x64_c1_sw8_ms=14.300573;128x256x64_c1_sw4_ms=12.998182;128x256x64_c1_sw8_ms=12.649384;128x128x64_c2_sw4_ms=16.837048;128x128x64_c2_sw8_ms=16.785938;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=13.149452;128x256x64_c2_sw8_ms=12.808100;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=12.640490;128x128x64_c2_sw8_rasterN_ms=16.836981;256x128x64_c1_sw8_rasterM_ms=13.294871;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=90.189621;64x64x128_basic_s3_ms=45.538807;64x64x256_basic_s2_ms=75.356339;128x64x128_c1_ms=45.210365;128x128x128_c1_sw8_ms=24.061340;128x256x128_direct_sw8_ms=18.235506;128x128x128_direct_sw8_ms=15.996762;fallback=id=39;tile=24;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=7/16;tuned_candidate=7;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=12.742207;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.999749766926,
+          "paired_speedups": [
+            0.9973947535186474,
+            0.9986686714907748,
+            1.0024937851423732,
+            1.0003453960279456,
+            0.9987923273577064
+          ],
+          "solution_ms": 12.7517834473,
+          "dense_ms": 12.7485925293,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=12.827797;128x64x64_c1_ms=47.313400;128x128x64_c1_ms=26.355606;128x256x64_c1_ms=17.031902;128x128x64_c2_ms=16.164631;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=13.963614;128x128x64_c1_sw8_ms=14.063457;128x256x64_c1_sw4_ms=12.996862;128x256x64_c1_sw8_ms=12.678613;128x128x64_c2_sw4_ms=16.743994;128x128x64_c2_sw8_ms=17.000437;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=13.213461;128x256x64_c2_sw8_ms=12.757051;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=12.641704;128x128x64_c2_sw8_rasterN_ms=16.954325;256x128x64_c1_sw8_rasterM_ms=13.209661;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=90.195930;64x64x128_basic_s3_ms=45.524422;64x64x256_basic_s2_ms=75.426765;128x64x128_c1_ms=45.125420;128x128x128_c1_sw8_ms=23.996990;128x256x128_direct_sw8_ms=18.322262;128x128x128_direct_sw8_ms=15.886185;fallback=id=39;tile=23;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/16;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=12.827797;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 16384,
+      "n": 16384,
+      "k": 16384,
+      "dtype": "fp16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9967833334585929,
+      "median_paired_speedup": 1.0012018869625312,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00209942533,
+          "paired_speedups": [
+            1.0138619685805434,
+            1.0042702914022796,
+            0.9989589384189443,
+            1.002099022713081,
+            0.9971789350479805
+          ],
+          "solution_ms": 13.291862793,
+          "dense_ms": 13.3197680664,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=13.209256;128x64x64_c1_ms=47.482071;128x128x64_c1_ms=25.901508;128x256x64_c1_ms=18.381762;128x128x64_c2_ms=16.934425;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=15.376116;128x128x64_c1_sw8_ms=15.220967;128x256x64_c1_sw4_ms=13.582171;128x256x64_c1_sw8_ms=13.679916;128x128x64_c2_sw4_ms=16.995117;128x128x64_c2_sw8_ms=18.705509;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=13.691503;128x256x64_c2_sw8_ms=13.031016;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=13.540091;128x128x64_c2_sw8_rasterN_ms=18.049986;256x128x64_c1_sw8_rasterM_ms=13.558269;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=90.196068;64x64x128_basic_s3_ms=45.377010;64x64x256_basic_s2_ms=75.497932;128x64x128_c1_ms=45.351467;128x128x128_c1_sw8_ms=24.232439;128x256x128_direct_sw8_ms=18.993494;128x128x128_direct_sw8_ms=16.587072;fallback=id=39;tile=23;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/9;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=13.209256;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00222727043,
+          "paired_speedups": [
+            1.008025960141245,
+            1.0042242703533026,
+            0.9967833334585929,
+            1.0021501981039163,
+            1.0010601503759398
+          ],
+          "solution_ms": 13.3000476074,
+          "dense_ms": 13.3296704102,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=13.240567;128x64x64_c1_ms=47.302166;128x128x64_c1_ms=26.342503;128x256x64_c1_ms=17.698574;128x128x64_c2_ms=16.759346;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=15.560539;128x128x64_c1_sw8_ms=15.196269;128x256x64_c1_sw4_ms=13.593287;128x256x64_c1_sw8_ms=13.696472;128x128x64_c2_sw4_ms=17.108732;128x128x64_c2_sw8_ms=19.118031;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=13.659737;128x256x64_c2_sw8_ms=13.087549;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=13.520666;128x128x64_c2_sw8_rasterN_ms=18.315479;256x128x64_c1_sw8_rasterM_ms=13.566557;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=90.167999;64x64x128_basic_s3_ms=45.400433;64x64x256_basic_s2_ms=75.351471;128x64x128_c1_ms=45.162315;128x128x128_c1_sw8_ms=24.138683;128x256x128_direct_sw8_ms=18.987457;128x128x128_direct_sw8_ms=16.318455;fallback=id=39;tile=23;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/9;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=13.240567;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00119210569,
+          "paired_speedups": [
+            1.0129601221198679,
+            1.0012018869625312,
+            1.000428832597296,
+            0.9994361156639551,
+            1.0002178240132198
+          ],
+          "solution_ms": 13.3005932617,
+          "dense_ms": 13.3164489746,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=13.108307;128x64x64_c1_ms=47.356941;128x128x64_c1_ms=26.076691;128x256x64_c1_ms=18.405849;128x128x64_c2_ms=16.813797;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=15.467997;128x128x64_c1_sw8_ms=14.556414;128x256x64_c1_sw4_ms=13.406984;128x256x64_c1_sw8_ms=13.813723;128x128x64_c2_sw4_ms=16.999653;128x128x64_c2_sw8_ms=18.390020;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=13.763659;128x256x64_c2_sw8_ms=13.041197;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=13.430324;128x128x64_c2_sw8_rasterN_ms=18.441250;256x128x64_c1_sw8_rasterM_ms=13.532684;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=90.178345;64x64x128_basic_s3_ms=45.424980;64x64x256_basic_s2_ms=75.353867;128x64x128_c1_ms=45.178131;128x128x128_c1_sw8_ms=24.153656;128x256x128_direct_sw8_ms=18.913004;128x128x128_direct_sw8_ms=16.435640;fallback=id=39;tile=23;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/9;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=13.108307;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 4096,
+      "k": 8192,
+      "dtype": "bf16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.967226381640015,
+      "median_paired_speedup": 0.9999815168220023,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.998036245665,
+          "paired_speedups": [
+            0.9980362064503241,
+            1.0083748808002513,
+            0.9870228318124702,
+            1.026319333728553,
+            0.9679147170497189
+          ],
+          "solution_ms": 0.880947875977,
+          "dense_ms": 0.879217910767,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.804494;128x64x64_c1_ms=1.463589;128x128x64_c1_ms=0.994523;128x256x64_c1_ms=0.874250;128x128x64_c2_ms=0.884566;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.870970;128x128x64_c1_sw8_ms=0.864010;128x256x64_c1_sw4_ms=0.871101;128x256x64_c1_sw8_ms=0.857518;128x128x64_c2_sw4_ms=0.873835;128x128x64_c2_sw8_ms=0.855909;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.910896;128x256x64_c2_sw8_ms=0.804845;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.818190;128x128x64_c2_sw8_rasterN_ms=0.842301;256x128x64_c1_sw8_rasterM_ms=0.852237;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.787248;64x64x128_basic_s3_ms=2.045176;64x64x256_basic_s2_ms=4.458810;128x64x128_c1_ms=1.564149;128x128x128_c1_sw8_ms=1.623360;128x256x128_direct_sw8_ms=1.227371;128x128x128_direct_sw8_ms=0.981035;fallback=id=39;tile=20;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=6/15;tuned_candidate=6;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.804494;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.994430869867,
+          "paired_speedups": [
+            1.011500522236644,
+            0.9944310202044266,
+            0.9999930806063233,
+            1.0402346104722466,
+            0.9692767957925272
+          ],
+          "solution_ms": 0.881490249634,
+          "dense_ms": 0.876581115723,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.804536;128x64x64_c1_ms=1.451800;128x128x64_c1_ms=0.960342;128x256x64_c1_ms=0.894821;128x128x64_c2_ms=0.895741;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.882858;128x128x64_c1_sw8_ms=0.878058;128x256x64_c1_sw4_ms=0.879253;128x256x64_c1_sw8_ms=0.869789;128x128x64_c2_sw4_ms=0.882296;128x128x64_c2_sw8_ms=0.863760;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.920813;128x256x64_c2_sw8_ms=0.806813;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.836392;128x128x64_c2_sw8_rasterN_ms=0.840349;256x128x64_c1_sw8_rasterM_ms=0.859517;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.788075;64x64x128_basic_s3_ms=2.100712;64x64x256_basic_s2_ms=4.455997;128x64x128_c1_ms=1.560469;128x128x128_c1_sw8_ms=1.629525;128x256x128_direct_sw8_ms=1.217258;128x128x128_direct_sw8_ms=0.983277;fallback=id=39;tile=20;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=6/15;tuned_candidate=6;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.804536;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.998591909042,
+          "paired_speedups": [
+            0.9999815168220023,
+            1.008086683369505,
+            0.9955850900614149,
+            1.0307859600130442,
+            0.967226381640015
+          ],
+          "solution_ms": 0.871309432983,
+          "dense_ms": 0.870082550049,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.831198;128x64x64_c1_ms=1.457110;128x128x64_c1_ms=0.968101;128x256x64_c1_ms=0.883208;128x128x64_c2_ms=0.937339;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.868997;128x128x64_c1_sw8_ms=0.862688;128x256x64_c1_sw4_ms=0.860218;128x256x64_c1_sw8_ms=0.853898;128x128x64_c2_sw4_ms=0.879123;128x128x64_c2_sw8_ms=0.866067;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.917995;128x256x64_c2_sw8_ms=0.824074;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.836459;128x128x64_c2_sw8_rasterN_ms=0.847306;256x128x64_c1_sw8_rasterM_ms=0.847864;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.694698;64x64x128_basic_s3_ms=2.053490;64x64x256_basic_s2_ms=4.450274;128x64x128_c1_ms=1.550862;128x128x128_c1_sw8_ms=1.629006;128x256x128_direct_sw8_ms=1.228904;128x128x128_direct_sw8_ms=0.979659;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=7/15;tuned_candidate=7;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.831198;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 4096,
+      "k": 8192,
+      "dtype": "fp16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9246666902429537,
+      "median_paired_speedup": 1.0085059728285166,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00390000082,
+          "paired_speedups": [
+            1.0213259532726757,
+            0.9957592333107669,
+            1.0085059728285166,
+            1.064768160378941,
+            0.9632506363526173
+          ],
+          "solution_ms": 0.894282226563,
+          "dense_ms": 0.897769927979,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.846571;128x64x64_c1_ms=1.366123;128x128x64_c1_ms=0.992232;128x256x64_c1_ms=0.883866;128x128x64_c2_ms=0.936606;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.921448;128x128x64_c1_sw8_ms=0.910797;128x256x64_c1_sw4_ms=0.908549;128x256x64_c1_sw8_ms=0.892843;128x128x64_c2_sw4_ms=0.901477;128x128x64_c2_sw8_ms=0.905275;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.956496;128x256x64_c2_sw8_ms=0.878334;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.875818;128x128x64_c2_sw8_rasterN_ms=0.891821;256x128x64_c1_sw8_rasterM_ms=0.903883;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.861656;64x64x128_basic_s3_ms=1.977299;64x64x256_basic_s2_ms=4.598714;128x64x128_c1_ms=1.570448;128x128x128_c1_sw8_ms=1.660741;128x256x128_direct_sw8_ms=1.239909;128x128x128_direct_sw8_ms=1.002938;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=3/15;tuned_candidate=3;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.846571;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00215820322,
+          "paired_speedups": [
+            1.0206692696501292,
+            0.9921237976006764,
+            1.018976502098614,
+            1.0403429994109212,
+            0.9851030332562355
+          ],
+          "solution_ms": 0.899710083008,
+          "dense_ms": 0.90165184021,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.857616;128x64x64_c1_ms=1.376918;128x128x64_c1_ms=0.982666;128x256x64_c1_ms=0.898546;128x128x64_c2_ms=0.932608;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.911728;128x128x64_c1_sw8_ms=0.898472;128x256x64_c1_sw4_ms=0.900726;128x256x64_c1_sw8_ms=0.902909;128x128x64_c2_sw4_ms=0.905096;128x128x64_c2_sw8_ms=0.899069;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.959198;128x256x64_c2_sw8_ms=0.880565;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.866197;128x128x64_c2_sw8_rasterN_ms=0.878736;256x128x64_c1_sw8_rasterM_ms=0.917170;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.866267;64x64x128_basic_s3_ms=1.992833;64x64x256_basic_s2_ms=4.571749;128x64x128_c1_ms=1.563254;128x128x128_c1_sw8_ms=1.672139;128x256x128_direct_sw8_ms=1.232608;128x128x128_direct_sw8_ms=1.009462;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=3/15;tuned_candidate=3;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.857616;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.990746070602,
+          "paired_speedups": [
+            0.9246666902429537,
+            0.9992333282370679,
+            1.0182255354750067,
+            1.0282280347812276,
+            0.9878715087988637
+          ],
+          "solution_ms": 0.906580810547,
+          "dense_ms": 0.898191375732,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.855019;128x64x64_c1_ms=1.380954;128x128x64_c1_ms=1.009258;128x256x64_c1_ms=0.894106;128x128x64_c2_ms=0.922987;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.914158;128x128x64_c1_sw8_ms=0.906718;128x256x64_c1_sw4_ms=0.902123;128x256x64_c1_sw8_ms=0.897770;128x128x64_c2_sw4_ms=0.901933;128x128x64_c2_sw8_ms=0.904019;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.955661;128x256x64_c2_sw8_ms=0.879682;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.863691;128x128x64_c2_sw8_rasterN_ms=0.873598;256x128x64_c1_sw8_rasterM_ms=0.914218;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.916477;64x64x128_basic_s3_ms=1.967454;64x64x256_basic_s2_ms=4.541289;128x64x128_c1_ms=1.576054;128x128x128_c1_sw8_ms=1.635570;128x256x128_direct_sw8_ms=1.225770;128x128x128_direct_sw8_ms=0.984819;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=3/15;tuned_candidate=3;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.855019;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "bf16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9425177415104284,
+      "median_paired_speedup": 1.026278794576278,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.04320033961,
+          "paired_speedups": [
+            0.9691421593704542,
+            1.005564344828021,
+            1.0016815336579747,
+            1.0432000336475837,
+            1.0370529443996468
+          ],
+          "solution_ms": 0.808379211426,
+          "dense_ms": 0.843301467896,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.718237;128x64x64_c1_ms=1.656723;128x128x64_c1_ms=0.857973;128x256x64_c1_ms=0.883434;128x128x64_c2_ms=0.903166;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.883790;128x128x64_c1_sw8_ms=0.881070;128x256x64_c1_sw4_ms=0.883739;128x256x64_c1_sw8_ms=0.860906;128x128x64_c2_sw4_ms=0.963256;128x128x64_c2_sw8_ms=0.949226;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.893805;128x256x64_c2_sw8_ms=0.832259;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.831691;128x128x64_c2_sw8_rasterN_ms=0.841322;256x128x64_c1_sw8_rasterM_ms=0.887493;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.192522;64x64x128_basic_s3_ms=1.830709;64x64x256_basic_s2_ms=3.682554;128x64x128_c1_ms=1.803536;128x128x128_c1_sw8_ms=1.528176;128x256x128_direct_sw8_ms=1.155704;128x128x128_direct_sw8_ms=1.107573;fallback=id=39;tile=24;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/8;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.718237;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.02627997823,
+          "paired_speedups": [
+            0.9505996721281943,
+            0.9983318409696823,
+            1.0316579936782988,
+            1.026278794576278,
+            1.0515725720546611
+          ],
+          "solution_ms": 0.818035507202,
+          "dense_ms": 0.839533462524,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.716958;128x64x64_c1_ms=1.615958;128x128x64_c1_ms=0.866752;128x256x64_c1_ms=0.897254;128x128x64_c2_ms=0.891350;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.893130;128x128x64_c1_sw8_ms=0.907098;128x256x64_c1_sw4_ms=0.885979;128x256x64_c1_sw8_ms=0.861339;128x128x64_c2_sw4_ms=0.962418;128x128x64_c2_sw8_ms=0.942669;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.897059;128x256x64_c2_sw8_ms=0.830602;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.831494;128x128x64_c2_sw8_rasterN_ms=0.822686;256x128x64_c1_sw8_rasterM_ms=0.876317;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.175261;64x64x128_basic_s3_ms=1.831037;64x64x256_basic_s2_ms=3.714944;128x64x128_c1_ms=1.786248;128x128x128_c1_sw8_ms=1.512630;128x256x128_direct_sw8_ms=1.151432;128x128x128_direct_sw8_ms=1.102106;fallback=id=39;tile=24;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/8;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.716958;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00195908333,
+          "paired_speedups": [
+            1.101678934350508,
+            0.9425177415104284,
+            1.0300513332382717,
+            1.0014952687551977,
+            1.060785577900662
+          ],
+          "solution_ms": 0.838925094604,
+          "dense_ms": 0.840568618774,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.717848;128x64x64_c1_ms=1.609368;128x128x64_c1_ms=0.838562;128x256x64_c1_ms=0.870403;128x128x64_c2_ms=0.882254;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.889405;128x128x64_c1_sw8_ms=0.886816;128x256x64_c1_sw4_ms=0.890814;128x256x64_c1_sw8_ms=0.865291;128x128x64_c2_sw4_ms=0.958259;128x128x64_c2_sw8_ms=0.947670;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.895192;128x256x64_c2_sw8_ms=0.845758;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.828798;128x128x64_c2_sw8_rasterN_ms=0.840174;256x128x64_c1_sw8_rasterM_ms=0.865320;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.239091;64x64x128_basic_s3_ms=1.840330;64x64x256_basic_s2_ms=3.655280;128x64x128_c1_ms=1.797666;128x128x128_c1_sw8_ms=1.506576;128x256x128_direct_sw8_ms=1.164234;128x128x128_direct_sw8_ms=1.100485;fallback=id=39;tile=24;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/8;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.717848;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "fp16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9945923719795082,
+      "median_paired_speedup": 1.029420904826212,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.03130644599,
+          "paired_speedups": [
+            1.0524709908596164,
+            0.9948387330038619,
+            1.013465303557137,
+            1.0407089075466778,
+            1.0313063456221458
+          ],
+          "solution_ms": 0.8879347229,
+          "dense_ms": 0.915732803345,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.837488;128x64x64_c1_ms=1.607416;128x128x64_c1_ms=0.884480;128x256x64_c1_ms=0.928870;128x128x64_c2_ms=0.953358;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.923043;128x128x64_c1_sw8_ms=0.921659;128x256x64_c1_sw4_ms=0.908344;128x256x64_c1_sw8_ms=0.890512;128x128x64_c2_sw4_ms=0.995408;128x128x64_c2_sw8_ms=0.981078;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.929504;128x256x64_c2_sw8_ms=0.876931;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.870077;128x128x64_c2_sw8_rasterN_ms=0.877723;256x128x64_c1_sw8_rasterM_ms=0.905562;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.243418;64x64x128_basic_s3_ms=1.856128;64x64x256_basic_s2_ms=3.741418;128x64x128_c1_ms=1.834699;128x128x128_c1_sw8_ms=1.615099;128x256x128_direct_sw8_ms=1.222054;128x128x128_direct_sw8_ms=1.100406;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=5/15;tuned_candidate=5;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.837488;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.05041574612,
+          "paired_speedups": [
+            1.0440880946917137,
+            1.0592698229024473,
+            1.0152835907865911,
+            0.9945923719795082,
+            1.0091353048505427
+          ],
+          "solution_ms": 0.892395172119,
+          "dense_ms": 0.937385940552,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.829096;128x64x64_c1_ms=1.631906;128x128x64_c1_ms=0.869376;128x256x64_c1_ms=0.931238;128x128x64_c2_ms=0.952490;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.921909;128x128x64_c1_sw8_ms=0.918832;128x256x64_c1_sw4_ms=0.910733;128x256x64_c1_sw8_ms=0.898848;128x128x64_c2_sw4_ms=0.994936;128x128x64_c2_sw8_ms=0.982859;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.930846;128x256x64_c2_sw8_ms=0.881454;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.880368;128x128x64_c2_sw8_rasterN_ms=0.877885;256x128x64_c1_sw8_rasterM_ms=0.919251;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.272406;64x64x128_basic_s3_ms=1.875173;64x64x256_basic_s2_ms=3.756562;128x64x128_c1_ms=1.818989;128x128x128_c1_sw8_ms=1.594808;128x256x128_direct_sw8_ms=1.234880;128x128x128_direct_sw8_ms=1.097798;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=5/15;tuned_candidate=5;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.829096;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.03070675617,
+          "paired_speedups": [
+            1.030824965775022,
+            1.029420904826212,
+            1.0183799624318173,
+            1.051643127893618,
+            0.9952821796100625
+          ],
+          "solution_ms": 0.875261764526,
+          "dense_ms": 0.902138214111,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.833685;128x64x64_c1_ms=1.608352;128x128x64_c1_ms=0.877064;128x256x64_c1_ms=0.907472;128x128x64_c2_ms=0.960146;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.923976;128x128x64_c1_sw8_ms=0.921174;128x256x64_c1_sw4_ms=0.910723;128x256x64_c1_sw8_ms=0.898426;128x128x64_c2_sw4_ms=0.993653;128x128x64_c2_sw8_ms=0.987082;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.935992;128x256x64_c2_sw8_ms=0.881018;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.871056;128x128x64_c2_sw8_rasterN_ms=0.882307;256x128x64_c1_sw8_rasterM_ms=0.891150;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.324056;64x64x128_basic_s3_ms=1.851000;64x64x256_basic_s2_ms=3.762571;128x64x128_c1_ms=1.803440;128x128x128_c1_sw8_ms=1.650384;128x256x128_direct_sw8_ms=1.232051;128x128x128_direct_sw8_ms=1.091437;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=5/15;tuned_candidate=5;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.833685;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 4096,
+      "dtype": "bf16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9418464120584128,
+      "median_paired_speedup": 1.0081418499745116,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.995803457504,
+          "paired_speedups": [
+            1.018711895151748,
+            1.0038299922475873,
+            0.9970097679382333,
+            0.9609613640965149,
+            1.016367272752151
+          ],
+          "solution_ms": 0.876994247437,
+          "dense_ms": 0.873313903809,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.744926;128x64x64_c1_ms=1.790562;128x128x64_c1_ms=1.041117;128x256x64_c1_ms=0.922570;128x128x64_c2_ms=1.030830;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.912595;128x128x64_c1_sw8_ms=0.903778;128x256x64_c1_sw4_ms=0.912109;128x256x64_c1_sw8_ms=0.887093;128x128x64_c2_sw4_ms=0.902237;128x128x64_c2_sw8_ms=0.901413;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.957845;128x256x64_c2_sw8_ms=0.870107;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.867907;128x128x64_c2_sw8_rasterN_ms=0.881397;256x128x64_c1_sw8_rasterM_ms=0.937382;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.495239;64x64x128_basic_s3_ms=1.850211;64x64x256_basic_s2_ms=4.692113;128x64x128_c1_ms=1.957608;128x128x128_c1_sw8_ms=1.605290;128x256x128_direct_sw8_ms=1.298269;128x128x128_direct_sw8_ms=1.040518;fallback=id=39;tile=24;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/9;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.744926;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.992642569859,
+          "paired_speedups": [
+            1.020530736334471,
+            1.0086035914992422,
+            0.9926430132026236,
+            0.9418464120584128,
+            1.0131146161836513
+          ],
+          "solution_ms": 0.87603805542,
+          "dense_ms": 0.869592666626,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.745027;128x64x64_c1_ms=1.789541;128x128x64_c1_ms=1.050307;128x256x64_c1_ms=0.907475;128x128x64_c2_ms=1.029509;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.915810;128x128x64_c1_sw8_ms=0.902592;128x256x64_c1_sw4_ms=0.911530;128x256x64_c1_sw8_ms=0.890144;128x128x64_c2_sw4_ms=0.891338;128x128x64_c2_sw8_ms=0.897290;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.957678;128x256x64_c2_sw8_ms=0.876277;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.868950;128x128x64_c2_sw8_rasterN_ms=0.878448;256x128x64_c1_sw8_rasterM_ms=0.947134;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.523445;64x64x128_basic_s3_ms=1.840072;64x64x256_basic_s2_ms=4.642517;128x64x128_c1_ms=1.934053;128x128x128_c1_sw8_ms=1.567914;128x256x128_direct_sw8_ms=1.289418;128x128x128_direct_sw8_ms=1.059941;fallback=id=39;tile=24;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/9;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.745027;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.01768119498,
+          "paired_speedups": [
+            1.0398181615874957,
+            1.0081418499745116,
+            0.991557443965284,
+            0.9451790492151814,
+            1.0352787487284545
+          ],
+          "solution_ms": 0.850097885132,
+          "dense_ms": 0.865128631592,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.745374;128x64x64_c1_ms=1.773394;128x128x64_c1_ms=1.050682;128x256x64_c1_ms=0.921597;128x128x64_c2_ms=1.034526;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.922984;128x128x64_c1_sw8_ms=0.914304;128x256x64_c1_sw4_ms=0.918093;128x256x64_c1_sw8_ms=0.890283;128x128x64_c2_sw4_ms=0.900206;128x128x64_c2_sw8_ms=0.897045;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.951749;128x256x64_c2_sw8_ms=0.866429;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.868938;128x128x64_c2_sw8_rasterN_ms=0.882819;256x128x64_c1_sw8_rasterM_ms=0.946867;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.610821;64x64x128_basic_s3_ms=1.839851;64x64x256_basic_s2_ms=4.731008;128x64x128_c1_ms=1.927838;128x128x128_c1_sw8_ms=1.562254;128x256x128_direct_sw8_ms=1.230173;128x128x128_direct_sw8_ms=1.029674;fallback=id=39;tile=24;split_k=-1;reduction=2;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/9;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.745374;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 4096,
+      "dtype": "fp16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9308092976673741,
+      "median_paired_speedup": 0.9994859328478874,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.0084449201,
+          "paired_speedups": [
+            1.0404526484715846,
+            0.9994859328478874,
+            1.0103063636714589,
+            0.9308092976673741,
+            1.0310683713173985
+          ],
+          "solution_ms": 0.89950012207,
+          "dense_ms": 0.907096328735,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.831886;128x64x64_c1_ms=1.765050;128x128x64_c1_ms=1.072506;128x256x64_c1_ms=0.963638;128x128x64_c2_ms=1.057019;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.952384;128x128x64_c1_sw8_ms=0.949013;128x256x64_c1_sw4_ms=0.943810;128x256x64_c1_sw8_ms=0.923933;128x128x64_c2_sw4_ms=0.930558;128x128x64_c2_sw8_ms=0.935853;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.984690;128x256x64_c2_sw8_ms=0.907925;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.898150;128x128x64_c2_sw8_rasterN_ms=0.913728;256x128x64_c1_sw8_rasterM_ms=0.969222;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.730744;64x64x128_basic_s3_ms=1.876061;64x64x256_basic_s2_ms=4.685587;128x64x128_c1_ms=1.906989;128x128x128_c1_sw8_ms=1.650878;128x256x128_direct_sw8_ms=1.314880;128x128x128_direct_sw8_ms=1.060274;fallback=id=39;tile=20;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=3/15;tuned_candidate=3;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.831886;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.01818604791,
+          "paired_speedups": [
+            1.0107662587969022,
+            0.9895890815758869,
+            0.9872254444654726,
+            0.9676544863448253,
+            1.0228995704935306
+          ],
+          "solution_ms": 0.898270111084,
+          "dense_ms": 0.91460609436,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.849366;128x64x64_c1_ms=1.791424;128x128x64_c1_ms=1.079547;128x256x64_c1_ms=0.981054;128x128x64_c2_ms=1.053901;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.948696;128x128x64_c1_sw8_ms=0.950656;128x256x64_c1_sw4_ms=0.949086;128x256x64_c1_sw8_ms=0.922638;128x128x64_c2_sw4_ms=0.934710;128x128x64_c2_sw8_ms=0.938842;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.983214;128x256x64_c2_sw8_ms=0.915283;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.901917;128x128x64_c2_sw8_rasterN_ms=0.911283;256x128x64_c1_sw8_rasterM_ms=0.972802;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.666903;64x64x128_basic_s3_ms=1.877326;64x64x256_basic_s2_ms=4.691096;128x64x128_c1_ms=1.920640;128x128x128_c1_sw8_ms=1.648317;128x256x128_direct_sw8_ms=1.373021;128x128x128_direct_sw8_ms=1.068574;fallback=id=39;tile=20;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=5;bound_candidate=1/15;tuned_candidate=1;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.849366;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00383935561,
+          "paired_speedups": [
+            1.001317895237894,
+            0.9904455959013512,
+            0.9908808320195518,
+            0.956555044416897,
+            1.033182416178438
+          ],
+          "solution_ms": 0.896902389526,
+          "dense_ms": 0.900345916748,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.833627;128x64x64_c1_ms=1.777832;128x128x64_c1_ms=1.079986;128x256x64_c1_ms=0.963533;128x128x64_c2_ms=1.057629;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.963291;128x128x64_c1_sw8_ms=0.956544;128x256x64_c1_sw4_ms=0.952301;128x256x64_c1_sw8_ms=0.924374;128x128x64_c2_sw4_ms=0.940882;128x128x64_c2_sw8_ms=0.937483;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.988552;128x256x64_c2_sw8_ms=0.915309;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.901363;128x128x64_c2_sw8_rasterN_ms=0.912347;256x128x64_c1_sw8_rasterM_ms=0.973939;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=3.670318;64x64x128_basic_s3_ms=1.891928;64x64x256_basic_s2_ms=4.705643;128x64x128_c1_ms=1.947237;128x128x128_c1_sw8_ms=1.610973;128x256x128_direct_sw8_ms=1.362142;128x128x128_direct_sw8_ms=1.077939;fallback=id=39;tile=20;split_k=1;reduction=0;swizzle=1;stages=35;custom=0;inner=0;cluster=3;bound_candidate=3/15;tuned_candidate=3;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.833627;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 1024,
+      "k": 512,
+      "dtype": "bf16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9902557470923451,
+      "median_paired_speedup": 0.9951148779107186,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.993725456797,
+          "paired_speedups": [
+            0.9921903272124487,
+            0.9916272778157845,
+            0.9934053223202086,
+            0.9951148779107186,
+            0.9950028926534368
+          ],
+          "solution_ms": 0.0257548809052,
+          "dense_ms": 0.0255932807922,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=failed;confirmed_candidate=128x128x64_c2_sw8;confirmed_dense_ms=0.025460;confirmed_custom_ms=0.025108;dense_ms=0.026722;128x64x64_c1_ms=0.028904;128x128x64_c1_ms=0.025730;128x256x64_c1_ms=0.025979;128x128x64_c2_ms=0.026298;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.025707;128x128x64_c1_sw8_ms=0.025571;128x256x64_c1_sw4_ms=0.026062;128x256x64_c1_sw8_ms=0.026010;128x128x64_c2_sw4_ms=0.025488;128x128x64_c2_sw8_ms=0.025526;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.027160;128x256x64_c2_sw8_ms=0.025934;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.026040;128x128x64_c2_sw8_rasterN_ms=0.025642;256x128x64_c1_sw8_rasterM_ms=0.026910;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.060685;64x64x128_basic_s3_ms=0.041451;64x64x256_basic_s2_ms=0.058405;128x64x128_c1_ms=0.031950;128x128x128_c1_sw8_ms=0.032002;128x256x128_direct_sw8_ms=0.052389;128x128x128_direct_sw8_ms=0.047787;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/16;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.026722;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.9950564283,
+          "paired_speedups": [
+            0.9986298540893891,
+            0.9944394832410549,
+            0.9962236850473828,
+            0.9972730891719745,
+            0.9902557470923451
+          ],
+          "solution_ms": 0.0251798391342,
+          "dense_ms": 0.0250553607941,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.026038;128x64x64_c1_ms=0.029024;128x128x64_c1_ms=0.025731;128x256x64_c1_ms=0.026110;128x128x64_c2_ms=0.026314;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.025499;128x128x64_c1_sw8_ms=0.025397;128x256x64_c1_sw4_ms=0.025960;128x256x64_c1_sw8_ms=0.025918;128x128x64_c2_sw4_ms=0.025346;128x128x64_c2_sw8_ms=0.025437;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.027082;128x256x64_c2_sw8_ms=0.025731;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.025922;128x128x64_c2_sw8_rasterN_ms=0.025461;256x128x64_c1_sw8_rasterM_ms=0.026778;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.060086;64x64x128_basic_s3_ms=0.040923;64x64x256_basic_s2_ms=0.057214;128x64x128_c1_ms=0.031285;128x128x128_c1_sw8_ms=0.031266;128x256x128_direct_sw8_ms=0.051090;128x128x128_direct_sw8_ms=0.047474;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/16;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.026038;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00045723772,
+          "paired_speedups": [
+            0.995941449380745,
+            0.9923486426349757,
+            1.0011194740853657,
+            0.9994797416977101,
+            1.0015616431824144
+          ],
+          "solution_ms": 0.0251904010773,
+          "dense_ms": 0.0252019190788,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.026093;128x64x64_c1_ms=0.028619;128x128x64_c1_ms=0.025566;128x256x64_c1_ms=0.025738;128x128x64_c2_ms=0.026290;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.025414;128x128x64_c1_sw8_ms=0.025424;128x256x64_c1_sw4_ms=0.026062;128x256x64_c1_sw8_ms=0.025920;128x128x64_c2_sw4_ms=0.025429;128x128x64_c2_sw8_ms=0.025509;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.027136;128x256x64_c2_sw8_ms=0.025778;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.025955;128x128x64_c2_sw8_rasterN_ms=0.025397;256x128x64_c1_sw8_rasterM_ms=0.026894;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.060080;64x64x128_basic_s3_ms=0.041011;64x64x256_basic_s2_ms=0.057859;128x64x128_c1_ms=0.031560;128x128x128_c1_sw8_ms=0.031430;128x256x128_direct_sw8_ms=0.051896;128x128x128_direct_sw8_ms=0.047798;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=0/16;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.026093;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 1024,
+      "k": 512,
+      "dtype": "fp16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9882579583432451,
+      "median_paired_speedup": 0.9923043953370736,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.995758182193,
+          "paired_speedups": [
+            0.9926317457005638,
+            0.9923043953370736,
+            0.9964263565891472,
+            0.9927616062562066,
+            0.9921690765793719
+          ],
+          "solution_ms": 0.0257999992371,
+          "dense_ms": 0.0256905603409,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.025336;128x64x64_c1_ms=0.028144;128x128x64_c1_ms=0.025104;128x256x64_c1_ms=0.025603;128x128x64_c2_ms=0.025878;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.025442;128x128x64_c1_sw8_ms=0.025077;128x256x64_c1_sw4_ms=0.025680;128x256x64_c1_sw8_ms=0.025634;128x128x64_c2_sw4_ms=0.024846;128x128x64_c2_sw8_ms=0.024819;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.026768;128x256x64_c2_sw8_ms=0.025635;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.025694;128x128x64_c2_sw8_rasterN_ms=0.024885;256x128x64_c1_sw8_rasterM_ms=0.026416;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.059294;64x64x128_basic_s3_ms=0.040230;64x64x256_basic_s2_ms=0.056168;128x64x128_c1_ms=0.031144;128x128x128_c1_sw8_ms=0.031299;128x256x128_direct_sw8_ms=0.051443;128x128x128_direct_sw8_ms=0.047074;fallback=id=39;tile=20;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=1/15;tuned_candidate=1;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.025336;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.991709987267,
+          "paired_speedups": [
+            0.9923301708671842,
+            0.9909093043641601,
+            0.9938870895645286,
+            0.9882579583432451,
+            0.9935066702438303
+          ],
+          "solution_ms": 0.0255536007881,
+          "dense_ms": 0.0253417611122,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.025286;128x64x64_c1_ms=0.028398;128x128x64_c1_ms=0.025301;128x256x64_c1_ms=0.025840;128x128x64_c2_ms=0.025958;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.025462;128x128x64_c1_sw8_ms=0.025419;128x256x64_c1_sw4_ms=0.025989;128x256x64_c1_sw8_ms=0.025931;128x128x64_c2_sw4_ms=0.025149;128x128x64_c2_sw8_ms=0.025082;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.026926;128x256x64_c2_sw8_ms=0.025824;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.025882;128x128x64_c2_sw8_rasterN_ms=0.025134;256x128x64_c1_sw8_rasterM_ms=0.026627;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.059093;64x64x128_basic_s3_ms=0.040842;64x64x256_basic_s2_ms=0.056525;128x64x128_c1_ms=0.031379;128x128x128_c1_sw8_ms=0.031386;128x256x128_direct_sw8_ms=0.051010;128x128x128_direct_sw8_ms=0.047608;fallback=id=39;tile=20;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=1/15;tuned_candidate=1;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.025286;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.99048926053,
+          "paired_speedups": [
+            0.9921743795484231,
+            0.9902107700990601,
+            0.9925794073675048,
+            0.9916861735330837,
+            0.9895294484263011
+          ],
+          "solution_ms": 0.0256719994545,
+          "dense_ms": 0.025427839756,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.025426;128x64x64_c1_ms=0.028456;128x128x64_c1_ms=0.025411;128x256x64_c1_ms=0.025782;128x128x64_c2_ms=0.026123;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.025517;128x128x64_c1_sw8_ms=0.025254;128x256x64_c1_sw4_ms=0.025880;128x256x64_c1_sw8_ms=0.025966;128x128x64_c2_sw4_ms=0.025262;128x128x64_c2_sw8_ms=0.025184;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.026720;128x256x64_c2_sw8_ms=0.025822;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.025797;128x128x64_c2_sw8_rasterN_ms=0.025104;256x128x64_c1_sw8_rasterM_ms=0.026669;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.059523;64x64x128_basic_s3_ms=0.040874;64x64x256_basic_s2_ms=0.056691;128x64x128_c1_ms=0.031474;128x128x128_c1_sw8_ms=0.031622;128x256x128_direct_sw8_ms=0.051418;128x128x128_direct_sw8_ms=0.047405;fallback=id=39;tile=20;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=3;bound_candidate=1/15;tuned_candidate=1;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.025426;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 1024,
+      "n": 8192,
+      "k": 512,
+      "dtype": "bf16",
+      "status": "stable_win",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": true,
+      "min_paired_speedup": 1.0644512496295564,
+      "median_paired_speedup": 1.0712785528736448,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "128x128x64_c1_sw8",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.07465736515,
+          "paired_speedups": [
+            1.075959478879913,
+            1.0764062170005397,
+            1.0749272209353284,
+            1.0728100113765642,
+            1.0745681291857045
+          ],
+          "solution_ms": 0.0255631995201,
+          "dense_ms": 0.0274716806412,
+          "config": "mnk_strategy;selection=128x128x64_c1_sw8;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x128x64_c1_sw8;confirmed_dense_ms=0.026428;confirmed_custom_ms=0.025289;dense_ms=0.027040;128x64x64_c1_ms=0.029218;128x128x64_c1_ms=0.025853;128x256x64_c1_ms=0.025950;128x128x64_c2_ms=0.026117;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.025666;128x128x64_c1_sw8_ms=0.025587;128x256x64_c1_sw4_ms=0.026005;128x256x64_c1_sw8_ms=0.026069;128x128x64_c2_sw4_ms=0.025872;128x128x64_c2_sw8_ms=0.043048;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.026835;128x256x64_c2_sw8_ms=0.039550;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.025923;128x128x64_c2_sw8_rasterN_ms=0.042742;256x128x64_c1_sw8_rasterM_ms=0.026816;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.056643;64x64x128_basic_s3_ms=0.041149;64x64x256_basic_s2_ms=0.057163;128x64x128_c1_ms=0.033384;128x128x128_c1_sw8_ms=0.032758;128x256x128_direct_sw8_ms=0.051325;128x128x128_direct_sw8_ms=0.048808;fallback=id=39;tile=21;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=5;bound_candidate=1/16;tuned_candidate=1;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.027040;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "128x128x64_c1_sw4",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.06506834239,
+          "paired_speedups": [
+            1.0768188246385921,
+            1.0647654668522266,
+            1.0651986490441276,
+            1.0644512496295564,
+            1.085643742605833
+          ],
+          "solution_ms": 0.0252927994728,
+          "dense_ms": 0.026938560009,
+          "config": "mnk_strategy;selection=128x128x64_c1_sw4;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x128x64_c1_sw4;confirmed_dense_ms=0.026577;confirmed_custom_ms=0.025571;dense_ms=0.027024;128x64x64_c1_ms=0.029078;128x128x64_c1_ms=0.025854;128x256x64_c1_ms=0.026006;128x128x64_c2_ms=0.026187;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.025611;128x128x64_c1_sw8_ms=0.025666;128x256x64_c1_sw4_ms=0.025984;128x256x64_c1_sw8_ms=0.026072;128x128x64_c2_sw4_ms=0.025946;128x128x64_c2_sw8_ms=0.043102;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.026869;128x256x64_c2_sw8_ms=0.039667;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.025994;128x128x64_c2_sw8_rasterN_ms=0.042738;256x128x64_c1_sw8_rasterM_ms=0.026936;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.056701;64x64x128_basic_s3_ms=0.041250;64x64x256_basic_s2_ms=0.056987;128x64x128_c1_ms=0.033382;128x128x128_c1_sw8_ms=0.032827;128x256x128_direct_sw8_ms=0.052013;128x128x128_direct_sw8_ms=0.048624;fallback=id=39;tile=21;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=5;bound_candidate=1/16;tuned_candidate=1;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.027024;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "128x128x64_c1_sw4",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.06812107288,
+          "paired_speedups": [
+            1.0653881919051822,
+            1.0692748144318913,
+            1.0681218678411317,
+            1.0712785528736448,
+            1.0677161754156386
+          ],
+          "solution_ms": 0.0253619194031,
+          "dense_ms": 0.027089600563,
+          "config": "mnk_strategy;selection=128x128x64_c1_sw4;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x128x64_c1_sw4;confirmed_dense_ms=0.026462;confirmed_custom_ms=0.025289;dense_ms=0.027152;128x64x64_c1_ms=0.029194;128x128x64_c1_ms=0.025770;128x256x64_c1_ms=0.026083;128x128x64_c2_ms=0.026216;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.025534;128x128x64_c1_sw8_ms=0.025602;128x256x64_c1_sw4_ms=0.025962;128x256x64_c1_sw8_ms=0.025984;128x128x64_c2_sw4_ms=0.025859;128x128x64_c2_sw8_ms=0.043216;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.026867;128x256x64_c2_sw8_ms=0.039813;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.025974;128x128x64_c2_sw8_rasterN_ms=0.042902;256x128x64_c1_sw8_rasterM_ms=0.026925;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.056949;64x64x128_basic_s3_ms=0.041070;64x64x256_basic_s2_ms=0.057326;128x64x128_c1_ms=0.033445;128x128x128_c1_sw8_ms=0.032757;128x256x128_direct_sw8_ms=0.051438;128x128x128_direct_sw8_ms=0.048707;fallback=id=39;tile=21;split_k=1;reduction=0;swizzle=0;stages=35;custom=0;inner=0;cluster=5;bound_candidate=1/16;tuned_candidate=1;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.027152;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 1024,
+      "n": 8192,
+      "k": 512,
+      "dtype": "fp16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9785463622879057,
+      "median_paired_speedup": 1.003896600121816,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "128x128x64_c1_sw4",
+          "actual": "tuned_hopper_dense",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.04118636527,
+          "paired_speedups": [
+            1.041341425937308,
+            1.0438745516813634,
+            1.0403279508843513,
+            1.0452934439423016,
+            1.0379596586801112
+          ],
+          "solution_ms": 0.0259580802917,
+          "dense_ms": 0.0270271992683,
+          "config": "mnk_strategy;selection=128x128x64_c1_sw4;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=128x128x64_c1_sw4;confirmed_dense_ms=0.026654;confirmed_custom_ms=0.025830;dense_ms=0.026706;128x64x64_c1_ms=0.029379;128x128x64_c1_ms=0.025906;128x256x64_c1_ms=0.026230;128x128x64_c2_ms=0.026131;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.025795;128x128x64_c1_sw8_ms=0.025762;128x256x64_c1_sw4_ms=0.026069;128x256x64_c1_sw8_ms=0.026258;128x128x64_c2_sw4_ms=0.026022;128x128x64_c2_sw8_ms=0.043078;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.027048;128x256x64_c2_sw8_ms=0.039675;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.026104;128x128x64_c2_sw8_rasterN_ms=0.042594;256x128x64_c1_sw8_rasterM_ms=0.026979;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.056800;64x64x128_basic_s3_ms=0.041331;64x64x256_basic_s2_ms=0.057085;128x64x128_c1_ms=0.033490;128x128x128_c1_sw8_ms=0.032726;128x256x128_direct_sw8_ms=0.051464;128x128x128_direct_sw8_ms=0.048683;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/14;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.026706;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00389810661,
+          "paired_speedups": [
+            0.9974549652540912,
+            1.0008894059368785,
+            1.003896600121816,
+            1.0060717634413519,
+            0.9992683010483874
+          ],
+          "solution_ms": 0.0264332795143,
+          "dense_ms": 0.0265363192558,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=failed;confirmed_candidate=128x128x64_c1_sw4;confirmed_dense_ms=0.026427;confirmed_custom_ms=0.025716;dense_ms=0.026421;128x64x64_c1_ms=0.029056;128x128x64_c1_ms=0.025638;128x256x64_c1_ms=0.025968;128x128x64_c2_ms=0.025954;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.025472;128x128x64_c1_sw8_ms=0.025470;128x256x64_c1_sw4_ms=0.025789;128x256x64_c1_sw8_ms=0.026032;128x128x64_c2_sw4_ms=0.025752;128x128x64_c2_sw8_ms=0.042738;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.026866;128x256x64_c2_sw8_ms=0.039830;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.026050;128x128x64_c2_sw8_rasterN_ms=0.042618;256x128x64_c1_sw8_rasterM_ms=0.026878;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.056613;64x64x128_basic_s3_ms=0.041461;64x64x256_basic_s2_ms=0.057054;128x64x128_c1_ms=0.033485;128x128x128_c1_sw8_ms=0.033070;128x256x128_direct_sw8_ms=0.052048;128x128x128_direct_sw8_ms=0.048472;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/14;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.026421;align0=16;align1=16;align2=16;align3=16"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.00285916991,
+          "paired_speedups": [
+            0.9785463622879057,
+            0.9997861989681472,
+            0.996798652064027,
+            1.0050537155934143,
+            1.0016542745593384
+          ],
+          "solution_ms": 0.0283158397675,
+          "dense_ms": 0.0283967995644,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=failed;confirmed_candidate=128x128x64_c1_sw4;confirmed_dense_ms=0.026651;confirmed_custom_ms=0.025917;dense_ms=0.026629;128x64x64_c1_ms=0.029346;128x128x64_c1_ms=0.025938;128x256x64_c1_ms=0.026082;128x128x64_c2_ms=0.026147;simt_small_ms=nan;pad_128x64x64_c1_ms=nan;pad_128x128x64_c1_ms=nan;pad_128x256x64_c1_ms=nan;pad_128x128x64_c2_ms=nan;128x128x64_c1_sw4_ms=0.025768;128x128x64_c1_sw8_ms=0.025739;128x256x64_c1_sw4_ms=0.026066;128x256x64_c1_sw8_ms=0.026293;128x128x64_c2_sw4_ms=0.025962;128x128x64_c2_sw8_ms=0.043032;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=0.027005;128x256x64_c2_sw8_ms=0.039819;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=0.026144;128x128x64_c2_sw8_rasterN_ms=0.042931;256x128x64_c1_sw8_rasterM_ms=0.027091;wmma_32x64x32_ms=nan;wmma_32x64x64_ms=nan;64x32x128_basic_s3_ms=0.056744;64x64x128_basic_s3_ms=0.041522;64x64x256_basic_s2_ms=0.057381;128x64x128_c1_ms=0.033635;128x128x128_c1_sw8_ms=0.033069;128x256x128_direct_sw8_ms=0.051630;128x128x128_direct_sw8_ms=0.048696;fallback=id=39;tile=20;split_k=-1;reduction=2;swizzle=0;stages=35;custom=0;inner=0;cluster=5;bound_candidate=0/14;tuned_candidate=0;bound_workspace=131;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.026629;align0=16;align1=16;align2=16;align3=16"
+        }
+      ]
+    },
+    {
+      "m": 1025,
+      "n": 1537,
+      "k": 769,
+      "dtype": "bf16",
+      "status": "stable_win",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": true,
+      "min_paired_speedup": 1.1093783855005417,
+      "median_paired_speedup": 1.113203230187528,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "pad_128x128x64_c1",
+          "actual": "tuned_padded_hopper",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.1111506783,
+          "paired_speedups": [
+            1.1093783855005417,
+            1.113203230187528,
+            1.1096291343339608,
+            1.1114691287867693,
+            1.1125820421066237
+          ],
+          "solution_ms": 0.0340985608101,
+          "dense_ms": 0.0378886389732,
+          "config": "mnk_strategy;selection=pad_128x128x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=pad_128x128x64_c1;confirmed_dense_ms=0.037710;confirmed_custom_ms=0.033940;dense_ms=0.037950;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=nan;pad_128x64x64_c1_ms=0.038317;pad_128x128x64_c1_ms=0.034171;pad_128x256x64_c1_ms=0.035768;pad_128x128x64_c2_ms=0.034379;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.159653;wmma_32x64x64_ms=0.171296;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=24;tile=24;split_k=2;reduction=2;swizzle=0;stages=0;custom=0;inner=0;cluster=0;bound_candidate=0/8;tuned_candidate=0;bound_workspace=12603400;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.037950;align0=2;align1=2;align2=2;align3=2"
+        },
+        {
+          "repeat": 1,
+          "selection": "pad_128x128x64_c1",
+          "actual": "tuned_padded_hopper",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.11290858106,
+          "paired_speedups": [
+            1.1149019792150114,
+            1.1135034407876394,
+            1.1115613420012567,
+            1.1133061234084694,
+            1.1147593560859062
+          ],
+          "solution_ms": 0.0340438389778,
+          "dense_ms": 0.0378876805305,
+          "config": "mnk_strategy;selection=pad_128x128x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=pad_128x128x64_c1;confirmed_dense_ms=0.037840;confirmed_custom_ms=0.033872;dense_ms=0.037965;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=nan;pad_128x64x64_c1_ms=0.038078;pad_128x128x64_c1_ms=0.034010;pad_128x256x64_c1_ms=0.035661;pad_128x128x64_c2_ms=0.034384;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.159472;wmma_32x64x64_ms=0.171459;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=24;tile=24;split_k=2;reduction=2;swizzle=0;stages=0;custom=0;inner=0;cluster=0;bound_candidate=0/8;tuned_candidate=0;bound_workspace=12603400;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.037965;align0=2;align1=2;align2=2;align3=2"
+        },
+        {
+          "repeat": 2,
+          "selection": "pad_128x128x64_c1",
+          "actual": "tuned_padded_hopper",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.11331027885,
+          "paired_speedups": [
+            1.111766277775657,
+            1.114150136271025,
+            1.112481011244869,
+            1.113495661678503,
+            1.1150296638101518
+          ],
+          "solution_ms": 0.0340332794189,
+          "dense_ms": 0.0378895998001,
+          "config": "mnk_strategy;selection=pad_128x128x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=pad_128x128x64_c1;confirmed_dense_ms=0.038036;confirmed_custom_ms=0.034067;dense_ms=0.038926;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=nan;pad_128x64x64_c1_ms=0.038635;pad_128x128x64_c1_ms=0.034213;pad_128x256x64_c1_ms=0.035880;pad_128x128x64_c2_ms=0.034560;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.160779;wmma_32x64x64_ms=0.172944;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=24;tile=24;split_k=2;reduction=2;swizzle=0;stages=0;custom=0;inner=0;cluster=0;bound_candidate=0/8;tuned_candidate=0;bound_workspace=12603400;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.038926;align0=2;align1=2;align2=2;align3=2"
+        }
+      ]
+    },
+    {
+      "m": 1025,
+      "n": 1537,
+      "k": 769,
+      "dtype": "fp16",
+      "status": "stable_win",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": true,
+      "min_paired_speedup": 1.074816078126524,
+      "median_paired_speedup": 1.0770094529465475,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "pad_128x128x64_c1",
+          "actual": "tuned_padded_hopper",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.07723300554,
+          "paired_speedups": [
+            1.0776534578831458,
+            1.0762646075193119,
+            1.0770551690301529,
+            1.0770094529465475,
+            1.0771856751527917
+          ],
+          "solution_ms": 0.0338342404366,
+          "dense_ms": 0.0364473605156,
+          "config": "mnk_strategy;selection=pad_128x128x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=pad_128x128x64_c1;confirmed_dense_ms=0.036454;confirmed_custom_ms=0.033860;dense_ms=0.036613;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=nan;pad_128x64x64_c1_ms=0.038109;pad_128x128x64_c1_ms=0.034024;pad_128x256x64_c1_ms=0.035586;pad_128x128x64_c2_ms=0.034229;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.166339;wmma_32x64x64_ms=0.132414;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=24;tile=20;split_k=2;reduction=1;swizzle=0;stages=0;custom=0;inner=0;cluster=0;bound_candidate=0/7;tuned_candidate=0;bound_workspace=468;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.036613;align0=2;align1=2;align2=2;align3=2"
+        },
+        {
+          "repeat": 1,
+          "selection": "pad_128x128x64_c1",
+          "actual": "tuned_padded_hopper",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.0752216051,
+          "paired_speedups": [
+            1.074816078126524,
+            1.0771439226666508,
+            1.0749668216467694,
+            1.0759897470161983,
+            1.0759938788135317
+          ],
+          "solution_ms": 0.0338243198395,
+          "dense_ms": 0.0363686394691,
+          "config": "mnk_strategy;selection=pad_128x128x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=pad_128x128x64_c1;confirmed_dense_ms=0.036383;confirmed_custom_ms=0.033815;dense_ms=0.036632;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=nan;pad_128x64x64_c1_ms=0.038112;pad_128x128x64_c1_ms=0.033970;pad_128x256x64_c1_ms=0.035582;pad_128x128x64_c2_ms=0.034290;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.166349;wmma_32x64x64_ms=0.132243;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=24;tile=20;split_k=2;reduction=1;swizzle=0;stages=0;custom=0;inner=0;cluster=0;bound_candidate=0/7;tuned_candidate=0;bound_workspace=468;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.036632;align0=2;align1=2;align2=2;align3=2"
+        },
+        {
+          "repeat": 2,
+          "selection": "pad_128x128x64_c1",
+          "actual": "tuned_padded_hopper",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.07708067887,
+          "paired_speedups": [
+            1.0792200958917877,
+            1.0765196564255037,
+            1.0786567899486397,
+            1.0778239962238547,
+            1.0764328953196516
+          ],
+          "solution_ms": 0.033896958828,
+          "dense_ms": 0.0365097594261,
+          "config": "mnk_strategy;selection=pad_128x128x64_c1;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=pad_128x128x64_c1;confirmed_dense_ms=0.036449;confirmed_custom_ms=0.033768;dense_ms=0.036611;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=nan;pad_128x64x64_c1_ms=0.038098;pad_128x128x64_c1_ms=0.033891;pad_128x256x64_c1_ms=0.035483;pad_128x128x64_c2_ms=0.034256;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.166074;wmma_32x64x64_ms=0.132040;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=24;tile=20;split_k=2;reduction=1;swizzle=0;stages=0;custom=0;inner=0;cluster=0;bound_candidate=0/7;tuned_candidate=0;bound_workspace=468;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.036611;align0=2;align1=2;align2=2;align3=2"
+        }
+      ]
+    },
+    {
+      "m": 514,
+      "n": 770,
+      "k": 258,
+      "dtype": "bf16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.9948911674761647,
+      "median_paired_speedup": 0.9982286168751355,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.999566201969,
+          "paired_speedups": [
+            0.9948911674761647,
+            1.0020291325458366,
+            1.000869281755949,
+            1.0009398156515454,
+            0.9975448604542008
+          ],
+          "solution_ms": 0.00885280013084,
+          "dense_ms": 0.00884895980358,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.008949;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=nan;pad_128x64x64_c1_ms=0.016030;pad_128x128x64_c1_ms=0.017128;pad_128x256x64_c1_ms=0.019426;pad_128x128x64_c2_ms=0.017125;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.028651;wmma_32x64x64_ms=0.024242;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=23;tile=18;split_k=1;reduction=0;swizzle=0;stages=15;custom=0;inner=0;cluster=0;bound_candidate=1/14;tuned_candidate=1;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.008949;align0=4;align1=4;align2=4;align3=4"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.999963731809,
+          "paired_speedups": [
+            0.9975706153232533,
+            1.0007597409645093,
+            0.9982223189667682,
+            1.0005441683294032,
+            0.9972878168733953
+          ],
+          "solution_ms": 0.0088252800703,
+          "dense_ms": 0.00882495999336,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.008942;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=nan;pad_128x64x64_c1_ms=0.016024;pad_128x128x64_c1_ms=0.017032;pad_128x256x64_c1_ms=0.019379;pad_128x128x64_c2_ms=0.017104;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.028602;wmma_32x64x64_ms=0.024250;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=23;tile=18;split_k=1;reduction=0;swizzle=0;stages=15;custom=0;inner=0;cluster=0;bound_candidate=1/14;tuned_candidate=1;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.008942;align0=4;align1=4;align2=4;align3=4"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.998409391793,
+          "paired_speedups": [
+            0.9985884907709012,
+            0.995996970680515,
+            0.9997467621735042,
+            0.9982286168751355,
+            0.9974731978486084
+          ],
+          "solution_ms": 0.00885183990002,
+          "dense_ms": 0.00883776009083,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.008966;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=nan;pad_128x64x64_c1_ms=0.016062;pad_128x128x64_c1_ms=0.017085;pad_128x256x64_c1_ms=0.019467;pad_128x128x64_c2_ms=0.017179;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.028706;wmma_32x64x64_ms=0.024197;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=23;tile=18;split_k=1;reduction=0;swizzle=0;stages=15;custom=0;inner=0;cluster=0;bound_candidate=1/14;tuned_candidate=1;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.008966;align0=4;align1=4;align2=4;align3=4"
+        }
+      ]
+    },
+    {
+      "m": 514,
+      "n": 770,
+      "k": 258,
+      "dtype": "fp16",
+      "status": "unresolved",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": false,
+      "min_paired_speedup": 0.99682757128952,
+      "median_paired_speedup": 1.000721761097077,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 0.999891744966,
+          "paired_speedups": [
+            1.0008666762964031,
+            0.9974782953276417,
+            1.0003607633753022,
+            0.99682757128952,
+            1.0014796636471905
+          ],
+          "solution_ms": 0.00887008011341,
+          "dense_ms": 0.00886911988258,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.008979;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=nan;pad_128x64x64_c1_ms=0.016088;pad_128x128x64_c1_ms=0.017098;pad_128x256x64_c1_ms=0.019563;pad_128x128x64_c2_ms=0.017150;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.030133;wmma_32x64x64_ms=0.023546;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=23;tile=18;split_k=1;reduction=0;swizzle=0;stages=15;custom=0;inner=0;cluster=0;bound_candidate=2/15;tuned_candidate=2;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.008979;align0=4;align1=4;align2=4;align3=4"
+        },
+        {
+          "repeat": 1,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.0,
+          "paired_speedups": [
+            0.9992790714440198,
+            1.0027049446387999,
+            0.9977285018929151,
+            1.0001803621672316,
+            1.000721761097077
+          ],
+          "solution_ms": 0.0088726401329,
+          "dense_ms": 0.0088726401329,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.008997;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=nan;pad_128x64x64_c1_ms=0.016072;pad_128x128x64_c1_ms=0.017091;pad_128x256x64_c1_ms=0.019474;pad_128x128x64_c2_ms=0.017208;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.030246;wmma_32x64x64_ms=0.023622;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=23;tile=18;split_k=1;reduction=0;swizzle=0;stages=15;custom=0;inner=0;cluster=0;bound_candidate=2/15;tuned_candidate=2;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.008997;align0=4;align1=4;align2=4;align3=4"
+        },
+        {
+          "repeat": 2,
+          "selection": "dense_cublaslt",
+          "actual": "tuned_dense_cublaslt",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.0017033351,
+          "paired_speedups": [
+            1.0016317354412938,
+            0.9994930291508237,
+            1.0019931869246936,
+            1.0017033305548508,
+            1.0022471095647132
+          ],
+          "solution_ms": 0.00882975995541,
+          "dense_ms": 0.00884479999542,
+          "config": "mnk_strategy;selection=dense_cublaslt;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=skipped;dense_ms=0.008984;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=nan;pad_128x64x64_c1_ms=0.016080;pad_128x128x64_c1_ms=0.017061;pad_128x256x64_c1_ms=0.019544;pad_128x128x64_c2_ms=0.017219;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.030261;wmma_32x64x64_ms=0.023541;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=23;tile=18;split_k=1;reduction=0;swizzle=0;stages=15;custom=0;inner=0;cluster=0;bound_candidate=2/15;tuned_candidate=2;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.008984;align0=4;align1=4;align2=4;align3=4"
+        }
+      ]
+    },
+    {
+      "m": 1,
+      "n": 1,
+      "k": 1,
+      "dtype": "bf16",
+      "status": "stable_win",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": true,
+      "min_paired_speedup": 1.067774480712166,
+      "median_paired_speedup": 1.0845561703151312,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "simt_small",
+          "actual": "tuned_simt_small",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.0801191339,
+          "paired_speedups": [
+            1.085936564931179,
+            1.067774480712166,
+            1.1089285714285715,
+            1.075757575757576,
+            1.0797239409804855
+          ],
+          "solution_ms": 0.00268799990416,
+          "dense_ms": 0.0029033601284,
+          "config": "mnk_strategy;selection=simt_small;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=simt_small;confirmed_dense_ms=0.002865;confirmed_custom_ms=0.002651;dense_ms=0.002981;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=0.002781;pad_128x64x64_c1_ms=0.010672;pad_128x128x64_c1_ms=0.011344;pad_128x256x64_c1_ms=0.012579;pad_128x128x64_c2_ms=0.011250;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.004486;wmma_32x64x64_ms=0.005389;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=13;tile=0;split_k=1;reduction=0;swizzle=0;stages=0;custom=10;inner=0;cluster=0;bound_candidate=7/8;tuned_candidate=7;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.002981;align0=2;align1=2;align2=4;align3=4"
+        },
+        {
+          "repeat": 1,
+          "selection": "simt_small",
+          "actual": "tuned_simt_small",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.08078768111,
+          "paired_speedups": [
+            1.100607938967696,
+            1.0791169451073985,
+            1.0802719465648856,
+            1.0819141280882705,
+            1.0877235089403576
+          ],
+          "solution_ms": 0.00268159985542,
+          "dense_ms": 0.00289824008942,
+          "config": "mnk_strategy;selection=simt_small;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=simt_small;confirmed_dense_ms=0.002867;confirmed_custom_ms=0.002638;dense_ms=0.002971;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=0.002758;pad_128x64x64_c1_ms=0.010582;pad_128x128x64_c1_ms=0.011322;pad_128x256x64_c1_ms=0.012606;pad_128x128x64_c2_ms=0.011262;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.004522;wmma_32x64x64_ms=0.005384;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=13;tile=0;split_k=1;reduction=0;swizzle=0;stages=0;custom=10;inner=0;cluster=0;bound_candidate=7/8;tuned_candidate=7;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.002971;align0=2;align1=2;align2=4;align3=4"
+        },
+        {
+          "repeat": 2,
+          "selection": "simt_small",
+          "actual": "tuned_simt_small",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.10253325545,
+          "paired_speedups": [
+            1.102533317325009,
+            1.1052129309316474,
+            1.1205716344421761,
+            1.0845561703151312,
+            1.0841020726009345
+          ],
+          "solution_ms": 0.00266528010368,
+          "dense_ms": 0.0029385599494,
+          "config": "mnk_strategy;selection=simt_small;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=simt_small;confirmed_dense_ms=0.002853;confirmed_custom_ms=0.002642;dense_ms=0.002986;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=0.002750;pad_128x64x64_c1_ms=0.010648;pad_128x128x64_c1_ms=0.011240;pad_128x256x64_c1_ms=0.012610;pad_128x128x64_c2_ms=0.011205;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.004480;wmma_32x64x64_ms=0.005342;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=13;tile=0;split_k=1;reduction=0;swizzle=0;stages=0;custom=10;inner=0;cluster=0;bound_candidate=7/8;tuned_candidate=7;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.002986;align0=2;align1=2;align2=4;align3=4"
+        }
+      ]
+    },
+    {
+      "m": 1,
+      "n": 1,
+      "k": 1,
+      "dtype": "fp16",
+      "status": "stable_win",
+      "complete": true,
+      "precision_pass": true,
+      "custom_every_repeat": true,
+      "min_paired_speedup": 1.07420282905778,
+      "median_paired_speedup": 1.091006679389313,
+      "observations": [
+        {
+          "repeat": 0,
+          "selection": "simt_small",
+          "actual": "tuned_simt_small",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.08920466564,
+          "paired_speedups": [
+            1.109610705596107,
+            1.091006679389313,
+            1.081988765387833,
+            1.103002254657648,
+            1.0833532362073084
+          ],
+          "solution_ms": 0.00267967998981,
+          "dense_ms": 0.00291871994734,
+          "config": "mnk_strategy;selection=simt_small;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=simt_small;confirmed_dense_ms=0.002857;confirmed_custom_ms=0.002650;dense_ms=0.002992;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=0.002770;pad_128x64x64_c1_ms=0.010554;pad_128x128x64_c1_ms=0.011285;pad_128x256x64_c1_ms=0.012594;pad_128x128x64_c2_ms=0.011189;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.004419;wmma_32x64x64_ms=0.005304;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=13;tile=0;split_k=1;reduction=0;swizzle=0;stages=0;custom=10;inner=0;cluster=0;bound_candidate=6/8;tuned_candidate=6;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.002992;align0=2;align1=2;align2=4;align3=4"
+        },
+        {
+          "repeat": 1,
+          "selection": "simt_small",
+          "actual": "tuned_simt_small",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.08578641482,
+          "paired_speedups": [
+            1.0899770835846099,
+            1.08411665461557,
+            1.0899724451898887,
+            1.07420282905778,
+            1.0922744202811485
+          ],
+          "solution_ms": 0.00266335994005,
+          "dense_ms": 0.00289184004068,
+          "config": "mnk_strategy;selection=simt_small;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=simt_small;confirmed_dense_ms=0.002855;confirmed_custom_ms=0.002643;dense_ms=0.002998;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=0.002781;pad_128x64x64_c1_ms=0.010629;pad_128x128x64_c1_ms=0.011293;pad_128x256x64_c1_ms=0.012518;pad_128x128x64_c2_ms=0.011202;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.004429;wmma_32x64x64_ms=0.005296;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=13;tile=0;split_k=1;reduction=0;swizzle=0;stages=0;custom=10;inner=0;cluster=0;bound_candidate=6/8;tuned_candidate=6;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.002998;align0=2;align1=2;align2=4;align3=4"
+        },
+        {
+          "repeat": 2,
+          "selection": "simt_small",
+          "actual": "tuned_simt_small",
+          "numerical_pass": true,
+          "correct_trials": 3,
+          "median_speedup": 1.0934534346,
+          "paired_speedups": [
+            1.091051051051051,
+            1.1105345722215518,
+            1.0890058619452088,
+            1.1211830918452879,
+            1.096898757089417
+          ],
+          "solution_ms": 0.00266400009394,
+          "dense_ms": 0.00291296005249,
+          "config": "mnk_strategy;selection=simt_small;rank=5x20_alternating_median;minimum_gain=3percent;require=5paired_wins;validation=dense_relative_1e-5;input_sets=2;dense_rerank=top8;confirmation=5x100;confirmation_status=passed;confirmed_candidate=simt_small;confirmed_dense_ms=0.002842;confirmed_custom_ms=0.002644;dense_ms=0.002974;128x64x64_c1_ms=nan;128x128x64_c1_ms=nan;128x256x64_c1_ms=nan;128x128x64_c2_ms=nan;simt_small_ms=0.002762;pad_128x64x64_c1_ms=0.010576;pad_128x128x64_c1_ms=0.011266;pad_128x256x64_c1_ms=0.012539;pad_128x128x64_c2_ms=0.011189;128x128x64_c1_sw4_ms=nan;128x128x64_c1_sw8_ms=nan;128x256x64_c1_sw4_ms=nan;128x256x64_c1_sw8_ms=nan;128x128x64_c2_sw4_ms=nan;128x128x64_c2_sw8_ms=nan;64x32x64_basic_s3_ms=nan;64x64x64_basic_s3_ms=nan;128x128x64_pingpong_s3_ms=nan;256x128x64_c1_sw8_ms=nan;128x256x64_c2_sw8_ms=nan;128x256x64_pingpong_s3_sw8_ms=nan;128x256x64_c1_sw8_rasterN_ms=nan;128x128x64_c2_sw8_rasterN_ms=nan;256x128x64_c1_sw8_rasterM_ms=nan;wmma_32x64x32_ms=0.004411;wmma_32x64x64_ms=0.005288;64x32x128_basic_s3_ms=nan;64x64x128_basic_s3_ms=nan;64x64x256_basic_s2_ms=nan;128x64x128_c1_ms=nan;128x128x128_c1_sw8_ms=nan;128x256x128_direct_sw8_ms=nan;128x128x128_direct_sw8_ms=nan;fallback=id=13;tile=0;split_k=1;reduction=0;swizzle=0;stages=0;custom=10;inner=0;cluster=0;bound_candidate=6/8;tuned_candidate=6;bound_workspace=0;tuned=1;tune=4w/5x20median_sets2;tuning_ms=0.002974;align0=2;align1=2;align2=4;align3=4"
+        }
+      ]
+    }
+  ]
+}

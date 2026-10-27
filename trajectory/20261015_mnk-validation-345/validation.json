@@ -1,0 +1,46 @@
+{
+  "iteration": 345,
+  "source_commit": "92757590961f9b897eea6c9c887c89445467f02c",
+  "forced_candidates": 37,
+  "api_original_fp64": "pass",
+  "warp_memcheck_errors": 0,
+  "warp_racecheck_errors": 0,
+  "warp_racecheck_warnings": 0,
+  "performance": "No additional certified win; boundary remains cuBLAS fallback. Iter344 eleven-win evidence is version-specific.",
+  "profiles": {
+    "boundary_id36": {
+      "shape": [
+        514,
+        770,
+        258
+      ],
+      "dtype": "fp16",
+      "registers": 114,
+      "issued_warp_instructions": 5649394,
+      "ncu_duration_us": 16.99
+    },
+    "hopper_id12": {
+      "shape": [
+        8192,
+        8192,
+        8192
+      ],
+      "dtype": "fp16",
+      "registers": 168,
+      "tensor_active_elapsed_percent": 91.368128,
+      "local_load_store_sectors": 0,
+      "ncu_duration_ms": 1.54
+    }
+  },
+  "files_sha256": {
+    "results/mnk345_candidates.log": "eb731abde09825e62d48b69907a44e5030cc62692a7e51a32242d39db9ee98c5",
+    "results/mnk345_api.log": "bf6f0327c75ce525df0afe03aeba74876356af23872c073b524c22c441676760",
+    "results/mnk345_warp_memcheck.log": "245858db99d33b53f352efb3bcfe1fde964fe3394321f76b8936dcf955e6eae2",
+    "results/mnk345_warp_racecheck.log": "ca3e00f3ebdd520a61d3f9d209076d6c94cef025ff6cadbb693eb70e1ca2b471",
+    "results/mnk345_mma_boundary.txt": "08fb14e2e2fe9475ace458975232a1931efabcd29ecd08b6c893c846721015cf",
+    "results/mnk345_hopper8192.txt": "ff390e29bed6be6bfca2f60d0711ccde87c99cc4b3175da8fb3da5ed154e269a",
+    "results/mnk345_hopper8192_raw.csv": "a6968a523996af67dd302fb7b2703a7b4adba02c1cb2a509c29f6f6aec9e92ab",
+    "research/mnk_tuning/profile_candidate.cu": "2aab0d29970b5f1f220af14a760ee9b44d67178100259d1cb2331f02277ee4e2",
+    "tests/test_tuning_candidates.cu": "efa8127d5238586efad4a38fc998c3418591fba1b69a60bd3784fb97e20772ab"
+  }
+}

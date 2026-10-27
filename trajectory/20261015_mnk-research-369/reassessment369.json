@@ -1,0 +1,125 @@
+{
+  "status": "368 validation/profile complete; proceed bounded resource and correctness preflight",
+  "history": [
+    "366 swapped orientation no stable added win.",
+    "367 consumer window3 no stable added win.",
+    "368 consumer batch8 no stable added win; all12 unresolved large-K combinations fallback.",
+    "354 candidate76 N128K64 two-stage nine-warp two-worker path has two-CTA capacity but Tensor activity59.56% and2.371ms fixed8192 diagnostic.",
+    "359/360 candidate79 N160K64 two-stage uses one worker per SM; no prior four-stage K32 two-worker test."
+  ],
+  "hypothesis": "Use K32 four-stage buffers at two resident CTAs per SM, increasing overlap relative to the old K64 two-stage two-CTA path; test N128/N160 and consumer windows1/3.",
+  "resource_guard": "Require actual compiled occupancy>=2 AND localSizeBytes==0 before any launch; 288threads each. Test all four variants independently and retain failures.",
+  "correctness": "Ten fresh nonsymmetric original-AB FP64 references plus strided padding/alpha0.5;12289x520 K8/K1032 persistent reuse exceeds264-CTA worker grid.",
+  "sources": [
+    "https://docs.nvidia.com/cuda/hopper-tuning-guide/index.html",
+    "https://docs.nvidia.com/cutlass/latest/media/docs/cpp/efficient_gemm.html"
+  ],
+  "source_interpretation": "Registers and shared memory constrain residency; software pipelining can hide latency. More occupancy alone is not a performance guarantee, as shown by our candidate76 measurements.",
+  "latest_certification": "353:16/28,12 unresolved; no additional stable-win claim",
+  "limits": "No precision relaxation or arithmetic compensation change; no production369 edits or GPU probe until368 job terminal and profile reviewed.",
+  "latest_profile": {
+    "candidate": 106,
+    "shape": [
+      8192,
+      8192,
+      8192
+    ],
+    "dtype": "fp16",
+    "inputs": "zeros diagnostic only, not acceptance",
+    "metrics": {
+      "gpu__time_duration.sum": {
+        "value": 1.523328,
+        "unit": "ms"
+      },
+      "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+        "value": 92.490816,
+        "unit": "%"
+      },
+      "lts__t_sector_hit_rate.pct": {
+        "value": 81.019346,
+        "unit": "%"
+      },
+      "smsp__warps_eligible.avg.per_cycle_active": {
+        "value": 0.168163,
+        "unit": "warp"
+      },
+      "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+        "value": 1.668687,
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio": {
+        "value": 0.019122,
+        "unit": "inst"
+      },
+      "launch__registers_per_thread": {
+        "value": 168.0,
+        "unit": "register/thread"
+      },
+      "smsp__inst_executed.sum": {
+        "value": 176910829.0,
+        "unit": "inst"
+      },
+      "dram__bytes_read.sum": {
+        "value": 1.493382,
+        "unit": "Gbyte"
+      },
+      "dram__bytes_write.sum": {
+        "value": 262.260992,
+        "unit": "Mbyte"
+      },
+      "l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum": {
+        "value": 0.0,
+        "unit": "sector"
+      },
+      "l1tex__t_sectors_pipe_lsu_mem_local_op_ld_lookup_hit.sum": {
+        "value": 0.0,
+        "unit": "sector"
+      },
+      "l1tex__t_sectors_pipe_lsu_mem_local_op_ld_lookup_miss.sum": {
+        "value": 0.0,
+        "unit": "sector"
+      },
+      "l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum": {
+        "value": 0.0,
+        "unit": "sector"
+      },
+      "l1tex__t_sectors_pipe_lsu_mem_local_op_st_lookup_hit.sum": {
+        "value": 0.0,
+        "unit": "sector"
+      },
+      "l1tex__t_sectors_pipe_lsu_mem_local_op_st_lookup_miss.sum": {
+        "value": 0.0,
+        "unit": "sector"
+      },
+      "smsp__average_warps_issue_stalled_barrier_per_issue_active.ratio": {
+        "value": 9.368698,
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_math_pipe_throttle_per_issue_active.ratio": {
+        "value": 0.010009,
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_membar_per_issue_active.ratio": {
+        "value": 0.0,
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio": {
+        "value": 0.056782,
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_no_instruction_per_issue_active.ratio": {
+        "value": 0.123071,
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_wait_per_issue_active.ratio": {
+        "value": 0.767338,
+        "unit": "inst"
+      },
+      "smsp__inst_executed_op_branch.sum": {
+        "value": 8203892.0,
+        "unit": "inst"
+      }
+    }
+  },
+  "decision": "Batch8 reduced warp instructions204.19M->176.91M and branch instructions11.70M->8.20M versus365K32, but eligible warps decreased. No stable formal gain. Test a distinct residency/pipeline balance: two narrow nine-warp CTAs with four K32 stages, compared to earlier two-CTA K64 two-stage path. Actual two-CTA capacity and no spill are mandatory before launch. Occupancy is a hypothesis, not proof of speedup."
+}

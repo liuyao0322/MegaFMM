@@ -1,0 +1,45 @@
+{
+  "scope": "Resource and exact-tail preflight only; no production364 edit or speed claim",
+  "tile": [
+    128,
+    256,
+    128
+  ],
+  "source_free_tma": true,
+  "clusters": [
+    [
+      1,
+      1,
+      1
+    ],
+    [
+      2,
+      1,
+      1
+    ]
+  ],
+  "dtype": "fp16",
+  "shape": [
+    257,
+    520,
+    1032
+  ],
+  "actual_stages": 2,
+  "threads": 384,
+  "registers": 168,
+  "shared_bytes": 231424,
+  "local_bytes": 0,
+  "all_preflights_pass": true,
+  "reassessment": {
+    "history": "361two-block ninewarp no newwins;362explicitSplitK slower all12largeKcombinations;363fixes more-accurate candidates falsely rejected by Dense screen, no newwins.",
+    "profile": "362SplitK4096BF16 GEMM263.36us,Tensor65.606%,168regs,67112960Bscratch.360wide ninewarpTensor92.323% but still random-input slower.",
+    "hypothesis": "K128 TMA changes mainloop iterations and pipeline depth without K-split reduction. Same shared bytes as K64auto family; actual stage count2 preflightverified. Performance must be measured.",
+    "local_source": "third_party/cutlass/include/cutlass/gemm/collective/builders/sm90_gmma_builder.inl compute_stage_count_or_override divides remaining SMEM by bytes per stage.",
+    "official_sources": [
+      "https://developer.nvidia.com/blog/cutlass-3-x-orthogonal-reusable-and-composable-abstractions-for-gemm-kernel-design/",
+      "https://docs.nvidia.com/cutlass/latest/media/docs/cpp/gemm_api_3x.html"
+    ],
+    "no_floor_claim": true
+  },
+  "required_next": "Integrate production98/99 only after resource proof; original full-call/fresh-FP64 benchmark/log/commit protocol, forced tests and sanitizers, independent certification before any newstablewin."
+}

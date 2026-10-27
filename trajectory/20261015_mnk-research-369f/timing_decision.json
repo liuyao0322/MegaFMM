@@ -1,0 +1,1402 @@
+{
+  "enabled_timing_mask": 63,
+  "research_only": true,
+  "large_random_fp64_acceptance": "unchecked",
+  "stable_certification": "unchecked",
+  "production_unchanged": true,
+  "timing": "5 groups x100 full calls, two fresh rotating random input sets; tuned dispatcher/source-free pingpong/existing cooperative61/70 measured in each group, reverse order on odd groups",
+  "rows": [
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "bf16",
+      "variant": 1,
+      "cluster_m": 1,
+      "tile_m": 128,
+      "tile_n": 128,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 1.058827,
+      "min_speedup": 1.008203,
+      "median_original_speedup": 1.085779,
+      "min_original_speedup": 1.077868,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.213298246,
+          "custom_ms": 0.211562887,
+          "speedup": 1.008203,
+          "original_ms": 0.229162231,
+          "original_speedup": 1.083187
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.223470405,
+          "custom_ms": 0.208617911,
+          "speedup": 1.071195,
+          "original_ms": 0.228467524,
+          "original_speedup": 1.095148
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.230046704,
+          "custom_ms": 0.217310384,
+          "speedup": 1.058609,
+          "original_ms": 0.234232008,
+          "original_speedup": 1.077868
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.230034888,
+          "custom_ms": 0.20994848,
+          "speedup": 1.095673,
+          "original_ms": 0.231417924,
+          "original_speedup": 1.102261
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.233452171,
+          "custom_ms": 0.220481917,
+          "speedup": 1.058827,
+          "original_ms": 0.239394575,
+          "original_speedup": 1.085779
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "bf16",
+      "variant": 2,
+      "cluster_m": 2,
+      "tile_m": 128,
+      "tile_n": 128,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 1.05335,
+      "min_speedup": 1.046521,
+      "median_original_speedup": 1.068262,
+      "min_original_speedup": 1.064192,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.233794227,
+          "custom_ms": 0.221711367,
+          "speedup": 1.054498,
+          "original_ms": 0.236845762,
+          "original_speedup": 1.068262
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.232358724,
+          "custom_ms": 0.216380477,
+          "speedup": 1.073843,
+          "original_ms": 0.234572485,
+          "original_speedup": 1.084074
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.233517438,
+          "custom_ms": 0.221760631,
+          "speedup": 1.053016,
+          "original_ms": 0.236537606,
+          "original_speedup": 1.066635
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.219701111,
+          "custom_ms": 0.208573759,
+          "speedup": 1.05335,
+          "original_ms": 0.229064643,
+          "original_speedup": 1.098243
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.224669114,
+          "custom_ms": 0.214681908,
+          "speedup": 1.046521,
+          "original_ms": 0.228462711,
+          "original_speedup": 1.064192
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "bf16",
+      "variant": 3,
+      "cluster_m": 1,
+      "tile_m": 128,
+      "tile_n": 160,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.485523,
+      "min_speedup": 0.480717,
+      "median_original_speedup": 0.459882,
+      "min_original_speedup": 0.447495,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.222565442,
+          "custom_ms": 0.437339216,
+          "speedup": 0.508908,
+          "original_ms": 0.195707202,
+          "original_speedup": 0.447495
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.205856323,
+          "custom_ms": 0.428227842,
+          "speedup": 0.480717,
+          "original_ms": 0.205627516,
+          "original_speedup": 0.480182
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.212481588,
+          "custom_ms": 0.434121579,
+          "speedup": 0.489452,
+          "original_ms": 0.199644491,
+          "original_speedup": 0.459882
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.207120001,
+          "custom_ms": 0.426591367,
+          "speedup": 0.485523,
+          "original_ms": 0.205304325,
+          "original_speedup": 0.481267
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.210108802,
+          "custom_ms": 0.436971515,
+          "speedup": 0.48083,
+          "original_ms": 0.196307525,
+          "original_speedup": 0.449246
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "bf16",
+      "variant": 4,
+      "cluster_m": 2,
+      "tile_m": 128,
+      "tile_n": 160,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.608871,
+      "min_speedup": 0.590601,
+      "median_original_speedup": 0.601483,
+      "min_original_speedup": 0.587596,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.206710398,
+          "custom_ms": 0.350000292,
+          "speedup": 0.590601,
+          "original_ms": 0.210519046,
+          "original_speedup": 0.601483
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.209106565,
+          "custom_ms": 0.337779492,
+          "speedup": 0.619062,
+          "original_ms": 0.210236803,
+          "original_speedup": 0.622408
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.21620895,
+          "custom_ms": 0.364674211,
+          "speedup": 0.592882,
+          "original_ms": 0.214281276,
+          "original_speedup": 0.587596
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.208109111,
+          "custom_ms": 0.336474866,
+          "speedup": 0.618498,
+          "original_ms": 0.209984958,
+          "original_speedup": 0.624073
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.218980163,
+          "custom_ms": 0.359649569,
+          "speedup": 0.608871,
+          "original_ms": 0.215946883,
+          "original_speedup": 0.600437
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "bf16",
+      "variant": 5,
+      "cluster_m": 1,
+      "tile_m": 128,
+      "tile_n": 192,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.928972,
+      "min_speedup": 0.909386,
+      "median_original_speedup": 0.955207,
+      "min_original_speedup": 0.869741,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.210849613,
+          "custom_ms": 0.231859207,
+          "speedup": 0.909386,
+          "original_ms": 0.225784972,
+          "original_speedup": 0.973802
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.222558409,
+          "custom_ms": 0.239575043,
+          "speedup": 0.928972,
+          "original_ms": 0.228843838,
+          "original_speedup": 0.955207
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.230179191,
+          "custom_ms": 0.241858557,
+          "speedup": 0.95171,
+          "original_ms": 0.229254067,
+          "original_speedup": 0.947885
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.216985285,
+          "custom_ms": 0.234408647,
+          "speedup": 0.925671,
+          "original_ms": 0.227652475,
+          "original_speedup": 0.971178
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.231813133,
+          "custom_ms": 0.248973444,
+          "speedup": 0.931076,
+          "original_ms": 0.216542393,
+          "original_speedup": 0.869741
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "bf16",
+      "variant": 6,
+      "cluster_m": 2,
+      "tile_m": 128,
+      "tile_n": 192,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.894258,
+      "min_speedup": 0.88206,
+      "median_original_speedup": 0.835238,
+      "min_original_speedup": 0.82196,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.228143677,
+          "custom_ms": 0.258648634,
+          "speedup": 0.88206,
+          "original_ms": 0.212806717,
+          "original_speedup": 0.822764
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.226055026,
+          "custom_ms": 0.251618236,
+          "speedup": 0.898405,
+          "original_ms": 0.211218238,
+          "original_speedup": 0.839439
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.227607369,
+          "custom_ms": 0.254489928,
+          "speedup": 0.894367,
+          "original_ms": 0.212559685,
+          "original_speedup": 0.835238
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.221605122,
+          "custom_ms": 0.247808948,
+          "speedup": 0.894258,
+          "original_ms": 0.210930228,
+          "original_speedup": 0.851181
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.228983358,
+          "custom_ms": 0.259557426,
+          "speedup": 0.882207,
+          "original_ms": 0.21334593,
+          "original_speedup": 0.82196
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "fp16",
+      "variant": 1,
+      "cluster_m": 1,
+      "tile_m": 128,
+      "tile_n": 128,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 1.006529,
+      "min_speedup": 0.901541,
+      "median_original_speedup": 1.080278,
+      "min_original_speedup": 0.980612,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.219190076,
+          "custom_ms": 0.217768326,
+          "speedup": 1.006529,
+          "original_ms": 0.235599041,
+          "original_speedup": 1.081879
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.22078687,
+          "custom_ms": 0.216237426,
+          "speedup": 1.021039,
+          "original_ms": 0.233596474,
+          "original_speedup": 1.080278
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.229932159,
+          "custom_ms": 0.231023669,
+          "speedup": 0.995275,
+          "original_ms": 0.247281283,
+          "original_speedup": 1.070372
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.225771204,
+          "custom_ms": 0.222742736,
+          "speedup": 1.013596,
+          "original_ms": 0.244801924,
+          "original_speedup": 1.099034
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.235991359,
+          "custom_ms": 0.261764497,
+          "speedup": 0.901541,
+          "original_ms": 0.25668928,
+          "original_speedup": 0.980612
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "fp16",
+      "variant": 2,
+      "cluster_m": 2,
+      "tile_m": 128,
+      "tile_n": 128,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 1.001155,
+      "min_speedup": 0.916748,
+      "median_original_speedup": 1.044942,
+      "min_original_speedup": 0.965356,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.250908792,
+          "custom_ms": 0.258023024,
+          "speedup": 0.972428,
+          "original_ms": 0.26923424,
+          "original_speedup": 1.04345
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.217969283,
+          "custom_ms": 0.217717767,
+          "speedup": 1.001155,
+          "original_ms": 0.24868992,
+          "original_speedup": 1.142258
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.223150074,
+          "custom_ms": 0.24341473,
+          "speedup": 0.916748,
+          "original_ms": 0.23498176,
+          "original_speedup": 0.965356
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.22799167,
+          "custom_ms": 0.219925761,
+          "speedup": 1.036676,
+          "original_ms": 0.239927679,
+          "original_speedup": 1.090948
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.237501428,
+          "custom_ms": 0.233081609,
+          "speedup": 1.018963,
+          "original_ms": 0.243556798,
+          "original_speedup": 1.044942
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "fp16",
+      "variant": 3,
+      "cluster_m": 1,
+      "tile_m": 128,
+      "tile_n": 160,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.473929,
+      "min_speedup": 0.467977,
+      "median_original_speedup": 0.449979,
+      "min_original_speedup": 0.447281,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.228266239,
+          "custom_ms": 0.458342701,
+          "speedup": 0.498025,
+          "original_ms": 0.205007985,
+          "original_speedup": 0.447281
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.207855999,
+          "custom_ms": 0.433402568,
+          "speedup": 0.479591,
+          "original_ms": 0.216130883,
+          "original_speedup": 0.498684
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.219414085,
+          "custom_ms": 0.465049595,
+          "speedup": 0.471808,
+          "original_ms": 0.208578572,
+          "original_speedup": 0.448508
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.207422078,
+          "custom_ms": 0.437664956,
+          "speedup": 0.473929,
+          "original_ms": 0.213293761,
+          "original_speedup": 0.487345
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.219243199,
+          "custom_ms": 0.468491822,
+          "speedup": 0.467977,
+          "original_ms": 0.210811526,
+          "original_speedup": 0.449979
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "fp16",
+      "variant": 4,
+      "cluster_m": 2,
+      "tile_m": 128,
+      "tile_n": 160,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.586877,
+      "min_speedup": 0.575421,
+      "median_original_speedup": 0.615526,
+      "min_original_speedup": 0.5935,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.213727355,
+          "custom_ms": 0.364177585,
+          "speedup": 0.586877,
+          "original_ms": 0.224160627,
+          "original_speedup": 0.615526
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.214699522,
+          "custom_ms": 0.351506591,
+          "speedup": 0.610798,
+          "original_ms": 0.221910402,
+          "original_speedup": 0.631312
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.217414722,
+          "custom_ms": 0.37783584,
+          "speedup": 0.575421,
+          "original_ms": 0.229415029,
+          "original_speedup": 0.607182
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.215304971,
+          "custom_ms": 0.350871056,
+          "speedup": 0.61363,
+          "original_ms": 0.223746568,
+          "original_speedup": 0.637689
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.224190086,
+          "custom_ms": 0.38384223,
+          "speedup": 0.584068,
+          "original_ms": 0.227810562,
+          "original_speedup": 0.5935
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "fp16",
+      "variant": 5,
+      "cluster_m": 1,
+      "tile_m": 128,
+      "tile_n": 192,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.88512,
+      "min_speedup": 0.880265,
+      "median_original_speedup": 0.951024,
+      "min_original_speedup": 0.927038,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.216358721,
+          "custom_ms": 0.245788157,
+          "speedup": 0.880265,
+          "original_ms": 0.235086083,
+          "original_speedup": 0.956458
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.224535674,
+          "custom_ms": 0.246566087,
+          "speedup": 0.910651,
+          "original_ms": 0.234490246,
+          "original_speedup": 0.951024
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.231700152,
+          "custom_ms": 0.261857927,
+          "speedup": 0.884832,
+          "original_ms": 0.243181765,
+          "original_speedup": 0.928678
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.220934391,
+          "custom_ms": 0.24321568,
+          "speedup": 0.908389,
+          "original_ms": 0.233862728,
+          "original_speedup": 0.961545
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.232505918,
+          "custom_ms": 0.262682885,
+          "speedup": 0.88512,
+          "original_ms": 0.243517116,
+          "original_speedup": 0.927038
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "fp16",
+      "variant": 6,
+      "cluster_m": 2,
+      "tile_m": 128,
+      "tile_n": 192,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.825839,
+      "min_speedup": 0.789282,
+      "median_original_speedup": 0.858081,
+      "min_original_speedup": 0.834467,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.229909435,
+          "custom_ms": 0.277415663,
+          "speedup": 0.828754,
+          "original_ms": 0.231494084,
+          "original_speedup": 0.834467
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.217622399,
+          "custom_ms": 0.265186876,
+          "speedup": 0.820638,
+          "original_ms": 0.228829116,
+          "original_speedup": 0.862898
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.227556154,
+          "custom_ms": 0.288307846,
+          "speedup": 0.789282,
+          "original_ms": 0.244168639,
+          "original_speedup": 0.846902
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.21666944,
+          "custom_ms": 0.262362868,
+          "speedup": 0.825839,
+          "original_ms": 0.232551038,
+          "original_speedup": 0.886372
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.22415264,
+          "custom_ms": 0.271377265,
+          "speedup": 0.825982,
+          "original_ms": 0.23286368,
+          "original_speedup": 0.858081
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "bf16",
+      "variant": 1,
+      "cluster_m": 1,
+      "tile_m": 128,
+      "tile_n": 128,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.994814,
+      "min_speedup": 0.989332,
+      "median_original_speedup": 0.973706,
+      "min_original_speedup": 0.957187,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.69120574,
+          "custom_ms": 1.684743047,
+          "speedup": 1.003836,
+          "original_ms": 1.612614751,
+          "original_speedup": 0.957187
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.685920238,
+          "custom_ms": 1.68254149,
+          "speedup": 1.002008,
+          "original_ms": 1.638301373,
+          "original_speedup": 0.973706
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.679002285,
+          "custom_ms": 1.697107792,
+          "speedup": 0.989332,
+          "original_ms": 1.629657626,
+          "original_speedup": 0.960256
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.675431728,
+          "custom_ms": 1.688544869,
+          "speedup": 0.992234,
+          "original_ms": 1.645721912,
+          "original_speedup": 0.974639
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.669268131,
+          "custom_ms": 1.677969694,
+          "speedup": 0.994814,
+          "original_ms": 1.652696371,
+          "original_speedup": 0.984938
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "bf16",
+      "variant": 2,
+      "cluster_m": 2,
+      "tile_m": 128,
+      "tile_n": 128,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.813115,
+      "min_speedup": 0.808145,
+      "median_original_speedup": 0.825476,
+      "min_original_speedup": 0.810594,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.600111723,
+          "custom_ms": 1.979980469,
+          "speedup": 0.808145,
+          "original_ms": 1.664185643,
+          "original_speedup": 0.840506
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.650031447,
+          "custom_ms": 1.967970014,
+          "speedup": 0.838443,
+          "original_ms": 1.624705315,
+          "original_speedup": 0.825574
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.615109086,
+          "custom_ms": 1.986323833,
+          "speedup": 0.813115,
+          "original_ms": 1.638382435,
+          "original_speedup": 0.824831
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.617246151,
+          "custom_ms": 1.975000262,
+          "speedup": 0.818859,
+          "original_ms": 1.630314589,
+          "original_speedup": 0.825476
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.62577498,
+          "custom_ms": 2.007833242,
+          "speedup": 0.809716,
+          "original_ms": 1.627536654,
+          "original_speedup": 0.810594
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "bf16",
+      "variant": 3,
+      "cluster_m": 1,
+      "tile_m": 128,
+      "tile_n": 160,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.620603,
+      "min_speedup": 0.601166,
+      "median_original_speedup": 0.627942,
+      "min_original_speedup": 0.620323,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.61760664,
+          "custom_ms": 2.689281225,
+          "speedup": 0.601501,
+          "original_ms": 1.688711643,
+          "original_speedup": 0.627942
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.675069094,
+          "custom_ms": 2.699098587,
+          "speedup": 0.620603,
+          "original_ms": 1.674311638,
+          "original_speedup": 0.620323
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.609289885,
+          "custom_ms": 2.676947832,
+          "speedup": 0.601166,
+          "original_ms": 1.721331477,
+          "original_speedup": 0.64302
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.669678688,
+          "custom_ms": 2.683064938,
+          "speedup": 0.622303,
+          "original_ms": 1.677432656,
+          "original_speedup": 0.625193
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.671682,
+          "custom_ms": 2.615676165,
+          "speedup": 0.639101,
+          "original_ms": 1.703980088,
+          "original_speedup": 0.651449
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "bf16",
+      "variant": 4,
+      "cluster_m": 2,
+      "tile_m": 128,
+      "tile_n": 160,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.728788,
+      "min_speedup": 0.71578,
+      "median_original_speedup": 0.719116,
+      "min_original_speedup": 0.714855,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.6385324,
+          "custom_ms": 2.24829793,
+          "speedup": 0.728788,
+          "original_ms": 1.61678648,
+          "original_speedup": 0.719116
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.6184659,
+          "custom_ms": 2.261121273,
+          "speedup": 0.71578,
+          "original_ms": 1.616373777,
+          "original_speedup": 0.714855
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.639235854,
+          "custom_ms": 2.254547358,
+          "speedup": 0.72708,
+          "original_ms": 1.614060163,
+          "original_speedup": 0.715913
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.654132485,
+          "custom_ms": 2.236557484,
+          "speedup": 0.739589,
+          "original_ms": 1.642566681,
+          "original_speedup": 0.734417
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.655112028,
+          "custom_ms": 2.245152235,
+          "speedup": 0.737194,
+          "original_ms": 1.65018785,
+          "original_speedup": 0.735
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "bf16",
+      "variant": 5,
+      "cluster_m": 1,
+      "tile_m": 128,
+      "tile_n": 192,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.826586,
+      "min_speedup": 0.817654,
+      "median_original_speedup": 0.843536,
+      "min_original_speedup": 0.820537,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.62269032,
+          "custom_ms": 1.982812524,
+          "speedup": 0.818378,
+          "original_ms": 1.626970768,
+          "original_speedup": 0.820537
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.640717149,
+          "custom_ms": 1.984932542,
+          "speedup": 0.826586,
+          "original_ms": 1.660368323,
+          "original_speedup": 0.836486
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.647006989,
+          "custom_ms": 1.976824641,
+          "speedup": 0.833158,
+          "original_ms": 1.667522311,
+          "original_speedup": 0.843536
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.613149405,
+          "custom_ms": 1.972900867,
+          "speedup": 0.817654,
+          "original_ms": 1.679618478,
+          "original_speedup": 0.851345
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.658055425,
+          "custom_ms": 1.95682025,
+          "speedup": 0.847321,
+          "original_ms": 1.666313887,
+          "original_speedup": 0.851542
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "bf16",
+      "variant": 6,
+      "cluster_m": 2,
+      "tile_m": 128,
+      "tile_n": 192,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.804346,
+      "min_speedup": 0.789276,
+      "median_original_speedup": 0.78907,
+      "min_original_speedup": 0.777254,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.644415379,
+          "custom_ms": 2.083446741,
+          "speedup": 0.789276,
+          "original_ms": 1.643985629,
+          "original_speedup": 0.78907
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.664773107,
+          "custom_ms": 2.059897423,
+          "speedup": 0.808183,
+          "original_ms": 1.634565711,
+          "original_speedup": 0.793518
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.672118425,
+          "custom_ms": 2.078855038,
+          "speedup": 0.804346,
+          "original_ms": 1.615798593,
+          "original_speedup": 0.777254
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.659020543,
+          "custom_ms": 2.077421427,
+          "speedup": 0.798596,
+          "original_ms": 1.619621754,
+          "original_speedup": 0.779631
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.680574298,
+          "custom_ms": 2.053672075,
+          "speedup": 0.818327,
+          "original_ms": 1.6262151,
+          "original_speedup": 0.791857
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "fp16",
+      "variant": 1,
+      "cluster_m": 1,
+      "tile_m": 128,
+      "tile_n": 128,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.941453,
+      "min_speedup": 0.912943,
+      "median_original_speedup": 0.963817,
+      "min_original_speedup": 0.909901,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.711836815,
+          "custom_ms": 1.740085721,
+          "speedup": 0.983766,
+          "original_ms": 1.790030003,
+          "original_speedup": 1.028702
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.782653451,
+          "custom_ms": 1.826703906,
+          "speedup": 0.975885,
+          "original_ms": 1.739768624,
+          "original_speedup": 0.952409
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.671399951,
+          "custom_ms": 1.830781698,
+          "speedup": 0.912943,
+          "original_ms": 1.764537692,
+          "original_speedup": 0.963817
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.749984264,
+          "custom_ms": 1.908655405,
+          "speedup": 0.916868,
+          "original_ms": 1.736687064,
+          "original_speedup": 0.909901
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.678301334,
+          "custom_ms": 1.78267169,
+          "speedup": 0.941453,
+          "original_ms": 1.762921333,
+          "original_speedup": 0.988921
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "fp16",
+      "variant": 2,
+      "cluster_m": 2,
+      "tile_m": 128,
+      "tile_n": 128,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.864726,
+      "min_speedup": 0.824207,
+      "median_original_speedup": 0.834,
+      "min_original_speedup": 0.806199,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.767981768,
+          "custom_ms": 2.011053801,
+          "speedup": 0.879132,
+          "original_ms": 1.741056919,
+          "original_speedup": 0.865744
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.751770139,
+          "custom_ms": 1.991977215,
+          "speedup": 0.879413,
+          "original_ms": 1.654181838,
+          "original_speedup": 0.830422
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.739662766,
+          "custom_ms": 2.102016926,
+          "speedup": 0.827616,
+          "original_ms": 1.753081679,
+          "original_speedup": 0.834
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.749692798,
+          "custom_ms": 2.023407936,
+          "speedup": 0.864726,
+          "original_ms": 1.631270409,
+          "original_speedup": 0.806199
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.714795589,
+          "custom_ms": 2.08054018,
+          "speedup": 0.824207,
+          "original_ms": 1.752878666,
+          "original_speedup": 0.842511
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "fp16",
+      "variant": 3,
+      "cluster_m": 1,
+      "tile_m": 128,
+      "tile_n": 160,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.604383,
+      "min_speedup": 0.584972,
+      "median_original_speedup": 0.620981,
+      "min_original_speedup": 0.614412,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.656768084,
+          "custom_ms": 2.832219124,
+          "speedup": 0.584972,
+          "original_ms": 1.758755207,
+          "original_speedup": 0.620981
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.74066782,
+          "custom_ms": 2.740732193,
+          "speedup": 0.63511,
+          "original_ms": 1.803973436,
+          "original_speedup": 0.658209
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.69584322,
+          "custom_ms": 2.838422537,
+          "speedup": 0.59746,
+          "original_ms": 1.760325193,
+          "original_speedup": 0.620177
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.715086102,
+          "custom_ms": 2.772503376,
+          "speedup": 0.618606,
+          "original_ms": 1.768959641,
+          "original_speedup": 0.638037
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.731835127,
+          "custom_ms": 2.865460396,
+          "speedup": 0.604383,
+          "original_ms": 1.760573983,
+          "original_speedup": 0.614412
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "fp16",
+      "variant": 4,
+      "cluster_m": 2,
+      "tile_m": 128,
+      "tile_n": 160,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.734729,
+      "min_speedup": 0.71033,
+      "median_original_speedup": 0.757692,
+      "min_original_speedup": 0.71414,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.721784353,
+          "custom_ms": 2.288427114,
+          "speedup": 0.752388,
+          "original_ms": 1.744485497,
+          "original_speedup": 0.762308
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.757224917,
+          "custom_ms": 2.340111971,
+          "speedup": 0.750915,
+          "original_ms": 1.691686153,
+          "original_speedup": 0.722908
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.67620194,
+          "custom_ms": 2.359750271,
+          "speedup": 0.71033,
+          "original_ms": 1.685192585,
+          "original_speedup": 0.71414
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.70451808,
+          "custom_ms": 2.319926977,
+          "speedup": 0.734729,
+          "original_ms": 1.771168113,
+          "original_speedup": 0.763459
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.700341821,
+          "custom_ms": 2.317362547,
+          "speedup": 0.73374,
+          "original_ms": 1.755846739,
+          "original_speedup": 0.757692
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "fp16",
+      "variant": 5,
+      "cluster_m": 1,
+      "tile_m": 128,
+      "tile_n": 192,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.835015,
+      "min_speedup": 0.807823,
+      "median_original_speedup": 0.85128,
+      "min_original_speedup": 0.828509,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.716700435,
+          "custom_ms": 2.050406694,
+          "speedup": 0.837249,
+          "original_ms": 1.709211826,
+          "original_speedup": 0.833596
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.714691758,
+          "custom_ms": 2.122606993,
+          "speedup": 0.807823,
+          "original_ms": 1.758599758,
+          "original_speedup": 0.828509
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.717496634,
+          "custom_ms": 2.04392767,
+          "speedup": 0.840292,
+          "original_ms": 1.742910743,
+          "original_speedup": 0.852726
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.729332685,
+          "custom_ms": 2.07102108,
+          "speedup": 0.835015,
+          "original_ms": 1.814838052,
+          "original_speedup": 0.876301
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.692504287,
+          "custom_ms": 2.072935581,
+          "speedup": 0.816477,
+          "original_ms": 1.764648318,
+          "original_speedup": 0.85128
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "fp16",
+      "variant": 6,
+      "cluster_m": 2,
+      "tile_m": 128,
+      "tile_n": 192,
+      "original_reference": "existing cooperative61/70 matching cluster, not the same tile width",
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.832317,
+      "min_speedup": 0.793195,
+      "median_original_speedup": 0.783114,
+      "min_original_speedup": 0.750439,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.786156178,
+          "custom_ms": 2.146005392,
+          "speedup": 0.832317,
+          "original_ms": 1.680567026,
+          "original_speedup": 0.783114
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.796945333,
+          "custom_ms": 2.157274723,
+          "speedup": 0.83297,
+          "original_ms": 1.687325478,
+          "original_speedup": 0.782156
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.762097955,
+          "custom_ms": 2.110705376,
+          "speedup": 0.834838,
+          "original_ms": 1.715414166,
+          "original_speedup": 0.812721
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.755110741,
+          "custom_ms": 2.212711573,
+          "speedup": 0.793195,
+          "original_ms": 1.66050458,
+          "original_speedup": 0.750439
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.699627876,
+          "custom_ms": 2.125473738,
+          "speedup": 0.799647,
+          "original_ms": 1.722641945,
+          "original_speedup": 0.810474
+        }
+      ]
+    }
+  ]
+}

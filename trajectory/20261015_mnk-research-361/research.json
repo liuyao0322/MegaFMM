@@ -1,0 +1,42 @@
+{
+  "purpose": "Nine-warp two-block cluster feasibility before production iteration361",
+  "production_source_modified": false,
+  "dtype": "fp16",
+  "shape": [
+    257,
+    520,
+    1032
+  ],
+  "tile": [
+    128,
+    256,
+    64
+  ],
+  "stages": 4,
+  "threads": 288,
+  "registers": 154,
+  "local_bytes": 0,
+  "shared_bytes": 231424,
+  "variants": [
+    {
+      "cluster": [
+        2,
+        1,
+        1
+      ],
+      "compile_pass": true,
+      "exact_all_ones_and_padding_pass": true
+    },
+    {
+      "cluster": [
+        1,
+        2,
+        1
+      ],
+      "compile_pass": true,
+      "exact_all_ones_and_padding_pass": true
+    }
+  ],
+  "performance_acceptance": false,
+  "required_next": "Production candidate integration followed by full formal benchmark/log/commit, all-candidate tests and sanitizers; full three-sweep acceptance if winner."
+}

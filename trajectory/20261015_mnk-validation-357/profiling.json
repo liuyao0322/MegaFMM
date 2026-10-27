@@ -1,0 +1,27 @@
+{
+  "diagnostic_inputs": "NCU zero-input; fixed pairs seeded fresh random two rotating sets. Neither substitutes FP64 acceptance.",
+  "4096BF16_id82": {
+    "ncu_us": 216.512,
+    "tensor_elapsed_percent": 81.332717,
+    "l2_hit_percent": 72.286263,
+    "registers": 168,
+    "eligible_warps_per_scheduler": 0.17403,
+    "workspace_bytes": 32507904,
+    "random_pairs": 15,
+    "calls_per_pair_route": 100,
+    "pair_median_speedup": 0.942093,
+    "pair_min_speedup": 0.928477
+  },
+  "8192FP16_id81": {
+    "ncu_ms": 1.479872,
+    "tensor_elapsed_percent": 94.416672,
+    "l2_hit_percent": 75.133708,
+    "registers": 168,
+    "eligible_warps_per_scheduler": 0.166543,
+    "random_pairs": 15,
+    "calls_per_pair_route": 100,
+    "pair_median_speedup": 1.00548,
+    "pair_min_speedup": 0.984154
+  },
+  "decision": "No stable newwinner. Test Stream-K swizzle/raster to address lower L2 reuse, with original complete-call gates unchanged."
+}

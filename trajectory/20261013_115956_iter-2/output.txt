@@ -1,0 +1,99 @@
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 10%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 20%] Building CUDA object CMakeFiles/megafmm.dir/solution/megakernel_hopper.cu.o
+ptxas info    : 2 bytes gmem
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m3IN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m3IN7cutlass6half_tEEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 248 registers
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass6half_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 150 registers
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m3IN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m3IN7cutlass10bfloat16_tEEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 248 registers
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass10bfloat16_tELi32EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 150 registers
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass6half_tELi64EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass6half_tELi64EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 254 registers
+ptxas info    : Compiling entry function '_ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass10bfloat16_tELi64EEEvNS_7ProblemEPKT_S7_PKfPf' for 'sm_90a'
+ptxas info    : Function properties for _ZN7megafmm53_GLOBAL__N__0567a63e_20_megakernel_hopper_cu_01e0465d11winograd_m1IN7cutlass10bfloat16_tELi64EEEvNS_7ProblemEPKT_S7_PKfPf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 254 registers
+[ 30%] Linking CXX static library libmegafmm.a
+[ 60%] Built target megafmm
+gmake[2]: Warning: File 'CMakeFiles/test_correctness.dir/compiler_depend.make' has modification time 0.0037 s in the future
+gmake[2]: Warning: File 'CMakeFiles/megafmm_bench.dir/compiler_depend.make' has modification time 0.0031 s in the future
+[ 80%] Linking CXX executable megafmm_bench
+[ 80%] Building CUDA object CMakeFiles/test_correctness.dir/tests/test_correctness.cu.o
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+[ 90%] Built target megafmm_bench
+/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(64): warning #177-D: variable "ac" was declared but never referenced
+    int ar=p.trans_a ? p.k:p.m, ac=p.trans_a ? p.m:p.k;
+                                ^
+          detected during instantiation of "void <unnamed>::structural_suite<T>(megafmm::DType) [with T=__nv_bfloat16]" at line 306
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/tests/test_correctness.cu(65): warning #177-D: variable "bc" was declared but never referenced
+    int br=p.trans_b ? p.n:p.k, bc=p.trans_b ? p.k:p.n;
+                                ^
+          detected during instantiation of "void <unnamed>::structural_suite<T>(megafmm::DType) [with T=__nv_bfloat16]" at line 306
+
+[100%] Linking CXX executable test_correctness
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+[100%] Built target test_correctness
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+CHECK 4096,4096,4096 bf16 trial=0 dense_eF=4.02334e-06 solution_eF=0.00602272 gate=0.00101207 pass=0
+TIME shape=4096,4096,4096 dtype=bf16 group=0 case=dense event_ms=0.194406 wall_ms=0.195354
+TIME shape=4096,4096,4096 dtype=bf16 group=0 case=solution event_ms=3.05289 wall_ms=3.05369
+TIME shape=4096,4096,4096 dtype=bf16 group=1 case=solution event_ms=3.07395 wall_ms=3.07474
+TIME shape=4096,4096,4096 dtype=bf16 group=1 case=dense event_ms=0.194893 wall_ms=0.195707
+TIME shape=4096,4096,4096 dtype=bf16 group=2 case=solution event_ms=3.071 wall_ms=3.07207
+TIME shape=4096,4096,4096 dtype=bf16 group=2 case=dense event_ms=0.199053 wall_ms=0.199979
+TIME shape=4096,4096,4096 dtype=bf16 group=3 case=dense event_ms=0.194845 wall_ms=0.195642
+TIME shape=4096,4096,4096 dtype=bf16 group=3 case=solution event_ms=3.07416 wall_ms=3.07497
+TIME shape=4096,4096,4096 dtype=bf16 group=4 case=solution event_ms=3.07979 wall_ms=3.0806
+TIME shape=4096,4096,4096 dtype=bf16 group=4 case=dense event_ms=0.195021 wall_ms=0.195834
+CHECK 4096,4096,4096 fp16 trial=0 dense_eF=4.87534e-06 solution_eF=0.000753133 gate=0.000114626 pass=0
+TIME shape=4096,4096,4096 dtype=fp16 group=0 case=dense event_ms=0.205491 wall_ms=0.206453
+TIME shape=4096,4096,4096 dtype=fp16 group=0 case=solution event_ms=3.01331 wall_ms=3.01414
+TIME shape=4096,4096,4096 dtype=fp16 group=1 case=solution event_ms=3.01212 wall_ms=3.01295
+TIME shape=4096,4096,4096 dtype=fp16 group=1 case=dense event_ms=0.203462 wall_ms=0.204258
+TIME shape=4096,4096,4096 dtype=fp16 group=2 case=solution event_ms=3.01481 wall_ms=3.01562
+TIME shape=4096,4096,4096 dtype=fp16 group=2 case=dense event_ms=0.203427 wall_ms=0.20422
+TIME shape=4096,4096,4096 dtype=fp16 group=3 case=dense event_ms=0.203338 wall_ms=0.204144
+TIME shape=4096,4096,4096 dtype=fp16 group=3 case=solution event_ms=3.01424 wall_ms=3.01505
+TIME shape=4096,4096,4096 dtype=fp16 group=4 case=solution event_ms=3.01462 wall_ms=3.01559
+TIME shape=4096,4096,4096 dtype=fp16 group=4 case=dense event_ms=0.205693 wall_ms=0.20656
+CHECK 8192,8192,8192 bf16 trial=0 dense_eF=8.54807e-06 solution_eF=0.00602247 gate=0.00102564 pass=0
+TIME shape=8192,8192,8192 dtype=bf16 group=0 case=solution event_ms=24.5623 wall_ms=24.5636
+TIME shape=8192,8192,8192 dtype=bf16 group=0 case=dense event_ms=1.40994 wall_ms=1.41121
+TIME shape=8192,8192,8192 dtype=bf16 group=1 case=solution event_ms=24.5682 wall_ms=24.5694
+TIME shape=8192,8192,8192 dtype=bf16 group=1 case=dense event_ms=1.40644 wall_ms=1.40735
+TIME shape=8192,8192,8192 dtype=bf16 group=2 case=dense event_ms=1.46379 wall_ms=1.46463
+TIME shape=8192,8192,8192 dtype=bf16 group=2 case=solution event_ms=25.0302 wall_ms=25.031
+TIME shape=8192,8192,8192 dtype=bf16 group=3 case=solution event_ms=24.3434 wall_ms=24.3442
+TIME shape=8192,8192,8192 dtype=bf16 group=3 case=dense event_ms=1.40735 wall_ms=1.4082
+TIME shape=8192,8192,8192 dtype=bf16 group=4 case=solution event_ms=24.5645 wall_ms=24.5653
+TIME shape=8192,8192,8192 dtype=bf16 group=4 case=dense event_ms=1.40674 wall_ms=1.40761
+CHECK 8192,8192,8192 fp16 trial=0 dense_eF=9.68663e-06 solution_eF=0.000753411 gate=0.00012906 pass=0
+TIME shape=8192,8192,8192 dtype=fp16 group=0 case=solution event_ms=24.5405 wall_ms=24.5417
+TIME shape=8192,8192,8192 dtype=fp16 group=0 case=dense event_ms=1.47767 wall_ms=1.47853
+TIME shape=8192,8192,8192 dtype=fp16 group=1 case=solution event_ms=24.8771 wall_ms=24.8784
+TIME shape=8192,8192,8192 dtype=fp16 group=1 case=dense event_ms=1.47284 wall_ms=1.47413
+TIME shape=8192,8192,8192 dtype=fp16 group=2 case=dense event_ms=1.50572 wall_ms=1.50653
+TIME shape=8192,8192,8192 dtype=fp16 group=2 case=solution event_ms=25.1327 wall_ms=25.1335
+TIME shape=8192,8192,8192 dtype=fp16 group=3 case=solution event_ms=24.4515 wall_ms=24.4524
+TIME shape=8192,8192,8192 dtype=fp16 group=3 case=dense event_ms=1.47206 wall_ms=1.4729
+TIME shape=8192,8192,8192 dtype=fp16 group=4 case=solution event_ms=24.8104 wall_ms=24.8112
+TIME shape=8192,8192,8192 dtype=fp16 group=4 case=dense event_ms=1.47238 wall_ms=1.47325
+srun: error: g08: task 0: Exited with exit code 2

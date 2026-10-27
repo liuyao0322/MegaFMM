@@ -1,0 +1,31 @@
+{
+  "status": "366 validation/profile complete; proceed bounded resource/correctness preflight only",
+  "history": [
+    "364 K128 two stages loses all unresolved sizes, Tensor60%, high long-scoreboard pressure",
+    "365 K32 eight stages recovers Tensor92.46% but no added stable wins; BF rectangular paired losses",
+    "366 swapped orientation20/20 original FP64pass, all12 unresolved combinations fallback; best8192 BF/FP1.599/1.708ms vsLt1.426/1.615; no new stable win"
+  ],
+  "proposed_distinct_axis": "Consumer WGMMA outstanding-group window, with matching prologue/main loop/tail buffer releases; not shared-buffer count alone",
+  "implementation": "Research-only InflightMainloop<Base,3> inherits CUTLASS3.5.1 producer/arguments/layouts; licensed copy overrides mma and mma_tail together. K32 auto remains8shared stages.",
+  "safety_preflight": [
+    "actual compiled resources/occupancy before launch",
+    "257x520 original-output strided/padded, K1032 and K8 for short prologue",
+    "two fresh non-symmetric input pairs compared against originalAB FP64, alpha0.5",
+    "timeout45s per variant; no performance certification from preflight"
+  ],
+  "official_ptx": "https://docs.nvidia.com/cuda/parallel-thread-execution/#asynchronous-warpgroup-level-matrix-instructions-wgmma-wait-group",
+  "ptx_evidence": "wait_group N permits only N or fewer newest committed groups pending; accumulator/shared input must not be read/reused before corresponding completion. All warpgroup lanes must execute aligned instructions uniformly.",
+  "source_authority": "third_party/cutlass/include/cutlass/gemm/collective/sm90_mma_tma_gmma_ss_warpspecialized.hpp mma() and mma_tail(); K_PIPE_MMAS hardcoded1 in baseline.",
+  "limits": "No gate relaxation, no physical-floor claim, no production367 edits yet.",
+  "inflight_rationale": "Baseline K32 commits two K16 MMA steps per buffer and keeps one newest group pending at release. Proposed wait3 allows a larger outstanding computation window while keeping eight shared stages; producer code and original-input arithmetic unchanged. This is a hypothesis, not a measured gain.",
+  "latest_profile": {
+    "candidate": 102,
+    "tensor_elapsed_pct": 92.399962,
+    "l2_hit_pct": 79.041888,
+    "eligible_warps": 0.143907,
+    "warp_instructions": 141786503,
+    "replay_ms": 1.52464,
+    "diagnostic_only": true
+  },
+  "decision": "K128 lost overlap; K32 recovered overlap but not stable performance; swapping orientation cut instruction work without stable wins. Test the separately hardcoded consumer outstanding-window parameter while keeping producer, layouts, original arithmetic and precision gate unchanged. Do not call92% Tensor activity a FLOP ceiling."
+}

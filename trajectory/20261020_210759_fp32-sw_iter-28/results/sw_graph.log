@@ -1,0 +1,56 @@
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1,1,1 dtype=fp32 case=dense config=dense:id=13;tile=0;split_k=1;reduction=0;swizzle=0;stages=0;custom=10;inner=0;cluster=0;bound_candidate=5/8;tuned_candidate=5;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.003325;align0=4;align1=4;align2=4;align3=4
+TUNE shape=1,1,1 dtype=fp32 case=solution config=sw_pipeline;tile=16x16;bk=16;threads=256;leaf_terms=7;levels=1;padding=logical_even;input=fp32;transforms=fp32;leaf_math=fp32_simt;accum=fp32;workspace=0;residual_correction=off;load=synchronous
+CHECK 1,1,1 fp32 trial=0 dense_eF=1.27424e-10 solution_eF=1.27424e-10 gate=1.00038e-06 pass=1
+CHECK 1,1,1 fp32 trial=1 dense_eF=9.56664e-09 solution_eF=9.56664e-09 gate=1.0287e-06 pass=1
+CHECK 1,1,1 fp32 trial=2 dense_eF=4.02674e-08 solution_eF=4.02674e-08 gate=1.1208e-06 pass=1
+TIME shape=1,1,1 dtype=fp32 group=0 case=solution event_ms=0.0037392 wall_ms=0.0041877
+TIME shape=1,1,1 dtype=fp32 group=0 case=dense event_ms=0.0026192 wall_ms=0.0030038
+TIME shape=1,1,1 dtype=fp32 group=1 case=solution event_ms=0.003744 wall_ms=0.00414295
+TIME shape=1,1,1 dtype=fp32 group=1 case=dense event_ms=0.002616 wall_ms=0.00300825
+TIME shape=1,1,1 dtype=fp32 group=2 case=solution event_ms=0.0039424 wall_ms=0.00436385
+TIME shape=1,1,1 dtype=fp32 group=2 case=dense event_ms=0.0026112 wall_ms=0.002986
+TUNE shape=33,65,129 dtype=fp32 case=dense config=dense:id=55;tile=11;split_k=1;reduction=0;swizzle=0;stages=31;custom=0;inner=0;cluster=0;bound_candidate=2/7;tuned_candidate=2;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.006534;align0=4;align1=4;align2=4;align3=4
+TUNE shape=33,65,129 dtype=fp32 case=solution config=sw_pipeline;tile=16x16;bk=16;threads=256;leaf_terms=7;levels=1;padding=logical_even;input=fp32;transforms=fp32;leaf_math=fp32_simt;accum=fp32;workspace=0;residual_correction=off;load=synchronous
+CHECK 33,65,129 fp32 trial=0 dense_eF=2.12287e-07 solution_eF=3.93218e-07 gate=1.63686e-06 pass=1
+CHECK 33,65,129 fp32 trial=1 dense_eF=2.06239e-07 solution_eF=4.04084e-07 gate=1.61872e-06 pass=1
+CHECK 33,65,129 fp32 trial=2 dense_eF=1.96992e-07 solution_eF=3.60166e-07 gate=1.59098e-06 pass=1
+TIME shape=33,65,129 dtype=fp32 group=0 case=solution event_ms=0.009848 wall_ms=0.0102605
+TIME shape=33,65,129 dtype=fp32 group=0 case=dense event_ms=0.0057184 wall_ms=0.0061626
+TIME shape=33,65,129 dtype=fp32 group=1 case=solution event_ms=0.0098336 wall_ms=0.010254
+TIME shape=33,65,129 dtype=fp32 group=1 case=dense event_ms=0.0057184 wall_ms=0.00615465
+TIME shape=33,65,129 dtype=fp32 group=2 case=solution event_ms=0.0098448 wall_ms=0.0102647
+TIME shape=33,65,129 dtype=fp32 group=2 case=dense event_ms=0.0056976 wall_ms=0.0061177
+TUNE shape=512,512,512 dtype=fp32 case=dense config=dense:id=20;tile=18;split_k=4;reduction=2;swizzle=0;stages=28;custom=0;inner=0;cluster=0;bound_candidate=6/8;tuned_candidate=6;bound_workspace=4194304;tuned=1;tune=4w/3x10median;tuning_ms=0.015226;align0=4;align1=4;align2=4;align3=4
+TUNE shape=512,512,512 dtype=fp32 case=solution config=sw_pipeline;tile=16x16;bk=16;threads=256;leaf_terms=7;levels=1;padding=logical_even;input=fp32;transforms=fp32;leaf_math=fp32_simt;accum=fp32;workspace=0;residual_correction=off;load=tma;raw_stages=2;issuer=thread0
+CHECK 512,512,512 fp32 trial=0 dense_eF=2.07493e-07 solution_eF=7.60069e-07 gate=1.62248e-06 pass=1
+CHECK 512,512,512 fp32 trial=1 dense_eF=2.07139e-07 solution_eF=7.67478e-07 gate=1.62142e-06 pass=1
+CHECK 512,512,512 fp32 trial=2 dense_eF=2.06748e-07 solution_eF=7.61325e-07 gate=1.62024e-06 pass=1
+TIME shape=512,512,512 dtype=fp32 group=0 case=solution event_ms=0.0307408 wall_ms=0.0311468
+TIME shape=512,512,512 dtype=fp32 group=0 case=dense event_ms=0.0139232 wall_ms=0.0143476
+TIME shape=512,512,512 dtype=fp32 group=1 case=dense event_ms=0.0138544 wall_ms=0.0142288
+TIME shape=512,512,512 dtype=fp32 group=1 case=solution event_ms=0.0307344 wall_ms=0.0311477
+TIME shape=512,512,512 dtype=fp32 group=2 case=solution event_ms=0.0307312 wall_ms=0.0311487
+TIME shape=512,512,512 dtype=fp32 group=2 case=dense event_ms=0.0139024 wall_ms=0.0143191
+TUNE shape=1024,1024,1024 dtype=fp32 case=dense config=dense:id=55;tile=17;split_k=1;reduction=0;swizzle=0;stages=31;custom=0;inner=0;cluster=0;bound_candidate=0/8;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.056845;align0=4;align1=4;align2=4;align3=4
+TUNE shape=1024,1024,1024 dtype=fp32 case=solution config=sw_pipeline;tile=16x16;bk=16;threads=256;leaf_terms=7;levels=1;padding=logical_even;input=fp32;transforms=fp32;leaf_math=fp32_simt;accum=fp32;workspace=0;residual_correction=off;load=tma;raw_stages=2;issuer=thread0
+CHECK 1024,1024,1024 fp32 trial=0 dense_eF=5.73266e-07 solution_eF=1.07565e-06 gate=2.7198e-06 pass=1
+CHECK 1024,1024,1024 fp32 trial=1 dense_eF=5.7296e-07 solution_eF=1.07488e-06 gate=2.71888e-06 pass=1
+CHECK 1024,1024,1024 fp32 trial=2 dense_eF=5.72212e-07 solution_eF=1.07619e-06 gate=2.71664e-06 pass=1
+TIME shape=1024,1024,1024 dtype=fp32 group=0 case=solution event_ms=0.213832 wall_ms=0.214237
+TIME shape=1024,1024,1024 dtype=fp32 group=0 case=dense event_ms=0.056088 wall_ms=0.0565871
+TIME shape=1024,1024,1024 dtype=fp32 group=1 case=dense event_ms=0.0560176 wall_ms=0.0564365
+TIME shape=1024,1024,1024 dtype=fp32 group=1 case=solution event_ms=0.213829 wall_ms=0.214251
+TIME shape=1024,1024,1024 dtype=fp32 group=2 case=solution event_ms=0.21389 wall_ms=0.214307
+TIME shape=1024,1024,1024 dtype=fp32 group=2 case=dense event_ms=0.05608 wall_ms=0.0564978
+TUNE shape=1025,1537,769 dtype=fp32 case=dense config=dense:id=55;tile=18;split_k=1;reduction=0;swizzle=0;stages=31;custom=0;inner=0;cluster=0;bound_candidate=0/8;tuned_candidate=0;bound_workspace=0;tuned=1;tune=4w/3x10median;tuning_ms=0.073002;align0=4;align1=4;align2=4;align3=4
+TUNE shape=1025,1537,769 dtype=fp32 case=solution config=sw_pipeline;tile=16x16;bk=16;threads=256;leaf_terms=7;levels=1;padding=logical_even;input=fp32;transforms=fp32;leaf_math=fp32_simt;accum=fp32;workspace=0;residual_correction=off;load=synchronous
+CHECK 1025,1537,769 fp32 trial=0 dense_eF=4.96803e-07 solution_eF=9.33324e-07 gate=2.49041e-06 pass=1
+CHECK 1025,1537,769 fp32 trial=1 dense_eF=4.96569e-07 solution_eF=9.30259e-07 gate=2.48971e-06 pass=1
+CHECK 1025,1537,769 fp32 trial=2 dense_eF=4.96835e-07 solution_eF=9.32007e-07 gate=2.4905e-06 pass=1
+TIME shape=1025,1537,769 dtype=fp32 group=0 case=dense event_ms=0.0725152 wall_ms=0.07295
+TIME shape=1025,1537,769 dtype=fp32 group=0 case=solution event_ms=0.285237 wall_ms=0.285704
+TIME shape=1025,1537,769 dtype=fp32 group=1 case=dense event_ms=0.0722608 wall_ms=0.0726941
+TIME shape=1025,1537,769 dtype=fp32 group=1 case=solution event_ms=0.285266 wall_ms=0.285693
+TIME shape=1025,1537,769 dtype=fp32 group=2 case=dense event_ms=0.0722608 wall_ms=0.0726727
+TIME shape=1025,1537,769 dtype=fp32 group=2 case=solution event_ms=0.28549 wall_ms=0.285917

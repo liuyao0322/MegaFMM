@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "suite": "applications",
+  "description": "External assets are required: absent assets are explicitly skipped, never replaced by synthetic data. Whole model/SCF quality remains separate from these frozen-input modules.",
+  "backends": ["cublaslt", "megafmm", "practical_torch"],
+  "baseline": "cublaslt",
+  "modes": ["launch", "graph"],
+  "measurement": {"independent_processes": 3, "warmup": 5, "groups": 7, "calls_per_group": 10, "fresh_quality_trials": 2, "rotate_inputs": 2, "timeout_seconds": 3600},
+  "backend_options": {"workspace_limit": 2147483648, "tuning_input_sets": 3, "sw_tuning_candidates": 16},
+  "cases": [
+    {"id": "lowdin_overlap_fp32", "kind": "matrix_function", "dtype": "fp32", "function": "inverse_sqrt", "iterations": 30, "input_scope": "external", "input_path": "data/suite/overlap.npz", "asset_description": "Real AO overlap S, molecule/basis/source version and provenance required"},
+    {"id": "frozen_fock_purification_fp32", "kind": "purification", "dtype": "fp32", "iterations": 25, "input_scope": "external", "input_path": "data/suite/fock.npz", "asset_description": "Frozen orthogonal-basis Hamiltonian with occupied count in asset metadata and physical provenance"},
+    {"id": "muon_momentum_bf16", "kind": "muon", "dtype": "bf16", "iterations": 5, "input_scope": "external", "input_path": "data/suite/muon_momentum.pt", "asset_description": "Actual saved training momentum matrix, training step and checkpoint hash"},
+    {"id": "prefill_mlp_bf16", "kind": "mlp", "dtype": "bf16", "activation": "swiglu", "input_scope": "external", "input_path": "data/suite/mlp_replay.pt", "asset_description": "Actual checkpoint weights and saved prefill activations with tokenizer/dataset provenance"}
+  ]
+}

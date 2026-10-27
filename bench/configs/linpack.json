@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "suite": "linpack_fp32",
+  "description": "Single-device FP32 LINPACK-style blocked LU, matched cuBLASLt/SW Schur updates. Not FP64 HPL; effective FLOPs use classical solve work.",
+  "backends": ["cublaslt", "megafmm"],
+  "baseline": "cublaslt",
+  "modes": ["launch"],
+  "measurement": {
+    "independent_processes": 3, "warmup": 2, "groups": 5, "calls_per_group": 3,
+    "fresh_quality_trials": 2, "rotate_inputs": 2, "timeout_seconds": 1800,
+    "seed": 20261023
+  },
+  "backend_options": {
+    "workspace_limit": 1073741824, "heuristic_candidates": 8,
+    "tuning_input_sets": 1, "sw_tuning_candidates": 0, "strict": true
+  },
+  "cases": [
+    {"id": "linpack_fp32_n512_nb128", "kind": "linpack", "dtype": "fp32", "n": 512, "block_size": 128},
+    {"id": "linpack_fp32_n1024_nb128", "kind": "linpack", "dtype": "fp32", "n": 1024, "block_size": 128},
+    {"id": "linpack_fp32_n2048_nb128", "kind": "linpack", "dtype": "fp32", "n": 2048, "block_size": 128},
+    {"id": "linpack_fp32_n2048_nb256", "kind": "linpack", "dtype": "fp32", "n": 2048, "block_size": 256},
+    {"id": "linpack_fp32_n4096_nb256", "kind": "linpack", "dtype": "fp32", "n": 4096, "block_size": 256},
+    {"id": "linpack_fp32_n1025_nb128", "kind": "linpack", "dtype": "fp32", "n": 1025, "block_size": 128}
+  ]
+}

@@ -1,0 +1,149 @@
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build-sw-tuner
+[  7%] Built target test_tuning_confirmation
+[ 11%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 14%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 18%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+[ 22%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw1024.cu.o
+[ 25%] Building CUDA object CMakeFiles/megafmm.dir/solution/tuning_check.cu.o
+[ 29%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_padding.cu.o
+[ 33%] Building CUDA object CMakeFiles/megafmm.dir/solution/dense_wmma.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/sw1024.cu(13): warning #177-D: variable "megafmm::detail::<unnamed>::Elements" was declared but never referenced
+  constexpr int BM=64,BN=32,BK=128,Stages=8,ASize=BM*BK,BSize=BK*BN,Elements=BM*BN;
+                                                                    ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw1024.cu(25): warning #177-D: function "megafmm::detail::<unnamed>::arrive" was declared but never referenced
+            void arrive(const uint64_t* b){asm volatile("" ::: "memory");Barrier::arrive(b);}
+                 ^
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw1024.cu(27): warning #177-D: function "megafmm::detail::<unnamed>::product_index" was declared but never referenced
+                            int product_index(int row,int col){
+                                ^
+
+[ 37%] Linking CXX static library libmegafmm.a
+[ 48%] Built target megafmm
+[ 55%] Linking CXX executable test_correctness
+[ 55%] Linking CXX executable test_sw1024
+[ 62%] Linking CXX executable test_sw_pipeline
+[ 62%] Linking CXX executable megafmm_bench
+[ 70%] Built target test_sw_pipeline
+[ 70%] Built target test_sw1024
+[ 74%] Built target megafmm_bench
+[ 77%] Built target test_correctness
+[ 81%] Linking CXX executable test_tuning_candidates
+[ 85%] Linking CXX executable test_tuning_precision
+[ 88%] Linking CXX executable test_sw_tuner
+[ 92%] Built target test_tuning_precision
+[ 96%] Built target test_tuning_candidates
+[100%] Built target test_sw_tuner
+Internal ctest changing into directory: /share/home/liuyao/workspace/MegaFMM/build-sw-tuner
+Test project /share/home/liuyao/workspace/MegaFMM/build-sw-tuner
+    Start  1: gpu_correctness
+1/8 Test  #1: gpu_correctness ..................   Passed    2.21 sec
+    Start  2: sw_1024_correctness
+2/8 Test  #2: sw_1024_correctness ..............***Failed    3.90 sec
+CHECK size=1024 dtype=bf16 pattern=uniform trial=0 mode=launch dense_ef=8.53687286941e-07 sw_ef=0.00601718845185 gate=0.00100256106186 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=uniform trial=0 mode=graph dense_ef=8.53687286941e-07 sw_ef=0.00601718845185 gate=0.00100256106186 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=uniform trial=1 mode=launch dense_ef=8.51899080015e-07 sw_ef=0.00600975092785 gate=0.00100255569724 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=uniform trial=1 mode=graph dense_ef=8.51899080015e-07 sw_ef=0.00600975092785 gate=0.00100255569724 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=uniform trial=2 mode=launch dense_ef=8.52265563131e-07 sw_ef=0.00601519652935 gate=0.00100255679669 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=uniform trial=2 mode=graph dense_ef=8.52265563131e-07 sw_ef=0.00601519652935 gate=0.00100255679669 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=positive trial=0 mode=launch dense_ef=1.71087936503e-06 sw_ef=0.000120467674207 gate=0.0010051326381 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=positive trial=0 mode=graph dense_ef=1.71087936503e-06 sw_ef=0.000120467674207 gate=0.0010051326381 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=positive trial=1 mode=launch dense_ef=1.70911423282e-06 sw_ef=0.000124194276158 gate=0.0010051273427 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=positive trial=1 mode=graph dense_ef=1.70911423282e-06 sw_ef=0.000124194276158 gate=0.0010051273427 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=positive trial=2 mode=launch dense_ef=1.70891531744e-06 sw_ef=0.000122013299143 gate=0.00100512674595 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=positive trial=2 mode=graph dense_ef=1.70891531744e-06 sw_ef=0.000122013299143 gate=0.00100512674595 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=range16 trial=0 mode=launch dense_ef=1.2369882908e-06 sw_ef=0.00553248887328 gate=0.00100371096487 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=range16 trial=0 mode=graph dense_ef=1.2369882908e-06 sw_ef=0.00553248887328 gate=0.00100371096487 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=range16 trial=1 mode=launch dense_ef=1.23314079112e-06 sw_ef=0.00554425589374 gate=0.00100369942237 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=range16 trial=1 mode=graph dense_ef=1.23314079112e-06 sw_ef=0.00554425589374 gate=0.00100369942237 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=range16 trial=2 mode=launch dense_ef=1.23744726309e-06 sw_ef=0.00555491803214 gate=0.00100371234179 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=range16 trial=2 mode=graph dense_ef=1.23744726309e-06 sw_ef=0.00555491803214 gate=0.00100371234179 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=cancellation trial=0 mode=launch dense_ef=9.69967465695e-05 sw_ef=0.0354621058332 gate=0.00129099023971 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=cancellation trial=0 mode=graph dense_ef=9.69967465695e-05 sw_ef=0.0354621058332 gate=0.00129099023971 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=cancellation trial=1 mode=launch dense_ef=9.72606819228e-05 sw_ef=0.0366816797274 gate=0.00129178204577 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=cancellation trial=1 mode=graph dense_ef=9.72606819228e-05 sw_ef=0.0366816797274 gate=0.00129178204577 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=cancellation trial=2 mode=launch dense_ef=9.25788023652e-05 sw_ef=0.0334420468525 gate=0.0012777364071 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=cancellation trial=2 mode=graph dense_ef=9.25788023652e-05 sw_ef=0.0334420468525 gate=0.0012777364071 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=zero trial=0 mode=launch dense_ef=0 sw_ef=0 gate=0.001 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=zero trial=0 mode=graph dense_ef=0 sw_ef=0 gate=0.001 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=zero trial=1 mode=launch dense_ef=0 sw_ef=0 gate=0.001 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=zero trial=1 mode=graph dense_ef=0 sw_ef=0 gate=0.001 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=zero trial=2 mode=launch dense_ef=0 sw_ef=0 gate=0.001 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=zero trial=2 mode=graph dense_ef=0 sw_ef=0 gate=0.001 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=identity trial=0 mode=launch dense_ef=0 sw_ef=0.00307253907289 gate=0.001 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=identity trial=0 mode=graph dense_ef=0 sw_ef=0.00307253907289 gate=0.001 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=identity trial=1 mode=launch dense_ef=0 sw_ef=0.0030736796328 gate=0.001 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=identity trial=1 mode=graph dense_ef=0 sw_ef=0.0030736796328 gate=0.001 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=identity trial=2 mode=launch dense_ef=0 sw_ef=0.00307126822866 gate=0.001 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=identity trial=2 mode=graph dense_ef=0 sw_ef=0.00307126822866 gate=0.001 nonfinite=0 pass=0
+SUMMARY dtype=bf16 checks=36 failures=24
+CHECK size=1024 dtype=fp16 pattern=uniform trial=0 mode=launch dense_ef=1.25050721477e-06 sw_ef=0.000754415629732 gate=0.000103751521644 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=uniform trial=0 mode=graph dense_ef=1.25050721477e-06 sw_ef=0.000754415629732 gate=0.000103751521644 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=uniform trial=1 mode=launch dense_ef=1.24851376493e-06 sw_ef=0.000751819326939 gate=0.000103745541295 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=uniform trial=1 mode=graph dense_ef=1.24851376493e-06 sw_ef=0.000751819326939 gate=0.000103745541295 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=uniform trial=2 mode=launch dense_ef=1.2509201956e-06 sw_ef=0.000753234665231 gate=0.000103752760587 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=uniform trial=2 mode=graph dense_ef=1.2509201956e-06 sw_ef=0.000753234665231 gate=0.000103752760587 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=positive trial=0 mode=launch dense_ef=5.48614012884e-06 sw_ef=1.56273902687e-05 gate=0.000116458420387 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=positive trial=0 mode=graph dense_ef=5.48614012884e-06 sw_ef=1.56273902687e-05 gate=0.000116458420387 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=positive trial=1 mode=launch dense_ef=5.48243330372e-06 sw_ef=1.53731226633e-05 gate=0.000116447299911 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=positive trial=1 mode=graph dense_ef=5.48243330372e-06 sw_ef=1.53731226633e-05 gate=0.000116447299911 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=positive trial=2 mode=launch dense_ef=5.48314031658e-06 sw_ef=1.53755165798e-05 gate=0.00011644942095 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=positive trial=2 mode=graph dense_ef=5.48314031658e-06 sw_ef=1.53755165798e-05 gate=0.00011644942095 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=range16 trial=0 mode=launch dense_ef=1.25480094515e-06 sw_ef=0.000694788182418 gate=0.000103764402835 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=range16 trial=0 mode=graph dense_ef=1.25480094515e-06 sw_ef=0.000694788182418 gate=0.000103764402835 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=range16 trial=1 mode=launch dense_ef=1.25088151355e-06 sw_ef=0.000693554160475 gate=0.000103752644541 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=range16 trial=1 mode=graph dense_ef=1.25088151355e-06 sw_ef=0.000693554160475 gate=0.000103752644541 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=range16 trial=2 mode=launch dense_ef=1.25669747941e-06 sw_ef=0.000696785417031 gate=0.000103770092438 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=range16 trial=2 mode=graph dense_ef=1.25669747941e-06 sw_ef=0.000696785417031 gate=0.000103770092438 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=cancellation trial=0 mode=launch dense_ef=0.000153158119682 sw_ef=0.00438247196116 gate=0.000559474359046 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=cancellation trial=0 mode=graph dense_ef=0.000153158119682 sw_ef=0.00438247196116 gate=0.000559474359046 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=cancellation trial=1 mode=launch dense_ef=0.000153597214113 sw_ef=0.00452178324389 gate=0.00056079164234 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=cancellation trial=1 mode=graph dense_ef=0.000153597214113 sw_ef=0.00452178324389 gate=0.00056079164234 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=cancellation trial=2 mode=launch dense_ef=0.000147038840179 sw_ef=0.00424962747258 gate=0.000541116520537 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=cancellation trial=2 mode=graph dense_ef=0.000147038840179 sw_ef=0.00424962747258 gate=0.000541116520537 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=zero trial=0 mode=launch dense_ef=0 sw_ef=0 gate=0.0001 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=zero trial=0 mode=graph dense_ef=0 sw_ef=0 gate=0.0001 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=zero trial=1 mode=launch dense_ef=0 sw_ef=0 gate=0.0001 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=zero trial=1 mode=graph dense_ef=0 sw_ef=0 gate=0.0001 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=zero trial=2 mode=launch dense_ef=0 sw_ef=0 gate=0.0001 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=zero trial=2 mode=graph dense_ef=0 sw_ef=0 gate=0.0001 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=identity trial=0 mode=launch dense_ef=0 sw_ef=0.000384141366313 gate=0.0001 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=identity trial=0 mode=graph dense_ef=0 sw_ef=0.000384141366313 gate=0.0001 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=identity trial=1 mode=launch dense_ef=0 sw_ef=0.000384352897435 gate=0.0001 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=identity trial=1 mode=graph dense_ef=0 sw_ef=0.000384352897435 gate=0.0001 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=identity trial=2 mode=launch dense_ef=0 sw_ef=0.00038349010856 gate=0.0001 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=identity trial=2 mode=graph dense_ef=0 sw_ef=0.00038349010856 gate=0.0001 nonfinite=0 pass=0
+SUMMARY dtype=fp16 checks=36 failures=24
+
+    Start  3: exact_winograd_dag
+3/8 Test  #3: exact_winograd_dag ...............   Passed    0.38 sec
+    Start  4: sw_pipeline_implementation
+4/8 Test  #4: sw_pipeline_implementation .......   Passed   19.04 sec
+    Start  7: tuning_precision_guard
+5/8 Test  #7: tuning_precision_guard ...........   Passed    3.47 sec
+    Start  8: tuning_confirmation_policy
+6/8 Test  #8: tuning_confirmation_policy .......   Passed    0.01 sec
+    Start  9: sw_tuner_selection
+7/8 Test  #9: sw_tuner_selection ...............***Failed    3.82 sec
+ERROR SW candidate does not compute original AB
+
+    Start 10: sw_tuner_candidates
+8/8 Test #10: sw_tuner_candidates ..............***Failed    0.63 sec
+ERROR SW candidate does not compute original AB
+
+
+63% tests passed, 3 tests failed out of 8
+
+Total Test time (real) =  33.51 sec
+
+The following tests FAILED:
+	  2 - sw_1024_correctness (Failed)
+	  9 - sw_tuner_selection (Failed)
+	 10 - sw_tuner_candidates (Failed)
+Errors while running CTest
+srun: error: g08: task 0: Exited with exit code 8

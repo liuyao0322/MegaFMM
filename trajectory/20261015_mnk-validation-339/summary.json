@@ -1,0 +1,15 @@
+{
+  "iteration": 339,
+  "stable_combinations": 9,
+  "total_combinations": 28,
+  "all_precision_pass": true,
+  "independent_sweeps": 3,
+  "paired_groups_per_combination": 15,
+  "calls_per_group": 100,
+  "fresh_fp64_trials_per_sweep": 3,
+  "rotated_input_sets": 2,
+  "minimum_pairwise_gain": 0.03,
+  "goal_complete": false,
+  "candidate_checks": "All9 candidates x2dtype x2fresh trials x2concurrent stream/Graph modes passed exact original-input FP64 integer reference and untouched output padding. Tuned API and forced candidates memcheck both zero errors. NCU fixed id0 captured with CUDA12.4 runtime; earlier profiler-time retuning capture excluded.",
+  "next": "Test scheduler swizzle4/8 as distinct candidates, then smaller tile and shallower pipeline for512 and boundary sizes. Continue bothdtype original FP64 gate and independent stable all-size validation."
+}

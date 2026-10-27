@@ -1,0 +1,31 @@
+a21b2bb07f1c42cdcdfebee9bb2b6d2c236b4dedb8a2485162469d3786d9965d  solution/internal.h
+e51c243676a7f822100d4b68fe7739bef74312c89b98230fe7ef2cca4d6caa7e  solution/plan.cpp
+32d1f9fd8d03b7f777f0f074da5f17707daa97368b516895071162a047926708  solution/scale_output.cu
+d3b65bff68ca4b43f7f82a6bc6bae38ce9a0405719410561639af09eb432144f  solution/sw_pipeline.cu
+d5564b71d399c934229c8dc2089c5dd8de7e942957845a9cf23977353186e475  include/megafmm/gemm.h
+0964fc49fdbd02945515ff2d8f6bb834c6a4c937fb4cfad396b1be313634ae4e  bench/benchmark.cu
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /share/home/liuyao/workspace/MegaFMM/build
+[ 20%] Building CUDA object CMakeFiles/megafmm.dir/solution/scale_output.cu.o
+[ 20%] Building CXX object CMakeFiles/megafmm.dir/solution/plan.cpp.o
+[ 30%] Building CUDA object CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(67): error: "auto" type is "cute::Tensor<cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<3, 4, 3>, cute::smem_ptr<cutlass::bfloat16_t *>>>, cute::Layout<cute::tuple<cute::_32, cute::tuple<cute::_64, cute::_2>>, cute::tuple<cute::_64, cute::tuple<cute::C<1>, cute::C<2048>>>>>" for this entity, but was previously implied to be "cute::Tensor<cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<3, 4, 3>, cute::smem_ptr<cutlass::bfloat16_t *>>>, cute::Layout<cute::tuple<cute::_64, cute::C<128>>, cute::tuple<cute::_1, cute::C<64>>>>"
+   auto a=make_tensor(make_smem_ptr(s.b[0]),la),b=make_tensor(make_smem_ptr(s.a[0]),lb);
+                                                ^
+          detected during:
+            instantiation of "void megafmm::detail::<unnamed>::tensor_chain(megafmm::detail::<unnamed>::Shared<T> &, int, int, int, float *) [with T=cutlass::bfloat16_t]" at line 1080
+            instantiation of "void megafmm::detail::<unnamed>::sw_cooperative_hilo<T>(CUtensorMap, CUtensorMap, float *) [with T=cutlass::bfloat16_t]" at line 1131
+
+/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu(67): error: "auto" type is "cute::Tensor<cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<3, 4, 3>, cute::smem_ptr<cutlass::half_t *>>>, cute::Layout<cute::tuple<cute::_32, cute::tuple<cute::_64, cute::_2>>, cute::tuple<cute::_64, cute::tuple<cute::C<1>, cute::C<2048>>>>>" for this entity, but was previously implied to be "cute::Tensor<cute::ViewEngine<cute::swizzle_ptr<cute::Swizzle<3, 4, 3>, cute::smem_ptr<cutlass::half_t *>>>, cute::Layout<cute::tuple<cute::_64, cute::C<128>>, cute::tuple<cute::_1, cute::C<64>>>>"
+   auto a=make_tensor(make_smem_ptr(s.b[0]),la),b=make_tensor(make_smem_ptr(s.a[0]),lb);
+                                                ^
+          detected during:
+            instantiation of "void megafmm::detail::<unnamed>::tensor_chain(megafmm::detail::<unnamed>::Shared<T> &, int, int, int, float *) [with T=cutlass::half_t]" at line 1080
+            instantiation of "void megafmm::detail::<unnamed>::sw_cooperative_hilo<T>(CUtensorMap, CUtensorMap, float *) [with T=cutlass::half_t]" at line 1133
+
+2 errors detected in the compilation of "/share/home/liuyao/workspace/MegaFMM/solution/sw_pipeline.cu".
+gmake[2]: *** [CMakeFiles/megafmm.dir/build.make:106: CMakeFiles/megafmm.dir/solution/sw_pipeline.cu.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:89: CMakeFiles/megafmm.dir/all] Error 2
+gmake: *** [Makefile:101: all] Error 2
+srun: error: g08: task 0: Exited with exit code 2

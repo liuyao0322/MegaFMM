@@ -1,0 +1,49 @@
+[1692847] profile_candidate352@127.0.0.1
+  void device_kernel<GemmUniversal<tuple<int, int, int, int>, CollectiveMma<MainloopSm90TmaGmmaWarpSpecialized<2, tuple<C<1>, C<1>, C<1>>, KernelTmaWarpSpecializedCooperative>, tuple<C<128>, C<128>, C<64>>, half_t, tuple<long, C<1>, long>, half_t, tuple<C<1>, long, long>, TiledMMA<MMA_Atom<SM90_64x128x16_F32F16F16_SS<0, 1, 1, 1>>, Layout<tuple<C<2>, C<1>, C<1>>, tuple<C<1>, C<0>, C<0>>>, tuple<Underscore, Underscore, Underscore>>, SM90_TMA_LOAD, ComposedLayout<Swizzle<3, 4, 3>, smem_ptr_flag_bits<16>, Layout<tuple<C<8>, C<64>>, tuple<C<64>, C<1>>>>, void, identity, SM90_TMA_LOAD, ComposedLayout<Swizzle<3, 4, 3>, smem_ptr_flag_bits<16>, Layout<tuple<C<64>, C<8>>, tuple<C<1>, C<64>>>>, void, identity>, CollectiveEpilogue<Sm90TmaWarpSpecialized<4, 2, 16, 0, 1>, tuple<C<128>, C<128>, C<64>>, tuple<C<128>, C<32>>, void, tuple<long, C<1>, long>, float, tuple<long, C<1>, long>, FusionCallbacks<Sm90TmaWarpSpecialized<4, 2, 16, 0, 1>, LinearCombination<float, float, void, float, 2>, tuple<C<128>, C<128>, C<64>>, tuple<C<128>, C<32>>, >, SM90_TMA_LOAD, ComposedLayout<Swizzle<3, 4, 3>, smem_ptr_flag_bits<32>, Layout<tuple<C<8>, C<32>>, tuple<C<32>, C<1>>>>, AutoVectorizingCopyWithAssumedAlignment<128>, SM90_TMA_STORE, ComposedLayout<Swizzle<3, 4, 3>, smem_ptr_flag_bits<32>, Layout<tuple<C<8>, C<32>>, tuple<C<32>, C<1>>>>, AutoVectorizingCopyWithAssumedAlignment<128>, Copy_Atom<SM90_U32x4_STSM_N, half_t>>, void, void>>(Params) (1, 264, 1)x(384, 1, 1), Context 1, Stream 7, Device 0, CC 9.0
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                   384
+    Cluster Scheduling Policy                           PolicySpread
+    Cluster Size                                                   0
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                    264
+    Registers Per Thread             register/thread             168
+    Shared Memory Configuration Size           Kbyte          233.47
+    Driver Shared Memory Per Block       Kbyte/block            1.02
+    Dynamic Shared Memory Per Block      Kbyte/block          100.35
+    Static Shared Memory Per Block        byte/block               0
+    # SMs                                         SM             132
+    Stack Size                                                  1024
+    Threads                                   thread          101376
+    # TPCs                                                        66
+    Enabled TPC IDs                                              all
+    Uses Green Context                                             0
+    Waves Per SM                                                   2
+    -------------------------------- --------------- ---------------
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Max Active Clusters                 cluster            0
+    Max Cluster Size                      block            8
+    Overall GPU Occupancy                     %            0
+    Cluster Occupancy                         %            0
+    Block Limit Barriers                  block           32
+    Block Limit SM                        block           32
+    Block Limit Registers                 block            1
+    Block Limit Shared Mem                block            2
+    Block Limit Warps                     block            5
+    Theoretical Active Warps per SM        warp           12
+    Theoretical Occupancy                     %        18.75
+    Achieved Occupancy                        %        14.06
+    Achieved Active Warps Per SM           warp         9.00
+    ------------------------------- ----------- ------------
+
+    OPT   Est. Local Speedup: 81.25%                                                                                    
+          The 3.00 theoretical warps per scheduler this kernel can issue according to its occupancy are below the       
+          hardware maximum of 16. This kernel's theoretical occupancy (18.8%) is limited by the number of required      
+          registers.                                                                                                    
+

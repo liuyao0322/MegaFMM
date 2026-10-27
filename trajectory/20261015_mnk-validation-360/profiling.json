@@ -1,0 +1,37 @@
+{
+  "diagnostic_only": "Zero-input NCU replay, not performance acceptance",
+  "shape": [
+    8192,
+    8192,
+    8192
+  ],
+  "dtype": "fp16",
+  "candidate": 90,
+  "metrics": {
+    "gpu__time_duration.sum": {
+      "value": "1.525760",
+      "unit": "ms"
+    },
+    "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+      "value": "92.323367",
+      "unit": "%"
+    },
+    "lts__t_sector_hit_rate.pct": {
+      "value": "75.348596",
+      "unit": "%"
+    },
+    "launch__registers_per_thread": {
+      "value": "154",
+      "unit": "register/thread"
+    },
+    "smsp__inst_executed.sum": {
+      "value": "143649241.000000",
+      "unit": "inst"
+    },
+    "smsp__warps_eligible.avg.per_cycle_active": {
+      "value": "0.140815",
+      "unit": "warp"
+    }
+  },
+  "next_axis": "Resource-guarded nine-warp CM2 and CN2 cluster preflight; current CM1 Tensor-active92.3%, L2hit75.35%. Existing Lt diagnostic cluster2."
+}

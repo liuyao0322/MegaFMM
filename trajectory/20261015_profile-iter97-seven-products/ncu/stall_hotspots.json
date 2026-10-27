@@ -1,0 +1,356 @@
+{
+  "bf16": {
+    "stall_long_sb": {
+      "total_samples": 520.0,
+      "top": [
+        {
+          "address": "0x7fb15f7b4c90",
+          "source": "@!P0  BRA 0x7fb15f7bbc80",
+          "samples": "143"
+        },
+        {
+          "address": "0x7fb15f7b5cb0",
+          "source": "@!P0  BRA 0x7fb15f7bbde0",
+          "samples": "69"
+        },
+        {
+          "address": "0x7fb15f7b7d60",
+          "source": "@!P0  BRA 0x7fb15f7bbfa0",
+          "samples": "56"
+        },
+        {
+          "address": "0x7fb15f7b3570",
+          "source": "      IMAD.U32 R14, R24, 0x10000, RZ",
+          "samples": "55"
+        },
+        {
+          "address": "0x7fb15f7b9570",
+          "source": "@!P0  BRA 0x7fb15f7bc060",
+          "samples": "45"
+        },
+        {
+          "address": "0x7fb15f7b8990",
+          "source": "@!P0  BRA 0x7fb15f7bc000",
+          "samples": "32"
+        }
+      ]
+    },
+    "stall_barrier": {
+      "total_samples": 211.0,
+      "top": [
+        {
+          "address": "0x7fb15f7b3de0",
+          "source": "@!P0  BRA 0x7fb15f7ba130",
+          "samples": "95"
+        },
+        {
+          "address": "0x7fb15f7b5860",
+          "source": "      WARPGROUP.DEPBAR.LE gsb0, 0x0",
+          "samples": "52"
+        },
+        {
+          "address": "0x7fb15f7b5210",
+          "source": "      WARPGROUP.DEPBAR.LE gsb0, 0x0",
+          "samples": "48"
+        },
+        {
+          "address": "0x7fb15f7b3290",
+          "source": "      ULDC.64 UR24, c[0x0][0x208]",
+          "samples": "6"
+        },
+        {
+          "address": "0x7fb15f7bbc70",
+          "source": "      EXIT",
+          "samples": "6"
+        },
+        {
+          "address": "0x7fb15f7b3b70",
+          "source": "@P0   BRA 0x7fb15f7b3db0",
+          "samples": "4"
+        }
+      ]
+    },
+    "stall_wait": {
+      "total_samples": 252.0,
+      "top": [
+        {
+          "address": "0x7fb15f7b4d80",
+          "source": "      UIADD3 UR10, UR4, 0x40, URZ",
+          "samples": "8"
+        },
+        {
+          "address": "0x7fb15f7b4e90",
+          "source": "      HGMMA.64x32x16.F32.BF16 R24, gdesc[UR8].tnspB, R24",
+          "samples": "4"
+        },
+        {
+          "address": "0x7fb15f7b54d0",
+          "source": "      UIADD3 UR8, UR5, 0x200, URZ",
+          "samples": "4"
+        },
+        {
+          "address": "0x7fb15f7b4cb0",
+          "source": "      WARPSYNC.ALL",
+          "samples": "3"
+        },
+        {
+          "address": "0x7fb15f7b4d10",
+          "source": "      UMOV UR8, UR5",
+          "samples": "3"
+        },
+        {
+          "address": "0x7fb15f7b4e30",
+          "source": "      HGMMA.64x32x16.F32.BF16 R24, gdesc[UR8].tnspB, R24",
+          "samples": "3"
+        }
+      ]
+    },
+    "stall_short_sb": {
+      "total_samples": 49.0,
+      "top": [
+        {
+          "address": "0x7fb15f7b3430",
+          "source": "      IMAD.WIDE R10, R19, 0x4, R2",
+          "samples": "13"
+        },
+        {
+          "address": "0x7fb15f7b81e0",
+          "source": "      SHF.R.S32.HI R25, RZ, 0x1f, R6",
+          "samples": "11"
+        },
+        {
+          "address": "0x7fb15f7b8480",
+          "source": "      IADD3 R25, R3, UR6, -R32",
+          "samples": "6"
+        },
+        {
+          "address": "0x7fb15f7b90a0",
+          "source": "      IADD3 R25, R3, UR6, -R32",
+          "samples": "4"
+        },
+        {
+          "address": "0x7fb15f7ba190",
+          "source": "      IADD3 R12, P0, R8, 0x30, RZ",
+          "samples": "4"
+        },
+        {
+          "address": "0x7fb15f7b3070",
+          "source": "@P0   BRA 0x7fb15f7b3250",
+          "samples": "2"
+        }
+      ]
+    },
+    "stall_math": {
+      "total_samples": 19.0,
+      "top": [
+        {
+          "address": "0x7fb15f7b34e0",
+          "source": "      IMAD.WIDE R20, R21, 0x4, R4",
+          "samples": "1"
+        },
+        {
+          "address": "0x7fb15f7b3670",
+          "source": "      F2FP.BF16.F32.PACK_AB R14, R24, R14",
+          "samples": "1"
+        },
+        {
+          "address": "0x7fb15f7b3810",
+          "source": "      LEA.HI R18, R18, R18, RZ, 0x1",
+          "samples": "1"
+        },
+        {
+          "address": "0x7fb15f7b3820",
+          "source": "      F2FP.BF16.F32.PACK_AB R17, R10, R17",
+          "samples": "1"
+        },
+        {
+          "address": "0x7fb15f7b3910",
+          "source": "      IMAD.WIDE R22, R23, 0x4, R6",
+          "samples": "1"
+        },
+        {
+          "address": "0x7fb15f7b3950",
+          "source": "      SHF.R.S32.HI R13, RZ, 0x1, R10",
+          "samples": "1"
+        }
+      ]
+    }
+  },
+  "fp16": {
+    "stall_long_sb": {
+      "total_samples": 576.0,
+      "top": [
+        {
+          "address": "0x7fb15f7abcb0",
+          "source": "@!P0  BRA 0x7fb15f7b1de0",
+          "samples": "131"
+        },
+        {
+          "address": "0x7fb15f7ac340",
+          "source": "@!P0  BRA 0x7fb15f7b1e40",
+          "samples": "57"
+        },
+        {
+          "address": "0x7fb15f7a9570",
+          "source": "      HADD2.F32 R15, -RZ, R24.H0_H0",
+          "samples": "49"
+        },
+        {
+          "address": "0x7fb15f7ad640",
+          "source": "@!P0  BRA 0x7fb15f7b1f20",
+          "samples": "40"
+        },
+        {
+          "address": "0x7fb15f7acf10",
+          "source": "@!P0  BRA 0x7fb15f7b1ea0",
+          "samples": "38"
+        },
+        {
+          "address": "0x7fb15f7aac90",
+          "source": "@!P0  BRA 0x7fb15f7b1c80",
+          "samples": "34"
+        }
+      ]
+    },
+    "stall_barrier": {
+      "total_samples": 225.0,
+      "top": [
+        {
+          "address": "0x7fb15f7a9de0",
+          "source": "@!P0  BRA 0x7fb15f7b0130",
+          "samples": "132"
+        },
+        {
+          "address": "0x7fb15f7b1c70",
+          "source": "      EXIT",
+          "samples": "25"
+        },
+        {
+          "address": "0x7fb15f7a9b70",
+          "source": "@P0   BRA 0x7fb15f7a9db0",
+          "samples": "24"
+        },
+        {
+          "address": "0x7fb15f7ab860",
+          "source": "      WARPGROUP.DEPBAR.LE gsb0, 0x0",
+          "samples": "20"
+        },
+        {
+          "address": "0x7fb15f7ab210",
+          "source": "      WARPGROUP.DEPBAR.LE gsb0, 0x0",
+          "samples": "15"
+        },
+        {
+          "address": "0x7fb15f7a9290",
+          "source": "      ULDC.64 UR24, c[0x0][0x208]",
+          "samples": "9"
+        }
+      ]
+    },
+    "stall_wait": {
+      "total_samples": 200.0,
+      "top": [
+        {
+          "address": "0x7fb15f7ab3d0",
+          "source": "      UIADD3 UR10, UR4, 0x40, URZ",
+          "samples": "3"
+        },
+        {
+          "address": "0x7fb15f7a9380",
+          "source": "      LOP3.LUT R10, R11, 0xfffffc00, RZ, 0xc0, !PT",
+          "samples": "2"
+        },
+        {
+          "address": "0x7fb15f7a9540",
+          "source": "      LDG.E R10, desc[UR24][R10.64]",
+          "samples": "2"
+        },
+        {
+          "address": "0x7fb15f7a9a60",
+          "source": "@!P0  BRA 0x7fb15f7a9340",
+          "samples": "2"
+        },
+        {
+          "address": "0x7fb15f7aaf80",
+          "source": "      HGMMA.64x32x16.F32 R24, gdesc[UR8].tnspB, R24",
+          "samples": "2"
+        },
+        {
+          "address": "0x7fb15f7ab070",
+          "source": "      HGMMA.64x32x16.F32 R24, gdesc[UR8].tnspB, R24",
+          "samples": "2"
+        }
+      ]
+    },
+    "stall_short_sb": {
+      "total_samples": 37.0,
+      "top": [
+        {
+          "address": "0x7fb15f7a9430",
+          "source": "      IMAD.WIDE R10, R19, 0x4, R2",
+          "samples": "17"
+        },
+        {
+          "address": "0x7fb15f7ae1e0",
+          "source": "      SHF.R.S32.HI R25, RZ, 0x1f, R6",
+          "samples": "5"
+        },
+        {
+          "address": "0x7fb15f7a9070",
+          "source": "@P0   BRA 0x7fb15f7a9250",
+          "samples": "4"
+        },
+        {
+          "address": "0x7fb15f7ad5c0",
+          "source": "@!P2  FADD R8, R8, R15",
+          "samples": "3"
+        },
+        {
+          "address": "0x7fb15f7ad4e0",
+          "source": "      LOP3.LUT R21, R19, 0x6, RZ, 0xc0, !PT",
+          "samples": "2"
+        },
+        {
+          "address": "0x7fb15f7adac0",
+          "source": "      SHF.R.S32.HI R21, RZ, 0x1f, R6",
+          "samples": "2"
+        }
+      ]
+    },
+    "stall_math": {
+      "total_samples": 35.0,
+      "top": [
+        {
+          "address": "0x7fb15f7a9970",
+          "source": "      SHF.R.S32.HI R21, RZ, 0x1, R25",
+          "samples": "2"
+        },
+        {
+          "address": "0x7fb15f7abf10",
+          "source": "      LEA.HI R9, R9, R4, RZ, 0x5",
+          "samples": "2"
+        },
+        {
+          "address": "0x7fb15f7ae050",
+          "source": "      LOP3.LUT R14, R27, 0xfffffffc, R14, 0xe2, !PT",
+          "samples": "2"
+        },
+        {
+          "address": "0x7fb15f7a93c0",
+          "source": "      VIADD R13, R10, 0x80200",
+          "samples": "1"
+        },
+        {
+          "address": "0x7fb15f7a9470",
+          "source": "      IMAD.WIDE R16, R23, 0x4, R2",
+          "samples": "1"
+        },
+        {
+          "address": "0x7fb15f7a94c0",
+          "source": "      IMAD.WIDE R18, R19, 0x4, R4",
+          "samples": "1"
+        }
+      ]
+    }
+  }
+}

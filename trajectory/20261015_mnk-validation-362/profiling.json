@@ -1,0 +1,110 @@
+{
+  "diagnostic_only": true,
+  "ncu": {
+    "candidate": 94,
+    "shape": [
+      4096,
+      4096,
+      4096
+    ],
+    "dtype": "bf16",
+    "input": "zeros",
+    "kernel_metrics": {
+      "gpu__time_duration.sum": {
+        "value": "263.360000",
+        "unit": "us"
+      },
+      "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+        "value": "65.606191",
+        "unit": "%"
+      },
+      "lts__t_sector_hit_rate.pct": {
+        "value": "78.331874",
+        "unit": "%"
+      },
+      "smsp__warps_eligible.avg.per_cycle_active": {
+        "value": "0.169436",
+        "unit": "warp"
+      },
+      "dram__bytes_read.sum": {
+        "value": "251.242496",
+        "unit": "Mbyte"
+      },
+      "dram__bytes_write.sum": {
+        "value": "122.411776",
+        "unit": "Mbyte"
+      },
+      "launch__registers_per_thread": {
+        "value": "168",
+        "unit": "register/thread"
+      },
+      "smsp__inst_executed.sum": {
+        "value": "26662817.000000",
+        "unit": "inst"
+      }
+    },
+    "workspace_bytes": 67112960,
+    "notes": "NCU metrics describe GEMM kernel replay; per-call barrier reset remains included in ordinary complete-call timings."
+  },
+  "16384_random_paired": {
+    "groups": 5,
+    "calls_per_group_route": 20,
+    "input_sets": 1,
+    "acceptance": false,
+    "results": {
+      "bf16": [
+        {
+          "candidate": "94",
+          "median_speedup": "0.97975862",
+          "min_speedup": "0.946799457",
+          "certification": "unchecked"
+        },
+        {
+          "candidate": "95",
+          "median_speedup": "0.85549432",
+          "min_speedup": "0.839335859",
+          "certification": "unchecked"
+        },
+        {
+          "candidate": "96",
+          "median_speedup": "0.886996865",
+          "min_speedup": "0.883692503",
+          "certification": "unchecked"
+        },
+        {
+          "candidate": "97",
+          "median_speedup": "0.865625799",
+          "min_speedup": "0.854170322",
+          "certification": "unchecked"
+        }
+      ],
+      "fp16": [
+        {
+          "candidate": "94",
+          "median_speedup": "0.985374391",
+          "min_speedup": "0.937639654",
+          "certification": "unchecked"
+        },
+        {
+          "candidate": "95",
+          "median_speedup": "0.844017446",
+          "min_speedup": "0.82938379",
+          "certification": "unchecked"
+        },
+        {
+          "candidate": "96",
+          "median_speedup": "0.926918924",
+          "min_speedup": "0.923509479",
+          "certification": "unchecked"
+        },
+        {
+          "candidate": "97",
+          "median_speedup": "0.849527836",
+          "min_speedup": "0.84807539",
+          "certification": "unchecked"
+        }
+      ]
+    }
+  },
+  "decision": "ExplicitSplitK has no measured winner, including16384 forcedshorttiming. Fix proven false dense-agreement rejection using unchanged original-input FP64 gate before pursuing other reduction algorithms; do not infer a physical floor."
+}

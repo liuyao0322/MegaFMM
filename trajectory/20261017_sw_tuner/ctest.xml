@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="10"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="172"
+	timestamp="2026-10-17T00:41:48"
+	>
+	<testcase name="gpu_correctness" classname="gpu_correctness" time="2.88971" status="run">
+		<system-out>PASS Dense policy, binding, empty, scale, overflow and overlap checks
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=01 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=01 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=01 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=10 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=10 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=10 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=11 alias=0 graph=0 element_aligned...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="sw_1024_correctness" classname="sw_1024_correctness" time="3.33844" status="fail">
+		<failure message=""/>
+		<system-out>CHECK size=1024 dtype=bf16 pattern=uniform trial=0 mode=launch dense_ef=8.53687286941e-07 sw_ef=0.00601718845185 gate=0.00100256106186 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=uniform trial=0 mode=graph dense_ef=8.53687286941e-07 sw_ef=0.00601718845185 gate=0.00100256106186 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=uniform trial=1 mode=launch dense_ef=8.51899080015e-07 sw_ef=0.00600975092785 gate=0.00100255569724 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=uniform trial=1 mode=graph dense_ef=8.51899080015e-07 sw_ef=0.00600975092785 gate=0.00100255569724 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=uniform trial=2 mode=launch dense_ef=8.52265563131e-07 sw_ef=0.00601519652935 gate=0.00100255679669 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=uniform trial=2 mode=graph dense_ef=8.52265563131e-07 sw_ef=0.00601519652935 gate=0.00100255679669 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=positive trial=0 mode=launch dense_ef=1.71087936503e-06 sw_ef=0.000120467674207 gate=0.0010051326381 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=positive trial=0 mode=graph dense_ef=1.71087936503e-06 sw_ef=0.000120467674207 gate=0.0010051326381 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=positive trial=1 mode=launch dense_ef=1.70911423282e-06 sw_ef=0.000124194276158 gate=0.0010051273427 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=positive trial=1 mode=graph dense_ef=1.70911423282e-06 sw_ef=0.000124194276158 gate=0.0010051273427 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=positive trial=2 mode=launch dense_ef=1.70891531744e-06 sw_ef=0.000122013299143 gate=0.00100512674595 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=positive trial=2 mode=graph dense_ef=1.70891531744e-06 sw_ef=0.000122013299143 gate=0.00100512674595 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=range16 trial=0 mode=launch dense_ef=1.2369882908e-06 sw_ef=0.00553248887328 gate=0.00100371096487 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=range16 trial=0 mode=graph dense_ef=1.2369882908e-06 sw_ef=0.00553248887328 gate=0.00100371096487 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=range16 trial=1 mode=launch dense_ef=1.23314079112e-06 sw_ef=0.00554425589374 gate=0.00100369942237 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=range16 trial=1 mode=graph dense_ef=1.23314079112e-06 sw_ef=0.00554425589374 gate=0.00100369942237 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=range16 trial=2 mode=launch dense_ef=1.23744726309e-06 sw_ef=0.00555491803214 gate=0.00100371234179 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=range16 trial=2 mode=graph dense_ef=1.23744726309e-06 sw_ef=0.00555491803214 gate=0.00100371234179 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=cancellation trial=0 mode=launch dense_ef=9.69967465695e-05 sw_ef=0.0354621058332 gate=0.00129099023971 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=cancellation trial=0 mode=graph dense_ef=9.69967465695e-05 sw_ef=0.0354621058332 gate=0.00129099023971 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=cancellation trial=1 mode=launch dense_ef=9.72606819228e-05 sw_ef=0.0366816797274 gate=0.00129178204577 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=cancellation trial=1 mode=graph dense_ef=9.72606819228e-05 sw_ef=0.0366816797274 gate=0.00129178204577 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=cancellation trial=2 mode=launch dense_ef=9.25788023652e-05 sw_ef=0.0334420468525 gate=0.0012777364071 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=cancellation trial=2 mode=graph dense_ef=9.25788023652e-05 sw_ef=0.0334420468525 gate=0.0012777364071 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=zero trial=0 mode=launch dense_ef=0 sw_ef=0 gate=0.001 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=zero trial=0 mode=graph dense_ef=0 sw_ef=0 gate=0.001 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=zero trial=1 mode=launch dense_ef=0 sw_ef=0 gate=0.001 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=zero trial=1 mode=graph dense_ef=0 sw_ef=0 gate=0.001 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=zero trial=2 mode=launch dense_ef=0 sw_ef=0 gate=0.001 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=zero trial=2 mode=graph dense_ef=0 sw_ef=0 gate=0.001 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=identity trial=0 mode=launch dense_ef=0 sw_ef=0.00307253907289 gate=0.001 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=identity trial=0 mode=graph dense_ef=0 sw_ef=0.00307253907289 gate=0.001 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=identity trial=1 mode=launch dense_ef=0 sw_ef=0.0030736796328 gate=0.001 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=identity trial=1 mode=graph dense_ef=0 sw_ef=0.0030736796328 gate=0.001 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=identity trial=2 mode=launch dense_ef=0 sw_ef=0.00307126822866 gate=0.001 nonfinite=0 pass=0
+CHECK size=1024 dtype=bf16 pattern=identity trial=2 mode=graph dense_ef=0 sw_ef=0.00307126822866 gate=0.001 nonfinite=0 pass=0
+SUMMARY dtype=bf16 checks=36 failures=24
+CHECK size=1024 dtype=fp16 pattern=uniform trial=0 mode=launch dense_ef=1.25050721477e-06 sw_ef=0.000754415629732 gate=0.000103751521644 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=uniform trial=0 mode=graph dense_ef=1.25050721477e-06 sw_ef=0.000754415629732 gate=0.000103751521644 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=uniform trial=1 mode=launch dense_ef=1.24851376493e-06 sw_ef=0.000751819326939 gate=0.000103745541295 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=uniform trial=1 mode=graph dense_ef=1.24851376493e-06 sw_ef=0.000751819326939 gate=0.000103745541295 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=uniform trial=2 mode=launch dense_ef=1.2509201956e-06 sw_ef=0.000753234665231 gate=0.000103752760587 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=uniform trial=2 mode=graph dense_ef=1.2509201956e-06 sw_ef=0.000753234665231 gate=0.000103752760587 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=positive trial=0 mode=launch dense_ef=5.48614012884e-06 sw_ef=1.56273902687e-05 gate=0.000116458420387 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=positive trial=0 mode=graph dense_ef=5.48614012884e-06 sw_ef=1.56273902687e-05 gate=0.000116458420387 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=positive trial=1 mode=launch dense_ef=5.48243330372e-06 sw_ef=1.53731226633e-05 gate=0.000116447299911 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=positive trial=1 mode=graph dense_ef=5.48243330372e-06 sw_ef=1.53731226633e-05 gate=0.000116447299911 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=positive trial=2 mode=launch dense_ef=5.48314031658e-06 sw_ef=1.53755165798e-05 gate=0.00011644942095 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=positive trial=2 mode=graph dense_ef=5.48314031658e-06 sw_ef=1.53755165798e-05 gate=0.00011644942095 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=range16 trial=0 mode=launch dense_ef=1.25480094515e-06 sw_ef=0.000694788182418 gate=0.000103764402835 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=range16 trial=0 mode=graph dense_ef=1.25480094515e-06 sw_ef=0.000694788182418 gate=0.000103764402835 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=range16 trial=1 mode=launch dense_ef=1.25088151355e-06 sw_ef=0.000693554160475 gate=0.000103752644541 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=range16 trial=1 mode=graph dense_ef=1.25088151355e-06 sw_ef=0.000693554160475 gate=0.000103752644541 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=range16 trial=2 mode=launch dense_ef=1.25669747941e-06 sw_ef=0.000696785417031 gate=0.000103770092438 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=range16 trial=2 mode=graph dense_ef=1.25669747941e-06 sw_ef=0.000696785417031 gate=0.000103770092438 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=cancellation trial=0 mode=launch dense_ef=0.000153158119682 sw_ef=0.00438247196116 gate=0.000559474359046 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=cancellation trial=0 mode=graph dense_ef=0.000153158119682 sw_ef=0.00438247196116 gate=0.000559474359046 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=cancellation trial=1 mode=launch dense_ef=0.000153597214113 sw_ef=0.00452178324389 gate=0.00056079164234 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=cancellation trial=1 mode=graph dense_ef=0.000153597214113 sw_ef=0.00452178324389 gate=0.00056079164234 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=cancellation trial=2 mode=launch dense_ef=0.000147038840179 sw_ef=0.00424962747258 gate=0.000541116520537 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=cancellation trial=2 mode=graph dense_ef=0.000147038840179 sw_ef=0.00424962747258 gate=0.000541116520537 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=zero trial=0 mode=launch dense_ef=0 sw_ef=0 gate=0.0001 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=zero trial=0 mode=graph dense_ef=0 sw_ef=0 gate=0.0001 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=zero trial=1 mode=launch dense_ef=0 sw_ef=0 gate=0.0001 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=zero trial=1 mode=graph dense_ef=0 sw_ef=0 gate=0.0001 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=zero trial=2 mode=launch dense_ef=0 sw_ef=0 gate=0.0001 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=zero trial=2 mode=graph dense_ef=0 sw_ef=0 gate=0.0001 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=identity trial=0 mode=launch dense_ef=0 sw_ef=0.000384141366313 gate=0.0001 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=identity trial=0 mode=graph dense_ef=0 sw_ef=0.000384141366313 gate=0.0001 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=identity trial=1 mode=launch dense_ef=0 sw_ef=0.000384352897435 gate=0.0001 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=identity trial=1 mode=graph dense_ef=0 sw_ef=0.000384352897435 gate=0.0001 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=identity trial=2 mode=launch dense_ef=0 sw_ef=0.00038349010856 gate=0.0001 nonfinite=0 pass=0
+CHECK size=1024 dtype=fp16 pattern=identity trial=2 mode=graph dense_ef=0 sw_ef=0.00038349010856 gate=0.0001 nonfinite=0 pass=0
+SUMMARY dtype=fp16 checks=36 failures=24
+</system-out>
+	</testcase>
+	<testcase name="exact_winograd_dag" classname="exact_winograd_dag" time="0.389724" status="run">
+		<system-out>...
+----------------------------------------------------------------------
+Ran 3 tests in 0.025s
+
+OK
+</system-out>
+	</testcase>
+	<testcase name="sw_pipeline_implementation" classname="sw_pipeline_implementation" time="20.1947" status="run">
+		<system-out>PASS dtype=bf16 shape=1x1x1 ta=0 tb=0 stride=0 alpha=1 beta=0 inplace=0 fractional=0 dedicated=0 unaligned=0 hopper=0 fresh_launch_graph=4
+PASS dtype=bf16 shape=2x3x5 ta=0 tb=0 stride=0 alpha=1 beta=0 inplace=0 fractional=0 dedicated=0 unaligned=0 hopper=0 fresh_launch_graph=4
+PASS dtype=bf16 shape=17x31x33 ta=0 tb=0 stride=0 alpha=1 beta=0 inplace=0 fractional=0 dedicated=0 unaligned=0 hopper=0 fresh_launch_graph=4
+PASS dtype=bf16 shape=63x65x127 ta=0 tb=0 stride=0 alpha=1 beta=0 inplace=0 fractional=0 dedicated=0 unaligned=0 hopper=0 fresh_launch_graph=4
+PASS dtype=bf16 shape=128x256x64 ta=0 tb=0 stride=0 alpha=1 beta=0 inplace=0 fractional=0 dedicated=0 unaligned=0 hopper=0 fresh_launch_graph=4
+PASS dtype=bf16 shape=512x512x512 ta=0 tb=0 stride=0 alpha=1 beta=0 inplace=0 fractional=0 dedicated=0 unaligned=0 hopper=0 fresh_launch_graph=4
+PASS dtype=bf16 shape=1025x65x33 ta=0 tb=0 stride=0 alpha=1 beta=0 inplace=0 fractional=0 dedicated=0 unaligned=0 hopper=0 fresh_launch_graph=4
+PASS dtype=bf16 shape=2048x1...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="tuned_correctness" classname="tuned_correctness" time="2.38984" status="run">
+		<system-out>PASS Dense policy, binding, empty, scale, overflow and overlap checks
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=01 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=01 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=01 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=10 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=10 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=10 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=11 alias=0 graph=0 element_aligned...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="tuning_candidates_correctness" classname="tuning_candidates_correctness" time="126.082" status="run">
+		<system-out>PASS candidate=128x64x64_c1 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x64x64_c1 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x128x64_c1 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x128x64_c1 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x256x64_c1 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x256x64_c1 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x128x64_c2 dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=128x128x64_c2 dtype=fp16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=simt_small dtype=bf16 fresh_trials=2 concurrent_graph_launch=2 in_place=1 padding=checked
+PASS candidate=simt_small dtype=fp16 fresh_trials=2 concu...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="tuning_precision_guard" classname="tuning_precision_guard" time="2.68433" status="run">
+		<system-out>PASS FP64 tuning guard dtype=bf16 transpose=0 alpha=checked strides=checked fresh_inputs=checked corruption=reject nonfinite=reject zero_reference=checked
+PASS FP64 tuning guard dtype=fp16 transpose=0 alpha=checked strides=checked fresh_inputs=checked corruption=reject nonfinite=reject zero_reference=checked
+PASS FP64 tuning guard dtype=bf16 transpose=1 alpha=checked strides=checked fresh_inputs=checked corruption=reject nonfinite=reject zero_reference=checked
+PASS FP64 tuning guard dtype=fp16 transpose=1 alpha=checked strides=checked fresh_inputs=checked corruption=reject nonfinite=reject zero_reference=checked
+</system-out>
+	</testcase>
+	<testcase name="tuning_confirmation_policy" classname="tuning_confirmation_policy" time="0.00760037" status="run">
+		<system-out>PASS late ninth winner, failed-prefix early rejection, five complete wins, unchanged median/boundary gates, invalid/empty timing rejection
+</system-out>
+	</testcase>
+	<testcase name="sw_tuner_selection" classname="sw_tuner_selection" time="3.98271" status="run">
+		<system-out>PASS SW tuning bf16 graph=0 strict_valid/no_valid/retune/diagnostic/fresh_inputs
+PASS SW tuning bf16 graph=1 strict_valid/no_valid/retune/diagnostic/fresh_inputs
+PASS SW tuning fp16 graph=0 strict_valid/no_valid/retune/diagnostic/fresh_inputs
+PASS SW tuning fp16 graph=1 strict_valid/no_valid/retune/diagnostic/fresh_inputs
+</system-out>
+	</testcase>
+	<testcase name="sw_tuner_candidates" classname="sw_tuner_candidates" time="10.4281" status="run">
+		<system-out>PASS native SW candidates 1024x1024x1024 bf16 count=90 fresh=3 launch+graph
+PASS native SW candidates 514x770x258 bf16 count=36 fresh=3 launch+graph
+PASS native SW candidates 512x1024x512 bf16 count=90 fresh=3 launch+graph
+PASS native SW candidates 512x512x2048 bf16 count=90 fresh=3 launch+graph
+PASS native SW candidates 1024x1024x1024 fp16 count=90 fresh=3 launch+graph
+PASS native SW candidates 514x770x258 fp16 count=36 fresh=3 launch+graph
+PASS native SW candidates 512x1024x512 fp16 count=90 fresh=3 launch+graph
+PASS native SW candidates 512x512x2048 fp16 count=90 fresh=3 launch+graph
+</system-out>
+	</testcase>
+</testsuite>

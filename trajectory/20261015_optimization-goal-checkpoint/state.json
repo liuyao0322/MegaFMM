@@ -1,0 +1,27 @@
+{
+  "active_goal": "Both BF16/FP16 full launch faster than contemporaneously tuned Dense",
+  "best_validated_source": "d8e6261",
+  "current_candidate": "d8e6261",
+  "candidate_note": "162 validated72bitwise+3quick sanitizers+256two-stream/Graph launches. LaunchBF11.337us beatsDense12.191; FP11.542us slowerDense9.965. AccuracyFAILboth. Goal remains active.",
+  "next_iteration": 163,
+  "rejected_invalid": [
+    109,
+    112,
+    121,
+    124,
+    127,
+    128,
+    151,
+    152
+  ],
+  "invalid_notes": {
+    "109": "accidentally Dense, no SW evidence",
+    "112": "build failed shared assertion",
+    "121": "wrong descriptor shared base, timings invalid",
+    "124": "resident capacity rejection",
+    "127": "build generator mistake",
+    "128": "direct producers wrong output eF~1.37, timings invalid",
+    "151": "Local-transform eF~1.58, excluded",
+    "152": "Position-independent indexing correction still eF~1.58, excluded"
+  }
+}

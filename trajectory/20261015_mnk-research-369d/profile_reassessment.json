@@ -1,0 +1,59 @@
+{
+  "production_commit": "9f4c9b3c8e5eb8720186aef75ad46f31a69a9ed4",
+  "shape": [
+    8192,
+    8192,
+    8192
+  ],
+  "dtype": "fp16",
+  "same_fresh_random_inputs": true,
+  "measurement": "NCU replay only; not timing acceptance or stable certification",
+  "profiles": [
+    {
+      "id": "0",
+      "kernel": "sm90_xmma_gemm_f16f32_f16f32_f32_nn_n_tilesize128x128x64_warpgroupsize1x1x1_execute_segment_k_on_kernel__5x_cublas",
+      "metrics": {
+        "gpu__time_duration.sum": "1.632672",
+        "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": "89.090901",
+        "lts__t_sector_hit_rate.pct": "60.762043",
+        "launch__registers_per_thread": "168",
+        "smsp__inst_executed.sum": "209476073.000000"
+      }
+    },
+    {
+      "id": "1",
+      "kernel": "void cutlass::device_kernel<cutlass::GemmUniversal<cute::tuple<int, int, int, int>, cutlass::CollectiveMma<cutlass::MainloopSm90TmaGmmaWarpSpecialized<4, cute::tuple<cute::C<1>, cute::C<1>, cute::C<1>>, cutlass::KernelTmaWarpSpecializedCooperative>, cute::tuple<cute::C<128>, cute::C<256>, cute::C<64>>, cutlass::half_t, cute::tuple<long, cute::C<1>, long>, cutlass::half_t, cute::tuple<cute::C<1>, long, long>, cute::TiledMMA<cute::MMA_Atom<cute::SM90_64x256x16_F32F16F16_SS<0, 1, 1, 1>>, cute::Layout<cute::tuple<cute::C<2>, cute::C<1>, cute::C<1>>, cute::tuple<cute::C<1>, cute::C<0>, cute::C<0>>>, cute::tuple<cute::Underscore, cute::Underscore, cute::Underscore>>, cute::SM90_TMA_LOAD, cute::ComposedLayout<cute::Swizzle<3, 4, 3>, cute::smem_ptr_flag_bits<16>, cute::Layout<cute::tuple<cute::C<8>, cute::C<64>>, cute::tuple<cute::C<64>, cute::C<1>>>>, void, cute::identity, cute::SM90_TMA_LOAD, cute::ComposedLayout<cute::Swizzle<3, 4, 3>, cute::smem_ptr_flag_bits<16>, cute::Layout<cute::tuple<cute::C<64>, cute::C<8>>, cute::tuple<cute::C<1>, cute::C<64>>>>, void, cute::identity>, cutlass::CollectiveEpilogue<cutlass::Sm90TmaWarpSpecialized<4, 2, 16, 0, 1>, cute::tuple<cute::C<128>, cute::C<256>, cute::C<64>>, cute::tuple<cute::C<128>, cute::C<32>>, void, cute::tuple<long, cute::C<1>, long>, float, cute::tuple<long, cute::C<1>, long>, cutlass::FusionCallbacks<cutlass::Sm90TmaWarpSpecialized<4, 2, 16, 0, 1>, cutlass::LinearCombination<float, float, void, float, 2>, cute::tuple<cute::C<128>, cute::C<256>, cute::C<64>>, cute::tuple<cute::C<128>, cute::C<32>>, >, cute::SM90_TMA_LOAD, cute::ComposedLayout<cute::Swizzle<3, 4, 3>, cute::smem_ptr_flag_bits<32>, cute::Layout<cute::tuple<cute::C<8>, cute::C<32>>, cute::tuple<cute::C<32>, cute::C<1>>>>, cute::AutoVectorizingCopyWithAssumedAlignment<128>, cute::SM90_TMA_STORE, cute::ComposedLayout<cute::Swizzle<3, 4, 3>, cute::smem_ptr_flag_bits<32>, cute::Layout<cute::tuple<cute::C<8>, cute::C<32>>, cute::tuple<cute::C<32>, cute::C<1>>>>, cute::AutoVectorizingCopyWithAssumedAlignment<128>, cute::Copy_Atom<cute::SM90_U32x4_STSM_N, cutlass::half_t>>, void, void>>(T1::Params)",
+      "metrics": {
+        "gpu__time_duration.sum": "1.559424",
+        "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": "91.655354",
+        "lts__t_sector_hit_rate.pct": "79.805614",
+        "launch__registers_per_thread": "168",
+        "smsp__inst_executed.sum": "143654457.000000"
+      }
+    }
+  ],
+  "observations": [
+    "Fresh cuBLASLt selects 128x128x64 segment_k_on rather than historical 128x256x64 segment_k_off. Do not transfer historical timing.",
+    "Both fresh Lt and historical Lt show two steady-state commits per K64 input tile, with wait1 between halves. Fresh Lt uses pairs of 64x128 MMA outputs while custom61 uses single 64x256 output.",
+    "Custom61 retains one commit after four K16 MMA operations per K64 tile."
+  ],
+  "hypothesis": "Keep K64 TMA buffers and all original MMA arithmetic ordering, split only WGMMA commits to release the previous full buffer after first half of the current tile.",
+  "safety_invariant": [
+    "Prologue commits one full K64 group and releases nothing.",
+    "Current first half commit + wait1 completes every previous-tile group; only then release previous full buffer.",
+    "Current second half commits after previous-buffer release; current buffer remains owned.",
+    "Exactly k_tile_count-1 mainloop releases; inherited Base mma_tail waits0 and releases the last tile.",
+    "No accumulator access besides MMA; compiler operand fences match Base. Producer/arguments/layout/shared storage inherited."
+  ],
+  "primary_semantics": "https://docs.nvidia.com/cuda/parallel-thread-execution/#asynchronous-warpgroup-level-matrix-instructions-wgmma-wait-group",
+  "next": "Resource guard and twelve original-input exact FP64 tails plus persistent reuse for ordinary/nine-warp x CM1/2; large random FP64 acceptance not yet measured.",
+  "raw_metric_units": {
+    "gpu__time_duration.sum": "msecond",
+    "smsp__inst_executed.sum": "instructions"
+  },
+  "fresh_lt_sass_summary": [
+    "Steady iteration has eight 64x128x16 instructions for two output fragments over K64.",
+    "Commit after first four instructions (K32 across both fragments), wait1, then four remaining instructions and second commit.",
+    "This supports testing half-K64 groups independently of output tile width; it does not establish a speedup."
+  ]
+}

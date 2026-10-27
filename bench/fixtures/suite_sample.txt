@@ -1,0 +1,23 @@
+This small text is a software test fixture written for the MegaFMM experiment suite.
+It is not a language modeling benchmark dataset. Results on this text establish
+that tokenization, backend substitution, likelihood evaluation, and provenance
+recording work together. They do not establish general language model quality.
+
+A matrix multiplication routine receives two arrays and computes their product.
+An application may call the routine many times, with different shapes and values.
+The experiment records both the time spent and the quality of the final result.
+Changing a numerical backend can change rounding, so speed and accuracy are
+measured independently.
+
+Scientific calculations often build matrices from physical models. Neural
+networks build matrices from observations, weights, gradients, and intermediate
+features. In both cases, an experiment needs a clear input, a reproducible
+reference, and a stated success criterion.
+
+An isolated benchmark starts each invocation from the same initial state.
+An iterative solver checks its residual before declaring convergence. A model
+evaluation computes likelihood on a fixed sequence of tokens. These operations
+serve different purposes and should retain distinct labels in the final report.
+
+The experiment suite preserves slow results and failed quality checks. A faster
+calculation is useful when its result meets the requirements of the application.

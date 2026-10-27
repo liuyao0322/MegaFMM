@@ -1,0 +1,34 @@
+==WARNING== Note: Running with uncontrolled GPU caches. Profiling results may be inconsistent.
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 1332741 (/share/home/liuyao/workspace/MegaFMM/results/opt_seven_round/iter160_bench)
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=1024,1024,1024 dtype=bf16 case=solution config=sw_cooperative;warp_roles=1tma+4simt+4mma_sync+15pack_only;smem=213120;operand_stages=4;bk=256;workspace=4194304;st=compact4planes_balanced_async_p1p2;publication=tma_leader_driver_workspace_barrier_cuda12.4;recombine=streaming_fixed_chunk_offsets;product_order=1_2_6_7_5_3_4;product_slots=2;product_layout=row_xor_0_3_4;operand_release=warp_leader;tc=warp_m16n8k16_ldmatrix;leaf_terms=7;residual_correction=off;current_pointer_maps=4;alpha=1;beta=0
+==PROF== Profiling "sw_cooperative_hilo": 0%....50%....100% - 1 pass
+PROFILE 1024,1024,1024 bf16 sw_cooperative_hilo_64x32x256 workspace=4194304 target=solution lt_config=sw_cooperative;warp_roles=1tma+4simt+4mma_sync+15pack_only;smem=213120;operand_stages=4;bk=256;workspace=4194304;st=compact4planes_balanced_async_p1p2;publication=tma_leader_driver_workspace_barrier_cuda12.4;recombine=streaming_fixed_chunk_offsets;product_order=1_2_6_7_5_3_4;product_slots=2;product_layout=row_xor_0_3_4;operand_release=warp_leader;tc=warp_m16n8k16_ldmatrix;leaf_terms=7;residual_correction=off;current_pointer_maps=4;alpha=1;beta=0
+TUNE shape=1024,1024,1024 dtype=fp16 case=solution config=sw_cooperative;warp_roles=1tma+4simt+4mma_sync+15pack_only;smem=213120;operand_stages=4;bk=256;workspace=4194304;st=compact4planes_balanced_async_p1p2;publication=tma_leader_driver_workspace_barrier_cuda12.4;recombine=streaming_fixed_chunk_offsets;product_order=1_2_6_7_5_3_4;product_slots=2;product_layout=row_xor_0_3_4;operand_release=warp_leader;tc=warp_m16n8k16_ldmatrix;leaf_terms=7;residual_correction=off;current_pointer_maps=4;alpha=1;beta=0
+==PROF== Profiling "sw_cooperative_hilo": 0%....50%....100% - 1 pass
+PROFILE 1024,1024,1024 fp16 sw_cooperative_hilo_64x32x256 workspace=4194304 target=solution lt_config=sw_cooperative;warp_roles=1tma+4simt+4mma_sync+15pack_only;smem=213120;operand_stages=4;bk=256;workspace=4194304;st=compact4planes_balanced_async_p1p2;publication=tma_leader_driver_workspace_barrier_cuda12.4;recombine=streaming_fixed_chunk_offsets;product_order=1_2_6_7_5_3_4;product_slots=2;product_layout=row_xor_0_3_4;operand_release=warp_leader;tc=warp_m16n8k16_ldmatrix;leaf_terms=7;residual_correction=off;current_pointer_maps=4;alpha=1;beta=0
+==PROF== Disconnected from process 1332741
+[1332741] iter160_bench@127.0.0.1
+  void unnamed>::sw_cooperative_hilo<bfloat16_t>(CUtensorMap_st, CUtensorMap_st, CUtensorMap_st, CUtensorMap_st, const T1 *, const T1 *, T1 *, float *) (16, 8, 1)x(768, 1, 1), Context 1, Stream 13, Device 0, CC 9.0
+    Warning: Data collection happened without fixed GPU frequencies. Profiling results may be inconsistent.
+    Section: Command line profiler metrics
+    --------------------------------------------------------------- ----------- ------------
+    Metric Name                                                     Metric Unit Metric Value
+    --------------------------------------------------------------- ----------- ------------
+    gpu__time_duration.sum                                                   us        31.65
+    sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed           %         9.09
+    smsp__inst_executed.sum                                                inst      6545261
+    --------------------------------------------------------------- ----------- ------------
+
+  void unnamed>::sw_cooperative_hilo<half_t>(CUtensorMap_st, CUtensorMap_st, CUtensorMap_st, CUtensorMap_st, const T1 *, const T1 *, T1 *, float *) (16, 8, 1)x(768, 1, 1), Context 1, Stream 14, Device 0, CC 9.0
+    Warning: Data collection happened without fixed GPU frequencies. Profiling results may be inconsistent.
+    Section: Command line profiler metrics
+    --------------------------------------------------------------- ----------- ------------
+    Metric Name                                                     Metric Unit Metric Value
+    --------------------------------------------------------------- ----------- ------------
+    gpu__time_duration.sum                                                   us        30.27
+    sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed           %         9.52
+    smsp__inst_executed.sum                                                inst      6545809
+    --------------------------------------------------------------- ----------- ------------
+

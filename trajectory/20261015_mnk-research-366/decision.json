@@ -1,0 +1,27 @@
+{
+  "direction": "Compute B^T A^T with column-major operand and output views, writing directly to original row-major D",
+  "variants": [
+    "128x256x64 CM1",
+    "128x256x64 CM2"
+  ],
+  "resource": {
+    "stages": 4,
+    "threads": 384,
+    "registers_per_thread": 168,
+    "shared_bytes": 231424,
+    "local_bytes": 0,
+    "resident_ctas_per_sm": 1
+  },
+  "tests": [
+    "257x520x1032 strided all-ones exact result and output padding",
+    "Two fresh non-symmetric integer-valued input pairs; original AB FP64 oracle; alpha=0.5; output padding"
+  ],
+  "result": "both pass resource and correctness preflight",
+  "performance": "not measured; not certified",
+  "motivation": "K32 recovered overlap (Tensor92.46%, L2hit80.69%) but did not add stable wins. Change memory orientation/reuse instead of further blind K granularity tuning.",
+  "implementation_authority": [
+    "third_party/cutlass/include/cutlass/gemm/collective/builders/sm90_common.inl gmma_ss_tag_to_major_A/B and is_use_rmem_A",
+    "third_party/cutlass/include/cutlass/epilogue/collective/builders/sm90_common.inl sm90_get_smem_store_op_for_accumulator"
+  ],
+  "next": "Add compile-time Swapped flag to shared Candidate arguments/layouts, append102/103 total104; eligibility and zero workspace preserved; extend existing forced tests automatically; formal366 full original protocol then immediate log/commit, force/API/sanitizers. No extra transpose kernel."
+}

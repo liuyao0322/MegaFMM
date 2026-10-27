@@ -1,0 +1,23 @@
+from pathlib import Path
+import subprocess
+p=Path('results/opt_goal/phasetrace282')
+base=subprocess.check_output(['git','show','1bdfb29:solution/sw_pipeline.cu'],text=True)
+(p/'base.cuh').write_text(base.replace('namespace megafmm::detail','namespace megafmm::base254'))
+s=base.replace('namespace megafmm::detail','namespace megafmm::trace254')
+s=s.replace('template<class T> __global__ __launch_bounds__(512,1)','__device__ __forceinline__ void stamp254(uint64_t* trace,int phase,int cta){uint64_t t;asm volatile("mov.u64 %0,%%globaltimer;":"=l"(t));trace[cta*8+phase]=t;}\ntemplate<class T> __global__ __launch_bounds__(512,1)')
+s=s.replace('T* packed){','T* packed,uint64_t* trace){')
+s=s.replace('  cudaTriggerProgrammaticLaunchCompletion();','  if(threadIdx.x==0)stamp254(trace,0,blockIdx.x);\n  cudaTriggerProgrammaticLaunchCompletion();')
+s=s.replace('  asm volatile("fence.proxy.async.global;" ::: "memory");','  asm volatile("fence.proxy.async.global;" ::: "memory");\n  if(threadIdx.x==0)stamp254(trace,1,blockIdx.x);')
+s=s.replace('T* packed,float* D){','T* packed,float* D,uint64_t* trace){')
+s=s.replace('  int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;','  int tid=threadIdx.x,m0=blockIdx.y*BM,n0=blockIdx.x*BN;\n  if(tid==0)stamp254(trace,2,blockIdx.y*16+blockIdx.x);')
+s=s.replace('if(sequence==8)cudaGridDependencySynchronize();','if(sequence==8){stamp254(trace,3,blockIdx.y*16+blockIdx.x);cudaGridDependencySynchronize();stamp254(trace,4,blockIdx.y*16+blockIdx.x);}')
+s=s.replace('    tensor_chain(s,tid,m0,n0,D);','    if(tid==128)stamp254(trace,5,blockIdx.y*16+blockIdx.x);\n    tensor_chain(s,tid,m0,n0,D);\n    if(tid==128)stamp254(trace,6,blockIdx.y*16+blockIdx.x);')
+s=s.replace('void* workspace,cudaStream_t stream){','void* workspace,cudaStream_t stream,uint64_t* trace){')
+s=s.replace('*>(workspace));','*>(workspace),trace);').replace('*>(workspace),D),','*>(workspace),D,trace),')
+# Reuse proven sparse instrumentation with adjusted K-block and operand indices.
+old=Path('results/opt_goal/phasetrace254/generate.py').read_text();a=old.index("s=s.replace('int n0");b=old.index("(p/'trace.cuh').write_text(s)")
+g=old[a:b].replace('%56','%40').replace('[(0,0),(2,0),(6,1)]','[(0,0),(2,0),(6,3)]')
+exec(g)
+(p/'trace.cuh').write_text(s)
+(p/'driver.cu').write_text(Path('results/opt_goal/phasetrace254/driver.cu').read_text())
+(p/'run.sh').write_text(Path('results/opt_goal/phasetrace254/run.sh').read_text().replace('phasetrace254','phasetrace282'))

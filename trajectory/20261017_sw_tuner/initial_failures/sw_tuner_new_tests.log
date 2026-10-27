@@ -1,0 +1,28 @@
+[  7%] Built target test_tuning_confirmation
+[ 48%] Built target megafmm
+[ 70%] Built target test_sw1024
+[ 70%] Built target test_sw_pipeline
+[ 77%] Built target megafmm_bench
+[ 77%] Built target test_correctness
+[ 96%] Built target test_tuning_precision
+[ 96%] Building CUDA object CMakeFiles/test_sw_tuner.dir/tests/test_sw_tuner.cu.o
+[ 96%] Built target test_tuning_candidates
+[100%] Linking CXX executable test_sw_tuner
+[100%] Built target test_sw_tuner
+Internal ctest changing into directory: /share/home/liuyao/workspace/MegaFMM/build-sw-tuner
+Test project /share/home/liuyao/workspace/MegaFMM/build-sw-tuner
+    Start  9: sw_tuner_selection
+1/2 Test  #9: sw_tuner_selection ...............   Passed    4.89 sec
+    Start 10: sw_tuner_candidates
+2/2 Test #10: sw_tuner_candidates ..............***Failed    1.11 sec
+ERROR SW candidate does not compute original AB
+
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =   6.02 sec
+
+The following tests FAILED:
+	 10 - sw_tuner_candidates (Failed)
+Errors while running CTest
+srun: error: g08: task 0: Exited with exit code 8

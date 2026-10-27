@@ -1,0 +1,905 @@
+{
+  "research_only": true,
+  "large_random_fp64_acceptance": "unchecked",
+  "stable_certification": "unchecked",
+  "production_unchanged": true,
+  "timing": "5 groups x100 full calls, two fresh rotating random input sets; tuned dispatcher/hybrid/matching original measured in each group, reverse order on odd groups",
+  "rows": [
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "bf16",
+      "variant": 1,
+      "cluster_m": 1,
+      "nine_warp": false,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.987583,
+      "min_speedup": 0.967551,
+      "median_original_speedup": 1.000056,
+      "min_original_speedup": 0.989447,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.219905287,
+          "custom_ms": 0.227280319,
+          "speedup": 0.967551,
+          "original_ms": 0.224881917,
+          "original_speedup": 0.989447
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.221544951,
+          "custom_ms": 0.222723842,
+          "speedup": 0.994707,
+          "original_ms": 0.222884163,
+          "original_speedup": 1.00072
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.232605442,
+          "custom_ms": 0.235709116,
+          "speedup": 0.986833,
+          "original_ms": 0.235722244,
+          "original_speedup": 1.000056
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.223411515,
+          "custom_ms": 0.226220474,
+          "speedup": 0.987583,
+          "original_ms": 0.232390404,
+          "original_speedup": 1.027274
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.23224768,
+          "custom_ms": 0.234696954,
+          "speedup": 0.989564,
+          "original_ms": 0.233389109,
+          "original_speedup": 0.994428
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "bf16",
+      "variant": 2,
+      "cluster_m": 2,
+      "nine_warp": false,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.98382,
+      "min_speedup": 0.965379,
+      "median_original_speedup": 0.996633,
+      "min_original_speedup": 0.976852,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.226004481,
+          "custom_ms": 0.228031039,
+          "speedup": 0.991113,
+          "original_ms": 0.227263361,
+          "original_speedup": 0.996633
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.216236159,
+          "custom_ms": 0.21836479,
+          "speedup": 0.990252,
+          "original_ms": 0.219427839,
+          "original_speedup": 1.004868
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.220857605,
+          "custom_ms": 0.228778243,
+          "speedup": 0.965379,
+          "original_ms": 0.225747839,
+          "original_speedup": 0.986754
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.21706593,
+          "custom_ms": 0.220635831,
+          "speedup": 0.98382,
+          "original_ms": 0.22407265,
+          "original_speedup": 1.015577
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.223590717,
+          "custom_ms": 0.229198396,
+          "speedup": 0.975533,
+          "original_ms": 0.223892808,
+          "original_speedup": 0.976852
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "bf16",
+      "variant": 3,
+      "cluster_m": 1,
+      "nine_warp": true,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.983817,
+      "min_speedup": 0.964313,
+      "median_original_speedup": 0.9998,
+      "min_original_speedup": 0.9875,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.22118561,
+          "custom_ms": 0.224513918,
+          "speedup": 0.985175,
+          "original_ms": 0.221707523,
+          "original_speedup": 0.9875
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.215278402,
+          "custom_ms": 0.218819529,
+          "speedup": 0.983817,
+          "original_ms": 0.218900159,
+          "original_speedup": 1.000368
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.221508801,
+          "custom_ms": 0.229706243,
+          "speedup": 0.964313,
+          "original_ms": 0.228613436,
+          "original_speedup": 0.995243
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.217586234,
+          "custom_ms": 0.223848641,
+          "speedup": 0.972024,
+          "original_ms": 0.224096641,
+          "original_speedup": 1.001108
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.224058241,
+          "custom_ms": 0.211194873,
+          "speedup": 1.060908,
+          "original_ms": 0.211152643,
+          "original_speedup": 0.9998
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "bf16",
+      "variant": 4,
+      "cluster_m": 2,
+      "nine_warp": true,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 1.044885,
+      "min_speedup": 0.973475,
+      "median_original_speedup": 1.000138,
+      "min_original_speedup": 0.900197,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.226526722,
+          "custom_ms": 0.216795847,
+          "speedup": 1.044885,
+          "original_ms": 0.216833293,
+          "original_speedup": 1.000173
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.232188478,
+          "custom_ms": 0.216756806,
+          "speedup": 1.071193,
+          "original_ms": 0.21682176,
+          "original_speedup": 1.0003
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.233975679,
+          "custom_ms": 0.217347831,
+          "speedup": 1.076503,
+          "original_ms": 0.217377916,
+          "original_speedup": 1.000138
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.234925121,
+          "custom_ms": 0.241326407,
+          "speedup": 0.973475,
+          "original_ms": 0.217241287,
+          "original_speedup": 0.900197
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.234927997,
+          "custom_ms": 0.240374386,
+          "speedup": 0.977342,
+          "original_ms": 0.232926413,
+          "original_speedup": 0.969015
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "fp16",
+      "variant": 1,
+      "cluster_m": 1,
+      "nine_warp": false,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.945803,
+      "min_speedup": 0.912983,
+      "median_original_speedup": 1.004009,
+      "min_original_speedup": 0.975885,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.209003851,
+          "custom_ms": 0.203598082,
+          "speedup": 1.026551,
+          "original_ms": 0.217852801,
+          "original_speedup": 1.070014
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.220801279,
+          "custom_ms": 0.229571208,
+          "speedup": 0.961799,
+          "original_ms": 0.230491519,
+          "original_speedup": 1.004009
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.228809282,
+          "custom_ms": 0.24192065,
+          "speedup": 0.945803,
+          "original_ms": 0.236919045,
+          "original_speedup": 0.979325
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.209424958,
+          "custom_ms": 0.229385287,
+          "speedup": 0.912983,
+          "original_ms": 0.233646721,
+          "original_speedup": 1.018578
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.216946885,
+          "custom_ms": 0.230405122,
+          "speedup": 0.941589,
+          "original_ms": 0.224848956,
+          "original_speedup": 0.975885
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "fp16",
+      "variant": 2,
+      "cluster_m": 2,
+      "nine_warp": false,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.934412,
+      "min_speedup": 0.916058,
+      "median_original_speedup": 0.971831,
+      "min_original_speedup": 0.965537,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.220119044,
+          "custom_ms": 0.240289286,
+          "speedup": 0.916058,
+          "original_ms": 0.233520642,
+          "original_speedup": 0.971831
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.208971515,
+          "custom_ms": 0.223407358,
+          "speedup": 0.935383,
+          "original_ms": 0.230253756,
+          "original_speedup": 1.030645
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.214655682,
+          "custom_ms": 0.229793608,
+          "speedup": 0.934124,
+          "original_ms": 0.22320801,
+          "original_speedup": 0.971341
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.221802562,
+          "custom_ms": 0.233441606,
+          "speedup": 0.950142,
+          "original_ms": 0.225396484,
+          "original_speedup": 0.965537
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.222963855,
+          "custom_ms": 0.238614082,
+          "speedup": 0.934412,
+          "original_ms": 0.233533442,
+          "original_speedup": 0.978708
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "fp16",
+      "variant": 3,
+      "cluster_m": 1,
+      "nine_warp": true,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.948939,
+      "min_speedup": 0.793621,
+      "median_original_speedup": 1.002603,
+      "min_original_speedup": 0.928185,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.221273601,
+          "custom_ms": 0.231052145,
+          "speedup": 0.957678,
+          "original_ms": 0.233872965,
+          "original_speedup": 1.012209
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.223395526,
+          "custom_ms": 0.23049216,
+          "speedup": 0.969211,
+          "original_ms": 0.23109217,
+          "original_speedup": 1.002603
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.249891534,
+          "custom_ms": 0.314875215,
+          "speedup": 0.793621,
+          "original_ms": 0.292262405,
+          "original_speedup": 0.928185
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.222275853,
+          "custom_ms": 0.249769911,
+          "speedup": 0.889922,
+          "original_ms": 0.277066886,
+          "original_speedup": 1.109288
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.225488961,
+          "custom_ms": 0.237622082,
+          "speedup": 0.948939,
+          "original_ms": 0.234757766,
+          "original_speedup": 0.987946
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "n": 4096,
+      "k": 4096,
+      "dtype": "fp16",
+      "variant": 4,
+      "cluster_m": 2,
+      "nine_warp": true,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.940749,
+      "min_speedup": 0.932766,
+      "median_original_speedup": 0.985177,
+      "min_original_speedup": 0.968097,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 0.227617607,
+          "custom_ms": 0.243562236,
+          "speedup": 0.934536,
+          "original_ms": 0.239951998,
+          "original_speedup": 0.985177
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 0.218860164,
+          "custom_ms": 0.227795199,
+          "speedup": 0.960776,
+          "original_ms": 0.23419103,
+          "original_speedup": 1.028077
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 0.226667523,
+          "custom_ms": 0.240943685,
+          "speedup": 0.940749,
+          "original_ms": 0.234416962,
+          "original_speedup": 0.972912
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 0.218544632,
+          "custom_ms": 0.225019842,
+          "speedup": 0.971224,
+          "original_ms": 0.228941441,
+          "original_speedup": 1.017428
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 0.226732805,
+          "custom_ms": 0.243075848,
+          "speedup": 0.932766,
+          "original_ms": 0.23532097,
+          "original_speedup": 0.968097
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "bf16",
+      "variant": 1,
+      "cluster_m": 1,
+      "nine_warp": false,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.996664,
+      "min_speedup": 0.985787,
+      "median_original_speedup": 0.965636,
+      "min_original_speedup": 0.960736,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.704637408,
+          "custom_ms": 1.710343003,
+          "speedup": 0.996664,
+          "original_ms": 1.643188834,
+          "original_speedup": 0.960736
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.622950435,
+          "custom_ms": 1.616781473,
+          "speedup": 1.003816,
+          "original_ms": 1.653499961,
+          "original_speedup": 1.022711
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.68620801,
+          "custom_ms": 1.704434514,
+          "speedup": 0.989306,
+          "original_ms": 1.645172715,
+          "original_speedup": 0.965231
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.654539466,
+          "custom_ms": 1.631780863,
+          "speedup": 1.013947,
+          "original_ms": 1.659816027,
+          "original_speedup": 1.017181
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.672506571,
+          "custom_ms": 1.696620226,
+          "speedup": 0.985787,
+          "original_ms": 1.638318062,
+          "original_speedup": 0.965636
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "bf16",
+      "variant": 2,
+      "cluster_m": 2,
+      "nine_warp": false,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 1.005912,
+      "min_speedup": 0.996248,
+      "median_original_speedup": 1.015645,
+      "min_original_speedup": 1.002488,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.652038455,
+          "custom_ms": 1.617495418,
+          "speedup": 1.021356,
+          "original_ms": 1.635528564,
+          "original_speedup": 1.011149
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.619204879,
+          "custom_ms": 1.625302792,
+          "speedup": 0.996248,
+          "original_ms": 1.658432007,
+          "original_speedup": 1.020383
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.62880218,
+          "custom_ms": 1.611115932,
+          "speedup": 1.010978,
+          "original_ms": 1.643767953,
+          "original_speedup": 1.020267
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.646274209,
+          "custom_ms": 1.646486044,
+          "speedup": 0.999871,
+          "original_ms": 1.650582075,
+          "original_speedup": 1.002488
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.634439349,
+          "custom_ms": 1.624833941,
+          "speedup": 1.005912,
+          "original_ms": 1.650254726,
+          "original_speedup": 1.015645
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "bf16",
+      "variant": 3,
+      "cluster_m": 1,
+      "nine_warp": true,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.978502,
+      "min_speedup": 0.971812,
+      "median_original_speedup": 1.002843,
+      "min_original_speedup": 0.995409,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.637034297,
+          "custom_ms": 1.673000693,
+          "speedup": 0.978502,
+          "original_ms": 1.680616856,
+          "original_speedup": 1.004552
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.666206002,
+          "custom_ms": 1.663935661,
+          "speedup": 1.001364,
+          "original_ms": 1.656296372,
+          "original_speedup": 0.995409
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.622998357,
+          "custom_ms": 1.670074582,
+          "speedup": 0.971812,
+          "original_ms": 1.678100109,
+          "original_speedup": 1.004805
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.664968967,
+          "custom_ms": 1.649649382,
+          "speedup": 1.009287,
+          "original_ms": 1.65084517,
+          "original_speedup": 1.000725
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.633718729,
+          "custom_ms": 1.676240683,
+          "speedup": 0.974633,
+          "original_ms": 1.681006789,
+          "original_speedup": 1.002843
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "bf16",
+      "variant": 4,
+      "cluster_m": 2,
+      "nine_warp": true,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 1.010815,
+      "min_speedup": 0.973399,
+      "median_original_speedup": 1.004578,
+      "min_original_speedup": 0.984105,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.635272026,
+          "custom_ms": 1.617775083,
+          "speedup": 1.010815,
+          "original_ms": 1.651516438,
+          "original_speedup": 1.020857
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.652649999,
+          "custom_ms": 1.605603218,
+          "speedup": 1.029302,
+          "original_ms": 1.612953901,
+          "original_speedup": 1.004578
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.638798714,
+          "custom_ms": 1.65542233,
+          "speedup": 0.989958,
+          "original_ms": 1.629108787,
+          "original_speedup": 0.984105
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.646963239,
+          "custom_ms": 1.60884738,
+          "speedup": 1.023691,
+          "original_ms": 1.633245111,
+          "original_speedup": 1.015165
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.601827264,
+          "custom_ms": 1.64560163,
+          "speedup": 0.973399,
+          "original_ms": 1.636025906,
+          "original_speedup": 0.994181
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "fp16",
+      "variant": 1,
+      "cluster_m": 1,
+      "nine_warp": false,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.991769,
+      "min_speedup": 0.978378,
+      "median_original_speedup": 0.999648,
+      "min_original_speedup": 0.985071,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.74591589,
+          "custom_ms": 1.763434291,
+          "speedup": 0.990066,
+          "original_ms": 1.737108707,
+          "original_speedup": 0.985071
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.713846087,
+          "custom_ms": 1.704725742,
+          "speedup": 1.00535,
+          "original_ms": 1.742113948,
+          "original_speedup": 1.021932
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.73452282,
+          "custom_ms": 1.748918772,
+          "speedup": 0.991769,
+          "original_ms": 1.748303413,
+          "original_speedup": 0.999648
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.717101455,
+          "custom_ms": 1.727117419,
+          "speedup": 0.994201,
+          "original_ms": 1.729533434,
+          "original_speedup": 1.001399
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.714099526,
+          "custom_ms": 1.751980424,
+          "speedup": 0.978378,
+          "original_ms": 1.748090267,
+          "original_speedup": 0.99778
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "fp16",
+      "variant": 2,
+      "cluster_m": 2,
+      "nine_warp": false,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 1.007526,
+      "min_speedup": 1.001984,
+      "median_original_speedup": 0.998821,
+      "min_original_speedup": 0.996164,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.716706872,
+          "custom_ms": 1.70239222,
+          "speedup": 1.008409,
+          "original_ms": 1.698593616,
+          "original_speedup": 0.997769
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.722634315,
+          "custom_ms": 1.706124783,
+          "speedup": 1.009677,
+          "original_ms": 1.699579477,
+          "original_speedup": 0.996164
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.70074141,
+          "custom_ms": 1.697373509,
+          "speedup": 1.001984,
+          "original_ms": 1.706357121,
+          "original_speedup": 1.005293
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.715539575,
+          "custom_ms": 1.70272541,
+          "speedup": 1.007526,
+          "original_ms": 1.700718045,
+          "original_speedup": 0.998821
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.703574657,
+          "custom_ms": 1.695925713,
+          "speedup": 1.00451,
+          "original_ms": 1.697633624,
+          "original_speedup": 1.001007
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "fp16",
+      "variant": 3,
+      "cluster_m": 1,
+      "nine_warp": true,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 0.975528,
+      "min_speedup": 0.973997,
+      "median_original_speedup": 1.000144,
+      "min_original_speedup": 0.997876,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.706210136,
+          "custom_ms": 1.746777296,
+          "speedup": 0.976776,
+          "original_ms": 1.749024987,
+          "original_speedup": 1.001287
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.716875196,
+          "custom_ms": 1.749185324,
+          "speedup": 0.981528,
+          "original_ms": 1.749708414,
+          "original_speedup": 1.000299
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.70780766,
+          "custom_ms": 1.750648975,
+          "speedup": 0.975528,
+          "original_ms": 1.750900388,
+          "original_speedup": 1.000144
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.70698595,
+          "custom_ms": 1.752557039,
+          "speedup": 0.973997,
+          "original_ms": 1.748835087,
+          "original_speedup": 0.997876
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.70540309,
+          "custom_ms": 1.749945521,
+          "speedup": 0.974546,
+          "original_ms": 1.748931885,
+          "original_speedup": 0.999421
+        }
+      ]
+    },
+    {
+      "m": 8192,
+      "n": 8192,
+      "k": 8192,
+      "dtype": "fp16",
+      "variant": 4,
+      "cluster_m": 2,
+      "nine_warp": true,
+      "baseline_route": "tuned_dense_cublaslt",
+      "median_speedup": 1.007105,
+      "min_speedup": 0.998798,
+      "median_original_speedup": 0.995831,
+      "min_original_speedup": 0.98998,
+      "groups": [
+        {
+          "group": 0.0,
+          "baseline_ms": 1.714148045,
+          "custom_ms": 1.710922837,
+          "speedup": 1.001885,
+          "original_ms": 1.693779469,
+          "original_speedup": 0.98998
+        },
+        {
+          "group": 1.0,
+          "baseline_ms": 1.718622088,
+          "custom_ms": 1.698641181,
+          "speedup": 1.011763,
+          "original_ms": 1.7071805,
+          "original_speedup": 1.005027
+        },
+        {
+          "group": 2.0,
+          "baseline_ms": 1.713954568,
+          "custom_ms": 1.701863408,
+          "speedup": 1.007105,
+          "original_ms": 1.694768667,
+          "original_speedup": 0.995831
+        },
+        {
+          "group": 3.0,
+          "baseline_ms": 1.712804437,
+          "custom_ms": 1.695119619,
+          "speedup": 1.010433,
+          "original_ms": 1.711061716,
+          "original_speedup": 1.009405
+        },
+        {
+          "group": 4.0,
+          "baseline_ms": 1.712965369,
+          "custom_ms": 1.715026498,
+          "speedup": 0.998798,
+          "original_ms": 1.703308821,
+          "original_speedup": 0.993168
+        }
+      ]
+    }
+  ]
+}

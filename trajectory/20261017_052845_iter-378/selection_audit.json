@@ -1,0 +1,219 @@
+{
+  "rows": 14,
+  "accepted_accelerations": 4,
+  "selection_audit": "PASS",
+  "results": [
+    {
+      "shape": [
+        "512",
+        "512",
+        "512"
+      ],
+      "dtype": "bf16",
+      "mode": "launch",
+      "candidate_count": 126,
+      "precision_valid": 36,
+      "selected": 95,
+      "speedup": 0.682556982986,
+      "precision_pass": true,
+      "accepted_acceleration": false
+    },
+    {
+      "shape": [
+        "512",
+        "512",
+        "512"
+      ],
+      "dtype": "fp16",
+      "mode": "launch",
+      "candidate_count": 90,
+      "precision_valid": 0,
+      "selected": 3,
+      "speedup": 0.73371787663,
+      "precision_pass": false,
+      "accepted_acceleration": false
+    },
+    {
+      "shape": [
+        "1024",
+        "1024",
+        "1024"
+      ],
+      "dtype": "bf16",
+      "mode": "launch",
+      "candidate_count": 127,
+      "precision_valid": 36,
+      "selected": 105,
+      "speedup": 0.785284059229,
+      "precision_pass": true,
+      "accepted_acceleration": false
+    },
+    {
+      "shape": [
+        "1024",
+        "1024",
+        "1024"
+      ],
+      "dtype": "fp16",
+      "mode": "launch",
+      "candidate_count": 91,
+      "precision_valid": 0,
+      "selected": -2,
+      "speedup": 0.91876966176,
+      "precision_pass": false,
+      "accepted_acceleration": false
+    },
+    {
+      "shape": [
+        "2048",
+        "2048",
+        "2048"
+      ],
+      "dtype": "bf16",
+      "mode": "launch",
+      "candidate_count": 126,
+      "precision_valid": 36,
+      "selected": 106,
+      "speedup": 0.493592519331,
+      "precision_pass": true,
+      "accepted_acceleration": false
+    },
+    {
+      "shape": [
+        "2048",
+        "2048",
+        "2048"
+      ],
+      "dtype": "fp16",
+      "mode": "launch",
+      "candidate_count": 90,
+      "precision_valid": 0,
+      "selected": 16,
+      "speedup": 0.611199304002,
+      "precision_pass": false,
+      "accepted_acceleration": false
+    },
+    {
+      "shape": [
+        "4096",
+        "4096",
+        "4096"
+      ],
+      "dtype": "bf16",
+      "mode": "launch",
+      "candidate_count": 126,
+      "precision_valid": 36,
+      "selected": 106,
+      "speedup": 0.532123437555,
+      "precision_pass": true,
+      "accepted_acceleration": false
+    },
+    {
+      "shape": [
+        "4096",
+        "4096",
+        "4096"
+      ],
+      "dtype": "fp16",
+      "mode": "launch",
+      "candidate_count": 90,
+      "precision_valid": 0,
+      "selected": 52,
+      "speedup": 0.617869566181,
+      "precision_pass": false,
+      "accepted_acceleration": false
+    },
+    {
+      "shape": [
+        "1025",
+        "1537",
+        "769"
+      ],
+      "dtype": "bf16",
+      "mode": "launch",
+      "candidate_count": 72,
+      "precision_valid": 36,
+      "selected": 51,
+      "speedup": 2.03873886219,
+      "precision_pass": true,
+      "accepted_acceleration": true
+    },
+    {
+      "shape": [
+        "1025",
+        "1537",
+        "769"
+      ],
+      "dtype": "fp16",
+      "mode": "launch",
+      "candidate_count": 36,
+      "precision_valid": 0,
+      "selected": 15,
+      "speedup": 1.9262750488,
+      "precision_pass": false,
+      "accepted_acceleration": false
+    },
+    {
+      "shape": [
+        "514",
+        "770",
+        "258"
+      ],
+      "dtype": "bf16",
+      "mode": "launch",
+      "candidate_count": 72,
+      "precision_valid": 36,
+      "selected": 42,
+      "speedup": 1.01328078079,
+      "precision_pass": true,
+      "accepted_acceleration": true
+    },
+    {
+      "shape": [
+        "514",
+        "770",
+        "258"
+      ],
+      "dtype": "fp16",
+      "mode": "launch",
+      "candidate_count": 36,
+      "precision_valid": 0,
+      "selected": 6,
+      "speedup": 1.0146792552,
+      "precision_pass": false,
+      "accepted_acceleration": false
+    },
+    {
+      "shape": [
+        "1",
+        "1",
+        "1"
+      ],
+      "dtype": "bf16",
+      "mode": "launch",
+      "candidate_count": 1,
+      "precision_valid": 1,
+      "selected": -3,
+      "speedup": 1.29933394151,
+      "precision_pass": true,
+      "accepted_acceleration": true
+    },
+    {
+      "shape": [
+        "1",
+        "1",
+        "1"
+      ],
+      "dtype": "fp16",
+      "mode": "launch",
+      "candidate_count": 1,
+      "precision_valid": 1,
+      "selected": -3,
+      "speedup": 1.18018768818,
+      "precision_pass": true,
+      "accepted_acceleration": true
+    }
+  ],
+  "acceptance_withdrawn": true,
+  "withdrawal_reason": "BF16-to-FP16 computation violates prior user constraint reaffirmed2026-10-17; retain raw numerical/timing evidence only."
+}

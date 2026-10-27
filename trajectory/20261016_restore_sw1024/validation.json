@@ -1,0 +1,36 @@
+{
+  "restored_from": "79dad0b:solution/sw_pipeline.cu",
+  "byte_identical": true,
+  "ctest_passed": 4,
+  "precision_exit": 2,
+  "precision": {
+    "bf16": {
+      "checks": 36,
+      "failures": 24,
+      "max_relative_frobenius_error": 0.0366816797274,
+      "nonfinite": 0
+    },
+    "fp16": {
+      "checks": 36,
+      "failures": 24,
+      "max_relative_frobenius_error": 0.00452178324389,
+      "nonfinite": 0
+    }
+  },
+  "memcheck_scope": "test_sw1024 --quick, both dtypes, uniform trial0 launch and Graph",
+  "memcheck_errors": 0,
+  "memcheck_application_exit": 2,
+  "new_performance_measurement": false,
+  "sha256": {
+    "CMakeLists.txt": "85e1903fd0d6d8e1e706077fef316a5b99c8ef2d235eee2154a94479ce76f3b5",
+    "solution/sw1024.cu": "ebc37e9dd171dd5855cdaed91fbb030d250c052a4c459746dd33b82cc634264b",
+    "solution/sw_pipeline.cu": "7143cb3aa0ed93ee5425d49db341d90151ba9cff91b0cb0e10895483a0fb32d5",
+    "solution/plan.cpp": "a6ffdb0c258889404908f4241cf04dcf11d4ffbf4c63490de4b39e99e8056007",
+    "solution/internal.h": "fc2a2a6abc0e321fbc872c598f090ac28f69c1fa9cda07949087ae2a6522334f",
+    "include/megafmm/gemm.h": "8be9d5ca4f73c559a7fdc89546abe40f2438c76f87c502620aefa0f9edbd28e3",
+    "tests/test_sw_pipeline.cu": "97a5f5f385b3bd1a1fda179036993be5bc5927bc569d458f8210057c3bee611e",
+    "tests/test_sw1024.cu": "337257c6c1fbcab6bf7371dfe05bba8f70eec45792b05300bc32c9aaebe1e911",
+    "build/test_sw_pipeline": "800b1330ed0d4634b962e21cf2996bf4e0434c7c4144768912795de79d95f194",
+    "build/test_sw1024": "48ca70d52d2bbd1972e08e125bd820f9b55616850554d68950abc3569d124530"
+  }
+}

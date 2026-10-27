@@ -1,0 +1,1804 @@
+{
+  "bf16": {
+    "metrics": {
+      "dram__bytes_read.sum": "256.000000",
+      "dram__bytes_write.sum": "139.264000",
+      "gpu__dram_throughput.avg.pct_of_peak_sustained_elapsed": "0.285999",
+      "gpu__dram_throughput.max.pct_of_peak_sustained_elapsed": "0.461797",
+      "gpu__dram_throughput.min.pct_of_peak_sustained_elapsed": "0.161479",
+      "gpu__dram_throughput.sum.pct_of_peak_sustained_elapsed": "0.285999",
+      "gpu__time_duration.sum": "14.592000",
+      "launch__occupancy_limit_registers": "2.000000",
+      "launch__occupancy_limit_shared_mem": "1.000000",
+      "launch__registers_per_thread": "56",
+      "launch__shared_mem_per_block_dynamic": "213.120000",
+      "lts__t_sector_hit_rate.pct": "97.921632",
+      "lts__t_sector_op_read_hit_rate.pct": "96.961298",
+      "lts__t_sector_op_write_hit_rate.pct": "99.954792",
+      "lts__throughput.avg.pct_of_peak_sustained_elapsed": "42.264240",
+      "pmsampling:dramc__read_throughput.avg.pct_of_peak_sustained_elapsed": "",
+      "pmsampling:dramc__throughput.avg.pct_of_peak_sustained_elapsed": "",
+      "pmsampling:dramc__write_throughput.avg.pct_of_peak_sustained_elapsed": "",
+      "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": "13.218218",
+      "sm__warps_active.avg.pct_of_peak_sustained_active": "24.975403",
+      "smsp__inst_executed.sum": "3204589.000000",
+      "smsp__issue_active.avg.pct_of_peak_sustained_active": "28.607651"
+    },
+    "opcodes": {
+      "LDC": 4096.0,
+      "S2R": 8448.0,
+      "S2UR": 4352.0,
+      "ULDC": 6400.0,
+      "BSSY": 113280.0,
+      "ISETP.NE.AND": 10368.0,
+      "BRA": 224503.0,
+      "UMOV": 251136.0,
+      "UPRMT": 128.0,
+      "NOP": 8320.0,
+      "FENCE.VIEW.ASYNC.S": 128.0,
+      "SYNCS.EXCH.64": 1024.0,
+      "BSYNC": 116992.0,
+      "UIMAD": 2304.0,
+      "BAR.SYNC.DEFER_BLOCKING": 8192.0,
+      "IMAD.U32": 41472.0,
+      "ULDC.64": 2048.0,
+      "IMAD": 174848.0,
+      "IMAD.SHL.U32": 71680.0,
+      "ISETP.GT.AND": 13485.0,
+      "LDC.64": 39040.0,
+      "SHF.R.S32.HI": 221696.0,
+      "LEA.HI": 190976.0,
+      "LOP3.LUT": 474285.0,
+      "IADD3": 37376.0,
+      "VIADD": 94208.0,
+      "IMAD.WIDE": 98304.0,
+      "LDG.E": 32768.0,
+      "FADD": 122880.0,
+      "F2FP.BF16.F32.PACK_AB": 32768.0,
+      "STG.E": 65536.0,
+      "ISETP.GE.AND": 4096.0,
+      "ISETP.NE.U32.AND": 2048.0,
+      "FENCE.VIEW.ASYNC.G": 2048.0,
+      "USHF.L.U32": 4096.0,
+      "ISETP.NE.AND.EX": 2048.0,
+      "BPT.TRAP": 0.0,
+      "IMAD.IADD": 128512.0,
+      "IMAD.MOV": 2048.0,
+      "VOTEU.ANY": 128.0,
+      "UIADD3": 193920.0,
+      "FLO.U32": 128.0,
+      "POPC": 256.0,
+      "UISETP.NE.AND": 128.0,
+      "ISETP.EQ.U32.AND": 128.0,
+      "USEL": 128.0,
+      "MEMBAR.ALL.CTA": 128.0,
+      "MEMBAR.ALL.GPU": 128.0,
+      "ERRBAR": 128.0,
+      "CGAERRBAR": 128.0,
+      "ATOM.E.ADD.STRONG.GPU": 128.0,
+      "VOTE.ANY": 128.0,
+      "SHFL.IDX": 128.0,
+      "LD.E.STRONG.GPU": 941.0,
+      "CCTL.IVALL": 941.0,
+      "YIELD": 941.0,
+      "WARPSYNC.ALL": 11520.0,
+      "ISETP.LT.U32.OR": 2048.0,
+      "MOV": 2048.0,
+      "PRMT": 2048.0,
+      "IMAD.MOV.U32": 56368.0,
+      "SHF.R.U32.HI": 2048.0,
+      "SYNCS.PHASECHK.TRANS64.TRYWAIT": 83101.0,
+      "R2UR": 41216.0,
+      "WARPGROUP.ARRIVE": 7168.0,
+      "HGMMA.64x32x16.F32.BF16": 114688.0,
+      "ULOP3.LUT": 21504.0,
+      "WARPGROUP.DEPBAR.LE": 7168.0,
+      "SYNCS.ARRIVE.TRANS64.A1T0": 20608.0,
+      "DEPBAR.LE": 66845.0,
+      "BREAK": 3584.0,
+      "ISETP.GE.U32.AND": 3584.0,
+      "STS": 57344.0,
+      "LDS": 57344.0,
+      "IMAD.X": 512.0,
+      "PLOP3.LUT": 10752.0,
+      "SYNCS.ARRIVE.TRANS64": 1792.0,
+      "ELECT": 3584.0,
+      "UTMALDG.3D": 1792.0,
+      "BRA.U.ANY": 3584.0,
+      "UTMALDG.2D": 768.0,
+      "UTMALDG.4D": 1024.0,
+      "EXIT": 2048.0,
+      "NANOSLEEP.SYNCS": 63261.0,
+      "SYNCS.PHASECHK.TRANS64": 63261.0
+    },
+    "true_opcodes": {
+      "LDC": 131072.0,
+      "S2R": 258432.0,
+      "S2UR": 131328.0,
+      "ULDC": 196864.0,
+      "BSSY": 3624960.0,
+      "ISETP.NE.AND": 331648.0,
+      "BRA": 2941649.0,
+      "UMOV": 7584000.0,
+      "UPRMT": 128.0,
+      "NOP": 230528.0,
+      "FENCE.VIEW.ASYNC.S": 128.0,
+      "SYNCS.EXCH.64": 1024.0,
+      "BSYNC": 3621376.0,
+      "UIMAD": 65792.0,
+      "BAR.SYNC.DEFER_BLOCKING": 262144.0,
+      "IMAD.U32": 1311232.0,
+      "ULDC.64": 65536.0,
+      "IMAD": 5587200.0,
+      "IMAD.SHL.U32": 2293760.0,
+      "ISETP.GT.AND": 402221.0,
+      "LDC.64": 1245312.0,
+      "SHF.R.S32.HI": 7094272.0,
+      "LEA.HI": 6111232.0,
+      "LOP3.LUT": 15143853.0,
+      "IADD3": 1180160.0,
+      "VIADD": 2953984.0,
+      "IMAD.WIDE": 3145728.0,
+      "LDG.E": 1048576.0,
+      "FADD": 3932160.0,
+      "F2FP.BF16.F32.PACK_AB": 1048576.0,
+      "STG.E": 2097152.0,
+      "ISETP.GE.AND": 131072.0,
+      "ISETP.NE.U32.AND": 65536.0,
+      "FENCE.VIEW.ASYNC.G": 65536.0,
+      "USHF.L.U32": 131072.0,
+      "ISETP.NE.AND.EX": 65536.0,
+      "BPT.TRAP": 0.0,
+      "IMAD.IADD": 4112384.0,
+      "IMAD.MOV": 65536.0,
+      "VOTEU.ANY": 128.0,
+      "UIADD3": 6193536.0,
+      "FLO.U32": 128.0,
+      "POPC": 256.0,
+      "UISETP.NE.AND": 128.0,
+      "ISETP.EQ.U32.AND": 128.0,
+      "USEL": 128.0,
+      "MEMBAR.ALL.CTA": 128.0,
+      "MEMBAR.ALL.GPU": 128.0,
+      "ERRBAR": 128.0,
+      "CGAERRBAR": 128.0,
+      "ATOM.E.ADD.STRONG.GPU": 128.0,
+      "VOTE.ANY": 128.0,
+      "SHFL.IDX": 128.0,
+      "LD.E.STRONG.GPU": 941.0,
+      "CCTL.IVALL": 941.0,
+      "YIELD": 941.0,
+      "WARPSYNC.ALL": 360448.0,
+      "ISETP.LT.U32.OR": 65408.0,
+      "MOV": 61568.0,
+      "PRMT": 61568.0,
+      "IMAD.MOV.U32": 1700930.0,
+      "SHF.R.U32.HI": 65536.0,
+      "SYNCS.PHASECHK.TRANS64.TRYWAIT": 2418436.0,
+      "R2UR": 930048.0,
+      "WARPGROUP.ARRIVE": 229376.0,
+      "HGMMA.64x32x16.F32.BF16": 3670016.0,
+      "ULOP3.LUT": 688128.0,
+      "WARPGROUP.DEPBAR.LE": 229376.0,
+      "SYNCS.ARRIVE.TRANS64.A1T0": 437248.0,
+      "DEPBAR.LE": 1945860.0,
+      "BREAK": 3584.0,
+      "ISETP.GE.U32.AND": 114688.0,
+      "STS": 1835008.0,
+      "LDS": 1835008.0,
+      "IMAD.X": 512.0,
+      "PLOP3.LUT": 10752.0,
+      "SYNCS.ARRIVE.TRANS64": 1792.0,
+      "ELECT": 3584.0,
+      "UTMALDG.3D": 1792.0,
+      "BRA.U.ANY": 0.0,
+      "UTMALDG.2D": 768.0,
+      "UTMALDG.4D": 1024.0,
+      "EXIT": 65536.0,
+      "NANOSLEEP.SYNCS": 1544241.0,
+      "SYNCS.PHASECHK.TRANS64": 1544241.0
+    },
+    "P_shared": [
+      {
+        "Source": "      STS [R47+0x30000], R24",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R42+0x30000], R25",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R45+0x30000], R26",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R4+0x30000], R27",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R5+0x30000], R28",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R46+0x30000], R29",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R49+0x30000], R30",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R48+0x30000], R31",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R47+0x30000], R32",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R24+0x30000], R33",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R25+0x30000], R34",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R4+0x30000], R35",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R5+0x30000], R36",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R26+0x30000], R37",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R27+0x30000], R38",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R28+0x30000], R39",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R18, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R8, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R9, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R10, [R11+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R11, [R11+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R12, [R13+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R19+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x32000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R21+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R21+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R21+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R21+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x32000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R25+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R25+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R25+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R25+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x32000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R9+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      }
+    ],
+    "shared_instructions": [
+      {
+        "Source": "      STS [R47+0x30000], R24",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R42+0x30000], R25",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R45+0x30000], R26",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R4+0x30000], R27",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R5+0x30000], R28",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R46+0x30000], R29",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R49+0x30000], R30",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R48+0x30000], R31",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R47+0x30000], R32",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R24+0x30000], R33",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R25+0x30000], R34",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R4+0x30000], R35",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R5+0x30000], R36",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R26+0x30000], R37",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R27+0x30000], R38",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R28+0x30000], R39",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R18, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R8, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R9, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R10, [R11+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R11, [R11+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R12, [R13+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R19+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x32000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R21+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R21+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R21+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R21+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x32000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R25+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R25+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R25+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R25+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x32000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R9+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      }
+    ]
+  },
+  "fp16": {
+    "metrics": {
+      "dram__bytes_read.sum": "256.000000",
+      "dram__bytes_write.sum": "166.656000",
+      "gpu__dram_throughput.avg.pct_of_peak_sustained_elapsed": "0.344521",
+      "gpu__dram_throughput.max.pct_of_peak_sustained_elapsed": "0.634089",
+      "gpu__dram_throughput.min.pct_of_peak_sustained_elapsed": "0.147954",
+      "gpu__dram_throughput.sum.pct_of_peak_sustained_elapsed": "0.344521",
+      "gpu__time_duration.sum": "14.464000",
+      "launch__occupancy_limit_registers": "2.000000",
+      "launch__occupancy_limit_shared_mem": "1.000000",
+      "launch__registers_per_thread": "56",
+      "launch__shared_mem_per_block_dynamic": "213.120000",
+      "lts__t_sector_hit_rate.pct": "97.384808",
+      "lts__t_sector_op_read_hit_rate.pct": "97.420722",
+      "lts__t_sector_op_write_hit_rate.pct": "99.993138",
+      "lts__throughput.avg.pct_of_peak_sustained_elapsed": "42.735548",
+      "pmsampling:dramc__read_throughput.avg.pct_of_peak_sustained_elapsed": "",
+      "pmsampling:dramc__throughput.avg.pct_of_peak_sustained_elapsed": "",
+      "pmsampling:dramc__write_throughput.avg.pct_of_peak_sustained_elapsed": "",
+      "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": "12.933908",
+      "sm__warps_active.avg.pct_of_peak_sustained_active": "24.975331",
+      "smsp__inst_executed.sum": "3204103.000000",
+      "smsp__issue_active.avg.pct_of_peak_sustained_active": "28.621425"
+    },
+    "opcodes": {
+      "LDC": 4096.0,
+      "S2R": 8448.0,
+      "S2UR": 4352.0,
+      "ULDC": 6400.0,
+      "BSSY": 113280.0,
+      "ISETP.NE.AND": 10368.0,
+      "BRA": 224792.0,
+      "UMOV": 251136.0,
+      "UPRMT": 128.0,
+      "NOP": 8320.0,
+      "FENCE.VIEW.ASYNC.S": 128.0,
+      "SYNCS.EXCH.64": 1024.0,
+      "BSYNC": 116992.0,
+      "UIMAD": 2304.0,
+      "BAR.SYNC.DEFER_BLOCKING": 8192.0,
+      "IMAD.U32": 8704.0,
+      "ULDC.64": 2048.0,
+      "IMAD": 174848.0,
+      "IMAD.SHL.U32": 71680.0,
+      "ISETP.GT.AND": 13557.0,
+      "LDC.64": 39040.0,
+      "SHF.R.S32.HI": 221696.0,
+      "LEA.HI": 190976.0,
+      "LOP3.LUT": 441589.0,
+      "IADD3": 37376.0,
+      "VIADD": 94208.0,
+      "IMAD.WIDE": 98304.0,
+      "LDG.E": 32768.0,
+      "HADD2.F32": 65536.0,
+      "FADD": 122880.0,
+      "F2FP.F16.F32.PACK_AB": 32768.0,
+      "STG.E": 65536.0,
+      "ISETP.GE.AND": 4096.0,
+      "ISETP.NE.U32.AND": 2048.0,
+      "FENCE.VIEW.ASYNC.G": 2048.0,
+      "USHF.L.U32": 4096.0,
+      "ISETP.NE.AND.EX": 2048.0,
+      "BPT.TRAP": 0.0,
+      "IMAD.IADD": 128512.0,
+      "IMAD.MOV": 2048.0,
+      "VOTEU.ANY": 128.0,
+      "UIADD3": 193920.0,
+      "FLO.U32": 128.0,
+      "POPC": 256.0,
+      "UISETP.NE.AND": 128.0,
+      "ISETP.EQ.U32.AND": 128.0,
+      "USEL": 128.0,
+      "MEMBAR.ALL.CTA": 128.0,
+      "MEMBAR.ALL.GPU": 128.0,
+      "ERRBAR": 128.0,
+      "CGAERRBAR": 128.0,
+      "ATOM.E.ADD.STRONG.GPU": 128.0,
+      "VOTE.ANY": 128.0,
+      "SHFL.IDX": 128.0,
+      "LD.E.STRONG.GPU": 1013.0,
+      "CCTL.IVALL": 1013.0,
+      "YIELD": 1013.0,
+      "WARPSYNC.ALL": 11520.0,
+      "ISETP.LT.U32.OR": 2048.0,
+      "MOV": 2048.0,
+      "PRMT": 2048.0,
+      "IMAD.MOV.U32": 56401.0,
+      "SHF.R.U32.HI": 2048.0,
+      "SYNCS.PHASECHK.TRANS64.TRYWAIT": 83286.0,
+      "R2UR": 41216.0,
+      "WARPGROUP.ARRIVE": 7168.0,
+      "HGMMA.64x32x16.F32": 114688.0,
+      "ULOP3.LUT": 21504.0,
+      "WARPGROUP.DEPBAR.LE": 7168.0,
+      "SYNCS.ARRIVE.TRANS64.A1T0": 20608.0,
+      "DEPBAR.LE": 67030.0,
+      "BREAK": 3584.0,
+      "ISETP.GE.U32.AND": 3584.0,
+      "STS": 57344.0,
+      "LDS": 57344.0,
+      "IMAD.X": 512.0,
+      "PLOP3.LUT": 10752.0,
+      "SYNCS.ARRIVE.TRANS64": 1792.0,
+      "ELECT": 3584.0,
+      "UTMALDG.3D": 1792.0,
+      "BRA.U.ANY": 3584.0,
+      "UTMALDG.2D": 768.0,
+      "UTMALDG.4D": 1024.0,
+      "EXIT": 2048.0,
+      "NANOSLEEP.SYNCS": 63446.0,
+      "SYNCS.PHASECHK.TRANS64": 63446.0
+    },
+    "true_opcodes": {
+      "LDC": 131072.0,
+      "S2R": 258432.0,
+      "S2UR": 131328.0,
+      "ULDC": 196864.0,
+      "BSSY": 3624960.0,
+      "ISETP.NE.AND": 331648.0,
+      "BRA": 2947828.0,
+      "UMOV": 7584000.0,
+      "UPRMT": 128.0,
+      "NOP": 230528.0,
+      "FENCE.VIEW.ASYNC.S": 128.0,
+      "SYNCS.EXCH.64": 1024.0,
+      "BSYNC": 3621376.0,
+      "UIMAD": 65792.0,
+      "BAR.SYNC.DEFER_BLOCKING": 262144.0,
+      "IMAD.U32": 262656.0,
+      "ULDC.64": 65536.0,
+      "IMAD": 5587200.0,
+      "IMAD.SHL.U32": 2293760.0,
+      "ISETP.GT.AND": 402293.0,
+      "LDC.64": 1245312.0,
+      "SHF.R.S32.HI": 7094272.0,
+      "LEA.HI": 6111232.0,
+      "LOP3.LUT": 14095349.0,
+      "IADD3": 1180160.0,
+      "VIADD": 2953984.0,
+      "IMAD.WIDE": 3145728.0,
+      "LDG.E": 1048576.0,
+      "HADD2.F32": 2097152.0,
+      "FADD": 3932160.0,
+      "F2FP.F16.F32.PACK_AB": 1048576.0,
+      "STG.E": 2097152.0,
+      "ISETP.GE.AND": 131072.0,
+      "ISETP.NE.U32.AND": 65536.0,
+      "FENCE.VIEW.ASYNC.G": 65536.0,
+      "USHF.L.U32": 131072.0,
+      "ISETP.NE.AND.EX": 65536.0,
+      "BPT.TRAP": 0.0,
+      "IMAD.IADD": 4112384.0,
+      "IMAD.MOV": 65536.0,
+      "VOTEU.ANY": 128.0,
+      "UIADD3": 6193536.0,
+      "FLO.U32": 128.0,
+      "POPC": 256.0,
+      "UISETP.NE.AND": 128.0,
+      "ISETP.EQ.U32.AND": 128.0,
+      "USEL": 128.0,
+      "MEMBAR.ALL.CTA": 128.0,
+      "MEMBAR.ALL.GPU": 128.0,
+      "ERRBAR": 128.0,
+      "CGAERRBAR": 128.0,
+      "ATOM.E.ADD.STRONG.GPU": 128.0,
+      "VOTE.ANY": 128.0,
+      "SHFL.IDX": 128.0,
+      "LD.E.STRONG.GPU": 1013.0,
+      "CCTL.IVALL": 1013.0,
+      "YIELD": 1013.0,
+      "WARPSYNC.ALL": 360448.0,
+      "ISETP.LT.U32.OR": 65408.0,
+      "MOV": 61568.0,
+      "PRMT": 61568.0,
+      "IMAD.MOV.U32": 1700684.0,
+      "SHF.R.U32.HI": 65536.0,
+      "SYNCS.PHASECHK.TRANS64.TRYWAIT": 2423519.0,
+      "R2UR": 930048.0,
+      "WARPGROUP.ARRIVE": 229376.0,
+      "HGMMA.64x32x16.F32": 3670016.0,
+      "ULOP3.LUT": 688128.0,
+      "WARPGROUP.DEPBAR.LE": 229376.0,
+      "SYNCS.ARRIVE.TRANS64.A1T0": 437248.0,
+      "DEPBAR.LE": 1950943.0,
+      "BREAK": 3584.0,
+      "ISETP.GE.U32.AND": 114688.0,
+      "STS": 1835008.0,
+      "LDS": 1835008.0,
+      "IMAD.X": 512.0,
+      "PLOP3.LUT": 10752.0,
+      "SYNCS.ARRIVE.TRANS64": 1792.0,
+      "ELECT": 3584.0,
+      "UTMALDG.3D": 1792.0,
+      "BRA.U.ANY": 0.0,
+      "UTMALDG.2D": 768.0,
+      "UTMALDG.4D": 1024.0,
+      "EXIT": 65536.0,
+      "NANOSLEEP.SYNCS": 1545902.0,
+      "SYNCS.PHASECHK.TRANS64": 1545902.0
+    },
+    "P_shared": [
+      {
+        "Source": "      STS [R47+0x30000], R24",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R42+0x30000], R25",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R45+0x30000], R26",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R4+0x30000], R27",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R5+0x30000], R28",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R46+0x30000], R29",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R49+0x30000], R30",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R48+0x30000], R31",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R47+0x30000], R32",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R24+0x30000], R33",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R25+0x30000], R34",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R4+0x30000], R35",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R5+0x30000], R36",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R26+0x30000], R37",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R27+0x30000], R38",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R28+0x30000], R39",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R18, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R8, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R9, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R10, [R11+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R11, [R11+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R12, [R13+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R19+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x32000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R21+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R21+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R21+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R21+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x32000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R25+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R25+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R25+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R25+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x32000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R9+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      }
+    ],
+    "shared_instructions": [
+      {
+        "Source": "      STS [R47+0x30000], R24",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R42+0x30000], R25",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R45+0x30000], R26",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R4+0x30000], R27",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R5+0x30000], R28",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R46+0x30000], R29",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R49+0x30000], R30",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R48+0x30000], R31",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R47+0x30000], R32",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R24+0x30000], R33",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R25+0x30000], R34",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R4+0x30000], R35",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R5+0x30000], R36",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R26+0x30000], R37",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R27+0x30000], R38",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      STS [R28+0x30000], R39",
+        "Instructions Executed": "3584",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R18, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R8, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R9, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R10, [R11+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R11, [R11+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R12, [R13+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R19+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x32000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R21+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R21+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R21+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R21+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x32000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R25+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R25+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R13+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R15+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R25+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R17+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R25+0x32000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R19+0x32000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R13, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R15, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R14, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R17, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R16, [R9+0x30000]",
+        "Instructions Executed": "1408",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      },
+      {
+        "Source": "      LDS R19, [R9+0x30000]",
+        "Instructions Executed": "1152",
+        "L1 Conflicts Shared N-Way": "1",
+        "L1 Wavefronts Shared Excessive": "0"
+      }
+    ]
+  }
+}

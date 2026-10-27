@@ -1,0 +1,3 @@
+DEVICE NVIDIA H100 80GB HBM3 sm=132 cc=9.0 driver=12090 runtime=12040 precision=FP32-output seed=1234567 workspace_limit=8589934592
+TUNE shape=4096,4096,4096 dtype=bf16 case=solution config=sw_hopper;tile=64x128;bk=64;stages=4;leaf_terms=7;consumer_init=split_first;raster=grouped_rows_4_or_2_when_k_ge_2048;cache=retain_a_when_k_ge_16384;residual_correction=off;workspace=67108864
+PROFILE 4096,4096,4096 bf16 sw_hopper workspace=67108864 target=solution lt_config=sw_hopper;tile=64x128;bk=64;stages=4;leaf_terms=7;consumer_init=split_first;raster=grouped_rows_4_or_2_when_k_ge_2048;cache=retain_a_when_k_ge_16384;residual_correction=off;workspace=67108864

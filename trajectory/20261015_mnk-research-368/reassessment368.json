@@ -1,0 +1,81 @@
+{
+  "status": "367 validation/profile complete; bounded resource and correctness preflight approved within active goal",
+  "history": [
+    "364 K128 increased long-scoreboard stalls and lost all large-K cases.",
+    "365 K32 restored overlap but emitted204.19M warp instructions in fixed8192FP16 diagnostic; no stable new win.",
+    "366 swapped K64 emitted141.79M warp instructions but still no stable new win.",
+    "367 consumer-window3 formal20/20 precision pass; 8192BF/FP1.636760/1.676926ms vsLt1.460307/1.621064."
+  ],
+  "hypothesis": "Batch eight existing consumer iterations to reduce loop-control and pipeline-index instruction overhead while preserving every MMA/commit/wait/release and accumulator order.",
+  "variants": [
+    "CM1 window1 batch8",
+    "CM2 window1 batch8",
+    "CM1 window3 batch8",
+    "CM2 window3 batch8"
+  ],
+  "preflight": [
+    "compiled residency before launch; no register spill",
+    "ten nonsymmetric original-input FP64 references across consumer/batch tails",
+    "persistent CTA reuse147 logical tiles over132 SMs atK8/1032",
+    "strided tails alpha0.5 and untouched output padding"
+  ],
+  "sources": [
+    "https://docs.nvidia.com/cutlass/latest/media/docs/cpp/efficient_gemm.html",
+    "https://docs.nvidia.com/cutlass/latest/media/docs/cpp/gemm_api.html"
+  ],
+  "source_interpretation": "Official CUTLASS describes software pipeline latency hiding and distinguishes fully unrolled inner MMA loops from the ordinary outer K mainloop. Outer batch8 is a new experimental hypothesis, not a documented guaranteed speedup.",
+  "limits": "No physical-floor or stable-win claim; no precision relaxation; preflight is not acceptance.",
+  "latest_profile": {
+    "candidate": 104,
+    "shape": [
+      8192,
+      8192,
+      8192
+    ],
+    "dtype": "fp16",
+    "inputs": "zeros diagnostic only, not acceptance",
+    "metrics": {
+      "gpu__time_duration.sum": {
+        "value": 1.52832,
+        "unit": "ms"
+      },
+      "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+        "value": 92.156422,
+        "unit": "%"
+      },
+      "lts__t_sector_hit_rate.pct": {
+        "value": 82.88383,
+        "unit": "%"
+      },
+      "smsp__warps_eligible.avg.per_cycle_active": {
+        "value": 0.1846,
+        "unit": "warp"
+      },
+      "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+        "value": 1.881751,
+        "unit": "inst"
+      },
+      "smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio": {
+        "value": 0.01721,
+        "unit": "inst"
+      },
+      "launch__registers_per_thread": {
+        "value": 168.0,
+        "unit": "register/thread"
+      },
+      "smsp__inst_executed.sum": {
+        "value": 187615437.0,
+        "unit": "inst"
+      },
+      "dram__bytes_read.sum": {
+        "value": 1.493256,
+        "unit": "Gbyte"
+      },
+      "dram__bytes_write.sum": {
+        "value": 262.246656,
+        "unit": "Mbyte"
+      }
+    }
+  },
+  "decision": "Window3 improved L2 hit rate and reduced warp instructions versus window1, but did not improve latency or eligible-warps count. Test batch8 control/index overhead independently at both windows, with explicit scalar tails. Tensor activity is not peak FLOPs or proof of a physical floor."
+}

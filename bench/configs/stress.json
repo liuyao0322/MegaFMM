@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "suite": "stress",
+  "description": "Numerical boundaries and coverage: condition number, long iterations, narrow gap, odd and rectangular shapes. Failed quality gates remain results.",
+  "backends": ["cublaslt", "megafmm"],
+  "modes": ["launch", "graph"],
+  "measurement": {"independent_processes": 3, "warmup": 3, "groups": 5, "calls_per_group": 5, "fresh_quality_trials": 3, "rotate_inputs": 3, "timeout_seconds": 1800},
+  "backend_options": {"workspace_limit": 1073741824, "tuning_input_sets": 3, "sw_tuning_candidates": 16},
+  "cases": [
+    {"id": "inverse_sqrt_cond1e2", "kind": "matrix_function", "dtype": "fp32", "n": 512, "function": "inverse_sqrt", "iterations": 25, "condition_number": 100},
+    {"id": "inverse_sqrt_cond1e4", "kind": "matrix_function", "dtype": "fp32", "n": 512, "function": "inverse_sqrt", "iterations": 30, "condition_number": 10000},
+    {"id": "inverse_sqrt_cond1e6", "kind": "matrix_function", "dtype": "fp32", "n": 512, "function": "inverse_sqrt", "iterations": 35, "condition_number": 1000000},
+    {"id": "muon_bf16_wide", "kind": "muon", "dtype": "bf16", "m": 256, "n": 2048, "iterations": 5},
+    {"id": "muon_fp16_tall_odd", "kind": "muon", "dtype": "fp16", "m": 513, "n": 129, "iterations": 5},
+    {"id": "muon_bf16_long", "kind": "muon", "dtype": "bf16", "m": 512, "n": 512, "iterations": 20},
+    {"id": "mlp_bf16_odd", "kind": "mlp", "dtype": "bf16", "tokens": 129, "hidden": 257, "intermediate": 769, "activation": "swiglu"},
+    {"id": "mlp_fp16_large_range", "kind": "mlp", "dtype": "fp16", "tokens": 256, "hidden": 256, "intermediate": 1024, "activation": "gelu", "dynamic_range": 1000},
+    {"id": "purification_narrow_gap", "kind": "purification", "dtype": "fp32", "n": 512, "occupied": 256, "iterations": 60, "gap": 0.001},
+    {"id": "gemm_bf16_rectangular", "kind": "gemm", "dtype": "bf16", "m": 1024, "n": 4096, "k": 1024},
+    {"id": "gemm_fp32_odd", "kind": "gemm", "dtype": "fp32", "m": 513, "n": 513, "k": 513}
+  ]
+}

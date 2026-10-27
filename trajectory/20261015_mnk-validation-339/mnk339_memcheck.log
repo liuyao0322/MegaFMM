@@ -1,0 +1,52 @@
+========= COMPUTE-SANITIZER
+PASS Dense policy, binding, empty, scale, overflow and overlap checks
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=01 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=01 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=01 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=10 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=10 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=10 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=11 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=11 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=11 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=bf16 shape=32,48,64 transpose=00 alias=1 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=32,48,64 transpose=00 alias=1 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=32,48,64 transpose=00 alias=1 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=bf16 shape=128,128,128 transpose=00 alias=0 graph=1 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=128,128,128 transpose=00 alias=0 graph=1 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=128,128,128 transpose=00 alias=0 graph=1 element_aligned=0 trial=2 eF=1.9546e-09
+PASS_DENSE dtype=bf16 shape=32,32,32 transpose=00 alias=1 graph=1 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=32,32,32 transpose=00 alias=1 graph=1 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=32,32,32 transpose=00 alias=1 graph=1 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=1 trial=0 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=1 trial=1 eF=0
+PASS_DENSE dtype=bf16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=1 trial=2 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=01 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=01 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=01 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=10 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=10 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=10 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=11 alias=0 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=11 alias=0 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=11 alias=0 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=fp16 shape=32,48,64 transpose=00 alias=1 graph=0 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=fp16 shape=32,48,64 transpose=00 alias=1 graph=0 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=fp16 shape=32,48,64 transpose=00 alias=1 graph=0 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=fp16 shape=128,128,128 transpose=00 alias=0 graph=1 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=fp16 shape=128,128,128 transpose=00 alias=0 graph=1 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=fp16 shape=128,128,128 transpose=00 alias=0 graph=1 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=fp16 shape=32,32,32 transpose=00 alias=1 graph=1 element_aligned=0 trial=0 eF=0
+PASS_DENSE dtype=fp16 shape=32,32,32 transpose=00 alias=1 graph=1 element_aligned=0 trial=1 eF=0
+PASS_DENSE dtype=fp16 shape=32,32,32 transpose=00 alias=1 graph=1 element_aligned=0 trial=2 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=1 trial=0 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=1 trial=1 eF=0
+PASS_DENSE dtype=fp16 shape=17,23,19 transpose=00 alias=0 graph=0 element_aligned=1 trial=2 eF=0
+PASS GEMM policy with fresh rounded inputs and original-input FP64 references
+========= ERROR SUMMARY: 0 errors

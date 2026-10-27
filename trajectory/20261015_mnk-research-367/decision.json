@@ -1,0 +1,17 @@
+{
+  "direction": "K32 with consumer outstanding-window3 and eight shared stages, CM1/CM2",
+  "resource": {
+    "actual_stages": 8,
+    "threads": 384,
+    "registers_per_thread": 168,
+    "local_bytes": 0,
+    "shared_bytes": 231424,
+    "resident_ctas_per_sm": 1
+  },
+  "preflight": "Both pass occupancy guard and all-ones strided tails; two fresh non-symmetric input pairs compared to original AB FP64, alpha0.5, K1032/K8 and output padding.",
+  "performance": "not measured; not acceptance",
+  "implementation": "Licensed CUTLASS3.5.1 adaptation inherits producer/arguments/layouts and overrides only consumer mma and matching mma_tail.",
+  "first_compile": "Extraction initially included producer methods and failed missing aliases; corrected to consumer-only methods before any GPU launch; diagnostic logs retained.",
+  "next": "Install private consumer header; append compile-time MmaInflight default1 to Candidate; BaseMainloop from builder; wrap only MmaInflight>1. Add104/105 K32CM1/CM2 with inflight3, total106; retain Swapped flag defaultfalse and existing kernel arguments. Formal367 original100x5/3fresh/twoinputsets then NEXTlog/NEXTcommit; force106/API/6CTest and CUDA12.8sanitizers. Add short-K consumer-tail test coverage for newIDs before certification.",
+  "goal_status": "active; latest independent35316/28 unchanged,12unresolved"
+}

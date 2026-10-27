@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "suite": "linpack_smoke",
+  "description": "Single-device FP32 blocked LU integration; not standard FP64 HPL or a performance certification.",
+  "backends": ["cublaslt", "megafmm"],
+  "baseline": "cublaslt",
+  "modes": ["launch"],
+  "measurement": {
+    "independent_processes": 1, "warmup": 1, "groups": 3, "calls_per_group": 2,
+    "fresh_quality_trials": 2, "rotate_inputs": 2, "timeout_seconds": 600,
+    "seed": 20261023
+  },
+  "backend_options": {
+    "workspace_limit": 268435456, "heuristic_candidates": 4,
+    "tuning_input_sets": 1, "sw_tuning_candidates": 4, "strict": true
+  },
+  "cases": [
+    {"id": "linpack_fp32_n128_nb32", "kind": "linpack", "dtype": "fp32", "n": 128, "block_size": 32},
+    {"id": "linpack_fp32_n129_nb32", "kind": "linpack", "dtype": "fp32", "n": 129, "block_size": 32}
+  ]
+}

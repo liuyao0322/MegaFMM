@@ -1,0 +1,37 @@
+{
+  "scope": "Resource and exact-tail preflight only, no production edit or speed claim",
+  "base_commit": "54978ac",
+  "candidate": "SM90 cooperative128x256 source-free, explicit deterministic SplitK decomposition",
+  "splits": [
+    2,
+    4
+  ],
+  "cluster_m": [
+    1,
+    2
+  ],
+  "dtype": "fp16",
+  "shape": [
+    257,
+    520,
+    1032
+  ],
+  "registers": 168,
+  "local_bytes": 0,
+  "shared_bytes": 231424,
+  "all_four_preflights_pass": true,
+  "workspace_cm1_bytes": 2097280,
+  "workspace_cm2_bytes": 4194560,
+  "reassessment": {
+    "profile360": "Wide nine-warp Tensoractive92.3%, still loses random timing.",
+    "history": "361CM2/CN2 gives no new stablewinner across all12 unresolvedlargeK combos; 20/20 formal+supplement precisionpass.",
+    "hypothesis": "Explicit K splits change parallelism and reduction order; may reduce tail inefficiency, but additional reduction overhead may lose. Measure complete calls, do not assume benefit.",
+    "official_sources": [
+      "https://docs.nvidia.com/cutlass/4.3.3/media/docs/cpp/efficient_gemm.html",
+      "https://developer.nvidia.com/blog/cutlass-3-x-orthogonal-reusable-and-composable-abstractions-for-gemm-kernel-design/"
+    ],
+    "local_contract": "Vendored3.5.1 sm90_tile_scheduler_stream_k.hpp Arguments::splits>1 bypassesStreamK decomposition; explicitSplitK and deterministic reduction.",
+    "no_floor_claim": true
+  },
+  "next_required": "Integrate split factor in shared argument builder and exact same workspace/run args, per-call barrier initialization, Graph/concurrent scratch/precision tests, full formal benchmark/log/commit. No completion claimed."
+}

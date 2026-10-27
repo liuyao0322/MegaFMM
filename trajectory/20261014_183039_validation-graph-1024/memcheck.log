@@ -1,0 +1,8 @@
+========= COMPUTE-SANITIZER
+CHECK size=1024 dtype=bf16 pattern=uniform trial=0 mode=launch dense_ef=8.53687286941e-07 sw_ef=7.14977007065e-06 gate=0.00100256106186 nonfinite=0 pass=1
+CHECK size=1024 dtype=bf16 pattern=uniform trial=0 mode=graph dense_ef=8.53687286941e-07 sw_ef=7.14977007065e-06 gate=0.00100256106186 nonfinite=0 pass=1
+SUMMARY dtype=bf16 checks=2 failures=0
+CHECK size=1024 dtype=fp16 pattern=uniform trial=0 mode=launch dense_ef=1.25050721477e-06 sw_ef=3.09442196397e-07 gate=0.000103751521644 nonfinite=0 pass=1
+CHECK size=1024 dtype=fp16 pattern=uniform trial=0 mode=graph dense_ef=1.25050721477e-06 sw_ef=3.09442196397e-07 gate=0.000103751521644 nonfinite=0 pass=1
+SUMMARY dtype=fp16 checks=2 failures=0
+========= ERROR SUMMARY: 0 errors

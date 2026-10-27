@@ -1,0 +1,48 @@
+{
+  "research_only": true,
+  "large_random_fp64_acceptance": "unchecked",
+  "passed": true,
+  "scope": "BF16/FP16 x four configs: twelve K tails exact original AB FP64, persistent reuse K8/K1032, and three fractional input trials bitwise with original Base.",
+  "variants": [
+    {
+      "variant": 0,
+      "cluster_m": 1,
+      "nine_warp": false,
+      "dtype_count": 2,
+      "fractional_base_bitwise_passes": 2,
+      "exact_fp64_tail_passes": 2,
+      "persistent_reuse_passes": 2,
+      "error": false
+    },
+    {
+      "variant": 1,
+      "cluster_m": 2,
+      "nine_warp": false,
+      "dtype_count": 2,
+      "fractional_base_bitwise_passes": 2,
+      "exact_fp64_tail_passes": 2,
+      "persistent_reuse_passes": 2,
+      "error": false
+    },
+    {
+      "variant": 2,
+      "cluster_m": 1,
+      "nine_warp": true,
+      "dtype_count": 2,
+      "fractional_base_bitwise_passes": 2,
+      "exact_fp64_tail_passes": 2,
+      "persistent_reuse_passes": 2,
+      "error": false
+    },
+    {
+      "variant": 3,
+      "cluster_m": 2,
+      "nine_warp": true,
+      "dtype_count": 2,
+      "fractional_base_bitwise_passes": 2,
+      "exact_fp64_tail_passes": 2,
+      "persistent_reuse_passes": 2,
+      "error": false
+    }
+  ]
+}

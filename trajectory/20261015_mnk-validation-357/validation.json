@@ -1,0 +1,23 @@
+{
+  "iteration": 357,
+  "commit": "1d9c6cc",
+  "formal_rows": 12,
+  "original_fp64_pass_rows": 12,
+  "ctest": {
+    "passed": 5,
+    "failed": 0,
+    "forced_candidates": 85
+  },
+  "sanitizer": "CUDA12.8 ComputeSanitizer2025.1",
+  "memcheck_errors": 0,
+  "racecheck_errors": 0,
+  "racecheck_warnings": 0,
+  "new_custom_stable_wins": 0,
+  "notes": [
+    "Stream-K82 4096BF16 short median0.202544ms versus rerankedLt0.211726ms, but not all5shortpairedwins; confirmation correctly skipped.",
+    "Stream-K81 8192FP16 short1.669704ms versus rerankedLt1.641016ms.",
+    "Complete-call timing includes scratch initialization and reduction.",
+    "Last complete independent acceptance remains35316/28.",
+    "Fixed-candidate profiles4096BF16/8192FP16 are diagnostic zero-input only, not acceptance."
+  ]
+}

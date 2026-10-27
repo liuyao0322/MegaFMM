@@ -1,0 +1,117 @@
+{
+  "status": "all eight resource and exact-tail preflights pass; random-input timing running",
+  "variants": [
+    {
+      "variant": 0,
+      "tile_m": 128,
+      "tile_n": 160,
+      "tile_k": 64,
+      "actual_stages": 5,
+      "threads": 288,
+      "registers": 106,
+      "shared_bytes": 201728,
+      "local_bytes": 0,
+      "resident_ctas": 1,
+      "exact_fp64_tail_and_reuse_pass": true
+    },
+    {
+      "variant": 1,
+      "tile_m": 128,
+      "tile_n": 192,
+      "tile_k": 64,
+      "actual_stages": 5,
+      "threads": 288,
+      "registers": 122,
+      "shared_bytes": 222208,
+      "local_bytes": 0,
+      "resident_ctas": 1,
+      "exact_fp64_tail_and_reuse_pass": true
+    },
+    {
+      "variant": 2,
+      "tile_m": 128,
+      "tile_n": 224,
+      "tile_k": 64,
+      "actual_stages": 4,
+      "threads": 288,
+      "registers": 138,
+      "shared_bytes": 197632,
+      "local_bytes": 0,
+      "resident_ctas": 1,
+      "exact_fp64_tail_and_reuse_pass": true
+    },
+    {
+      "variant": 3,
+      "tile_m": 128,
+      "tile_n": 256,
+      "tile_k": 64,
+      "actual_stages": 4,
+      "threads": 288,
+      "registers": 154,
+      "shared_bytes": 214016,
+      "local_bytes": 0,
+      "resident_ctas": 1,
+      "exact_fp64_tail_and_reuse_pass": true
+    },
+    {
+      "variant": 4,
+      "tile_m": 128,
+      "tile_n": 160,
+      "tile_k": 32,
+      "actual_stages": 11,
+      "threads": 288,
+      "registers": 106,
+      "shared_bytes": 220160,
+      "local_bytes": 0,
+      "resident_ctas": 1,
+      "exact_fp64_tail_and_reuse_pass": true
+    },
+    {
+      "variant": 5,
+      "tile_m": 128,
+      "tile_n": 192,
+      "tile_k": 32,
+      "actual_stages": 10,
+      "threads": 288,
+      "registers": 122,
+      "shared_bytes": 222208,
+      "local_bytes": 0,
+      "resident_ctas": 1,
+      "exact_fp64_tail_and_reuse_pass": true
+    },
+    {
+      "variant": 6,
+      "tile_m": 128,
+      "tile_n": 224,
+      "tile_k": 32,
+      "actual_stages": 9,
+      "threads": 288,
+      "registers": 138,
+      "shared_bytes": 220160,
+      "local_bytes": 0,
+      "resident_ctas": 1,
+      "exact_fp64_tail_and_reuse_pass": true
+    },
+    {
+      "variant": 7,
+      "tile_m": 128,
+      "tile_n": 256,
+      "tile_k": 32,
+      "actual_stages": 8,
+      "threads": 288,
+      "registers": 154,
+      "shared_bytes": 214016,
+      "local_bytes": 0,
+      "resident_ctas": 1,
+      "exact_fp64_tail_and_reuse_pass": true
+    }
+  ],
+  "epilogue_tile": [
+    128,
+    16
+  ],
+  "workers_per_sm": 1,
+  "correctness_scope": "FP16 original-AB exact FP64,12 K tails,alpha0.5,padding,persistent reuse12289x520 K8/K1032; no performance acceptance yet",
+  "rationale": "Distinct WGMMA width/cache-reuse/input-depth tradeoff at one CTA, after dual-CTA hypotheses lost. No production369 integration until credible signal plus formal original-protocol validation.",
+  "latest_certification": "353:16/28 unchanged"
+}

@@ -1,0 +1,22 @@
+{
+  "iteration": 356,
+  "commit": "ec9464d",
+  "formal_rows": 12,
+  "original_fp64_pass_rows": 12,
+  "ctest": {
+    "passed": 5,
+    "failed": 0,
+    "forced_candidates": 81
+  },
+  "sanitizer": "CUDA12.8 ComputeSanitizer2025.1",
+  "memcheck_errors": 0,
+  "racecheck_errors": 0,
+  "racecheck_warnings": 0,
+  "new_custom_stable_wins": 0,
+  "notes": [
+    "Direct128 S3 improves nine-warp8192 to2.04-2.09ms but loses to retained1.6-1.7ms kernels.",
+    "Native160 S2 usesone residentCTA and is slower3.93-3.96ms.",
+    "Last complete independent acceptance remains35316/28.",
+    "Three consecutive iterations without newwin reassessed using354profile,356officialsources anditerationhistory; nextStreamK direction."
+  ]
+}
