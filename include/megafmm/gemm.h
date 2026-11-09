@@ -11,8 +11,8 @@ enum class DType { BF16, FP16, FP32 };
 constexpr size_t dtype_size(DType dtype) { return dtype == DType::FP32 ? 4 : 2; }
 // SWPipeline uses shared seven-product kernels for all dimensions: a zero-workspace
 // fallback, plus one padded Hopper BF16/FP16 path when bindings and budget allow.
-// FP32 remains full FP32 throughout. SWTuned can additionally use one general
-// packed FP32 TMA kernel with a small compile-time parameter registry.
+// FP32 remains full FP32 throughout. SWTuned measures bounded compile-time
+// parameter registries for the packed FP32 and native BF16/FP16 Hopper templates.
 // SWTuned measures configurations for each problem; no size-specific kernels.
 // Auto/Dense use cuBLASLt. Tuned is retained as a compatibility alias for that
 // same explicitly tuned cuBLASLt implementation.

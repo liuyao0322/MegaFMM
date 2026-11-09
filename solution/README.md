@@ -5,11 +5,13 @@
 | 文件 | 用途 |
 |---|---|
 | [sw/sw_pipeline.cu](sw/sw_pipeline.cu) | 任意布局的零 workspace 七乘法 fallback |
-| [sw/hopper/sw_hopper.cu](sw/hopper/sw_hopper.cu) | BF16/FP16 通用 padded Hopper 实现 |
+| [sw/hopper/sw_hopper.cu](sw/hopper/sw_hopper.cu) | BF16/FP16 单一可配置 Hopper 模板（native/padded） |
 | [sw/fp32/sw_fp32.cu](sw/fp32/sw_fp32.cu) | FP32 零 workspace 同步/TMA，BK16/32 |
 | [sw/fp32/sw_fp32_batch.cu](sw/fp32/sw_fp32_batch.cu) | 同一份 packed 模板：物化或共享重构、可配置驻留任务循环 |
 
-`SWPipeline` 保持零 workspace 路径；`SWTuned` 在预算内按实际完整调用调优。BF16/FP16至多2项，当前FP32至多25项（4项零workspace + 21项packed模板）。默认Auto/Dense仍为cuBLASLt。旧特化代码在[归档](../archive/sw_specializations/README.md)，不参加生产构建或注册。
+`SWPipeline` 保留通用 padded Hopper 和零 workspace 回退；`SWTuned` 在预算内按实际完整调用调优。BF16/FP16 至多 10 项（9 项统一模板配置 + 零 workspace 回退），当前FP32至多25项（4项零workspace + 21项packed模板）。默认Auto/Dense仍为cuBLASLt。旧特化代码在[归档](../archive/sw_specializations/README.md)，不参加生产构建或注册。
+
+Tensor Core 的参数注册表在 [sw_hopper.h](sw/hopper/sw_hopper.h)，统一算法在 [sw_hopper.cu](sw/hopper/sw_hopper.cu)；详见 [模板说明](../docs/tensorcore_template.md)。
 
 ## 当前 FP32 默认候选池 — iteration209
 

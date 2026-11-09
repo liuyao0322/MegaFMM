@@ -1,5 +1,6 @@
 #include "megafmm/gemm.h"
 #include "sw_fp32_batch.h"
+#include "sw_hopper.h"
 #include <cuda_bf16.h>
 #include <cuda_fp16.h>
 #include <algorithm>
@@ -46,8 +47,8 @@ template<class T>void exercise(megafmm::DType dtype,int m,int n,int k,bool tuned
   if(zero_budget)require(plan->workspace_bytes()==0,"fallback allocated workspace");
   if(tuned) {
     const auto& candidates=plan->sw_tuning_results();
-    require(!candidates.empty() && candidates.size()<=(dtype==DType::FP32?4u+detail::sw_fp32_batch::configurations.size():2u),"specialization pool grew");
-    for(const auto& c:candidates)require(c.id==-1 || c.id==0 || c.id==9000016 || c.id==9000032 ||
+    require(!candidates.empty() && candidates.size()<=(dtype==DType::FP32?4u+detail::sw_fp32_batch::configurations.size():1u+detail::sw_hopper::configuration_count),"specialization pool grew");
+    for(const auto& c:candidates)require(c.id==-1 || (dtype!=DType::FP32 && c.id>=0 && c.id<detail::sw_hopper::configuration_count) || c.id==9000016 || c.id==9000032 ||
       c.id==9100016 || c.id==9100032 ||
       (c.id>=9500000 && c.id<9500000+int(detail::sw_fp32_batch::configurations.size())),"size-specific candidate registered");
   }

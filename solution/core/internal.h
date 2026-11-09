@@ -9,7 +9,7 @@ void run_sw_hopper(const Problem& p,const void* A,const void* B,float* D,
                    void* workspace,cudaStream_t stream);
 const char* sw_hopper_config(const Problem& p);
 // Metadata shared by the small general-purpose SW candidate pool.
-struct SWConfig {int id, n, bk, stages, pack_cap, raster; bool padded;};
+struct SWConfig {int id, n, bk, stages, pack_cap, raster; bool padded; int groups=1;};
 struct SWResources {size_t shared;int registers,resident;};
 void run_sw_fp32(const Problem& p,const float* A,const float* B,const float* C,
                  float* D,cudaStream_t stream,int bk=16);

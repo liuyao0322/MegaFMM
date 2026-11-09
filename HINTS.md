@@ -45,3 +45,7 @@
 - 冻结 `archive/sw_specializations/solution/sw/sw1024.cu`（来自 `79dad0b:solution/sw_pipeline.cu`），SHA256 `ebc37e9dd171dd5855cdaed91fbb030d250c052a4c459746dd33b82cc634264b`，禁止修改。历史参数化须先证明 generated1024 等价，再比较 2048；不能从归档推断恢复授权。
 - SubCuber 仅源码审阅；其 FP16 输出和测量合同不同，无本地同合同 H100 证书，见 `research/subcuber_reference_20261018/REVIEW.md`。
 - 旧进展逐次轮询、完整候选表和研究负结果在原始 Git blob/研究目录；以后只向本文件维护最新交接与长期约束，逐轮数据放 ITERATIONS 和 study artifacts。
+
+## Tensor Core template recovery (2026-10-27)
+
+User requests recovering the historical high-performance Tensor Core SW kernels as one configurable C++ kernel template, analogous to FP32, rather than separate shape-specific implementations. Preserve native BF16/FP16 operands, the original seven products, original-input error reporting, full-call timing and a bounded measured configuration registry. Work in an isolated worktree; preserve the main worktree's pre-existing deletion of sw_pipeline.cu. Historical evidence and the current baseline are in results/sw_hopper_20261027_203658 in the original workspace.

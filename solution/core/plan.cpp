@@ -448,9 +448,9 @@ std::unique_ptr<Plan> create_plan(Problem p, Policy policy) {
       SWCandidateResult r;r.id=c.id;r.config=name;r.workspace_bytes=bytes;r.shared_bytes=resource.shared;
       r.registers_per_thread=resource.registers;r.resident_ctas=resource.resident;
       const auto align=[](int64_t value,int multiple){return (value+multiple-1)/multiple*multiple;};
-      int64_t mh=c.padded?align((p.m+1)/2,c.n):p.m/2,nh=c.padded?align((p.n+1)/2,64):p.n/2,kh=c.padded?align((p.k+1)/2,c.bk):p.k/2;
+      int64_t mh=c.padded?align((p.m+1)/2,c.n):p.m/2,nh=c.padded?align((p.n+1)/2,64*c.groups):p.n/2,kh=c.padded?align((p.k+1)/2,c.bk):p.k/2;
       r.physical_work_ratio=7.0*mh*nh*kh/(double(p.m)*p.n*p.k);
-      const double ctas=c.id==-1?double(mh/c.n)*((nh+15)/16):double(mh/c.n)*(nh/64);
+      const double ctas=c.id==-1?double(mh/c.n)*((nh+15)/16):double((mh+c.n-1)/c.n)*((nh+64*c.groups-1)/(64*c.groups));
       const double capacity=prop.multiProcessorCount*resource.resident;
       const double wave_eff=ctas/(std::ceil(ctas/capacity)*capacity);
       // Ranking heuristic, not a latency claim: actual padded work, wave fill,

@@ -52,7 +52,10 @@ megafmm_executable(test_correctness tests/test_correctness.cu)
 megafmm_executable(test_tuning_precision tests/test_tuning_precision.cu)
 megafmm_executable(test_sw_paths tests/test_sw_paths.cu)
 
+megafmm_executable(test_tensorcore_configs tests/test_tensorcore_configs.cu)
+
 enable_testing()
+add_test(NAME tensorcore_configurations COMMAND test_tensorcore_configs)
 add_test(NAME gpu_correctness COMMAND test_correctness)
 add_test(NAME tuned_correctness COMMAND test_correctness --tuned)
 add_test(NAME tuning_precision_guard COMMAND test_tuning_precision)

@@ -102,7 +102,7 @@ megafmm::run(*plan, A, B, nullptr, D, nullptr, stream);
 
 FP32 固定 SW 使用 FP32 变换、SIMT 叶乘法与重构，零 global workspace；兼容绑定走双槽 TMA，其他走同步 fallback。固定 TMA 条件：非转置、M/N/K≤32768、N/K 为 8 倍数、A/B leading dimension 为 4 倍数、指针 16B 对齐；M 可为奇数，实际路径由 `load=tma/synchronous` 报告。
 
-FP32 SWTuned 还测量 materialized/direct-B/fused 等通用模板，包含 pack、七叶和重构；cooperative 路由需实际驻留及绑定检查，否则使用普通 launch fallback。候选池和 workspace 以 [注册表](solution/sw/fp32/sw_fp32_batch.h) 与 Plan/API 为准，不能沿用旧六模板或固定七平面公式。BF16/FP16 对合格绑定使用统一 padded Hopper（64×64、BK128、4 stages），其余走零 workspace 通用 SW。
+FP32 SWTuned 还测量 materialized/direct-B/fused 等通用模板，包含 pack、七叶和重构；cooperative 路由需实际驻留及绑定检查，否则使用普通 launch fallback。候选池和 workspace 以 [注册表](solution/sw/fp32/sw_fp32_batch.h) 与 Plan/API 为准，不能沿用旧六模板或固定七平面公式。BF16/FP16 的 `SWTuned` 使用统一 Hopper 模板的 9 项参数配置，涵盖原生输入、padding、短 K 流水和双 consumer warp group；按完整调用实测选择。`SWPipeline` 仍使用通用 padded 配置，其余绑定走零 workspace 通用 SW。模板参数、调用链与验证见 [Tensor Core 模板说明](docs/tensorcore_template.md)。
 
 参考为已舍入原始输入的普通 FP64 GEMM。gate 为 `eF_SW <= 3*eF_dense + floor`，BF16/FP16/FP32 floor=`1e-3/1e-4/1e-6`，逐 fresh trial 检查且无 nonfinite。BF16/FP16 默认 SW 调优将旧 gate 作报告项，strict 可显式要求；FP32 保留原 gate。原生 BF16/FP16 仍有广泛精度失败；逐位正确、数值合格、应用质量和速度分别报告，Auto 不自动改用 SW。
 
